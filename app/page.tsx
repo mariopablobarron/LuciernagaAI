@@ -52,8 +52,8 @@ export default function Home() {
     setError(null);
 
     try {
-      console.log("[FRONTEND] 🌐 POST /api/chat");
-      const res = await fetch("/api/chat", {
+      console.log("[FRONTEND] 🌐 POST /api/chat-direct");
+      const res = await fetch("/api/chat-direct", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

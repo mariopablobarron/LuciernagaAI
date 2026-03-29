@@ -11,3 +11,42 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model Conversation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  messages  Json     @default("[]")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lastSeen  DateTime @default(now())
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  content        String
+  createdAt      DateTime @default(now())
+}
+
+model DailyLog {
+  id        String   @id @default(cuid())
+  userId    String
+  checkIns  Int      @default(0)
+  messagesCount Int  @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Insight {
+  id        String   @id @default(cuid())
+  type      String   // retention, behavior, risk, clarity, engagement
+  title     String
+  content   String
+  action    String
+  priority  String   @default("medium") // low, medium, high
+  createdAt DateTime @default(now())
+}

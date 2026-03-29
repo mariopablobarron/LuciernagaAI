@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateDecision, type Metrics } from "@/lib/decisions";
+import { checkAndAlert } from "@/lib/alerts";
 
 export async function GET() {
   try {
@@ -131,7 +132,10 @@ export async function GET() {
 
     // Generar decisión
     const decision = generateDecision(metrics);
+Activar alertas basadas en métricas críticas
+    await checkAndAlert(metrics);
 
+    // 
     // Guardar en DB
     await prisma.decisionLog.create({
       data: {

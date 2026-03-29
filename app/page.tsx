@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 
+const VERSION = "v3";
+
 interface Message {
   id: string;
   role: "user" | "assistant";
@@ -14,6 +16,10 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    console.log("VERSION ACTUAL:", VERSION);
+  }, []);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -21,8 +27,6 @@ export default function Home() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
-  const sendMessage = async () => {
     if (!input.trim()) return;
 
     const userMessage: Message = {
@@ -78,7 +82,7 @@ export default function Home() {
       {/* Header */}
       <header className="border-b border-blue-100 bg-white/80 backdrop-blur-md">
         <div className="max-w-4xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-blue-900">🧠 Mentor IA</h1>
+          <h1 className="text-3xl font-bold text-blue-900">🧠 Mentor IA {VERSION}</h1>
           <p className="text-sm text-blue-600 mt-1">Verdad sin filtros, dirección clara</p>
         </div>
       </header>

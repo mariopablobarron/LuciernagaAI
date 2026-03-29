@@ -31,8 +31,30 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## 🚀 Flujo de trabajo
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Hacer cambios en código
+2. Ejecutar en terminal:
+   ```bash
+   git add .
+   git commit -m "tu mensaje"
+   git push
+   ```
+3. Coolify desplegará automáticamente
+4. Ver cambios en: https://luciernaga.72.61.195.108.sslip.io/
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔧 Configuración
+
+Copiar `.env.example` a `.env` y agregar tu `OPENROUTER_API_KEY`:
+
+```bash
+cp .env.example .env
+```
+
+## 📦 Build y Deploy
+
+```bash
+npm run build  # Construir para producción
+npm run start  # Ejecutar en producción (puerto 3000)
+npm run dev    # Ejecutar en desarrollo
+```

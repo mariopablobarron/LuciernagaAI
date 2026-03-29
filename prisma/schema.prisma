@@ -13,32 +13,50 @@ datasource db {
 }
 
 model Conversation {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  messages  Json     @default("[]")
+  id             String    @id @default(cuid())
+  userRefId      String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  messages       Json      @default("[]")
+  messageRecords Message[] @relation("ConversationMessages")
+  user           User?     @relation("UserConversations", fields: [userRefId], references: [id], onDelete: SetNull)
+
+  @@index([userRefId])
 }
 
 model User {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  lastSeen  DateTime @default(now())
+  id            String         @id @default(cuid())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  lastSeen      DateTime       @default(now())
+  conversations Conversation[] @relation("UserConversations")
+  messages      Message[]      @relation("UserMessages")
 }
 
 model Message {
-  id             String   @id @default(cuid())
-  conversationId String
-  content        String
-  createdAt      DateTime @default(now())
+  id                String        @id @default(cuid())
+  conversationId    String
+  userRefId         String?
+  conversationRefId String?
+  content           String
+  createdAt         DateTime      @default(now())
+  user              User?         @relation("UserMessages", fields: [userRefId], references: [id], onDelete: SetNull)
+  conversation      Conversation? @relation("ConversationMessages", fields: [conversationRefId], references: [id], onDelete: SetNull)
+
+  @@index([conversationId])
+  @@index([createdAt])
+  @@index([userRefId])
+  @@index([conversationRefId])
 }
 
 model DailyLog {
-  id        String   @id @default(cuid())
-  userId    String
-  checkIns  Int      @default(0)
-  messagesCount Int  @default(0)
-  createdAt DateTime @default(now())
+  id            String   @id @default(cuid())
+  userId        String
+  checkIns      Int      @default(0)
+  messagesCount Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  @@index([userId, createdAt])
 }
 
 model Insight {
@@ -54,8 +72,10 @@ model Insight {
 model UserState {
   id        String   @id @default(cuid())
   userId    String   @unique
-  state     String   // "bloqueado" | "perdido" | "ansioso"
+  state     String   // "neutral" | "bloqueado" | "perdido" | "ansioso"
   updatedAt DateTime @updatedAt
+
+  @@index([state, updatedAt])
 }
 
 model DailyCheckin {
@@ -64,6 +84,8 @@ model DailyCheckin {
   response  String
   mood      String?
   createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
 }
 
 model DecisionLog {
@@ -72,4 +94,6 @@ model DecisionLog {
   value     Float
   decision  String
   createdAt DateTime @default(now())
+
+  @@index([metric, createdAt])
 }

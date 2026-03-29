@@ -9,16 +9,17 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./
 COPY next.config.ts ./
+COPY next-env.d.ts ./
 COPY postcss.config.mjs ./
 COPY eslint.config.mjs ./
+COPY prisma.config.ts ./
 
 # Install dependencies (including devDependencies for build)
 RUN npm ci --prefer-offline --no-audit
 
 # Copiar source code
 COPY prisma ./prisma
-COPY app ./app
-COPY lib ./lib
+COPY src ./src
 COPY public ./public
 
 # Build Next.js app
@@ -40,9 +41,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy package files
 COPY package*.json ./
+COPY next.config.ts ./
 
 # Install ONLY production dependencies
-RUN npm ci --only=production --prefer-offline --no-audit
+RUN npm ci --omit=dev --prefer-offline --no-audit
 
 # Copy built app from builder
 COPY --from=builder /app/.next ./.next

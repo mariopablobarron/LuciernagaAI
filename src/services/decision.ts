@@ -1,0 +1,82 @@
+import { logInfo } from "@/lib/logger";
+import type { UserState } from "@/types/chat";
+
+export interface DecisionMetrics {
+  retentionDay3: number;
+  retentionDay7: number;
+  dropOffPoint: string;
+  checkinDrop: number;
+  dominantState: string;
+}
+
+export interface DecisionResult {
+  decision: string;
+  reason: string;
+  priority: "low" | "medium" | "high";
+  action: string;
+}
+
+function normalizeState(state: string): UserState {
+  if (state === "neutral" || state === "bloqueado" || state === "ansioso" || state === "perdido") {
+    return state;
+  }
+  return "neutral";
+}
+
+export function generateDecision(metrics: DecisionMetrics, userState: string): DecisionResult {
+  const normalizedUserState = normalizeState(userState);
+
+  if (metrics.retentionDay3 < 0.4) {
+    const result: DecisionResult = {
+      decision: "Intervenir onboarding de forma inmediata",
+      reason: `Retention Day 3 crítica (${(metrics.retentionDay3 * 100).toFixed(1)}%)`,
+      priority: "high",
+      action: "Reducir fricción inicial, simplificar primeros 3 pasos y activar seguimiento proactivo.",
+    };
+    logInfo("DECISION", "decision_generated", { trigger: "retentionDay3", result });
+    return result;
+  }
+
+  if (metrics.checkinDrop > 0.6) {
+    const result: DecisionResult = {
+      decision: "Simplificar interacción diaria",
+      reason: `Check-in drop elevado (${(metrics.checkinDrop * 100).toFixed(1)}%)`,
+      priority: "high",
+      action: "Reducir número de preguntas por check-in y ofrecer respuesta guiada con un solo clic.",
+    };
+    logInfo("DECISION", "decision_generated", { trigger: "checkinDrop", result });
+    return result;
+  }
+
+  if (metrics.dominantState === "bloqueado") {
+    const result: DecisionResult = {
+      decision: "Activar estrategia de microacciones",
+      reason: "El estado dominante del sistema es bloqueado",
+      priority: "medium",
+      action: "Forzar respuestas con microacciones de 5-10 minutos y seguimiento al primer paso.",
+    };
+    logInfo("DECISION", "decision_generated", { trigger: "dominantState", result });
+    return result;
+  }
+
+  const stable = metrics.retentionDay3 >= 0.4 && metrics.checkinDrop <= 0.6;
+  if (stable) {
+    const result: DecisionResult = {
+      decision: "Sistema estable",
+      reason: `Métricas dentro de umbral y usuario actual en estado ${normalizedUserState}`,
+      priority: "low",
+      action: "Mantener estrategia actual y optimizar incrementalmente los prompts.",
+    };
+    logInfo("DECISION", "decision_generated", { trigger: "stable", result });
+    return result;
+  }
+
+  const result: DecisionResult = {
+    decision: "Ajuste táctico",
+    reason: "Se detectaron variaciones menores que requieren observación",
+    priority: "medium",
+    action: "Monitorizar cohortes 7 días y re-evaluar reglas en próximo ciclo.",
+  };
+  logInfo("DECISION", "decision_generated", { trigger: "fallback", result });
+  return result;
+}

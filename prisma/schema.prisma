@@ -50,3 +50,26 @@ model Insight {
   priority  String   @default("medium") // low, medium, high
   createdAt DateTime @default(now())
 }
+
+model UserState {
+  id        String   @id @default(cuid())
+  userId    String
+  state     String   // "bloqueado" | "perdido" | "ansioso"
+  updatedAt DateTime @updatedAt
+}
+
+model DailyCheckin {
+  id        String   @id @default(cuid())
+  userId    String
+  response  String
+  mood      String?
+  createdAt DateTime @default(now())
+}
+
+model DecisionLog {
+  id        String   @id @default(cuid())
+  metric    String
+  value     Float
+  decision  String
+  createdAt DateTime @default(now())
+}

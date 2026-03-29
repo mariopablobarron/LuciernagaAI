@@ -7,21 +7,26 @@ export default function Home() {
   const [response, setResponse] = useState("");
 
   const sendMessage = async () => {
+    console.log("📡 Enviando a /api/chat...");
+
     const res = await fetch("/api/chat", {
       method: "POST",
-      body: JSON.stringify({ message: input }),
       headers: {
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({ message: input }),
     });
 
     const data = await res.json();
+
+    console.log("🧠 RESPUESTA REAL:", data);
+
     setResponse(data.reply);
   };
 
   return (
     <main style={{ padding: 20 }}>
-      <h1>Luciernaga AI 🚀</h1>
+      <h1>🔥 VERSION REAL IA</h1>
 
       <input
         value={input}

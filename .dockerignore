@@ -1,0 +1,63 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Node
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Build artifacts
+.next
+dist
+build
+out
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Tests
+coverage
+.jest
+.nyc_output
+
+# Logs
+logs
+*.log
+lerna-debug.log
+
+# Package manager
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Documentation
+README.md
+CONTRIBUTING.md
+LICENSE.md
+
+# Development
+debug-test.sh
+DEBUG_SENIOR.md
+DECISION_ENGINE.md
+CLAUDE.md
+AGENTS.md
+
+# Misc
+.nvmrc
+.npmrc
+.example
+*.md

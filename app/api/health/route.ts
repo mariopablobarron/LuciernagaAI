@@ -9,22 +9,29 @@ export async function GET() {
       hasOpenRouterKey: !!process.env.OPENROUTER_API_KEY,
       hasDatabaseUrl: !!process.env.DATABASE_URL,
       nodeEnv: process.env.NODE_ENV,
+      isProd: process.env.NODE_ENV === "production",
     },
     server: {
       status: "✅ RUNNING",
       version: "v3",
+      uptime: process.uptime(),
+    },
+    dependencies: {
+      openrouter: process.env.OPENROUTER_API_KEY ? "✅" : "⚠️ MISSING",
+      database: process.env.DATABASE_URL ? "✅" : "⏭️ Optional",
     },
   };
 
-  const allGood = 
-    diagnostics.environment.hasOpenRouterKey &&
-    diagnostics.environment.hasDatabaseUrl;
+  // In production, we only require OpenRouter key
+  const isHealthy = process.env.NODE_ENV === "production" 
+    ? !!process.env.OPENROUTER_API_KEY
+    : true;
 
   return NextResponse.json({
     ...diagnostics,
-    ready: allGood,
-    statusCode: allGood ? 200 : 503,
+    ready: isHealthy,
+    statusCode: isHealthy ? 200 : 503,
   }, {
-    status: allGood ? 200 : 503,
+    status: isHealthy ? 200 : 503,
   });
 }

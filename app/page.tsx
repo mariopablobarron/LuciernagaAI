@@ -8,17 +8,21 @@ interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
+  error?: boolean;
 }
 
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [userId] = useState(() => `user_${Date.now()}`);
 
   useEffect(() => {
-    console.log("VERSION ACTUAL:", VERSION);
-  }, []);
+    console.log("[FRONTEND] VERSION:", VERSION);
+    console.log("[FRONTEND] userId:", userId);
+  }, [userId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -27,7 +31,14 @@ export default function Home() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-    if (!input.trim()) return;
+
+  const sendMessage = async () => {
+    if (!input.trim()) {
+      console.warn("[FRONTEND] ⚠️ Input vacío");
+      return;
+    }
+
+    console.log(`[FRONTEND] 📨 Enviando mensaje (${input.length} chars)`);
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -38,31 +49,73 @@ export default function Home() {
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setLoading(true);
+    setError(null);
 
     try {
+      console.log("[FRONTEND] 🌐 POST /api/chat");
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ 
+          message: input,
+          userId
+        }),
       });
 
+      console.log(`[FRONTEND] 📡 Respuesta status: ${res.status}`);
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        const errorMsg = errorData.reply || errorData.error || `Error ${res.status}`;
+        console.error(`[FRONTEND] ❌ Error API: ${errorMsg}`);
+        
+        setError(errorMsg);
+        const errorMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content: `❌ Error: ${errorMsg}`,
+          error: true,
+        };
+        setMessages((prev) => [...prev, errorMessage]);
+        return;
+      }
+
       const data = await res.json();
+      console.log(`[FRONTEND] ✅ Respuesta recibida (${data.reply?.length || 0} chars)`);
+
+      if (!data.reply) {
+        console.error("[FRONTEND] ❌ Reply vacío en respuesta");
+        setError("Empty response from server");
+        const emptyMessage: Message = {
+          id: (Date.now() + 2).toString(),
+          role: "assistant",
+          content: "❌ El servidor no generó una respuesta. Intenta de nuevo.",
+          error: true,
+        };
+        setMessages((prev) => [...prev, emptyMessage]);
+        return;
+      }
 
       const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: (Date.now() + 3).toString(),
         role: "assistant",
-        content: data.reply || "No pude obtener una respuesta.",
+        content: data.reply,
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
-    } catch (error) {
-      console.error("Error:", error);
+      console.log("[FRONTEND] ✨ Mensaje asistente agregado");
+
+    } catch (err: any) {
+      console.error("[FRONTEND] 💥 Error:", err.message);
+      setError(err.message);
+      
       const errorMessage: Message = {
-        id: (Date.now() + 2).toString(),
+        id: (Date.now() + 4).toString(),
         role: "assistant",
-        content: "Error al conectar con el servidor.",
+        content: `❌ Error de conexión: ${err.message || "No se pudo conectar al servidor"}`,
+        error: true,
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
@@ -84,6 +137,11 @@ export default function Home() {
         <div className="max-w-4xl mx-auto px-4 py-6">
           <h1 className="text-3xl font-bold text-blue-900">🧠 Mentor IA {VERSION}</h1>
           <p className="text-sm text-blue-600 mt-1">Verdad sin filtros, dirección clara</p>
+          {error && (
+            <div className="mt-3 p-2 bg-red-100 border border-red-300 rounded text-red-800 text-sm">
+              ⚠️ {error}
+            </div>
+          )}
         </div>
       </header>
 
@@ -110,6 +168,8 @@ export default function Home() {
                   className={`max-w-md lg:max-w-2xl px-4 py-3 rounded-2xl ${
                     msg.role === "user"
                       ? "bg-blue-600 text-white rounded-br-none shadow-lg"
+                      : msg.error
+                      ? "bg-red-50 text-red-900 border border-red-200 rounded-bl-none shadow-md"
                       : "bg-white text-blue-900 border border-blue-100 rounded-bl-none shadow-md"
                   }`}
                 >
@@ -125,7 +185,7 @@ export default function Home() {
             <div className="flex justify-start">
               <div className="bg-white text-blue-900 border border-blue-100 px-4 py-3 rounded-2xl rounded-bl-none shadow-md">
                 <div className="flex items-center space-x-2">
-                  <span className="text-xl">✨</span>
+                  <span className="text-xl animate-spin">⚙️</span>
                   <p className="text-sm">Pensando…</p>
                 </div>
               </div>

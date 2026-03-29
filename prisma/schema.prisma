@@ -53,7 +53,7 @@ model Insight {
 
 model UserState {
   id        String   @id @default(cuid())
-  userId    String
+  userId    String   @unique
   state     String   // "bloqueado" | "perdido" | "ansioso"
   updatedAt DateTime @updatedAt
 }

@@ -93,26 +93,59 @@ Dile explícitamente que no necesita resolver todo hoy, solo dar el primer paso.
 
 export async function POST(req: NextRequest) {
   try {
-    const { message } = await req.json();
+    // 1. PARSE REQUEST
+    console.log("[CHAT] 📨 Petición recibida");
+    const { message, userId } = await req.json();
+    console.log(`[CHAT] userState=${userId}, msgLen=${message?.length || 0}`);
 
-    if (!process.env.OPENROUTER_API_KEY) {
-      return NextResponse.json({ reply: "Falta API KEY" });
+    // 2. VALIDAR INPUT
+    if (!message?.trim() || !userId?.trim()) {
+      console.warn("[CHAT] ⚠️ Input incompleto: message o userId vacíos");
+      return NextResponse.json(
+        { 
+          reply: "Error: message y userId son requeridos",
+          error: "INVALID_INPUT"
+        }, 
+        { status: 400 }
+      );
     }
 
-    // 1. DETECTAR ESTADO
+    // 3. VALIDAR API KEY
+    if (!process.env.OPENROUTER_API_KEY) {
+      console.error("[CHAT] 🔑 OPENROUTER_API_KEY no definida");
+      return NextResponse.json(
+        { 
+          reply: "Error: servidor no configurado (falta API key)",
+          error: "MISSING_API_KEY"
+        },
+        { status: 501 }
+      );
+    }
+
+    // 4. DETECTAR ESTADO
     const userState = detectUserState(message);
+    console.log(`[CHAT] 🎯 Estado detectado: ${userState}`);
 
-    // 2. GUARDAR ESTADO EN DB
-    const sessionId = `session-${Date.now()}`;
-    await prisma.userState.upsert({
-      where: { userId: sessionId },
-      update: { state: userState, updatedAt: new Date() },
-      create: { userId: sessionId, state: userState },
-    });
+    // 5. GUARDAR ESTADO EN DB (CON FALLBACK)
+    try {
+      console.log(`[CHAT] 💾 Guardando UserState en DB...`);
+      await prisma.userState.upsert({
+        where: { userId },
+        update: { state: userState, updatedAt: new Date() },
+        create: { userId, state: userState },
+      });
+      console.log(`[CHAT] ✅ UserState guardado`);
+    } catch (dbError: any) {
+      console.warn(`[CHAT] ⚠️ DB error (no crítico): ${dbError.code || dbError.message}`);
+      // NO fallar aquí - continuar sin persistencia
+    }
 
-    // 3. ADAPTAR RESPUESTA SEGÚN ESTADO
+    // 6. ADAPTAR RESPUESTA SEGÚN ESTADO
     const adaptedPrompt = buildPrompt(userState);
+    console.log(`[CHAT] 🧠 Prompt construido (${adaptedPrompt.length} chars)`);
 
+    // 7. LLAMAR A OPENROUTER
+    console.log(`[CHAT] 🌐 Llamando OpenRouter...`);
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -134,19 +167,72 @@ export async function POST(req: NextRequest) {
       }),
     });
 
-    const data = await response.json();
+    console.log(`[CHAT] 📡 OpenRouter responded with status ${response.status}`);
 
+    // 8. VALIDAR RESPUESTA HTTP ANTES DE PARSE
     if (!response.ok) {
-      console.error(data);
-      return NextResponse.json({ reply: "Error en API externa" });
+      const errorText = await response.text();
+      console.error(`[CHAT] ❌ OpenRouter error: ${response.status} - ${errorText.substring(0, 200)}`);
+      return NextResponse.json(
+        {
+          reply: `Error de API externa (${response.status}). Intenta de nuevo.`,
+          error: "OPENROUTER_ERROR",
+          statusCode: response.status
+        },
+        { status: 502 }
+      );
     }
 
+    // 9. PARSE JSON CON VALIDACIÓN
+    let data;
+    try {
+      data = await response.json();
+      console.log(`[CHAT] ✅ JSON parsed correctamente`);
+    } catch (parseError) {
+      console.error(`[CHAT] ❌ JSON parse error: ${String(parseError)}`);
+      return NextResponse.json(
+        {
+          reply: "Error: respuesta del servidor no válida",
+          error: "JSON_PARSE_ERROR"
+        },
+        { status: 502 }
+      );
+    }
+
+    // 10. VALIDAR ESTRUCTURA DE RESPUESTA
+    const reply = data?.choices?.[0]?.message?.content;
+    if (!reply) {
+      console.error(`[CHAT] ❌ Respuesta sin contenido: ${JSON.stringify(data).substring(0, 200)}`);
+      return NextResponse.json(
+        {
+          reply: "Error: el modelo no generó respuesta",
+          error: "EMPTY_RESPONSE"
+        },
+        { status: 502 }
+      );
+    }
+
+    console.log(`[CHAT] ✨ Respuesta generada (${reply.length} chars)`);
+
+    // 11. RETORNAR ÉXITO
     return NextResponse.json({
-      reply: data?.choices?.[0]?.message?.content || "Sin respuesta",
+      ok: true,
+      reply,
       state: userState,
+      timestamp: new Date().toISOString(),
     });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ reply: "Error interno del servidor" });
+
+  } catch (error: any) {
+    console.error(`[CHAT] 💥 UNHANDLED ERROR: ${error.message}`);
+    console.error(error.stack);
+    
+    return NextResponse.json(
+      {
+        reply: "Error inesperado en el servidor. Por favor, intenta de nuevo.",
+        error: "INTERNAL_ERROR",
+        message: error.message || "Unknown error"
+      },
+      { status: 500 }
+    );
   }
 }

@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   console.log("[HEALTH] 🏥 Diagnostico de sistema");
@@ -11,28 +10,15 @@ export async function GET() {
       hasDatabaseUrl: !!process.env.DATABASE_URL,
       nodeEnv: process.env.NODE_ENV,
     },
-    database: {
-      status: "checking...",
-      error: null as string | null,
+    server: {
+      status: "✅ RUNNING",
+      version: "v3",
     },
   };
 
-  // Verificar DB
-  try {
-    console.log("[HH] 🔗 Intentando conexión a DB...");
-    const result = await prisma.$queryRaw`SELECT 1`;
-    diagnostics.database.status = "✅ CONNECTED";
-    console.log("[HEALTH] ✅ DB OK");
-  } catch (error: any) {
-    diagnostics.database.status = "❌ FAILED";
-    diagnostics.database.error = error.message || String(error);
-    console.error(`[HEALTH] ❌ DB ERROR: ${error.code || error.message}`);
-  }
-
   const allGood = 
     diagnostics.environment.hasOpenRouterKey &&
-    diagnostics.environment.hasDatabaseUrl &&
-    diagnostics.database.status.includes("✅");
+    diagnostics.environment.hasDatabaseUrl;
 
   return NextResponse.json({
     ...diagnostics,

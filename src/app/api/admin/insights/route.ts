@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { clearAdminSessionCookie, resolveAdminAuth } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { generateDecision, type DecisionMetrics } from "@/services/decision";
@@ -59,8 +60,25 @@ function getDecisionMetricForLog(metrics: DecisionMetrics): { metric: string; va
   return { metric: "overall", value: metrics.retentionDay7 };
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const adminAuth = resolveAdminAuth(req);
+    if (!adminAuth.authenticated) {
+      const unauthorized = NextResponse.json(
+        {
+          error: "UNAUTHORIZED_ADMIN",
+          message: "Admin authentication required.",
+        },
+        { status: 401 }
+      );
+
+      if (adminAuth.source === "invalid") {
+        clearAdminSessionCookie(unauthorized);
+      }
+
+      return unauthorized;
+    }
+
     const prisma = getPrismaClient();
 
     const now = new Date();

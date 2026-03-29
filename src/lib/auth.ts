@@ -37,13 +37,20 @@ const USER_ID_PATTERN = /^[a-zA-Z0-9._:-]{3,64}$/;
 function getSessionSecret(): string {
   const authSecret = process.env.AUTH_TOKEN_SECRET?.trim();
   if (authSecret) {
+    logInfo("CHAT", "auth_token_secret_loaded");
     return authSecret;
   }
 
   if (process.env.NODE_ENV === "production") {
+    logError("CHAT", new Error("Missing AUTH_TOKEN_SECRET in production"), {
+      area: "get_session_secret",
+    });
     throw new Error("AUTH_TOKEN_SECRET is required in production");
   }
 
+  logInfo("CHAT", "auth_token_secret_fallback_in_use", {
+    nodeEnv: process.env.NODE_ENV || "development",
+  });
   return (
     process.env.SESSION_SECRET?.trim() ||
     process.env.OPENROUTER_API_KEY?.trim() ||
@@ -96,13 +103,19 @@ function safeEqual(left: string, right: string): boolean {
 }
 
 function verifyToken(token: string): TokenVerificationResult {
+  logInfo("CHAT", "verify_token_started", {
+    hasToken: !!token,
+    tokenLength: token.length,
+  });
   const [payloadEncoded, signature] = token.split(".");
   if (!payloadEncoded || !signature) {
+    logInfo("CHAT", "verify_token_failed_malformed");
     return { kind: "invalid" };
   }
 
   const expectedSignature = signValue(payloadEncoded);
   if (!safeEqual(expectedSignature, signature)) {
+    logInfo("CHAT", "verify_token_failed_signature");
     return { kind: "invalid" };
   }
 
@@ -111,41 +124,65 @@ function verifyToken(token: string): TokenVerificationResult {
     const payload = JSON.parse(decoded) as SessionPayload;
 
     if (!payload?.uid || !payload?.exp || !payload?.iat) {
+      logInfo("CHAT", "verify_token_failed_payload_shape");
       return { kind: "invalid" };
     }
 
     if (!isValidUserId(payload.uid)) {
+      logInfo("CHAT", "verify_token_failed_uid_invalid");
       return { kind: "invalid" };
     }
 
     const now = Math.floor(Date.now() / 1000);
     if (payload.exp <= now) {
+      logInfo("CHAT", "verify_token_expired", {
+        uid: payload.uid,
+        exp: payload.exp,
+        now,
+      });
       return { kind: "expired", payload };
     }
 
+    logInfo("CHAT", "verify_token_success", { uid: payload.uid });
     return { kind: "valid", payload };
   } catch {
+    logInfo("CHAT", "verify_token_failed_parse");
     return { kind: "invalid" };
   }
 }
 
-function getTokenFromRequest(req: NextRequest): string | null {
+function getTokenFromRequest(req: NextRequest): {
+  token: string | null;
+  source: "authorization" | "header" | "cookie" | "none";
+} {
   const authHeader = req.headers.get("authorization") || "";
   if (authHeader.startsWith("Bearer ")) {
-    return authHeader.slice(7).trim();
+    return {
+      token: authHeader.slice(7).trim(),
+      source: "authorization",
+    };
   }
 
   const headerToken = req.headers.get("x-session-token");
   if (headerToken?.trim()) {
-    return headerToken.trim();
+    return {
+      token: headerToken.trim(),
+      source: "header",
+    };
   }
 
   const cookieToken = req.cookies.get(SESSION_COOKIE_NAME)?.value;
   if (cookieToken?.trim()) {
-    return cookieToken.trim();
+    return {
+      token: cookieToken.trim(),
+      source: "cookie",
+    };
   }
 
-  return null;
+  return {
+    token: null,
+    source: "none",
+  };
 }
 
 function buildGeneratedUserId(req: NextRequest): string {
@@ -161,11 +198,19 @@ function buildGeneratedUserId(req: NextRequest): string {
 }
 
 export function resolveIdentity(req: NextRequest): ResolvedIdentity {
-  const requestToken = getTokenFromRequest(req);
+  const requestTokenInfo = getTokenFromRequest(req);
+  const requestToken = requestTokenInfo.token;
+  logInfo("CHAT", "resolve_identity_started", {
+    hasToken: !!requestToken,
+    tokenSource: requestTokenInfo.source,
+  });
 
   if (requestToken) {
     const verified = verifyToken(requestToken);
     if (verified.kind === "valid") {
+      logInfo("CHAT", "resolve_identity_valid_session", {
+        userId: verified.payload.uid,
+      });
       return {
         userId: verified.payload.uid,
         source: "session",
@@ -176,6 +221,9 @@ export function resolveIdentity(req: NextRequest): ResolvedIdentity {
 
     if (verified.kind === "expired") {
       const refreshedToken = issueSessionToken(verified.payload.uid);
+      logInfo("CHAT", "resolve_identity_refreshed_session", {
+        userId: verified.payload.uid,
+      });
       return {
         userId: verified.payload.uid,
         source: "refreshed",
@@ -185,13 +233,18 @@ export function resolveIdentity(req: NextRequest): ResolvedIdentity {
     }
 
     if (verified.kind === "invalid") {
-      logInfo("CHAT", "invalid_session_token");
+      logInfo("CHAT", "resolve_identity_invalid_session_token", {
+        tokenSource: requestTokenInfo.source,
+      });
       throw new InvalidSessionTokenError();
     }
   }
 
   const generatedUserId = buildGeneratedUserId(req);
   const sessionToken = issueSessionToken(generatedUserId);
+  logInfo("CHAT", "resolve_identity_generated_anonymous_user", {
+    userId: generatedUserId,
+  });
 
   return {
     userId: generatedUserId,

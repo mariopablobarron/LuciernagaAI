@@ -1,0 +1,13 @@
+{
+  "extensions.ignoreRecommendations": false,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "eslint.run": "onType",
+  "prettier.requireConfig": true,
+  "errorLens.enabled": true,
+  "thunder-client.saveToWorkspace": true
+}

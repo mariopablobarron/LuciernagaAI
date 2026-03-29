@@ -1,235 +1,317 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useMemo, useState } from "react";
+import Chat, { type ChatMessage } from "@/components/Chat";
+import InsightsPanel from "@/components/InsightsPanel";
+import Sidebar, { type SidebarConversation } from "@/components/Sidebar";
 
-const VERSION = "v3";
-
-interface Message {
+type Conversation = {
   id: string;
-  role: "user" | "assistant";
-  content: string;
-  error?: boolean;
-}
+  title: string;
+  updatedAt: string;
+  messages: ChatMessage[];
+  state: string;
+  insight: string;
+  action: string;
+  alerts: string[];
+};
 
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error && error.message) {
-    return error.message;
+type ChatApiResponse = {
+  success?: boolean;
+  response?: string;
+  state?: string;
+  insight?: string;
+  action?: string;
+  alerts?: string[];
+  error?: string;
+};
+
+function buildStateInsight(state: string): {
+  insight: string;
+  action: string;
+  alerts: string[];
+} {
+  if (state === "bloqueado") {
+    return {
+      insight: "Hay fricción para arrancar. Necesitas reducir el tamaño del siguiente paso.",
+      action: "Haz una microacción de 10 minutos ahora mismo.",
+      alerts: ["Riesgo de parálisis si no se ejecuta una primera acción hoy."],
+    };
   }
-  return "No se pudo conectar al servidor";
+
+  if (state === "ansioso") {
+    return {
+      insight: "Tu energía está dispersa. El foco debe volver a una sola prioridad.",
+      action: "Define una prioridad única y descarta tareas secundarias por hoy.",
+      alerts: ["Evita multitarea. Puede aumentar el bloqueo."],
+    };
+  }
+
+  if (state === "perdido") {
+    return {
+      insight: "Hay falta de claridad en objetivos o siguiente paso.",
+      action: "Escribe un objetivo concreto y un primer paso ejecutable.",
+      alerts: ["Sin dirección clara, la ejecución se vuelve inestable."],
+    };
+  }
+
+  return {
+    insight: "Estado estable. Buen momento para mantener ritmo y consistencia.",
+    action: "Continúa con una acción concreta y medible.",
+    alerts: [],
+  };
 }
 
-export default function Home() {
-  const [messages, setMessages] = useState<Message[]>([]);
+function createConversation(index: number): Conversation {
+  const now = new Date().toISOString();
+  const baseInsight = buildStateInsight("neutral");
+  return {
+    id: `conv_${Date.now()}_${index}`,
+    title: `Conversación ${index}`,
+    updatedAt: now,
+    messages: [],
+    state: "neutral",
+    insight: baseInsight.insight,
+    action: baseInsight.action,
+    alerts: baseInsight.alerts,
+  };
+}
+
+function getDominantState(conversations: Conversation[]): string {
+  const counter = new Map<string, number>();
+  for (const conversation of conversations) {
+    counter.set(conversation.state, (counter.get(conversation.state) || 0) + 1);
+  }
+  let dominant = "neutral";
+  let max = -1;
+  for (const [state, count] of counter.entries()) {
+    if (count > max) {
+      max = count;
+      dominant = state;
+    }
+  }
+  return dominant;
+}
+
+function trimTitle(input: string): string {
+  const normalized = input.trim();
+  if (!normalized) {
+    return "Nueva conversación";
+  }
+  return normalized.length > 34 ? `${normalized.slice(0, 34)}...` : normalized;
+}
+
+export default function HomePage() {
+  const [conversations, setConversations] = useState<Conversation[]>([
+    createConversation(1),
+  ]);
+  const [activeConversationId, setActiveConversationId] = useState(
+    () => conversations[0].id
+  );
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [userId] = useState(() => `user_${Date.now()}`);
 
-  useEffect(() => {
-    console.log("[FRONTEND] VERSION:", VERSION);
-    console.log("[FRONTEND] userId:", userId);
-  }, [userId]);
+  const activeConversation = useMemo(() => {
+    return (
+      conversations.find((conversation) => conversation.id === activeConversationId) ||
+      conversations[0]
+    );
+  }, [activeConversationId, conversations]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const sidebarConversations: SidebarConversation[] = useMemo(() => {
+    return conversations.map((conversation) => ({
+      id: conversation.id,
+      title: conversation.title,
+      updatedAt: conversation.updatedAt,
+      messageCount: conversation.messages.length,
+    }));
+  }, [conversations]);
+
+  const progress = useMemo(() => {
+    const completedActions = conversations.reduce((accumulator, conversation) => {
+      const hasAssistantMessage = conversation.messages.some(
+        (message) => message.role === "assistant" && !message.isError
+      );
+      return hasAssistantMessage ? accumulator + 1 : accumulator;
+    }, 0);
+
+    return {
+      completedActions,
+      totalActions: Math.max(conversations.length, 1),
+      dominantState: getDominantState(conversations),
+    };
+  }, [conversations]);
+
+  const updateActiveConversation = (
+    updater: (conversation: Conversation) => Conversation
+  ) => {
+    setConversations((previous) =>
+      previous.map((conversation) =>
+        conversation.id === activeConversationId
+          ? updater(conversation)
+          : conversation
+      )
+    );
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  const handleNewConversation = () => {
+    const next = createConversation(conversations.length + 1);
+    setConversations((previous) => [next, ...previous]);
+    setActiveConversationId(next.id);
+    setInput("");
+    setError(null);
+  };
 
-  const sendMessage = async () => {
-    if (!input.trim()) {
-      console.warn("[FRONTEND] ⚠️ Input vacío");
+  const handleSelectConversation = (conversationId: string) => {
+    setActiveConversationId(conversationId);
+    setInput("");
+    setError(null);
+  };
+
+  const handleSend = async () => {
+    const trimmed = input.trim();
+    if (!trimmed || loading || !activeConversation) {
       return;
     }
 
-    console.log(`[FRONTEND] 📨 Enviando mensaje (${input.length} chars)`);
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
+    const userMessage: ChatMessage = {
+      id: `user_${Date.now()}`,
       role: "user",
-      content: input,
+      content: trimmed,
     };
 
-    setMessages((prev) => [...prev, userMessage]);
     setInput("");
-    setLoading(true);
     setError(null);
+    setLoading(true);
+
+    updateActiveConversation((conversation) => ({
+      ...conversation,
+      title:
+        conversation.messages.length === 0 ? trimTitle(trimmed) : conversation.title,
+      updatedAt: new Date().toISOString(),
+      messages: [...conversation.messages, userMessage],
+    }));
 
     try {
-      console.log("[FRONTEND] 🌐 POST /api/chat-direct");
-      const res = await fetch("/api/chat-direct", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
-          message: input,
-          userId
-        }),
+        body: JSON.stringify({ message: trimmed }),
       });
 
-      console.log(`[FRONTEND] 📡 Respuesta status: ${res.status}`);
+      const payload = (await response
+        .json()
+        .catch(() => ({}))) as Partial<ChatApiResponse>;
 
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        const errorMsg = errorData.reply || errorData.error || `Error ${res.status}`;
-        console.error(`[FRONTEND] ❌ Error API: ${errorMsg}`);
-        
-        setError(errorMsg);
-        const errorMessage: Message = {
-          id: (Date.now() + 1).toString(),
+      if (!response.ok) {
+        const message = payload.error || payload.response || `Error ${response.status}`;
+        const assistantError: ChatMessage = {
+          id: `assistant_error_${Date.now()}`,
           role: "assistant",
-          content: `❌ Error: ${errorMsg}`,
-          error: true,
+          content: message,
+          isError: true,
         };
-        setMessages((prev) => [...prev, errorMessage]);
+        setError(message);
+        updateActiveConversation((conversation) => ({
+          ...conversation,
+          updatedAt: new Date().toISOString(),
+          messages: [...conversation.messages, assistantError],
+        }));
         return;
       }
 
-      const data = await res.json();
-      console.log(`[FRONTEND] ✅ Respuesta recibida (${data.reply?.length || 0} chars)`);
-
-      if (!data.reply) {
-        console.error("[FRONTEND] ❌ Reply vacío en respuesta");
-        setError("Empty response from server");
-        const emptyMessage: Message = {
-          id: (Date.now() + 2).toString(),
-          role: "assistant",
-          content: "❌ El servidor no generó una respuesta. Intenta de nuevo.",
-          error: true,
-        };
-        setMessages((prev) => [...prev, emptyMessage]);
-        return;
-      }
-
-      const assistantMessage: Message = {
-        id: (Date.now() + 3).toString(),
+      const assistantText =
+        payload.response?.trim() || "No pude generar una respuesta en este momento.";
+      const nextState = payload.state || "neutral";
+      const assistantMessage: ChatMessage = {
+        id: `assistant_${Date.now()}`,
         role: "assistant",
-        content: data.reply,
+        content: assistantText,
       };
 
-      setMessages((prev) => [...prev, assistantMessage]);
-      console.log("[FRONTEND] ✨ Mensaje asistente agregado");
+      const fallbackInsight = buildStateInsight(nextState);
+      const nextInsight = payload.insight || fallbackInsight.insight;
+      const nextAction = payload.action || fallbackInsight.action;
+      const nextAlerts =
+        Array.isArray(payload.alerts) && payload.alerts.length > 0
+          ? payload.alerts
+          : fallbackInsight.alerts;
 
-    } catch (err: unknown) {
-      const errorMessageText = getErrorMessage(err);
-      console.error("[FRONTEND] 💥 Error:", errorMessageText);
-      setError(errorMessageText);
-      
-      const errorMessage: Message = {
-        id: (Date.now() + 4).toString(),
+      updateActiveConversation((conversation) => ({
+        ...conversation,
+        updatedAt: new Date().toISOString(),
+        state: nextState,
+        insight: nextInsight,
+        action: nextAction,
+        alerts: nextAlerts,
+        messages: [...conversation.messages, assistantMessage],
+      }));
+    } catch (requestError: unknown) {
+      const fallbackMessage =
+        requestError instanceof Error && requestError.message
+          ? requestError.message
+          : "No se pudo conectar con el servidor.";
+      const assistantError: ChatMessage = {
+        id: `assistant_network_${Date.now()}`,
         role: "assistant",
-        content: `❌ Error de conexión: ${errorMessageText}`,
-        error: true,
+        content: fallbackMessage,
+        isError: true,
       };
-      setMessages((prev) => [...prev, errorMessage]);
+      setError(fallbackMessage);
+      updateActiveConversation((conversation) => ({
+        ...conversation,
+        updatedAt: new Date().toISOString(),
+        messages: [...conversation.messages, assistantError],
+      }));
     } finally {
       setLoading(false);
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
+  if (!activeConversation) {
+    return null;
+  }
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
-      {/* Header */}
-      <header className="border-b border-blue-100 bg-white/80 backdrop-blur-md">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-blue-900">🧠 Mentor IA {VERSION}</h1>
-          <p className="text-sm text-blue-600 mt-1">Verdad sin filtros, dirección clara</p>
-          {error && (
-            <div className="mt-3 p-2 bg-red-100 border border-red-300 rounded text-red-800 text-sm">
-              ⚠️ {error}
-            </div>
-          )}
-        </div>
-      </header>
-
-      {/* Messages Container */}
-      <main className="flex-1 overflow-y-auto">
-        <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
-          {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center py-20">
-              <div className="text-6xl mb-4">🧠</div>
-              <h2 className="text-2xl font-bold text-blue-900 mb-2">
-                Bienvenido al Mentor IA
-              </h2>
-              <p className="text-blue-600 max-w-md">
-                Cuéntame qué te pasa y te diré la verdad, sin rodeos ni listas de consejos.
-              </p>
-            </div>
-          ) : (
-            messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`max-w-md lg:max-w-2xl px-4 py-3 rounded-2xl ${
-                    msg.role === "user"
-                      ? "bg-blue-600 text-white rounded-br-none shadow-lg"
-                      : msg.error
-                      ? "bg-red-50 text-red-900 border border-red-200 rounded-bl-none shadow-md"
-                      : "bg-white text-blue-900 border border-blue-100 rounded-bl-none shadow-md"
-                  }`}
-                >
-                  <p className="text-sm md:text-base leading-relaxed whitespace-pre-wrap">
-                    {msg.content}
-                  </p>
-                </div>
-              </div>
-            ))
-          )}
-
-          {loading && (
-            <div className="flex justify-start">
-              <div className="bg-white text-blue-900 border border-blue-100 px-4 py-3 rounded-2xl rounded-bl-none shadow-md">
-                <div className="flex items-center space-x-2">
-                  <span className="text-xl animate-spin">⚙️</span>
-                  <p className="text-sm">Pensando…</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div ref={messagesEndRef} />
-        </div>
-      </main>
-
-      {/* Input Area */}
-      <footer className="border-t border-blue-100 bg-white/80 backdrop-blur-md py-4">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="flex gap-3">
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Dime qué te preocupa o qué necesitas entender..."
-              disabled={loading}
-              rows={3}
-              className="flex-1 p-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-blue-50 text-blue-900 placeholder-blue-400 disabled:opacity-50 disabled:bg-gray-100"
+    <div className="h-screen bg-slate-100 text-slate-900">
+      <div className="mx-auto h-full max-w-[1700px] p-4 lg:p-6">
+        <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-12">
+          <div className="min-h-[280px] lg:col-span-3 lg:min-h-0">
+            <Sidebar
+              conversations={sidebarConversations}
+              activeConversationId={activeConversationId}
+              progress={progress}
+              profile={{ name: "Startidea", plan: "Plan Pro" }}
+              onSelectConversation={handleSelectConversation}
+              onNewConversation={handleNewConversation}
             />
-            <button
-              onClick={sendMessage}
-              disabled={loading || !input.trim()}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-semibold flex items-center justify-center whitespace-nowrap h-fit mt-auto shadow-lg hover:shadow-xl"
-            >
-              {loading ? "..." : "Enviar"}
-            </button>
           </div>
-          <p className="text-xs text-blue-500 mt-2">
-            Shift+Enter para nueva línea, Enter para enviar
-          </p>
+
+          <div className="min-h-[460px] lg:col-span-6 lg:min-h-0">
+            <Chat
+              title={activeConversation.title}
+              messages={activeConversation.messages}
+              input={input}
+              loading={loading}
+              error={error}
+              onInputChange={setInput}
+              onSend={handleSend}
+            />
+          </div>
+
+          <div className="min-h-[280px] lg:col-span-3 lg:min-h-0">
+            <InsightsPanel
+              state={activeConversation.state}
+              insight={activeConversation.insight}
+              action={activeConversation.action}
+              alerts={activeConversation.alerts}
+            />
+          </div>
         </div>
-      </footer>
+      </div>
     </div>
   );
 }

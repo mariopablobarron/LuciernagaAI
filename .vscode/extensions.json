@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "Codeium.codeium",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "usernamehw.errorlens",
+    "rangav.vscode-thunder-client",
+    "eamodio.gitlens",
+    "Prisma.prisma"
+  ]
+}

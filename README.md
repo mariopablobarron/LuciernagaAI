@@ -43,6 +43,7 @@ See **[QUICKSTART.md](QUICKSTART.md)** for 5-minute deploy.
 GET  /api/health                 → System health check
 POST /api/chat-direct            → Chat with AI mentor (no DB)
 POST /api/mock-chat              → Test endpoint (mock response)
+GET  /api/admin/insights         → Admin insights (protected)
 GET  /api/*                      → 404 Not Found
 ```
 
@@ -81,6 +82,9 @@ GET  /api/*                      → 404 Not Found
 ```
 OPENROUTER_API_KEY=sk-or-YOUR-KEY   # Get from https://openrouter.ai/keys
 NODE_ENV=production                 # production | development
+AUTH_TOKEN_SECRET=replace-me        # HMAC secret for session tokens
+ADMIN_USERNAME=admin                # Admin login username
+ADMIN_PASSWORD=replace-me           # Admin login password
 ```
 
 ### Optional
@@ -88,6 +92,7 @@ NODE_ENV=production                 # production | development
 DATABASE_URL=postgresql://...       # For persistence (future)
 LOG_LEVEL=info                      # info | debug | error
 PORT=3000                           # Server port (Coolify manages)
+ADMIN_AUTH_SECRET=replace-me        # Optional dedicated secret for admin cookies
 ```
 
 ### Setup
@@ -98,6 +103,13 @@ cp .env.example .env
 # Add your OpenRouter API key
 echo "OPENROUTER_API_KEY=sk-or-YOUR-KEY" >> .env
 ```
+
+### Admin Access
+- ` /admin` y ` /api/admin/*` ahora requieren autenticación admin.
+- En producción define `ADMIN_USERNAME` y `ADMIN_PASSWORD` en Coolify.
+- En desarrollo, si no defines variables, el fallback es:
+  - usuario: `admin`
+  - contraseña: `admin123`
 
 ---
 
@@ -415,4 +427,3 @@ Luciérnaga AI Mentorship Platform
 3. **Iterate prompts** → Based on user responses
 4. **Add database** → PostgreSQL persistence
 5. **Build dashboard** → Admin analytics
-

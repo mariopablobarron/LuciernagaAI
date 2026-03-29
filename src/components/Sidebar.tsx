@@ -1,0 +1,149 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { useMemo, useState } from "react";
+
+export type SidebarConversation = {
+  id: string;
+  title: string;
+  updatedAt: string;
+  messageCount: number;
+};
+
+type SidebarProgress = {
+  completedActions: number;
+  totalActions: number;
+  dominantState: string;
+};
+
+type SidebarProfile = {
+  name: string;
+  plan: string;
+};
+
+type SidebarProps = {
+  conversations: SidebarConversation[];
+  activeConversationId: string;
+  progress: SidebarProgress;
+  profile: SidebarProfile;
+  onSelectConversation: (conversationId: string) => void;
+  onNewConversation: () => void;
+};
+
+function formatRelativeDate(isoDate: string): string {
+  const date = new Date(isoDate);
+  return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  })}`;
+}
+
+export default function Sidebar({
+  conversations,
+  activeConversationId,
+  progress,
+  profile,
+  onSelectConversation,
+  onNewConversation,
+}: SidebarProps) {
+  const [logoSrc, setLogoSrc] = useState("/logo-startidea.png");
+
+  const progressPercent = useMemo(() => {
+    if (progress.totalActions <= 0) {
+      return 0;
+    }
+    return Math.min(
+      100,
+      Math.round((progress.completedActions / progress.totalActions) * 100)
+    );
+  }, [progress.completedActions, progress.totalActions]);
+
+  return (
+    <aside className="h-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <Link href="/" className="mb-6 inline-flex items-center">
+        <Image
+          src={logoSrc}
+          alt="Startidea"
+          width={140}
+          height={40}
+          className="h-8 w-auto sm:h-10"
+          priority
+          onError={() => setLogoSrc("/placeholder.png")}
+        />
+      </Link>
+
+      <button
+        type="button"
+        onClick={onNewConversation}
+        className="mb-4 w-full rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+      >
+        Nueva conversación
+      </button>
+
+      <nav className="mb-4">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+          Conversaciones
+        </p>
+        <ul className="space-y-2">
+          {conversations.map((conversation) => {
+            const isActive = conversation.id === activeConversationId;
+            return (
+              <li key={conversation.id}>
+                <button
+                  type="button"
+                  onClick={() => onSelectConversation(conversation.id)}
+                  className={`w-full rounded-xl border px-3 py-2 text-left transition ${
+                    isActive
+                      ? "border-slate-900 bg-slate-900 text-white"
+                      : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
+                  }`}
+                >
+                  <p className="truncate text-sm font-medium">{conversation.title}</p>
+                  <p
+                    className={`mt-1 text-xs ${
+                      isActive ? "text-slate-200" : "text-slate-500"
+                    }`}
+                  >
+                    {conversation.messageCount} mensajes
+                  </p>
+                  <p
+                    className={`mt-0.5 text-xs ${
+                      isActive ? "text-slate-300" : "text-slate-400"
+                    }`}
+                  >
+                    {formatRelativeDate(conversation.updatedAt)}
+                  </p>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      <section className="mb-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          Progreso
+        </p>
+        <p className="mt-2 text-sm font-semibold text-slate-800">
+          {progress.completedActions}/{progress.totalActions} acciones
+        </p>
+        <div className="mt-2 h-2 rounded-full bg-slate-200">
+          <div
+            className="h-full rounded-full bg-slate-900"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+        <p className="mt-2 text-xs text-slate-600">
+          Estado dominante: <span className="font-medium">{progress.dominantState}</span>
+        </p>
+      </section>
+
+      <section className="rounded-xl border border-slate-200 p-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Perfil</p>
+        <p className="mt-2 text-sm font-semibold text-slate-800">{profile.name}</p>
+        <p className="text-xs text-slate-500">{profile.plan}</p>
+      </section>
+    </aside>
+  );
+}

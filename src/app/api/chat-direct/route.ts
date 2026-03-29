@@ -8,6 +8,7 @@ import {
 import { detectUserState } from "@/services/state";
 import { generateMentorReply } from "@/services/ai";
 import { logError, logInfo } from "@/lib/logger";
+import type { UserState } from "@/types/chat";
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error && error.message) {
@@ -16,38 +17,121 @@ function getErrorMessage(error: unknown): string {
   return "Unknown error";
 }
 
+function hasIncomingToken(req: NextRequest): boolean {
+  const hasBearer = (req.headers.get("authorization") || "").startsWith("Bearer ");
+  const hasHeaderToken = !!req.headers.get("x-session-token")?.trim();
+  const hasCookieToken = !!req.cookies.get("mw_session")?.value?.trim();
+  return hasBearer || hasHeaderToken || hasCookieToken;
+}
+
+function buildErrorResponse(
+  message: string,
+  status: number,
+  state: UserState = "neutral",
+  code?: string,
+  details?: string
+): NextResponse {
+  return NextResponse.json(
+    {
+      success: false,
+      error: message,
+      code,
+      details,
+      reply: message,
+      state,
+    },
+    { status }
+  );
+}
+
 export async function POST(req: NextRequest) {
   try {
-    logInfo("CHAT", "chat_direct_request_received");
+    logInfo("CHAT", "request received", {
+      method: req.method,
+      path: req.nextUrl.pathname,
+      hasToken: hasIncomingToken(req),
+    });
 
-    const body = (await req.json()) as { message?: string; userId?: string };
+    let body: { message?: string; userId?: string };
+    try {
+      body = (await req.json()) as { message?: string; userId?: string };
+    } catch (parseError: unknown) {
+      logError("CHAT", parseError, { area: "parse_chat_direct_body" });
+      return buildErrorResponse("Body inválido en la solicitud", 400, "neutral", "INVALID_BODY");
+    }
+
+    logInfo("CHAT", "request body parsed", {
+      hasMessage: !!body.message,
+      messageLength: body.message?.length ?? 0,
+      providedUserId: body.userId ?? null,
+    });
+
     const message = body.message?.trim() ?? "";
     const identity = resolveIdentity(req);
+    logInfo("CHAT", "identity resolved", {
+      userId: identity.userId,
+      source: identity.source,
+      shouldSetCookie: identity.shouldSetCookie,
+      hasToken: hasIncomingToken(req),
+    });
 
     if (!message) {
       logInfo("CHAT", "chat_direct_invalid_input", {
         hasMessage: !!message,
       });
-      return NextResponse.json(
-        { reply: "Necesito que me cuentes qué te pasa", error: "EMPTY_INPUT" },
-        { status: 400 }
+      return buildErrorResponse(
+        "Necesito que me cuentes qué te pasa",
+        400,
+        "neutral",
+        "EMPTY_INPUT"
       );
     }
 
     // Detectar estado
     const state = detectUserState(message);
-    logInfo("CHAT", "chat_direct_state_detected", { state });
+    logInfo("STATE", "state_detected", {
+      userId: identity.userId,
+      state,
+      messageLength: message.length,
+    });
 
+    if (!process.env.OPENROUTER_API_KEY?.trim()) {
+      logError("AI", new Error("Missing OPENROUTER_API_KEY"), { route: "/api/chat-direct" });
+      return buildErrorResponse(
+        "Error de configuración del servidor",
+        500,
+        state,
+        "MISSING_OPENROUTER_API_KEY"
+      );
+    }
+
+    logInfo("AI", "openrouter_call_requested", {
+      userId: identity.userId,
+      state,
+      messageLength: message.length,
+    });
     const aiResult = await generateMentorReply({
       message,
       state,
       profile: "direct",
     });
-    logInfo("CHAT", "chat_direct_ai_result", {
+    logInfo("AI", "openrouter_call_completed", {
+      userId: identity.userId,
+      state,
       fallback: aiResult.fallback,
+      errorType: aiResult.errorType ?? null,
+      errorMessage: aiResult.errorMessage ?? null,
     });
 
+    if (aiResult.fallback && aiResult.errorType === "provider_failure") {
+      logError("AI", new Error(aiResult.errorMessage || "Provider failure"), {
+        route: "/api/chat-direct",
+        state,
+      });
+    }
+
     const response = NextResponse.json({
+      success: true,
       ok: true,
       reply: aiResult.reply,
       state,
@@ -61,26 +145,30 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (error: unknown) {
     if (error instanceof InvalidSessionTokenError) {
-      const unauthorized = NextResponse.json(
-        {
-          reply: "Sesión inválida. Solicita un nuevo token.",
-          error: "INVALID_SESSION_TOKEN",
-        },
-        { status: 401 }
+      const unauthorized = buildErrorResponse(
+        "Token inválido o expirado",
+        401,
+        "neutral",
+        "INVALID_SESSION_TOKEN"
       );
       clearSessionCookie(unauthorized);
       return unauthorized;
     }
 
-    const errorMessage = getErrorMessage(error);
-    logError("CHAT", new Error(errorMessage), { route: "chat-direct" });
-    return NextResponse.json(
-      {
-        reply: "Error interno. Por favor intenta de nuevo.",
-        error: "INTERNAL_ERROR",
-        details: errorMessage,
-      },
-      { status: 500 }
+    const rawMessage = getErrorMessage(error);
+    logError("CHAT", error, { route: "chat-direct", rawMessage });
+    const clearMessage = rawMessage.includes("OPENROUTER_API_KEY")
+      ? "Error de configuración del servidor"
+      : rawMessage.toLowerCase().includes("openrouter")
+        ? "Fallo en proveedor de IA"
+        : "Error interno del servidor";
+
+    return buildErrorResponse(
+      clearMessage,
+      500,
+      "neutral",
+      "INTERNAL_ERROR",
+      rawMessage
     );
   }
 }

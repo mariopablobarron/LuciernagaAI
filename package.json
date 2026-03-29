@@ -15,6 +15,8 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@blocknote/mantine": "^0.47.3",
+    "@blocknote/react": "^0.47.3",
     "@prisma/client": "^7.6.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

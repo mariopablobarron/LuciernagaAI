@@ -5,9 +5,13 @@ import { useState } from "react";
 export default function Home() {
   const [input, setInput] = useState("");
   const [response, setResponse] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const sendMessage = async () => {
-    console.log("📡 Enviando a /api/chat...");
+    if (!input) return;
+
+    setLoading(true);
+    setResponse("");
 
     const res = await fetch("/api/chat", {
       method: "POST",
@@ -19,27 +23,34 @@ export default function Home() {
 
     const data = await res.json();
 
-    console.log("🧠 RESPUESTA REAL:", data);
-
     setResponse(data.reply);
+    setLoading(false);
   };
 
   return (
-    <main style={{ padding: 20 }}>
-      <h1>🔥 VERSION REAL IA</h1>
+    <main style={{ padding: 20, maxWidth: 600, margin: "0 auto" }}>
+      <h1>🧠 Mentor IA v2</h1>
 
-      <input
+      <textarea
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        placeholder="Escribe aquí..."
-        style={{ padding: 10, width: "100%", marginBottom: 10 }}
+        placeholder="Cuéntame qué te pasa..."
+        style={{
+          width: "100%",
+          padding: 10,
+          minHeight: 100,
+          marginBottom: 10,
+        }}
       />
 
-      <button onClick={sendMessage}>Enviar</button>
+      <button onClick={sendMessage} disabled={loading}>
+        {loading ? "Pensando..." : "Hablar"}
+      </button>
 
-      <p style={{ marginTop: 20 }}>
-        <strong>Respuesta:</strong> {response}
-      </p>
+      <div style={{ marginTop: 20 }}>
+        <strong>Respuesta:</strong>
+        <p>{response}</p>
+      </div>
     </main>
   );
 }

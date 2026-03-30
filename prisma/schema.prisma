@@ -72,13 +72,17 @@ model Insight {
 }
 
 model UserState {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  state     String   // "neutral" | "bloqueado" | "perdido" | "ansioso"
-  mood      String?
-  updatedAt DateTime @updatedAt
+  id               String    @id @default(cuid())
+  userId           String    @unique
+  state            String    // "neutral" | "bloqueado" | "perdido" | "ansioso"
+  mood             String?
+  crisisActive     Boolean   @default(false)
+  crisisActivatedAt DateTime?
+  crisisActiveUntil DateTime?
+  updatedAt        DateTime  @updatedAt
 
   @@index([state, updatedAt])
+  @@index([crisisActive, crisisActiveUntil])
 }
 
 model DailyCheckin {

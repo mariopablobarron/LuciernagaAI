@@ -35,10 +35,32 @@ interface AdminInsightsResponse {
   };
   alerts: AlertItem[];
   insights: Insight[];
+  crisis: {
+    last24h: {
+      total: number;
+      high: number;
+      critical: number;
+    };
+    latestEvents: Array<{
+      userId: string;
+      level: "high" | "critical";
+      message: string;
+      createdAt: string;
+    }>;
+  };
 }
 
 function formatPercent(value: number): string {
   return `${(value * 100).toFixed(1)}%`;
+}
+
+function formatDateTime(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleString();
 }
 
 export default function AdminPage() {
@@ -159,6 +181,61 @@ export default function AdminPage() {
               <div key={idx} className="p-4 bg-white rounded shadow border-l-4 border-red-500">
                 <h3 className="font-bold text-red-900">{alert.title}</h3>
                 <p className="text-sm text-gray-700 mt-1">{alert.message}</p>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <h2 className="text-lg font-bold">Crisis (últimas 24h)</h2>
+
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+          <div className="rounded bg-white p-4 shadow">
+            <p className="text-sm text-gray-600">Total eventos</p>
+            <p className="text-2xl font-bold text-slate-900">{data.crisis.last24h.total}</p>
+          </div>
+          <div className="rounded bg-white p-4 shadow">
+            <p className="text-sm text-gray-600">High</p>
+            <p className="text-2xl font-bold text-orange-600">{data.crisis.last24h.high}</p>
+          </div>
+          <div className="rounded bg-white p-4 shadow">
+            <p className="text-sm text-gray-600">Critical</p>
+            <p className="text-2xl font-bold text-red-700">{data.crisis.last24h.critical}</p>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          {data.crisis.latestEvents.length === 0 ? (
+            <div className="rounded bg-white p-4 text-sm text-gray-600 shadow">
+              Sin eventos high/critical en las últimas 24h.
+            </div>
+          ) : (
+            data.crisis.latestEvents.map((event, idx) => (
+              <div
+                key={`${event.userId}-${event.createdAt}-${idx}`}
+                className={`rounded border-l-4 bg-white p-4 shadow ${
+                  event.level === "critical"
+                    ? "border-red-600 bg-red-50/40"
+                    : "border-orange-500 bg-orange-50/40"
+                }`}
+              >
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <span className="rounded bg-slate-100 px-2 py-1 font-mono text-slate-700">
+                    {event.userId}
+                  </span>
+                  <span
+                    className={`rounded px-2 py-1 font-semibold uppercase ${
+                      event.level === "critical"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-orange-100 text-orange-800"
+                    }`}
+                  >
+                    {event.level}
+                  </span>
+                  <span className="text-slate-500">{formatDateTime(event.createdAt)}</span>
+                </div>
+                <p className="mt-2 text-sm text-slate-800">{event.message}</p>
               </div>
             ))
           )}

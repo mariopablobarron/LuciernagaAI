@@ -30,7 +30,10 @@ jest.mock("@/services/goals", () => ({
 }));
 
 jest.mock("@/services/state", () => ({
+  activateUserCrisis: jest.fn(),
+  clearUserCrisis: jest.fn(),
   detectUserState: jest.fn(),
+  getUserCrisisStatus: jest.fn(),
   updateUserState: jest.fn(),
 }));
 
@@ -54,7 +57,13 @@ import {
   saveConversationMessage,
 } from "@/services/conversation";
 import { createGoalFromIntentMessage, getActiveGoalForUser } from "@/services/goals";
-import { detectUserState, updateUserState } from "@/services/state";
+import {
+  activateUserCrisis,
+  clearUserCrisis,
+  detectUserState,
+  getUserCrisisStatus,
+  updateUserState,
+} from "@/services/state";
 import { generateAIResponse } from "@/services/ai";
 import { detectRiskLevel, getCrisisResponse, registerCrisisEvent } from "@/services/risk";
 
@@ -64,11 +73,18 @@ describe("POST /api/chat", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     process.env.OPENROUTER_API_KEY = "test-key";
+    (activateUserCrisis as jest.Mock).mockResolvedValue(new Date("2026-03-30T12:00:00.000Z"));
+    (clearUserCrisis as jest.Mock).mockResolvedValue(undefined);
     (detectRiskLevel as jest.Mock).mockReturnValue("low");
     (getCrisisResponse as jest.Mock).mockReturnValue({
       response: "Estoy contigo. Vamos paso a paso.",
       resources: [],
       shouldEscalate: false,
+    });
+    (getUserCrisisStatus as jest.Mock).mockResolvedValue({
+      active: false,
+      expiresAt: null,
+      reason: "none",
     });
   });
 
@@ -168,7 +184,63 @@ describe("POST /api/chat", () => {
     expect(body.response).toContain("seguridad");
     expect(generateAIResponse).not.toHaveBeenCalled();
     expect(createGoalFromIntentMessage).not.toHaveBeenCalled();
+    expect(activateUserCrisis).toHaveBeenCalledTimes(1);
     expect(registerCrisisEvent).toHaveBeenCalledTimes(1);
+  });
+
+  it("mantiene modo contención mientras crisisActive esté vigente", async () => {
+    (resolveIdentity as jest.Mock).mockReturnValue({
+      userId: "usr_test_1",
+      source: "session",
+      sessionToken: "token",
+      shouldSetCookie: false,
+    });
+    (checkRateLimit as jest.Mock).mockReturnValue({
+      allowed: true,
+      retryAfterSeconds: 0,
+      limit: 10,
+      remaining: 9,
+    });
+    (ensureUserSession as jest.Mock).mockResolvedValue(undefined);
+    (detectUserState as jest.Mock).mockReturnValue("ansioso");
+    (detectRiskLevel as jest.Mock).mockReturnValue("low");
+    (updateUserState as jest.Mock).mockResolvedValue(undefined);
+    (getUserCrisisStatus as jest.Mock).mockResolvedValue({
+      active: true,
+      expiresAt: "2026-03-30T12:00:00.000Z",
+      reason: "active",
+    });
+    (resolveConversationForUser as jest.Mock).mockResolvedValue({
+      id: "conv_crisis_2",
+      title: "Nueva conversación",
+    });
+    (saveConversationMessage as jest.Mock).mockResolvedValue(undefined);
+    (getCrisisResponse as jest.Mock).mockReturnValue({
+      response: "Vamos a centrarnos en tu seguridad y apoyo humano ahora mismo.",
+      resources: ["Llama al 112 o 911"],
+      shouldEscalate: true,
+    });
+    (registerCrisisEvent as jest.Mock).mockResolvedValue(undefined);
+
+    const req = new NextRequest("http://localhost/api/chat", {
+      method: "POST",
+      body: JSON.stringify({ message: "hoy estoy regular" }),
+      headers: {
+        "content-type": "application/json",
+      },
+    });
+
+    const response = await POST(req);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(body.crisis).toBe(true);
+    expect(body.crisisActive).toBe(true);
+    expect(body.riskLevel).toBe("high");
+    expect(body.detectedRiskLevel).toBe("low");
+    expect(generateAIResponse).not.toHaveBeenCalled();
+    expect(createGoalFromIntentMessage).not.toHaveBeenCalled();
   });
 
   it("retorna 401 cuando no hay sesión válida", async () => {

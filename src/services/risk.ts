@@ -23,14 +23,33 @@ export type CrisisStats = {
   latestEventAt: string | null;
 };
 
+export type CrisisEventListItem = {
+  userId: string;
+  level: "high" | "critical";
+  message: string;
+  createdAt: string;
+};
+
 type CrisisEventDelegate = {
   create: (args: { data: CrisisEventPayload }) => Promise<unknown>;
   findMany: (args: {
     where: { createdAt: { gte: Date }; level?: { in: RiskLevel[] } };
-    select: { level: true; createdAt: true };
+    select: {
+      level?: true;
+      createdAt?: true;
+      userId?: true;
+      message?: true;
+    };
     orderBy: { createdAt: "desc" };
     take: number;
-  }) => Promise<Array<{ level: string; createdAt: Date }>>;
+  }) => Promise<
+    Array<{
+      level: string;
+      createdAt: Date;
+      userId?: string;
+      message?: string;
+    }>
+  >;
 };
 
 const CRITICAL_PATTERNS: RegExp[] = [
@@ -110,7 +129,7 @@ export function getCrisisResponse(level: RiskLevel): CrisisResponse {
   if (level === "critical") {
     return {
       response:
-        "Gracias por decirlo. Tu seguridad es lo primero ahora. No puedo ayudarte con daño, pero sí acompañarte para buscar ayuda inmediata. Si hay riesgo ahora mismo, llama a emergencias y contacta a una persona de confianza en este momento.",
+        "Lo que estás sintiendo es muy importante y no voy a juzgarte por ello. No tienes que pasar por esto solo: me quedo contigo mientras damos un paso seguro ahora. En este momento, habla con una persona real de confianza o con un profesional de urgencias para que te acompañe directamente. Si hay riesgo inmediato, llama al 112/911 ahora mismo, y usa 024 (España) o 988 (EE.UU.) para apoyo continuo.",
       resources,
       shouldEscalate: true,
     };
@@ -119,7 +138,7 @@ export function getCrisisResponse(level: RiskLevel): CrisisResponse {
   if (level === "high") {
     return {
       response:
-        "Siento que estés pasando por esto. Ahora lo más importante es que no estés solo con esta carga. Te recomiendo pedir apoyo inmediato a alguien de confianza y contactar una línea de ayuda hoy mismo.",
+        "Lo que estás viviendo pesa mucho, y tiene sentido que te sientas así. No estás solo en esto: podemos priorizar tu seguridad y apoyo ahora mismo. Te propongo hablar hoy con alguien real de confianza y pedir ayuda profesional cuanto antes para no cargar con todo a solas. Si notas que el riesgo sube, llama al 112/911 y usa 024 (España) o 988 (EE.UU.).",
       resources,
       shouldEscalate: true,
     };
@@ -128,7 +147,7 @@ export function getCrisisResponse(level: RiskLevel): CrisisResponse {
   if (level === "medium") {
     return {
       response:
-        "Veo que estás en un momento difícil. Vamos a ir paso a paso y, si empeora, priorizamos pedir apoyo humano inmediato.",
+        "Lo que te pasa importa y merece cuidado. No tienes que sostener esto en soledad; estoy aquí para acompañarte paso a paso. Si en algún momento se vuelve demasiado intenso, busca apoyo de una persona real de confianza. Si hay urgencia, llama al 112/911 y utiliza 024 (España) o 988 (EE.UU.).",
       resources: [],
       shouldEscalate: false,
     };
@@ -219,5 +238,47 @@ export async function getRecentCrisisStats(since: Date): Promise<CrisisStats> {
       critical: 0,
       latestEventAt: null,
     };
+  }
+}
+
+export async function listRecentCrisisEvents(
+  since: Date,
+  take = 20
+): Promise<CrisisEventListItem[]> {
+  try {
+    const crisisEvent = getCrisisEventDelegate();
+    if (!crisisEvent) {
+      return [];
+    }
+
+    const safeTake = Math.max(1, Math.min(100, Math.round(take)));
+    const events = await crisisEvent.findMany({
+      where: {
+        createdAt: { gte: since },
+        level: { in: ["high", "critical"] },
+      },
+      select: {
+        userId: true,
+        level: true,
+        message: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "desc" },
+      take: safeTake,
+    });
+
+    return events
+      .filter((event) => event.level === "high" || event.level === "critical")
+      .map((event) => ({
+        userId: event.userId || "unknown",
+        level: event.level as "high" | "critical",
+        message: event.message || "",
+        createdAt: event.createdAt.toISOString(),
+      }));
+  } catch (error: unknown) {
+    logError("RISK", error, {
+      action: "list_recent_crisis_events_failed",
+    });
+    return [];
   }
 }

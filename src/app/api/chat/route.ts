@@ -21,7 +21,13 @@ import {
   registerCrisisEvent,
   type RiskLevel,
 } from "@/services/risk";
-import { detectUserState, updateUserState } from "@/services/state";
+import {
+  activateUserCrisis,
+  clearUserCrisis,
+  detectUserState,
+  getUserCrisisStatus,
+  updateUserState,
+} from "@/services/state";
 import type { ChatRequestBody, UserState } from "@/types/chat";
 
 function hasIncomingToken(req: NextRequest): boolean {
@@ -74,6 +80,27 @@ function serializeGoal(goal: Awaited<ReturnType<typeof getActiveGoalForUser>>) {
 
 function isCrisisLevel(level: RiskLevel): boolean {
   return level === "high" || level === "critical";
+}
+
+function isCrisisInterventionMessage(message: string): boolean {
+  const normalized = message
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  const interventionSignals = [
+    "ya hable con",
+    "ya pedi ayuda",
+    "ya contacte",
+    "ya llame al 112",
+    "ya llame al 911",
+    "estoy con mi familia",
+    "estoy acompanado",
+    "estoy acompañado",
+    "ya estoy seguro",
+  ];
+
+  return interventionSignals.some((signal) => normalized.includes(signal));
 }
 
 export async function POST(req: NextRequest) {
@@ -145,7 +172,9 @@ export async function POST(req: NextRequest) {
 
     const state = detectUserState(message);
     const riskLevel = detectRiskLevel(message);
-    const crisisMode = isCrisisLevel(riskLevel);
+    let crisisMode = isCrisisLevel(riskLevel);
+    let crisisActiveUntil: string | null = null;
+    let crisisSource: "detected" | "active_state" | "none" = crisisMode ? "detected" : "none";
 
     logInfo("STATE", "state_detected", { userId, state, messageLength: message.length });
     logInfo("RISK", "risk_level_detected", {
@@ -162,6 +191,27 @@ export async function POST(req: NextRequest) {
     try {
       await ensureUserSession(userId);
       await updateUserState(userId, state);
+
+      if (isCrisisInterventionMessage(message)) {
+        await clearUserCrisis(userId);
+        logInfo("RISK", "crisis_intervention_detected", {
+          userId,
+        });
+      }
+
+      const currentCrisisStatus = await getUserCrisisStatus(userId);
+      if (currentCrisisStatus.active) {
+        crisisMode = true;
+        crisisSource = "active_state";
+        crisisActiveUntil = currentCrisisStatus.expiresAt;
+      }
+
+      if (isCrisisLevel(riskLevel)) {
+        const activeUntil = await activateUserCrisis(userId);
+        crisisMode = true;
+        crisisSource = "detected";
+        crisisActiveUntil = activeUntil.toISOString();
+      }
 
       const conversation = await resolveConversationForUser(userId, body.conversationId, message);
       conversationId = conversation.id;
@@ -206,11 +256,12 @@ export async function POST(req: NextRequest) {
     }
 
     if (crisisMode) {
-      const crisisPayload = getCrisisResponse(riskLevel);
+      const containmentLevel: RiskLevel = isCrisisLevel(riskLevel) ? riskLevel : "high";
+      const crisisPayload = getCrisisResponse(containmentLevel);
 
       await registerCrisisEvent({
         userId,
-        level: riskLevel,
+        level: containmentLevel,
         message,
         response: crisisPayload.response,
       });
@@ -243,6 +294,9 @@ export async function POST(req: NextRequest) {
         userId,
         conversationId,
         riskLevel,
+        containmentLevel,
+        crisisSource,
+        crisisActiveUntil,
       });
 
       const crisisResponse = NextResponse.json({
@@ -254,7 +308,10 @@ export async function POST(req: NextRequest) {
         fallback: true,
         persistenceAvailable,
         crisis: true,
-        riskLevel,
+        riskLevel: containmentLevel,
+        detectedRiskLevel: riskLevel,
+        crisisActive: true,
+        crisisActiveUntil,
         alerts: crisisPayload.resources,
       });
 

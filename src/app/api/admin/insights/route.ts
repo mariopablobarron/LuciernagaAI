@@ -4,7 +4,7 @@ import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { generateDecision, type DecisionMetrics } from "@/services/decision";
 import { generateInsights, getInsightConfidence } from "@/services/insights";
-import { getRecentCrisisStats } from "@/services/risk";
+import { getRecentCrisisStats, listRecentCrisisEvents } from "@/services/risk";
 import { getDominantState } from "@/services/state";
 
 export const dynamic = "force-dynamic";
@@ -81,6 +81,15 @@ function smoothRate(numerator: number, denominator: number, prior = 0.5, strengt
   return Math.min(1, Math.max(0, value));
 }
 
+function truncateMessage(message: string, maxLength = 140): string {
+  const normalized = message.trim();
+  if (normalized.length <= maxLength) {
+    return normalized;
+  }
+
+  return `${normalized.slice(0, maxLength - 3)}...`;
+}
+
 export async function GET(req: NextRequest) {
   try {
     const adminAuth = resolveAdminAuth(req);
@@ -103,6 +112,7 @@ export async function GET(req: NextRequest) {
     const prisma = getPrismaClient();
 
     const now = new Date();
+    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
 
@@ -162,6 +172,12 @@ export async function GET(req: NextRequest) {
     const checkinCompletion = smoothRate(totalCheckinsLast7d, expectedCheckins, 0.35, 6);
     const checkinDrop = Math.max(0, 1 - checkinCompletion);
     const crisisStats = await getRecentCrisisStats(sevenDaysAgo);
+    const recentCrisisEvents24h = await listRecentCrisisEvents(oneDayAgo, 25);
+    const crisis24h = {
+      total: recentCrisisEvents24h.length,
+      high: recentCrisisEvents24h.filter((event) => event.level === "high").length,
+      critical: recentCrisisEvents24h.filter((event) => event.level === "critical").length,
+    };
 
     const confidence = getInsightConfidence({
       totalUsers,
@@ -240,6 +256,15 @@ export async function GET(req: NextRequest) {
       },
       alerts,
       insights,
+      crisis: {
+        last24h: crisis24h,
+        latestEvents: recentCrisisEvents24h.map((event) => ({
+          userId: event.userId,
+          level: event.level,
+          message: truncateMessage(event.message),
+          createdAt: event.createdAt,
+        })),
+      },
     });
   } catch (error: unknown) {
     logError("DECISION", error, { route: "/api/admin/insights" });
@@ -260,6 +285,14 @@ export async function GET(req: NextRequest) {
         },
         alerts: [],
         insights: [],
+        crisis: {
+          last24h: {
+            total: 0,
+            high: 0,
+            critical: 0,
+          },
+          latestEvents: [],
+        },
       },
       { status: 500 }
     );

@@ -31,10 +31,7 @@ function truncateText(value: string, maxLength = 140): string {
   return `${normalized.slice(0, maxLength - 3)}...`;
 }
 
-function reserveAutomatedAlert(
-  key: string,
-  cooldownMs = AUTOMATED_ALERT_COOLDOWN_MS
-): boolean {
+function reserveAutomatedAlert(key: string, cooldownMs = AUTOMATED_ALERT_COOLDOWN_MS): boolean {
   const cache = getAutomatedAlertsCache();
   const now = Date.now();
 
@@ -68,20 +65,17 @@ async function sendTelegram(alert: Alert): Promise<void> {
   }`;
 
   try {
-    const response = await fetch(
-      `https://api.telegram.org/bot${botToken}/sendMessage`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: message,
-          parse_mode: "Markdown",
-        }),
-      }
-    );
+    const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        parse_mode: "Markdown",
+      }),
+    });
 
     if (!response.ok) {
       console.error("Telegram error:", await response.text());
@@ -205,7 +199,7 @@ export async function sendCrisisEscalationAlert(params: {
 
 export async function sendAvoidanceEscalationAlert(params: {
   userId: string;
-  type: "postpone" | "refuse";
+  type: "postpone" | "refuse" | "avoidance";
   count: number;
   actionTitle: string;
   goalTitle?: string | null;
@@ -220,7 +214,9 @@ export async function sendAvoidanceEscalationAlert(params: {
       title:
         params.type === "refuse"
           ? "Rechazo explícito de acción clave"
-          : "Evitación repetida de acción pendiente",
+          : params.type === "avoidance"
+            ? "Desvio repetido de accion pendiente"
+            : "Evitación repetida de acción pendiente",
       message:
         `Usuario ${params.userId}. Acción: ${params.actionTitle}. ` +
         `${params.goalTitle ? `Objetivo: ${params.goalTitle}. ` : ""}` +
@@ -245,8 +241,7 @@ export async function checkAndAlert(metrics: {
     await sendAutomatedAlert({
       type: "critical",
       title: "CRISIS: Retención crítica en día 3",
-      message:
-        "Solo el 30% de usuarios vuelven en día 3. Necesitas intervención inmediata.",
+      message: "Solo el 30% de usuarios vuelven en día 3. Necesitas intervención inmediata.",
       metric: "retentionDay3",
       value: metrics.retentionDay3,
     });

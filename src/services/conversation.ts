@@ -1,4 +1,5 @@
 import { getPrismaClient } from "@/db/prisma";
+import { ensureUserAccount } from "@/services/user";
 
 export type ConversationSummary = {
   id: string;
@@ -32,12 +33,7 @@ export function buildConversationTitle(input: string): string {
 }
 
 export async function ensureUserSession(userId: string): Promise<void> {
-  const prisma = getPrismaClient();
-  await prisma.user.upsert({
-    where: { id: userId },
-    create: { id: userId, lastSeen: new Date() },
-    update: { lastSeen: new Date() },
-  });
+  await ensureUserAccount(userId);
 }
 
 export async function createConversationForUser(
@@ -227,4 +223,14 @@ export async function listRecentUserMessagesForUser(
   });
 
   return messages.map((message) => message.content).reverse();
+}
+
+export async function countMessagesForConversation(conversationId: string): Promise<number> {
+  const prisma = getPrismaClient();
+
+  return prisma.message.count({
+    where: {
+      conversationId,
+    },
+  });
 }

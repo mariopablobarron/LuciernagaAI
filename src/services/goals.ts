@@ -8,7 +8,7 @@ export type GoalActionItem = {
   createdAt: Date;
 };
 
-export type AvoidanceType = "postpone" | "refuse";
+export type AvoidanceType = "postpone" | "refuse" | "avoidance";
 
 export type GoalWithProgress = {
   id: string;
@@ -31,6 +31,36 @@ const GOAL_INTENT_PATTERNS: RegExp[] = [
   /\bmi objetivo es\s+(.+)/i,
 ];
 
+const GOAL_INFERENCE_PATTERNS: Array<{
+  pattern: RegExp;
+  buildTitle: (focus: string) => string;
+}> = [
+  {
+    pattern: /\bno s[eé] si\s+(.+)/i,
+    buildTitle: (focus) => `Decidir si ${focus}`,
+  },
+  {
+    pattern: /\b(tengo un problema con|problema con)\s+(.+)/i,
+    buildTitle: (focus) => `Resolver ${focus}`,
+  },
+  {
+    pattern: /\b(me cuesta|me est[aá] costando)\s+(.+)/i,
+    buildTitle: (focus) => `Desbloquear ${focus}`,
+  },
+  {
+    pattern: /\b(estoy bloquead[oa] con|bloquead[oa] con)\s+(.+)/i,
+    buildTitle: (focus) => `Desbloquear ${focus}`,
+  },
+  {
+    pattern: /\b(quiero claridad sobre|necesito claridad sobre)\s+(.+)/i,
+    buildTitle: (focus) => `Ganar claridad sobre ${focus}`,
+  },
+  {
+    pattern: /\b(me preocupa)\s+(.+)/i,
+    buildTitle: (focus) => `Resolver ${focus}`,
+  },
+];
+
 const AVOIDANCE_PATTERNS = [
   "mañana",
   "manana",
@@ -49,6 +79,25 @@ const AVOIDANCE_PATTERNS = [
   "mas tarde",
   "más tarde",
 ];
+
+const SIDESTEP_PATTERNS = [
+  "otra cosa",
+  "otro tema",
+  "cambiemos de tema",
+  "prefiero no pensar en eso",
+  "prefiero no hablar de eso",
+  "dejemos eso",
+  "ya veremos",
+  "da igual",
+  "no quiero entrar ahi",
+  "no quiero entrar ahí",
+];
+
+const RELEVANT_CONVERSATION_PATTERNS = [
+  /\b(no s[eé]|duda|dudas|bloque|ansiedad|problema|me cuesta|no puedo|quiero|necesito|tengo que|debo|decidir|me preocupa)\b/i,
+];
+
+const IRRELEVANT_SHORT_PATTERNS = [/^(hola|buenas|gracias|ok|vale|perfecto|entiendo)$/i];
 
 const COMPLETION_PATTERNS = [
   "ya lo hice",
@@ -92,8 +141,11 @@ export type GoalCoachContext = {
   title: string;
   progress: number;
   pendingActions: string[];
+  activeAction: string | null;
   avoidanceDetected: boolean;
   avoidanceCount: number;
+  unfinishedActionsCount: number;
+  confrontationMode: boolean;
 };
 
 function normalizeText(value: string): string {
@@ -114,6 +166,47 @@ function normalizeGoalTitle(value: string): string {
   return compact.length > 120 ? `${compact.slice(0, 120)}...` : compact;
 }
 
+function cleanGoalFocus(value: string): string {
+  return normalizeGoalTitle(
+    value
+      .replace(/^(que|qué)\s+/i, "")
+      .replace(/^(hacer|resolver|decidir)\s+/i, "")
+      .trim()
+  );
+}
+
+function fallbackGoalTitleFromMessage(message: string): string | null {
+  const cleaned = normalizeGoalTitle(
+    message
+      .replace(/[¿?¡!]/g, "")
+      .replace(
+        /\b(hola|buenas|gracias|por favor|me siento|estoy|ahora mismo|en este momento)\b/gi,
+        ""
+      )
+      .replace(/\s+/g, " ")
+      .trim()
+  );
+
+  if (cleaned.length < 18) {
+    return null;
+  }
+
+  return normalizeGoalTitle(`Aclarar y avanzar con ${cleaned}`);
+}
+
+export function isRelevantConversation(message: string): boolean {
+  const normalized = normalizeText(message);
+  if (normalized.length < 12) {
+    return false;
+  }
+
+  if (IRRELEVANT_SHORT_PATTERNS.some((pattern) => pattern.test(normalized))) {
+    return false;
+  }
+
+  return RELEVANT_CONVERSATION_PATTERNS.some((pattern) => pattern.test(normalized));
+}
+
 export function detectGoalIntent(message: string): string | null {
   for (const pattern of GOAL_INTENT_PATTERNS) {
     const match = message.match(pattern);
@@ -124,7 +217,40 @@ export function detectGoalIntent(message: string): string | null {
       }
     }
   }
-  return null;
+
+  for (const rule of GOAL_INFERENCE_PATTERNS) {
+    const match = message.match(rule.pattern);
+    const rawFocus = match?.[2] ?? match?.[1];
+    if (!rawFocus) {
+      continue;
+    }
+
+    const focus = cleanGoalFocus(rawFocus);
+    if (!focus) {
+      continue;
+    }
+
+    const title = normalizeGoalTitle(rule.buildTitle(focus));
+    if (title) {
+      return title;
+    }
+  }
+
+  if (!isRelevantConversation(message)) {
+    return null;
+  }
+
+  return fallbackGoalTitleFromMessage(message);
+}
+
+export function detectAvoidance(message: string): boolean {
+  const normalized = normalizeText(message);
+  return (
+    AVOIDANCE_PATTERNS.some((pattern) => normalized.includes(pattern)) ||
+    SIDESTEP_PATTERNS.some((pattern) => normalized.includes(pattern)) ||
+    POSTPONE_PATTERNS.some((pattern) => normalized.includes(pattern)) ||
+    REFUSAL_PATTERNS.some((pattern) => normalized.includes(pattern))
+  );
 }
 
 function defaultActionsForGoal(goalTitle: string): string[] {
@@ -199,9 +325,34 @@ function getGoalStatusFromActions(actions: GoalActionItem[]): string {
   return actions.length > 0 && actions.every((action) => action.completed) ? "completed" : "active";
 }
 
+type GoalRecord = {
+  id: string;
+  title: string;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  actions: GoalActionItem[];
+};
+
+function prioritizeGoalRecords(goals: GoalRecord[]): GoalRecord {
+  return [...goals].sort((left, right) => {
+    const leftHasPending = left.actions.some((action) => !action.completed) ? 1 : 0;
+    const rightHasPending = right.actions.some((action) => !action.completed) ? 1 : 0;
+
+    if (rightHasPending !== leftHasPending) {
+      return rightHasPending - leftHasPending;
+    }
+
+    if (right.updatedAt.getTime() !== left.updatedAt.getTime()) {
+      return right.updatedAt.getTime() - left.updatedAt.getTime();
+    }
+
+    return right.createdAt.getTime() - left.createdAt.getTime();
+  })[0];
+}
+
 export function detectGoalAvoidance(message: string): boolean {
-  const normalized = normalizeText(message);
-  return AVOIDANCE_PATTERNS.some((pattern) => normalized.includes(pattern));
+  return detectAvoidance(message);
 }
 
 export function detectActionCompletionIntent(message: string): boolean {
@@ -227,34 +378,54 @@ export function getFirstPendingAction(goal: GoalWithProgress | null): GoalAction
   return goal.actions.find((action) => !action.completed) ?? null;
 }
 
+export function countPendingActions(goal: GoalWithProgress | null): number {
+  if (!goal) {
+    return 0;
+  }
+
+  return goal.actions.filter((action) => !action.completed).length;
+}
+
 export function buildGoalCoachContext(
   goal: GoalWithProgress | null,
   latestMessage: string,
-  avoidanceCount = 0
+  options: number | { avoidanceCount?: number; avoidanceDetected?: boolean } = 0
 ): GoalCoachContext | null {
   if (!goal) {
     return null;
   }
 
   const pendingActions = goal.actions.filter((action) => !action.completed);
+  const avoidanceCount = typeof options === "number" ? options : (options.avoidanceCount ?? 0);
+  const avoidanceDetected =
+    typeof options === "number"
+      ? detectAvoidance(latestMessage)
+      : (options.avoidanceDetected ?? detectAvoidance(latestMessage));
+  const unfinishedActionsCount = pendingActions.length;
 
   return {
     title: goal.title,
     progress: goal.progress,
     pendingActions: pendingActions.map((action) => action.description).slice(0, 3),
-    avoidanceDetected: pendingActions.length > 0 && detectGoalAvoidance(latestMessage),
+    activeAction: pendingActions[0]?.description ?? null,
+    avoidanceDetected: pendingActions.length > 0 && avoidanceDetected,
     avoidanceCount,
+    unfinishedActionsCount,
+    confrontationMode:
+      (pendingActions.length > 0 && avoidanceDetected) ||
+      avoidanceCount >= 2 ||
+      unfinishedActionsCount > 2,
   };
 }
 
 export async function getActiveGoalForUser(userId: string): Promise<GoalWithProgress | null> {
   const prisma = getPrismaClient();
-  const goal = await prisma.goal.findFirst({
+  const goals = await prisma.goal.findMany({
     where: {
       userId,
       status: "active",
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
     include: {
       actions: {
         orderBy: { createdAt: "asc" },
@@ -262,11 +433,27 @@ export async function getActiveGoalForUser(userId: string): Promise<GoalWithProg
     },
   });
 
-  if (!goal) {
+  if (goals.length === 0) {
     return null;
   }
 
-  return mapGoalWithProgress(goal);
+  const prioritizedGoal = prioritizeGoalRecords(goals);
+  const staleGoalIds = goals
+    .filter((goal) => goal.id !== prioritizedGoal.id)
+    .map((goal) => goal.id);
+
+  if (staleGoalIds.length > 0) {
+    await prisma.goal.updateMany({
+      where: {
+        id: { in: staleGoalIds },
+      },
+      data: {
+        status: "paused",
+      },
+    });
+  }
+
+  return mapGoalWithProgress(prioritizedGoal);
 }
 
 export async function createGoalForUser(params: {
@@ -281,6 +468,15 @@ export async function createGoalForUser(params: {
   }
 
   await ensureUserSession(params.userId);
+  await prisma.goal.updateMany({
+    where: {
+      userId: params.userId,
+      status: "active",
+    },
+    data: {
+      status: "paused",
+    },
+  });
 
   const actionDescriptions = (params.actions || [])
     .map((action) => action.trim())
@@ -308,6 +504,40 @@ export async function createGoalForUser(params: {
   return mapGoalWithProgress(goal);
 }
 
+async function activateGoalForUser(
+  userId: string,
+  goalId: string
+): Promise<GoalWithProgress | null> {
+  const prisma = getPrismaClient();
+
+  await prisma.goal.updateMany({
+    where: {
+      userId,
+      status: "active",
+      NOT: { id: goalId },
+    },
+    data: {
+      status: "paused",
+    },
+  });
+
+  const goal = await prisma.goal.update({
+    where: { id: goalId },
+    data: { status: "active" },
+    include: {
+      actions: {
+        orderBy: { createdAt: "asc" },
+      },
+    },
+  });
+
+  if (goal.userId !== userId) {
+    return null;
+  }
+
+  return mapGoalWithProgress(goal);
+}
+
 export async function createGoalFromIntentMessage(params: {
   userId: string;
   message: string;
@@ -323,7 +553,9 @@ export async function createGoalFromIntentMessage(params: {
   const existing = await prisma.goal.findFirst({
     where: {
       userId: params.userId,
-      status: "active",
+      status: {
+        in: ["active", "paused"],
+      },
       title: {
         equals: detectedTitle,
         mode: "insensitive",
@@ -338,6 +570,16 @@ export async function createGoalFromIntentMessage(params: {
   });
 
   if (existing) {
+    if (existing.status !== "active") {
+      const reactivatedGoal = await activateGoalForUser(params.userId, existing.id);
+      if (reactivatedGoal) {
+        return {
+          goal: reactivatedGoal,
+          created: false,
+        };
+      }
+    }
+
     return {
       goal: mapGoalWithProgress(existing),
       created: false,

@@ -4,22 +4,17 @@ type MessageProps = {
   role: "user" | "assistant";
   content: string;
   isError?: boolean;
-  variant?: "action_required";
+  variant?: "action_required" | "crisis";
   meta?: {
     searchUsed?: boolean;
     fallback?: boolean;
   };
 };
 
-export default function Message({
-  role,
-  content,
-  isError = false,
-  variant,
-  meta,
-}: MessageProps) {
+export default function Message({ role, content, isError = false, variant, meta }: MessageProps) {
   const isUser = role === "user";
   const isActionRequired = variant === "action_required";
+  const isCrisis = variant === "crisis";
   const showMeta = !isUser && (meta?.searchUsed || meta?.fallback);
 
   return (
@@ -30,11 +25,18 @@ export default function Message({
             ? "rounded-br-md bg-slate-900 text-white"
             : isError
               ? "rounded-bl-md border border-red-200 bg-red-50 text-red-900"
-              : isActionRequired
-                ? "rounded-bl-md border border-amber-200 bg-amber-50 text-amber-950"
-              : "rounded-bl-md border border-slate-200 bg-white text-slate-800"
+              : isCrisis
+                ? "rounded-bl-md border border-rose-300 bg-rose-50 text-rose-950"
+                : isActionRequired
+                  ? "rounded-bl-md border border-amber-200 bg-amber-50 text-amber-950"
+                  : "rounded-bl-md border border-slate-200 bg-white text-slate-800"
         }`}
       >
+        {isCrisis ? (
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-rose-700">
+            Crisis
+          </p>
+        ) : null}
         {isActionRequired ? (
           <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-amber-700">
             Acción requerida

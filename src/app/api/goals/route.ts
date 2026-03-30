@@ -37,7 +37,7 @@ function serializeGoal(goal: GoalWithProgress | null) {
 
 export async function GET(req: NextRequest) {
   try {
-    const identity = resolveIdentity(req);
+    const identity = await resolveIdentity(req);
     const goal = await getActiveGoalForUser(identity.userId);
 
     const response = NextResponse.json({
@@ -73,7 +73,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const identity = resolveIdentity(req);
+    const identity = await resolveIdentity(req);
     const body = (await req.json()) as { title?: string; actions?: string[] };
     const title = body.title?.trim() ?? "";
 

@@ -8,6 +8,8 @@ export interface DecisionMetrics {
   dropOffPoint: string;
   checkinDrop: number;
   dominantState: string;
+  avoidanceTotalLast7d?: number;
+  repeatPatternUsers?: number;
   confidence?: InsightConfidence;
 }
 
@@ -73,6 +75,19 @@ export function generateDecision(metrics: DecisionMetrics, userState: string): D
         "Reducir número de preguntas por check-in y ofrecer respuesta guiada con un solo clic.",
     };
     logInfo("DECISION", "decision_generated", { trigger: "checkinDrop", result });
+    return result;
+  }
+
+  if ((metrics.avoidanceTotalLast7d ?? 0) >= 8 || (metrics.repeatPatternUsers ?? 0) >= 3) {
+    const result: DecisionResult = {
+      decision: "Subir confrontación de responsabilidad",
+      reason:
+        "Se detecta evitación repetida o patrón sostenido de no ejecución en la base activa.",
+      priority: "high",
+      action:
+        "Reducir validación complaciente, reforzar seguimiento de acciones abiertas y activar mensajes binarios de compromiso.",
+    };
+    logInfo("DECISION", "decision_generated", { trigger: "avoidance", result });
     return result;
   }
 

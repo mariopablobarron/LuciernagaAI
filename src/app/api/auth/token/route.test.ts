@@ -1,3 +1,28 @@
+jest.mock("@/services/user", () => ({
+  ensureUserAccount: jest.fn().mockResolvedValue({
+    id: "usr_mock",
+    email: "anon@session.luciernaga.local",
+    name: null,
+    role: "user",
+    lastSeen: new Date("2026-03-30T00:00:00.000Z"),
+  }),
+  linkIdentityToEmail: jest.fn(),
+  getUserSessionProfile: jest.fn().mockResolvedValue({
+    id: "usr_mock",
+    email: "anon@session.luciernaga.local",
+    name: null,
+    role: "user",
+    plan: "free",
+    planLabel: "Free",
+    subscriptionStatus: "free",
+    hasPlan: false,
+    isAnonymous: true,
+    messagesUsedToday: 0,
+    messagesRemainingToday: 10,
+    messageLimitPerDay: 10,
+  }),
+}));
+
 import { NextRequest } from "next/server";
 import { GET, POST } from "./route";
 
@@ -16,6 +41,7 @@ describe("/api/auth/token", () => {
     expect(typeof body.userId).toBe("string");
     expect(typeof body.token).toBe("string");
     expect(body.token.length).toBeGreaterThan(0);
+    expect(body.user.planLabel).toBe("Free");
     expect(response.headers.get("set-cookie")).toContain("mw_session=");
   });
 
@@ -41,5 +67,6 @@ describe("/api/auth/token", () => {
     expect(body.success).toBe(true);
     expect(body.authenticated).toBe(true);
     expect(typeof body.userId).toBe("string");
+    expect(body.user.isAnonymous).toBe(true);
   });
 });

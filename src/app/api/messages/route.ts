@@ -10,7 +10,7 @@ import { ensureUserSession, listMessagesForConversation } from "@/services/conve
 
 export async function GET(req: NextRequest) {
   try {
-    const identity = resolveIdentity(req);
+    const identity = await resolveIdentity(req);
     const userId = identity.userId;
 
     const conversationId = req.nextUrl.searchParams.get("conversationId")?.trim() ?? "";

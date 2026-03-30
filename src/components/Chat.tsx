@@ -2,13 +2,14 @@
 
 import { KeyboardEvent, useEffect, useRef } from "react";
 import Message from "@/components/Message";
+import { PRODUCT_DISCLAIMERS } from "@/lib/legal";
 
 export type ChatMessage = {
   id: string;
   role: "user" | "assistant";
   content: string;
   isError?: boolean;
-  variant?: "action_required";
+  variant?: "action_required" | "crisis";
   meta?: {
     searchUsed?: boolean;
     fallback?: boolean;
@@ -115,9 +116,7 @@ export default function Chat({
             ))
           )}
 
-          {loading ? (
-            <Message role="assistant" content="Pensando..." />
-          ) : null}
+          {loading ? <Message role="assistant" content="Pensando..." /> : null}
 
           <div ref={endRef} />
         </div>
@@ -129,6 +128,17 @@ export default function Chat({
             {error}
           </div>
         ) : null}
+
+        <div className="mb-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+          <p>{PRODUCT_DISCLAIMERS[0]}</p>
+          <p className="mt-1">
+            {PRODUCT_DISCLAIMERS[1]} Consulta{" "}
+            <a href="/api/legal" className="font-semibold text-slate-800 underline">
+              /api/legal
+            </a>
+            .
+          </p>
+        </div>
 
         {actionLock ? (
           <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3">

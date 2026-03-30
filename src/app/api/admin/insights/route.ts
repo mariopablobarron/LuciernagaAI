@@ -268,6 +268,8 @@ export async function GET(req: NextRequest) {
       dropOffPoint,
       checkinDrop,
       dominantState,
+      avoidanceTotalLast7d: avoidanceStats.total,
+      repeatPatternUsers: avoidanceStats.uniqueUsers,
       confidence,
     };
 
@@ -383,6 +385,20 @@ export async function GET(req: NextRequest) {
         confidence,
         sampleSize: totalUsers,
       },
+      activity: {
+        usersCreatedLast7d,
+        activeUsersLast7d: activeUsers.length,
+        messagesLast7d: recentMessages.length,
+        checkinsLast7d: totalCheckinsLast7d,
+      },
+      segments: {
+        totalUsers,
+        newUsers,
+        returningUsers,
+        activeNewUsers,
+        activeReturningUsers,
+        inactiveUsers,
+      },
       decision: {
         decision: decision.decision,
         reason: decision.reason,
@@ -444,6 +460,20 @@ export async function GET(req: NextRequest) {
           dropOffPoint: "day_1",
           checkinDrop: 0,
           dominantState: "neutral",
+        },
+        activity: {
+          usersCreatedLast7d: 0,
+          activeUsersLast7d: 0,
+          messagesLast7d: 0,
+          checkinsLast7d: 0,
+        },
+        segments: {
+          totalUsers: 0,
+          newUsers: 0,
+          returningUsers: 0,
+          activeNewUsers: 0,
+          activeReturningUsers: 0,
+          inactiveUsers: 0,
         },
         decision: {
           decision: "Error en motor de decisiones",

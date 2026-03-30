@@ -1,4 +1,5 @@
 import { getPrismaClient } from "@/db/prisma";
+import { PRODUCT_DISCLAIMERS, RESPONSIBLE_USE_NOTES, formatCrisisResourceLines } from "@/lib/legal";
 import { logError, logInfo } from "@/lib/logger";
 
 export type RiskLevel = "low" | "medium" | "high" | "critical";
@@ -7,6 +8,9 @@ export type CrisisResponse = {
   response: string;
   resources: string[];
   shouldEscalate: boolean;
+  legalFlag: boolean;
+  disclaimer: string;
+  continueChat: boolean;
 };
 
 export type CrisisEventPayload = {
@@ -75,7 +79,10 @@ const MEDIUM_PATTERNS: RegExp[] = [
 const RISK_ORDER: RiskLevel[] = ["low", "medium", "high", "critical"];
 
 function normalizeText(message: string): string {
-  return message.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return message
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 }
 
 function getRiskPriority(level: RiskLevel): number {
@@ -120,43 +127,52 @@ export function detectRiskLevel(message: string, context: string[] = []): RiskLe
 }
 
 export function getCrisisResponse(level: RiskLevel): CrisisResponse {
-  const resources = [
-    "Si hay riesgo inmediato, llama al 112 (ES/UE) o 911 (EE.UU.).",
-    "Si estás en EE.UU., también puedes llamar o escribir al 988 (24/7).",
-    "Si estás en España, puedes llamar al 024 (24/7).",
-  ];
+  const resources = formatCrisisResourceLines();
+  const disclaimer = `${PRODUCT_DISCLAIMERS[0]} ${RESPONSIBLE_USE_NOTES[1]}`;
 
   if (level === "critical") {
     return {
       response:
-        "Lo que estás sintiendo es muy importante y no voy a juzgarte por ello. No tienes que pasar por esto solo: me quedo contigo mientras damos un paso seguro ahora. En este momento, habla con una persona real de confianza o con un profesional de urgencias para que te acompañe directamente. Si hay riesgo inmediato, llama al 112/911 ahora mismo, y usa 024 (España) o 988 (EE.UU.) para apoyo continuo.",
+        `Voy a frenar el flujo normal aqui porque tu seguridad va primero. Busca apoyo humano inmediato ahora mismo: llama a emergencias si hay riesgo inminente y contacta de inmediato con 024 en Espana o 988 en Estados Unidos. No te quedes solo con esto; avisa ya a una persona real de confianza para que este contigo.\n\n${disclaimer}`,
       resources,
       shouldEscalate: true,
+      legalFlag: true,
+      disclaimer,
+      continueChat: false,
     };
   }
 
   if (level === "high") {
     return {
       response:
-        "Lo que estás viviendo pesa mucho, y tiene sentido que te sientas así. No estás solo en esto: podemos priorizar tu seguridad y apoyo ahora mismo. Te propongo hablar hoy con alguien real de confianza y pedir ayuda profesional cuanto antes para no cargar con todo a solas. Si notas que el riesgo sube, llama al 112/911 y usa 024 (España) o 988 (EE.UU.).",
+        `No voy a seguir con el flujo normal de la conversacion porque aqui lo prioritario es tu seguridad. Quiero que contactes hoy, ahora, con una persona real de confianza y con ayuda profesional. Si el riesgo sube o sientes peligro inmediato, llama al 112 o 911, y usa 024 en Espana o 988 en Estados Unidos para apoyo urgente.\n\n${disclaimer}`,
       resources,
       shouldEscalate: true,
+      legalFlag: true,
+      disclaimer,
+      continueChat: false,
     };
   }
 
   if (level === "medium") {
     return {
       response:
-        "Lo que te pasa importa y merece cuidado. No tienes que sostener esto en soledad; estoy aquí para acompañarte paso a paso. Si en algún momento se vuelve demasiado intenso, busca apoyo de una persona real de confianza. Si hay urgencia, llama al 112/911 y utiliza 024 (España) o 988 (EE.UU.).",
+        `Lo que te pasa importa y merece cuidado. No tienes que sostener esto en soledad; estoy aquí para acompañarte paso a paso. Si en algún momento se vuelve demasiado intenso, busca apoyo de una persona real de confianza. Si hay urgencia, llama al 112/911 y utiliza 024 (España) o 988 (EE.UU.).\n\n${PRODUCT_DISCLAIMERS[0]}`,
       resources: [],
       shouldEscalate: false,
+      legalFlag: false,
+      disclaimer: PRODUCT_DISCLAIMERS[0],
+      continueChat: true,
     };
   }
 
   return {
-    response: "Estoy contigo. Vamos paso a paso.",
+    response: `Estoy contigo. Vamos paso a paso. ${PRODUCT_DISCLAIMERS[0]}`,
     resources: [],
     shouldEscalate: false,
+    legalFlag: false,
+    disclaimer: PRODUCT_DISCLAIMERS[0],
+    continueChat: true,
   };
 }
 

@@ -10,18 +10,31 @@ export type WebSearchResult = {
 
 const SEARCH_TIMEOUT_MS = 6000;
 
-const EXTERNAL_INFO_PATTERNS = [
-  /\b(busca|buscame|búscame|investiga|consulta)\b/,
-  /\b(ultimo|último|ultimos|últimos|actual|actualidad|hoy)\b/,
-  /\b(noticia|noticias|precio|cotiza|tendencia|mercado)\b/,
-  /\b(que es|qué es|quien es|quién es|como funciona|cómo funciona)\b/,
-  /\b(datos de|informacion sobre|información sobre)\b/,
+const EXTERNAL_REQUEST_VERBS = [
+  /\b(busca|buscame|búscame|investiga|consulta|encuentra|recomienda|recomiendame|recomiéndame|dame|muestrame|muéstrame|compara)\b/,
 ];
 
-const PERSONAL_COACHING_PATTERNS = [
-  /\b(me siento|estoy|me pasa|quiero ayuda|necesito ayuda)\b/,
-  /\b(ansiedad|bloqueo|duda|miedo|procrastin)\b/,
+const REAL_WORLD_OPTION_PATTERNS = [
+  /\b(opciones|alternativas|recursos|contactos|telefonos|teléfonos|lugares|centros|apps|herramientas|servicios|profesionales|terapeutas|psicologos|psicólogos|cursos|planes|proveedores)\b/,
 ];
+
+const CONCRETE_DOUBT_PATTERNS = [
+  /\b(cual|cuál|donde|dónde|quien|quién|precio|coste|horario|disponibilidad|telefono|teléfono|contacto)\b/,
+];
+
+const PRACTICAL_DECISION_PATTERNS = [
+  /\b(decidir|comparar|elegir|contratar|reservar|comprar|agendar|contactar|llamar|inscribirme|inscribirme)\b/,
+];
+
+const EMOTIONAL_REFLECTION_PATTERNS = [
+  /\b(me siento|estoy|me pasa|quiero ayuda|necesito ayuda|no se que hacer|no sé qué hacer)\b/,
+  /\b(ansiedad|bloqueo|duda|miedo|procrastin|emocion|emoción|rumiando)\b/,
+];
+
+export type ExternalInfoClassification = {
+  shouldUse: boolean;
+  usage: "practical_decision" | "none";
+};
 
 function normalizeText(value: string): string {
   return value
@@ -47,22 +60,49 @@ function uniqueByUrl(results: WebSearchResult[]): WebSearchResult[] {
   return deduped;
 }
 
-export function needsExternalInfo(message: string): boolean {
+export function classifyExternalInfoNeed(message: string): ExternalInfoClassification {
   const normalized = normalizeText(message);
-  const hasExternalSignal = EXTERNAL_INFO_PATTERNS.some((pattern) => pattern.test(normalized));
-  const looksPersonal = PERSONAL_COACHING_PATTERNS.some((pattern) => pattern.test(normalized));
+  const hasRequestVerb = EXTERNAL_REQUEST_VERBS.some((pattern) => pattern.test(normalized));
+  const asksForRealOptions = REAL_WORLD_OPTION_PATTERNS.some((pattern) => pattern.test(normalized));
+  const hasConcreteDoubt = CONCRETE_DOUBT_PATTERNS.some((pattern) => pattern.test(normalized));
+  const hasPracticalDecision = PRACTICAL_DECISION_PATTERNS.some((pattern) => pattern.test(normalized));
+  const isEmotionalReflection = EMOTIONAL_REFLECTION_PATTERNS.some((pattern) =>
+    pattern.test(normalized)
+  );
 
-  if (!hasExternalSignal) {
-    return false;
+  if (!hasRequestVerb || !asksForRealOptions) {
+    return {
+      shouldUse: false,
+      usage: "none",
+    };
   }
 
-  return !looksPersonal || /\b(busca|investiga|actual|hoy|noticias)\b/.test(normalized);
+  if (isEmotionalReflection && !hasConcreteDoubt && !hasPracticalDecision && !asksForRealOptions) {
+    return {
+      shouldUse: false,
+      usage: "none",
+    };
+  }
+
+  return {
+    shouldUse: true,
+    usage: "practical_decision",
+  };
+}
+
+export function needsExternalInfo(message: string): boolean {
+  return classifyExternalInfoNeed(message).shouldUse;
 }
 
 export function buildSearchQuery(message: string): string {
   return message
-    .replace(/\b(por favor|puedes|podrias|podrías|me puedes|quiero saber|necesito saber)\b/gi, "")
+    .replace(
+      /\b(por favor|puedes|podrias|podrías|me puedes|quiero saber|necesito saber|dame|muestrame|muéstrame|recomiendame|recomiéndame)\b/gi,
+      ""
+    )
+    .replace(/\b(opciones|alternativas|reales)\b/gi, "")
     .replace(/^[,\s]+|[,\s]+$/g, "")
+    .replace(/^de\s+/i, "")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -138,10 +178,9 @@ async function fetchDuckDuckGo(query: string): Promise<WebSearchResult[]> {
 }
 
 async function fetchWikipedia(query: string): Promise<WebSearchResult[]> {
-  const url =
-    `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(
-      query
-    )}&utf8=1&format=json&origin=*`;
+  const url = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(
+    query
+  )}&utf8=1&format=json&origin=*`;
   const response = await withTimeout(fetch(url), SEARCH_TIMEOUT_MS);
   if (!response.ok) {
     throw new Error(`Wikipedia HTTP ${response.status}`);

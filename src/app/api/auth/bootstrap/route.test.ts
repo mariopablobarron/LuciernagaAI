@@ -1,3 +1,14 @@
+jest.mock("@/services/user", () => ({
+  ensureUserAccount: jest.fn().mockResolvedValue({
+    id: "usr_mock",
+    email: "anon@session.luciernaga.local",
+    name: null,
+    role: "user",
+    lastSeen: new Date("2026-03-30T00:00:00.000Z"),
+  }),
+  linkIdentityToEmail: jest.fn(),
+}));
+
 import { NextRequest } from "next/server";
 import { POST } from "./route";
 

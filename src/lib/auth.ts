@@ -1,6 +1,7 @@
 import { createHmac, randomUUID, timingSafeEqual } from "crypto";
 import type { NextRequest, NextResponse } from "next/server";
 import { logError, logInfo } from "@/lib/logger";
+import { ensureUserAccount, linkIdentityToEmail } from "@/services/user";
 
 type SessionPayload = {
   uid: string;
@@ -13,13 +14,19 @@ type TokenVerificationResult =
   | { kind: "expired"; payload: SessionPayload }
   | { kind: "invalid" };
 
-export type IdentitySource = "session" | "generated" | "refreshed" | "static";
+export type IdentitySource = "session" | "generated" | "refreshed" | "linked" | "static";
 
 export type ResolvedIdentity = {
   userId: string;
   source: IdentitySource;
   sessionToken: string;
   shouldSetCookie: boolean;
+};
+
+type ResolveIdentityOptions = {
+  allowAnonymousBootstrap?: boolean;
+  email?: string;
+  name?: string | null;
 };
 
 export class InvalidSessionTokenError extends Error {
@@ -192,13 +199,49 @@ function getTokenFromRequest(req: NextRequest): {
   };
 }
 
-export function resolveIdentity(req: NextRequest): ResolvedIdentity {
+async function finalizeIdentity(
+  identity: ResolvedIdentity,
+  options: ResolveIdentityOptions
+): Promise<ResolvedIdentity> {
+  await ensureUserAccount(identity.userId);
+
+  const requestedEmail = options.email?.trim();
+  if (!requestedEmail) {
+    return identity;
+  }
+
+  const linkedIdentity = await linkIdentityToEmail({
+    currentUserId: identity.userId,
+    email: requestedEmail,
+    name: options.name,
+  });
+
+  if (linkedIdentity.userId !== identity.userId) {
+    return {
+      userId: linkedIdentity.userId,
+      source: "linked",
+      sessionToken: issueSessionToken(linkedIdentity.userId),
+      shouldSetCookie: true,
+    };
+  }
+
+  return {
+    ...identity,
+    source: "linked",
+  };
+}
+
+export async function resolveIdentity(
+  req: NextRequest,
+  options: ResolveIdentityOptions = {}
+): Promise<ResolvedIdentity> {
   if (MVP_STATIC_IDENTITY_ENABLED && process.env.NODE_ENV !== "production") {
     // ⚠️ MVP MODE: identidad fija para validar persistencia sin login
     // Reemplazar por auth real en producción
     logInfo("CHAT", "resolve_identity_mvp_static", {
       userId: MVP_STATIC_USER_ID,
     });
+    await ensureUserAccount(MVP_STATIC_USER_ID);
     return {
       userId: MVP_STATIC_USER_ID,
       source: "static",
@@ -220,12 +263,15 @@ export function resolveIdentity(req: NextRequest): ResolvedIdentity {
       logInfo("CHAT", "resolve_identity_valid_session", {
         userId: verified.payload.uid,
       });
-      return {
-        userId: verified.payload.uid,
-        source: "session",
-        sessionToken: requestToken,
-        shouldSetCookie: false,
-      };
+      return finalizeIdentity(
+        {
+          userId: verified.payload.uid,
+          source: "session",
+          sessionToken: requestToken,
+          shouldSetCookie: false,
+        },
+        options
+      );
     }
 
     if (verified.kind === "expired") {
@@ -233,12 +279,15 @@ export function resolveIdentity(req: NextRequest): ResolvedIdentity {
       logInfo("CHAT", "resolve_identity_refreshed_session", {
         userId: verified.payload.uid,
       });
-      return {
-        userId: verified.payload.uid,
-        source: "refreshed",
-        sessionToken: refreshedToken,
-        shouldSetCookie: true,
-      };
+      return finalizeIdentity(
+        {
+          userId: verified.payload.uid,
+          source: "refreshed",
+          sessionToken: refreshedToken,
+          shouldSetCookie: true,
+        },
+        options
+      );
     }
 
     if (verified.kind === "invalid") {
@@ -249,25 +298,46 @@ export function resolveIdentity(req: NextRequest): ResolvedIdentity {
     }
   }
 
+  if (options.allowAnonymousBootstrap) {
+    const userId = createGeneratedUserId();
+    const sessionToken = issueSessionToken(userId);
+
+    logInfo("CHAT", "bootstrap_session_generated", {
+      userId,
+    });
+
+    return finalizeIdentity(
+      {
+        userId,
+        source: "generated",
+        sessionToken,
+        shouldSetCookie: true,
+      },
+      options
+    );
+  }
+
   // En modo normal, si no hay sesión válida exigimos autenticación explícita.
   // MVP MODE (opt-in) queda arriba para entornos de demo.
   throw new InvalidSessionTokenError();
 }
 
-export function bootstrapSessionIdentity(req: NextRequest): ResolvedIdentity {
+export async function bootstrapSessionIdentity(req: NextRequest): Promise<ResolvedIdentity> {
   try {
-    return resolveIdentity(req);
+    return await resolveIdentity(req, {
+      allowAnonymousBootstrap: true,
+    });
   } catch (error: unknown) {
     if (!(error instanceof InvalidSessionTokenError)) {
       throw error;
     }
 
-    // MVP MODE: solo cuando está explícitamente activo en entorno no productivo.
-    // Fuera de ese modo, bootstrap crea sesión aislada por usuario (sin identidad compartida).
+    // Fallback defensivo: si por alguna razón no se pudo resolver la identidad
+    // pero sí debemos aislar la sesión, generamos una nueva.
     const userId = createGeneratedUserId();
     const sessionToken = issueSessionToken(userId);
 
-    logInfo("CHAT", "bootstrap_session_generated", {
+    logInfo("CHAT", "bootstrap_session_generated_fallback", {
       userId,
     });
 

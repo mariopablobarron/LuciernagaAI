@@ -7,26 +7,30 @@ import {
   resolveIdentity,
 } from "@/lib/auth";
 import { logError, logInfo } from "@/lib/logger";
+import { getUserSessionProfile } from "@/services/user";
 
-function buildSessionResponse(identity: {
+async function buildSessionResponse(identity: {
   userId: string;
   source: string;
   sessionToken: string;
   shouldSetCookie: boolean;
-}): NextResponse {
+}): Promise<NextResponse> {
+  const user = await getUserSessionProfile(identity.userId);
+
   return NextResponse.json({
     success: true,
     authenticated: true,
     userId: identity.userId,
     source: identity.source,
     token: identity.sessionToken,
+    user,
   });
 }
 
 export async function GET(req: NextRequest) {
   try {
-    const identity = resolveIdentity(req);
-    const response = buildSessionResponse(identity);
+    const identity = await resolveIdentity(req);
+    const response = await buildSessionResponse(identity);
 
     if (identity.shouldSetCookie) {
       attachSessionCookie(response, identity.sessionToken);
@@ -66,8 +70,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const identity = bootstrapSessionIdentity(req);
-    const response = buildSessionResponse(identity);
+    const identity = await bootstrapSessionIdentity(req);
+    const response = await buildSessionResponse(identity);
 
     if (identity.sessionToken) {
       attachSessionCookie(response, identity.sessionToken);

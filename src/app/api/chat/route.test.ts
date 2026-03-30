@@ -24,6 +24,7 @@ jest.mock("@/lib/alerts", () => ({
 }));
 
 jest.mock("@/services/conversation", () => ({
+  countMessagesForConversation: jest.fn(),
   ensureUserSession: jest.fn(),
   listRecentUserMessagesForUser: jest.fn(),
   resolveConversationForUser: jest.fn(),
@@ -37,15 +38,18 @@ jest.mock("@/services/emotional-model", () => ({
 
 jest.mock("@/services/search", () => ({
   buildSearchQuery: jest.fn(),
+  classifyExternalInfoNeed: jest.fn(),
   needsExternalInfo: jest.fn(),
   searchWeb: jest.fn(),
 }));
 
 jest.mock("@/services/goals", () => ({
   buildGoalCoachContext: jest.fn(),
+  countPendingActions: jest.fn(),
   completeFirstPendingActionForUser: jest.fn(),
   createGoalFromIntentMessage: jest.fn(),
   detectActionCompletionIntent: jest.fn(),
+  detectAvoidance: jest.fn(),
   detectActionPostponeIntent: jest.fn(),
   detectActionRefusalIntent: jest.fn(),
   getFirstPendingAction: jest.fn(),
@@ -60,7 +64,12 @@ jest.mock("@/services/state", () => ({
   detectUserState: jest.fn(),
   getUserCrisisStatus: jest.fn(),
   shouldBypassActionLock: jest.fn(),
+  updateUserTransformationPhase: jest.fn(),
   updateUserState: jest.fn(),
+}));
+
+jest.mock("@/services/user", () => ({
+  getUserSessionProfile: jest.fn(),
 }));
 
 jest.mock("@/services/ai", () => ({
@@ -79,6 +88,7 @@ import { InvalidSessionTokenError, resolveIdentity, clearSessionCookie } from "@
 import { sendAvoidanceEscalationAlert, sendCrisisEscalationAlert } from "@/lib/alerts";
 import { checkRateLimit } from "@/lib/rate-limit";
 import {
+  countMessagesForConversation,
   ensureUserSession,
   listRecentUserMessagesForUser,
   resolveConversationForUser,
@@ -87,16 +97,23 @@ import {
 import { analyzeEmotionalProfile, updateEmotionalProfile } from "@/services/emotional-model";
 import {
   buildGoalCoachContext,
+  countPendingActions,
   completeFirstPendingActionForUser,
   createGoalFromIntentMessage,
   detectActionCompletionIntent,
+  detectAvoidance,
   detectActionPostponeIntent,
   detectActionRefusalIntent,
   getFirstPendingAction,
   getActiveGoalForUser,
   registerAvoidanceEvent,
 } from "@/services/goals";
-import { buildSearchQuery, needsExternalInfo, searchWeb } from "@/services/search";
+import {
+  buildSearchQuery,
+  classifyExternalInfoNeed,
+  needsExternalInfo,
+  searchWeb,
+} from "@/services/search";
 import {
   activateUserCrisis,
   buildConversationContext,
@@ -104,8 +121,10 @@ import {
   detectUserState,
   getUserCrisisStatus,
   shouldBypassActionLock,
+  updateUserTransformationPhase,
   updateUserState,
 } from "@/services/state";
+import { getUserSessionProfile } from "@/services/user";
 import { generateAIResponse } from "@/services/ai";
 import { detectRiskLevel, getCrisisResponse, registerCrisisEvent } from "@/services/risk";
 
@@ -132,14 +151,25 @@ describe("POST /api/chat", () => {
       progressTrend: "igual",
     });
     (buildSearchQuery as jest.Mock).mockImplementation((message: string) => message);
+    (classifyExternalInfoNeed as jest.Mock).mockReturnValue({
+      shouldUse: false,
+      usage: "none",
+    });
     (needsExternalInfo as jest.Mock).mockReturnValue(false);
     (searchWeb as jest.Mock).mockResolvedValue([]);
     (buildGoalCoachContext as jest.Mock).mockReturnValue(null);
+    (countPendingActions as jest.Mock).mockImplementation(
+      (goal) =>
+        goal?.actions?.filter((action: { completed: boolean }) => !action.completed).length ?? 0
+    );
     (completeFirstPendingActionForUser as jest.Mock).mockResolvedValue(null);
     (detectActionCompletionIntent as jest.Mock).mockReturnValue(false);
+    (detectAvoidance as jest.Mock).mockReturnValue(false);
     (detectActionPostponeIntent as jest.Mock).mockReturnValue(false);
     (detectActionRefusalIntent as jest.Mock).mockReturnValue(false);
-    (getFirstPendingAction as jest.Mock).mockReturnValue(null);
+    (getFirstPendingAction as jest.Mock).mockImplementation(
+      (goal) => goal?.actions?.find((action: { completed: boolean }) => !action.completed) ?? null
+    );
     (activateUserCrisis as jest.Mock).mockResolvedValue(new Date("2026-03-30T12:00:00.000Z"));
     (buildConversationContext as jest.Mock).mockReturnValue({
       lastGoal: null,
@@ -153,6 +183,9 @@ describe("POST /api/chat", () => {
       response: "Estoy contigo. Vamos paso a paso.",
       resources: [],
       shouldEscalate: false,
+      legalFlag: false,
+      disclaimer: "Luciernaga AI no sustituye terapia.",
+      continueChat: true,
     });
     (getUserCrisisStatus as jest.Mock).mockResolvedValue({
       active: false,
@@ -161,6 +194,22 @@ describe("POST /api/chat", () => {
     });
     (registerAvoidanceEvent as jest.Mock).mockResolvedValue(1);
     (shouldBypassActionLock as jest.Mock).mockReturnValue(false);
+    (countMessagesForConversation as jest.Mock).mockResolvedValue(1);
+    (updateUserTransformationPhase as jest.Mock).mockResolvedValue(undefined);
+    (getUserSessionProfile as jest.Mock).mockResolvedValue({
+      id: "usr_test_1",
+      email: "anon@session.luciernaga.local",
+      name: null,
+      role: "user",
+      plan: "free",
+      planLabel: "Free",
+      subscriptionStatus: "free",
+      hasPlan: false,
+      isAnonymous: true,
+      messagesUsedToday: 0,
+      messagesRemainingToday: 10,
+      messageLimitPerDay: 10,
+    });
   });
 
   afterAll(() => {
@@ -212,6 +261,7 @@ describe("POST /api/chat", () => {
     expect(body.conversationId).toBe("conv_1");
     expect(body.response).toBe("Respuesta de prueba");
     expect(body.emotionalProfile.primaryEmotion).toBe("calma");
+    expect(body.captureEmail).toBe(false);
     expect(body.flow).toEqual({
       currentIntent: "greeting",
       currentStep: 0,
@@ -219,6 +269,46 @@ describe("POST /api/chat", () => {
       instruction: null,
     });
     expect(updateEmotionalProfile).toHaveBeenCalledTimes(1);
+  });
+
+  it("bloquea el chat cuando el plan free alcanza el limite diario", async () => {
+    (resolveIdentity as jest.Mock).mockReturnValue({
+      userId: "usr_test_limit",
+      source: "session",
+      sessionToken: "token",
+      shouldSetCookie: false,
+    });
+    (getUserSessionProfile as jest.Mock).mockResolvedValue({
+      id: "usr_test_limit",
+      email: "anon@session.luciernaga.local",
+      name: null,
+      role: "user",
+      plan: "free",
+      planLabel: "Free",
+      subscriptionStatus: "free",
+      hasPlan: false,
+      isAnonymous: true,
+      messagesUsedToday: 10,
+      messagesRemainingToday: 0,
+      messageLimitPerDay: 10,
+    });
+
+    const req = new NextRequest("http://localhost/api/chat", {
+      method: "POST",
+      body: JSON.stringify({ message: "Quiero seguir trabajando" }),
+      headers: {
+        "content-type": "application/json",
+      },
+    });
+
+    const response = await POST(req);
+    const body = await response.json();
+
+    expect(response.status).toBe(403);
+    expect(body.success).toBe(false);
+    expect(body.code).toBe("PLAN_LIMIT_REACHED");
+    expect(checkRateLimit).not.toHaveBeenCalled();
+    expect(saveConversationMessage).not.toHaveBeenCalled();
   });
 
   it("activa protocolo de crisis en riesgo crítico", async () => {
@@ -248,6 +338,9 @@ describe("POST /api/chat", () => {
       response: "Tu seguridad es lo primero. Busca ayuda inmediata ahora.",
       resources: ["Llama al 112 o 911"],
       shouldEscalate: true,
+      legalFlag: true,
+      disclaimer: "Luciernaga AI no sustituye terapia.",
+      continueChat: false,
     });
     (registerCrisisEvent as jest.Mock).mockResolvedValue(undefined);
 
@@ -265,6 +358,8 @@ describe("POST /api/chat", () => {
     expect(response.status).toBe(200);
     expect(body.success).toBe(true);
     expect(body.crisis).toBe(true);
+    expect(body.type).toBe("crisis");
+    expect(body.continueChat).toBe(false);
     expect(body.riskLevel).toBe("critical");
     expect(body.response).toContain("seguridad");
     expect(generateAIResponse).not.toHaveBeenCalled();
@@ -310,6 +405,9 @@ describe("POST /api/chat", () => {
       response: "Vamos a centrarnos en tu seguridad y apoyo humano ahora mismo.",
       resources: ["Llama al 112 o 911"],
       shouldEscalate: true,
+      legalFlag: true,
+      disclaimer: "Luciernaga AI no sustituye terapia.",
+      continueChat: false,
     });
     (registerCrisisEvent as jest.Mock).mockResolvedValue(undefined);
 
@@ -327,6 +425,8 @@ describe("POST /api/chat", () => {
     expect(response.status).toBe(200);
     expect(body.success).toBe(true);
     expect(body.crisis).toBe(true);
+    expect(body.type).toBe("crisis");
+    expect(body.continueChat).toBe(false);
     expect(body.crisisActive).toBe(true);
     expect(body.riskLevel).toBe("high");
     expect(body.detectedRiskLevel).toBe("low");
@@ -355,7 +455,7 @@ describe("POST /api/chat", () => {
     expect(clearSessionCookie).toHaveBeenCalledTimes(1);
   });
 
-  it("usa searchWeb cuando el mensaje necesita info externa", async () => {
+  it("usa searchWeb solo cuando el mensaje pide opciones reales", async () => {
     (resolveIdentity as jest.Mock).mockReturnValue({
       userId: "usr_test_1",
       source: "session",
@@ -369,7 +469,9 @@ describe("POST /api/chat", () => {
       remaining: 9,
     });
     (ensureUserSession as jest.Mock).mockResolvedValue(undefined);
-    (listRecentUserMessagesForUser as jest.Mock).mockResolvedValue(["busca noticias de OpenAI"]);
+    (listRecentUserMessagesForUser as jest.Mock).mockResolvedValue([
+      "busca opciones reales de terapia online en Madrid",
+    ]);
     (detectUserState as jest.Mock).mockReturnValue("duda");
     (updateUserState as jest.Mock).mockResolvedValue(undefined);
     (createGoalFromIntentMessage as jest.Mock).mockResolvedValue(null);
@@ -380,12 +482,16 @@ describe("POST /api/chat", () => {
     });
     (saveConversationMessage as jest.Mock).mockResolvedValue(undefined);
     (needsExternalInfo as jest.Mock).mockReturnValue(true);
-    (buildSearchQuery as jest.Mock).mockReturnValue("OpenAI latest news");
+    (classifyExternalInfoNeed as jest.Mock).mockReturnValue({
+      shouldUse: true,
+      usage: "practical_decision",
+    });
+    (buildSearchQuery as jest.Mock).mockReturnValue("terapia online Madrid");
     (searchWeb as jest.Mock).mockResolvedValue([
       {
-        title: "OpenAI",
-        url: "https://example.com/openai",
-        snippet: "Latest OpenAI news",
+        title: "Terapia online Madrid",
+        url: "https://example.com/therapy",
+        snippet: "Opciones verificadas de terapia online",
         source: "duckduckgo",
       },
     ]);
@@ -396,7 +502,7 @@ describe("POST /api/chat", () => {
 
     const req = new NextRequest("http://localhost/api/chat", {
       method: "POST",
-      body: JSON.stringify({ message: "Busca noticias recientes de OpenAI" }),
+      body: JSON.stringify({ message: "Busca opciones reales de terapia online en Madrid" }),
       headers: {
         "content-type": "application/json",
       },
@@ -406,8 +512,80 @@ describe("POST /api/chat", () => {
     const body = await response.json();
 
     expect(response.status).toBe(200);
-    expect(searchWeb).toHaveBeenCalledWith("OpenAI latest news", 3);
+    expect(searchWeb).toHaveBeenCalledWith("terapia online Madrid", 3);
     expect(body.searchUsed).toBe(true);
+  });
+
+  it("genera un objetivo con accion para una conversacion relevante", async () => {
+    const generatedGoal = {
+      id: "goal_focus_1",
+      title: "Decidir si dejar mi trabajo",
+      status: "active",
+      createdAt: new Date("2026-03-30T10:00:00.000Z"),
+      updatedAt: new Date("2026-03-30T10:00:00.000Z"),
+      completedCount: 0,
+      totalCount: 3,
+      progress: 0,
+      actions: [
+        {
+          id: "action_focus_1",
+          description: "Definir hoy el criterio principal para tomar la decision",
+          completed: false,
+          createdAt: new Date("2026-03-30T10:00:00.000Z"),
+        },
+      ],
+    };
+
+    (resolveIdentity as jest.Mock).mockReturnValue({
+      userId: "usr_test_1",
+      source: "session",
+      sessionToken: "token",
+      shouldSetCookie: false,
+    });
+    (checkRateLimit as jest.Mock).mockReturnValue({
+      allowed: true,
+      retryAfterSeconds: 0,
+      limit: 10,
+      remaining: 9,
+    });
+    (ensureUserSession as jest.Mock).mockResolvedValue(undefined);
+    (listRecentUserMessagesForUser as jest.Mock).mockResolvedValue(["No sé si dejar mi trabajo"]);
+    (detectUserState as jest.Mock).mockReturnValue("duda");
+    (updateUserState as jest.Mock).mockResolvedValue(undefined);
+    (getActiveGoalForUser as jest.Mock).mockResolvedValue(null);
+    (createGoalFromIntentMessage as jest.Mock).mockResolvedValue({
+      goal: generatedGoal,
+      created: true,
+    });
+    (resolveConversationForUser as jest.Mock).mockResolvedValue({
+      id: "conv_focus_1",
+      title: "Nueva conversación",
+    });
+    (saveConversationMessage as jest.Mock).mockResolvedValue(undefined);
+    (generateAIResponse as jest.Mock).mockResolvedValue({
+      response: "Vamos a centrar esto en un solo criterio y convertirlo en decision hoy.",
+      fallback: false,
+    });
+
+    const req = new NextRequest("http://localhost/api/chat", {
+      method: "POST",
+      body: JSON.stringify({ message: "No sé si dejar mi trabajo" }),
+      headers: {
+        "content-type": "application/json",
+      },
+    });
+
+    const response = await POST(req);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(createGoalFromIntentMessage).toHaveBeenCalledWith({
+      userId: "usr_test_1",
+      message: "No sé si dejar mi trabajo",
+    });
+    expect(body.goal.title).toBe("Decidir si dejar mi trabajo");
+    expect(body.action).toBe("Definir hoy el criterio principal para tomar la decision");
+    expect(generateAIResponse).toHaveBeenCalledTimes(1);
   });
 
   it("bloquea el chat cuando hay una acción pendiente y el mensaje no cierra la acción", async () => {
@@ -471,7 +649,9 @@ describe("POST /api/chat", () => {
       id: "action_1",
       title: "Enviar el borrador al cliente",
     });
-    expect(body.message).toBe("Tienes una acción pendiente antes de continuar.");
+    expect(body.message).toBe(
+      'Tu objetivo activo es "Terminar propuesta". Antes de seguir, necesito una respuesta directa: ¿ya completaste "Enviar el borrador al cliente"? Responde sí o no.\n\n¿Quieres guardar tu progreso y continuar otro día? Déjame tu email.'
+    );
     expect(generateAIResponse).not.toHaveBeenCalled();
   });
 
@@ -547,8 +727,83 @@ describe("POST /api/chat", () => {
     });
     expect(body.type).toBe("action_required");
     expect(body.message).toBe(
-      "Has evitado esta decisión varias veces. ¿Vas a hacerla ahora o prefieres asumir que no es una prioridad?"
+      'Tu objetivo activo es "Terminar propuesta". Estás acumulando decisiones sin cerrar. Antes de seguir con otro tema, responde con claridad: ¿ya completaste "Enviar el borrador al cliente"? Responde sí o no, y si no, dime cuándo la harás hoy.\n\n¿Quieres guardar tu progreso y continuar otro día? Déjame tu email.'
     );
+    expect(generateAIResponse).not.toHaveBeenCalled();
+  });
+
+  it("detecta evasión genérica y activa confrontación directa", async () => {
+    const activeGoal = {
+      id: "goal_avoidance_1",
+      title: "Cerrar propuesta",
+      status: "active",
+      createdAt: new Date("2026-03-30T10:00:00.000Z"),
+      updatedAt: new Date("2026-03-30T10:00:00.000Z"),
+      completedCount: 0,
+      totalCount: 1,
+      progress: 0,
+      actions: [
+        {
+          id: "action_avoidance_1",
+          description: "Enviar el borrador al cliente",
+          completed: false,
+          createdAt: new Date("2026-03-30T10:00:00.000Z"),
+        },
+      ],
+    };
+
+    (resolveIdentity as jest.Mock).mockReturnValue({
+      userId: "usr_test_1",
+      source: "session",
+      sessionToken: "token",
+      shouldSetCookie: false,
+    });
+    (checkRateLimit as jest.Mock).mockReturnValue({
+      allowed: true,
+      retryAfterSeconds: 0,
+      limit: 10,
+      remaining: 9,
+    });
+    (ensureUserSession as jest.Mock).mockResolvedValue(undefined);
+    (listRecentUserMessagesForUser as jest.Mock).mockResolvedValue(["cambiemos de tema"]);
+    (detectUserState as jest.Mock).mockReturnValue("neutral");
+    (updateUserState as jest.Mock).mockResolvedValue(undefined);
+    (getActiveGoalForUser as jest.Mock).mockResolvedValue(activeGoal);
+    (getFirstPendingAction as jest.Mock).mockReturnValue(activeGoal.actions[0]);
+    (detectAvoidance as jest.Mock).mockReturnValue(true);
+    (registerAvoidanceEvent as jest.Mock).mockResolvedValue(2);
+    (resolveConversationForUser as jest.Mock).mockResolvedValue({
+      id: "conv_avoidance_1",
+      title: "Nueva conversación",
+    });
+    (saveConversationMessage as jest.Mock).mockResolvedValue(undefined);
+
+    const req = new NextRequest("http://localhost/api/chat", {
+      method: "POST",
+      body: JSON.stringify({ message: "cambiemos de tema" }),
+      headers: {
+        "content-type": "application/json",
+      },
+    });
+
+    const response = await POST(req);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(registerAvoidanceEvent).toHaveBeenCalledWith({
+      userId: "usr_test_1",
+      actionId: "action_avoidance_1",
+      type: "avoidance",
+    });
+    expect(sendAvoidanceEscalationAlert).toHaveBeenCalledWith({
+      userId: "usr_test_1",
+      type: "avoidance",
+      count: 2,
+      actionTitle: "Enviar el borrador al cliente",
+      goalTitle: "Cerrar propuesta",
+    });
+    expect(body.type).toBe("action_required");
+    expect(body.message).toContain("¿ya completaste");
     expect(generateAIResponse).not.toHaveBeenCalled();
   });
 

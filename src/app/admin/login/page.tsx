@@ -2,6 +2,8 @@
 
 import { FormEvent, Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { AuthShell } from "@/features/auth/components/AuthShell";
+import { SAAS_CONFIG } from "@/lib/saas";
 
 function normalizeNextPath(value: string | null): string {
   if (!value || !value.startsWith("/") || value.startsWith("//")) {
@@ -18,10 +20,7 @@ function normalizeNextPath(value: string | null): string {
 function AdminLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextPath = useMemo(
-    () => normalizeNextPath(searchParams.get("next")),
-    [searchParams]
-  );
+  const nextPath = useMemo(() => normalizeNextPath(searchParams.get("next")), [searchParams]);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -60,10 +59,16 @@ function AdminLoginForm() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-slate-100 p-6">
-      <section className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <AuthShell
+      eyebrow="Admin"
+      title="Panel interno"
+      description={`${SAAS_CONFIG.name} protege el acceso al dashboard con una sesion separada del usuario final.`}
+    >
+      <section className="w-full max-w-md">
         <h1 className="text-2xl font-bold text-slate-900">Admin Login</h1>
-        <p className="mt-2 text-sm text-slate-600">Acceso protegido para panel de administración.</p>
+        <p className="mt-2 text-sm text-slate-600">
+          Acceso protegido para panel de administracion.
+        </p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <label className="block space-y-1">
@@ -72,19 +77,19 @@ function AdminLoginForm() {
               type="text"
               value={username}
               onChange={(event) => setUsername(event.target.value)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 outline-none focus:border-slate-600"
+              className="w-full rounded-xl border border-slate-300 px-3 py-2.5 outline-none focus:border-slate-600"
               autoComplete="username"
               required
             />
           </label>
 
           <label className="block space-y-1">
-            <span className="text-sm font-medium text-slate-700">Contraseña</span>
+            <span className="text-sm font-medium text-slate-700">Contrasena</span>
             <input
               type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 outline-none focus:border-slate-600"
+              className="w-full rounded-xl border border-slate-300 px-3 py-2.5 outline-none focus:border-slate-600"
               autoComplete="current-password"
               required
             />
@@ -95,13 +100,13 @@ function AdminLoginForm() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+            className="w-full rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
           >
             {isSubmitting ? "Entrando..." : "Entrar"}
           </button>
         </form>
       </section>
-    </main>
+    </AuthShell>
   );
 }
 

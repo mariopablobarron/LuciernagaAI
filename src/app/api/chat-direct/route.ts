@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     });
 
     const message = body.message?.trim() ?? "";
-    const identity = resolveIdentity(req);
+    const identity = await resolveIdentity(req);
     logInfo("CHAT", "identity resolved", {
       userId: identity.userId,
       source: identity.source,

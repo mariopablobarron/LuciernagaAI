@@ -1,25 +1,129 @@
 @import "tailwindcss";
+@custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #f1f5f9;
-  --foreground: #0f172a;
+  --background: oklch(0.985 0.003 264);
+  --foreground: oklch(0.204 0.016 264);
+  --card: oklch(0.996 0.002 264);
+  --card-foreground: oklch(0.204 0.016 264);
+  --popover: oklch(0.996 0.002 264);
+  --popover-foreground: oklch(0.204 0.016 264);
+  --primary: oklch(0.265 0.018 265);
+  --primary-foreground: oklch(0.985 0.003 264);
+  --secondary: oklch(0.956 0.006 264);
+  --secondary-foreground: oklch(0.265 0.018 265);
+  --muted: oklch(0.965 0.004 264);
+  --muted-foreground: oklch(0.47 0.014 264);
+  --accent: oklch(0.95 0.009 248);
+  --accent-foreground: oklch(0.25 0.019 265);
+  --destructive: oklch(0.61 0.215 27);
+  --destructive-foreground: oklch(0.985 0.003 264);
+  --border: oklch(0.91 0.006 264);
+  --input: oklch(0.91 0.006 264);
+  --ring: oklch(0.62 0.025 264);
+  --radius: 1rem;
+  --emotion-blocked: oklch(0.82 0.08 82);
+  --emotion-anxious: oklch(0.78 0.11 54);
+  --emotion-doubt: oklch(0.84 0.07 236);
+  --emotion-clarity: oklch(0.84 0.09 154);
+  --signal-warning: oklch(0.82 0.1 83);
+  --signal-danger: oklch(0.77 0.12 18);
+  --signal-success: oklch(0.84 0.09 154);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-emotion-blocked: var(--emotion-blocked);
+  --color-emotion-anxious: var(--emotion-anxious);
+  --color-emotion-doubt: var(--emotion-doubt);
+  --color-emotion-clarity: var(--emotion-clarity);
+  --color-signal-warning: var(--signal-warning);
+  --color-signal-danger: var(--signal-danger);
+  --color-signal-success: var(--signal-success);
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-lg: calc(var(--radius) - 2px);
+  --radius-xl: var(--radius);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family:
-    var(--font-geist-sans),
-    "Inter",
-    "Segoe UI",
-    -apple-system,
-    BlinkMacSystemFont,
-    sans-serif;
+.dark {
+  --background: oklch(0.19 0.012 264);
+  --foreground: oklch(0.96 0.004 264);
+  --card: oklch(0.23 0.012 264);
+  --card-foreground: oklch(0.96 0.004 264);
+  --popover: oklch(0.23 0.012 264);
+  --popover-foreground: oklch(0.96 0.004 264);
+  --primary: oklch(0.95 0.004 264);
+  --primary-foreground: oklch(0.21 0.012 264);
+  --secondary: oklch(0.28 0.01 264);
+  --secondary-foreground: oklch(0.95 0.004 264);
+  --muted: oklch(0.27 0.009 264);
+  --muted-foreground: oklch(0.73 0.01 264);
+  --accent: oklch(0.31 0.018 248);
+  --accent-foreground: oklch(0.96 0.004 264);
+  --destructive: oklch(0.67 0.191 22);
+  --destructive-foreground: oklch(0.985 0.003 264);
+  --border: oklch(0.32 0.01 264);
+  --input: oklch(0.32 0.01 264);
+  --ring: oklch(0.72 0.016 264);
+  --emotion-blocked: oklch(0.52 0.11 82);
+  --emotion-anxious: oklch(0.58 0.12 54);
+  --emotion-doubt: oklch(0.56 0.09 236);
+  --emotion-clarity: oklch(0.63 0.11 154);
+  --signal-warning: oklch(0.62 0.13 83);
+  --signal-danger: oklch(0.59 0.17 18);
+  --signal-success: oklch(0.63 0.11 154);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    background-color: var(--background);
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  html:not(.dark) {
+    color-scheme: light;
+  }
+
+  body {
+    @apply min-h-screen bg-background text-foreground;
+    font-family:
+      var(--font-geist-sans),
+      "Inter",
+      "Segoe UI",
+      -apple-system,
+      BlinkMacSystemFont,
+      sans-serif;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--primary) 18%, transparent);
+  }
 }

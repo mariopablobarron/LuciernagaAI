@@ -9,5 +9,8 @@
   "eslint.run": "onType",
   "prettier.requireConfig": true,
   "errorLens.enabled": true,
-  "thunder-client.saveToWorkspace": true
+  "thunder-client.saveToWorkspace": true,
+  "chat.tools.terminal.autoApprove": {
+    "gh": true
+  }
 }

@@ -2,6 +2,7 @@ import type { UserState } from "@/types/chat";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { DEFAULT_EMOTIONAL_PROFILE } from "@/types/emotional-profile";
+import type { TransformationPhase } from "@/services/transformation";
 
 const DEFAULT_CRISIS_ACTIVE_HOURS = 6;
 
@@ -211,17 +212,26 @@ function buildCrisisActiveUntil(hours: number): Date {
   return new Date(Date.now() + hours * 60 * 60 * 1000);
 }
 
-export async function updateUserState(userId: string, state: string): Promise<UserState> {
+export async function updateUserState(
+  userId: string,
+  state: string,
+  options?: { transformationPhase?: TransformationPhase }
+): Promise<UserState> {
   const normalizedState = toUserState(state);
   const prisma = getPrismaClient();
 
   try {
     await prisma.userState.upsert({
       where: { userId },
-      update: { state: normalizedState, updatedAt: new Date() },
+      update: {
+        state: normalizedState,
+        transformationPhase: options?.transformationPhase,
+        updatedAt: new Date(),
+      },
       create: {
         userId,
         state: normalizedState,
+        transformationPhase: options?.transformationPhase ?? "bloqueo",
         primaryEmotion: DEFAULT_EMOTIONAL_PROFILE.primaryEmotion,
         dominantPattern: DEFAULT_EMOTIONAL_PROFILE.dominantPattern,
         focusArea: DEFAULT_EMOTIONAL_PROFILE.focusArea,
@@ -234,6 +244,42 @@ export async function updateUserState(userId: string, state: string): Promise<Us
     return normalizedState;
   } catch (error: unknown) {
     logError("STATE", error, { userId, state: normalizedState });
+    throw error;
+  }
+}
+
+export async function updateUserTransformationPhase(
+  userId: string,
+  transformationPhase: TransformationPhase
+): Promise<void> {
+  const prisma = getPrismaClient();
+
+  try {
+    await prisma.userState.upsert({
+      where: { userId },
+      update: {
+        transformationPhase,
+        updatedAt: new Date(),
+      },
+      create: {
+        userId,
+        state: "neutral",
+        transformationPhase,
+        primaryEmotion: DEFAULT_EMOTIONAL_PROFILE.primaryEmotion,
+        dominantPattern: DEFAULT_EMOTIONAL_PROFILE.dominantPattern,
+        focusArea: DEFAULT_EMOTIONAL_PROFILE.focusArea,
+        energyLevel: DEFAULT_EMOTIONAL_PROFILE.energyLevel,
+        riskLevel: DEFAULT_EMOTIONAL_PROFILE.riskLevel,
+        progressTrend: DEFAULT_EMOTIONAL_PROFILE.progressTrend,
+      },
+    });
+
+    logInfo("STATE", "user_transformation_phase_updated", {
+      userId,
+      transformationPhase,
+    });
+  } catch (error: unknown) {
+    logError("STATE", error, { userId, transformationPhase });
     throw error;
   }
 }
@@ -264,6 +310,7 @@ export async function activateUserCrisis(
       create: {
         userId,
         state: "neutral",
+        transformationPhase: "bloqueo",
         primaryEmotion: DEFAULT_EMOTIONAL_PROFILE.primaryEmotion,
         dominantPattern: DEFAULT_EMOTIONAL_PROFILE.dominantPattern,
         focusArea: DEFAULT_EMOTIONAL_PROFILE.focusArea,

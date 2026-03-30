@@ -584,6 +584,7 @@ export async function updateEmotionalProfile(
       create: {
         userId,
         state: "neutral",
+        transformationPhase: "bloqueo",
         primaryEmotion: normalizedProfile.primaryEmotion,
         dominantPattern: normalizedProfile.dominantPattern,
         focusArea: normalizedProfile.focusArea,

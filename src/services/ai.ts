@@ -58,6 +58,21 @@ function extractReply(data: OpenRouterResponse): string {
   return data.choices?.[0]?.message?.content?.trim() ?? "";
 }
 
+function sanitizeCoachContext(coachContext: CoachContext): CoachContext {
+  if (!coachContext.web) {
+    return coachContext;
+  }
+
+  if (coachContext.web.usage !== "practical_decision") {
+    return {
+      ...coachContext,
+      web: null,
+    };
+  }
+
+  return coachContext;
+}
+
 async function requestOpenRouter(
   message: string,
   userState: UserState,
@@ -79,7 +94,10 @@ async function requestOpenRouter(
     dominantPattern: emotionalProfile.dominantPattern,
     energyLevel: emotionalProfile.energyLevel,
     messageLength: message.length,
+    webUsage: coachContext.web?.usage ?? "none",
   });
+
+  const safeCoachContext = sanitizeCoachContext(coachContext);
 
   let response: Response;
   try {
@@ -95,7 +113,10 @@ async function requestOpenRouter(
         body: JSON.stringify({
           model: OPENROUTER_MODEL,
           messages: [
-            { role: "system", content: buildCoachPrompt(userState, emotionalProfile, coachContext) },
+            {
+              role: "system",
+              content: buildCoachPrompt(userState, emotionalProfile, safeCoachContext),
+            },
             { role: "user", content: message },
           ],
           temperature: 0.7,

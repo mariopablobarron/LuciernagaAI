@@ -17,5 +17,8 @@ describe("risk service", () => {
     const response = getCrisisResponse("critical");
     expect(response.shouldEscalate).toBe(true);
     expect(response.resources.length).toBeGreaterThan(0);
+    expect(response.response).toContain("seguridad");
+    expect(response.resources.join(" ")).toContain("024");
+    expect(response.resources.join(" ")).toContain("988");
   });
 });

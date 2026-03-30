@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { attachSessionCookie, bootstrapSessionIdentity } from "@/lib/auth";
 import { logError, logInfo } from "@/lib/logger";
 
-function buildBootstrapResponse(req: NextRequest): NextResponse {
-  const identity = bootstrapSessionIdentity(req);
+async function buildBootstrapResponse(req: NextRequest): Promise<NextResponse> {
+  const identity = await bootstrapSessionIdentity(req);
 
   const response = NextResponse.json({
     ok: true,
@@ -42,7 +42,7 @@ function buildBootstrapResponse(req: NextRequest): NextResponse {
 
 export async function GET(req: NextRequest) {
   try {
-    return buildBootstrapResponse(req);
+    return await buildBootstrapResponse(req);
   } catch (error: unknown) {
     logError("CHAT", error, { route: "auth-bootstrap-get" });
     return NextResponse.json(
@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    return buildBootstrapResponse(req);
+    return await buildBootstrapResponse(req);
   } catch (error: unknown) {
     logError("CHAT", error, { route: "auth-bootstrap-post" });
     return NextResponse.json(

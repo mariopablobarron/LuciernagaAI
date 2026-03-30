@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 
     const body = (await req.json()) as { response?: string };
     const responseText = body.response?.trim() ?? "";
-    const identity = resolveIdentity(req);
+    const identity = await resolveIdentity(req);
     const userId = identity.userId;
 
     if (!responseText) {

@@ -26,15 +26,19 @@ model Conversation {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  lastSeen      DateTime       @default(now())
-  conversations Conversation[] @relation("UserConversations")
-  messages      Message[]      @relation("UserMessages")
-  goals         Goal[]
-  crisisEvents  CrisisEvent[]
+  id              String           @id @default(cuid())
+  email           String           @unique
+  name            String?
+  role            String           @default("user")
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  lastSeen        DateTime         @default(now())
+  conversations   Conversation[]   @relation("UserConversations")
+  messages        Message[]        @relation("UserMessages")
+  goals           Goal[]
+  crisisEvents    CrisisEvent[]
   avoidanceEvents AvoidanceEvent[]
+  subscriptions   Subscription[]
 }
 
 model Message {
@@ -77,6 +81,7 @@ model UserState {
   id               String    @id @default(cuid())
   userId           String    @unique
   state            String    // "neutral" | "duda" | "bloqueo" | "ansiedad" | "claridad"
+  transformationPhase String @default("bloqueo")
   mood             String?
   primaryEmotion   String    @default("calma")
   dominantPattern  String    @default("evita_decidir")
@@ -90,6 +95,7 @@ model UserState {
   updatedAt        DateTime  @updatedAt
 
   @@index([state, updatedAt])
+  @@index([transformationPhase, updatedAt])
   @@index([primaryEmotion, dominantPattern, updatedAt])
   @@index([crisisActive, crisisActiveUntil])
 }
@@ -164,4 +170,16 @@ model AvoidanceEvent {
   @@index([userId, createdAt])
   @@index([actionId, createdAt])
   @@index([actionId, type, createdAt])
+}
+
+model Subscription {
+  id        String   @id @default(cuid())
+  userId    String
+  status    String
+  plan      String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([status, plan, createdAt])
 }

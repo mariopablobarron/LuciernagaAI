@@ -38,7 +38,7 @@ type PatchActionBody = {
 
 export async function PATCH(req: NextRequest) {
   try {
-    const identity = resolveIdentity(req);
+    const identity = await resolveIdentity(req);
     const body = (await req.json()) as PatchActionBody;
     const actionId = body.actionId?.trim() ?? "";
 

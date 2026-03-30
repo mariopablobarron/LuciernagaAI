@@ -1,3 +1,6 @@
+import { RESPONSIBLE_USE_NOTES } from "@/lib/legal";
+import type { MentorMode } from "@/services/mentor-protocol";
+import type { TransformationPhase } from "@/services/transformation";
 import type { UserState } from "@/types/chat";
 import {
   DEFAULT_EMOTIONAL_PROFILE,
@@ -11,12 +14,16 @@ export type CoachGoalContext = {
   title: string;
   progress: number;
   pendingActions: string[];
+  activeAction: string | null;
   avoidanceDetected: boolean;
   avoidanceCount: number;
+  unfinishedActionsCount: number;
+  confrontationMode: boolean;
 };
 
 export type CoachSearchContext = {
   query: string;
+  usage: "practical_decision";
   results: Array<{
     title: string;
     url: string;
@@ -26,6 +33,15 @@ export type CoachSearchContext = {
 
 export type CoachContext = {
   goal?: CoachGoalContext | null;
+  mentor?: MentorMode | null;
+  transformation?: {
+    phase: TransformationPhase;
+    summary: string;
+  } | null;
+  legal?: {
+    limitsNote?: string | null;
+    critical?: boolean;
+  } | null;
   continuity?: {
     lastGoal: string | null;
     pendingActions: string[];
@@ -44,7 +60,9 @@ export type CoachContext = {
 
 const BASE_PROMPT = `Eres un mentor directo, humano y claro.
 No des respuestas genéricas ni listas largas.
-Da una sola acción ejecutable hoy y una pregunta final que fuerce decisión.`;
+Da una sola acción ejecutable hoy y una pregunta final que fuerce decisión.
+Si detectas evasión o acumulación de acciones abiertas, confronta con claridad sin volverte cruel.
+Nunca presentes el sistema como terapia, diagnostico o sustituto de ayuda profesional.`;
 
 const STATE_GUIDANCE: Record<UserState, string> = {
   neutral:
@@ -91,10 +109,16 @@ const ENERGY_GUIDANCE: Record<EnergyLevel, string> = {
 };
 
 function buildEmpatheticResponse(userState: UserState, context: CoachContext): string {
+  const mentor = context.mentor;
   const hasGoal = Boolean(context.goal?.title);
   const hasPendingActions = (context.goal?.pendingActions.length ?? 0) > 0;
+  const unfinishedActionsCount = context.goal?.unfinishedActionsCount ?? 0;
   const needsConfrontation =
-    Boolean(context.goal?.avoidanceDetected) || (context.goal?.avoidanceCount ?? 0) >= 2;
+    Boolean(context.continuity?.hesitationDetected) ||
+    Boolean(context.goal?.confrontationMode) ||
+    Boolean(context.goal?.avoidanceDetected) ||
+    (context.goal?.avoidanceCount ?? 0) >= 2 ||
+    unfinishedActionsCount > 2;
 
   const emotionalTone =
     userState === "ansiedad"
@@ -107,16 +131,20 @@ function buildEmpatheticResponse(userState: UserState, context: CoachContext): s
             ? "Tono emocional: refuerzo positivo con exigencia práctica. Convierte claridad en ejecución."
             : "Tono emocional: equilibrado, humano y práctico.";
 
+  const step1Rule = mentor?.validate === false
+    ? "PASO 1 ENFOQUE: no valides la evasión. Nombra el patrón y ve directo a responsabilidad."
+    : "PASO 1 VALIDACIÓN: reconoce emoción y normaliza sin trivializar.";
+
   const step4Rule = !hasGoal
     ? "PASO 4 (ACCIÓN): como no hay objetivo definido, propone un siguiente paso concreto y ejecutable hoy."
     : hasPendingActions
       ? needsConfrontation
-        ? "PASO 4 (RESPONSABILIDAD + CONFRONTACIÓN): hay acción pendiente y evitación detectada, exige compromiso explícito hoy con firmeza calmada."
-        : "PASO 4 (RESPONSABILIDAD): hay acción pendiente, pide evidencia concreta de avance hoy."
+        ? "PASO 4 (RESPONSABILIDAD + CONFRONTACIÓN): hay deuda de ejecución o evasión; exige una respuesta clara, compromiso explícito hoy y cero rodeos."
+        : "PASO 4 (RESPONSABILIDAD): hay acción pendiente, pregunta si ya se completó y pide evidencia concreta de avance hoy."
       : "PASO 4 (ACCIÓN): hay objetivo activo sin acción pendiente clara, define una acción específica para hoy.";
 
   return `Formato obligatorio de respuesta (texto plano, no JSON):
-- PASO 1 VALIDACIÓN: reconoce emoción y normaliza sin trivializar.
+- ${step1Rule}
 - PASO 2 REFORMULACIÓN: reformula lo dicho por el usuario para demostrar comprensión.
 - PASO 3 PREGUNTA GUIADA: formula una sola pregunta enfocada para profundizar claridad.
 - ${step4Rule}
@@ -126,8 +154,50 @@ Reglas de estilo conversacional:
 - No uses listas largas ni teoría.
 - Mantén orientación a acción en el cierre.
 - Conserva y aplica lógica de objetivos, acciones, evitación y confrontación existente.
+- Si hay una acción pendiente, nómbrala explícitamente en la respuesta.
 
 ${emotionalTone}`;
+}
+
+function buildMentorProtocolGuidance(context: CoachContext): string {
+  if (!context.mentor) {
+    return "";
+  }
+
+  return `Protocolo mentor activo:
+- Modo: ${context.mentor.mode}
+- Validar: ${context.mentor.validate ? "sí" : "no"}
+- Confrontar: ${context.mentor.confront ? "sí" : "no"}
+- Empujar acción: ${context.mentor.pushAction ? "sí" : "no"}
+- Detener conversación: ${context.mentor.stopConversation ? "sí" : "no"}
+- Razón: ${context.mentor.reason}
+
+Reglas obligatorias:
+- Si confrontas, no uses consuelo para aliviar la responsabilidad.
+- Si empujas acción, termina con un compromiso observable hoy.
+- Si validar = no, evita frases que premien la postergación.`;
+}
+
+function buildTransformationGuidance(context: CoachContext): string {
+  if (!context.transformation) {
+    return "";
+  }
+
+  return `Modelo de cambio:
+- Fase actual: ${context.transformation.phase}
+- Lectura: ${context.transformation.summary}
+
+Regla:
+- Ajusta la respuesta a la fase actual y evita pedir acciones de fases posteriores si todavía no toca.`;
+}
+
+function buildLegalGuidance(context: CoachContext): string {
+  const limitsNote = context.legal?.limitsNote ?? RESPONSIBLE_USE_NOTES[0];
+
+  return `Límites del sistema:
+- ${limitsNote}
+- ${RESPONSIBLE_USE_NOTES[1]}
+- Nunca uses lenguaje que sugiera sustitución de terapia, diagnóstico o soporte de emergencia.`;
 }
 
 function buildFlowGuidance(context: CoachContext): string {
@@ -177,8 +247,11 @@ export function buildCoachPrompt(
   context: CoachContext = {}
 ): string {
   const empatheticResponseGuidance = buildEmpatheticResponse(userState, context);
+  const mentorProtocolGuidance = buildMentorProtocolGuidance(context);
+  const transformationGuidance = buildTransformationGuidance(context);
   const flowGuidance = buildFlowGuidance(context);
   const continuityGuidance = buildContinuityGuidance(context);
+  const legalGuidance = buildLegalGuidance(context);
 
   const goalContext = context.goal
     ? `
@@ -186,19 +259,26 @@ export function buildCoachPrompt(
 Responsabilidad activa:
 - Objetivo: ${context.goal.title}
 - Progreso: ${context.goal.progress}%
+- Acción prioritaria: ${context.goal.activeAction ?? "Definir la siguiente acción ahora"}
+- Acciones no completadas: ${context.goal.unfinishedActionsCount}
 - Acciones pendientes: ${
         context.goal.pendingActions.length > 0
           ? context.goal.pendingActions.join(" | ")
           : "No hay acciones pendientes"
       }
 ${
-  context.goal.avoidanceDetected
-    ? "- El usuario está evitando o posponiendo. Confróntalo con firmeza calmada y pide compromiso explícito hoy."
+  context.goal.confrontationMode
+    ? "- Activa modo confrontación: ve directo al punto, nombra la evasión o la deuda de ejecución y exige una respuesta binaria o una hora concreta."
     : "- Haz seguimiento directo de la siguiente acción pendiente y pide evidencia concreta de avance."
 }
 ${
   context.goal.avoidanceCount >= 2
     ? "- Has evitado esta decisión varias veces. ¿Vas a hacerla ahora o prefieres asumir que no es una prioridad?"
+    : ""
+}
+${
+  context.goal.unfinishedActionsCount > 2
+    ? "- Hay demasiadas acciones abiertas. No abras otro frente: reduce todo a una sola acción prioritaria y exige cierre."
     : ""
 }`
     : "";
@@ -240,6 +320,9 @@ ${ENERGY_GUIDANCE[emotionalProfile.energyLevel]}
 
 Reglas conversacionales obligatorias:
 ${empatheticResponseGuidance}
+${mentorProtocolGuidance ? `\n\n${mentorProtocolGuidance}` : ""}
+${transformationGuidance ? `\n\n${transformationGuidance}` : ""}
+${legalGuidance ? `\n\n${legalGuidance}` : ""}
 
 Consistencia obligatoria de salida:
 - Toda respuesta debe incluir: 1) reconocimiento emocional, 2) referencia de contexto previo si existe, 3) siguiente paso concreto.
@@ -266,10 +349,35 @@ export function buildFallbackResponse(): string {
   return "Estoy contigo. Vamos paso a paso.";
 }
 
-export function buildActionRequiredMessage(avoidanceCount = 0): string {
-  if (avoidanceCount >= 2) {
-    return "Has evitado esta decisión varias veces. ¿Vas a hacerla ahora o prefieres asumir que no es una prioridad?";
+export function buildActionRequiredMessage(params: {
+  actionTitle: string;
+  goalTitle?: string | null;
+  avoidanceCount?: number;
+  unfinishedActionsCount?: number;
+  mentorMode?: MentorMode | null;
+}): string {
+  const avoidanceCount = params.avoidanceCount ?? 0;
+  const unfinishedActionsCount = params.unfinishedActionsCount ?? 0;
+  const focusLine = params.goalTitle
+    ? `Tu objetivo activo es "${params.goalTitle}".`
+    : "Tenemos una acción activa que no se puede ignorar.";
+  const confront = params.mentorMode?.confront ?? false;
+
+  if (avoidanceCount >= 2 || unfinishedActionsCount > 2) {
+    return `${focusLine} Estás acumulando decisiones sin cerrar. Antes de seguir con otro tema, responde con claridad: ¿ya completaste "${params.actionTitle}"? Responde sí o no, y si no, dime cuándo la harás hoy.`;
   }
 
-  return "Tienes una acción pendiente antes de continuar.";
+  if (confront) {
+    return `${focusLine} No voy a validar más rodeos aquí. Responde directo: ¿ya completaste "${params.actionTitle}"? Sí o no, y si no, dime la hora exacta en que la harás hoy.`;
+  }
+
+  return `${focusLine} Antes de seguir, necesito una respuesta directa: ¿ya completaste "${params.actionTitle}"? Responde sí o no.`;
+}
+
+export function appendCaptureEmailPrompt(response: string, shouldAsk: boolean): string {
+  if (!shouldAsk) {
+    return response;
+  }
+
+  return `${response}\n\n¿Quieres guardar tu progreso y continuar otro día? Déjame tu email.`;
 }

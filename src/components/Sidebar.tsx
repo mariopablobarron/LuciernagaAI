@@ -4,6 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
+import { ArrowRight, LogOut, Plus, ShieldCheck } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 
 export type SidebarConversation = {
   id: string;
@@ -77,6 +83,7 @@ export default function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname();
   const [logoSrc, setLogoSrc] = useState("/logo-startidea.png");
+
   const pendingActionsCount = useMemo(() => {
     if (!activeGoal) {
       return 0;
@@ -93,215 +100,251 @@ export default function Sidebar({
   }, [progress.completedActions, progress.totalActions]);
 
   return (
-    <aside className="h-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <Link href="/" className="mb-6 inline-flex items-center">
-        <Image
-          src={logoSrc}
-          alt="Startidea"
-          width={140}
-          height={40}
-          className="h-8 w-auto sm:h-10"
-          priority
-          onError={() => setLogoSrc("/placeholder.png")}
-        />
-      </Link>
-
-      <nav className="mb-4">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Menú</p>
-        <ul className="space-y-2">
-          <li>
-            <Link
-              href="/"
-              className={`block rounded-xl border px-3 py-2 text-sm font-medium transition ${
-                pathname === "/"
-                  ? "border-slate-900 bg-slate-900 text-white"
-                  : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
-              }`}
-            >
-              Chat
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/editor"
-              className={`block rounded-xl border px-3 py-2 text-sm font-medium transition ${
-                pathname === "/editor"
-                  ? "border-slate-900 bg-slate-900 text-white"
-                  : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
-              }`}
-            >
-              Editor
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/#mi-progreso"
-              className="block rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-            >
-              Mi progreso
-            </Link>
-          </li>
-          <li>
-            <Link
-              href={adminAuthenticated ? "/admin" : "/admin/login?next=/admin"}
-              className={`block rounded-xl border px-3 py-2 text-sm font-medium transition ${
-                pathname === "/admin"
-                  ? "border-slate-900 bg-slate-900 text-white"
-                  : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
-              }`}
-            >
-              Admin
-            </Link>
-          </li>
-        </ul>
-      </nav>
-
-      <button
-        type="button"
-        onClick={onNewConversation}
-        className="mb-4 w-full rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
-      >
-        Nueva conversación
-      </button>
-
-      <nav className="mb-4">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-          Conversaciones
-        </p>
-        <ul className="space-y-2">
-          {conversations.map((conversation) => {
-            const isActive = conversation.id === activeConversationId;
-            return (
-              <li key={conversation.id}>
-                <button
-                  type="button"
-                  onClick={() => onSelectConversation(conversation.id)}
-                  className={`w-full rounded-xl border px-3 py-2 text-left transition ${
-                    isActive
-                      ? "border-slate-900 bg-slate-900 text-white"
-                      : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
-                  }`}
-                >
-                  <p className="truncate text-sm font-medium">{conversation.title}</p>
-                  <p className={`mt-1 text-xs ${isActive ? "text-slate-200" : "text-slate-500"}`}>
-                    {conversation.messageCount} mensajes
-                  </p>
-                  <p className={`mt-0.5 text-xs ${isActive ? "text-slate-300" : "text-slate-400"}`}>
-                    {formatRelativeDate(conversation.updatedAt)}
-                  </p>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-
-      <section className="mb-4 rounded-xl border border-slate-200 p-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Acceso admin</p>
-        {adminLoading ? (
-          <p className="mt-2 text-xs text-slate-500">Verificando sesión...</p>
-        ) : adminAuthenticated ? (
-          <div className="mt-2 space-y-2">
-            <p className="text-xs text-emerald-700">Sesión admin activa.</p>
-            <button
-              type="button"
-              onClick={() => void onAdminLogout()}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              Cerrar sesión admin
-            </button>
-          </div>
-        ) : (
-          <div className="mt-2 space-y-2">
-            <p className="text-xs text-slate-500">No autenticado.</p>
-            <Link
-              href="/admin/login?next=/admin"
-              className="block w-full rounded-lg border border-slate-300 px-3 py-2 text-center text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              Entrar como admin
-            </Link>
-          </div>
-        )}
-      </section>
-
-      <section id="mi-progreso" className="mb-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Progreso</p>
-        <p className="mt-2 text-sm font-semibold text-slate-800">
-          {progress.completedActions}/{progress.totalActions} acciones
-        </p>
-        <div className="mt-2 h-2 rounded-full bg-slate-200">
-          <div
-            className="h-full rounded-full bg-slate-900"
-            style={{ width: `${progressPercent}%` }}
-          />
+    <aside className="flex h-full flex-col rounded-3xl border border-border/80 bg-card/95 p-4 shadow-sm">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between gap-3">
+          <Link href="/" className="inline-flex items-center">
+            <Image
+              src={logoSrc}
+              alt="Startidea"
+              width={140}
+              height={40}
+              className="h-8 w-auto sm:h-10"
+              priority
+              onError={() => setLogoSrc("/placeholder.png")}
+            />
+          </Link>
+          <Badge variant="secondary" className="rounded-full px-3 py-1">
+            {profile.plan}
+          </Badge>
         </div>
-        <p className="mt-2 text-xs text-slate-600">
-          Estado dominante: <span className="font-medium">{progress.dominantState}</span>
-        </p>
-      </section>
 
-      <section className="mb-4 rounded-xl border border-slate-200 p-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-          Objetivo activo
-        </p>
-        {!activeGoal ? (
-          <p className="mt-2 text-sm text-slate-600">Sin objetivo activo.</p>
-        ) : (
-          <div className="mt-2 space-y-2">
-            <p className="text-sm font-semibold text-slate-900">{activeGoal.title}</p>
-            <p className="text-xs text-slate-500">
-              {activeGoal.completedCount}/{activeGoal.totalCount} acciones completadas
-            </p>
-            {pendingActionsCount > 0 ? (
-              <p className="rounded-lg border border-amber-200 bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-800">
-                {pendingActionsCount === 1
-                  ? "Tienes 1 acción pendiente"
-                  : `Tienes ${pendingActionsCount} acciones pendientes`}
+        <div className="rounded-2xl border border-border bg-muted/40 p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Workspace
+          </p>
+          <p className="mt-1 text-sm font-medium text-foreground">{profile.name}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Conversaciones, continuidad y acceso rápido al producto.
+          </p>
+          <Button type="button" className="mt-4 w-full justify-between" onClick={onNewConversation}>
+            Nueva conversación
+            <Plus className="size-4" />
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-3 gap-2">
+          <Button
+            asChild
+            type="button"
+            variant={pathname === "/" ? "default" : "outline"}
+            size="sm"
+            className="justify-center"
+          >
+            <Link href="/">Chat</Link>
+          </Button>
+          <Button
+            asChild
+            type="button"
+            variant={pathname === "/editor" ? "default" : "outline"}
+            size="sm"
+            className="justify-center"
+          >
+            <Link href="/editor">Editor</Link>
+          </Button>
+          <Button
+            asChild
+            type="button"
+            variant={pathname === "/admin" ? "default" : "outline"}
+            size="sm"
+            className="justify-center"
+          >
+            <Link href={adminAuthenticated ? "/admin" : "/admin/login?next=/admin"}>Admin</Link>
+          </Button>
+        </div>
+      </div>
+
+      <Separator className="my-4" />
+
+      <div className="flex min-h-0 flex-1 flex-col gap-4">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                Conversaciones
               </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Actividad reciente y continuidad.
+              </p>
+            </div>
+            <Badge variant="secondary" className="rounded-full px-3 py-1">
+              {conversations.length}
+            </Badge>
+          </div>
+
+          <ScrollArea className="h-[16rem] rounded-2xl border border-border bg-muted/30">
+            <div className="space-y-2 p-2">
+              {conversations.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-border bg-background/60 p-4 text-sm text-muted-foreground">
+                  Todavía no hay conversaciones persistidas.
+                </div>
+              ) : (
+                conversations.map((conversation) => {
+                  const isActive = conversation.id === activeConversationId;
+                  return (
+                    <button
+                      key={conversation.id}
+                      type="button"
+                      onClick={() => onSelectConversation(conversation.id)}
+                      className={`w-full rounded-2xl border px-3 py-3 text-left transition ${
+                        isActive
+                          ? "border-primary/20 bg-primary text-primary-foreground shadow-sm"
+                          : "border-border bg-background/80 text-foreground hover:bg-accent"
+                      }`}
+                    >
+                      <p className="truncate text-sm font-medium">{conversation.title}</p>
+                      <div
+                        className={`mt-2 flex items-center justify-between gap-2 text-xs ${
+                          isActive ? "text-primary-foreground/80" : "text-muted-foreground"
+                        }`}
+                      >
+                        <span>{conversation.messageCount} mensajes</span>
+                        <span>{formatRelativeDate(conversation.updatedAt)}</span>
+                      </div>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          </ScrollArea>
+        </div>
+
+        <div id="mi-progreso" className="space-y-4">
+          <div className="rounded-2xl border border-border bg-muted/40 p-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="secondary" className="rounded-full px-3 py-1">
+                {progress.completedActions}/{progress.totalActions} acciones
+              </Badge>
+              <Badge variant="secondary" className="rounded-full px-3 py-1 capitalize">
+                {progress.dominantState}
+              </Badge>
+            </div>
+            <p className="mt-3 text-sm font-medium text-foreground">Progreso del proceso</p>
+            <Progress value={progressPercent} className="mt-3 h-2.5" />
+            <p className="mt-2 text-sm text-muted-foreground">
+              Continuidad visible para que el trabajo no dependa solo de la memoria.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-border bg-muted/40 p-4">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  Objetivo activo
+                </p>
+                <p className="mt-1 text-sm font-medium text-foreground">
+                  {activeGoal?.title || "Sin objetivo activo"}
+                </p>
+              </div>
+              {activeGoal ? (
+                <Badge variant="secondary" className="rounded-full px-3 py-1">
+                  {activeGoal.progress}%
+                </Badge>
+              ) : null}
+            </div>
+
+            {activeGoal ? (
+              <>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  {activeGoal.completedCount}/{activeGoal.totalCount} acciones completadas.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Badge
+                    variant={pendingActionsCount > 0 ? "warning" : "success"}
+                    className="rounded-full px-3 py-1"
+                  >
+                    {pendingActionsCount > 0
+                      ? `${pendingActionsCount} pendientes`
+                      : "Sin deuda abierta"}
+                  </Badge>
+                </div>
+                <div className="mt-3 space-y-2">
+                  {activeGoal.actions.slice(0, 3).map((action) => (
+                    <div
+                      key={action.id}
+                      className="flex items-start gap-2 rounded-xl border border-border bg-background/80 px-3 py-2 text-sm"
+                    >
+                      <span
+                        className={`mt-1 inline-block h-2.5 w-2.5 rounded-full ${
+                          action.completed ? "bg-emerald-500" : "bg-amber-400"
+                        }`}
+                      />
+                      <span className={action.completed ? "text-muted-foreground line-through" : "text-foreground"}>
+                        {action.description}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                {actionLock ? (
+                  <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
+                    <p className="font-semibold">{actionLock.actionTitle}</p>
+                    <p className="mt-1">{actionLock.message}</p>
+                  </div>
+                ) : null}
+              </>
             ) : (
-              <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700">
-                Sin acciones pendientes.
+              <p className="mt-3 text-sm text-muted-foreground">
+                Usa el chat para definir un foco y convertirlo aquí en seguimiento.
               </p>
             )}
-            {actionLock ? (
-              <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-800">
-                  Modo responsabilidad activo
-                </p>
-                <p className="mt-1 text-xs font-semibold text-amber-950">
-                  {actionLock.actionTitle}
-                </p>
-                <p className="mt-1 text-xs text-amber-900">{actionLock.message}</p>
-              </div>
-            ) : null}
-            <div className="h-2 rounded-full bg-slate-200">
-              <div
-                className="h-full rounded-full bg-slate-900"
-                style={{ width: `${activeGoal.progress}%` }}
-              />
-            </div>
-            <p className="text-xs text-slate-600">
-              Progreso actual: {activeGoal.completedCount}/{activeGoal.totalCount}
-            </p>
-            <ul className="space-y-2 pt-1">
-              {activeGoal.actions.slice(0, 3).map((action) => (
-                <li key={action.id} className="text-xs text-slate-700">
-                  <span className="mr-2 inline-block h-2 w-2 rounded-full bg-slate-400 align-middle" />
-                  <span className={action.completed ? "text-slate-400 line-through" : ""}>
-                    {action.description}
-                  </span>
-                </li>
-              ))}
-            </ul>
           </div>
-        )}
-      </section>
+        </div>
+      </div>
 
-      <section className="rounded-xl border border-slate-200 p-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Perfil</p>
-        <p className="mt-2 text-sm font-semibold text-slate-800">{profile.name}</p>
-        <p className="text-xs text-slate-500">{profile.plan}</p>
-      </section>
+      <Separator className="my-4" />
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              Acceso admin
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {adminLoading
+                ? "Verificando sesión..."
+                : adminAuthenticated
+                  ? "Sesión operativa activa."
+                  : "No autenticado."}
+            </p>
+          </div>
+          <Badge
+            variant={adminAuthenticated ? "success" : "secondary"}
+            className="rounded-full px-3 py-1"
+          >
+            <ShieldCheck className="mr-1 size-3.5" />
+            {adminAuthenticated ? "Activa" : "Inactiva"}
+          </Badge>
+        </div>
+
+        {adminAuthenticated ? (
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full justify-between"
+            onClick={() => void onAdminLogout()}
+          >
+            Cerrar sesión admin
+            <LogOut className="size-4" />
+          </Button>
+        ) : (
+          <Button asChild type="button" variant="outline" className="w-full justify-between">
+            <Link href="/admin/login?next=/admin">
+              Entrar como admin
+              <ArrowRight className="size-4" />
+            </Link>
+          </Button>
+        )}
+      </div>
     </aside>
   );
 }

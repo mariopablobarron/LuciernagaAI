@@ -28,12 +28,26 @@ jest.mock("@/services/emotional-model", () => ({
   updateEmotionalProfile: jest.fn(),
 }));
 
+jest.mock("@/services/impulse-challenges", () => ({
+  upsertDailyImpulseLog: jest.fn(),
+  updateActiveChallengesFromCheckin: jest.fn(),
+}));
+
+jest.mock("@/services/streak", () => ({
+  updateStreak: jest.fn(),
+}));
+
 import { NextRequest } from "next/server";
 import { POST } from "./route";
 import { resolveIdentity } from "@/lib/auth";
 import { getPrismaClient } from "@/lib/prisma";
 import { analyzeEmotionalProfile, updateEmotionalProfile } from "@/services/emotional-model";
+import {
+  upsertDailyImpulseLog,
+  updateActiveChallengesFromCheckin,
+} from "@/services/impulse-challenges";
 import { detectUserState, updateUserState } from "@/services/state";
+import { updateStreak } from "@/services/streak";
 
 describe("POST /api/checkin", () => {
   beforeEach(() => {
@@ -55,6 +69,22 @@ describe("POST /api/checkin", () => {
       progressTrend: "mejora",
     });
     (updateEmotionalProfile as jest.Mock).mockResolvedValue(undefined);
+    (upsertDailyImpulseLog as jest.Mock).mockResolvedValue({
+      id: "log_1",
+      emotionalState: "claridad",
+      note: "Hoy me siento mejor",
+      mood: "positive",
+      challengeStatus: "cumplido",
+      momentum: 4,
+      createdAt: new Date().toISOString(),
+    });
+    (updateActiveChallengesFromCheckin as jest.Mock).mockResolvedValue([]);
+    (updateStreak as jest.Mock).mockResolvedValue({
+      currentDays: 1,
+      bestDays: 1,
+      lastCheckInDate: new Date().toISOString(),
+      status: "active",
+    });
     (getPrismaClient as jest.Mock).mockReturnValue({
       dailyCheckin: {
         create: jest.fn().mockResolvedValue({

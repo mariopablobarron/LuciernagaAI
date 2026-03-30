@@ -1,0 +1,608 @@
+"use client";
+
+import type { ReactNode } from "react";
+import {
+  ArrowRight,
+  ChartNoAxesColumn,
+  CheckCheck,
+  ClipboardCheck,
+  Compass,
+  MessageSquareText,
+  Plus,
+  Target,
+} from "lucide-react";
+import type { BrowserSessionUser } from "@/lib/session-client";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+
+export type WorkspaceTab = "chat" | "plan" | "checkin";
+
+type WorkspaceGoal = {
+  id: string;
+  title: string;
+  status: string;
+  progress: number;
+  completedCount: number;
+  totalCount: number;
+  actions: Array<{
+    id: string;
+    description: string;
+    completed: boolean;
+    createdAt?: string;
+  }>;
+} | null;
+
+type WorkspaceActionLock = {
+  message: string;
+  actionTitle: string;
+} | null;
+
+type WorkspaceCheckinStatus = {
+  message: string;
+  checkinsToday: number;
+  state: string;
+  savedAt: string;
+} | null;
+
+type HomeWorkspaceProps = {
+  activeTab: WorkspaceTab;
+  onTabChange: (value: WorkspaceTab) => void;
+  chat: ReactNode;
+  onNewConversation: () => void;
+  conversationTitle: string;
+  conversationState: string;
+  flowSummary?: string | null;
+  flowInstruction?: string | null;
+  responseSignals?: {
+    searchUsed: boolean;
+    fallback: boolean;
+  };
+  progress: {
+    completedActions: number;
+    totalActions: number;
+    dominantState: string;
+  };
+  activeGoal: WorkspaceGoal;
+  actionLock?: WorkspaceActionLock;
+  pendingGoalAction?: {
+    id: string;
+    description: string;
+  } | null;
+  goalLoading?: boolean;
+  onToggleAction?: (actionId: string, completed: boolean) => Promise<void> | void;
+  sessionProfile: BrowserSessionUser | null;
+  captureEmailRecommended: boolean;
+  captureEmailPrompt: string | null;
+  saveProgressEmail: string;
+  onSaveProgressEmailChange: (value: string) => void;
+  saveProgressLoading: boolean;
+  saveProgressStatus: string | null;
+  onSaveProgress: () => Promise<void> | void;
+  showUpgradeCta: boolean;
+  upgradeCopy: string | null;
+  onOpenUpgrade: () => void;
+  checkinInput: string;
+  onCheckinInputChange: (value: string) => void;
+  checkinLoading: boolean;
+  checkinStatus: WorkspaceCheckinStatus;
+  onCheckinSubmit: () => Promise<void> | void;
+};
+
+function normalizePlanDescription(sessionProfile: BrowserSessionUser | null): string {
+  if (!sessionProfile) {
+    return "Sesión iniciándose. El progreso y el plan se sincronizarán cuando la identidad esté lista.";
+  }
+
+  if (sessionProfile.messageLimitPerDay == null) {
+    return "Sin límite diario y con continuidad completa de conversaciones, objetivos y acciones.";
+  }
+
+  return `Te quedan ${sessionProfile.messagesRemainingToday ?? 0} de ${
+    sessionProfile.messageLimitPerDay
+  } mensajes hoy en el plan ${sessionProfile.planLabel}.`;
+}
+
+function statusVariant(value: string): "secondary" | "success" | "warning" {
+  if (value === "claridad") return "success";
+  if (value === "bloqueo" || value === "ansiedad") return "warning";
+  return "secondary";
+}
+
+export default function HomeWorkspace({
+  activeTab,
+  onTabChange,
+  chat,
+  onNewConversation,
+  conversationTitle,
+  conversationState,
+  flowSummary,
+  flowInstruction,
+  responseSignals,
+  progress,
+  activeGoal,
+  actionLock,
+  pendingGoalAction,
+  goalLoading = false,
+  onToggleAction,
+  sessionProfile,
+  captureEmailRecommended,
+  captureEmailPrompt,
+  saveProgressEmail,
+  onSaveProgressEmailChange,
+  saveProgressLoading,
+  saveProgressStatus,
+  onSaveProgress,
+  showUpgradeCta,
+  upgradeCopy,
+  onOpenUpgrade,
+  checkinInput,
+  onCheckinInputChange,
+  checkinLoading,
+  checkinStatus,
+  onCheckinSubmit,
+}: HomeWorkspaceProps) {
+  const accountLabel = sessionProfile?.isAnonymous
+    ? "Cuenta anónima"
+    : sessionProfile?.email || "Pendiente de vincular";
+
+  return (
+    <Tabs
+      value={activeTab}
+      onValueChange={(value) => onTabChange(value as WorkspaceTab)}
+      className="flex h-full min-h-[34rem] flex-col gap-4"
+    >
+      <Card className="border-border/80 bg-card/95 shadow-sm">
+        <CardContent className="space-y-4 p-4">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                Workspace principal
+              </p>
+              <h2 className="mt-1 text-lg font-semibold text-foreground">
+                Todo lo importante vive aquí
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Conversa, aterriza un plan y mantén el hábito diario sin salir del centro del
+                producto.
+              </p>
+            </div>
+
+            <TabsList className="grid w-full grid-cols-3 lg:w-[420px]">
+              <TabsTrigger value="chat" className="gap-2">
+                <MessageSquareText className="size-4" />
+                Chat
+              </TabsTrigger>
+              <TabsTrigger value="plan" className="gap-2">
+                <Target className="size-4" />
+                Plan
+              </TabsTrigger>
+              <TabsTrigger value="checkin" className="gap-2">
+                <ClipboardCheck className="size-4" />
+                Check-in
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 text-sm">
+            <Badge variant="secondary" className="rounded-full px-3 py-1">
+              Conversación: <span className="ml-1 font-semibold">{conversationTitle}</span>
+            </Badge>
+            <Badge variant={statusVariant(conversationState)} className="rounded-full px-3 py-1">
+              Estado: <span className="ml-1 font-semibold capitalize">{conversationState}</span>
+            </Badge>
+            <Badge variant="secondary" className="rounded-full px-3 py-1">
+              Cuenta: <span className="ml-1 font-semibold">{accountLabel}</span>
+            </Badge>
+            {activeGoal ? (
+              <Badge variant="secondary" className="rounded-full px-3 py-1">
+                Objetivo: <span className="ml-1 font-semibold">{activeGoal.title}</span>
+              </Badge>
+            ) : null}
+            {flowSummary ? (
+              <Badge variant="secondary" className="rounded-full px-3 py-1">
+                {flowSummary}
+              </Badge>
+            ) : null}
+          </div>
+        </CardContent>
+      </Card>
+
+      <TabsContent value="chat" className="flex-1">
+        <div className="flex h-full min-h-[34rem] flex-col gap-4">
+          <Card className="border-border/80 bg-card/95 shadow-sm">
+            <CardContent className="flex flex-col gap-3 p-4 lg:flex-row lg:items-center lg:justify-between">
+              <div className="space-y-3">
+                <p className="text-sm font-semibold text-foreground">
+                  Mantén la conversación como superficie principal
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Usa el chat para definir claridad y salta al plan cuando quieras convertirlo en
+                  seguimiento.
+                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant={statusVariant(conversationState)} className="rounded-full px-3 py-1">
+                    Estado {conversationState}
+                  </Badge>
+                  <Badge variant="secondary" className="rounded-full px-3 py-1">
+                    Dominante {progress.dominantState}
+                  </Badge>
+                  {responseSignals?.searchUsed ? (
+                    <Badge variant="secondary" className="rounded-full px-3 py-1">
+                      Internet usado
+                    </Badge>
+                  ) : null}
+                  {responseSignals?.fallback ? (
+                    <Badge variant="warning" className="rounded-full px-3 py-1">
+                      Fallback activo
+                    </Badge>
+                  ) : null}
+                </div>
+                {flowInstruction ? (
+                  <p className="text-sm text-muted-foreground">{flowInstruction}</p>
+                ) : null}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button type="button" variant="outline" size="sm" onClick={onNewConversation}>
+                  <Plus className="size-4" />
+                  Nueva conversación
+                </Button>
+                <Button type="button" variant="secondary" size="sm" onClick={() => onTabChange("plan")}>
+                  Ver plan
+                  <ArrowRight className="size-4" />
+                </Button>
+                {showUpgradeCta ? (
+                  <Button type="button" size="sm" onClick={onOpenUpgrade}>
+                    Desbloquear continuidad
+                  </Button>
+                ) : null}
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="min-h-[32rem] flex-1">{chat}</div>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="plan" className="flex-1">
+        <div className="grid gap-4 xl:grid-cols-[1.18fr_0.82fr]">
+          <Card id="mi-progreso" className="border-border/80 bg-card/95 shadow-sm">
+            <CardHeader className="pb-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <CardTitle className="text-xl">Plan de ejecución</CardTitle>
+                  <CardDescription className="mt-1">
+                    Convierte la claridad en seguimiento visible. Aquí vive el objetivo y la deuda
+                    real de acción.
+                  </CardDescription>
+                </div>
+                <Badge
+                  variant={actionLock || pendingGoalAction ? "warning" : "success"}
+                  className="rounded-full px-3 py-1"
+                >
+                  {actionLock || pendingGoalAction ? "Seguimiento activo" : "Sin deuda abierta"}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              {!activeGoal ? (
+                <div className="rounded-2xl border border-dashed border-border bg-muted/40 p-6 text-sm text-muted-foreground">
+                  No hay un objetivo activo todavía. Usa el chat para definirlo y luego vuelve aquí
+                  para convertirlo en sistema.
+                </div>
+              ) : (
+                <>
+                  <div className="rounded-2xl border border-border bg-muted/40 p-4">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge variant="secondary" className="rounded-full px-3 py-1">
+                        {activeGoal.status}
+                      </Badge>
+                      <Badge variant="secondary" className="rounded-full px-3 py-1">
+                        {activeGoal.completedCount}/{activeGoal.totalCount} acciones
+                      </Badge>
+                    </div>
+                    <h3 className="mt-3 text-lg font-semibold text-foreground">{activeGoal.title}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      Progreso actual: {activeGoal.progress}% completado
+                    </p>
+                    <Progress value={activeGoal.progress} className="mt-3 h-2.5" />
+                  </div>
+
+                  <div className="rounded-2xl border border-border">
+                    <div className="border-b border-border px-4 py-3">
+                      <p className="text-sm font-semibold text-foreground">Checklist de acciones</p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Marca avances sin salir del workspace central.
+                      </p>
+                    </div>
+                    <ScrollArea className="h-[18rem]">
+                      <div className="space-y-3 p-4">
+                        {activeGoal.actions.length === 0 ? (
+                          <div className="rounded-2xl border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+                            Aún no hay acciones definidas para este objetivo.
+                          </div>
+                        ) : (
+                          activeGoal.actions.map((goalAction) => (
+                            <div
+                              key={goalAction.id}
+                              className="flex flex-col gap-3 rounded-2xl border border-border bg-background p-4 sm:flex-row sm:items-center sm:justify-between"
+                            >
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <Badge
+                                    variant={goalAction.completed ? "success" : "secondary"}
+                                    className="rounded-full px-2.5 py-0.5"
+                                  >
+                                    {goalAction.completed ? "Hecha" : "Pendiente"}
+                                  </Badge>
+                                </div>
+                                <p
+                                  className={`text-sm font-medium ${
+                                    goalAction.completed
+                                      ? "text-muted-foreground line-through"
+                                      : "text-foreground"
+                                  }`}
+                                >
+                                  {goalAction.description}
+                                </p>
+                              </div>
+                              <Button
+                                type="button"
+                                variant={goalAction.completed ? "outline" : "secondary"}
+                                size="sm"
+                                disabled={goalLoading}
+                                onClick={() =>
+                                  void onToggleAction?.(goalAction.id, !goalAction.completed)
+                                }
+                              >
+                                {goalAction.completed ? (
+                                  <>
+                                    <Compass className="size-4" />
+                                    Marcar pendiente
+                                  </>
+                                ) : (
+                                  <>
+                                    <CheckCheck className="size-4" />
+                                    Marcar hecha
+                                  </>
+                                )}
+                              </Button>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </ScrollArea>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          <div className="space-y-4">
+            <Card className="border-border/80 bg-card/95 shadow-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base">Continuidad y cuenta</CardTitle>
+                <CardDescription>{normalizePlanDescription(sessionProfile)}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant="secondary" className="rounded-full px-3 py-1">
+                    {sessionProfile?.planLabel || "Free"}
+                  </Badge>
+                  <Badge
+                    variant={sessionProfile?.isAnonymous ? "warning" : "success"}
+                    className="rounded-full px-3 py-1"
+                  >
+                    {sessionProfile?.isAnonymous ? "Progreso sin guardar" : "Progreso guardado"}
+                  </Badge>
+                  {sessionProfile?.subscriptionStatus ? (
+                    <Badge variant="secondary" className="rounded-full px-3 py-1">
+                      {sessionProfile.subscriptionStatus}
+                    </Badge>
+                  ) : null}
+                  {sessionProfile?.messageLimitPerDay != null ? (
+                    <Badge variant="warning" className="rounded-full px-3 py-1">
+                      {sessionProfile.messagesUsedToday}/{sessionProfile.messageLimitPerDay} hoy
+                    </Badge>
+                  ) : null}
+                </div>
+
+                {(captureEmailRecommended ||
+                  Boolean(sessionProfile && !sessionProfile.isAnonymous)) && (
+                  <div className="rounded-2xl border border-border bg-muted/40 p-4">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                      Guardar progreso
+                    </p>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {captureEmailPrompt ||
+                        "Vincula un email para conservar conversaciones, objetivos y continuidad entre dispositivos."}
+                    </p>
+                    <div className="mt-4 flex flex-col gap-3">
+                      <Input
+                        type="email"
+                        value={saveProgressEmail}
+                        onChange={(event) => onSaveProgressEmailChange(event.target.value)}
+                        placeholder="tu@email.com"
+                        className="bg-background"
+                      />
+                      <Button
+                        type="button"
+                        onClick={() => void onSaveProgress()}
+                        disabled={saveProgressLoading || !saveProgressEmail.trim()}
+                      >
+                        {saveProgressLoading ? "Guardando..." : "Guardar progreso"}
+                      </Button>
+                    </div>
+                    {saveProgressStatus ? (
+                      <div className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-3 text-sm text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-100">
+                        {saveProgressStatus}
+                      </div>
+                    ) : null}
+                  </div>
+                )}
+
+                {showUpgradeCta && upgradeCopy ? (
+                  <div className="rounded-2xl border border-border bg-background/80 p-4">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                      Continuidad completa
+                    </p>
+                    <p className="mt-2 text-sm text-muted-foreground">{upgradeCopy}</p>
+                    <Button type="button" variant="secondary" className="mt-4 w-full" onClick={onOpenUpgrade}>
+                      Ver plan Pro
+                    </Button>
+                  </div>
+                ) : null}
+              </CardContent>
+            </Card>
+
+            <Card className="border-border/80 bg-card/95 shadow-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base">Responsabilidad activa</CardTitle>
+                <CardDescription>
+                  Lo que no se hace hoy se convierte en fricción mañana.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {actionLock ? (
+                  <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-800 dark:text-amber-300">
+                      Acción pendiente prioritaria
+                    </p>
+                    <p className="mt-2 font-semibold">{actionLock.actionTitle}</p>
+                    <p className="mt-1">{actionLock.message}</p>
+                  </div>
+                ) : pendingGoalAction ? (
+                  <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-foreground">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                      Siguiente acción sugerida
+                    </p>
+                    <p className="mt-2 font-medium">{pendingGoalAction.description}</p>
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+                    No hay deuda activa abierta. Aprovecha el chat para definir el siguiente paso.
+                  </div>
+                )}
+
+                <Button type="button" variant="outline" className="w-full" onClick={() => onTabChange("chat")}>
+                  Volver al chat
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="checkin" className="flex-1">
+        <div className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
+          <Card className="border-border/80 bg-card/95 shadow-sm">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl">Ritual diario</CardTitle>
+              <CardDescription>
+                Úsalo para registrar cómo llegas hoy, aunque no necesites una conversación larga.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Textarea
+                value={checkinInput}
+                onChange={(event) => onCheckinInputChange(event.target.value)}
+                rows={7}
+                disabled={checkinLoading}
+                placeholder="Ejemplo: Hoy estoy bloqueado y me cuesta arrancar."
+                className="min-h-[14rem] resize-none bg-background"
+              />
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="text-xs text-muted-foreground">
+                  {checkinStatus ? (
+                    <span>
+                      Último guardado:{" "}
+                      {new Date(checkinStatus.savedAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}{" "}
+                      · estado {checkinStatus.state}
+                    </span>
+                  ) : (
+                    <span>Sin check-in registrado en esta sesión.</span>
+                  )}
+                </div>
+                <Button
+                  type="button"
+                  onClick={() => void onCheckinSubmit()}
+                  disabled={checkinLoading || !checkinInput.trim()}
+                >
+                  {checkinLoading ? "Guardando..." : "Guardar check-in"}
+                </Button>
+              </div>
+              {checkinStatus ? (
+                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-3 text-sm text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-100">
+                  {checkinStatus.message}
+                </div>
+              ) : null}
+            </CardContent>
+          </Card>
+
+          <div className="space-y-4">
+            <Card className="border-border/80 bg-card/95 shadow-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base">Pulso actual</CardTitle>
+                <CardDescription>
+                  Una lectura rápida de dónde estás hoy y cómo encaja con tu continuidad.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant={statusVariant(conversationState)} className="rounded-full px-3 py-1">
+                    Estado actual: {conversationState}
+                  </Badge>
+                  <Badge variant="secondary" className="rounded-full px-3 py-1">
+                    Dominante: {progress.dominantState}
+                  </Badge>
+                  {checkinStatus ? (
+                    <Badge variant="success" className="rounded-full px-3 py-1">
+                      {checkinStatus.checkinsToday} check-ins hoy
+                    </Badge>
+                  ) : null}
+                </div>
+
+                <div className="rounded-2xl border border-border bg-muted/40 p-4">
+                  <p className="text-sm font-medium text-foreground">
+                    Haz un check-in cuando necesites registrar el estado sin abrir una sesión larga.
+                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    El objetivo no es explicar todo. Es dejar una señal breve que mantenga el hilo
+                    del proceso.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border/80 bg-card/95 shadow-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base">Atajos de continuidad</CardTitle>
+                <CardDescription>
+                  Salta al modo que necesites sin perder el estado local de esta vista.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-3">
+                <Button type="button" variant="secondary" className="justify-between" onClick={() => onTabChange("chat")}>
+                  Ir al chat
+                  <ArrowRight className="size-4" />
+                </Button>
+                <Button type="button" variant="outline" className="justify-between" onClick={() => onTabChange("plan")}>
+                  Ver plan activo
+                  <ChartNoAxesColumn className="size-4" />
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </TabsContent>
+    </Tabs>
+  );
+}

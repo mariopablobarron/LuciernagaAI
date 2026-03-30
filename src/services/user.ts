@@ -4,6 +4,7 @@ import { getPrismaClient } from "@/db/prisma";
 const SYNTHETIC_EMAIL_DOMAIN = "session.luciernaga.local";
 const ACTIVE_SUBSCRIPTION_STATUSES = new Set(["active", "trialing"]);
 export const FREE_PLAN_MESSAGE_LIMIT = 10;
+export type CanonicalUserPlan = "free" | "pro";
 
 type UserStateRecord = {
   id: string;
@@ -28,7 +29,7 @@ export type UserSessionProfile = {
   email: string;
   name: string | null;
   role: string;
-  plan: string;
+  plan: CanonicalUserPlan;
   planLabel: string;
   subscriptionStatus: string;
   hasPlan: boolean;
@@ -67,7 +68,7 @@ function normalizeSyntheticLocalPart(userId: string): string {
 }
 
 function buildAccessState(params: {
-  plan: string;
+  plan: CanonicalUserPlan;
   hasPlan: boolean;
   subscriptionStatus: string;
   messagesUsedToday: number;
@@ -79,7 +80,7 @@ function buildAccessState(params: {
 
   return {
     plan: params.plan,
-    planLabel: getPlanLabel(params.plan, params.hasPlan),
+    planLabel: getPlanLabel(params.plan),
     subscriptionStatus: params.subscriptionStatus,
     hasPlan: params.hasPlan,
     messagesUsedToday: params.messagesUsedToday,
@@ -88,24 +89,21 @@ function buildAccessState(params: {
   };
 }
 
-function getPlanLabel(plan: string, hasPlan: boolean): string {
+function normalizePlan(plan: string | null | undefined, hasPlan: boolean): CanonicalUserPlan {
   if (!hasPlan) {
-    return "Free";
+    return "free";
   }
 
-  if (plan === "starter") {
-    return "Starter";
+  const normalized = (plan || "").trim().toLowerCase();
+  if (normalized === "pro" || normalized === "starter") {
+    return "pro";
   }
 
-  if (plan === "pro") {
-    return "Pro";
-  }
+  return "pro";
+}
 
-  return plan
-    .split(/[-_\s]+/g)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
+function getPlanLabel(plan: CanonicalUserPlan): string {
+  return plan === "pro" ? "Pro" : "Free";
 }
 
 function getStartOfDay(): Date {
@@ -167,6 +165,107 @@ async function mergeUserStates(params: {
   });
 }
 
+async function mergeUserProfileAssignments(params: {
+  tx: Prisma.TransactionClient;
+  sourceUserId: string;
+  targetUserId: string;
+}): Promise<void> {
+  const [sourceProfile, targetProfile] = await Promise.all([
+    params.tx.userProfile.findUnique({
+      where: { userId: params.sourceUserId },
+    }),
+    params.tx.userProfile.findUnique({
+      where: { userId: params.targetUserId },
+    }),
+  ]);
+
+  if (!sourceProfile) {
+    return;
+  }
+
+  if (!targetProfile) {
+    await params.tx.userProfile.update({
+      where: { id: sourceProfile.id },
+      data: {
+        userId: params.targetUserId,
+      },
+    });
+    return;
+  }
+
+  const sourceIsNewer = sourceProfile.updatedAt > targetProfile.updatedAt;
+  if (sourceIsNewer) {
+    await params.tx.userProfile.update({
+      where: { id: targetProfile.id },
+      data: {
+        profileId: sourceProfile.profileId,
+        clarityScore: sourceProfile.clarityScore,
+        autoestimaScore: sourceProfile.autoestimaScore,
+        energiaScore: sourceProfile.energiaScore,
+        disciplinaScore: sourceProfile.disciplinaScore,
+        socialScore: sourceProfile.socialScore,
+        totalScore: sourceProfile.totalScore,
+        rawAnswers: sourceProfile.rawAnswers as Prisma.InputJsonValue,
+      },
+    });
+  }
+
+  await params.tx.userProfile.delete({
+    where: { id: sourceProfile.id },
+  });
+}
+
+async function mergeUserStreaks(params: {
+  tx: Prisma.TransactionClient;
+  sourceUserId: string;
+  targetUserId: string;
+}): Promise<void> {
+  const [sourceStreak, targetStreak] = await Promise.all([
+    params.tx.streak.findUnique({
+      where: { userId: params.sourceUserId },
+    }),
+    params.tx.streak.findUnique({
+      where: { userId: params.targetUserId },
+    }),
+  ]);
+
+  if (!sourceStreak) {
+    return;
+  }
+
+  if (!targetStreak) {
+    await params.tx.streak.update({
+      where: { id: sourceStreak.id },
+      data: {
+        userId: params.targetUserId,
+      },
+    });
+    return;
+  }
+
+  await params.tx.streak.update({
+    where: { id: targetStreak.id },
+    data: {
+      currentDays: Math.max(targetStreak.currentDays, sourceStreak.currentDays),
+      bestDays: Math.max(targetStreak.bestDays, sourceStreak.bestDays),
+      lastCheckInDate:
+        !targetStreak.lastCheckInDate ||
+        (sourceStreak.lastCheckInDate &&
+          sourceStreak.lastCheckInDate > targetStreak.lastCheckInDate)
+          ? sourceStreak.lastCheckInDate
+          : targetStreak.lastCheckInDate,
+      status:
+        targetStreak.status === "active" || sourceStreak.status === "active"
+          ? "active"
+          : targetStreak.status,
+    },
+  });
+
+  await params.tx.streak.delete({
+    where: { id: sourceStreak.id },
+  });
+}
+
 async function moveUserOwnedRecords(params: {
   tx: Prisma.TransactionClient;
   sourceUserId: string;
@@ -205,8 +304,20 @@ async function moveUserOwnedRecords(params: {
       where: { userId: params.sourceUserId },
       data: { userId: params.targetUserId },
     }),
+    params.tx.userChallenge.updateMany({
+      where: { userId: params.sourceUserId },
+      data: { userId: params.targetUserId },
+    }),
+    params.tx.futureMessage.updateMany({
+      where: { userId: params.sourceUserId },
+      data: { userId: params.targetUserId },
+    }),
   ]);
-  await mergeUserStates(params);
+  await Promise.all([
+    mergeUserStates(params),
+    mergeUserProfileAssignments(params),
+    mergeUserStreaks(params),
+  ]);
 }
 
 export function normalizeEmail(email: string): string {
@@ -347,7 +458,7 @@ export async function getUserAccessState(userId: string): Promise<UserAccessStat
 
   const subscriptionStatus = latestSubscription?.status ?? "free";
   const hasPlan = ACTIVE_SUBSCRIPTION_STATUSES.has(subscriptionStatus);
-  const plan = hasPlan ? latestSubscription?.plan ?? "starter" : "free";
+  const plan = normalizePlan(latestSubscription?.plan, hasPlan);
 
   return buildAccessState({
     plan,

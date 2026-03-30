@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { AdminMetricCard } from "@/features/admin/components/AdminMetricCard";
 import { AdminPanel } from "@/features/admin/components/AdminPanel";
 import { AdminShell } from "@/features/admin/components/AdminShell";
@@ -80,11 +82,23 @@ export default function AdminPage() {
   }
 
   if (error) {
-    return <div className="p-6 text-red-600">{error}</div>;
+    return (
+      <main className="min-h-screen bg-background p-6">
+        <Card className="mx-auto max-w-2xl border-rose-200 bg-rose-50 dark:border-rose-900 dark:bg-rose-950/40">
+          <CardContent className="p-6 text-rose-800 dark:text-rose-100">{error}</CardContent>
+        </Card>
+      </main>
+    );
   }
 
   if (!data) {
-    return <div className="p-6">Cargando...</div>;
+    return (
+      <main className="min-h-screen bg-background p-6">
+        <Card className="mx-auto max-w-2xl border-border/80 bg-card/95">
+          <CardContent className="p-6 text-muted-foreground">Cargando dashboard...</CardContent>
+        </Card>
+      </main>
+    );
   }
 
   return (
@@ -198,15 +212,15 @@ export default function AdminPage() {
 
           <div className="space-y-3">
             {SAAS_CONFIG.billing.plans.map((plan) => (
-              <div key={plan.id} className="rounded-2xl border border-slate-200 bg-white p-4">
+              <div key={plan.id} className="rounded-2xl border border-border bg-background p-4">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="font-semibold text-slate-900">{plan.name}</p>
-                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
+                  <p className="font-semibold text-foreground">{plan.name}</p>
+                  <Badge variant="secondary" className="rounded-full px-2.5 py-1">
                     {plan.status}
-                  </span>
+                  </Badge>
                 </div>
-                <p className="mt-2 text-sm text-slate-600">{plan.description}</p>
-                <p className="mt-2 text-sm font-medium text-slate-800">{plan.priceLabel}</p>
+                <p className="mt-2 text-sm text-muted-foreground">{plan.description}</p>
+                <p className="mt-2 text-sm font-medium text-foreground">{plan.priceLabel}</p>
               </div>
             ))}
           </div>

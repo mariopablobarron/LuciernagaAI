@@ -1,15 +1,24 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import Chat, { type ChatMessage } from "@/components/Chat";
+import HomeHero from "@/components/home/HomeHero";
+import HomeWorkspace, { type WorkspaceTab } from "@/components/home/HomeWorkspace";
 import InsightsPanel from "@/components/InsightsPanel";
 import Sidebar, { type SidebarConversation } from "@/components/Sidebar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { PRODUCT_DISCLAIMERS } from "@/lib/legal";
 import {
   bootstrapBrowserSession,
@@ -17,6 +26,7 @@ import {
   fetchBrowserSession,
   type BrowserSessionUser,
 } from "@/lib/session-client";
+import { DEFAULT_ONBOARDING_EXAMPLE } from "@/lib/onboarding";
 import { DEFAULT_EMOTIONAL_PROFILE, type EmotionalProfile } from "@/types/emotional-profile";
 
 type Conversation = {
@@ -35,6 +45,8 @@ type Conversation = {
   flow: FlowSignal | null;
   hasLoadedMessages: boolean;
   isDraft: boolean;
+  conversionTrigger: boolean;
+  conversionType: "progress" | null;
 };
 
 type GoalAction = {
@@ -101,6 +113,8 @@ type ChatApiResponse = {
   goal?: ActiveGoal | null;
   flow?: FlowSignal | null;
   continueChat?: boolean;
+  conversionTrigger?: boolean;
+  conversionType?: "progress";
 };
 
 type ConversationsApiResponse = {
@@ -200,16 +214,6 @@ function trimTitle(input: string): string {
   return normalized.length > 48 ? `${normalized.slice(0, 48)}...` : normalized;
 }
 
-function formatIntentLabel(intent: string): string {
-  if (intent === "goal_creation") return "crear objetivo";
-  if (intent === "action_done") return "acción completada";
-  if (intent === "postpone") return "postergar";
-  if (intent === "refusal") return "rechazo";
-  if (intent === "problem") return "problema";
-  if (intent === "doubt") return "duda";
-  return intent || "sin clasificar";
-}
-
 function formatFlowLabel(flowName: string | null): string {
   if (flowName === "decision") return "decisión";
   if (flowName === "avoidance") return "evitación";
@@ -235,6 +239,8 @@ function createDraftConversation(index: number): Conversation {
     flow: null,
     hasLoadedMessages: true,
     isDraft: true,
+    conversionTrigger: false,
+    conversionType: null,
   };
 }
 
@@ -275,6 +281,8 @@ function mapApiConversationToLocal(
     flow: existing?.flow ?? null,
     hasLoadedMessages: existing?.hasLoadedMessages ?? false,
     isDraft: false,
+    conversionTrigger: existing?.conversionTrigger ?? false,
+    conversionType: existing?.conversionType ?? null,
   };
 }
 
@@ -291,6 +299,7 @@ function mergeConversations(
 }
 
 export default function HomePage() {
+  const starterPrefilledConversationsRef = useRef<Set<string>>(new Set());
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [input, setInput] = useState("");
@@ -315,10 +324,13 @@ export default function HomePage() {
   const [saveProgressStatus, setSaveProgressStatus] = useState<string | null>(null);
   const [captureEmailRecommended, setCaptureEmailRecommended] = useState(false);
   const [captureEmailPrompt, setCaptureEmailPrompt] = useState<string | null>(null);
+  const [captureDialogOpen, setCaptureDialogOpen] = useState(false);
   const [sessionReady, setSessionReady] = useState(false);
   const [sessionLoading, setSessionLoading] = useState(true);
   const [adminAuthenticated, setAdminAuthenticated] = useState(false);
   const [adminLoading, setAdminLoading] = useState(true);
+  const [workspaceTab, setWorkspaceTab] = useState<WorkspaceTab>("chat");
+  const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
 
   const handleUnauthorizedSession = () => {
     setSessionReady(false);
@@ -336,6 +348,7 @@ export default function HomePage() {
     if (nextProfile && !nextProfile.isAnonymous) {
       setCaptureEmailRecommended(false);
       setCaptureEmailPrompt(null);
+      setCaptureDialogOpen(false);
     }
     setSaveProgressEmail((previous) => {
       if (nextProfile && !nextProfile.isAnonymous) {
@@ -437,6 +450,50 @@ export default function HomePage() {
       },
     };
   }, [actionLock, pendingGoalAction, safeConversation.state]);
+
+  const nearPlanLimit = useMemo(() => {
+    if (!sessionProfile || sessionProfile.hasPlan || sessionProfile.messageLimitPerDay == null) {
+      return false;
+    }
+
+    return (sessionProfile.messagesRemainingToday ?? 0) <= 2;
+  }, [sessionProfile]);
+
+  const limitReached = useMemo(() => {
+    if (!sessionProfile || sessionProfile.hasPlan || sessionProfile.messageLimitPerDay == null) {
+      return false;
+    }
+
+    return (sessionProfile.messagesRemainingToday ?? 0) <= 0;
+  }, [sessionProfile]);
+
+  const showUpgradeCta = useMemo(() => {
+    if (!sessionProfile || sessionProfile.hasPlan) {
+      return false;
+    }
+
+    return safeConversation.conversionTrigger || nearPlanLimit || limitReached;
+  }, [limitReached, nearPlanLimit, safeConversation.conversionTrigger, sessionProfile]);
+
+  const upgradeCopy = useMemo(() => {
+    if (!showUpgradeCta) {
+      return null;
+    }
+
+    if (limitReached) {
+      return "Has tocado el límite del plan Free. Pro mantiene el hilo, evita cortes y te acompaña sin límite diario.";
+    }
+
+    if (safeConversation.conversionTrigger) {
+      return "Aquí ya hubo valor real: claridad, objetivo o una acción concreta. Pro sirve para sostener ese avance y no perderlo entre sesiones.";
+    }
+
+    if (nearPlanLimit) {
+      return "Estás cerca del límite diario. Si quieres continuidad sin perder ritmo, Pro es el paso natural.";
+    }
+
+    return null;
+  }, [limitReached, nearPlanLimit, safeConversation.conversionTrigger, showUpgradeCta]);
 
   const loadMessages = async (conversationId: string): Promise<void> => {
     const response = await fetch(
@@ -612,6 +669,23 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
+    if (safeConversation.messages.length > 0) {
+      return;
+    }
+
+    if (starterPrefilledConversationsRef.current.has(safeConversation.id)) {
+      return;
+    }
+
+    if (input.trim()) {
+      return;
+    }
+
+    starterPrefilledConversationsRef.current.add(safeConversation.id);
+    setInput(DEFAULT_ONBOARDING_EXAMPLE);
+  }, [input, safeConversation.id, safeConversation.messages.length]);
+
+  useEffect(() => {
     let cancelled = false;
 
     async function checkAdminSession() {
@@ -657,7 +731,14 @@ export default function HomePage() {
     const next = createDraftConversation(conversations.length + 1);
     setConversations((previous) => [next, ...previous]);
     setActiveConversationId(next.id);
+    setWorkspaceTab("chat");
     setInput("");
+    setError(null);
+  };
+
+  const handleUseStarterExample = (value: string) => {
+    setWorkspaceTab("chat");
+    setInput(value);
     setError(null);
   };
 
@@ -736,6 +817,7 @@ export default function HomePage() {
       );
       setCaptureEmailRecommended(false);
       setCaptureEmailPrompt(null);
+      setCaptureDialogOpen(false);
     } catch (loginError: unknown) {
       const message =
         loginError instanceof Error ? loginError.message : "No se pudo guardar el progreso.";
@@ -1060,9 +1142,14 @@ export default function HomePage() {
       const nextGoal = payload.goal ?? null;
       const nextEmotionalProfile = payload.emotionalProfile ?? emotionalProfile;
       const nextFlow = payload.flow ?? null;
+      const conversionTrigger = Boolean(payload.conversionTrigger);
+      const conversionType = payload.conversionType ?? null;
       if (payload.captureEmail) {
         setCaptureEmailRecommended(true);
         setCaptureEmailPrompt(payload.captureEmailMessage || null);
+        if (sessionProfile?.isAnonymous !== false) {
+          setCaptureDialogOpen(true);
+        }
       } else if (sessionProfile && !sessionProfile.isAnonymous) {
         setCaptureEmailRecommended(false);
         setCaptureEmailPrompt(null);
@@ -1091,6 +1178,8 @@ export default function HomePage() {
                 searchUsed: Boolean(payload.searchUsed),
                 fallback: Boolean(payload.fallback),
                 flow: nextFlow,
+                conversionTrigger,
+                conversionType,
                 messageCount: conversation.messageCount + 1,
                 messages: [...conversation.messages, assistantMessage],
               }
@@ -1178,326 +1267,316 @@ export default function HomePage() {
   };
 
   return (
-    <AppLayout
-      title="Luciernaga AI"
-      subtitle="Mentoría conversacional con foco en acción, continuidad emocional y un contexto persistente que acompaña la conversación."
-      summary={
-        <>
-          <Badge variant="secondary" className="rounded-full px-3 py-1">
-            Cuenta:{" "}
-            <span className="ml-1 font-semibold">
-              {sessionProfile?.isAnonymous
-                ? "Anónima"
-                : sessionProfile?.email || "Pendiente de vincular"}
-            </span>
-          </Badge>
-          <Badge variant="secondary" className="rounded-full px-3 py-1">
-            Plan: <span className="ml-1 font-semibold">{sessionProfile?.planLabel || "Free"}</span>
-          </Badge>
-          {sessionProfile?.messageLimitPerDay != null ? (
-            <Badge variant="warning" className="rounded-full px-3 py-1">
-              Uso hoy:{" "}
+    <>
+      <AppLayout
+        title="Luciernaga AI"
+        subtitle="Mentoría conversacional con foco en acción, continuidad emocional y un contexto persistente que acompaña la conversación."
+        summary={
+          <>
+            <Badge variant="secondary" className="rounded-full px-3 py-1">
+              Cuenta:{" "}
               <span className="ml-1 font-semibold">
-                {sessionProfile?.messagesUsedToday ?? 0}/{sessionProfile?.messageLimitPerDay ?? 0}
+                {sessionProfile?.isAnonymous
+                  ? "Anónima"
+                  : sessionProfile?.email || "Pendiente de vincular"}
               </span>
             </Badge>
-          ) : (
-            <Badge variant="success" className="rounded-full px-3 py-1">
-              Acceso completo activo
-            </Badge>
-          )}
-          <Badge variant="secondary" className="rounded-full px-3 py-1">
-            Objetivo: <span className="ml-1 font-semibold">{activeGoal?.title || "Sin objetivo"}</span>
-          </Badge>
-          <Badge
-            variant={pendingActionsCount > 0 || effectiveActionLock ? "warning" : "success"}
-            className="rounded-full px-3 py-1"
-          >
-            {pendingActionsCount > 0
-              ? pendingActionsCount === 1
-                ? "1 acción pendiente"
-                : `${pendingActionsCount} acciones pendientes`
-              : "Sin acciones pendientes"}
-          </Badge>
-          {safeConversation.searchUsed ? (
             <Badge variant="secondary" className="rounded-full px-3 py-1">
-              Internet usado
+              Plan: <span className="ml-1 font-semibold">{sessionProfile?.planLabel || "Free"}</span>
             </Badge>
-          ) : null}
-          {safeConversation.fallback ? (
-            <Badge variant="danger" className="rounded-full px-3 py-1">
-              Fallback IA activo
-            </Badge>
-          ) : null}
-          {safeConversation.flow?.activeFlow ? (
             <Badge variant="secondary" className="rounded-full px-3 py-1">
-              Flujo {formatFlowLabel(safeConversation.flow.activeFlow)} · paso{" "}
-              {safeConversation.flow.currentStep}
+              Progreso:{" "}
+              <span className="ml-1 font-semibold">
+                {progress.completedActions}/{progress.totalActions}
+              </span>
             </Badge>
-          ) : null}
-        </>
-      }
-      prelude={
-        <>
-          <Card className="border-border/80 bg-card/95 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                Uso responsable
-              </CardTitle>
-              <CardDescription className="text-sm leading-6 text-foreground">
-                {PRODUCT_DISCLAIMERS[0]}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-0 text-sm text-muted-foreground">
-              {PRODUCT_DISCLAIMERS[1]} Si hay riesgo alto, prioriza ayuda humana inmediata.
-            </CardContent>
-          </Card>
-
-          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.55fr_0.95fr]">
-            <Card className="border-border/80 bg-card/95 shadow-sm">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-base font-semibold">Continuidad de sesión</CardTitle>
-                <CardDescription>
-                  Mantén contexto, progreso y seguimiento entre sesiones sin cambiar la lógica actual
-                  del producto.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex flex-wrap items-center gap-2 text-sm">
-                  <Badge variant="secondary" className="rounded-full px-3 py-1">
-                    Progreso:{" "}
-                    <span className="ml-1 font-semibold">
-                      {progress.completedActions}/{progress.totalActions}
-                    </span>
-                  </Badge>
-                  <Badge variant="secondary" className="rounded-full px-3 py-1">
-                    Estado dominante:{" "}
-                    <span className="ml-1 font-semibold">{progress.dominantState}</span>
-                  </Badge>
-                  {effectiveActionLock ? (
-                    <Badge variant="warning" className="rounded-full px-3 py-1">
-                      Modo responsabilidad activo
-                    </Badge>
-                  ) : null}
+            <Badge variant="secondary" className="rounded-full px-3 py-1">
+              Objetivo:{" "}
+              <span className="ml-1 font-semibold">{activeGoal?.title || "Sin objetivo"}</span>
+            </Badge>
+            <Badge
+              variant={pendingActionsCount > 0 || effectiveActionLock ? "warning" : "success"}
+              className="rounded-full px-3 py-1"
+            >
+              {pendingActionsCount > 0
+                ? pendingActionsCount === 1
+                  ? "1 acción pendiente"
+                  : `${pendingActionsCount} acciones pendientes`
+                : "Sin acciones pendientes"}
+            </Badge>
+            <Badge
+              variant={
+                safeConversation.state === "claridad"
+                  ? "success"
+                  : safeConversation.state === "bloqueo" || safeConversation.state === "ansiedad"
+                    ? "warning"
+                    : "secondary"
+              }
+              className="rounded-full px-3 py-1"
+            >
+              Estado: <span className="ml-1 font-semibold capitalize">{safeConversation.state}</span>
+            </Badge>
+          </>
+        }
+        prelude={
+          <>
+            <HomeHero
+              onUseChat={() => setWorkspaceTab("chat")}
+              onUseExample={handleUseStarterExample}
+            />
+            <Card className="border-border/70 bg-card/80 shadow-sm">
+              <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="space-y-1">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Uso responsable
+                  </p>
+                  <p className="text-sm text-foreground">{PRODUCT_DISCLAIMERS[0]}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {PRODUCT_DISCLAIMERS[1]} Si hay riesgo alto, prioriza ayuda humana inmediata.
+                  </p>
                 </div>
-
-                {(captureEmailRecommended ||
-                  Boolean(sessionProfile && !sessionProfile.isAnonymous)) ? (
-                  <div className="rounded-2xl border border-border bg-muted/40 p-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                      Guardar progreso
-                    </p>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {captureEmailPrompt ||
-                        "Vincula un email para conservar tus conversaciones y objetivos entre dispositivos."}
-                    </p>
-                    <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                      <Input
-                        type="email"
-                        value={saveProgressEmail}
-                        onChange={(event) => setSaveProgressEmail(event.target.value)}
-                        placeholder="tu@email.com"
-                        className="bg-background"
-                      />
-                      <Button
-                        type="button"
-                        onClick={() => void handleSaveProgress()}
-                        disabled={saveProgressLoading || !saveProgressEmail.trim()}
-                      >
-                        {saveProgressLoading ? "Guardando..." : "Guardar progreso"}
-                      </Button>
-                    </div>
-                    <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-                      {sessionProfile?.isAnonymous ? (
-                        <Badge variant="warning" className="rounded-full px-3 py-1">
-                          Sesión anónima actual
-                        </Badge>
-                      ) : sessionProfile?.email ? (
-                        <Badge variant="success" className="rounded-full px-3 py-1">
-                          Vinculado a {sessionProfile.email}
-                        </Badge>
-                      ) : null}
-                      {sessionProfile?.subscriptionStatus ? (
-                        <Badge variant="secondary" className="rounded-full px-3 py-1">
-                          Estado: {sessionProfile.subscriptionStatus}
-                        </Badge>
-                      ) : null}
-                    </div>
-                    {saveProgressStatus ? (
-                      <div className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-3 text-sm text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-100">
-                        {saveProgressStatus}
-                      </div>
-                    ) : null}
-                  </div>
-                ) : null}
-
-                {safeConversation.flow?.activeFlow ? (
-                  <div className="rounded-2xl border border-violet-200 bg-violet-50 p-4 text-sm text-violet-950 dark:border-violet-900 dark:bg-violet-950/40 dark:text-violet-100">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-violet-700 dark:text-violet-300">
-                      Coach empujando flujo activo
-                    </p>
-                    <p className="mt-2 font-semibold">
-                      {formatFlowLabel(safeConversation.flow.activeFlow)} · intent{" "}
-                      {formatIntentLabel(safeConversation.flow.currentIntent)}
-                    </p>
-                    {safeConversation.flow.instruction ? (
-                      <p className="mt-2 text-violet-900 dark:text-violet-100">
-                        {safeConversation.flow.instruction}
-                      </p>
-                    ) : null}
-                  </div>
-                ) : null}
-
-                {effectiveActionLock ? (
-                  <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-800 dark:text-amber-300">
-                      Acción pendiente prioritaria
-                    </p>
-                    <p className="mt-2 font-semibold">{effectiveActionLock.action.title}</p>
-                    <p className="mt-1 text-amber-900 dark:text-amber-100">
-                      {effectiveActionLock.message}
-                    </p>
-                  </div>
-                ) : pendingGoalAction ? (
-                  <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-foreground">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                      Siguiente acción sugerida
-                    </p>
-                    <p className="mt-2 font-medium">{pendingGoalAction.description}</p>
-                  </div>
-                ) : null}
+                <a
+                  href="/api/legal"
+                  className="text-sm font-medium text-foreground underline underline-offset-4"
+                >
+                  Ver límites del sistema
+                </a>
               </CardContent>
             </Card>
+          </>
+        }
+        sidebar={
+          <Sidebar
+            conversations={sidebarConversations}
+            activeConversationId={activeConversationId || safeConversation.id}
+            progress={progress}
+            activeGoal={activeGoal}
+            actionLock={
+              effectiveActionLock
+                ? {
+                    message: effectiveActionLock.message,
+                    actionTitle: effectiveActionLock.action.title,
+                  }
+                : null
+            }
+            profile={sidebarProfile}
+            adminAuthenticated={adminAuthenticated}
+            adminLoading={adminLoading}
+            onSelectConversation={handleSelectConversation}
+            onNewConversation={handleNewConversation}
+            onAdminLogout={handleAdminLogout}
+          />
+        }
+        main={
+          <HomeWorkspace
+            activeTab={workspaceTab}
+            onTabChange={setWorkspaceTab}
+            chat={
+              <Chat
+                title={safeConversation.title}
+                messages={safeConversation.messages}
+                input={input}
+                loading={loading || sessionLoading}
+                error={error}
+                responseSignals={{
+                  searchUsed: safeConversation.searchUsed,
+                  fallback: safeConversation.fallback,
+                  flow: safeConversation.flow,
+                }}
+                actionLock={
+                  effectiveActionLock
+                    ? {
+                        message: effectiveActionLock.message,
+                        actionTitle: effectiveActionLock.action.title,
+                      }
+                    : null
+                }
+                onInputChange={setInput}
+                onSend={handleSend}
+                onUseStarterExample={handleUseStarterExample}
+              />
+            }
+            onNewConversation={handleNewConversation}
+            conversationTitle={safeConversation.title}
+            conversationState={safeConversation.state}
+            flowSummary={
+              safeConversation.flow?.activeFlow
+                ? `Flujo ${formatFlowLabel(safeConversation.flow.activeFlow)} · paso ${safeConversation.flow.currentStep}`
+                : null
+            }
+            flowInstruction={safeConversation.flow?.instruction ?? null}
+            responseSignals={{
+              searchUsed: safeConversation.searchUsed,
+              fallback: safeConversation.fallback,
+            }}
+            progress={progress}
+            activeGoal={activeGoal}
+            actionLock={
+              effectiveActionLock
+                ? {
+                    message: effectiveActionLock.message,
+                    actionTitle: effectiveActionLock.action.title,
+                  }
+                : null
+            }
+            pendingGoalAction={pendingGoalAction}
+            goalLoading={goalLoading}
+            onToggleAction={handleToggleAction}
+            sessionProfile={sessionProfile}
+            captureEmailRecommended={captureEmailRecommended}
+            captureEmailPrompt={captureEmailPrompt}
+            saveProgressEmail={saveProgressEmail}
+            onSaveProgressEmailChange={setSaveProgressEmail}
+            saveProgressLoading={saveProgressLoading}
+            saveProgressStatus={saveProgressStatus}
+            onSaveProgress={handleSaveProgress}
+            showUpgradeCta={showUpgradeCta}
+            upgradeCopy={upgradeCopy}
+            onOpenUpgrade={() => setUpgradeDialogOpen(true)}
+            checkinInput={checkinInput}
+            onCheckinInputChange={setCheckinInput}
+            checkinLoading={checkinLoading}
+            checkinStatus={checkinStatus}
+            onCheckinSubmit={handleCheckinSubmit}
+          />
+        }
+        rightPanel={
+          <InsightsPanel
+            mode={workspaceTab}
+            state={safeConversation.state}
+            emotionalProfile={emotionalProfile}
+            insight={safeConversation.insight}
+            action={safeConversation.action}
+            responseSignals={{
+              searchUsed: safeConversation.searchUsed,
+              fallback: safeConversation.fallback,
+              flow: safeConversation.flow,
+            }}
+            actionLock={
+              effectiveActionLock
+                ? {
+                    message: effectiveActionLock.message,
+                    actionTitle: effectiveActionLock.action.title,
+                  }
+                : null
+            }
+            alerts={safeConversation.alerts}
+            goal={activeGoal}
+            goalLoading={goalLoading}
+            onToggleAction={handleToggleAction}
+          />
+        }
+      />
 
-            <Card className="border-border/80 bg-card/95 shadow-sm">
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <CardTitle className="text-base font-semibold">Check-in diario</CardTitle>
-                    <CardDescription className="mt-1">
-                      Registra cómo llegas hoy aunque no quieras abrir otra conversación.
-                    </CardDescription>
-                  </div>
-                  {checkinStatus ? (
-                    <Badge variant="success" className="rounded-full px-3 py-1">
-                      {checkinStatus.checkinsToday} hoy
-                    </Badge>
-                  ) : null}
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Textarea
-                  value={checkinInput}
-                  onChange={(event) => setCheckinInput(event.target.value)}
-                  rows={4}
-                  disabled={checkinLoading}
-                  placeholder="Ejemplo: Hoy estoy bloqueado y me cuesta arrancar."
-                  className="min-h-[132px] resize-none bg-background"
-                />
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="text-xs text-muted-foreground">
-                    {checkinStatus ? (
-                      <span>
-                        Último guardado:{" "}
-                        {new Date(checkinStatus.savedAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}{" "}
-                        · estado {checkinStatus.state}
-                      </span>
-                    ) : (
-                      <span>Sin check-in registrado en esta sesión.</span>
-                    )}
-                  </div>
-                  <Button
-                    type="button"
-                    onClick={() => void handleCheckinSubmit()}
-                    disabled={checkinLoading || !checkinInput.trim()}
-                  >
-                    {checkinLoading ? "Guardando..." : "Guardar check-in"}
-                  </Button>
-                </div>
-                {checkinStatus ? (
-                  <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-3 text-sm text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-100">
-                    {checkinStatus.message}
-                  </div>
-                ) : null}
-              </CardContent>
-            </Card>
+      <Dialog open={upgradeDialogOpen} onOpenChange={setUpgradeDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Continuidad completa, no presión vacía</DialogTitle>
+            <DialogDescription>
+              {upgradeCopy ||
+                "El siguiente salto no es más ruido: es más continuidad, historial y seguimiento real."}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl border border-border bg-muted/40 p-4">
+                <p className="text-sm font-semibold text-foreground">Free</p>
+                <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+                  <li>10 mensajes al día</li>
+                  <li>Continuidad resumida</li>
+                  <li>Buen punto de entrada</li>
+                </ul>
+              </div>
+              <div className="rounded-2xl border border-border bg-background p-4">
+                <p className="text-sm font-semibold text-foreground">Pro</p>
+                <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+                  <li>Sin límite diario</li>
+                  <li>Seguimiento completo de objetivos y acciones</li>
+                  <li>Más continuidad entre sesiones</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+              {sessionProfile?.isAnonymous
+                ? "Antes de activar un plan, guarda tu progreso con email para no perder continuidad."
+                : `Tu progreso ya está vinculado a ${sessionProfile?.email}. Cuando Pro esté listo, este flujo ya estará preparado.`}
+            </div>
           </div>
-        </>
-      }
-      sidebar={
-        <Sidebar
-          conversations={sidebarConversations}
-          activeConversationId={activeConversationId || safeConversation.id}
-          progress={progress}
-          activeGoal={activeGoal}
-          actionLock={
-            effectiveActionLock
-              ? {
-                  message: effectiveActionLock.message,
-                  actionTitle: effectiveActionLock.action.title,
-                }
-              : null
-          }
-          profile={sidebarProfile}
-          adminAuthenticated={adminAuthenticated}
-          adminLoading={adminLoading}
-          onSelectConversation={handleSelectConversation}
-          onNewConversation={handleNewConversation}
-          onAdminLogout={handleAdminLogout}
-        />
-      }
-      main={
-        <Chat
-          title={safeConversation.title}
-          messages={safeConversation.messages}
-          input={input}
-          loading={loading || sessionLoading}
-          error={error}
-          responseSignals={{
-            searchUsed: safeConversation.searchUsed,
-            fallback: safeConversation.fallback,
-            flow: safeConversation.flow,
-          }}
-          actionLock={
-            effectiveActionLock
-              ? {
-                  message: effectiveActionLock.message,
-                  actionTitle: effectiveActionLock.action.title,
-                }
-              : null
-          }
-          onInputChange={setInput}
-          onSend={handleSend}
-        />
-      }
-      rightPanel={
-        <InsightsPanel
-          state={safeConversation.state}
-          emotionalProfile={emotionalProfile}
-          insight={safeConversation.insight}
-          action={safeConversation.action}
-          responseSignals={{
-            searchUsed: safeConversation.searchUsed,
-            fallback: safeConversation.fallback,
-            flow: safeConversation.flow,
-          }}
-          actionLock={
-            effectiveActionLock
-              ? {
-                  message: effectiveActionLock.message,
-                  actionTitle: effectiveActionLock.action.title,
-                }
-              : null
-          }
-          alerts={safeConversation.alerts}
-          goal={activeGoal}
-          goalLoading={goalLoading}
-          onToggleAction={handleToggleAction}
-        />
-      }
-    />
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setUpgradeDialogOpen(false)}>
+              Ahora no
+            </Button>
+            <Button
+              onClick={() => {
+                setWorkspaceTab("plan");
+                setUpgradeDialogOpen(false);
+              }}
+            >
+              Ver continuidad en el plan
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={captureDialogOpen} onOpenChange={setCaptureDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Guarda tu progreso antes de perderlo</DialogTitle>
+            <DialogDescription>
+              {captureEmailPrompt ||
+                "Ya apareció claridad real en la conversación. Vincula un email para no perder objetivos, acciones y continuidad."}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="warning" className="rounded-full px-3 py-1">
+                Cuenta anónima
+              </Badge>
+              <Badge variant="secondary" className="rounded-full px-3 py-1">
+                {sessionProfile?.planLabel || "Free"}
+              </Badge>
+              <Badge variant="secondary" className="rounded-full px-3 py-1">
+                Progreso {progress.completedActions}/{progress.totalActions}
+              </Badge>
+            </div>
+
+            <div className="space-y-3">
+              <label className="block space-y-2">
+                <span className="text-sm font-medium text-foreground">Email</span>
+                <Input
+                  type="email"
+                  value={saveProgressEmail}
+                  onChange={(event) => setSaveProgressEmail(event.target.value)}
+                  placeholder="tu@email.com"
+                />
+              </label>
+
+              {saveProgressStatus ? (
+                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-3 text-sm text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-100">
+                  {saveProgressStatus}
+                </div>
+              ) : null}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setCaptureDialogOpen(false)}>
+              Seguir anónimo
+            </Button>
+            <Button
+              type="button"
+              onClick={() => void handleSaveProgress()}
+              disabled={saveProgressLoading || !saveProgressEmail.trim()}
+            >
+              {saveProgressLoading ? "Guardando..." : "Guardar progreso"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

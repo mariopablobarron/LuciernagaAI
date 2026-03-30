@@ -10,7 +10,14 @@ import { logError, logInfo } from "@/lib/logger";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getErrorMessage } from "@/lib/utils";
 import { generateAIResponse } from "@/services/ai";
-import { appendCaptureEmailPrompt, buildActionRequiredMessage } from "@/services/coach";
+import { generateImpulseResponse } from "@/services/impulse-ai";
+import {
+  appendCaptureEmailPrompt,
+  appendConversionPrompt,
+  finalizeLuciernagaResponse,
+  appendSoftPaywallPrompt,
+  buildActionRequiredMessage,
+} from "@/services/coach";
 import {
   countMessagesForConversation,
   ensureUserSession,
@@ -18,6 +25,8 @@ import {
   resolveConversationForUser,
   saveConversationMessage,
 } from "@/services/conversation";
+import { listRecentImpulseLogs, upsertDailyImpulseLog } from "@/services/impulse-challenges";
+import { getUserImpulseProfile } from "@/services/impulse-diagnostic";
 import {
   buildGoalCoachContext,
   countPendingActions,
@@ -34,6 +43,7 @@ import {
 import { runFlow, loadDialogueState, saveDialogueState } from "@/services/flows";
 import { detectIntent } from "@/services/intent";
 import { getMentorMode, shouldAskForEmail } from "@/services/mentor-protocol";
+import { getConversationalOnboarding } from "@/services/onboarding";
 import { analyzeEmotionalProfile, updateEmotionalProfile } from "@/services/emotional-model";
 import {
   buildSearchQuery,
@@ -194,6 +204,19 @@ function isCrisisInterventionMessage(message: string): boolean {
   return interventionSignals.some((signal) => normalized.includes(signal));
 }
 
+function buildHardPaywallMessage(): string {
+  return [
+    "No es falta de claridad.",
+    "Es que necesitas continuidad.",
+    "",
+    "Aquí es donde la mayoría falla.",
+    "",
+    "Si quieres que te acompañe de verdad, necesitas acceso completo.",
+    "",
+    "¿Quieres sostener este avance con continuidad real?",
+  ].join("\n");
+}
+
 export async function POST(req: NextRequest) {
   try {
     logInfo("CHAT", "request_received", {
@@ -238,6 +261,11 @@ export async function POST(req: NextRequest) {
 
     const sessionProfile = await getUserSessionProfile(userId);
     const accessState = sessionProfile;
+    const userPlan = accessState.hasPlan ? "pro" : "free";
+    const remainingMessagesAfterTurn =
+      accessState.messageLimitPerDay === null
+        ? null
+        : Math.max(0, accessState.messageLimitPerDay - (accessState.messagesUsedToday + 1));
     if (
       !accessState.hasPlan &&
       accessState.messageLimitPerDay !== null &&
@@ -250,13 +278,12 @@ export async function POST(req: NextRequest) {
         messageLimitPerDay: accessState.messageLimitPerDay,
       });
 
+      const hardPaywallMessage = buildHardPaywallMessage();
       const planLimitedResponse = NextResponse.json(
         {
           success: false,
-          error:
-            "Has alcanzado el limite diario del plan Free. Guarda tu progreso con email o activa un plan para seguir hoy.",
-          response:
-            "Has alcanzado el limite diario del plan Free. Guarda tu progreso con email o activa un plan para seguir hoy.",
+          error: `${hardPaywallMessage}\n\nHas alcanzado el limite diario del plan Free hoy.`,
+          response: `${hardPaywallMessage}\n\nHas alcanzado el limite diario del plan Free hoy.`,
           state: "neutral",
           code: "PLAN_LIMIT_REACHED",
           plan: accessState.planLabel,
@@ -344,10 +371,13 @@ export async function POST(req: NextRequest) {
     let actionLockAssistantMessage: string | null = null;
     let goalAvoidanceCount = 0;
     let goalPendingActionsCount = 0;
+    let goalCreatedThisTurn = false;
+    let actionGeneratedThisTurn = false;
     const avoidanceDetectedThisTurn = detectAvoidance(message);
     let completionMicroFeedback: string | null = null;
     let actionCompletedThisTurn = false;
     let conversationMessageCount = 0;
+    let conversionTrigger = state === "claridad";
     let transformationPhase = inferTransformationPhase({
       state,
       intent: detectedIntent,
@@ -369,6 +399,15 @@ export async function POST(req: NextRequest) {
       avoidanceDetected: avoidanceDetectedThisTurn,
       repeatedPattern: false,
       conversationMessageCount: 0,
+    });
+    let onboardingContext = getConversationalOnboarding({
+      state,
+      intent: detectedIntent,
+      hasGoal: false,
+      pendingActionsCount: 0,
+      conversationMessageCount: 0,
+      goalCreatedThisTurn: false,
+      actionGeneratedThisTurn: false,
     });
     let captureEmailRecommended = false;
     const captureEmailMessage =
@@ -437,9 +476,24 @@ export async function POST(req: NextRequest) {
         });
       }
 
+      await upsertDailyImpulseLog({
+        userId,
+        note: message,
+        emotionalState: state,
+        mood: null,
+        incrementMessage: true,
+      }).catch((dailyLogError: unknown) => {
+        logError("IMPULSE", dailyLogError, {
+          route: "/api/chat",
+          userId,
+          stage: "upsert_daily_log",
+        });
+      });
+
       if (!crisisMode) {
         activeGoal = await getActiveGoalForUser(userId);
         let pendingAction = getFirstPendingAction(activeGoal);
+        const pendingActionBeforeTurn = pendingAction;
         goalPendingActionsCount = countPendingActions(activeGoal);
         const repeatedPattern =
           conversationMessageCount > 3 &&
@@ -587,12 +641,18 @@ export async function POST(req: NextRequest) {
           activeGoal = goalIntentResult?.goal ?? activeGoal;
           goalPendingActionsCount = countPendingActions(activeGoal);
           if (goalIntentResult?.created) {
+            goalCreatedThisTurn = true;
             logInfo("STATE", "goal_created_from_intent", {
               userId,
               goalId: goalIntentResult.goal.id,
             });
           }
         }
+
+        const pendingActionAfterGoalResolution = getFirstPendingAction(activeGoal);
+        actionGeneratedThisTurn = Boolean(
+          pendingActionAfterGoalResolution && (!pendingActionBeforeTurn || goalCreatedThisTurn)
+        );
 
         transformationPhase = inferTransformationPhase({
           state,
@@ -616,11 +676,23 @@ export async function POST(req: NextRequest) {
           repeatedPattern,
           conversationMessageCount,
         });
+        conversionTrigger =
+          goalCreatedThisTurn || actionGeneratedThisTurn || state === "claridad";
+        onboardingContext = getConversationalOnboarding({
+          state,
+          intent: detectedIntent,
+          hasGoal: Boolean(activeGoal),
+          pendingActionsCount: goalPendingActionsCount,
+          conversationMessageCount,
+          goalCreatedThisTurn,
+          actionGeneratedThisTurn,
+        });
         captureEmailRecommended = shouldAskForEmail({
           isAnonymous: sessionProfile.isAnonymous,
           goalCount: activeGoal ? 1 : 0,
           actionCount: activeGoal?.totalCount ?? 0,
           conversationMessageCount,
+          conversionTrigger,
         });
         await updateUserTransformationPhase(userId, transformationPhase);
       }
@@ -632,6 +704,13 @@ export async function POST(req: NextRequest) {
         stage: "pre_ai_persistence",
       });
     }
+
+    const conversionType = conversionTrigger ? "progress" : undefined;
+    const softPaywallPrompt =
+      !accessState.hasPlan &&
+      remainingMessagesAfterTurn !== null &&
+      remainingMessagesAfterTurn <= 2 &&
+      (conversionTrigger || Boolean(activeGoal));
 
     if (actionLockResponse) {
       if (captureEmailRecommended && actionLockAssistantMessage) {
@@ -829,47 +908,71 @@ export async function POST(req: NextRequest) {
           .filter((action) => !action.completed)
           .map((action) => action.description) ?? [],
     });
+    const [impulseProfile, impulseLogs] = await Promise.all([
+      getUserImpulseProfile(userId).catch(() => null),
+      listRecentImpulseLogs(userId, 5).catch(() => []),
+    ]);
 
-    const aiResult = await generateAIResponse(message, state, emotionalProfile, {
-      goal: buildGoalCoachContext(activeGoal, message, {
-        avoidanceCount: goalAvoidanceCount,
-        avoidanceDetected: avoidanceDetectedThisTurn,
-      }),
-      continuity: {
-        ...conversationContext,
-        hesitationDetected: goalAvoidanceCount > 0 || avoidanceDetectedThisTurn,
-      },
-      flow: {
-        currentIntent: flowContext.currentIntent,
-        currentStep: flowContext.currentStep,
-        activeFlow: flowContext.activeFlow,
-        instruction: flowContext.instruction,
-      },
-      mentor: mentorMode,
-      transformation: {
-        phase: transformationPhase,
-        summary: transformationSummary,
-      },
-      legal: {
-        limitsNote:
-          "Luciernaga AI orienta y empuja accion, pero no sustituye terapia ni soporte de emergencia.",
-        critical: false,
-      },
-      web: searchQuery
-        ? {
-            query: searchQuery,
-            usage: "practical_decision",
-            results: searchResults,
-          }
-        : null,
-    });
+    const aiResult = impulseProfile
+      ? await generateImpulseResponse(message, impulseProfile, impulseLogs)
+      : await generateAIResponse(message, state, emotionalProfile, {
+          goal: buildGoalCoachContext(activeGoal, message, {
+            avoidanceCount: goalAvoidanceCount,
+            avoidanceDetected: avoidanceDetectedThisTurn,
+          }),
+          continuity: {
+            ...conversationContext,
+            hesitationDetected: goalAvoidanceCount > 0 || avoidanceDetectedThisTurn,
+          },
+          flow: {
+            currentIntent: flowContext.currentIntent,
+            currentStep: flowContext.currentStep,
+            activeFlow: flowContext.activeFlow,
+            instruction: flowContext.instruction,
+          },
+          mentor: mentorMode,
+          transformation: {
+            phase: transformationPhase,
+            summary: transformationSummary,
+          },
+          legal: {
+            limitsNote:
+              "Luciernaga AI orienta y empuja accion, pero no sustituye terapia ni soporte de emergencia.",
+            critical: false,
+          },
+          onboarding: onboardingContext,
+          access: {
+            userPlan,
+            remainingMessages: remainingMessagesAfterTurn,
+            hasActiveGoal: Boolean(activeGoal),
+            conversionTrigger,
+          },
+          web: searchQuery
+            ? {
+                query: searchQuery,
+                usage: "practical_decision",
+                results: searchResults,
+              }
+            : null,
+        });
 
-    const assistantResponse = appendCaptureEmailPrompt(
-      completionMicroFeedback
-        ? `${completionMicroFeedback}\n\n${aiResult.response}`
-        : aiResult.response,
-      captureEmailRecommended
-    );
+    let assistantResponse = completionMicroFeedback
+      ? `${completionMicroFeedback}\n\n${aiResult.response}`
+      : aiResult.response;
+    if (!impulseProfile) {
+      assistantResponse = finalizeLuciernagaResponse(assistantResponse, {
+        state,
+        mentor: mentorMode,
+        goal: buildGoalCoachContext(activeGoal, message, {
+          avoidanceCount: goalAvoidanceCount,
+          avoidanceDetected: avoidanceDetectedThisTurn,
+        }),
+        onboarding: onboardingContext,
+      });
+    }
+    assistantResponse = appendConversionPrompt(assistantResponse, conversionTrigger);
+    assistantResponse = appendSoftPaywallPrompt(assistantResponse, softPaywallPrompt);
+    assistantResponse = appendCaptureEmailPrompt(assistantResponse, captureEmailRecommended);
 
     logInfo("AI", "openrouter_call_completed", {
       userId,
@@ -930,6 +1033,8 @@ export async function POST(req: NextRequest) {
       persistenceAvailable,
       mentorMode: mentorMode.mode,
       transformationPhase,
+      conversionTrigger,
+      conversionType,
       captureEmail: captureEmailRecommended,
       captureEmailMessage: captureEmailRecommended ? captureEmailMessage : null,
     });

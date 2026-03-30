@@ -2,7 +2,12 @@
 
 import { FormEvent, Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowRight, ShieldCheck } from "lucide-react";
 import { AuthShell } from "@/features/auth/components/AuthShell";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { SAAS_CONFIG } from "@/lib/saas";
 
 function normalizeNextPath(value: string | null): string {
@@ -64,47 +69,61 @@ function AdminLoginForm() {
       title="Panel interno"
       description={`${SAAS_CONFIG.name} protege el acceso al dashboard con una sesion separada del usuario final.`}
     >
-      <section className="w-full max-w-md">
-        <h1 className="text-2xl font-bold text-slate-900">Admin Login</h1>
-        <p className="mt-2 text-sm text-slate-600">
-          Acceso protegido para panel de administracion.
-        </p>
+      <section className="mx-auto w-full max-w-md">
+        <Card className="border-border/80 bg-card/95 shadow-sm">
+          <CardHeader className="pb-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="secondary" className="rounded-full px-3 py-1">
+                Admin Login
+              </Badge>
+              <Badge variant="warning" className="rounded-full px-3 py-1">
+                <ShieldCheck className="mr-1 size-3.5" />
+                Acceso restringido
+              </Badge>
+            </div>
+            <CardTitle className="text-2xl">Entrar al dashboard</CardTitle>
+            <CardDescription>
+              Acceso protegido para operaciones, crisis, insights y decisiones del producto.
+            </CardDescription>
+          </CardHeader>
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <label className="block space-y-1">
-            <span className="text-sm font-medium text-slate-700">Usuario</span>
-            <input
-              type="text"
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
-              className="w-full rounded-xl border border-slate-300 px-3 py-2.5 outline-none focus:border-slate-600"
-              autoComplete="username"
-              required
-            />
-          </label>
+          <CardContent className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <label className="block space-y-2">
+                <span className="text-sm font-medium text-foreground">Usuario</span>
+                <Input
+                  type="text"
+                  value={username}
+                  onChange={(event) => setUsername(event.target.value)}
+                  autoComplete="username"
+                  required
+                />
+              </label>
 
-          <label className="block space-y-1">
-            <span className="text-sm font-medium text-slate-700">Contrasena</span>
-            <input
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="w-full rounded-xl border border-slate-300 px-3 py-2.5 outline-none focus:border-slate-600"
-              autoComplete="current-password"
-              required
-            />
-          </label>
+              <label className="block space-y-2">
+                <span className="text-sm font-medium text-foreground">Contrasena</span>
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  autoComplete="current-password"
+                  required
+                />
+              </label>
 
-          {error ? <p className="text-sm text-red-600">{error}</p> : null}
+              {error ? (
+                <div className="rounded-2xl border border-rose-200 bg-rose-50 px-3 py-3 text-sm text-rose-800 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-100">
+                  {error}
+                </div>
+              ) : null}
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
-          >
-            {isSubmitting ? "Entrando..." : "Entrar"}
-          </button>
-        </form>
+              <Button type="submit" disabled={isSubmitting} className="w-full justify-between">
+                {isSubmitting ? "Entrando..." : "Entrar al panel"}
+                <ArrowRight className="size-4" />
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </section>
     </AuthShell>
   );

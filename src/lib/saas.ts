@@ -1,5 +1,5 @@
 export type SaasPlan = {
-  id: "starter" | "pro";
+  id: "free" | "pro";
   name: string;
   priceLabel: string;
   status: "planned" | "ready";
@@ -24,11 +24,11 @@ export const SAAS_CONFIG = {
     enabled: false,
     plans: [
       {
-        id: "starter",
-        name: "Starter",
-        priceLabel: "Pendiente",
-        status: "planned",
-        description: "Plan base para sesiones guiadas y seguimiento ligero.",
+        id: "free",
+        name: "Free",
+        priceLabel: "0 €",
+        status: "ready",
+        description: "Acceso inicial con límite diario y continuidad resumida.",
       },
       {
         id: "pro",

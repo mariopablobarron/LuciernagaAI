@@ -39,6 +39,11 @@ model User {
   crisisEvents    CrisisEvent[]
   avoidanceEvents AvoidanceEvent[]
   subscriptions   Subscription[]
+  userProfile     UserProfile?
+  userChallenges  UserChallenge[]
+  dailyLogs       DailyLog[]
+  futureMessages  FutureMessage[]
+  streak          Streak?
 }
 
 model Message {
@@ -61,9 +66,18 @@ model DailyLog {
   userId        String
   checkIns      Int      @default(0)
   messagesCount Int      @default(0)
+  logDate       DateTime @default(now())
+  emotionalState String?
+  note          String?
+  mood          String?
+  challengeStatus String?
+  momentum      Int?
   createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
+  @@index([userId, logDate])
+  @@index([emotionalState, createdAt])
 }
 
 model Insight {
@@ -182,4 +196,111 @@ model Subscription {
 
   @@index([userId, createdAt])
   @@index([status, plan, createdAt])
+}
+
+model Profile {
+  id               String       @id @default(cuid())
+  code             String       @unique
+  type             String
+  title            String
+  description      String
+  operationalFocus String
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  userProfiles     UserProfile[]
+  challenges       Challenge[]
+
+  @@index([type, updatedAt])
+}
+
+model UserProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  profileId       String
+  clarityScore    Int
+  autoestimaScore Int
+  energiaScore    Int
+  disciplinaScore Int
+  socialScore     Int
+  totalScore      Int
+  rawAnswers      Json
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile         Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, updatedAt])
+  @@index([totalScore, updatedAt])
+}
+
+model Challenge {
+  id               String          @id @default(cuid())
+  slug             String          @unique
+  profileId        String?
+  type             String
+  title            String
+  description      String
+  difficulty       Int
+  durationDays     Int
+  estimatedMinutes Int
+  instructions     String
+  successMetric    String
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  profile          Profile?        @relation(fields: [profileId], references: [id], onDelete: SetNull)
+  userChallenges   UserChallenge[]
+
+  @@index([type, difficulty])
+  @@index([profileId, difficulty])
+}
+
+model UserChallenge {
+  id             String    @id @default(cuid())
+  userId         String
+  challengeId    String
+  status         String    @default("active")
+  startedAt      DateTime  @default(now())
+  endsAt         DateTime?
+  completedDays  Int       @default(0)
+  totalDays      Int
+  progress       Int       @default(0)
+  lastCheckInAt  DateTime?
+  validationNote String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenge      Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status, startedAt])
+  @@index([challengeId, status])
+}
+
+model FutureMessage {
+  id          String    @id @default(cuid())
+  userId      String
+  title       String
+  content     String
+  unlockAt    DateTime
+  deliveredAt DateTime?
+  status      String    @default("pending")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, unlockAt])
+  @@index([status, unlockAt])
+}
+
+model Streak {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  currentDays     Int       @default(0)
+  bestDays        Int       @default(0)
+  lastCheckInDate DateTime?
+  status          String    @default("inactive")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status, updatedAt])
 }

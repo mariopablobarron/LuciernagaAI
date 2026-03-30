@@ -1,5 +1,9 @@
 "use client";
 
+import type { ReactNode } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import type { EmotionalProfile } from "@/types/emotional-profile";
 
 type InsightsPanelProps = {
@@ -7,6 +11,7 @@ type InsightsPanelProps = {
   emotionalProfile: EmotionalProfile;
   insight: string;
   action: string;
+  mode?: "chat" | "plan" | "checkin";
   responseSignals?: {
     searchUsed: boolean;
     fallback: boolean;
@@ -39,20 +44,19 @@ type InsightsPanelProps = {
   onToggleAction?: (actionId: string, completed: boolean) => Promise<void> | void;
 };
 
-function stateTone(state: string): string {
-  if (state === "bloqueo") return "bg-amber-100 text-amber-900";
-  if (state === "ansiedad") return "bg-orange-100 text-orange-900";
-  if (state === "duda") return "bg-sky-100 text-sky-900";
-  if (state === "claridad") return "bg-emerald-100 text-emerald-900";
-  return "bg-emerald-100 text-emerald-900";
+function stateVariant(state: string): "secondary" | "success" | "warning" {
+  if (state === "claridad") return "success";
+  if (state === "bloqueo" || state === "ansiedad") return "warning";
+  return "secondary";
 }
 
-function emotionTone(emotion: EmotionalProfile["primaryEmotion"]): string {
-  if (emotion === "ansiedad") return "bg-orange-100 text-orange-900";
-  if (emotion === "apatía") return "bg-slate-200 text-slate-800";
-  if (emotion === "confusión") return "bg-sky-100 text-sky-900";
-  if (emotion === "frustración") return "bg-rose-100 text-rose-900";
-  return "bg-emerald-100 text-emerald-900";
+function emotionVariant(
+  emotion: EmotionalProfile["primaryEmotion"]
+): "secondary" | "success" | "warning" | "danger" {
+  if (emotion === "frustración") return "danger";
+  if (emotion === "ansiedad") return "warning";
+  if (emotion === "calma") return "success";
+  return "secondary";
 }
 
 function formatPattern(pattern: EmotionalProfile["dominantPattern"]): string {
@@ -68,6 +72,7 @@ export default function InsightsPanel({
   emotionalProfile,
   insight,
   action,
+  mode = "chat",
   responseSignals,
   actionLock,
   alerts,
@@ -77,191 +82,204 @@ export default function InsightsPanel({
 }: InsightsPanelProps) {
   const flow = responseSignals?.flow;
 
-  return (
-    <aside className="h-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-        Panel inteligente
-      </h2>
-
-      <section className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
-        <p className="text-xs font-semibold text-slate-500">Perfil emocional actual</p>
-        <span
-          className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${emotionTone(
-            emotionalProfile.primaryEmotion
-          )}`}
-        >
-          {emotionalProfile.primaryEmotion}
-        </span>
-        <p className="mt-2 text-xs text-slate-600">
-          Estado operativo:{" "}
-          <span className={`rounded-full px-2 py-1 font-semibold ${stateTone(state)}`}>
+  const profileSection = (
+    <Card className="border-border/80 bg-card/95 shadow-sm">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm font-semibold">Pulso emocional</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant={emotionVariant(emotionalProfile.primaryEmotion)} className="rounded-full px-3 py-1">
+            {emotionalProfile.primaryEmotion}
+          </Badge>
+          <Badge variant={stateVariant(state)} className="rounded-full px-3 py-1 capitalize">
             {state}
-          </span>
-        </p>
-        <div className="mt-3 grid grid-cols-1 gap-2">
-          <div className="rounded-lg border border-slate-200 bg-white px-3 py-2">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+          </Badge>
+        </div>
+        <div className="grid gap-2 text-sm sm:grid-cols-2 xl:grid-cols-1">
+          <div className="rounded-2xl border border-border bg-muted/40 p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
               Patrón dominante
             </p>
-            <p className="mt-1 text-sm font-medium text-slate-900">
+            <p className="mt-1 font-medium text-foreground">
               {formatPattern(emotionalProfile.dominantPattern)}
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="rounded-lg border border-slate-200 bg-white px-3 py-2">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
+            <div className="rounded-2xl border border-border bg-muted/40 p-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                 Energía
               </p>
-              <p className="mt-1 text-sm font-medium text-slate-900">
-                {emotionalProfile.energyLevel}
-              </p>
+              <p className="mt-1 font-medium text-foreground">{emotionalProfile.energyLevel}</p>
             </div>
-            <div className="rounded-lg border border-slate-200 bg-white px-3 py-2">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+            <div className="rounded-2xl border border-border bg-muted/40 p-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                 Tendencia
               </p>
-              <p className="mt-1 text-sm font-medium text-slate-900">
-                {emotionalProfile.progressTrend}
-              </p>
+              <p className="mt-1 font-medium text-foreground">{emotionalProfile.progressTrend}</p>
             </div>
           </div>
         </div>
-      </section>
+      </CardContent>
+    </Card>
+  );
 
-      <section className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
-        <p className="text-xs font-semibold text-slate-500">Insight</p>
-        <p className="mt-2 text-sm text-slate-700">{insight}</p>
-      </section>
+  const insightSection = (
+    <Card className="border-border/80 bg-card/95 shadow-sm">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm font-semibold">Lectura del turno</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm leading-6 text-muted-foreground">{insight}</p>
+      </CardContent>
+    </Card>
+  );
 
-      <section className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
-        <p className="text-xs font-semibold text-slate-500">Motor de respuesta</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          <span
-            className={`rounded-full px-3 py-1 text-xs font-semibold ${
-              responseSignals?.searchUsed
-                ? "border border-sky-200 bg-sky-50 text-sky-700"
-                : "border border-slate-200 bg-white text-slate-500"
-            }`}
+  const engineSection = (
+    <Card className="border-border/80 bg-card/95 shadow-sm">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm font-semibold">Señales del motor</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="flex flex-wrap gap-2">
+          <Badge
+            variant={responseSignals?.searchUsed ? "secondary" : "secondary"}
+            className="rounded-full px-3 py-1"
           >
             {responseSignals?.searchUsed ? "Internet usado" : "Sin búsqueda externa"}
-          </span>
-          <span
-            className={`rounded-full px-3 py-1 text-xs font-semibold ${
-              responseSignals?.fallback
-                ? "border border-rose-200 bg-rose-50 text-rose-700"
-                : "border border-emerald-200 bg-emerald-50 text-emerald-700"
-            }`}
+          </Badge>
+          <Badge
+            variant={responseSignals?.fallback ? "warning" : "success"}
+            className="rounded-full px-3 py-1"
           >
             {responseSignals?.fallback ? "Fallback activo" : "Proveedor IA estable"}
-          </span>
+          </Badge>
         </div>
         {flow?.activeFlow ? (
-          <div className="mt-3 rounded-lg border border-violet-200 bg-violet-50 px-3 py-3">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-violet-700">
-              Flujo conversacional activo
+          <div className="rounded-2xl border border-border bg-muted/40 p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              Flujo activo
             </p>
-            <p className="mt-1 text-sm font-semibold text-violet-950">
+            <p className="mt-1 text-sm font-medium text-foreground">
               {flow.activeFlow} · paso {flow.currentStep}
             </p>
-            <p className="mt-1 text-xs text-violet-800">Intent: {flow.currentIntent}</p>
+            <p className="mt-1 text-sm text-muted-foreground">Intent: {flow.currentIntent}</p>
             {flow.instruction ? (
-              <p className="mt-2 text-sm text-violet-900">{flow.instruction}</p>
+              <p className="mt-2 text-sm text-muted-foreground">{flow.instruction}</p>
             ) : null}
           </div>
         ) : (
-          <p className="mt-3 text-sm text-slate-600">Sin flujo guiado activo en este turno.</p>
+          <p className="text-sm text-muted-foreground">Sin flujo guiado activo en este turno.</p>
         )}
-      </section>
+      </CardContent>
+    </Card>
+  );
 
-      <section className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
-        <p className="text-xs font-semibold text-slate-500">Acción recomendada</p>
-        <p className="mt-2 text-sm font-medium text-slate-900">{action}</p>
-      </section>
+  const actionSection = (
+    <Card className="border-border/80 bg-card/95 shadow-sm">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm font-semibold">Siguiente empuje</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm font-medium leading-6 text-foreground">{action}</p>
+      </CardContent>
+    </Card>
+  );
 
-      {actionLock ? (
-        <section className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3">
-          <p className="text-xs font-semibold text-amber-800">Acción obligatoria</p>
-          <p className="mt-2 text-sm font-semibold text-amber-950">{actionLock.actionTitle}</p>
-          <p className="mt-2 text-sm text-amber-900">{actionLock.message}</p>
-          <div className="mt-3 grid grid-cols-1 gap-2">
-            <div className="rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs text-amber-900">
-              Marca progreso: escribe &quot;ya lo hice&quot;
-            </div>
-            <div className="rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs text-amber-900">
-              Pospón explícitamente: &quot;lo hago luego&quot;
-            </div>
-            <div className="rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs text-amber-900">
-              Rechaza explícitamente: &quot;no lo voy a hacer&quot;
-            </div>
+  const actionLockSection = actionLock ? (
+    <Card className="border-amber-200 bg-amber-50 shadow-sm dark:border-amber-900 dark:bg-amber-950/40">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm font-semibold text-amber-950 dark:text-amber-100">
+          Responsabilidad activa
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3 text-sm text-amber-900 dark:text-amber-100">
+        <p className="font-semibold">{actionLock.actionTitle}</p>
+        <p>{actionLock.message}</p>
+        <div className="grid gap-2">
+          <div className="rounded-xl border border-amber-200 bg-white px-3 py-2 dark:border-amber-900 dark:bg-amber-950/40">
+            Escribe: &quot;ya lo hice&quot;
           </div>
-        </section>
-      ) : null}
+          <div className="rounded-xl border border-amber-200 bg-white px-3 py-2 dark:border-amber-900 dark:bg-amber-950/40">
+            O pospón explícitamente: &quot;lo hago luego&quot;
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  ) : null;
 
-      <section className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
-        <p className="text-xs font-semibold text-slate-500">Alertas</p>
+  const alertsSection = (
+    <Card className="border-border/80 bg-card/95 shadow-sm">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm font-semibold">Alertas</CardTitle>
+      </CardHeader>
+      <CardContent>
         {alerts.length === 0 ? (
-          <p className="mt-2 text-sm text-slate-600">Sin alertas activas.</p>
+          <p className="text-sm text-muted-foreground">Sin alertas activas.</p>
         ) : (
-          <ul className="mt-2 space-y-2">
+          <div className="space-y-2">
             {alerts.map((alert, index) => (
-              <li
+              <div
                 key={`${alert}-${index}`}
-                className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-800"
+                className="rounded-2xl border border-rose-200 bg-rose-50 px-3 py-3 text-sm text-rose-800 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-100"
               >
                 {alert}
-              </li>
+              </div>
             ))}
-          </ul>
-        )}
-      </section>
-
-      <section className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
-        <p className="text-xs font-semibold text-slate-500">Objetivo activo</p>
-        {!goal ? (
-          <p className="mt-2 text-sm text-slate-600">Aún no hay objetivo activo.</p>
-        ) : (
-          <div className="mt-2 space-y-2">
-            <p className="text-sm font-semibold text-slate-900">{goal.title}</p>
-            <p className="text-xs text-slate-600">
-              Estado: <span className="font-medium">{goal.status}</span>
-            </p>
-            <p className="text-xs text-slate-600">
-              Progreso:{" "}
-              <span className="font-medium">
-                {goal.completedCount}/{goal.totalCount} ({goal.progress}%)
-              </span>
-            </p>
-            <div className="h-2 rounded-full bg-slate-200">
-              <div
-                className="h-full rounded-full bg-slate-900"
-                style={{ width: `${goal.progress}%` }}
-              />
-            </div>
           </div>
         )}
-      </section>
+      </CardContent>
+    </Card>
+  );
 
-      <section className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
-        <p className="text-xs font-semibold text-slate-500">Checklist de acciones</p>
-        {!goal || goal.actions.length === 0 ? (
-          <p className="mt-2 text-sm text-slate-600">Sin acciones definidas.</p>
+  const goalSection = (
+    <Card className="border-border/80 bg-card/95 shadow-sm">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm font-semibold">Objetivo activo</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {!goal ? (
+          <p className="text-sm text-muted-foreground">Aún no hay objetivo activo.</p>
         ) : (
-          <ul className="mt-2 space-y-2">
+          <>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="secondary" className="rounded-full px-3 py-1">
+                {goal.status}
+              </Badge>
+              <Badge variant="secondary" className="rounded-full px-3 py-1">
+                {goal.completedCount}/{goal.totalCount}
+              </Badge>
+            </div>
+            <p className="text-sm font-semibold text-foreground">{goal.title}</p>
+            <Progress value={goal.progress} className="h-2.5" />
+            <p className="text-sm text-muted-foreground">Progreso visible: {goal.progress}%</p>
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
+
+  const checklistSection = (
+    <Card className="border-border/80 bg-card/95 shadow-sm">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm font-semibold">Checklist</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {!goal || goal.actions.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Sin acciones definidas.</p>
+        ) : (
+          <ul className="space-y-2">
             {goal.actions.map((goalAction) => (
               <li key={goalAction.id}>
-                <label className="flex items-start gap-2 text-sm text-slate-700">
+                <label className="flex items-start gap-3 rounded-2xl border border-border bg-muted/40 px-3 py-3 text-sm text-foreground">
                   <input
                     type="checkbox"
                     checked={goalAction.completed}
                     disabled={goalLoading}
-                    onChange={(event) =>
-                      onToggleAction?.(goalAction.id, event.target.checked)
-                    }
-                    className="mt-0.5 h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-500"
+                    onChange={(event) => onToggleAction?.(goalAction.id, event.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-ring"
                   />
-                  <span
-                    className={goalAction.completed ? "line-through text-slate-400" : ""}
-                  >
+                  <span className={goalAction.completed ? "line-through text-muted-foreground" : ""}>
                     {goalAction.description}
                   </span>
                 </label>
@@ -269,7 +287,47 @@ export default function InsightsPanel({
             ))}
           </ul>
         )}
-      </section>
+      </CardContent>
+    </Card>
+  );
+
+  const sectionMap: Record<string, ReactNode> = {
+    profile: profileSection,
+    insight: insightSection,
+    engine: engineSection,
+    action: actionSection,
+    actionLock: actionLockSection,
+    alerts: alertsSection,
+    goal: goalSection,
+    checklist: checklistSection,
+  };
+
+  const orderedKeys =
+    mode === "plan"
+      ? ["goal", "checklist", "action", "actionLock", "alerts", "profile", "engine", "insight"]
+      : mode === "checkin"
+        ? ["profile", "insight", "alerts", "goal", "action", "engine", "checklist", "actionLock"]
+        : ["profile", "insight", "engine", "action", "actionLock", "alerts", "goal", "checklist"];
+
+  return (
+    <aside className="h-full space-y-3">
+      <div className="rounded-2xl border border-border/80 bg-card/95 px-4 py-3 shadow-sm">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          Panel contextual
+        </p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {mode === "plan"
+            ? "Objetivo, progreso y deuda de acción en primer plano."
+            : mode === "checkin"
+              ? "Estado emocional y continuidad del hábito diario."
+              : "Lectura rápida de estado, señales y siguiente empuje."}
+        </p>
+      </div>
+
+      {orderedKeys.map((key) => {
+        const section = sectionMap[key];
+        return section ? <div key={key}>{section}</div> : null;
+      })}
     </aside>
   );
 }

@@ -4,6 +4,7 @@ type MessageProps = {
   role: "user" | "assistant";
   content: string;
   isError?: boolean;
+  streaming?: boolean;
   variant?: "action_required" | "crisis";
   meta?: {
     searchUsed?: boolean;
@@ -11,7 +12,7 @@ type MessageProps = {
   };
 };
 
-export default function Message({ role, content, isError = false, variant, meta }: MessageProps) {
+export default function Message({ role, content, isError = false, streaming = false, variant, meta }: MessageProps) {
   const isUser = role === "user";
   const isActionRequired = variant === "action_required";
   const isCrisis = variant === "crisis";
@@ -56,7 +57,12 @@ export default function Message({ role, content, isError = false, variant, meta 
             ) : null}
           </div>
         ) : null}
-        <p className="whitespace-pre-wrap">{content}</p>
+        <p className="whitespace-pre-wrap">
+          {content}
+          {streaming && (
+            <span className="ml-0.5 inline-block h-4 w-0.5 align-middle animate-pulse bg-current" />
+          )}
+        </p>
       </article>
     </div>
   );

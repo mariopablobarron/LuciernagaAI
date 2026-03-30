@@ -9,7 +9,7 @@ import { sendAvoidanceEscalationAlert, sendCrisisEscalationAlert } from "@/lib/a
 import { logError, logInfo } from "@/lib/logger";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getErrorMessage } from "@/lib/utils";
-import { generateAIResponse } from "@/services/ai";
+import { generateAIResponse, streamOpenRouterTokens } from "@/services/ai";
 import { generateImpulseResponse } from "@/services/impulse-ai";
 import {
   appendCaptureEmailPrompt,
@@ -17,6 +17,7 @@ import {
   finalizeLuciernagaResponse,
   appendSoftPaywallPrompt,
   buildActionRequiredMessage,
+  buildCoachPrompt,
 } from "@/services/coach";
 import {
   countMessagesForConversation,
@@ -913,111 +914,82 @@ export async function POST(req: NextRequest) {
       listRecentImpulseLogs(userId, 5).catch(() => []),
     ]);
 
-    const aiResult = impulseProfile
-      ? await generateImpulseResponse(message, impulseProfile, impulseLogs)
-      : await generateAIResponse(message, state, emotionalProfile, {
-          goal: buildGoalCoachContext(activeGoal, message, {
-            avoidanceCount: goalAvoidanceCount,
-            avoidanceDetected: avoidanceDetectedThisTurn,
-          }),
-          continuity: {
-            ...conversationContext,
-            hesitationDetected: goalAvoidanceCount > 0 || avoidanceDetectedThisTurn,
-          },
-          flow: {
-            currentIntent: flowContext.currentIntent,
-            currentStep: flowContext.currentStep,
-            activeFlow: flowContext.activeFlow,
-            instruction: flowContext.instruction,
-          },
-          mentor: mentorMode,
-          transformation: {
-            phase: transformationPhase,
-            summary: transformationSummary,
-          },
-          legal: {
-            limitsNote:
-              "Luciernaga AI orienta y empuja accion, pero no sustituye terapia ni soporte de emergencia.",
-            critical: false,
-          },
-          onboarding: onboardingContext,
-          access: {
-            userPlan,
-            remainingMessages: remainingMessagesAfterTurn,
-            hasActiveGoal: Boolean(activeGoal),
-            conversionTrigger,
-          },
-          web: searchQuery
-            ? {
-                query: searchQuery,
-                usage: "practical_decision",
-                results: searchResults,
-              }
-            : null,
-        });
+    // --- Impulse mode: non-streaming JSON path ---
+    if (impulseProfile) {
+      const aiResult = await generateImpulseResponse(message, impulseProfile, impulseLogs);
+      const assistantResponse = aiResult.response;
 
-    let assistantResponse = completionMicroFeedback
-      ? `${completionMicroFeedback}\n\n${aiResult.response}`
-      : aiResult.response;
-    if (!impulseProfile) {
-      assistantResponse = finalizeLuciernagaResponse(assistantResponse, {
-        state,
-        mentor: mentorMode,
-        goal: buildGoalCoachContext(activeGoal, message, {
-          avoidanceCount: goalAvoidanceCount,
-          avoidanceDetected: avoidanceDetectedThisTurn,
-        }),
-        onboarding: onboardingContext,
-      });
-    }
-    assistantResponse = appendConversionPrompt(assistantResponse, conversionTrigger);
-    assistantResponse = appendSoftPaywallPrompt(assistantResponse, softPaywallPrompt);
-    assistantResponse = appendCaptureEmailPrompt(assistantResponse, captureEmailRecommended);
-
-    logInfo("AI", "openrouter_call_completed", {
-      userId,
-      conversationId,
-      state,
-      fallback: aiResult.fallback,
-      errorType: aiResult.errorType ?? null,
-      errorMessage: aiResult.errorMessage ?? null,
-    });
-
-    if (persistenceAvailable) {
-      try {
-        await saveConversationMessage({
-          conversationId,
-          userId,
-          role: "assistant",
-          content: assistantResponse,
-        });
-        logInfo("DB", "message_saved", {
-          userId,
-          conversationId,
-          role: "assistant",
-        });
-      } catch (dbError: unknown) {
-        persistenceAvailable = false;
-        logError("DB", dbError, {
-          route: "/api/chat",
-          userId,
-          stage: "post_ai_persistence",
-        });
+      if (persistenceAvailable) {
+        try {
+          await saveConversationMessage({ conversationId, userId, role: "assistant", content: assistantResponse });
+        } catch (dbError: unknown) {
+          persistenceAvailable = false;
+          logError("DB", dbError, { route: "/api/chat", userId, stage: "impulse_persistence" });
+        }
       }
+
+      const activeAction = getFirstPendingAction(activeGoal);
+      const jsonResponse = NextResponse.json({
+        success: true,
+        response: assistantResponse,
+        state,
+        conversationId,
+        goal: serializeGoal(activeGoal),
+        action: activeAction?.description ?? "Define una sola accion concreta para hoy y ejecútala.",
+        emotionalProfile,
+        searchUsed: false,
+        fallback: aiResult.fallback,
+        flow: serializeFlow(flowContext),
+        persistenceAvailable,
+        mentorMode: mentorMode.mode,
+        transformationPhase,
+        conversionTrigger,
+        conversionType,
+        captureEmail: captureEmailRecommended,
+        captureEmailMessage: captureEmailRecommended ? captureEmailMessage : null,
+      });
+      if (identity.shouldSetCookie) {
+        attachSessionCookie(jsonResponse, identity.sessionToken);
+      }
+      return jsonResponse;
     }
 
-    if (aiResult.fallback && aiResult.errorType === "provider_failure") {
-      logError("AI", new Error(aiResult.errorMessage || "Provider failure"), {
-        route: "/api/chat",
-        state,
-      });
-    }
+    // --- Normal path: SSE token streaming ---
+    const coachContext = {
+      goal: buildGoalCoachContext(activeGoal, message, {
+        avoidanceCount: goalAvoidanceCount,
+        avoidanceDetected: avoidanceDetectedThisTurn,
+      }),
+      continuity: {
+        ...conversationContext,
+        hesitationDetected: goalAvoidanceCount > 0 || avoidanceDetectedThisTurn,
+      },
+      flow: {
+        currentIntent: flowContext.currentIntent,
+        currentStep: flowContext.currentStep,
+        activeFlow: flowContext.activeFlow,
+        instruction: flowContext.instruction,
+      },
+      mentor: mentorMode,
+      transformation: { phase: transformationPhase, summary: transformationSummary },
+      legal: {
+        limitsNote: "Luciernaga AI orienta y empuja accion, pero no sustituye terapia ni soporte de emergencia.",
+        critical: false,
+      },
+      onboarding: onboardingContext,
+      access: {
+        userPlan: userPlan as "free" | "pro",
+        remainingMessages: remainingMessagesAfterTurn,
+        hasActiveGoal: Boolean(activeGoal),
+        conversionTrigger,
+      },
+      web: searchQuery ? { query: searchQuery, usage: "practical_decision" as const, results: searchResults } : null,
+    };
+    const systemPrompt = buildCoachPrompt(state, emotionalProfile, coachContext);
 
     const activeAction = getFirstPendingAction(activeGoal);
-
-    const response = NextResponse.json({
+    const metaPayload = {
       success: true,
-      response: assistantResponse,
       state,
       conversationId,
       goal: serializeGoal(activeGoal),
@@ -1028,20 +1000,99 @@ export async function POST(req: NextRequest) {
           : "Define una sola accion concreta para hoy y ejecútala."),
       emotionalProfile,
       searchUsed: searchResults.length > 0,
-      fallback: aiResult.fallback,
       flow: serializeFlow(flowContext),
-      persistenceAvailable,
       mentorMode: mentorMode.mode,
       transformationPhase,
       conversionTrigger,
       conversionType,
       captureEmail: captureEmailRecommended,
       captureEmailMessage: captureEmailRecommended ? captureEmailMessage : null,
+    };
+
+    // Capture locals for use in the stream closure
+    const streamUserId = userId;
+    const streamConversationId = conversationId;
+    const streamIdentity = identity;
+    let streamPersistence = persistenceAvailable;
+
+    const encoder = new TextEncoder();
+    const readableStream = new ReadableStream({
+      async start(controller) {
+        const send = (data: object) => {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+        };
+
+        let rawText = "";
+        let streamFallback = false;
+
+        try {
+          for await (const token of streamOpenRouterTokens(message, systemPrompt)) {
+            rawText += token;
+            send({ type: "delta", delta: token });
+          }
+        } catch (streamError: unknown) {
+          logError("AI", streamError, { area: "chat_stream", userId: streamUserId });
+          streamFallback = true;
+        }
+
+        if (!rawText) {
+          // Fallback: generate non-streaming response
+          const fallbackResult = await generateAIResponse(message, state, emotionalProfile, coachContext);
+          rawText = fallbackResult.response;
+          streamFallback = fallbackResult.fallback;
+          send({ type: "delta", delta: rawText });
+        }
+
+        // Post-process
+        let finalText = completionMicroFeedback ? `${completionMicroFeedback}\n\n${rawText}` : rawText;
+        finalText = finalizeLuciernagaResponse(finalText, {
+          state,
+          mentor: mentorMode,
+          goal: buildGoalCoachContext(activeGoal, message, {
+            avoidanceCount: goalAvoidanceCount,
+            avoidanceDetected: avoidanceDetectedThisTurn,
+          }),
+          onboarding: onboardingContext,
+        });
+        finalText = appendConversionPrompt(finalText, conversionTrigger);
+        finalText = appendSoftPaywallPrompt(finalText, softPaywallPrompt);
+        finalText = appendCaptureEmailPrompt(finalText, captureEmailRecommended);
+
+        if (finalText !== rawText) {
+          send({ type: "replace", content: finalText });
+        }
+
+        // Persist
+        if (streamPersistence) {
+          try {
+            await saveConversationMessage({ conversationId: streamConversationId, userId: streamUserId, role: "assistant", content: finalText });
+          } catch (dbError: unknown) {
+            streamPersistence = false;
+            logError("DB", dbError, { route: "/api/chat", userId: streamUserId, stage: "stream_persistence" });
+          }
+        }
+
+        logInfo("AI", "stream_completed", { userId: streamUserId, conversationId: streamConversationId, fallback: streamFallback });
+
+        send({ type: "meta", ...metaPayload, fallback: streamFallback, persistenceAvailable: streamPersistence });
+        send({ type: "done" });
+        controller.close();
+      },
     });
-    if (identity.shouldSetCookie) {
-      attachSessionCookie(response, identity.sessionToken);
+
+    const streamHeaders: Record<string, string> = {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    };
+
+    if (streamIdentity.shouldSetCookie && streamIdentity.sessionToken) {
+      const isProduction = process.env.NODE_ENV === "production";
+      streamHeaders["Set-Cookie"] =
+        `mw_session=${streamIdentity.sessionToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400${isProduction ? "; Secure" : ""}`;
     }
-    return response;
+
+    return new Response(readableStream, { headers: streamHeaders });
   } catch (error: unknown) {
     if (error instanceof InvalidSessionTokenError) {
       const unauthorized = buildErrorResponse(

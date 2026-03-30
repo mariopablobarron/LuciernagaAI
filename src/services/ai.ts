@@ -15,6 +15,10 @@ interface OpenRouterResponse {
   choices?: Array<{ message?: { content?: string } }>;
 }
 
+interface OpenRouterStreamChunk {
+  choices?: Array<{ delta?: { content?: string }; finish_reason?: string | null }>;
+}
+
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const OPENROUTER_MODEL = "openai/gpt-4o-mini";
 const REQUEST_TIMEOUT_MS = 15000;
@@ -313,6 +317,89 @@ export async function generateImpulseResponse(input: ImpulseResponseInput): Prom
       response: "Hoy solo haz esto: define en una sola línea qué tarea es tu prioridad y empiézala ahora. Te llevará 5 minutos.",
       fallback: true,
     };
+  }
+}
+
+export async function* streamOpenRouterTokens(
+  message: string,
+  systemPrompt: string,
+): AsyncGenerator<string, void, unknown> {
+  const apiKey = process.env.OPENROUTER_API_KEY?.trim();
+  if (!apiKey) {
+    yield buildFallbackResponse();
+    return;
+  }
+
+  let res: Response;
+  try {
+    res = await withTimeout(
+      fetch(OPENROUTER_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": process.env.APP_BASE_URL ?? "http://localhost:3000",
+          "X-Title": "mentor-web",
+        },
+        body: JSON.stringify({
+          model: OPENROUTER_MODEL,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: message },
+          ],
+          temperature: 0.7,
+          max_tokens: 500,
+          stream: true,
+        }),
+      }),
+      REQUEST_TIMEOUT_MS
+    );
+  } catch (error: unknown) {
+    logError("AI", error, { area: "streamOpenRouterTokens_fetch" });
+    yield buildFallbackResponse();
+    return;
+  }
+
+  if (!res.ok) {
+    logError("AI", new Error(`OpenRouter stream HTTP ${res.status}`), { area: "streamOpenRouterTokens" });
+    yield buildFallbackResponse();
+    return;
+  }
+
+  const reader = res.body?.getReader();
+  if (!reader) {
+    yield buildFallbackResponse();
+    return;
+  }
+
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      const lines = buffer.split("\n");
+      buffer = lines.pop() ?? "";
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || !trimmed.startsWith("data: ")) continue;
+        const jsonStr = trimmed.slice(6);
+        if (jsonStr === "[DONE]") return;
+        try {
+          const chunk = JSON.parse(jsonStr) as OpenRouterStreamChunk;
+          const delta = chunk.choices?.[0]?.delta?.content;
+          if (delta) yield delta;
+        } catch {
+          // malformed chunk — skip
+        }
+      }
+    }
+  } finally {
+    reader.releaseLock();
   }
 }
 

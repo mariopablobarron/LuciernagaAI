@@ -39,6 +39,7 @@ type ChatProps = {
   messages: ChatMessage[];
   input: string;
   loading: boolean;
+  streamingMessageId?: string | null;
   error: string | null;
   actionLock?: ActionLock | null;
   responseSignals?: {
@@ -56,6 +57,7 @@ export default function Chat({
   messages,
   input,
   loading,
+  streamingMessageId,
   error,
   actionLock,
   responseSignals,
@@ -156,6 +158,7 @@ export default function Chat({
                   role={message.role}
                   content={message.content}
                   isError={message.isError}
+                  streaming={message.id === streamingMessageId}
                   variant={message.variant}
                   meta={message.meta}
                 />

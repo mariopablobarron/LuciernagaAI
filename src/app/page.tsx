@@ -672,6 +672,65 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+
+    async function consumeTelegramLink(): Promise<void> {
+      if (typeof window === "undefined") {
+        return;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const telegramLinkToken = params.get("telegram_link")?.trim();
+      if (!telegramLinkToken) {
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/auth/link-telegram", {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token: telegramLinkToken }),
+        });
+
+        const payload = (await response.json().catch(() => ({}))) as {
+          success?: boolean;
+          error?: string;
+        };
+
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.error || "No se pudo vincular Telegram.");
+        }
+
+        if (!cancelled) {
+          await refreshSessionProfile().catch(() => null);
+          setSaveProgressStatus("Telegram vinculado correctamente a esta cuenta.");
+        }
+      } catch (linkError: unknown) {
+        if (!cancelled) {
+          const message =
+            linkError instanceof Error ? linkError.message : "No se pudo vincular Telegram.";
+          setSaveProgressStatus(`Vinculación Telegram: ${message}`);
+        }
+      } finally {
+        if (!cancelled) {
+          const nextUrl = new URL(window.location.href);
+          nextUrl.searchParams.delete("telegram_link");
+          window.history.replaceState({}, "", nextUrl.pathname + nextUrl.search);
+        }
+      }
+    }
+
+    void consumeTelegramLink();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     if (safeConversation.messages.length > 0) {
       return;
     }

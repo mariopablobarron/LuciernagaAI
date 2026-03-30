@@ -15,6 +15,7 @@ import {
   logTelegramCrisis,
   touchTelegramUser,
 } from "@/services/telegram";
+import { issueTelegramLinkToken } from "@/lib/telegram-link";
 import { sendAdminUserAlert } from "@/lib/alerts";
 import { DEFAULT_EMOTIONAL_PROFILE } from "@/types/emotional-profile";
 
@@ -92,10 +93,26 @@ const DELETE_ERROR_MESSAGE =
 const SALIR_MESSAGE =
   "👋 Entendido. Has desactivado los recordatorios. Estaré aquí cuando quieras retomar.";
 
+function buildTelegramLinkMessage(token: string): string {
+  const baseUrl = process.env.APP_BASE_URL?.trim() || "http://localhost:3000";
+  const url = `${baseUrl}/?telegram_link=${encodeURIComponent(token)}`;
+
+  return [
+    "Para conectar Telegram con tu cuenta web, abre este enlace en tu navegador:",
+    "",
+    url,
+    "",
+    "Este enlace vence en 10 minutos.",
+  ].join("\n");
+}
+
 // ---- Helpers ----
 
 function hasSafetyKeyword(text: string): boolean {
-  const normalized = text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const normalized = text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
   return SAFETY_KEYWORDS.some((kw) => normalized.includes(kw));
 }
 
@@ -211,6 +228,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         logError("TELEGRAM", err, { area: "/estado", userId });
         await sendTelegramMessage(chatId, "No pude cargar tu estado en este momento.");
       }
+      return NextResponse.json({ ok: true });
+    }
+
+    // ---- Handle /vincular ----
+    if (text === "/vincular") {
+      const token = issueTelegramLinkToken(userId);
+      await sendTelegramMessage(chatId, buildTelegramLinkMessage(token));
       return NextResponse.json({ ok: true });
     }
 

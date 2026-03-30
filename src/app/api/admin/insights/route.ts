@@ -112,7 +112,7 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    const statesFromMessages = recentMessages.map((m) => m.content);
+    const statesFromMessages = recentMessages.map((m: { content: string }) => m.content);
     const dominantState = getDominantState(statesFromMessages);
 
     const retentionDay3 =
@@ -123,8 +123,7 @@ export async function GET(req: NextRequest) {
     const expectedCheckins = Math.max(usersActiveLast7d.length * 7, 1);
     const checkinDrop = Math.max(0, 1 - totalCheckinsLast7d / expectedCheckins);
 
-    const dropOffPoint =
-      retentionDay3 < 0.25 ? "day_1" : retentionDay3 < 0.4 ? "day_3" : "day_7";
+    const dropOffPoint = retentionDay3 < 0.25 ? "day_1" : retentionDay3 < 0.4 ? "day_3" : "day_7";
 
     const metrics: DecisionMetrics = {
       retentionDay3,

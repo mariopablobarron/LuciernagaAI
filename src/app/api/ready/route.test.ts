@@ -1,15 +1,15 @@
+const queryMock = jest.fn();
+
 jest.mock("@/db/prisma", () => ({
-  prisma: {
-    $queryRaw: jest.fn(),
-  },
+  getPrismaClient: () => ({
+    $queryRaw: queryMock,
+  }),
 }));
 
 import { GET } from "./route";
-import { prisma } from "@/db/prisma";
 
 describe("GET /api/ready", () => {
   it("retorna ok cuando la DB responde", async () => {
-    const queryMock = prisma.$queryRaw as jest.Mock;
     queryMock.mockResolvedValueOnce([{ "?column?": 1 }]);
 
     const response = await GET();
@@ -21,7 +21,6 @@ describe("GET /api/ready", () => {
   });
 
   it("retorna error cuando falla la DB", async () => {
-    const queryMock = prisma.$queryRaw as jest.Mock;
     queryMock.mockRejectedValueOnce(new Error("DB down"));
 
     const response = await GET();

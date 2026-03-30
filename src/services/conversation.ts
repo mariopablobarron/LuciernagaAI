@@ -47,7 +47,7 @@ export async function createConversationForUser(
   const prisma = getPrismaClient();
   const conversation = await prisma.conversation.create({
     data: {
-      userRefId: userId,
+      userId,
       title: buildConversationTitle(title ?? ""),
     },
     select: {
@@ -69,7 +69,7 @@ export async function getConversationByIdForUser(
   return prisma.conversation.findFirst({
     where: {
       id: conversationId,
-      userRefId: userId,
+      userId,
     },
     select: {
       id: true,
@@ -109,7 +109,7 @@ export async function saveConversationMessage(params: {
     await tx.message.create({
       data: {
         conversationId: params.conversationId,
-        userRefId: params.userId,
+        userId: params.userId,
         role: params.role,
         content: params.content,
       },
@@ -127,12 +127,10 @@ export async function saveConversationMessage(params: {
   });
 }
 
-export async function listConversationsForUser(
-  userId: string
-): Promise<ConversationSummary[]> {
+export async function listConversationsForUser(userId: string): Promise<ConversationSummary[]> {
   const prisma = getPrismaClient();
   const conversations = await prisma.conversation.findMany({
-    where: { userRefId: userId },
+    where: { userId },
     orderBy: { updatedAt: "desc" },
     select: {
       id: true,
@@ -151,7 +149,7 @@ export async function listConversationsForUser(
     by: ["conversationId"],
     where: {
       conversationId: { in: conversationIds },
-      userRefId: userId,
+      userId,
     },
     _count: { _all: true },
   });
@@ -178,7 +176,7 @@ export async function listMessagesForConversation(params: {
   const conversation = await prisma.conversation.findFirst({
     where: {
       id: params.conversationId,
-      userRefId: params.userId,
+      userId: params.userId,
     },
     select: { id: true },
   });
@@ -190,7 +188,7 @@ export async function listMessagesForConversation(params: {
   const messages = await prisma.message.findMany({
     where: {
       conversationId: params.conversationId,
-      userRefId: params.userId,
+      userId: params.userId,
     },
     orderBy: { createdAt: "asc" },
     select: {

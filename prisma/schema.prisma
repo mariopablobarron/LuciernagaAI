@@ -14,15 +14,15 @@ datasource db {
 
 model Conversation {
   id             String    @id @default(cuid())
-  userRefId      String?
+  userId         String?
   title          String    @default("Nueva conversación")
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   messages       Json      @default("[]")
   messageRecords Message[] @relation("ConversationMessages")
-  user           User?     @relation("UserConversations", fields: [userRefId], references: [id], onDelete: SetNull)
+  user           User?     @relation("UserConversations", fields: [userId], references: [id], onDelete: SetNull)
 
-  @@index([userRefId, updatedAt])
+  @@index([userId, updatedAt])
 }
 
 model User {
@@ -32,21 +32,22 @@ model User {
   lastSeen      DateTime       @default(now())
   conversations Conversation[] @relation("UserConversations")
   messages      Message[]      @relation("UserMessages")
+  goals         Goal[]
 }
 
 model Message {
   id             String       @id @default(cuid())
   conversationId String
-  userRefId      String?
+  userId         String?
   role           String       @default("user") // "user" | "assistant"
   content        String
   createdAt      DateTime     @default(now())
-  user           User?        @relation("UserMessages", fields: [userRefId], references: [id], onDelete: SetNull)
+  user           User?        @relation("UserMessages", fields: [userId], references: [id], onDelete: SetNull)
   conversation   Conversation @relation("ConversationMessages", fields: [conversationId], references: [id], onDelete: Cascade)
 
   @@index([conversationId, createdAt])
   @@index([createdAt])
-  @@index([userRefId, createdAt])
+  @@index([userId, createdAt])
 }
 
 model DailyLog {
@@ -96,4 +97,28 @@ model DecisionLog {
   createdAt DateTime @default(now())
 
   @@index([metric, createdAt])
+}
+
+model Goal {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  actions   Action[]
+
+  @@index([userId, status, createdAt])
+}
+
+model Action {
+  id          String   @id @default(cuid())
+  goalId      String
+  description String
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  goal        Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@index([goalId, createdAt])
 }

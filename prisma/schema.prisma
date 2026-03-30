@@ -33,6 +33,10 @@ model User {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   lastSeen        DateTime         @default(now())
+  telegramId      String?          @unique
+  consentGiven    Boolean          @default(false)
+  consentAt       DateTime?
+  source          String?
   conversations   Conversation[]   @relation("UserConversations")
   messages        Message[]        @relation("UserMessages")
   goals           Goal[]

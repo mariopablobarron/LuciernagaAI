@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowRight, MessageSquareDashed, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, MessageSquareDashed, Sparkles, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -69,6 +70,28 @@ export default function HomeHero({ onUseChat, onUseExample }: HomeHeroProps) {
             </Button>
           ))}
         </div>
+
+        <Link
+          href="/impulso"
+          className="group flex items-center justify-between rounded-2xl border border-amber-400/30 bg-amber-400/5 px-5 py-4 transition hover:border-amber-400/60 hover:bg-amber-400/10"
+        >
+          <div className="flex items-start gap-4">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-400/15 text-amber-500">
+              <Zap className="size-4" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-semibold text-foreground">⚡ Modo Impulso</p>
+                <Badge variant="secondary" className="rounded-full px-2 py-0.5 text-xs">Nuevo</Badge>
+              </div>
+              <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                Diagnóstico psicológico-operativo · Retos de 3 a 7 días · Racha diaria · Insights de comportamiento.
+                Para cuando el chat no es suficiente y necesitas estructura real.
+              </p>
+            </div>
+          </div>
+          <ArrowRight className="ml-4 size-4 shrink-0 text-muted-foreground transition group-hover:translate-x-0.5" />
+        </Link>
       </CardContent>
     </Card>
   );

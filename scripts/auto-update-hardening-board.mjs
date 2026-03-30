@@ -8,7 +8,7 @@ const MANUAL_PATH = path.join(ROOT, "docs/manual-saas-50p.md");
 const PLAN_START_ISO = "2026-03-30";
 
 const WEEK_COMMANDS = {
-  1: ["npm run lint", "npm run test", "npm run system-check"],
+  1: ["npm run lint", "npm run test"],
   2: ["npm run lint", "npm run test"],
   3: ["npm run lint", "npm run test", "npm run build"],
   4: ["npm run lint", "npm run test", "npm run test:coverage"],

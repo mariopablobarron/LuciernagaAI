@@ -5,9 +5,9 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, RefreshCw, Search, ShieldAlert, UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 
 type AdminUsersResponse = {

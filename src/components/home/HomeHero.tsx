@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { ArrowRight, MessageSquareDashed, Sparkles, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
 import {
   DEFAULT_ONBOARDING_EXAMPLE,
   ONBOARDING_EXAMPLE_PROMPTS,

@@ -5,8 +5,8 @@ import dynamic from "next/dynamic";
 import { ArrowLeft, FileText, Grip, Sparkles } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
 
 const BlockEditor = dynamic(() => import("@/components/BlockEditor"), {
   ssr: false,

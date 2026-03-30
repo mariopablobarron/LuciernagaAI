@@ -9,8 +9,8 @@ import HomeWorkspace, { type WorkspaceTab } from "@/components/home/HomeWorkspac
 import InsightsPanel from "@/components/InsightsPanel";
 import Sidebar, { type SidebarConversation } from "@/components/Sidebar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/Input";
 import { PRODUCT_DISCLAIMERS } from "@/lib/legal";
 import {
   bootstrapBrowserSession,

@@ -3,8 +3,8 @@
 import { KeyboardEvent, useEffect, useRef } from "react";
 import Message from "@/components/Message";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/Card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { ONBOARDING_EXAMPLE_PROMPTS, ONBOARDING_STARTER_QUESTION } from "@/lib/onboarding";

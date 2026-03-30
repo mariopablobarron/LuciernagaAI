@@ -153,6 +153,8 @@ export default function ExploreCanvas({
           );
 
           const isActive = activeNodeId === action.id;
+          const isPrimary = action.id === "action-1"; // "Escribir lo que evitas"
+          const otherNodesActive = activeNodeId !== null && activeNodeId !== action.id;
 
           return (
             <div
@@ -167,6 +169,8 @@ export default function ExploreCanvas({
               <ActionNode
                 action={action}
                 isActive={isActive}
+                isPrimary={isPrimary}
+                otherNodesActive={otherNodesActive}
                 onClick={() => {
                   onNodeClick(action.id);
                   setSelectedAction(action);

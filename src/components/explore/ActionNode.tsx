@@ -13,26 +13,35 @@ type ActionNodeProps = {
   action: ActionNodeType;
   isActive: boolean;
   onClick: () => void;
+  isPrimary?: boolean;
+  otherNodesActive?: boolean;
 };
 
-export default function ActionNode({ action, isActive, onClick }: ActionNodeProps) {
+export default function ActionNode({ action, isActive, onClick, isPrimary = false, otherNodesActive = false }: ActionNodeProps) {
   const colorClass = getNodeColorClass(action.color);
   const glowColor = getGlowColor(action.color);
   const borderColor = getBorderColor(action.color);
 
+  // Tamaños según si es principal
+  const nodeSize = isPrimary ? "h-40 w-40" : "h-28 w-28";
+  const hoverScale = isPrimary ? "hover:scale-115" : "hover:scale-110";
+  const activeScale = isPrimary ? "scale-135" : "scale-125";
+
   return (
     <button
       onClick={onClick}
-      className={`action-node group relative h-28 w-28 transition-all duration-300 ${
-        isActive ? "scale-125" : "scale-100 hover:scale-110"
-      } ${action.completed ? "opacity-40 pointer-events-none" : ""}`}
+      className={`action-node group relative ${nodeSize} transition-all duration-300 ${
+        isActive ? activeScale : `scale-100 ${!otherNodesActive ? hoverScale : ""}`
+      } ${otherNodesActive && !isActive ? "opacity-50" : ""} ${action.completed ? "opacity-40 pointer-events-none" : ""}`}
       aria-label={`${action.title}: ${action.description}`}
       aria-pressed={isActive}
     >
       {/* Glow effect */}
       <div
-        className={`absolute inset-0 rounded-full opacity-0 blur-2xl transition-opacity duration-300 ${
-          isActive ? "opacity-100" : "group-hover:opacity-40"
+        className={`absolute inset-0 rounded-full opacity-0 transition-opacity duration-300 ${
+          isPrimary ? "blur-3xl" : "blur-2xl"
+        } ${
+          isActive ? "opacity-100" : `${!otherNodesActive ? "group-hover:opacity-50" : ""}`
         } ${glowColor}`}
       />
 

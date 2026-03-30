@@ -26,11 +26,11 @@ export default function UserCore({ state }: UserCoreProps) {
         {/* Content */}
         <div className="text-center space-y-3 px-6">
           <div className="space-y-1">
-            <h2 className="text-2xl font-bold tracking-tight text-foreground">
-              Empieza aquí
-            </h2>
-            <p className="text-sm text-muted-foreground">
+            <h2 className="text-xl font-bold tracking-tight text-foreground leading-tight">
               ¿Qué estás evitando ahora mismo?
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              No le des más vueltas. Escríbelo.
             </p>
           </div>
 

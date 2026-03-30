@@ -19,3 +19,16 @@ export function getPrismaClient(): PrismaClient {
 
   return globalForPrisma.prisma;
 }
+
+export function getExistingPrismaClient(): PrismaClient | undefined {
+  return globalForPrisma.prisma;
+}
+
+export async function disconnectPrismaClient(): Promise<void> {
+  if (!globalForPrisma.prisma) {
+    return;
+  }
+
+  await globalForPrisma.prisma.$disconnect();
+  delete globalForPrisma.prisma;
+}

@@ -231,6 +231,35 @@ export async function sendAvoidanceEscalationAlert(params: {
   );
 }
 
+export async function sendAdminUserAlert(params: {
+  userId: string;
+  lastMessage: string;
+  state?: string;
+  reason?: string;
+}): Promise<void> {
+  const adminChatId = process.env.ADMIN_TELEGRAM_ID;
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  if (!adminChatId || !botToken) return;
+
+  const emoji = params.state === "ansiedad" || params.state === "riesgo" ? "🚨" : "⚠️";
+  const text =
+    `${emoji} Usuario en riesgo:\n` +
+    `ID: ${params.userId}\n` +
+    (params.state ? `Estado: ${params.state}\n` : "") +
+    (params.reason ? `Motivo: ${params.reason}\n` : "") +
+    `Último mensaje: ${truncateText(params.lastMessage)}`;
+
+  try {
+    await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: adminChatId, text }),
+    });
+  } catch (error) {
+    console.error("[ALERTS] sendAdminUserAlert failed:", error);
+  }
+}
+
 export async function checkAndAlert(metrics: {
   retentionDay3: number;
   checkinDrop: number;

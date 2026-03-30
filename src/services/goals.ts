@@ -661,11 +661,25 @@ export async function completeFirstPendingActionForUser(
     return activeGoal;
   }
 
-  return updateGoalAction({
-    userId,
-    actionId: firstPending.id,
-    completed: true,
-  });
+  const [result] = await Promise.all([
+    updateGoalAction({ userId, actionId: firstPending.id, completed: true }),
+    resetAvoidanceForAction(firstPending.id),
+  ]);
+
+  return result;
+}
+
+export async function getAvoidanceCountForAction(
+  userId: string,
+  actionId: string
+): Promise<number> {
+  const prisma = getPrismaClient();
+  return prisma.avoidanceEvent.count({ where: { userId, actionId } });
+}
+
+export async function resetAvoidanceForAction(actionId: string): Promise<void> {
+  const prisma = getPrismaClient();
+  await prisma.avoidanceEvent.deleteMany({ where: { actionId } });
 }
 
 export async function registerAvoidanceEvent(params: {

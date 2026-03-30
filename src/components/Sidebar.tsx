@@ -174,7 +174,8 @@ export default function Sidebar({
           <div>
             <p className="font-semibold leading-snug">⚡ Modo Impulso</p>
             <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">
-              Diagnóstico, retos personalizados y racha diaria para convertir intención en ejecución.
+              Diagnóstico, retos personalizados y racha diaria para convertir intención en
+              ejecución.
             </p>
           </div>
           <ArrowRight className="ml-3 size-4 shrink-0 text-muted-foreground" />
@@ -199,7 +200,7 @@ export default function Sidebar({
             </Badge>
           </div>
 
-          <ScrollArea className="h-[16rem] rounded-2xl border border-border bg-muted/30">
+          <ScrollArea className="h-64 rounded-2xl border border-border bg-muted/30">
             <div className="space-y-2 p-2">
               {conversations.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-border bg-background/60 p-4 text-sm text-muted-foreground">
@@ -296,7 +297,13 @@ export default function Sidebar({
                           action.completed ? "bg-emerald-500" : "bg-amber-400"
                         }`}
                       />
-                      <span className={action.completed ? "text-muted-foreground line-through" : "text-foreground"}>
+                      <span
+                        className={
+                          action.completed
+                            ? "text-muted-foreground line-through"
+                            : "text-foreground"
+                        }
+                      >
                         {action.description}
                       </span>
                     </div>

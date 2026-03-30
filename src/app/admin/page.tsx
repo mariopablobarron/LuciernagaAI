@@ -10,6 +10,8 @@ import { AdminShell } from "@/features/admin/components/AdminShell";
 import type { AdminInsightsResponse } from "@/features/admin/types";
 import { SAAS_CONFIG } from "@/lib/saas";
 
+type AdminInsightsPartial = Partial<AdminInsightsResponse> | null;
+
 function formatPercent(value: number): string {
   return `${(value * 100).toFixed(1)}%`;
 }
@@ -23,6 +25,61 @@ function formatDateTime(value: string): string {
   return date.toLocaleString();
 }
 
+function normalizeAdminInsights(payload: AdminInsightsPartial): AdminInsightsResponse {
+  return {
+    metrics: {
+      retentionDay3: payload?.metrics?.retentionDay3 ?? 0,
+      retentionDay7: payload?.metrics?.retentionDay7 ?? 0,
+      dropOffPoint: payload?.metrics?.dropOffPoint ?? "day_1",
+      checkinDrop: payload?.metrics?.checkinDrop ?? 0,
+      dominantState: payload?.metrics?.dominantState ?? "neutral",
+      confidence: payload?.metrics?.confidence,
+      sampleSize: payload?.metrics?.sampleSize ?? 0,
+    },
+    activity: {
+      usersCreatedLast7d: payload?.activity?.usersCreatedLast7d ?? 0,
+      activeUsersLast7d: payload?.activity?.activeUsersLast7d ?? 0,
+      messagesLast7d: payload?.activity?.messagesLast7d ?? 0,
+      checkinsLast7d: payload?.activity?.checkinsLast7d ?? 0,
+    },
+    segments: {
+      totalUsers: payload?.segments?.totalUsers ?? 0,
+      newUsers: payload?.segments?.newUsers ?? 0,
+      returningUsers: payload?.segments?.returningUsers ?? 0,
+      activeNewUsers: payload?.segments?.activeNewUsers ?? 0,
+      activeReturningUsers: payload?.segments?.activeReturningUsers ?? 0,
+      inactiveUsers: payload?.segments?.inactiveUsers ?? 0,
+    },
+    decision: {
+      decision: payload?.decision?.decision ?? "Sin decisión disponible",
+      reason: payload?.decision?.reason ?? "No hay información suficiente para mostrar decisión.",
+      priority: payload?.decision?.priority ?? "medium",
+      action: payload?.decision?.action ?? "Revisar estado del servicio de insights.",
+    },
+    alerts: payload?.alerts ?? [],
+    insights: payload?.insights ?? [],
+    crisis: {
+      last24h: {
+        total: payload?.crisis?.last24h?.total ?? 0,
+        high: payload?.crisis?.last24h?.high ?? 0,
+        critical: payload?.crisis?.last24h?.critical ?? 0,
+      },
+      latestEvents: payload?.crisis?.latestEvents ?? [],
+    },
+    avoidance: {
+      last7d: {
+        total: payload?.avoidance?.last7d?.total ?? 0,
+        postpone: payload?.avoidance?.last7d?.postpone ?? 0,
+        refuse: payload?.avoidance?.last7d?.refuse ?? 0,
+        uniqueUsers: payload?.avoidance?.last7d?.uniqueUsers ?? 0,
+      },
+      topActions: payload?.avoidance?.topActions ?? [],
+    },
+    decisionHistory: payload?.decisionHistory ?? [],
+    insightHistory: payload?.insightHistory ?? [],
+  };
+}
+
 export default function AdminPage() {
   const router = useRouter();
   const [data, setData] = useState<AdminInsightsResponse | null>(null);
@@ -32,34 +89,41 @@ export default function AdminPage() {
   useEffect(() => {
     fetch("/api/admin/insights")
       .then(async (res) => {
-        const payload = (await res.json().catch(() => null)) as AdminInsightsResponse | null;
+        const payload = (await res.json().catch(() => null)) as AdminInsightsPartial;
 
         if (res.status === 401) {
           router.replace("/admin/login?next=/admin");
           return null;
         }
 
-        if (
-          payload?.metrics &&
-          payload?.decision &&
-          payload?.alerts &&
-          payload?.insights &&
-          payload?.segments &&
-          payload?.activity
-        ) {
+        if (!payload || typeof payload !== "object") {
           if (!res.ok) {
-            setDegraded(
-              "El panel está en modo degradado. Revisa la base de datos o las migraciones."
-            );
+            throw new Error("No se pudieron cargar los insights.");
           }
-          return payload;
+          throw new Error("La respuesta del panel admin no tiene formato válido.");
         }
 
-        if (!res.ok) {
-          throw new Error("No se pudieron cargar los insights.");
+        const normalized = normalizeAdminInsights(payload);
+        const missingSections = [
+          "metrics",
+          "decision",
+          "alerts",
+          "insights",
+          "segments",
+          "activity",
+          "crisis",
+          "avoidance",
+        ].filter((section) => !(section in payload));
+
+        if (!res.ok || missingSections.length > 0) {
+          setDegraded(
+            missingSections.length > 0
+              ? `El panel está en modo degradado. Faltan secciones en la respuesta: ${missingSections.join(", ")}.`
+              : "El panel está en modo degradado. Revisa la base de datos o las migraciones."
+          );
         }
 
-        return payload;
+        return normalized;
       })
       .then((payload) => {
         if (payload) {
@@ -198,6 +262,7 @@ export default function AdminPage() {
         </AdminPanel>
 
         <AdminPanel
+          id="billing"
           title="Billing readiness"
           description="Extraccion de patron de Open SaaS: dejar billing desacoplado y listo, sin forzar Stripe antes de tiempo."
         >
@@ -277,6 +342,7 @@ export default function AdminPage() {
         </AdminPanel>
 
         <AdminPanel
+          id="alerts"
           title="Alerts"
           description="Señales accionables priorizadas por retencion, crisis y evitacion."
         >
@@ -348,7 +414,11 @@ export default function AdminPage() {
         </div>
       </AdminPanel>
 
-      <AdminPanel title="Insights" description="Lecturas accionables para producto y operaciones.">
+      <AdminPanel
+        id="insights"
+        title="Insights"
+        description="Lecturas accionables para producto y operaciones."
+      >
         <div className="space-y-3">
           {data.insights.map((insight, idx) => (
             <div key={idx} className="rounded-2xl border-l-4 border-sky-500 bg-white p-4 shadow-sm">

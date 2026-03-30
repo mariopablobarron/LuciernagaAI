@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import Chat, { type ChatMessage } from "@/components/Chat";
 import HomeHero from "@/components/home/HomeHero";
+import HomeOnboarding from "@/components/home/HomeOnboarding";
 import HomeWorkspace, { type WorkspaceTab } from "@/components/home/HomeWorkspace";
 import InsightsPanel from "@/components/InsightsPanel";
 import Sidebar, { type SidebarConversation } from "@/components/Sidebar";
@@ -304,6 +305,7 @@ export default function HomePage() {
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeGoal, setActiveGoal] = useState<ActiveGoal | null>(null);
   const [actionLock, setActionLock] = useState<ActionLockState | null>(null);
@@ -331,6 +333,9 @@ export default function HomePage() {
   const [adminLoading, setAdminLoading] = useState(true);
   const [workspaceTab, setWorkspaceTab] = useState<WorkspaceTab>("chat");
   const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState<0 | 1 | 2 | 3>(0);
+  const [onboardingSituation, setOnboardingSituation] = useState("");
+  const [onboardingTime, setOnboardingTime] = useState("");
 
   const handleUnauthorizedSession = () => {
     setSessionReady(false);
@@ -1046,8 +1051,7 @@ export default function HomePage() {
         }),
       });
 
-      const payload = (await response.json().catch(() => ({}))) as Partial<ChatApiResponse>;
-
+      // Handle 401 without consuming body
       if (response.status === 401) {
         handleUnauthorizedSession();
         const assistantUnauthorized: ChatMessage = {
@@ -1068,8 +1072,209 @@ export default function HomePage() {
               : conversation
           )
         );
+        await refreshSessionProfile().catch(() => null);
         return;
       }
+
+      // --- SSE streaming path ---
+      const contentType = response.headers.get("content-type") ?? "";
+      if (contentType.includes("text/event-stream") && response.body) {
+        if (!response.ok) {
+          const errMsg = `Error ${response.status}`;
+          setError(errMsg);
+          setConversations((previous) =>
+            previous.map((conversation) =>
+              conversation.id === currentConversationId
+                ? {
+                    ...conversation,
+                    updatedAt: new Date().toISOString(),
+                    messageCount: conversation.messageCount + 1,
+                    messages: [
+                      ...conversation.messages,
+                      { id: `assistant_error_${Date.now()}`, role: "assistant" as const, content: errMsg, isError: true },
+                    ],
+                  }
+                : conversation
+            )
+          );
+          return;
+        }
+
+        const streamMsgId = `assistant_${Date.now()}`;
+        setConversations((previous) =>
+          previous.map((conversation) =>
+            conversation.id === currentConversationId
+              ? {
+                  ...conversation,
+                  updatedAt: new Date().toISOString(),
+                  messageCount: conversation.messageCount + 1,
+                  messages: [
+                    ...conversation.messages,
+                    { id: streamMsgId, role: "assistant" as const, content: "" },
+                  ],
+                }
+              : conversation
+          )
+        );
+        setStreamingMessageId(streamMsgId);
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let sseBuffer = "";
+        let sseMeta: Partial<ChatApiResponse> | null = null;
+        let sseStreamDone = false;
+
+        while (!sseStreamDone) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          sseBuffer += decoder.decode(value, { stream: true });
+          const lines = sseBuffer.split("\n");
+          sseBuffer = lines.pop() ?? "";
+          for (const line of lines) {
+            const trimmedLine = line.trim();
+            if (!trimmedLine.startsWith("data: ")) continue;
+            try {
+              const event = JSON.parse(trimmedLine.slice(6)) as {
+                type: string;
+                delta?: string;
+                content?: string;
+                [key: string]: unknown;
+              };
+              if (event.type === "delta" && event.delta) {
+                setConversations((previous) =>
+                  previous.map((conversation) =>
+                    conversation.id === currentConversationId
+                      ? {
+                          ...conversation,
+                          messages: conversation.messages.map((msg) =>
+                            msg.id === streamMsgId
+                              ? { ...msg, content: msg.content + (event.delta as string) }
+                              : msg
+                          ),
+                        }
+                      : conversation
+                  )
+                );
+              } else if (event.type === "replace" && typeof event.content === "string") {
+                setConversations((previous) =>
+                  previous.map((conversation) =>
+                    conversation.id === currentConversationId
+                      ? {
+                          ...conversation,
+                          messages: conversation.messages.map((msg) =>
+                            msg.id === streamMsgId ? { ...msg, content: event.content as string } : msg
+                          ),
+                        }
+                      : conversation
+                  )
+                );
+              } else if (event.type === "meta") {
+                sseMeta = event as Partial<ChatApiResponse>;
+              } else if (event.type === "done") {
+                sseStreamDone = true;
+                break;
+              }
+            } catch {
+              // skip malformed SSE event
+            }
+          }
+        }
+
+        setStreamingMessageId(null);
+
+        const ssePayload = sseMeta ?? {};
+        const sseNextState = (ssePayload.state as string) || "neutral";
+        const ssePersistenceAvailable = ssePayload.persistenceAvailable !== false;
+        const sseResolvedConversationId = ssePersistenceAvailable
+          ? ssePayload.conversationId || currentConversationId
+          : currentConversationId;
+        const sseNextGoal = ssePayload.goal ?? null;
+        const sseNextEmotionalProfile = ssePayload.emotionalProfile ?? emotionalProfile;
+        const sseNextFlow = ssePayload.flow ?? null;
+        const sseConversionTrigger = Boolean(ssePayload.conversionTrigger);
+        const sseConversionType = ssePayload.conversionType ?? null;
+        const sseFallbackInsight = buildStateInsight(sseNextState);
+        const sseNextInsight = ssePayload.insight || sseFallbackInsight.insight;
+        const sseNextAction =
+          typeof ssePayload.action === "string" ? ssePayload.action : sseFallbackInsight.action;
+        const sseNextAlerts =
+          Array.isArray(ssePayload.alerts) && ssePayload.alerts.length > 0
+            ? ssePayload.alerts
+            : sseFallbackInsight.alerts;
+
+        if (ssePayload.captureEmail) {
+          setCaptureEmailRecommended(true);
+          setCaptureEmailPrompt((ssePayload.captureEmailMessage as string) || null);
+          if (sessionProfile?.isAnonymous !== false) {
+            setCaptureDialogOpen(true);
+          }
+        } else if (sessionProfile && !sessionProfile.isAnonymous) {
+          setCaptureEmailRecommended(false);
+          setCaptureEmailPrompt(null);
+        }
+
+        setConversations((previous) => {
+          const next = previous.map((conversation) =>
+            conversation.id === currentConversationId
+              ? {
+                  ...conversation,
+                  id: sseResolvedConversationId,
+                  isDraft: ssePersistenceAvailable ? false : conversation.isDraft,
+                  hasLoadedMessages: ssePersistenceAvailable ? true : conversation.hasLoadedMessages,
+                  updatedAt: new Date().toISOString(),
+                  state: sseNextState,
+                  insight: sseNextInsight,
+                  action: sseNextAction,
+                  alerts: sseNextAlerts,
+                  searchUsed: Boolean(ssePayload.searchUsed),
+                  fallback: Boolean(ssePayload.fallback),
+                  flow: sseNextFlow,
+                  conversionTrigger: sseConversionTrigger,
+                  conversionType: sseConversionType,
+                  messages: conversation.messages.map((msg) =>
+                    msg.id === streamMsgId
+                      ? { ...msg, meta: { searchUsed: Boolean(ssePayload.searchUsed), fallback: Boolean(ssePayload.fallback) } }
+                      : msg
+                  ),
+                }
+              : conversation
+          );
+          const dedupById = new Map<string, Conversation>();
+          for (const item of next) {
+            if (!dedupById.has(item.id)) dedupById.set(item.id, item);
+          }
+          return Array.from(dedupById.values());
+        });
+        setEmotionalProfile(sseNextEmotionalProfile);
+
+        if (sseResolvedConversationId !== currentConversationId) {
+          setActiveConversationId(sseResolvedConversationId);
+        }
+        if (sseNextGoal) {
+          setActiveGoal(sseNextGoal);
+        } else {
+          setActionLock(null);
+        }
+
+        try {
+          if (ssePersistenceAvailable) {
+            await refreshConversations(sseResolvedConversationId);
+            await loadMessages(sseResolvedConversationId);
+            if (!sseNextGoal) {
+              await refreshActiveGoal();
+            }
+          } else {
+            setError("La respuesta llegó, pero no se pudo guardar en base de datos. Revisa los logs del servidor.");
+          }
+          await refreshSessionProfile().catch(() => null);
+        } catch {
+          console.error("[CHAT_UI] refresh_failed_after_stream", { conversationId: sseResolvedConversationId });
+        }
+        return;
+      }
+
+      // --- JSON path ---
+      const payload = (await response.json().catch(() => ({}))) as Partial<ChatApiResponse>;
 
       if (!response.ok) {
         const message = payload.error || payload.response || `Error ${response.status}`;
@@ -1320,10 +1525,38 @@ export default function HomePage() {
         }
         prelude={
           <>
-            <HomeHero
-              onUseChat={() => setWorkspaceTab("chat")}
-              onUseExample={handleUseStarterExample}
-            />
+            {onboardingStep === 0 ? (
+              <HomeHero
+                onUseChat={() => setWorkspaceTab("chat")}
+                onUseExample={handleUseStarterExample}
+                onStartOnboarding={() => setOnboardingStep(1)}
+              />
+            ) : (
+              <HomeOnboarding
+                step={onboardingStep as 1 | 2 | 3}
+                situation={onboardingSituation}
+                time={onboardingTime}
+                onSelectSituation={(value) => {
+                  setOnboardingSituation(value);
+                  setOnboardingStep(2);
+                }}
+                onSelectTime={(value) => {
+                  setOnboardingTime(value);
+                  setOnboardingStep(3);
+                }}
+                onSubmitGoal={(goal) => {
+                  const message =
+                    `${onboardingSituation} Tengo ${onboardingTime} ahora. ` +
+                    `Lo que quiero resolver: ${goal}`;
+                  setOnboardingStep(0);
+                  handleUseStarterExample(message);
+                }}
+                onSkip={() => {
+                  setOnboardingStep(0);
+                  setWorkspaceTab("chat");
+                }}
+              />
+            )}
             <Card className="border-border/70 bg-card/80 shadow-sm">
               <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="space-y-1">
@@ -1377,6 +1610,7 @@ export default function HomePage() {
                 messages={safeConversation.messages}
                 input={input}
                 loading={loading || sessionLoading}
+                streamingMessageId={streamingMessageId}
                 error={error}
                 responseSignals={{
                   searchUsed: safeConversation.searchUsed,

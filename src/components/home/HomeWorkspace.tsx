@@ -155,7 +155,7 @@ export default function HomeWorkspace({
     <Tabs
       value={activeTab}
       onValueChange={(value) => onTabChange(value as WorkspaceTab)}
-      className="flex h-full min-h-[34rem] flex-col gap-4"
+      className="flex h-full min-h-136 flex-col gap-4"
     >
       <Card className="border-border/80 bg-card/95 shadow-sm">
         <CardContent className="space-y-4 p-4">
@@ -173,7 +173,7 @@ export default function HomeWorkspace({
               </p>
             </div>
 
-            <TabsList className="grid w-full grid-cols-3 lg:w-[420px]">
+            <TabsList className="grid w-full grid-cols-3 lg:w-105">
               <TabsTrigger value="chat" className="gap-2">
                 <MessageSquareText className="size-4" />
                 Chat
@@ -214,7 +214,7 @@ export default function HomeWorkspace({
       </Card>
 
       <TabsContent value="chat" className="flex-1">
-        <div className="flex h-full min-h-[34rem] flex-col gap-4">
+        <div className="flex h-full min-h-136 flex-col gap-4">
           <Card className="border-border/80 bg-card/95 shadow-sm">
             <CardContent className="flex flex-col gap-3 p-4 lg:flex-row lg:items-center lg:justify-between">
               <div className="space-y-3">
@@ -226,7 +226,10 @@ export default function HomeWorkspace({
                   seguimiento.
                 </p>
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant={statusVariant(conversationState)} className="rounded-full px-3 py-1">
+                  <Badge
+                    variant={statusVariant(conversationState)}
+                    className="rounded-full px-3 py-1"
+                  >
                     Estado {conversationState}
                   </Badge>
                   <Badge variant="secondary" className="rounded-full px-3 py-1">
@@ -252,7 +255,12 @@ export default function HomeWorkspace({
                   <Plus className="size-4" />
                   Nueva conversación
                 </Button>
-                <Button type="button" variant="secondary" size="sm" onClick={() => onTabChange("plan")}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => onTabChange("plan")}
+                >
                   Ver plan
                   <ArrowRight className="size-4" />
                 </Button>
@@ -265,7 +273,7 @@ export default function HomeWorkspace({
             </CardContent>
           </Card>
 
-          <div className="min-h-[32rem] flex-1">{chat}</div>
+          <div className="min-h-128 flex-1">{chat}</div>
         </div>
       </TabsContent>
 
@@ -306,7 +314,9 @@ export default function HomeWorkspace({
                         {activeGoal.completedCount}/{activeGoal.totalCount} acciones
                       </Badge>
                     </div>
-                    <h3 className="mt-3 text-lg font-semibold text-foreground">{activeGoal.title}</h3>
+                    <h3 className="mt-3 text-lg font-semibold text-foreground">
+                      {activeGoal.title}
+                    </h3>
                     <p className="mt-2 text-sm text-muted-foreground">
                       Progreso actual: {activeGoal.progress}% completado
                     </p>
@@ -320,7 +330,7 @@ export default function HomeWorkspace({
                         Marca avances sin salir del workspace central.
                       </p>
                     </div>
-                    <ScrollArea className="h-[18rem]">
+                    <ScrollArea className="h-72">
                       <div className="space-y-3 p-4">
                         {activeGoal.actions.length === 0 ? (
                           <div className="rounded-2xl border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">
@@ -452,7 +462,12 @@ export default function HomeWorkspace({
                       Continuidad completa
                     </p>
                     <p className="mt-2 text-sm text-muted-foreground">{upgradeCopy}</p>
-                    <Button type="button" variant="secondary" className="mt-4 w-full" onClick={onOpenUpgrade}>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      className="mt-4 w-full"
+                      onClick={onOpenUpgrade}
+                    >
                       Ver plan Pro
                     </Button>
                   </div>
@@ -489,7 +504,12 @@ export default function HomeWorkspace({
                   </div>
                 )}
 
-                <Button type="button" variant="outline" className="w-full" onClick={() => onTabChange("chat")}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => onTabChange("chat")}
+                >
                   Volver al chat
                 </Button>
               </CardContent>
@@ -514,7 +534,7 @@ export default function HomeWorkspace({
                 rows={7}
                 disabled={checkinLoading}
                 placeholder="Ejemplo: Hoy estoy bloqueado y me cuesta arrancar."
-                className="min-h-[14rem] resize-none bg-background"
+                className="min-h-56 resize-none bg-background"
               />
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="text-xs text-muted-foreground">
@@ -557,7 +577,10 @@ export default function HomeWorkspace({
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant={statusVariant(conversationState)} className="rounded-full px-3 py-1">
+                  <Badge
+                    variant={statusVariant(conversationState)}
+                    className="rounded-full px-3 py-1"
+                  >
                     Estado actual: {conversationState}
                   </Badge>
                   <Badge variant="secondary" className="rounded-full px-3 py-1">
@@ -590,11 +613,21 @@ export default function HomeWorkspace({
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex flex-col gap-3">
-                <Button type="button" variant="secondary" className="justify-between" onClick={() => onTabChange("chat")}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="justify-between"
+                  onClick={() => onTabChange("chat")}
+                >
                   Ir al chat
                   <ArrowRight className="size-4" />
                 </Button>
-                <Button type="button" variant="outline" className="justify-between" onClick={() => onTabChange("plan")}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="justify-between"
+                  onClick={() => onTabChange("plan")}
+                >
                   Ver plan activo
                   <ChartNoAxesColumn className="size-4" />
                 </Button>

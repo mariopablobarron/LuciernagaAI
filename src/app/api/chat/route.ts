@@ -5,16 +5,14 @@ import {
   InvalidSessionTokenError,
   resolveIdentity,
 } from "@/lib/auth";
-import {
-  sendAvoidanceEscalationAlert,
-  sendCrisisEscalationAlert,
-} from "@/lib/alerts";
+import { sendAvoidanceEscalationAlert, sendCrisisEscalationAlert } from "@/lib/alerts";
 import { logError, logInfo } from "@/lib/logger";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getErrorMessage } from "@/lib/utils";
 import { generateAIResponse } from "@/services/ai";
-import { buildActionRequiredMessage } from "@/services/coach";
+import { appendCaptureEmailPrompt, buildActionRequiredMessage } from "@/services/coach";
 import {
+  countMessagesForConversation,
   ensureUserSession,
   listRecentUserMessagesForUser,
   resolveConversationForUser,
@@ -22,9 +20,11 @@ import {
 } from "@/services/conversation";
 import {
   buildGoalCoachContext,
+  countPendingActions,
   completeFirstPendingActionForUser,
   createGoalFromIntentMessage,
   detectActionCompletionIntent,
+  detectAvoidance,
   detectActionPostponeIntent,
   detectActionRefusalIntent,
   getFirstPendingAction,
@@ -33,8 +33,14 @@ import {
 } from "@/services/goals";
 import { runFlow, loadDialogueState, saveDialogueState } from "@/services/flows";
 import { detectIntent } from "@/services/intent";
+import { getMentorMode, shouldAskForEmail } from "@/services/mentor-protocol";
 import { analyzeEmotionalProfile, updateEmotionalProfile } from "@/services/emotional-model";
-import { buildSearchQuery, needsExternalInfo, searchWeb } from "@/services/search";
+import {
+  buildSearchQuery,
+  classifyExternalInfoNeed,
+  needsExternalInfo,
+  searchWeb,
+} from "@/services/search";
 import {
   detectRiskLevel,
   getCrisisResponse,
@@ -48,8 +54,11 @@ import {
   detectUserState,
   getUserCrisisStatus,
   shouldBypassActionLock,
+  updateUserTransformationPhase,
   updateUserState,
 } from "@/services/state";
+import { describeTransformationPhase, inferTransformationPhase } from "@/services/transformation";
+import { getUserSessionProfile } from "@/services/user";
 import type { ChatRequestBody, UserState } from "@/types/chat";
 
 function hasIncomingToken(req: NextRequest): boolean {
@@ -131,6 +140,10 @@ function buildActionRequiredResponse(params: {
     activeFlow: string | null;
     instruction: string | null;
   };
+  mentorMode?: string;
+  transformationPhase?: string;
+  captureEmail?: boolean;
+  captureEmailMessage?: string | null;
 }): NextResponse {
   return NextResponse.json({
     success: true,
@@ -145,6 +158,10 @@ function buildActionRequiredResponse(params: {
     persistenceAvailable: params.persistenceAvailable,
     searchUsed: false,
     flow: serializeFlow(params.flow),
+    mentorMode: params.mentorMode ?? "directive",
+    transformationPhase: params.transformationPhase ?? "bloqueo",
+    captureEmail: params.captureEmail ?? false,
+    captureEmailMessage: params.captureEmailMessage ?? null,
     action: {
       id: params.action.id,
       title: params.action.description,
@@ -200,7 +217,7 @@ export async function POST(req: NextRequest) {
     });
 
     const message = body.message?.trim() ?? "";
-    const identity = resolveIdentity(req);
+    const identity = await resolveIdentity(req);
     const userId = identity.userId;
 
     logInfo("CHAT", "identity_resolved", {
@@ -217,6 +234,44 @@ export async function POST(req: NextRequest) {
         "neutral",
         "EMPTY_MESSAGE"
       );
+    }
+
+    const sessionProfile = await getUserSessionProfile(userId);
+    const accessState = sessionProfile;
+    if (
+      !accessState.hasPlan &&
+      accessState.messageLimitPerDay !== null &&
+      accessState.messagesUsedToday >= accessState.messageLimitPerDay
+    ) {
+      logInfo("CHAT", "plan_limit_reached", {
+        userId,
+        plan: accessState.plan,
+        messagesUsedToday: accessState.messagesUsedToday,
+        messageLimitPerDay: accessState.messageLimitPerDay,
+      });
+
+      const planLimitedResponse = NextResponse.json(
+        {
+          success: false,
+          error:
+            "Has alcanzado el limite diario del plan Free. Guarda tu progreso con email o activa un plan para seguir hoy.",
+          response:
+            "Has alcanzado el limite diario del plan Free. Guarda tu progreso con email o activa un plan para seguir hoy.",
+          state: "neutral",
+          code: "PLAN_LIMIT_REACHED",
+          plan: accessState.planLabel,
+          subscriptionStatus: accessState.subscriptionStatus,
+          messagesUsedToday: accessState.messagesUsedToday,
+          messageLimitPerDay: accessState.messageLimitPerDay,
+        },
+        { status: 403 }
+      );
+
+      if (identity.shouldSetCookie) {
+        attachSessionCookie(planLimitedResponse, identity.sessionToken);
+      }
+
+      return planLimitedResponse;
     }
 
     const rateLimit = checkRateLimit(`chat:${userId}`, 10, 60_000);
@@ -288,8 +343,36 @@ export async function POST(req: NextRequest) {
     let actionLockResponse: NextResponse | null = null;
     let actionLockAssistantMessage: string | null = null;
     let goalAvoidanceCount = 0;
+    let goalPendingActionsCount = 0;
+    const avoidanceDetectedThisTurn = detectAvoidance(message);
     let completionMicroFeedback: string | null = null;
     let actionCompletedThisTurn = false;
+    let conversationMessageCount = 0;
+    let transformationPhase = inferTransformationPhase({
+      state,
+      intent: detectedIntent,
+      hasGoal: false,
+      totalActions: 0,
+      pendingActionsCount: 0,
+      completedActionsCount: 0,
+      avoidanceCount: 0,
+      conversationMessageCount: 0,
+    });
+    let transformationSummary = describeTransformationPhase(transformationPhase);
+    let mentorMode = getMentorMode({
+      state,
+      riskLevel,
+      transformationPhase,
+      activeGoal: false,
+      pendingActionsCount: 0,
+      avoidanceCount: 0,
+      avoidanceDetected: avoidanceDetectedThisTurn,
+      repeatedPattern: false,
+      conversationMessageCount: 0,
+    });
+    let captureEmailRecommended = false;
+    const captureEmailMessage =
+      "¿Quieres guardar tu progreso y continuar otro día? Déjame tu email.";
 
     try {
       await ensureUserSession(userId);
@@ -338,6 +421,7 @@ export async function POST(req: NextRequest) {
         conversationId,
         role: "user",
       });
+      conversationMessageCount = await countMessagesForConversation(conversationId);
 
       try {
         const userMessageHistory = await listRecentUserMessagesForUser(userId, 16);
@@ -356,12 +440,45 @@ export async function POST(req: NextRequest) {
       if (!crisisMode) {
         activeGoal = await getActiveGoalForUser(userId);
         let pendingAction = getFirstPendingAction(activeGoal);
+        goalPendingActionsCount = countPendingActions(activeGoal);
+        const repeatedPattern =
+          conversationMessageCount > 3 &&
+          (emotionalProfile.dominantPattern === "evita_decidir" ||
+            emotionalProfile.dominantPattern === "procrastinación");
+        transformationPhase = inferTransformationPhase({
+          state,
+          intent: detectedIntent,
+          hasGoal: Boolean(activeGoal),
+          totalActions: activeGoal?.totalCount ?? 0,
+          pendingActionsCount: goalPendingActionsCount,
+          completedActionsCount: activeGoal?.completedCount ?? 0,
+          avoidanceCount: goalAvoidanceCount,
+          conversationMessageCount,
+        });
+        transformationSummary = describeTransformationPhase(transformationPhase);
+        mentorMode = getMentorMode({
+          state,
+          riskLevel,
+          transformationPhase,
+          activeGoal: Boolean(activeGoal),
+          pendingActionsCount: goalPendingActionsCount,
+          avoidanceCount: goalAvoidanceCount,
+          avoidanceDetected: avoidanceDetectedThisTurn,
+          repeatedPattern,
+          conversationMessageCount,
+        });
 
         if (pendingAction) {
-          if (detectActionCompletionIntent(message)) {
+          const completionIntent = detectActionCompletionIntent(message);
+          const postponeIntent = detectActionPostponeIntent(message);
+          const refusalIntent = detectActionRefusalIntent(message);
+          const sidestepAvoidance = avoidanceDetectedThisTurn && !completionIntent;
+
+          if (completionIntent) {
             const progressedGoal = await completeFirstPendingActionForUser(userId);
             activeGoal = progressedGoal ?? activeGoal;
             pendingAction = getFirstPendingAction(activeGoal);
+            goalPendingActionsCount = countPendingActions(activeGoal);
             actionCompletedThisTurn = true;
             completionMicroFeedback = pendingAction
               ? `Bien. Has avanzado. Siguiente paso: ${pendingAction.description}`
@@ -373,7 +490,7 @@ export async function POST(req: NextRequest) {
               });
             }
           } else {
-            if (detectActionPostponeIntent(message)) {
+            if (postponeIntent) {
               goalAvoidanceCount = await registerAvoidanceEvent({
                 userId,
                 actionId: pendingAction.id,
@@ -386,7 +503,7 @@ export async function POST(req: NextRequest) {
                 actionTitle: pendingAction.description,
                 goalTitle: activeGoal?.title ?? null,
               });
-            } else if (detectActionRefusalIntent(message)) {
+            } else if (refusalIntent) {
               goalAvoidanceCount = await registerAvoidanceEvent({
                 userId,
                 actionId: pendingAction.id,
@@ -395,6 +512,19 @@ export async function POST(req: NextRequest) {
               await sendAvoidanceEscalationAlert({
                 userId,
                 type: "refuse",
+                count: goalAvoidanceCount,
+                actionTitle: pendingAction.description,
+                goalTitle: activeGoal?.title ?? null,
+              });
+            } else if (sidestepAvoidance) {
+              goalAvoidanceCount = await registerAvoidanceEvent({
+                userId,
+                actionId: pendingAction.id,
+                type: "avoidance",
+              });
+              await sendAvoidanceEscalationAlert({
+                userId,
+                type: "avoidance",
                 count: goalAvoidanceCount,
                 actionTitle: pendingAction.description,
                 goalTitle: activeGoal?.title ?? null,
@@ -402,7 +532,13 @@ export async function POST(req: NextRequest) {
             }
 
             if (!shouldBypassActionLock(state)) {
-              actionLockAssistantMessage = buildActionRequiredMessage(goalAvoidanceCount);
+              actionLockAssistantMessage = buildActionRequiredMessage({
+                actionTitle: pendingAction.description,
+                goalTitle: activeGoal?.title ?? null,
+                avoidanceCount: goalAvoidanceCount,
+                unfinishedActionsCount: goalPendingActionsCount,
+                mentorMode,
+              });
               actionLockResponse = buildActionRequiredResponse({
                 message: actionLockAssistantMessage,
                 state,
@@ -412,6 +548,8 @@ export async function POST(req: NextRequest) {
                 action: pendingAction,
                 persistenceAvailable,
                 flow: flowContext,
+                mentorMode: mentorMode.mode,
+                transformationPhase,
               });
             }
           }
@@ -423,7 +561,13 @@ export async function POST(req: NextRequest) {
           pendingAction &&
           !shouldBypassActionLock(state)
         ) {
-          actionLockAssistantMessage = buildActionRequiredMessage(goalAvoidanceCount);
+          actionLockAssistantMessage = buildActionRequiredMessage({
+            actionTitle: pendingAction.description,
+            goalTitle: activeGoal?.title ?? null,
+            avoidanceCount: goalAvoidanceCount,
+            unfinishedActionsCount: goalPendingActionsCount,
+            mentorMode,
+          });
           actionLockResponse = buildActionRequiredResponse({
             message: actionLockAssistantMessage,
             state,
@@ -433,12 +577,15 @@ export async function POST(req: NextRequest) {
             action: pendingAction,
             persistenceAvailable,
             flow: flowContext,
+            mentorMode: mentorMode.mode,
+            transformationPhase,
           });
         }
 
         if (!activeGoal || activeGoal.status !== "active") {
           const goalIntentResult = await createGoalFromIntentMessage({ userId, message });
           activeGoal = goalIntentResult?.goal ?? activeGoal;
+          goalPendingActionsCount = countPendingActions(activeGoal);
           if (goalIntentResult?.created) {
             logInfo("STATE", "goal_created_from_intent", {
               userId,
@@ -446,6 +593,36 @@ export async function POST(req: NextRequest) {
             });
           }
         }
+
+        transformationPhase = inferTransformationPhase({
+          state,
+          intent: detectedIntent,
+          hasGoal: Boolean(activeGoal),
+          totalActions: activeGoal?.totalCount ?? 0,
+          pendingActionsCount: goalPendingActionsCount,
+          completedActionsCount: activeGoal?.completedCount ?? 0,
+          avoidanceCount: goalAvoidanceCount,
+          conversationMessageCount,
+        });
+        transformationSummary = describeTransformationPhase(transformationPhase);
+        mentorMode = getMentorMode({
+          state,
+          riskLevel,
+          transformationPhase,
+          activeGoal: Boolean(activeGoal),
+          pendingActionsCount: goalPendingActionsCount,
+          avoidanceCount: goalAvoidanceCount,
+          avoidanceDetected: avoidanceDetectedThisTurn,
+          repeatedPattern,
+          conversationMessageCount,
+        });
+        captureEmailRecommended = shouldAskForEmail({
+          isAnonymous: sessionProfile.isAnonymous,
+          goalCount: activeGoal ? 1 : 0,
+          actionCount: activeGoal?.totalCount ?? 0,
+          conversationMessageCount,
+        });
+        await updateUserTransformationPhase(userId, transformationPhase);
       }
     } catch (dbError: unknown) {
       persistenceAvailable = false;
@@ -457,6 +634,30 @@ export async function POST(req: NextRequest) {
     }
 
     if (actionLockResponse) {
+      if (captureEmailRecommended && actionLockAssistantMessage) {
+        actionLockAssistantMessage = appendCaptureEmailPrompt(
+          actionLockAssistantMessage,
+          captureEmailRecommended
+        );
+        actionLockResponse = buildActionRequiredResponse({
+          message: actionLockAssistantMessage,
+          state,
+          conversationId,
+          goal: activeGoal,
+          emotionalProfile,
+          action: getFirstPendingAction(activeGoal) ?? {
+            id: "unknown",
+            description: "Acción pendiente",
+          },
+          persistenceAvailable,
+          flow: flowContext,
+          mentorMode: mentorMode.mode,
+          transformationPhase,
+          captureEmail: true,
+          captureEmailMessage,
+        });
+      }
+
       if (persistenceAvailable && actionLockAssistantMessage) {
         try {
           await saveConversationMessage({
@@ -490,6 +691,10 @@ export async function POST(req: NextRequest) {
             },
             persistenceAvailable,
             flow: flowContext,
+            mentorMode: mentorMode.mode,
+            transformationPhase,
+            captureEmail: captureEmailRecommended,
+            captureEmailMessage: captureEmailRecommended ? captureEmailMessage : null,
           });
         }
       }
@@ -552,6 +757,7 @@ export async function POST(req: NextRequest) {
 
       const crisisResponse = NextResponse.json({
         success: true,
+        type: "crisis",
         response: crisisPayload.response,
         state,
         conversationId,
@@ -560,6 +766,7 @@ export async function POST(req: NextRequest) {
         fallback: true,
         persistenceAvailable,
         crisis: true,
+        continueChat: crisisPayload.continueChat,
         riskLevel: containmentLevel,
         detectedRiskLevel: riskLevel,
         crisisActive: true,
@@ -567,6 +774,8 @@ export async function POST(req: NextRequest) {
         searchUsed: false,
         flow: serializeFlow(flowContext),
         alerts: crisisPayload.resources,
+        legalFlag: crisisPayload.legalFlag,
+        legalDisclaimer: crisisPayload.disclaimer,
       });
 
       if (identity.shouldSetCookie) {
@@ -594,8 +803,11 @@ export async function POST(req: NextRequest) {
       dominantPattern: emotionalProfile.dominantPattern,
       energyLevel: emotionalProfile.energyLevel,
       messageLength: message.length,
+      mentorMode: mentorMode.mode,
+      transformationPhase,
     });
-    if (needsExternalInfo(message)) {
+    const externalInfo = classifyExternalInfoNeed(message);
+    if (needsExternalInfo(message) && externalInfo.shouldUse) {
       searchQuery = buildSearchQuery(message);
       if (searchQuery) {
         searchResults = await searchWeb(searchQuery, 3).catch((searchError: unknown) => {
@@ -619,10 +831,13 @@ export async function POST(req: NextRequest) {
     });
 
     const aiResult = await generateAIResponse(message, state, emotionalProfile, {
-      goal: buildGoalCoachContext(activeGoal, message, goalAvoidanceCount),
+      goal: buildGoalCoachContext(activeGoal, message, {
+        avoidanceCount: goalAvoidanceCount,
+        avoidanceDetected: avoidanceDetectedThisTurn,
+      }),
       continuity: {
         ...conversationContext,
-        hesitationDetected: goalAvoidanceCount > 0,
+        hesitationDetected: goalAvoidanceCount > 0 || avoidanceDetectedThisTurn,
       },
       flow: {
         currentIntent: flowContext.currentIntent,
@@ -630,17 +845,31 @@ export async function POST(req: NextRequest) {
         activeFlow: flowContext.activeFlow,
         instruction: flowContext.instruction,
       },
+      mentor: mentorMode,
+      transformation: {
+        phase: transformationPhase,
+        summary: transformationSummary,
+      },
+      legal: {
+        limitsNote:
+          "Luciernaga AI orienta y empuja accion, pero no sustituye terapia ni soporte de emergencia.",
+        critical: false,
+      },
       web: searchQuery
         ? {
             query: searchQuery,
+            usage: "practical_decision",
             results: searchResults,
           }
         : null,
     });
 
-    const assistantResponse = completionMicroFeedback
-      ? `${completionMicroFeedback}\n\n${aiResult.response}`
-      : aiResult.response;
+    const assistantResponse = appendCaptureEmailPrompt(
+      completionMicroFeedback
+        ? `${completionMicroFeedback}\n\n${aiResult.response}`
+        : aiResult.response,
+      captureEmailRecommended
+    );
 
     logInfo("AI", "openrouter_call_completed", {
       userId,
@@ -681,17 +910,28 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    const activeAction = getFirstPendingAction(activeGoal);
+
     const response = NextResponse.json({
       success: true,
       response: assistantResponse,
       state,
       conversationId,
       goal: serializeGoal(activeGoal),
+      action:
+        activeAction?.description ??
+        (activeGoal
+          ? "Cierra hoy una sola accion visible de tu objetivo activo."
+          : "Define una sola accion concreta para hoy y ejecútala."),
       emotionalProfile,
       searchUsed: searchResults.length > 0,
       fallback: aiResult.fallback,
       flow: serializeFlow(flowContext),
       persistenceAvailable,
+      mentorMode: mentorMode.mode,
+      transformationPhase,
+      captureEmail: captureEmailRecommended,
+      captureEmailMessage: captureEmailRecommended ? captureEmailMessage : null,
     });
     if (identity.shouldSetCookie) {
       attachSessionCookie(response, identity.sessionToken);

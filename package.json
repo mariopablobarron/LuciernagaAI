@@ -11,6 +11,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "system-check": "bash scripts/system-check.sh",
+    "hardening:auto": "node scripts/auto-update-hardening-board.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

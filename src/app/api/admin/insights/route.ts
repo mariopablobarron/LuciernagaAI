@@ -17,7 +17,8 @@ type AlertItem = {
 
 function buildAlerts(
   metrics: DecisionMetrics,
-  crisisStats: { total: number; high: number; critical: number }
+  crisisStats: { total: number; high: number; critical: number },
+  avoidanceStats: { total: number; postpone: number; refuse: number }
 ): AlertItem[] {
   const alerts: AlertItem[] = [];
 
@@ -37,7 +38,7 @@ function buildAlerts(
     });
   }
 
-  if (metrics.dominantState === "bloqueado") {
+  if (metrics.dominantState === "bloqueo") {
     alerts.push({
       type: "warning",
       title: "Bloqueo dominante",
@@ -53,6 +54,20 @@ function buildAlerts(
     });
   }
 
+  if (avoidanceStats.refuse >= 3) {
+    alerts.push({
+      type: "warning",
+      title: "Resistencia explícita a acciones",
+      message: `Se detectaron ${avoidanceStats.refuse} rechazos explícitos de acciones en 7 días.`,
+    });
+  } else if (avoidanceStats.total >= 6) {
+    alerts.push({
+      type: "warning",
+      title: "Evitación recurrente",
+      message: `Se registraron ${avoidanceStats.total} eventos de evitación en 7 días.`,
+    });
+  }
+
   return alerts;
 }
 
@@ -65,7 +80,7 @@ function getDecisionMetricForLog(metrics: DecisionMetrics): { metric: string; va
     return { metric: "checkinDrop", value: metrics.checkinDrop };
   }
 
-  if (metrics.dominantState === "bloqueado") {
+  if (metrics.dominantState === "bloqueo") {
     return { metric: "dominantState", value: 1 };
   }
 
@@ -173,10 +188,69 @@ export async function GET(req: NextRequest) {
     const checkinDrop = Math.max(0, 1 - checkinCompletion);
     const crisisStats = await getRecentCrisisStats(sevenDaysAgo);
     const recentCrisisEvents24h = await listRecentCrisisEvents(oneDayAgo, 25);
+    const recentAvoidanceEvents = await prisma.avoidanceEvent.findMany({
+      where: { createdAt: { gte: sevenDaysAgo } },
+      include: {
+        action: {
+          select: {
+            id: true,
+            description: true,
+            goal: {
+              select: {
+                title: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 300,
+    });
     const crisis24h = {
       total: recentCrisisEvents24h.length,
       high: recentCrisisEvents24h.filter((event) => event.level === "high").length,
       critical: recentCrisisEvents24h.filter((event) => event.level === "critical").length,
+    };
+    const avoidanceByAction = new Map<
+      string,
+      {
+        actionId: string;
+        description: string;
+        goalTitle: string | null;
+        total: number;
+        postpone: number;
+        refuse: number;
+      }
+    >();
+
+    for (const event of recentAvoidanceEvents) {
+      const current = avoidanceByAction.get(event.actionId) ?? {
+        actionId: event.actionId,
+        description: event.action.description,
+        goalTitle: event.action.goal?.title ?? null,
+        total: 0,
+        postpone: 0,
+        refuse: 0,
+      };
+
+      current.total += 1;
+      if (event.type === "refuse") {
+        current.refuse += 1;
+      } else {
+        current.postpone += 1;
+      }
+
+      avoidanceByAction.set(event.actionId, current);
+    }
+
+    const topAvoidedActions = Array.from(avoidanceByAction.values())
+      .sort((left, right) => right.total - left.total)
+      .slice(0, 5);
+    const avoidanceStats = {
+      total: recentAvoidanceEvents.length,
+      postpone: recentAvoidanceEvents.filter((event) => event.type === "postpone").length,
+      refuse: recentAvoidanceEvents.filter((event) => event.type === "refuse").length,
+      uniqueUsers: new Set(recentAvoidanceEvents.map((event) => event.userId)).size,
     };
 
     const confidence = getInsightConfidence({
@@ -215,8 +289,15 @@ export async function GET(req: NextRequest) {
         activeNewUsers,
         activeReturningUsers,
       },
+      avoidance: {
+        totalLast7d: avoidanceStats.total,
+        postponeLast7d: avoidanceStats.postpone,
+        refuseLast7d: avoidanceStats.refuse,
+        uniqueUsers: avoidanceStats.uniqueUsers,
+        topActionTitle: topAvoidedActions[0]?.description ?? null,
+      },
     });
-    const alerts = buildAlerts(metrics, crisisStats);
+    const alerts = buildAlerts(metrics, crisisStats, avoidanceStats);
 
     const logMetric = getDecisionMetricForLog(metrics);
     await prisma.decisionLog.create({
@@ -265,6 +346,22 @@ export async function GET(req: NextRequest) {
           createdAt: event.createdAt,
         })),
       },
+      avoidance: {
+        last7d: {
+          total: avoidanceStats.total,
+          postpone: avoidanceStats.postpone,
+          refuse: avoidanceStats.refuse,
+          uniqueUsers: avoidanceStats.uniqueUsers,
+        },
+        topActions: topAvoidedActions.map((item) => ({
+          actionId: item.actionId,
+          description: item.description,
+          goalTitle: item.goalTitle,
+          total: item.total,
+          postpone: item.postpone,
+          refuse: item.refuse,
+        })),
+      },
     });
   } catch (error: unknown) {
     logError("DECISION", error, { route: "/api/admin/insights" });
@@ -292,6 +389,15 @@ export async function GET(req: NextRequest) {
             critical: 0,
           },
           latestEvents: [],
+        },
+        avoidance: {
+          last7d: {
+            total: 0,
+            postpone: 0,
+            refuse: 0,
+            uniqueUsers: 0,
+          },
+          topActions: [],
         },
       },
       { status: 500 }

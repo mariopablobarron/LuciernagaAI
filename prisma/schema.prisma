@@ -33,6 +33,8 @@ model User {
   conversations Conversation[] @relation("UserConversations")
   messages      Message[]      @relation("UserMessages")
   goals         Goal[]
+  crisisEvents  CrisisEvent[]
+  avoidanceEvents AvoidanceEvent[]
 }
 
 model Message {
@@ -74,14 +76,21 @@ model Insight {
 model UserState {
   id               String    @id @default(cuid())
   userId           String    @unique
-  state            String    // "neutral" | "bloqueado" | "perdido" | "ansioso"
+  state            String    // "neutral" | "duda" | "bloqueo" | "ansiedad" | "claridad"
   mood             String?
+  primaryEmotion   String    @default("calma")
+  dominantPattern  String    @default("evita_decidir")
+  focusArea        String    @default("propósito")
+  energyLevel      String    @default("medio")
+  riskLevel        String    @default("low")
+  progressTrend    String    @default("igual")
   crisisActive     Boolean   @default(false)
   crisisActivatedAt DateTime?
   crisisActiveUntil DateTime?
   updatedAt        DateTime  @updatedAt
 
   @@index([state, updatedAt])
+  @@index([primaryEmotion, dominantPattern, updatedAt])
   @@index([crisisActive, crisisActiveUntil])
 }
 
@@ -112,6 +121,7 @@ model CrisisEvent {
   message   String
   response  String
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([level, createdAt])
   @@index([userId, createdAt])
@@ -137,6 +147,21 @@ model Action {
   completed   Boolean  @default(false)
   createdAt   DateTime @default(now())
   goal        Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  avoidanceEvents AvoidanceEvent[]
 
   @@index([goalId, createdAt])
+}
+
+model AvoidanceEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  actionId  String
+  type      String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    Action   @relation(fields: [actionId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([actionId, createdAt])
+  @@index([actionId, type, createdAt])
 }

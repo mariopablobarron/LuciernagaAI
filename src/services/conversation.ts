@@ -208,3 +208,23 @@ export async function listMessagesForConversation(params: {
     createdAt: message.createdAt,
   }));
 }
+
+export async function listRecentUserMessagesForUser(
+  userId: string,
+  limit = 12
+): Promise<string[]> {
+  const prisma = getPrismaClient();
+  const messages = await prisma.message.findMany({
+    where: {
+      userId,
+      role: "user",
+    },
+    orderBy: { createdAt: "desc" },
+    take: Math.max(1, limit),
+    select: {
+      content: true,
+    },
+  });
+
+  return messages.map((message) => message.content).reverse();
+}

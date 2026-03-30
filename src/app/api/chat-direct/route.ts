@@ -52,9 +52,9 @@ export async function POST(req: NextRequest) {
       hasToken: hasIncomingToken(req),
     });
 
-    let body: { message?: string; userId?: string };
+    let body: { message?: string };
     try {
-      body = (await req.json()) as { message?: string; userId?: string };
+      body = (await req.json()) as { message?: string };
     } catch (parseError: unknown) {
       logError("CHAT", parseError, { area: "parse_chat_direct_body" });
       return buildErrorResponse("Body inválido en la solicitud", 400, "neutral", "INVALID_BODY");
@@ -63,7 +63,6 @@ export async function POST(req: NextRequest) {
     logInfo("CHAT", "request body parsed", {
       hasMessage: !!body.message,
       messageLength: body.message?.length ?? 0,
-      providedUserId: body.userId ?? null,
     });
 
     const message = body.message?.trim() ?? "";

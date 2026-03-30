@@ -8,6 +8,8 @@ export type GoalActionItem = {
   createdAt: Date;
 };
 
+export type AvoidanceType = "postpone" | "refuse";
+
 export type GoalWithProgress = {
   id: string;
   title: string;
@@ -22,9 +24,86 @@ export type GoalWithProgress = {
 
 const GOAL_INTENT_PATTERNS: RegExp[] = [
   /\bquiero\s+(.+)/i,
+  /\bnecesito\s+(.+)/i,
+  /\btengo que\s+(.+)/i,
+  /\bdebo\s+(.+)/i,
   /\bme gustar(?:i|í)a\s+(.+)/i,
   /\bmi objetivo es\s+(.+)/i,
 ];
+
+const AVOIDANCE_PATTERNS = [
+  "mañana",
+  "manana",
+  "luego",
+  "despues",
+  "después",
+  "todavia no",
+  "todavía no",
+  "no hice",
+  "no lo hice",
+  "no avance",
+  "no avancé",
+  "evite",
+  "evité",
+  "lo pospuse",
+  "mas tarde",
+  "más tarde",
+];
+
+const COMPLETION_PATTERNS = [
+  "ya lo hice",
+  "ya hice",
+  "hecho",
+  "listo",
+  "terminado",
+  "termine",
+  "terminé",
+  "acabado",
+  "completado",
+  "ya avance",
+  "ya avancé",
+];
+
+const POSTPONE_PATTERNS = [
+  "lo hago luego",
+  "lo hare luego",
+  "lo haré luego",
+  "mañana",
+  "manana",
+  "no ahora",
+  "mas tarde",
+  "más tarde",
+  "ahora no",
+  "despues",
+  "después",
+];
+
+const REFUSAL_PATTERNS = [
+  "no quiero",
+  "no lo voy a hacer",
+  "no voy a hacerlo",
+  "no lo hare",
+  "no lo haré",
+  "paso",
+  "no pienso hacerlo",
+];
+
+export type GoalCoachContext = {
+  title: string;
+  progress: number;
+  pendingActions: string[];
+  avoidanceDetected: boolean;
+  avoidanceCount: number;
+};
+
+function normalizeText(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
 function normalizeGoalTitle(value: string): string {
   const trimmed = value.trim().replace(/[.!?]+$/g, "");
@@ -50,9 +129,36 @@ export function detectGoalIntent(message: string): string | null {
 
 function defaultActionsForGoal(goalTitle: string): string[] {
   const focus = goalTitle.length > 64 ? `${goalTitle.slice(0, 64)}...` : goalTitle;
+
+  const normalized = normalizeText(goalTitle);
+  if (/(estudio|examen|universidad|tesis|curso|clase)/.test(normalized)) {
+    return [
+      `Definir el tema o bloque exacto que vas a estudiar para: ${focus}`,
+      "Bloquear 25 minutos hoy sin distracciones para estudiarlo",
+      "Cerrar el bloque con una evidencia: resumen, ejercicio o repaso hecho",
+    ];
+  }
+
+  if (/(trabajo|cliente|proyecto|jefe|empleo|negocio)/.test(normalized)) {
+    return [
+      `Definir el entregable concreto de: ${focus}`,
+      "Reservar un bloque de trabajo hoy para el primer avance visible",
+      "Enviar o dejar listo un avance comprobable antes de terminar el día",
+    ];
+  }
+
+  if (/(pareja|familia|relacion|relación|amigo|amiga)/.test(normalized)) {
+    return [
+      `Definir la conversación o gesto concreto que necesitas hacer sobre: ${focus}`,
+      "Preparar el mensaje o idea principal en una nota breve",
+      "Dar el primer paso real hoy: escribir, llamar o proponer conversación",
+    ];
+  }
+
   return [
     `Definir el primer paso concreto para: ${focus}`,
-    "Ejecutar ese primer paso hoy",
+    "Bloquear tiempo hoy para ejecutar ese primer paso",
+    "Cerrar el día con una evidencia visible de avance",
   ];
 }
 
@@ -86,6 +192,58 @@ function mapGoalWithProgress(goal: {
     completedCount: metrics.completedCount,
     totalCount: metrics.totalCount,
     progress: metrics.progress,
+  };
+}
+
+function getGoalStatusFromActions(actions: GoalActionItem[]): string {
+  return actions.length > 0 && actions.every((action) => action.completed) ? "completed" : "active";
+}
+
+export function detectGoalAvoidance(message: string): boolean {
+  const normalized = normalizeText(message);
+  return AVOIDANCE_PATTERNS.some((pattern) => normalized.includes(pattern));
+}
+
+export function detectActionCompletionIntent(message: string): boolean {
+  const normalized = normalizeText(message);
+  return COMPLETION_PATTERNS.some((pattern) => normalized.includes(pattern));
+}
+
+export function detectActionPostponeIntent(message: string): boolean {
+  const normalized = normalizeText(message);
+  return POSTPONE_PATTERNS.some((pattern) => normalized.includes(pattern));
+}
+
+export function detectActionRefusalIntent(message: string): boolean {
+  const normalized = normalizeText(message);
+  return REFUSAL_PATTERNS.some((pattern) => normalized.includes(pattern));
+}
+
+export function getFirstPendingAction(goal: GoalWithProgress | null): GoalActionItem | null {
+  if (!goal) {
+    return null;
+  }
+
+  return goal.actions.find((action) => !action.completed) ?? null;
+}
+
+export function buildGoalCoachContext(
+  goal: GoalWithProgress | null,
+  latestMessage: string,
+  avoidanceCount = 0
+): GoalCoachContext | null {
+  if (!goal) {
+    return null;
+  }
+
+  const pendingActions = goal.actions.filter((action) => !action.completed);
+
+  return {
+    title: goal.title,
+    progress: goal.progress,
+    pendingActions: pendingActions.map((action) => action.description).slice(0, 3),
+    avoidanceDetected: pendingActions.length > 0 && detectGoalAvoidance(latestMessage),
+    avoidanceCount,
   };
 }
 
@@ -220,7 +378,7 @@ export async function updateGoalAction(params: {
     data: { completed: params.completed },
   });
 
-  const goal = await prisma.goal.findUnique({
+  let goal = await prisma.goal.findUnique({
     where: { id: action.goalId },
     include: {
       actions: {
@@ -233,5 +391,60 @@ export async function updateGoalAction(params: {
     return null;
   }
 
+  const nextStatus = getGoalStatusFromActions(goal.actions);
+  if (goal.status !== nextStatus) {
+    await prisma.goal.update({
+      where: { id: goal.id },
+      data: { status: nextStatus },
+    });
+    goal = {
+      ...goal,
+      status: nextStatus,
+    };
+  }
+
   return mapGoalWithProgress(goal);
+}
+
+export async function completeFirstPendingActionForUser(
+  userId: string
+): Promise<GoalWithProgress | null> {
+  const activeGoal = await getActiveGoalForUser(userId);
+  if (!activeGoal) {
+    return null;
+  }
+
+  const firstPending = activeGoal.actions.find((action) => !action.completed);
+  if (!firstPending) {
+    return activeGoal;
+  }
+
+  return updateGoalAction({
+    userId,
+    actionId: firstPending.id,
+    completed: true,
+  });
+}
+
+export async function registerAvoidanceEvent(params: {
+  userId: string;
+  actionId: string;
+  type: AvoidanceType;
+}): Promise<number> {
+  const prisma = getPrismaClient();
+
+  await prisma.avoidanceEvent.create({
+    data: {
+      userId: params.userId,
+      actionId: params.actionId,
+      type: params.type,
+    },
+  });
+
+  return prisma.avoidanceEvent.count({
+    where: {
+      userId: params.userId,
+      actionId: params.actionId,
+    },
+  });
 }

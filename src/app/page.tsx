@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Chat, { type ChatMessage } from "@/components/Chat";
 import InsightsPanel from "@/components/InsightsPanel";
 import Sidebar, { type SidebarConversation } from "@/components/Sidebar";
+import { DEFAULT_EMOTIONAL_PROFILE, type EmotionalProfile } from "@/types/emotional-profile";
 
 type Conversation = {
   id: string;
@@ -39,12 +40,28 @@ type ActiveGoal = {
   actions: GoalAction[];
 };
 
+type ActionLockState = {
+  message: string;
+  action: {
+    id: string;
+    title: string;
+  };
+};
+
 type ChatApiResponse = {
+  type?: "action_required";
+  message?: string;
   success?: boolean;
   response?: string;
   state?: string;
+  emotionalProfile?: EmotionalProfile;
   insight?: string;
-  action?: string;
+  action?:
+    | string
+    | {
+        id: string;
+        title: string;
+      };
   alerts?: string[];
   error?: string;
   conversationId?: string;
@@ -53,6 +70,7 @@ type ChatApiResponse = {
 
 type ConversationsApiResponse = {
   success?: boolean;
+  emotionalProfile?: EmotionalProfile;
   conversations?: Array<{
     id: string;
     title: string;
@@ -99,7 +117,7 @@ function buildStateInsight(state: string): {
   action: string;
   alerts: string[];
 } {
-  if (state === "bloqueado") {
+  if (state === "bloqueo") {
     return {
       insight: "Hay fricción para arrancar. Necesitas reducir el tamaño del siguiente paso.",
       action: "Haz una microacción de 10 minutos ahora mismo.",
@@ -107,7 +125,7 @@ function buildStateInsight(state: string): {
     };
   }
 
-  if (state === "ansioso") {
+  if (state === "ansiedad") {
     return {
       insight: "Tu energía está dispersa. El foco debe volver a una sola prioridad.",
       action: "Define una prioridad única y descarta tareas secundarias por hoy.",
@@ -115,11 +133,19 @@ function buildStateInsight(state: string): {
     };
   }
 
-  if (state === "perdido") {
+  if (state === "duda") {
     return {
-      insight: "Hay falta de claridad en objetivos o siguiente paso.",
-      action: "Escribe un objetivo concreto y un primer paso ejecutable.",
+      insight: "Hay incertidumbre real. Necesitas recortar opciones y elegir un foco.",
+      action: "Reduce a dos opciones y decide una antes de terminar hoy.",
       alerts: ["Sin dirección clara, la ejecución se vuelve inestable."],
+    };
+  }
+
+  if (state === "claridad") {
+    return {
+      insight: "Ya hay dirección. Este es el momento de convertir claridad en evidencia.",
+      action: "Entrega una prueba visible de avance hoy mismo.",
+      alerts: [],
     };
   }
 
@@ -213,6 +239,9 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeGoal, setActiveGoal] = useState<ActiveGoal | null>(null);
+  const [actionLock, setActionLock] = useState<ActionLockState | null>(null);
+  const [emotionalProfile, setEmotionalProfile] =
+    useState<EmotionalProfile>(DEFAULT_EMOTIONAL_PROFILE);
   const [goalLoading, setGoalLoading] = useState(false);
   const [sessionReady, setSessionReady] = useState(false);
   const [sessionLoading, setSessionLoading] = useState(true);
@@ -265,16 +294,49 @@ export default function HomePage() {
   }, [conversations]);
 
   const progress = useMemo(() => {
-    const completedActions = conversations.reduce((accumulator, conversation) => {
-      return conversation.messageCount > 0 ? accumulator + 1 : accumulator;
-    }, 0);
+    const completedActions =
+      activeGoal?.actions.filter((action) => action.completed).length ??
+      conversations.reduce((accumulator, conversation) => {
+        return conversation.messageCount > 0 ? accumulator + 1 : accumulator;
+      }, 0);
+    const totalActions = activeGoal?.actions.length ?? Math.max(conversations.length, 1);
 
     return {
       completedActions,
-      totalActions: Math.max(conversations.length, 1),
+      totalActions: Math.max(totalActions, 1),
       dominantState: getDominantState(conversations),
     };
-  }, [conversations]);
+  }, [activeGoal, conversations]);
+
+  const pendingActionsCount = useMemo(() => {
+    if (!activeGoal) {
+      return 0;
+    }
+
+    return activeGoal.actions.filter((action) => !action.completed).length;
+  }, [activeGoal]);
+
+  const pendingGoalAction = useMemo(() => {
+    return activeGoal?.actions.find((goalAction) => !goalAction.completed) ?? null;
+  }, [activeGoal]);
+
+  const effectiveActionLock = useMemo(() => {
+    if (actionLock) {
+      return actionLock;
+    }
+
+    if (!pendingGoalAction || safeConversation.state === "ansiedad") {
+      return null;
+    }
+
+    return {
+      message: "Tienes una acción pendiente antes de continuar.",
+      action: {
+        id: pendingGoalAction.id,
+        title: pendingGoalAction.description,
+      },
+    };
+  }, [actionLock, pendingGoalAction, safeConversation.state]);
 
   const loadMessages = async (conversationId: string): Promise<void> => {
     const response = await fetch(
@@ -335,6 +397,10 @@ export default function HomePage() {
       throw new Error(payload.error || "No se pudieron cargar las conversaciones.");
     }
 
+    if (payload.emotionalProfile) {
+      setEmotionalProfile(payload.emotionalProfile);
+    }
+
     const apiConversations = payload.conversations || [];
     let mergedResult: Conversation[] = [];
     setConversations((previous) => {
@@ -382,7 +448,26 @@ export default function HomePage() {
       throw new Error(payload.error || "No se pudo cargar el objetivo activo.");
     }
 
-    setActiveGoal(payload.goal || null);
+    const nextGoal = payload.goal || null;
+    setActiveGoal(nextGoal);
+    setActionLock((previous) => {
+      if (!previous || !nextGoal) {
+        return nextGoal ? previous : null;
+      }
+
+      const nextPending = nextGoal.actions.find((goalAction) => !goalAction.completed);
+      if (!nextPending) {
+        return null;
+      }
+
+      return {
+        ...previous,
+        action: {
+          id: nextPending.id,
+          title: nextPending.description,
+        },
+      };
+    });
   };
 
   useEffect(() => {
@@ -535,7 +620,26 @@ export default function HomePage() {
         throw new Error(payload.error || "No se pudo actualizar la acción.");
       }
 
-      setActiveGoal(payload.goal || null);
+      const nextGoal = payload.goal || null;
+      setActiveGoal(nextGoal);
+      setActionLock((previous) => {
+        if (!previous || !nextGoal) {
+          return nextGoal ? previous : null;
+        }
+
+        const nextPending = nextGoal.actions.find((goalAction) => !goalAction.completed);
+        if (!nextPending) {
+          return null;
+        }
+
+        return {
+          ...previous,
+          action: {
+            id: nextPending.id,
+            title: nextPending.description,
+          },
+        };
+      });
     } catch (toggleError: unknown) {
       const message =
         toggleError instanceof Error ? toggleError.message : "No se pudo actualizar la acción.";
@@ -545,18 +649,30 @@ export default function HomePage() {
     }
   };
 
-  const handleSend = async () => {
-    const trimmed = input.trim();
+  const handleSend = async (overrideText?: string) => {
+    const trimmed = (overrideText ?? input).trim();
     if (!sessionReady) {
-      handleUnauthorizedSession();
+      try {
+        await bootstrapSession();
+      } catch {
+        handleUnauthorizedSession();
+        return;
+      }
+    }
+
+    if (!trimmed || loading) {
       return;
     }
 
-    if (!trimmed || loading || !activeConversation) {
-      return;
+    let resolvedConversation = activeConversation;
+    if (!resolvedConversation) {
+      const draft = createDraftConversation(conversations.length + 1);
+      setConversations((previous) => [draft, ...previous]);
+      setActiveConversationId(draft.id);
+      resolvedConversation = draft;
     }
 
-    const currentConversationId = activeConversation.id;
+    const currentConversationId = resolvedConversation.id;
     const userMessage: ChatMessage = {
       id: `user_${Date.now()}`,
       role: "user",
@@ -593,7 +709,7 @@ export default function HomePage() {
         },
         body: JSON.stringify({
           message: trimmed,
-          conversationId: activeConversation.isDraft ? undefined : currentConversationId,
+          conversationId: resolvedConversation.isDraft ? undefined : currentConversationId,
         }),
       });
 
@@ -647,23 +763,37 @@ export default function HomePage() {
       }
 
       const assistantText =
-        payload.response?.trim() || "No pude generar una respuesta en este momento.";
+        payload.message?.trim() ||
+        payload.response?.trim() ||
+        "No pude generar una respuesta en este momento.";
       const nextState = payload.state || "neutral";
+      const nextActionLock =
+        payload.type === "action_required" &&
+        payload.action &&
+        typeof payload.action !== "string"
+          ? {
+              message: assistantText,
+              action: payload.action,
+            }
+          : null;
       const assistantMessage: ChatMessage = {
         id: `assistant_${Date.now()}`,
         role: "assistant",
         content: assistantText,
+        variant: nextActionLock ? "action_required" : undefined,
       };
 
       const fallbackInsight = buildStateInsight(nextState);
       const nextInsight = payload.insight || fallbackInsight.insight;
-      const nextAction = payload.action || fallbackInsight.action;
+      const nextAction =
+        typeof payload.action === "string" ? payload.action : fallbackInsight.action;
       const nextAlerts =
         Array.isArray(payload.alerts) && payload.alerts.length > 0
           ? payload.alerts
           : fallbackInsight.alerts;
       const resolvedConversationId = payload.conversationId || currentConversationId;
       const nextGoal = payload.goal ?? null;
+      const nextEmotionalProfile = payload.emotionalProfile ?? emotionalProfile;
 
       setConversations((previous) => {
         const next = previous.map((conversation) =>
@@ -692,6 +822,8 @@ export default function HomePage() {
         }
         return Array.from(dedupById.values());
       });
+      setEmotionalProfile(nextEmotionalProfile);
+      setActionLock(nextActionLock);
 
       if (resolvedConversationId !== currentConversationId) {
         setActiveConversationId(resolvedConversationId);
@@ -699,6 +831,11 @@ export default function HomePage() {
 
       if (nextGoal) {
         setActiveGoal(nextGoal);
+        if (!nextActionLock && !nextGoal.actions.some((goalAction) => !goalAction.completed)) {
+          setActionLock(null);
+        }
+      } else {
+        setActionLock(null);
       }
 
       try {
@@ -742,12 +879,72 @@ export default function HomePage() {
   return (
     <div className="h-screen bg-slate-100 text-slate-900">
       <div className="mx-auto h-full max-w-[1700px] p-4 lg:p-6">
+        <section className="mb-4 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Continuidad de sesión
+          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-slate-700">
+            <span>
+              Objetivo activo:{" "}
+              <span className="font-semibold">{activeGoal?.title || "Sin objetivo"}</span>
+            </span>
+            <span className="text-slate-400">•</span>
+            <span>
+              Progreso:{" "}
+              <span className="font-semibold">
+                {progress.completedActions}/{progress.totalActions}
+              </span>
+            </span>
+            {pendingActionsCount > 0 ? (
+              <span className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-800">
+                {pendingActionsCount === 1
+                  ? "Tienes 1 acción pendiente"
+                  : `Tienes ${pendingActionsCount} acciones pendientes`}
+              </span>
+            ) : (
+              <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700">
+                Sin acciones pendientes
+              </span>
+            )}
+            {effectiveActionLock ? (
+              <span className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-800">
+                Modo responsabilidad activo
+              </span>
+            ) : null}
+          </div>
+          {effectiveActionLock ? (
+            <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-sm text-amber-950">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-800">
+                Acción pendiente prioritaria
+              </p>
+              <p className="mt-1 font-semibold">{effectiveActionLock.action.title}</p>
+              <p className="mt-1 text-amber-900">{effectiveActionLock.message}</p>
+            </div>
+          ) : pendingGoalAction ? (
+            <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-700">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                Siguiente acción sugerida
+              </p>
+              <p className="mt-1 font-medium text-slate-900">{pendingGoalAction.description}</p>
+            </div>
+          ) : null}
+        </section>
+
         <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-12">
           <div className="min-h-[280px] lg:col-span-3 lg:min-h-0">
             <Sidebar
               conversations={sidebarConversations}
               activeConversationId={activeConversationId || safeConversation.id}
               progress={progress}
+              activeGoal={activeGoal}
+              actionLock={
+                effectiveActionLock
+                  ? {
+                      message: effectiveActionLock.message,
+                      actionTitle: effectiveActionLock.action.title,
+                    }
+                  : null
+              }
               profile={{ name: "Startidea", plan: "Plan Pro" }}
               adminAuthenticated={adminAuthenticated}
               adminLoading={adminLoading}
@@ -764,6 +961,14 @@ export default function HomePage() {
               input={input}
               loading={loading || sessionLoading}
               error={error}
+              actionLock={
+                effectiveActionLock
+                  ? {
+                      message: effectiveActionLock.message,
+                      actionTitle: effectiveActionLock.action.title,
+                    }
+                  : null
+              }
               onInputChange={setInput}
               onSend={handleSend}
             />
@@ -772,8 +977,17 @@ export default function HomePage() {
           <div className="min-h-[280px] lg:col-span-3 lg:min-h-0">
             <InsightsPanel
               state={safeConversation.state}
+              emotionalProfile={emotionalProfile}
               insight={safeConversation.insight}
               action={safeConversation.action}
+              actionLock={
+                effectiveActionLock
+                  ? {
+                      message: effectiveActionLock.message,
+                      actionTitle: effectiveActionLock.action.title,
+                    }
+                  : null
+              }
               alerts={safeConversation.alerts}
               goal={activeGoal}
               goalLoading={goalLoading}

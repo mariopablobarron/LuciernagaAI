@@ -15,7 +15,7 @@ describe("POST /api/mock-chat", () => {
     expect(response.status).toBe(200);
     expect(body.ok).toBe(true);
     expect(body.mock).toBe(true);
-    expect(body.state).toBe("bloqueado");
+    expect(body.state).toBe("bloqueo");
     expect(typeof body.reply).toBe("string");
     expect(body.reply.length).toBeGreaterThan(0);
   });

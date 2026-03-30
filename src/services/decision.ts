@@ -19,9 +19,19 @@ export interface DecisionResult {
 }
 
 function normalizeState(state: string): UserState {
-  if (state === "neutral" || state === "bloqueado" || state === "ansioso" || state === "perdido") {
+  if (
+    state === "neutral" ||
+    state === "bloqueo" ||
+    state === "ansiedad" ||
+    state === "duda" ||
+    state === "claridad"
+  ) {
     return state;
   }
+
+  if (state === "bloqueado") return "bloqueo";
+  if (state === "ansioso") return "ansiedad";
+  if (state === "perdido") return "duda";
   return "neutral";
 }
 
@@ -66,10 +76,10 @@ export function generateDecision(metrics: DecisionMetrics, userState: string): D
     return result;
   }
 
-  if (metrics.dominantState === "bloqueado") {
+  if (metrics.dominantState === "bloqueo") {
     const result: DecisionResult = {
       decision: "Activar estrategia de microacciones",
-      reason: "El estado dominante del sistema es bloqueado",
+      reason: "El estado dominante del sistema es bloqueo",
       priority: "medium",
       action: "Forzar respuestas con microacciones de 5-10 minutos y seguimiento al primer paso.",
     };

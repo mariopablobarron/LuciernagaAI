@@ -11,6 +11,7 @@ import {
   ensureUserSession,
   listConversationsForUser,
 } from "@/services/conversation";
+import { getEmotionalProfile } from "@/services/emotional-model";
 
 export async function GET(req: NextRequest) {
   try {
@@ -18,7 +19,10 @@ export async function GET(req: NextRequest) {
     const userId = identity.userId;
 
     await ensureUserSession(userId);
-    const conversations = await listConversationsForUser(userId);
+    const [conversations, emotionalProfile] = await Promise.all([
+      listConversationsForUser(userId),
+      getEmotionalProfile(userId),
+    ]);
 
     logInfo("CHAT", "conversations_listed", {
       userId,
@@ -27,6 +31,7 @@ export async function GET(req: NextRequest) {
 
     const response = NextResponse.json({
       success: true,
+      emotionalProfile,
       conversations: conversations.map((conversation) => ({
         id: conversation.id,
         title: conversation.title,

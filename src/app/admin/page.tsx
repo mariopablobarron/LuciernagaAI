@@ -48,6 +48,22 @@ interface AdminInsightsResponse {
       createdAt: string;
     }>;
   };
+  avoidance: {
+    last7d: {
+      total: number;
+      postpone: number;
+      refuse: number;
+      uniqueUsers: number;
+    };
+    topActions: Array<{
+      actionId: string;
+      description: string;
+      goalTitle: string | null;
+      total: number;
+      postpone: number;
+      refuse: number;
+    }>;
+  };
 }
 
 function formatPercent(value: number): string {
@@ -236,6 +252,64 @@ export default function AdminPage() {
                   <span className="text-slate-500">{formatDateTime(event.createdAt)}</span>
                 </div>
                 <p className="mt-2 text-sm text-slate-800">{event.message}</p>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <h2 className="text-lg font-bold">Evitación de acciones (últimos 7 días)</h2>
+
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+          <div className="rounded bg-white p-4 shadow">
+            <p className="text-sm text-gray-600">Total eventos</p>
+            <p className="text-2xl font-bold text-slate-900">{data.avoidance.last7d.total}</p>
+          </div>
+          <div className="rounded bg-white p-4 shadow">
+            <p className="text-sm text-gray-600">Postergaciones</p>
+            <p className="text-2xl font-bold text-amber-600">
+              {data.avoidance.last7d.postpone}
+            </p>
+          </div>
+          <div className="rounded bg-white p-4 shadow">
+            <p className="text-sm text-gray-600">Rechazos</p>
+            <p className="text-2xl font-bold text-rose-700">{data.avoidance.last7d.refuse}</p>
+          </div>
+          <div className="rounded bg-white p-4 shadow">
+            <p className="text-sm text-gray-600">Usuarios implicados</p>
+            <p className="text-2xl font-bold text-slate-900">
+              {data.avoidance.last7d.uniqueUsers}
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          {data.avoidance.topActions.length === 0 ? (
+            <div className="rounded bg-white p-4 text-sm text-gray-600 shadow">
+              Sin acciones evitadas en los últimos 7 días.
+            </div>
+          ) : (
+            data.avoidance.topActions.map((item) => (
+              <div
+                key={item.actionId}
+                className="rounded border-l-4 border-amber-500 bg-white p-4 shadow"
+              >
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <span className="rounded bg-slate-100 px-2 py-1 font-semibold text-slate-700">
+                    {item.total} eventos
+                  </span>
+                  <span className="rounded bg-amber-100 px-2 py-1 font-semibold text-amber-800">
+                    {item.postpone} postpone
+                  </span>
+                  <span className="rounded bg-rose-100 px-2 py-1 font-semibold text-rose-800">
+                    {item.refuse} refuse
+                  </span>
+                  {item.goalTitle ? (
+                    <span className="text-slate-500">Objetivo: {item.goalTitle}</span>
+                  ) : null}
+                </div>
+                <p className="mt-2 text-sm font-semibold text-slate-900">{item.description}</p>
               </div>
             ))
           )}

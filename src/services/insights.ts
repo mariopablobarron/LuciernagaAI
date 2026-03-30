@@ -29,6 +29,13 @@ export interface InsightsInput {
     activeNewUsers: number;
     activeReturningUsers: number;
   };
+  avoidance: {
+    totalLast7d: number;
+    postponeLast7d: number;
+    refuseLast7d: number;
+    uniqueUsers: number;
+    topActionTitle: string | null;
+  };
 }
 
 function toPercent(value: number): string {
@@ -52,7 +59,7 @@ export function getInsightConfidence(input: {
 }
 
 function countConfusionMessages(messages: string[]): number {
-  const patterns = ["no sé", "no se", "confund", "no entiendo", "perdido"];
+  const patterns = ["no sé", "no se", "confund", "no entiendo", "duda", "no tengo claro"];
   return messages.filter((msg) => {
     const lower = msg.toLowerCase();
     return patterns.some((pattern) => lower.includes(pattern));
@@ -103,10 +110,10 @@ export function generateInsights(data: InsightsInput): InsightItem[] {
     });
   }
 
-  if (data.dominantState === "bloqueado") {
+  if (data.dominantState === "bloqueo") {
     insights.push({
       type: "state",
-      title: "Predomina estado bloqueado",
+      title: "Predomina estado de bloqueo",
       content: `El estado dominante es bloqueo en una muestra de ${data.totalMessages} mensajes recientes.`,
       action: "Forzar respuestas de microacción en el primer turno del coach.",
       priority: "medium",
@@ -156,6 +163,22 @@ export function generateInsights(data: InsightsInput): InsightItem[] {
       content: `${data.segments.activeReturningUsers}/${data.segments.returningUsers} usuarios recurrentes siguen activos esta semana.`,
       action: "Usar este segmento para validar mejoras antes de escalar cambios al onboarding.",
       priority: "low",
+      confidence,
+    });
+  }
+
+  if (data.avoidance.totalLast7d > 0) {
+    insights.push({
+      type: "engagement",
+      title: "Evitación activa detectada",
+      content:
+        `${data.avoidance.totalLast7d} eventos de evitación en 7 días ` +
+        `(${data.avoidance.postponeLast7d} postergaciones, ${data.avoidance.refuseLast7d} rechazos) ` +
+        `repartidos entre ${data.avoidance.uniqueUsers} usuario(s).`,
+      action: data.avoidance.topActionTitle
+        ? `Revisa la fricción de la acción más evitada: ${data.avoidance.topActionTitle}.`
+        : "Revisa la fricción de las acciones pendientes y reduce su coste de entrada.",
+      priority: data.avoidance.refuseLast7d >= 2 ? "high" : "medium",
       confidence,
     });
   }

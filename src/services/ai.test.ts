@@ -1,4 +1,5 @@
 import { generateAIResponse } from "@/services/ai";
+import { DEFAULT_EMOTIONAL_PROFILE } from "@/types/emotional-profile";
 
 describe("generateAIResponse", () => {
   const originalApiKey = process.env.OPENROUTER_API_KEY;
@@ -13,7 +14,7 @@ describe("generateAIResponse", () => {
   it("activa fallback cuando falta OPENROUTER_API_KEY", async () => {
     delete process.env.OPENROUTER_API_KEY;
 
-    const result = await generateAIResponse("No sé por dónde empezar", "perdido");
+    const result = await generateAIResponse("No sé por dónde empezar", "duda");
 
     expect(result.fallback).toBe(true);
     expect(result.response).toBe("Estoy contigo. Vamos paso a paso.");
@@ -28,10 +29,21 @@ describe("generateAIResponse", () => {
       }),
     } as Response);
 
-    const result = await generateAIResponse("Estoy bloqueado", "bloqueado");
+    const result = await generateAIResponse("Estoy bloqueado", "bloqueo", {
+      ...DEFAULT_EMOTIONAL_PROFILE,
+      primaryEmotion: "frustración",
+      dominantPattern: "perfeccionismo",
+      energyLevel: "alto",
+    });
 
     expect(result.fallback).toBe(false);
     expect(result.response).toBe("Respuesta mentor");
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        body: expect.stringContaining("Emoción primaria: frustración"),
+      })
+    );
   });
 
   it("activa fallback cuando OpenRouter falla", async () => {
@@ -42,7 +54,7 @@ describe("generateAIResponse", () => {
       text: async () => "Bad gateway",
     } as Response);
 
-    const result = await generateAIResponse("Tengo ansiedad", "ansioso");
+    const result = await generateAIResponse("Tengo ansiedad", "ansiedad");
 
     expect(result.fallback).toBe(true);
     expect(result.response).toBe("Estoy contigo. Vamos paso a paso.");

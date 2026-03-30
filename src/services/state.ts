@@ -1,33 +1,88 @@
 import type { UserState } from "@/types/chat";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
+import { DEFAULT_EMOTIONAL_PROFILE } from "@/types/emotional-profile";
 
 const DEFAULT_CRISIS_ACTIVE_HOURS = 6;
 
 const STATE_KEYWORDS: Record<UserState, string[]> = {
-  neutral: ["bien", "normal", "ok", "tranquilo", "calma", "estable", "sereno"],
-  perdido: ["no sé", "no se", "perdido", "confund", "desorientado", "sin rumbo"],
-  ansioso: ["ansiedad", "ansioso", "pánico", "panico", "miedo", "nervioso", "estrés", "estres"],
-  bloqueado: ["bloqueado", "parálisis", "paralisis", "estancado", "atrapado", "no puedo avanzar"],
+  neutral: ["bien", "normal", "ok", "estable", "sereno", "tranquilo"],
+  duda: [
+    "no se",
+    "no sé",
+    "duda",
+    "dudas",
+    "confund",
+    "desorientado",
+    "sin rumbo",
+    "no tengo claro",
+    "por donde empiezo",
+  ],
+  bloqueo: [
+    "bloqueo",
+    "bloqueado",
+    "paralisis",
+    "parálisis",
+    "estancado",
+    "atrapado",
+    "no puedo avanzar",
+    "no arranco",
+    "evitando",
+  ],
+  ansiedad: [
+    "ansiedad",
+    "ansioso",
+    "panico",
+    "pánico",
+    "miedo",
+    "nervioso",
+    "estres",
+    "estrés",
+    "desbordado",
+    "agobio",
+  ],
+  claridad: [
+    "claro",
+    "claridad",
+    "ya se",
+    "ya sé",
+    "entiendo",
+    "decidido",
+    "decidida",
+    "tengo claro",
+    "plan definido",
+    "avance",
+    "progreso",
+  ],
 };
+
+function normalizeText(message: string): string {
+  return message
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
 function countMatches(message: string, keywords: string[]): number {
   return keywords.reduce((total, keyword) => {
-    return total + (message.includes(keyword) ? 1 : 0);
+    return total + (message.includes(normalizeText(keyword)) ? 1 : 0);
   }, 0);
 }
 
 export function detectUserState(message: string): UserState {
-  const normalized = message.toLowerCase();
+  const normalized = normalizeText(message);
 
   const scores: Record<UserState, number> = {
     neutral: countMatches(normalized, STATE_KEYWORDS.neutral),
-    perdido: countMatches(normalized, STATE_KEYWORDS.perdido),
-    ansioso: countMatches(normalized, STATE_KEYWORDS.ansioso),
-    bloqueado: countMatches(normalized, STATE_KEYWORDS.bloqueado),
+    duda: countMatches(normalized, STATE_KEYWORDS.duda),
+    bloqueo: countMatches(normalized, STATE_KEYWORDS.bloqueo),
+    ansiedad: countMatches(normalized, STATE_KEYWORDS.ansiedad),
+    claridad: countMatches(normalized, STATE_KEYWORDS.claridad),
   };
 
-  const orderedStates: UserState[] = ["bloqueado", "ansioso", "perdido", "neutral"];
+  const orderedStates: UserState[] = ["bloqueo", "ansiedad", "duda", "claridad", "neutral"];
   let winner: UserState = "neutral";
   let maxScore = -1;
 
@@ -42,6 +97,47 @@ export function detectUserState(message: string): UserState {
   return maxScore > 0 ? winner : "neutral";
 }
 
+export function shouldBypassActionLock(state: UserState): boolean {
+  return state === "ansiedad";
+}
+
+export type ConversationContextSummary = {
+  lastGoal: string | null;
+  pendingActions: string[];
+  emotionalState: UserState;
+  summary: string;
+};
+
+export function buildConversationContext(userState: {
+  state: string;
+  lastGoal?: string | null;
+  pendingActions?: string[] | null;
+}): ConversationContextSummary {
+  const emotionalState = toUserState(userState.state);
+  const lastGoal = userState.lastGoal?.trim() || null;
+  const pendingActions = (userState.pendingActions || [])
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0)
+    .slice(0, 3);
+
+  const summaryParts: string[] = [`Estado emocional: ${emotionalState}.`];
+
+  if (lastGoal) {
+    summaryParts.push(`Último objetivo: ${lastGoal}.`);
+  }
+
+  if (pendingActions.length > 0) {
+    summaryParts.push(`Acciones pendientes: ${pendingActions.join(" | ")}.`);
+  }
+
+  return {
+    lastGoal,
+    pendingActions,
+    emotionalState,
+    summary: summaryParts.join(" "),
+  };
+}
+
 export function getDominantState(messages: string[]): UserState {
   if (messages.length === 0) {
     return "neutral";
@@ -49,9 +145,10 @@ export function getDominantState(messages: string[]): UserState {
 
   const counts: Record<UserState, number> = {
     neutral: 0,
-    perdido: 0,
-    ansioso: 0,
-    bloqueado: 0,
+    duda: 0,
+    bloqueo: 0,
+    ansiedad: 0,
+    claridad: 0,
   };
 
   for (const message of messages) {
@@ -59,7 +156,7 @@ export function getDominantState(messages: string[]): UserState {
     counts[state] += 1;
   }
 
-  const ordered: UserState[] = ["bloqueado", "ansioso", "perdido", "neutral"];
+  const ordered: UserState[] = ["bloqueo", "ansiedad", "duda", "claridad", "neutral"];
   let dominant: UserState = "neutral";
   let max = -1;
 
@@ -74,9 +171,28 @@ export function getDominantState(messages: string[]): UserState {
 }
 
 function toUserState(state: string): UserState {
-  if (state === "neutral" || state === "ansioso" || state === "bloqueado" || state === "perdido") {
+  if (
+    state === "neutral" ||
+    state === "duda" ||
+    state === "bloqueo" ||
+    state === "ansiedad" ||
+    state === "claridad"
+  ) {
     return state;
   }
+
+  if (state === "perdido") {
+    return "duda";
+  }
+
+  if (state === "bloqueado") {
+    return "bloqueo";
+  }
+
+  if (state === "ansioso") {
+    return "ansiedad";
+  }
+
   return "neutral";
 }
 
@@ -103,7 +219,16 @@ export async function updateUserState(userId: string, state: string): Promise<Us
     await prisma.userState.upsert({
       where: { userId },
       update: { state: normalizedState, updatedAt: new Date() },
-      create: { userId, state: normalizedState },
+      create: {
+        userId,
+        state: normalizedState,
+        primaryEmotion: DEFAULT_EMOTIONAL_PROFILE.primaryEmotion,
+        dominantPattern: DEFAULT_EMOTIONAL_PROFILE.dominantPattern,
+        focusArea: DEFAULT_EMOTIONAL_PROFILE.focusArea,
+        energyLevel: DEFAULT_EMOTIONAL_PROFILE.energyLevel,
+        riskLevel: DEFAULT_EMOTIONAL_PROFILE.riskLevel,
+        progressTrend: DEFAULT_EMOTIONAL_PROFILE.progressTrend,
+      },
     });
     logInfo("STATE", "user_state_updated", { userId, state: normalizedState });
     return normalizedState;
@@ -139,6 +264,12 @@ export async function activateUserCrisis(
       create: {
         userId,
         state: "neutral",
+        primaryEmotion: DEFAULT_EMOTIONAL_PROFILE.primaryEmotion,
+        dominantPattern: DEFAULT_EMOTIONAL_PROFILE.dominantPattern,
+        focusArea: DEFAULT_EMOTIONAL_PROFILE.focusArea,
+        energyLevel: DEFAULT_EMOTIONAL_PROFILE.energyLevel,
+        riskLevel: DEFAULT_EMOTIONAL_PROFILE.riskLevel,
+        progressTrend: DEFAULT_EMOTIONAL_PROFILE.progressTrend,
         crisisActive: true,
         crisisActivatedAt: now,
         crisisActiveUntil,

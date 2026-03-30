@@ -7,6 +7,10 @@ import {
 } from "@/lib/auth";
 import { getPrismaClient } from "@/lib/prisma";
 import { logError, logInfo } from "@/lib/logger";
+import {
+  analyzeEmotionalProfile,
+  updateEmotionalProfile,
+} from "@/services/emotional-model";
 import { detectUserState, updateUserState } from "@/services/state";
 
 function extractMood(message: string): string {
@@ -35,7 +39,7 @@ export async function POST(req: NextRequest) {
   try {
     const prisma = getPrismaClient();
 
-    const body = (await req.json()) as { userId?: string; response?: string };
+    const body = (await req.json()) as { response?: string };
     const responseText = body.response?.trim() ?? "";
     const identity = resolveIdentity(req);
     const userId = identity.userId;
@@ -64,6 +68,14 @@ export async function POST(req: NextRequest) {
 
     // 3. GUARDAR/ACTUALIZAR ESTADO
     await updateUserState(userId, state);
+    try {
+      await updateEmotionalProfile(userId, analyzeEmotionalProfile(responseText, []));
+    } catch (emotionalError: unknown) {
+      logError("EMOTION", emotionalError, {
+        route: "/api/checkin",
+        userId,
+      });
+    }
 
     // 4. CONTAR RESPUESTAS DEL DÍA
     const today = new Date();

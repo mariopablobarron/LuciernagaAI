@@ -43,3 +43,6 @@ logs/
 next-env.d.ts
 
 /app/generated/prisma
+Just_HEAR_ME/
+rasa-demo/
+**/.venv/

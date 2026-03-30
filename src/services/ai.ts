@@ -1,7 +1,15 @@
 import { logError, logInfo } from "@/lib/logger";
 import { getErrorMessage, withTimeout } from "@/lib/utils";
-import { buildCoachPrompt, buildFallbackResponse } from "@/services/coach";
+import {
+  buildCoachPrompt,
+  buildFallbackResponse,
+  type CoachContext,
+} from "@/services/coach";
 import type { UserState } from "@/types/chat";
+import {
+  DEFAULT_EMOTIONAL_PROFILE,
+  type EmotionalProfile,
+} from "@/types/emotional-profile";
 
 interface OpenRouterResponse {
   choices?: Array<{ message?: { content?: string } }>;
@@ -32,12 +40,17 @@ class OpenRouterProviderError extends Error {
 function normalizeState(userState: string): UserState {
   if (
     userState === "neutral" ||
-    userState === "ansioso" ||
-    userState === "bloqueado" ||
-    userState === "perdido"
+    userState === "duda" ||
+    userState === "bloqueo" ||
+    userState === "ansiedad" ||
+    userState === "claridad"
   ) {
     return userState;
   }
+
+  if (userState === "ansioso") return "ansiedad";
+  if (userState === "bloqueado") return "bloqueo";
+  if (userState === "perdido") return "duda";
   return "neutral";
 }
 
@@ -45,7 +58,12 @@ function extractReply(data: OpenRouterResponse): string {
   return data.choices?.[0]?.message?.content?.trim() ?? "";
 }
 
-async function requestOpenRouter(message: string, userState: UserState): Promise<string> {
+async function requestOpenRouter(
+  message: string,
+  userState: UserState,
+  emotionalProfile: EmotionalProfile,
+  coachContext: CoachContext
+): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY?.trim();
   if (!apiKey) {
     logError("AI", new Error("Missing OPENROUTER_API_KEY"), {
@@ -57,6 +75,9 @@ async function requestOpenRouter(message: string, userState: UserState): Promise
   logInfo("AI", "openrouter_request_started", {
     model: OPENROUTER_MODEL,
     state: userState,
+    primaryEmotion: emotionalProfile.primaryEmotion,
+    dominantPattern: emotionalProfile.dominantPattern,
+    energyLevel: emotionalProfile.energyLevel,
     messageLength: message.length,
   });
 
@@ -74,7 +95,7 @@ async function requestOpenRouter(message: string, userState: UserState): Promise
         body: JSON.stringify({
           model: OPENROUTER_MODEL,
           messages: [
-            { role: "system", content: buildCoachPrompt(userState) },
+            { role: "system", content: buildCoachPrompt(userState, emotionalProfile, coachContext) },
             { role: "user", content: message },
           ],
           temperature: 0.7,
@@ -125,7 +146,9 @@ function classifyAIError(error: unknown): AIErrorType {
 
 export async function generateAIResponse(
   message: string,
-  userState: string
+  userState: string,
+  emotionalProfile: EmotionalProfile = DEFAULT_EMOTIONAL_PROFILE,
+  coachContext: CoachContext = {}
 ): Promise<{
   response: string;
   fallback: boolean;
@@ -135,9 +158,12 @@ export async function generateAIResponse(
   const typedState = normalizeState(userState);
 
   try {
-    const response = await requestOpenRouter(message, typedState);
+    const response = await requestOpenRouter(message, typedState, emotionalProfile, coachContext);
     logInfo("AI", "ai_response_generated", {
       state: typedState,
+      primaryEmotion: emotionalProfile.primaryEmotion,
+      dominantPattern: emotionalProfile.dominantPattern,
+      energyLevel: emotionalProfile.energyLevel,
       model: OPENROUTER_MODEL,
       fallback: false,
     });
@@ -164,6 +190,7 @@ type LegacyInput = {
   message: string;
   state: UserState;
   profile?: "structured" | "direct";
+  emotionalProfile?: EmotionalProfile;
 };
 
 export async function generateMentorReply(input: LegacyInput): Promise<{
@@ -172,7 +199,11 @@ export async function generateMentorReply(input: LegacyInput): Promise<{
   errorType?: AIErrorType;
   errorMessage?: string;
 }> {
-  const result = await generateAIResponse(input.message, input.state);
+  const result = await generateAIResponse(
+    input.message,
+    input.state,
+    input.emotionalProfile ?? DEFAULT_EMOTIONAL_PROFILE
+  );
   return {
     reply: result.response,
     fallback: result.fallback,

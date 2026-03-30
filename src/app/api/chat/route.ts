@@ -9,12 +9,28 @@ import { logError, logInfo } from "@/lib/logger";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getErrorMessage } from "@/lib/utils";
 import { generateAIResponse } from "@/services/ai";
+import { buildActionRequiredMessage } from "@/services/coach";
 import {
   ensureUserSession,
+  listRecentUserMessagesForUser,
   resolveConversationForUser,
   saveConversationMessage,
 } from "@/services/conversation";
-import { createGoalFromIntentMessage, getActiveGoalForUser } from "@/services/goals";
+import {
+  buildGoalCoachContext,
+  completeFirstPendingActionForUser,
+  createGoalFromIntentMessage,
+  detectActionCompletionIntent,
+  detectActionPostponeIntent,
+  detectActionRefusalIntent,
+  getFirstPendingAction,
+  getActiveGoalForUser,
+  registerAvoidanceEvent,
+} from "@/services/goals";
+import { runFlow, loadDialogueState, saveDialogueState } from "@/services/flows";
+import { detectIntent } from "@/services/intent";
+import { analyzeEmotionalProfile, updateEmotionalProfile } from "@/services/emotional-model";
+import { buildSearchQuery, needsExternalInfo, searchWeb } from "@/services/search";
 import {
   detectRiskLevel,
   getCrisisResponse,
@@ -23,9 +39,11 @@ import {
 } from "@/services/risk";
 import {
   activateUserCrisis,
+  buildConversationContext,
   clearUserCrisis,
   detectUserState,
   getUserCrisisStatus,
+  shouldBypassActionLock,
   updateUserState,
 } from "@/services/state";
 import type { ChatRequestBody, UserState } from "@/types/chat";
@@ -76,6 +94,36 @@ function serializeGoal(goal: Awaited<ReturnType<typeof getActiveGoalForUser>>) {
       createdAt: action.createdAt.toISOString(),
     })),
   };
+}
+
+function buildActionRequiredResponse(params: {
+  message: string;
+  state: UserState;
+  conversationId: string;
+  goal: Awaited<ReturnType<typeof getActiveGoalForUser>>;
+  emotionalProfile: ReturnType<typeof analyzeEmotionalProfile>;
+  action: {
+    id: string;
+    description: string;
+  };
+  persistenceAvailable: boolean;
+}): NextResponse {
+  return NextResponse.json({
+    success: true,
+    type: "action_required",
+    message: params.message,
+    response: params.message,
+    state: params.state,
+    conversationId: params.conversationId,
+    goal: serializeGoal(params.goal),
+    emotionalProfile: params.emotionalProfile,
+    fallback: true,
+    persistenceAvailable: params.persistenceAvailable,
+    action: {
+      id: params.action.id,
+      title: params.action.description,
+    },
+  });
 }
 
 function isCrisisLevel(level: RiskLevel): boolean {
@@ -171,12 +219,34 @@ export async function POST(req: NextRequest) {
     }
 
     const state = detectUserState(message);
+    const detectedIntent = detectIntent(message);
     const riskLevel = detectRiskLevel(message);
+    let emotionalProfile = analyzeEmotionalProfile(message, []);
+    const dialogueState = loadDialogueState(userId);
+    const flowContext = runFlow(
+      {
+        ...dialogueState,
+        currentIntent: detectedIntent,
+      },
+      message
+    );
+    saveDialogueState(userId, {
+      currentIntent: flowContext.currentIntent,
+      currentStep: flowContext.currentStep,
+      activeFlow: flowContext.activeFlow,
+    });
     let crisisMode = isCrisisLevel(riskLevel);
     let crisisActiveUntil: string | null = null;
     let crisisSource: "detected" | "active_state" | "none" = crisisMode ? "detected" : "none";
 
-    logInfo("STATE", "state_detected", { userId, state, messageLength: message.length });
+    logInfo("STATE", "state_detected", {
+      userId,
+      state,
+      intent: detectedIntent,
+      activeFlow: flowContext.activeFlow,
+      flowStep: flowContext.currentStep,
+      messageLength: message.length,
+    });
     logInfo("RISK", "risk_level_detected", {
       userId,
       riskLevel,
@@ -185,8 +255,15 @@ export async function POST(req: NextRequest) {
 
     let persistenceAvailable = true;
     let activeGoal: Awaited<ReturnType<typeof getActiveGoalForUser>> | null = null;
+    let searchResults: Awaited<ReturnType<typeof searchWeb>> = [];
+    let searchQuery: string | null = null;
     let conversationId = body.conversationId?.trim() || `tmp_${Date.now()}`;
     let isNewConversationTitle = false;
+    let actionLockResponse: NextResponse | null = null;
+    let actionLockAssistantMessage: string | null = null;
+    let goalAvoidanceCount = 0;
+    let completionMicroFeedback: string | null = null;
+    let actionCompletedThisTurn = false;
 
     try {
       await ensureUserSession(userId);
@@ -236,14 +313,96 @@ export async function POST(req: NextRequest) {
         role: "user",
       });
 
+      try {
+        const userMessageHistory = await listRecentUserMessagesForUser(userId, 16);
+        const previousMessages = userMessageHistory.slice(0, -1);
+        emotionalProfile = analyzeEmotionalProfile(message, previousMessages);
+        await updateEmotionalProfile(userId, emotionalProfile);
+      } catch (emotionalError: unknown) {
+        emotionalProfile = analyzeEmotionalProfile(message, []);
+        logError("EMOTION", emotionalError, {
+          route: "/api/chat",
+          userId,
+          stage: "update_emotional_profile",
+        });
+      }
+
       if (!crisisMode) {
-        const goalIntentResult = await createGoalFromIntentMessage({ userId, message });
-        activeGoal = goalIntentResult?.goal ?? (await getActiveGoalForUser(userId));
-        if (goalIntentResult?.created) {
-          logInfo("STATE", "goal_created_from_intent", {
-            userId,
-            goalId: goalIntentResult.goal.id,
+        activeGoal = await getActiveGoalForUser(userId);
+        let pendingAction = getFirstPendingAction(activeGoal);
+
+        if (pendingAction) {
+          if (detectActionCompletionIntent(message)) {
+            const progressedGoal = await completeFirstPendingActionForUser(userId);
+            activeGoal = progressedGoal ?? activeGoal;
+            pendingAction = getFirstPendingAction(activeGoal);
+            actionCompletedThisTurn = true;
+            completionMicroFeedback = pendingAction
+              ? `Bien. Has avanzado. Siguiente paso: ${pendingAction.description}`
+              : "Bien. Has avanzado. Siguiente paso: consolida este avance hoy con una evidencia concreta.";
+            if (activeGoal) {
+              logInfo("STATE", "goal_action_auto_completed", {
+                userId,
+                goalId: activeGoal.id,
+              });
+            }
+          } else {
+            if (detectActionPostponeIntent(message)) {
+              goalAvoidanceCount = await registerAvoidanceEvent({
+                userId,
+                actionId: pendingAction.id,
+                type: "postpone",
+              });
+            } else if (detectActionRefusalIntent(message)) {
+              goalAvoidanceCount = await registerAvoidanceEvent({
+                userId,
+                actionId: pendingAction.id,
+                type: "refuse",
+              });
+            }
+
+            if (!shouldBypassActionLock(state)) {
+              actionLockAssistantMessage = buildActionRequiredMessage(goalAvoidanceCount);
+              actionLockResponse = buildActionRequiredResponse({
+                message: actionLockAssistantMessage,
+                state,
+                conversationId,
+                goal: activeGoal,
+                emotionalProfile,
+                action: pendingAction,
+                persistenceAvailable,
+              });
+            }
+          }
+        }
+
+        if (
+          !actionCompletedThisTurn &&
+          !actionLockResponse &&
+          pendingAction &&
+          !shouldBypassActionLock(state)
+        ) {
+          actionLockAssistantMessage = buildActionRequiredMessage(goalAvoidanceCount);
+          actionLockResponse = buildActionRequiredResponse({
+            message: actionLockAssistantMessage,
+            state,
+            conversationId,
+            goal: activeGoal,
+            emotionalProfile,
+            action: pendingAction,
+            persistenceAvailable,
           });
+        }
+
+        if (!activeGoal || activeGoal.status !== "active") {
+          const goalIntentResult = await createGoalFromIntentMessage({ userId, message });
+          activeGoal = goalIntentResult?.goal ?? activeGoal;
+          if (goalIntentResult?.created) {
+            logInfo("STATE", "goal_created_from_intent", {
+              userId,
+              goalId: goalIntentResult.goal.id,
+            });
+          }
         }
       }
     } catch (dbError: unknown) {
@@ -253,6 +412,50 @@ export async function POST(req: NextRequest) {
         userId,
         stage: "pre_ai_persistence",
       });
+    }
+
+    if (actionLockResponse) {
+      if (persistenceAvailable && actionLockAssistantMessage) {
+        try {
+          await saveConversationMessage({
+            conversationId,
+            userId,
+            role: "assistant",
+            content: actionLockAssistantMessage,
+          });
+          logInfo("DB", "message_saved", {
+            userId,
+            conversationId,
+            role: "assistant",
+            actionLock: true,
+          });
+        } catch (dbError: unknown) {
+          persistenceAvailable = false;
+          logError("DB", dbError, {
+            route: "/api/chat",
+            userId,
+            stage: "action_lock_persistence",
+          });
+          actionLockResponse = buildActionRequiredResponse({
+            message: actionLockAssistantMessage,
+            state,
+            conversationId,
+            goal: activeGoal,
+            emotionalProfile,
+            action: getFirstPendingAction(activeGoal) ?? {
+              id: "unknown",
+              description: "Acción pendiente",
+            },
+            persistenceAvailable,
+          });
+        }
+      }
+
+      if (identity.shouldSetCookie) {
+        attachSessionCookie(actionLockResponse, identity.sessionToken);
+      }
+
+      return actionLockResponse;
     }
 
     if (crisisMode) {
@@ -305,6 +508,7 @@ export async function POST(req: NextRequest) {
         state,
         conversationId,
         goal: null,
+        emotionalProfile,
         fallback: true,
         persistenceAvailable,
         crisis: true,
@@ -336,9 +540,58 @@ export async function POST(req: NextRequest) {
       userId,
       conversationId,
       state,
+      primaryEmotion: emotionalProfile.primaryEmotion,
+      dominantPattern: emotionalProfile.dominantPattern,
+      energyLevel: emotionalProfile.energyLevel,
       messageLength: message.length,
     });
-    const aiResult = await generateAIResponse(message, state);
+    if (needsExternalInfo(message)) {
+      searchQuery = buildSearchQuery(message);
+      if (searchQuery) {
+        searchResults = await searchWeb(searchQuery, 3).catch((searchError: unknown) => {
+          logError("SEARCH", searchError, {
+            route: "/api/chat",
+            userId,
+            query: searchQuery,
+          });
+          return [];
+        });
+      }
+    }
+
+    const conversationContext = buildConversationContext({
+      state,
+      lastGoal: activeGoal?.title ?? null,
+      pendingActions:
+        activeGoal?.actions
+          .filter((action) => !action.completed)
+          .map((action) => action.description) ?? [],
+    });
+
+    const aiResult = await generateAIResponse(message, state, emotionalProfile, {
+      goal: buildGoalCoachContext(activeGoal, message, goalAvoidanceCount),
+      continuity: {
+        ...conversationContext,
+        hesitationDetected: goalAvoidanceCount > 0,
+      },
+      flow: {
+        currentIntent: flowContext.currentIntent,
+        currentStep: flowContext.currentStep,
+        activeFlow: flowContext.activeFlow,
+        instruction: flowContext.instruction,
+      },
+      web: searchQuery
+        ? {
+            query: searchQuery,
+            results: searchResults,
+          }
+        : null,
+    });
+
+    const assistantResponse = completionMicroFeedback
+      ? `${completionMicroFeedback}\n\n${aiResult.response}`
+      : aiResult.response;
+
     logInfo("AI", "openrouter_call_completed", {
       userId,
       conversationId,
@@ -354,7 +607,7 @@ export async function POST(req: NextRequest) {
           conversationId,
           userId,
           role: "assistant",
-          content: aiResult.response,
+          content: assistantResponse,
         });
         logInfo("DB", "message_saved", {
           userId,
@@ -380,10 +633,12 @@ export async function POST(req: NextRequest) {
 
     const response = NextResponse.json({
       success: true,
-      response: aiResult.response,
+      response: assistantResponse,
       state,
       conversationId,
       goal: serializeGoal(activeGoal),
+      emotionalProfile,
+      searchUsed: searchResults.length > 0,
       fallback: aiResult.fallback,
       persistenceAvailable,
     });

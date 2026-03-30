@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "Just_HEAR_ME/**",
+    "rasa-demo/**",
+    "**/.venv/**",
   ]),
 ]);
 

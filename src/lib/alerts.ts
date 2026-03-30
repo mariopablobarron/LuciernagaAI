@@ -120,10 +120,10 @@ export async function checkAndAlert(metrics: {
   }
 
   // Mayoría bloqueados
-  if (metrics.dominantState === "bloqueado") {
+  if (metrics.dominantState === "bloqueo") {
     await sendAlert({
       type: "warning",
-      title: "Usuarios principalmente bloqueados",
+      title: "Usuarios principalmente en bloqueo",
       message: "La mayoría de usuarios reportan parálisis o bloqueo mental.",
       metric: "dominantState",
       value: 1,

@@ -20,6 +20,10 @@ jest.mock("@/services/conversation", () => ({
   listConversationsForUser: jest.fn(),
 }));
 
+jest.mock("@/services/emotional-model", () => ({
+  getEmotionalProfile: jest.fn(),
+}));
+
 import { NextRequest } from "next/server";
 import { GET, POST } from "./route";
 import { InvalidSessionTokenError, resolveIdentity, clearSessionCookie } from "@/lib/auth";
@@ -28,10 +32,19 @@ import {
   ensureUserSession,
   listConversationsForUser,
 } from "@/services/conversation";
+import { getEmotionalProfile } from "@/services/emotional-model";
 
 describe("GET /api/conversations", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    (getEmotionalProfile as jest.Mock).mockResolvedValue({
+      primaryEmotion: "calma",
+      dominantPattern: "evita_decidir",
+      focusArea: "propósito",
+      energyLevel: "medio",
+      riskLevel: "low",
+      progressTrend: "igual",
+    });
   });
 
   it("retorna conversaciones cuando la sesión es válida", async () => {
@@ -58,6 +71,7 @@ describe("GET /api/conversations", () => {
 
     expect(response.status).toBe(200);
     expect(body.success).toBe(true);
+    expect(body.emotionalProfile.primaryEmotion).toBe("calma");
     expect(body.conversations).toHaveLength(1);
     expect(body.conversations[0].id).toBe("conv_1");
   });

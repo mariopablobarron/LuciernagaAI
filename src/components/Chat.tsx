@@ -8,6 +8,12 @@ export type ChatMessage = {
   role: "user" | "assistant";
   content: string;
   isError?: boolean;
+  variant?: "action_required";
+};
+
+type ActionLock = {
+  message: string;
+  actionTitle: string;
 };
 
 type ChatProps = {
@@ -16,8 +22,9 @@ type ChatProps = {
   input: string;
   loading: boolean;
   error: string | null;
+  actionLock?: ActionLock | null;
   onInputChange: (value: string) => void;
-  onSend: () => Promise<void> | void;
+  onSend: (overrideText?: string) => Promise<void> | void;
 };
 
 export default function Chat({
@@ -26,6 +33,7 @@ export default function Chat({
   input,
   loading,
   error,
+  actionLock,
   onInputChange,
   onSend,
 }: ChatProps) {
@@ -62,6 +70,7 @@ export default function Chat({
                 role={message.role}
                 content={message.content}
                 isError={message.isError}
+                variant={message.variant}
               />
             ))
           )}
@@ -81,13 +90,53 @@ export default function Chat({
           </div>
         ) : null}
 
+        {actionLock ? (
+          <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-800">
+              Responsabilidad activa
+            </p>
+            <p className="mt-2 text-sm font-semibold text-amber-950">{actionLock.actionTitle}</p>
+            <p className="mt-1 text-sm text-amber-900">{actionLock.message}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={loading}
+                onClick={() => void onSend("Ya lo hice")}
+                className="rounded-lg border border-emerald-200 bg-white px-3 py-1.5 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Ya lo hice
+              </button>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={() => void onSend("Lo hago luego")}
+                className="rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-xs font-semibold text-amber-800 transition hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Lo hago luego
+              </button>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={() => void onSend("No lo voy a hacer")}
+                className="rounded-lg border border-rose-200 bg-white px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                No lo voy a hacer
+              </button>
+            </div>
+          </div>
+        ) : null}
+
         <div className="flex gap-3">
           <textarea
             value={input}
             onChange={(event) => onInputChange(event.target.value)}
             onKeyDown={onKeyDown}
             rows={2}
-            placeholder="Escribe tu mensaje..."
+            placeholder={
+              actionLock
+                ? "Responde sobre la acción pendiente o usa los accesos rápidos."
+                : "Escribe tu mensaje..."
+            }
             disabled={loading}
             className="w-full resize-none rounded-xl border border-slate-300 bg-slate-50 px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-700 focus:bg-white disabled:opacity-60"
           />
@@ -97,7 +146,7 @@ export default function Chat({
             disabled={loading || !input.trim()}
             className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Enviar
+            {actionLock ? "Responder" : "Enviar"}
           </button>
         </div>
       </footer>

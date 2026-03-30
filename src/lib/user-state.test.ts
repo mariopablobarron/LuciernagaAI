@@ -1,16 +1,20 @@
 import { detectUserState } from "@/services/state";
 
 describe("detectUserState", () => {
-  it("detecta estado perdido", () => {
-    expect(detectUserState("No sé por dónde empezar")).toBe("perdido");
+  it("detecta estado duda", () => {
+    expect(detectUserState("No sé por dónde empezar")).toBe("duda");
   });
 
-  it("detecta estado ansioso", () => {
-    expect(detectUserState("Tengo pánico y mucho miedo")).toBe("ansioso");
+  it("detecta estado ansiedad", () => {
+    expect(detectUserState("Tengo pánico y mucho miedo")).toBe("ansiedad");
   });
 
-  it("detecta estado bloqueado", () => {
-    expect(detectUserState("Estoy bloqueado y estancado")).toBe("bloqueado");
+  it("detecta estado bloqueo", () => {
+    expect(detectUserState("Estoy bloqueado y estancado")).toBe("bloqueo");
+  });
+
+  it("detecta estado claridad", () => {
+    expect(detectUserState("Ya sé el plan y tengo claridad para avanzar")).toBe("claridad");
   });
 
   it("retorna neutral cuando no hay señales claras", () => {

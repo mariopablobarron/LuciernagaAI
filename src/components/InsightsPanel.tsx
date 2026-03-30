@@ -1,9 +1,16 @@
 "use client";
 
+import type { EmotionalProfile } from "@/types/emotional-profile";
+
 type InsightsPanelProps = {
   state: string;
+  emotionalProfile: EmotionalProfile;
   insight: string;
   action: string;
+  actionLock?: {
+    message: string;
+    actionTitle: string;
+  } | null;
   alerts: string[];
   goal: {
     id: string;
@@ -23,16 +30,35 @@ type InsightsPanelProps = {
 };
 
 function stateTone(state: string): string {
-  if (state === "bloqueado") return "bg-amber-100 text-amber-900";
-  if (state === "ansioso") return "bg-orange-100 text-orange-900";
-  if (state === "perdido") return "bg-rose-100 text-rose-900";
+  if (state === "bloqueo") return "bg-amber-100 text-amber-900";
+  if (state === "ansiedad") return "bg-orange-100 text-orange-900";
+  if (state === "duda") return "bg-sky-100 text-sky-900";
+  if (state === "claridad") return "bg-emerald-100 text-emerald-900";
   return "bg-emerald-100 text-emerald-900";
+}
+
+function emotionTone(emotion: EmotionalProfile["primaryEmotion"]): string {
+  if (emotion === "ansiedad") return "bg-orange-100 text-orange-900";
+  if (emotion === "apatía") return "bg-slate-200 text-slate-800";
+  if (emotion === "confusión") return "bg-sky-100 text-sky-900";
+  if (emotion === "frustración") return "bg-rose-100 text-rose-900";
+  return "bg-emerald-100 text-emerald-900";
+}
+
+function formatPattern(pattern: EmotionalProfile["dominantPattern"]): string {
+  if (pattern === "evita_decidir") return "Evita decidir";
+  if (pattern === "miedo_al_error") return "Miedo al error";
+  if (pattern === "perfeccionismo") return "Perfeccionismo";
+  if (pattern === "comparación") return "Comparación";
+  return "Procrastinación";
 }
 
 export default function InsightsPanel({
   state,
+  emotionalProfile,
   insight,
   action,
+  actionLock,
   alerts,
   goal,
   goalLoading = false,
@@ -45,14 +71,48 @@ export default function InsightsPanel({
       </h2>
 
       <section className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
-        <p className="text-xs font-semibold text-slate-500">Estado emocional</p>
+        <p className="text-xs font-semibold text-slate-500">Perfil emocional actual</p>
         <span
-          className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${stateTone(
-            state
+          className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${emotionTone(
+            emotionalProfile.primaryEmotion
           )}`}
         >
-          {state}
+          {emotionalProfile.primaryEmotion}
         </span>
+        <p className="mt-2 text-xs text-slate-600">
+          Estado operativo:{" "}
+          <span className={`rounded-full px-2 py-1 font-semibold ${stateTone(state)}`}>
+            {state}
+          </span>
+        </p>
+        <div className="mt-3 grid grid-cols-1 gap-2">
+          <div className="rounded-lg border border-slate-200 bg-white px-3 py-2">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+              Patrón dominante
+            </p>
+            <p className="mt-1 text-sm font-medium text-slate-900">
+              {formatPattern(emotionalProfile.dominantPattern)}
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="rounded-lg border border-slate-200 bg-white px-3 py-2">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                Energía
+              </p>
+              <p className="mt-1 text-sm font-medium text-slate-900">
+                {emotionalProfile.energyLevel}
+              </p>
+            </div>
+            <div className="rounded-lg border border-slate-200 bg-white px-3 py-2">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                Tendencia
+              </p>
+              <p className="mt-1 text-sm font-medium text-slate-900">
+                {emotionalProfile.progressTrend}
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
@@ -64,6 +124,25 @@ export default function InsightsPanel({
         <p className="text-xs font-semibold text-slate-500">Acción recomendada</p>
         <p className="mt-2 text-sm font-medium text-slate-900">{action}</p>
       </section>
+
+      {actionLock ? (
+        <section className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3">
+          <p className="text-xs font-semibold text-amber-800">Acción obligatoria</p>
+          <p className="mt-2 text-sm font-semibold text-amber-950">{actionLock.actionTitle}</p>
+          <p className="mt-2 text-sm text-amber-900">{actionLock.message}</p>
+          <div className="mt-3 grid grid-cols-1 gap-2">
+            <div className="rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs text-amber-900">
+              Marca progreso: escribe &quot;ya lo hice&quot;
+            </div>
+            <div className="rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs text-amber-900">
+              Pospón explícitamente: &quot;lo hago luego&quot;
+            </div>
+            <div className="rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs text-amber-900">
+              Rechaza explícitamente: &quot;no lo voy a hacer&quot;
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <section className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
         <p className="text-xs font-semibold text-slate-500">Alertas</p>

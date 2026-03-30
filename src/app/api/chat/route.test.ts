@@ -259,7 +259,9 @@ describe("POST /api/chat", () => {
     expect(response.status).toBe(200);
     expect(body.success).toBe(true);
     expect(body.conversationId).toBe("conv_1");
-    expect(body.response).toBe("Respuesta de prueba");
+    expect(body.response).toContain("Respuesta de prueba");
+    expect(body.response).toContain("No busques entenderlo todo ahora");
+    expect(body.response).toContain("¿Qué estás evitando ahora mismo?");
     expect(body.emotionalProfile.primaryEmotion).toBe("calma");
     expect(body.captureEmail).toBe(false);
     expect(body.flow).toEqual({
@@ -269,6 +271,18 @@ describe("POST /api/chat", () => {
       instruction: null,
     });
     expect(updateEmotionalProfile).toHaveBeenCalledTimes(1);
+    expect(generateAIResponse).toHaveBeenCalledWith(
+      "Hola mentor",
+      "neutral",
+      expect.any(Object),
+      expect.objectContaining({
+        onboarding: expect.objectContaining({
+          active: true,
+          stage: "opening",
+          starterQuestion: "¿Qué llevas semanas evitando hacer?",
+        }),
+      })
+    );
   });
 
   it("bloquea el chat cuando el plan free alcanza el limite diario", async () => {
@@ -307,8 +321,72 @@ describe("POST /api/chat", () => {
     expect(response.status).toBe(403);
     expect(body.success).toBe(false);
     expect(body.code).toBe("PLAN_LIMIT_REACHED");
+    expect(body.response).toContain("No es falta de claridad.");
+    expect(body.response).toContain("¿Quieres sostener este avance con continuidad real?");
     expect(checkRateLimit).not.toHaveBeenCalled();
     expect(saveConversationMessage).not.toHaveBeenCalled();
+  });
+
+  it("marca conversionTrigger cuando detecta claridad", async () => {
+    (resolveIdentity as jest.Mock).mockReturnValue({
+      userId: "usr_test_conversion",
+      source: "session",
+      sessionToken: "token",
+      shouldSetCookie: false,
+    });
+    (checkRateLimit as jest.Mock).mockReturnValue({
+      allowed: true,
+      retryAfterSeconds: 0,
+      limit: 10,
+      remaining: 9,
+    });
+    (ensureUserSession as jest.Mock).mockResolvedValue(undefined);
+    (listRecentUserMessagesForUser as jest.Mock).mockResolvedValue(["ya lo veo claro"]);
+    (detectUserState as jest.Mock).mockReturnValue("claridad");
+    (updateUserState as jest.Mock).mockResolvedValue(undefined);
+    (createGoalFromIntentMessage as jest.Mock).mockResolvedValue(null);
+    (getActiveGoalForUser as jest.Mock).mockResolvedValue(null);
+    (resolveConversationForUser as jest.Mock).mockResolvedValue({
+      id: "conv_conversion_1",
+      title: "Nueva conversación",
+    });
+    (saveConversationMessage as jest.Mock).mockResolvedValue(undefined);
+    (generateAIResponse as jest.Mock).mockResolvedValue({
+      response: "Ahora toca convertirlo en avance visible.",
+      fallback: false,
+    });
+
+    const req = new NextRequest("http://localhost/api/chat", {
+      method: "POST",
+      body: JSON.stringify({ message: "Ya lo veo claro" }),
+      headers: {
+        "content-type": "application/json",
+      },
+    });
+
+    const response = await POST(req);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(body.conversionTrigger).toBe(true);
+    expect(body.conversionType).toBe("progress");
+    expect(body.captureEmail).toBe(true);
+    expect(body.response).toContain("Esto que acabas de definir es importante.");
+    expect(body.response).toContain("¿Quieres guardar tu progreso y continuar otro día? Déjame tu email.");
+    expect(generateAIResponse).toHaveBeenCalledWith(
+      "Ya lo veo claro",
+      "claridad",
+      expect.any(Object),
+      expect.objectContaining({
+        access: expect.objectContaining({
+          userPlan: "free",
+          remainingMessages: 9,
+          hasActiveGoal: false,
+          conversionTrigger: true,
+        }),
+      })
+    );
   });
 
   it("activa protocolo de crisis en riesgo crítico", async () => {
@@ -727,7 +805,7 @@ describe("POST /api/chat", () => {
     });
     expect(body.type).toBe("action_required");
     expect(body.message).toBe(
-      'Tu objetivo activo es "Terminar propuesta". Estás acumulando decisiones sin cerrar. Antes de seguir con otro tema, responde con claridad: ¿ya completaste "Enviar el borrador al cliente"? Responde sí o no, y si no, dime cuándo la harás hoy.\n\n¿Quieres guardar tu progreso y continuar otro día? Déjame tu email.'
+      'Tu objetivo activo es "Terminar propuesta". Estás acumulando decisiones sin cerrar. No te voy a ayudar a abrir otro frente hasta resolver este. ¿Ya completaste "Enviar el borrador al cliente"? Responde sí o no, y si no, dime cuándo la harás hoy.\n\n¿Quieres guardar tu progreso y continuar otro día? Déjame tu email.'
     );
     expect(generateAIResponse).not.toHaveBeenCalled();
   });
@@ -803,7 +881,7 @@ describe("POST /api/chat", () => {
       goalTitle: "Cerrar propuesta",
     });
     expect(body.type).toBe("action_required");
-    expect(body.message).toContain("¿ya completaste");
+    expect(body.message).toContain("¿Ya completaste");
     expect(generateAIResponse).not.toHaveBeenCalled();
   });
 

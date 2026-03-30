@@ -17,7 +17,9 @@ describe("generateAIResponse", () => {
     const result = await generateAIResponse("No sé por dónde empezar", "duda");
 
     expect(result.fallback).toBe(true);
-    expect(result.response).toBe("Estoy contigo. Vamos paso a paso.");
+    expect(result.response).toBe(
+      "Vamos a hacerlo simple. Dime qué estás evitando ahora mismo y lo convertimos en un paso concreto hoy."
+    );
   });
 
   it("retorna respuesta real cuando OpenRouter responde bien", async () => {
@@ -57,6 +59,8 @@ describe("generateAIResponse", () => {
     const result = await generateAIResponse("Tengo ansiedad", "ansiedad");
 
     expect(result.fallback).toBe(true);
-    expect(result.response).toBe("Estoy contigo. Vamos paso a paso.");
+    expect(result.response).toBe(
+      "Vamos a hacerlo simple. Dime qué estás evitando ahora mismo y lo convertimos en un paso concreto hoy."
+    );
   });
 });

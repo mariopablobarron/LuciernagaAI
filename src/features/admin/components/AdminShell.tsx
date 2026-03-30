@@ -1,6 +1,12 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { LogOut, ShieldCheck, Sparkles } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { SAAS_ADMIN_NAV, SAAS_CONFIG } from "@/lib/saas";
 
 type AdminShellProps = {
@@ -12,52 +18,67 @@ type AdminShellProps = {
 
 export function AdminShell({ title, subtitle, onLogout, children }: AdminShellProps) {
   return (
-    <div className="min-h-screen bg-slate-100 p-6 text-slate-900">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_color-mix(in_oklab,var(--accent)_18%,transparent),transparent_30%),linear-gradient(180deg,color-mix(in_oklab,var(--background)_94%,white_6%),var(--background))] p-4 text-foreground md:p-6">
       <div className="mx-auto max-w-[1700px] space-y-6">
-        <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-          <div className="grid gap-6 border-b border-slate-200 bg-slate-950 px-6 py-6 text-white lg:grid-cols-[1.4fr_0.9fr]">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">
-                SaaS Admin
-              </p>
-              <h1 className="mt-3 text-3xl font-semibold tracking-tight">{title}</h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">{subtitle}</p>
-            </div>
-
-            <div className="flex flex-col justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 p-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-300">
-                  Producto
+        <Card className="overflow-hidden border-border/80 bg-card/90 shadow-lg shadow-black/5 backdrop-blur">
+          <CardContent className="space-y-5 p-5 md:p-6">
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+              <div className="max-w-4xl">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant="secondary" className="gap-1 rounded-full px-3 py-1">
+                    <Sparkles className="size-3.5" />
+                    SaaS Admin
+                  </Badge>
+                  <Badge variant="warning" className="rounded-full px-3 py-1">
+                    <ShieldCheck className="mr-1 size-3.5" />
+                    Acceso interno
+                  </Badge>
+                </div>
+                <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+                  {title}
+                </h1>
+                <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground md:text-base">
+                  {subtitle}
                 </p>
-                <p className="mt-2 text-lg font-semibold">{SAAS_CONFIG.name}</p>
-                <p className="mt-1 text-sm text-slate-300">{SAAS_CONFIG.description}</p>
               </div>
 
-              <button
-                type="button"
-                onClick={onLogout}
-                className="inline-flex w-fit rounded-xl border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/15"
-              >
-                Cerrar sesión
-              </button>
-            </div>
-          </div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center xl:flex-col xl:items-stretch">
+                <div className="flex items-center justify-end gap-2">
+                  <ThemeToggle />
+                  <Button type="button" variant="outline" onClick={onLogout}>
+                    <LogOut className="size-4" />
+                    Cerrar sesión
+                  </Button>
+                </div>
 
-          <div className="flex flex-wrap gap-3 px-6 py-4">
-            {SAAS_ADMIN_NAV.map((item) => (
-              <a
-                key={item.id}
-                href={`#${item.id}`}
-                className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-white"
-              >
-                {item.label}
-              </a>
-            ))}
-          </div>
-        </section>
+                <div className="rounded-2xl border border-border bg-muted/40 p-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Producto
+                  </p>
+                  <p className="mt-2 text-lg font-semibold text-foreground">{SAAS_CONFIG.name}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{SAAS_CONFIG.description}</p>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="flex flex-wrap gap-2">
+              {SAAS_ADMIN_NAV.map((item) => (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  className="rounded-full border border-border bg-background/70 px-3 py-2 text-xs font-semibold text-muted-foreground transition hover:bg-accent hover:text-accent-foreground"
+                >
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         {children}
       </div>
-    </div>
+    </main>
   );
 }

@@ -53,5 +53,15 @@ describe("mentor protocol", () => {
         conversationMessageCount: 2,
       })
     ).toBe(false);
+
+    expect(
+      shouldAskForEmail({
+        isAnonymous: true,
+        goalCount: 0,
+        actionCount: 0,
+        conversationMessageCount: 1,
+        conversionTrigger: true,
+      })
+    ).toBe(true);
   });
 });

@@ -28,6 +28,7 @@ export type EmailCaptureContext = {
   goalCount: number;
   actionCount: number;
   conversationMessageCount: number;
+  conversionTrigger?: boolean;
 };
 
 export function getMentorMode(context: MentorProtocolContext): MentorMode {
@@ -89,6 +90,7 @@ export function shouldAskForEmail(context: EmailCaptureContext): boolean {
   }
 
   return (
+    Boolean(context.conversionTrigger) ||
     context.goalCount >= 1 ||
     context.actionCount >= 1 ||
     context.conversationMessageCount > 3

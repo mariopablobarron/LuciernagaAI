@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { useTheme } from "next-themes";
 import { BlockNoteView } from "@blocknote/mantine";
 import { useCreateBlockNote } from "@blocknote/react";
 import "@blocknote/core/fonts/inter.css";
@@ -12,10 +13,11 @@ type BlockEditorProps = {
 
 export default function BlockEditor({ className = "" }: BlockEditorProps) {
   const editor = useCreateBlockNote();
+  const { resolvedTheme } = useTheme();
 
   const wrapperClassName = useMemo(() => {
     const base =
-      "h-full min-h-[520px] rounded-xl border border-slate-200 bg-white p-4 shadow-sm";
+      "h-full min-h-[520px] rounded-3xl border border-border/80 bg-card/95 p-4 shadow-sm";
     return className ? `${base} ${className}` : base;
   }, [className]);
 
@@ -23,7 +25,7 @@ export default function BlockEditor({ className = "" }: BlockEditorProps) {
     <section className={wrapperClassName}>
       <BlockNoteView
         editor={editor}
-        theme="light"
+        theme={resolvedTheme === "dark" ? "dark" : "light"}
         className="h-full [&_.bn-container]:h-full [&_.bn-editor]:min-h-[460px]"
       />
     </section>

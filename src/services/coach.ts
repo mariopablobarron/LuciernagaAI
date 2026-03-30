@@ -1,6 +1,14 @@
 import { RESPONSIBLE_USE_NOTES } from "@/lib/legal";
+import {
+  LUCIERNAGA_IDENTITY_PROMPT,
+  LUCIERNAGA_POWERFUL_QUESTIONS_PROMPT,
+  LUCIERNAGA_PURPOSE_MODEL_PROMPT,
+  LUCIERNAGA_RESPONSE_STRUCTURE_PROMPT,
+} from "@/lib/luciernaga-identity";
 import type { MentorMode } from "@/services/mentor-protocol";
+import type { ConversationalOnboardingContext } from "@/services/onboarding";
 import type { TransformationPhase } from "@/services/transformation";
+import type { CanonicalUserPlan } from "@/services/user";
 import type { UserState } from "@/types/chat";
 import {
   DEFAULT_EMOTIONAL_PROFILE,
@@ -56,13 +64,41 @@ export type CoachContext = {
     instruction: string | null;
   } | null;
   web?: CoachSearchContext | null;
+  access?: {
+    userPlan: CanonicalUserPlan;
+    remainingMessages: number | null;
+    hasActiveGoal: boolean;
+    conversionTrigger?: boolean;
+  } | null;
+  onboarding?: ConversationalOnboardingContext | null;
 };
 
-const BASE_PROMPT = `Eres un mentor directo, humano y claro.
-No des respuestas genéricas ni listas largas.
-Da una sola acción ejecutable hoy y una pregunta final que fuerce decisión.
-Si detectas evasión o acumulación de acciones abiertas, confronta con claridad sin volverte cruel.
-Nunca presentes el sistema como terapia, diagnostico o sustituto de ayuda profesional.`;
+type ResponseFinalizationContext = {
+  state: UserState;
+  mentor?: MentorMode | null;
+  goal?: CoachGoalContext | null;
+  onboarding?: ConversationalOnboardingContext | null;
+};
+
+const BASE_PROMPT = `${LUCIERNAGA_IDENTITY_PROMPT}
+
+${LUCIERNAGA_PURPOSE_MODEL_PROMPT}
+
+Estilo de respuesta:
+- Directo, humano y cercano.
+- Frases claras, sin tecnicismos.
+- No demasiado largo.
+- Siempre con intención.
+- Evita respuestas genéricas, exceso de motivación vacía y lenguaje clínico o frío.
+
+${LUCIERNAGA_RESPONSE_STRUCTURE_PROMPT}
+
+${LUCIERNAGA_POWERFUL_QUESTIONS_PROMPT}
+
+Reglas operativas base:
+- Da una sola acción ejecutable hoy y una pregunta final que fuerce decisión cuando tenga sentido.
+- Si detectas evasión o acumulación de acciones abiertas, confronta con claridad sin volverte cruel.
+- Nunca presentes el sistema como terapia, diagnóstico o sustituto de ayuda profesional.`;
 
 const STATE_GUIDANCE: Record<UserState, string> = {
   neutral:
@@ -107,6 +143,10 @@ const ENERGY_GUIDANCE: Record<EnergyLevel, string> = {
   medio: "Si la energía es media, usa un siguiente paso concreto con ritmo sostenible.",
   alto: "Si la energía es alta, canalízala sin dispersión hacia una decisión o ejecución clara.",
 };
+
+const ACTION_CUE_PATTERN =
+  /\b(hoy|haz|elige|escribe|bloquea|envia|envía|manda|abre|cierra|agenda|camina|llama|define|ejecuta|actua|actúa|reserva|dedica|termina)\b/i;
+const QUESTION_PATTERN = /[?¿]/;
 
 function buildEmpatheticResponse(userState: UserState, context: CoachContext): string {
   const mentor = context.mentor;
@@ -200,6 +240,53 @@ function buildLegalGuidance(context: CoachContext): string {
 - Nunca uses lenguaje que sugiera sustitución de terapia, diagnóstico o soporte de emergencia.`;
 }
 
+function buildAccessGuidance(context: CoachContext): string {
+  const access = context.access;
+  if (!access) {
+    return "";
+  }
+
+  return `Contexto de continuidad y acceso:
+- Plan actual: ${access.userPlan}
+- Mensajes restantes hoy: ${
+    access.remainingMessages === null ? "sin límite" : access.remainingMessages
+  }
+- Objetivo activo: ${access.hasActiveGoal ? "sí" : "no"}
+${access.conversionTrigger ? "- Acaba de ocurrir un momento de valor real que merece continuidad." : ""}
+
+Reglas obligatorias:
+- Si mencionas continuidad o acceso, hazlo desde el valor que el usuario ya obtuvo, no como pitch frío.
+- Si el plan es free y quedan pocos mensajes, subraya la importancia de sostener el proceso.
+- Si hay objetivo activo, enfatiza continuidad, seguimiento y evidencia de avance.
+- No uses lenguaje comercial agresivo ni manipulación artificial.`;
+}
+
+function buildOnboardingGuidance(context: CoachContext): string {
+  const onboarding = context.onboarding;
+  if (!onboarding?.active) {
+    return "";
+  }
+
+  const stageGuidance =
+    onboarding.stage === "opening"
+      ? `- Si el usuario llega con saludo o vaguedad, evita una bienvenida larga y usa esta pregunta como entrada útil: "${onboarding.starterQuestion}".`
+      : onboarding.stage === "reflection"
+        ? "- Refleja el problema central en una sola frase y recorta el foco hasta dejar un único frente accionable."
+        : "- Cierra con una primera acción concreta, ejecutable hoy y visible para el propio usuario.";
+
+  return `Onboarding conversacional activo:
+- Intent inicial detectado: ${onboarding.intent}
+- Etapa: ${onboarding.stage}
+- Resultado buscado: ${onboarding.targetOutcome}
+- Pregunta de entrada: ${onboarding.starterQuestion}
+
+Reglas obligatorias de onboarding:
+${stageGuidance}
+- Detecta el problema real detrás del mensaje inicial y nómbralo con claridad.
+- Refleja la fricción del usuario antes de empujar la acción.
+- En los primeros turnos, evita teoría o intros largas: lleva la conversación hacia una primera acción en menos de dos minutos.`;
+}
+
 function buildFlowGuidance(context: CoachContext): string {
   const flow = context.flow;
   if (!flow?.activeFlow || !flow?.instruction) {
@@ -252,6 +339,8 @@ export function buildCoachPrompt(
   const flowGuidance = buildFlowGuidance(context);
   const continuityGuidance = buildContinuityGuidance(context);
   const legalGuidance = buildLegalGuidance(context);
+  const accessGuidance = buildAccessGuidance(context);
+  const onboardingGuidance = buildOnboardingGuidance(context);
 
   const goalContext = context.goal
     ? `
@@ -323,6 +412,8 @@ ${empatheticResponseGuidance}
 ${mentorProtocolGuidance ? `\n\n${mentorProtocolGuidance}` : ""}
 ${transformationGuidance ? `\n\n${transformationGuidance}` : ""}
 ${legalGuidance ? `\n\n${legalGuidance}` : ""}
+${accessGuidance ? `\n\n${accessGuidance}` : ""}
+${onboardingGuidance ? `\n\n${onboardingGuidance}` : ""}
 
 Consistencia obligatoria de salida:
 - Toda respuesta debe incluir: 1) reconocimiento emocional, 2) referencia de contexto previo si existe, 3) siguiente paso concreto.
@@ -346,7 +437,93 @@ Nunca respondas igual a dos usuarios distintos si su perfil emocional acumulado 
 }
 
 export function buildFallbackResponse(): string {
-  return "Estoy contigo. Vamos paso a paso.";
+  return "Vamos a hacerlo simple. Dime qué estás evitando ahora mismo y lo convertimos en un paso concreto hoy.";
+}
+
+function buildLuciernagaActionLine(context: ResponseFinalizationContext): string {
+  const activeAction = context.goal?.activeAction;
+  const unfinishedActionsCount = context.goal?.unfinishedActionsCount ?? 0;
+  const confront = context.mentor?.confront ?? false;
+
+  if (activeAction && (confront || unfinishedActionsCount > 0)) {
+    return confront
+      ? `No necesitas seguir dándole vueltas. Tu foco ahora es este: ${activeAction}.`
+      : `Tu siguiente paso concreto es este: ${activeAction}.`;
+  }
+
+  if (context.state === "bloqueo") {
+    return "Haz una versión mínima de esto en menos de 10 minutos.";
+  }
+
+  if (context.state === "duda") {
+    return "Reduce esto a dos opciones y elige una hoy.";
+  }
+
+  if (context.state === "ansiedad") {
+    return "Elige una sola tarea controlable y ciérrala hoy.";
+  }
+
+  if (context.state === "claridad") {
+    return "Convierte esta claridad en una evidencia visible hoy.";
+  }
+
+  if (context.onboarding?.active) {
+    return "No busques entenderlo todo ahora: elige un paso pequeño que puedas hacer hoy.";
+  }
+
+  return "Convierte esto en un paso concreto antes de cerrar el día.";
+}
+
+function buildLuciernagaQuestion(context: ResponseFinalizationContext): string {
+  const activeAction = context.goal?.activeAction;
+  const confront = context.mentor?.confront ?? false;
+
+  if (activeAction && confront) {
+    return `¿Lo haces hoy o sigues evitando lo importante?`;
+  }
+
+  if (activeAction) {
+    return "¿Lo vas a hacer hoy?";
+  }
+
+  if (context.state === "bloqueo") {
+    return "¿Cuál es el paso más pequeño que sí puedes hacer hoy?";
+  }
+
+  if (context.state === "duda") {
+    return "¿Qué opción eliges hoy?";
+  }
+
+  if (context.state === "ansiedad") {
+    return "¿Qué puedes controlar en la próxima hora?";
+  }
+
+  if (context.state === "claridad") {
+    return "¿Qué vas a cerrar hoy para que esto deje de ser solo una idea?";
+  }
+
+  if (context.onboarding?.active) {
+    return "¿Qué estás evitando ahora mismo?";
+  }
+
+  return "¿Qué pequeño paso puedes dar hoy?";
+}
+
+export function finalizeLuciernagaResponse(
+  response: string,
+  context: ResponseFinalizationContext
+): string {
+  let next = response.trim();
+
+  if (!ACTION_CUE_PATTERN.test(next)) {
+    next = `${next}\n\n${buildLuciernagaActionLine(context)}`;
+  }
+
+  if (!QUESTION_PATTERN.test(next)) {
+    next = `${next}\n\n${buildLuciernagaQuestion(context)}`;
+  }
+
+  return next;
 }
 
 export function buildActionRequiredMessage(params: {
@@ -364,7 +541,7 @@ export function buildActionRequiredMessage(params: {
   const confront = params.mentorMode?.confront ?? false;
 
   if (avoidanceCount >= 2 || unfinishedActionsCount > 2) {
-    return `${focusLine} Estás acumulando decisiones sin cerrar. Antes de seguir con otro tema, responde con claridad: ¿ya completaste "${params.actionTitle}"? Responde sí o no, y si no, dime cuándo la harás hoy.`;
+    return `${focusLine} Estás acumulando decisiones sin cerrar. No te voy a ayudar a abrir otro frente hasta resolver este. ¿Ya completaste "${params.actionTitle}"? Responde sí o no, y si no, dime cuándo la harás hoy.`;
   }
 
   if (confront) {
@@ -380,4 +557,20 @@ export function appendCaptureEmailPrompt(response: string, shouldAsk: boolean): 
   }
 
   return `${response}\n\n¿Quieres guardar tu progreso y continuar otro día? Déjame tu email.`;
+}
+
+export function appendConversionPrompt(response: string, conversionTrigger: boolean): string {
+  if (!conversionTrigger) {
+    return response;
+  }
+
+  return `${response}\n\nEsto que acabas de definir es importante.\nSi no lo guardas, lo vas a perder.\n¿Quieres que lo guarde por ti?`;
+}
+
+export function appendSoftPaywallPrompt(response: string, shouldPrompt: boolean): string {
+  if (!shouldPrompt) {
+    return response;
+  }
+
+  return `${response}\n\nNo es falta de claridad.\nEs que necesitas continuidad.\n\nAquí es donde la mayoría falla.\n\nSi quieres que te acompañe de verdad, necesitas acceso completo.\n\n¿Quieres sostener este avance con continuidad real?`;
 }

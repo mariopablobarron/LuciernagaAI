@@ -95,6 +95,10 @@ async function requestOpenRouter(
     energyLevel: emotionalProfile.energyLevel,
     messageLength: message.length,
     webUsage: coachContext.web?.usage ?? "none",
+    userPlan: coachContext.access?.userPlan ?? "unknown",
+    remainingMessages: coachContext.access?.remainingMessages ?? null,
+    hasActiveGoal: coachContext.access?.hasActiveGoal ?? false,
+    conversionTrigger: coachContext.access?.conversionTrigger ?? false,
   });
 
   const safeCoachContext = sanitizeCoachContext(coachContext);
@@ -187,6 +191,9 @@ export async function generateAIResponse(
       energyLevel: emotionalProfile.energyLevel,
       model: OPENROUTER_MODEL,
       fallback: false,
+      userPlan: coachContext.access?.userPlan ?? "unknown",
+      remainingMessages: coachContext.access?.remainingMessages ?? null,
+      hasActiveGoal: coachContext.access?.hasActiveGoal ?? false,
     });
     return { response, fallback: false };
   } catch (error: unknown) {
@@ -203,6 +210,108 @@ export async function generateAIResponse(
       fallback: true,
       errorType,
       errorMessage,
+    };
+  }
+}
+
+// --- Modo Impulso ---
+
+const IMPULSE_SYSTEM_PROMPT = `Eres Luciérnaga en Modo Impulso.
+No es una conversación libre. Es entrenamiento.
+
+Reglas absolutas:
+1. Detecta el estado emocional del usuario en la primera línea (no lo digas, solo úsalo para calibrar).
+2. Confronta suavemente si hay evasión o vaguedad. No valides sin acción.
+3. Da exactamente UNA acción concreta, específica y acotada en tiempo.
+4. Cierra SIEMPRE con este formato obligatorio:
+
+"Hoy solo haz esto: [acción concreta]. Te llevará [X] minutos."
+
+Prohibido:
+- Respuestas largas (máximo 4 oraciones antes del cierre).
+- Validar sin empujar a acción.
+- Terminar sin la línea de cierre obligatoria.
+- Dar más de una acción.`;
+
+export type ImpulseResponseInput = {
+  message: string;
+  profileCode: string;
+  profileFocus: string;
+  recentLogs: Array<{ emotionalState: string | null; note: string | null }>;
+};
+
+function buildImpulsePrompt(input: ImpulseResponseInput): string {
+  const logContext =
+    input.recentLogs.length > 0
+      ? `\nÚltimos estados reportados:\n${input.recentLogs
+          .slice(0, 3)
+          .map((l) => `- Estado: ${l.emotionalState ?? "desconocido"} | Nota: ${l.note ?? "sin nota"}`)
+          .join("\n")}`
+      : "";
+
+  return `${IMPULSE_SYSTEM_PROMPT}
+
+Perfil del usuario: ${input.profileCode}
+Foco operativo: ${input.profileFocus}${logContext}`;
+}
+
+export async function generateImpulseResponse(input: ImpulseResponseInput): Promise<{
+  response: string;
+  fallback: boolean;
+}> {
+  const apiKey = process.env.OPENROUTER_API_KEY?.trim();
+  if (!apiKey) {
+    return {
+      response: "Hoy solo haz esto: abre el documento o la tarea más importante y trabaja 10 minutos sin parar. Te llevará 10 minutos.",
+      fallback: true,
+    };
+  }
+
+  try {
+    const res = await withTimeout(
+      fetch(OPENROUTER_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": process.env.APP_BASE_URL ?? "http://localhost:3000",
+          "X-Title": "mentor-web-impulso",
+        },
+        body: JSON.stringify({
+          model: OPENROUTER_MODEL,
+          messages: [
+            { role: "system", content: buildImpulsePrompt(input) },
+            { role: "user", content: input.message },
+          ],
+          temperature: 0.5,
+          max_tokens: 220,
+        }),
+      }),
+      REQUEST_TIMEOUT_MS
+    );
+
+    if (!res.ok) {
+      throw new OpenRouterProviderError(`OpenRouter HTTP ${res.status}`);
+    }
+
+    const data = (await res.json()) as OpenRouterResponse;
+    const reply = extractReply(data);
+
+    if (!reply) {
+      throw new OpenRouterProviderError("Empty response");
+    }
+
+    logInfo("AI", "impulse_response_generated", {
+      profileCode: input.profileCode,
+      replyLength: reply.length,
+    });
+
+    return { response: reply, fallback: false };
+  } catch (error: unknown) {
+    logError("AI", error, { area: "generateImpulseResponse", profile: input.profileCode });
+    return {
+      response: "Hoy solo haz esto: define en una sola línea qué tarea es tu prioridad y empiézala ahora. Te llevará 5 minutos.",
+      fallback: true,
     };
   }
 }

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPrismaClient } from "@/db/prisma";
 import {
   attachSessionCookie,
   clearSessionCookie,
@@ -10,6 +9,11 @@ import { logError, logInfo } from "@/lib/logger";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getErrorMessage } from "@/lib/utils";
 import { generateAIResponse } from "@/services/ai";
+import {
+  ensureUserSession,
+  resolveConversationForUser,
+  saveConversationMessage,
+} from "@/services/conversation";
 import { detectUserState, updateUserState } from "@/services/state";
 import type { ChatRequestBody, UserState } from "@/types/chat";
 
@@ -40,20 +44,11 @@ function buildErrorResponse(
 
 export async function POST(req: NextRequest) {
   try {
-    logInfo("CHAT", "request received", {
+    logInfo("CHAT", "request_received", {
       method: req.method,
       path: req.nextUrl.pathname,
       hasToken: hasIncomingToken(req),
     });
-
-    let prisma: ReturnType<typeof getPrismaClient> | null = null;
-    try {
-      prisma = getPrismaClient();
-      logInfo("DB", "prisma_client_ready", { route: "/api/chat" });
-    } catch (dbInitError: unknown) {
-      logError("DB", dbInitError, { route: "/api/chat", area: "prisma_init" });
-      prisma = null;
-    }
 
     let body: Partial<ChatRequestBody>;
     try {
@@ -63,16 +58,18 @@ export async function POST(req: NextRequest) {
       return buildErrorResponse("Body inválido en la solicitud", 400, "neutral", "INVALID_BODY");
     }
 
-    logInfo("CHAT", "request body parsed", {
+    logInfo("CHAT", "request_body_parsed", {
       hasMessage: !!body.message,
       messageLength: body.message?.length ?? 0,
+      conversationId: body.conversationId ?? null,
       providedUserId: body.userId ?? null,
     });
 
     const message = body.message?.trim() ?? "";
     const identity = resolveIdentity(req);
     const userId = identity.userId;
-    logInfo("CHAT", "identity resolved", {
+
+    logInfo("CHAT", "identity_resolved", {
       userId,
       source: identity.source,
       shouldSetCookie: identity.shouldSetCookie,
@@ -113,32 +110,37 @@ export async function POST(req: NextRequest) {
       return limitedResponse;
     }
 
+    await ensureUserSession(userId);
+
     const state = detectUserState(message);
     logInfo("STATE", "state_detected", { userId, state, messageLength: message.length });
 
-    // Guardar estado de usuario.
-    try {
-      await updateUserState(userId, state);
-    } catch (dbError: unknown) {
-      logError("STATE", dbError, { userId, area: "updateUserState" });
-    }
+    await updateUserState(userId, state);
 
-    // Registrar mensaje de usuario para analítica.
-    if (prisma) {
-      try {
-        await prisma.message.create({
-          data: {
-            conversationId: userId,
-            content: message,
-          },
-        });
-        logInfo("DB", "message_logged_user", { userId });
-      } catch (messageError: unknown) {
-        logError("DB", messageError, { userId, area: "message_create_user" });
-      }
-    } else {
-      logInfo("DB", "message_log_skipped_user", { userId, reason: "prisma_unavailable" });
-    }
+    const conversation = await resolveConversationForUser(
+      userId,
+      body.conversationId,
+      message
+    );
+
+    logInfo("DB", "conversation_resolved", {
+      userId,
+      conversationId: conversation.id,
+      requestedConversationId: body.conversationId ?? null,
+    });
+
+    await saveConversationMessage({
+      conversationId: conversation.id,
+      userId,
+      role: "user",
+      content: message,
+      updateTitleFromUserMessage: conversation.title === "Nueva conversación",
+    });
+    logInfo("DB", "message_saved", {
+      userId,
+      conversationId: conversation.id,
+      role: "user",
+    });
 
     if (!process.env.OPENROUTER_API_KEY?.trim()) {
       logError("AI", new Error("Missing OPENROUTER_API_KEY"), { route: "/api/chat" });
@@ -150,40 +152,33 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Respuesta IA usando prompt dinámico por estado.
     logInfo("AI", "openrouter_call_requested", {
       userId,
+      conversationId: conversation.id,
       state,
       messageLength: message.length,
     });
     const aiResult = await generateAIResponse(message, state);
     logInfo("AI", "openrouter_call_completed", {
       userId,
+      conversationId: conversation.id,
       state,
       fallback: aiResult.fallback,
       errorType: aiResult.errorType ?? null,
       errorMessage: aiResult.errorMessage ?? null,
     });
 
-    // Registrar mensaje del asistente para analítica.
-    if (prisma) {
-      try {
-        await prisma.message.create({
-          data: {
-            conversationId: userId,
-            content: aiResult.response,
-          },
-        });
-        logInfo("DB", "message_logged_assistant", { userId });
-      } catch (messageError: unknown) {
-        logError("DB", messageError, { userId, area: "message_create_assistant" });
-      }
-    } else {
-      logInfo("DB", "message_log_skipped_assistant", {
-        userId,
-        reason: "prisma_unavailable",
-      });
-    }
+    await saveConversationMessage({
+      conversationId: conversation.id,
+      userId,
+      role: "assistant",
+      content: aiResult.response,
+    });
+    logInfo("DB", "message_saved", {
+      userId,
+      conversationId: conversation.id,
+      role: "assistant",
+    });
 
     if (aiResult.fallback && aiResult.errorType === "provider_failure") {
       logError("AI", new Error(aiResult.errorMessage || "Provider failure"), {
@@ -196,6 +191,7 @@ export async function POST(req: NextRequest) {
       success: true,
       response: aiResult.response,
       state,
+      conversationId: conversation.id,
       fallback: aiResult.fallback,
     });
     if (identity.shouldSetCookie) {
@@ -222,11 +218,6 @@ export async function POST(req: NextRequest) {
         ? "Fallo en proveedor de IA"
         : "Error interno del servidor";
 
-    return buildErrorResponse(
-      clearMessage,
-      500,
-      "neutral",
-      "INTERNAL_ERROR"
-    );
+    return buildErrorResponse(clearMessage, 500, "neutral", "INTERNAL_ERROR");
   }
 }

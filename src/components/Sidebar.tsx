@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
 
 export type SidebarConversation = {
@@ -27,8 +28,11 @@ type SidebarProps = {
   activeConversationId: string;
   progress: SidebarProgress;
   profile: SidebarProfile;
+  adminAuthenticated: boolean;
+  adminLoading: boolean;
   onSelectConversation: (conversationId: string) => void;
   onNewConversation: () => void;
+  onAdminLogout: () => Promise<void> | void;
 };
 
 function formatRelativeDate(isoDate: string): string {
@@ -44,9 +48,13 @@ export default function Sidebar({
   activeConversationId,
   progress,
   profile,
+  adminAuthenticated,
+  adminLoading,
   onSelectConversation,
   onNewConversation,
+  onAdminLogout,
 }: SidebarProps) {
+  const pathname = usePathname();
   const [logoSrc, setLogoSrc] = useState("/logo-startidea.png");
 
   const progressPercent = useMemo(() => {
@@ -72,6 +80,50 @@ export default function Sidebar({
           onError={() => setLogoSrc("/placeholder.png")}
         />
       </Link>
+
+      <nav className="mb-4">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+          Menú
+        </p>
+        <ul className="space-y-2">
+          <li>
+            <Link
+              href="/"
+              className={`block rounded-xl border px-3 py-2 text-sm font-medium transition ${
+                pathname === "/"
+                  ? "border-slate-900 bg-slate-900 text-white"
+                  : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
+              }`}
+            >
+              Chat
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/editor"
+              className={`block rounded-xl border px-3 py-2 text-sm font-medium transition ${
+                pathname === "/editor"
+                  ? "border-slate-900 bg-slate-900 text-white"
+                  : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
+              }`}
+            >
+              Editor
+            </Link>
+          </li>
+          <li>
+            <Link
+              href={adminAuthenticated ? "/admin" : "/admin/login?next=/admin"}
+              className={`block rounded-xl border px-3 py-2 text-sm font-medium transition ${
+                pathname === "/admin"
+                  ? "border-slate-900 bg-slate-900 text-white"
+                  : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
+              }`}
+            >
+              Admin
+            </Link>
+          </li>
+        </ul>
+      </nav>
 
       <button
         type="button"
@@ -120,6 +172,36 @@ export default function Sidebar({
           })}
         </ul>
       </nav>
+
+      <section className="mb-4 rounded-xl border border-slate-200 p-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          Acceso admin
+        </p>
+        {adminLoading ? (
+          <p className="mt-2 text-xs text-slate-500">Verificando sesión...</p>
+        ) : adminAuthenticated ? (
+          <div className="mt-2 space-y-2">
+            <p className="text-xs text-emerald-700">Sesión admin activa.</p>
+            <button
+              type="button"
+              onClick={() => void onAdminLogout()}
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              Cerrar sesión admin
+            </button>
+          </div>
+        ) : (
+          <div className="mt-2 space-y-2">
+            <p className="text-xs text-slate-500">No autenticado.</p>
+            <Link
+              href="/admin/login?next=/admin"
+              className="block w-full rounded-lg border border-slate-300 px-3 py-2 text-center text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              Entrar como admin
+            </Link>
+          </div>
+        )}
+      </section>
 
       <section className="mb-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">

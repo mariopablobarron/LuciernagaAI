@@ -1,0 +1,212 @@
+import { getPrismaClient } from "@/db/prisma";
+
+export type ConversationSummary = {
+  id: string;
+  title: string;
+  createdAt: Date;
+  updatedAt: Date;
+  messageCount: number;
+};
+
+export type ConversationMessage = {
+  id: string;
+  conversationId: string;
+  role: "user" | "assistant";
+  content: string;
+  createdAt: Date;
+};
+
+const DEFAULT_CONVERSATION_TITLE = "Nueva conversación";
+
+function normalizeRole(role: string): "user" | "assistant" {
+  return role === "assistant" ? "assistant" : "user";
+}
+
+export function buildConversationTitle(input: string): string {
+  const value = input.trim();
+  if (!value) {
+    return DEFAULT_CONVERSATION_TITLE;
+  }
+
+  return value.length > 48 ? `${value.slice(0, 48)}...` : value;
+}
+
+export async function ensureUserSession(userId: string): Promise<void> {
+  const prisma = getPrismaClient();
+  await prisma.user.upsert({
+    where: { id: userId },
+    create: { id: userId, lastSeen: new Date() },
+    update: { lastSeen: new Date() },
+  });
+}
+
+export async function createConversationForUser(
+  userId: string,
+  title?: string
+): Promise<{ id: string; title: string; createdAt: Date; updatedAt: Date }> {
+  const prisma = getPrismaClient();
+  const conversation = await prisma.conversation.create({
+    data: {
+      userRefId: userId,
+      title: buildConversationTitle(title ?? ""),
+    },
+    select: {
+      id: true,
+      title: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  return conversation;
+}
+
+export async function getConversationByIdForUser(
+  conversationId: string,
+  userId: string
+): Promise<{ id: string; title: string; createdAt: Date; updatedAt: Date } | null> {
+  const prisma = getPrismaClient();
+  return prisma.conversation.findFirst({
+    where: {
+      id: conversationId,
+      userRefId: userId,
+    },
+    select: {
+      id: true,
+      title: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+}
+
+export async function resolveConversationForUser(
+  userId: string,
+  requestedConversationId: string | undefined,
+  firstMessage: string
+): Promise<{ id: string; title: string; createdAt: Date; updatedAt: Date }> {
+  if (requestedConversationId?.trim()) {
+    const existing = await getConversationByIdForUser(requestedConversationId, userId);
+    if (existing) {
+      return existing;
+    }
+  }
+
+  return createConversationForUser(userId, firstMessage);
+}
+
+export async function saveConversationMessage(params: {
+  conversationId: string;
+  userId: string;
+  role: "user" | "assistant";
+  content: string;
+  updateTitleFromUserMessage?: boolean;
+}): Promise<void> {
+  const prisma = getPrismaClient();
+  const now = new Date();
+
+  await prisma.$transaction(async (tx) => {
+    await tx.message.create({
+      data: {
+        conversationId: params.conversationId,
+        userRefId: params.userId,
+        role: params.role,
+        content: params.content,
+      },
+    });
+
+    const updateData: { updatedAt: Date; title?: string } = { updatedAt: now };
+    if (params.updateTitleFromUserMessage && params.role === "user") {
+      updateData.title = buildConversationTitle(params.content);
+    }
+
+    await tx.conversation.update({
+      where: { id: params.conversationId },
+      data: updateData,
+    });
+  });
+}
+
+export async function listConversationsForUser(
+  userId: string
+): Promise<ConversationSummary[]> {
+  const prisma = getPrismaClient();
+  const conversations = await prisma.conversation.findMany({
+    where: { userRefId: userId },
+    orderBy: { updatedAt: "desc" },
+    select: {
+      id: true,
+      title: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  if (conversations.length === 0) {
+    return [];
+  }
+
+  const conversationIds = conversations.map((conversation) => conversation.id);
+  const groupedCounts = await prisma.message.groupBy({
+    by: ["conversationId"],
+    where: {
+      conversationId: { in: conversationIds },
+      userRefId: userId,
+    },
+    _count: { _all: true },
+  });
+
+  const countByConversation = new Map<string, number>();
+  for (const row of groupedCounts) {
+    countByConversation.set(row.conversationId, row._count._all);
+  }
+
+  return conversations.map((conversation) => ({
+    id: conversation.id,
+    title: conversation.title,
+    createdAt: conversation.createdAt,
+    updatedAt: conversation.updatedAt,
+    messageCount: countByConversation.get(conversation.id) ?? 0,
+  }));
+}
+
+export async function listMessagesForConversation(params: {
+  userId: string;
+  conversationId: string;
+}): Promise<ConversationMessage[] | null> {
+  const prisma = getPrismaClient();
+  const conversation = await prisma.conversation.findFirst({
+    where: {
+      id: params.conversationId,
+      userRefId: params.userId,
+    },
+    select: { id: true },
+  });
+
+  if (!conversation) {
+    return null;
+  }
+
+  const messages = await prisma.message.findMany({
+    where: {
+      conversationId: params.conversationId,
+      userRefId: params.userId,
+    },
+    orderBy: { createdAt: "asc" },
+    select: {
+      id: true,
+      conversationId: true,
+      role: true,
+      content: true,
+      createdAt: true,
+    },
+  });
+
+  return messages.map((message) => ({
+    id: message.id,
+    conversationId: message.conversationId,
+    role: normalizeRole(message.role),
+    content: message.content,
+    createdAt: message.createdAt,
+  }));
+}

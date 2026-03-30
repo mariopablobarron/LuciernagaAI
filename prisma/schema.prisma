@@ -141,6 +141,17 @@ model DecisionLog {
   @@index([metric, createdAt])
 }
 
+model Event {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([type, createdAt])
+}
+
 model CrisisEvent {
   id        String   @id @default(cuid())
   userId    String

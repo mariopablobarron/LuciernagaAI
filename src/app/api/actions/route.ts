@@ -6,6 +6,7 @@ import {
   resolveIdentity,
 } from "@/lib/auth";
 import { logError, logInfo } from "@/lib/logger";
+import { trackSafe } from "@/services/events";
 import { updateGoalAction, type GoalWithProgress } from "@/services/goals";
 
 function serializeGoal(goal: GoalWithProgress | null) {
@@ -73,6 +74,19 @@ export async function PATCH(req: NextRequest) {
       actionId,
       completed: body.completed,
       goalId: goal.id,
+    });
+
+    // Track ACTION_COMPLETED or ACTION_SKIPPED event
+    const eventType = body.completed ? "ACTION_COMPLETED" : "ACTION_SKIPPED";
+    await trackSafe({
+      userId: identity.userId,
+      type: eventType,
+      metadata: {
+        actionId,
+        goalId: goal.id,
+        goalTitle: goal.title,
+        progress: `${goal.completedCount}/${goal.totalCount}`,
+      },
     });
 
     const response = NextResponse.json({

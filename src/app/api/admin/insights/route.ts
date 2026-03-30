@@ -7,6 +7,7 @@ import { generateDecision, type DecisionMetrics } from "@/services/decision";
 import { generateInsights, getInsightConfidence } from "@/services/insights";
 import { getRecentCrisisStats, listRecentCrisisEvents } from "@/services/risk";
 import { getDominantState } from "@/services/state";
+import { getActionCompletionRate, getAvoidanceRate, getEventMetrics } from "@/lib/metrics";
 
 export const dynamic = "force-dynamic";
 
@@ -375,6 +376,40 @@ export async function GET(req: NextRequest) {
       automatedAlertsSent,
     });
 
+    // Calculate event metrics
+    let eventMetrics = {
+      totalEventsLast7d: 0,
+      messagesPerUserLast7d: 0,
+      actionsCompletedLast7d: 0,
+      actionsCreatedLast7d: 0,
+      actionCompletionRate: 0,
+      avoidanceRate: 0,
+      eventsByType: {} as Record<string, number>,
+    };
+
+    try {
+      const [eventData, allActionCompletionRate, allAvoidanceRate] = await Promise.all([
+        getEventMetrics(7),
+        getActionCompletionRate("", 7),
+        getAvoidanceRate("", 7),
+      ]);
+
+      eventMetrics = {
+        totalEventsLast7d: eventData.totalEvents,
+        messagesPerUserLast7d: eventData.averageEventsPerUser,
+        actionsCompletedLast7d: eventData.eventsByType["ACTION_COMPLETED"] ?? 0,
+        actionsCreatedLast7d: eventData.eventsByType["ACTION_CREATED"] ?? 0,
+        actionCompletionRate: allActionCompletionRate,
+        avoidanceRate: allAvoidanceRate,
+        eventsByType: eventData.eventsByType,
+      };
+    } catch (eventError: unknown) {
+      logError("TRACKING", eventError, {
+        route: "/api/admin/insights",
+        stage: "event_metrics_calculation",
+      });
+    }
+
     return NextResponse.json({
       metrics: {
         retentionDay3,
@@ -407,6 +442,7 @@ export async function GET(req: NextRequest) {
       },
       alerts,
       insights,
+      events: eventMetrics,
       crisis: {
         last24h: crisis24h,
         latestEvents: recentCrisisEvents24h.map((event) => ({

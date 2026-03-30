@@ -11,6 +11,7 @@ import { checkRateLimit } from "@/lib/rate-limit";
 import { getErrorMessage } from "@/lib/utils";
 import { generateAIResponse, streamOpenRouterTokens } from "@/services/ai";
 import { generateImpulseResponse } from "@/services/impulse-ai";
+import { trackSafe } from "@/services/events";
 import {
   appendCaptureEmailPrompt,
   appendConversionPrompt,
@@ -303,12 +304,11 @@ export async function POST(req: NextRequest) {
       return planLimitedResponse;
     }
 
-    const ip =
-      (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
+    const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
     const rateLimits = [
-      checkRateLimit(`chat:burst:${userId}`, 5, 60_000),          // 5 / min per user
-      checkRateLimit(`chat:hour:${userId}`, 30, 3_600_000),       // 30 / hour per user
-      checkRateLimit(`chat:ip:${ip}`, 100, 3_600_000),            // 100 / hour per IP
+      checkRateLimit(`chat:burst:${userId}`, 5, 60_000), // 5 / min per user
+      checkRateLimit(`chat:hour:${userId}`, 30, 3_600_000), // 30 / hour per user
+      checkRateLimit(`chat:ip:${ip}`, 100, 3_600_000), // 100 / hour per IP
     ];
     const blockedLimit = rateLimits.find((r) => !r.allowed);
     if (blockedLimit) {
@@ -438,6 +438,18 @@ export async function POST(req: NextRequest) {
         crisisMode = true;
         crisisSource = "detected";
         crisisActiveUntil = activeUntil.toISOString();
+
+        // Track CRISIS_DETECTED event
+        await trackSafe({
+          userId,
+          type: "CRISIS_DETECTED",
+          metadata: {
+            riskLevel,
+            source: "detected",
+            activatedAt: new Date().toISOString(),
+            expiresAt: activeUntil.toISOString(),
+          },
+        });
       }
 
       const conversation = await resolveConversationForUser(userId, body.conversationId, message);
@@ -462,6 +474,18 @@ export async function POST(req: NextRequest) {
         conversationId,
         role: "user",
       });
+
+      // Track MESSAGE_SENT event
+      await trackSafe({
+        userId,
+        type: "MESSAGE_SENT",
+        metadata: {
+          conversationId,
+          messageLength: message.length,
+          intent: detectedIntent,
+        },
+      });
+
       conversationMessageCount = await countMessagesForConversation(conversationId);
 
       try {
@@ -547,6 +571,18 @@ export async function POST(req: NextRequest) {
               logInfo("STATE", "goal_action_auto_completed", {
                 userId,
                 goalId: activeGoal.id,
+              });
+
+              // Track ACTION_COMPLETED event
+              await trackSafe({
+                userId,
+                type: "ACTION_COMPLETED",
+                metadata: {
+                  goalId: activeGoal.id,
+                  goalTitle: activeGoal.title,
+                  completedCount: activeGoal.completedCount,
+                  totalCount: activeGoal.totalCount,
+                },
               });
             }
           } else {
@@ -651,6 +687,17 @@ export async function POST(req: NextRequest) {
             logInfo("STATE", "goal_created_from_intent", {
               userId,
               goalId: goalIntentResult.goal.id,
+            });
+
+            // Track GOAL_CREATED event
+            await trackSafe({
+              userId,
+              type: "GOAL_CREATED",
+              metadata: {
+                goalId: goalIntentResult.goal.id,
+                goalTitle: goalIntentResult.goal.title,
+                actionCount: goalIntentResult.goal.totalCount,
+              },
             });
           }
         }
@@ -1043,6 +1090,17 @@ export async function POST(req: NextRequest) {
         }
       }
 
+      // Track MESSAGE_RECEIVED event after assistant response
+      await trackSafe({
+        userId,
+        type: "MESSAGE_RECEIVED",
+        metadata: {
+          conversationId,
+          responseLength: assistantResponse.length,
+          fallback: aiResult.fallback,
+        },
+      });
+
       const activeAction = getFirstPendingAction(activeGoal);
       const jsonResponse = NextResponse.json({
         success: true,
@@ -1177,6 +1235,18 @@ export async function POST(req: NextRequest) {
             });
           }
         }
+
+        // Track MESSAGE_RECEIVED event after streaming completes
+        await trackSafe({
+          userId: streamUserId,
+          type: "MESSAGE_RECEIVED",
+          metadata: {
+            conversationId: streamConversationId,
+            responseLength: finalText.length,
+            fallback: streamFallback,
+            streaming: true,
+          },
+        });
 
         logInfo("AI", "stream_completed", {
           userId: streamUserId,

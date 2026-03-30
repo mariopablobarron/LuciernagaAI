@@ -101,6 +101,18 @@ model DecisionLog {
   @@index([metric, createdAt])
 }
 
+model CrisisEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  level     String
+  message   String
+  response  String
+  createdAt DateTime @default(now())
+
+  @@index([level, createdAt])
+  @@index([userId, createdAt])
+}
+
 model Goal {
   id        String   @id @default(cuid())
   userId    String

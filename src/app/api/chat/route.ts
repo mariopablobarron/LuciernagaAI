@@ -15,6 +15,12 @@ import {
   saveConversationMessage,
 } from "@/services/conversation";
 import { createGoalFromIntentMessage, getActiveGoalForUser } from "@/services/goals";
+import {
+  detectRiskLevel,
+  getCrisisResponse,
+  registerCrisisEvent,
+  type RiskLevel,
+} from "@/services/risk";
 import { detectUserState, updateUserState } from "@/services/state";
 import type { ChatRequestBody, UserState } from "@/types/chat";
 
@@ -64,6 +70,10 @@ function serializeGoal(goal: Awaited<ReturnType<typeof getActiveGoalForUser>>) {
       createdAt: action.createdAt.toISOString(),
     })),
   };
+}
+
+function isCrisisLevel(level: RiskLevel): boolean {
+  return level === "high" || level === "critical";
 }
 
 export async function POST(req: NextRequest) {
@@ -134,7 +144,16 @@ export async function POST(req: NextRequest) {
     }
 
     const state = detectUserState(message);
+    const riskLevel = detectRiskLevel(message);
+    const crisisMode = isCrisisLevel(riskLevel);
+
     logInfo("STATE", "state_detected", { userId, state, messageLength: message.length });
+    logInfo("RISK", "risk_level_detected", {
+      userId,
+      riskLevel,
+      crisisMode,
+    });
+
     let persistenceAvailable = true;
     let activeGoal: Awaited<ReturnType<typeof getActiveGoalForUser>> | null = null;
     let conversationId = body.conversationId?.trim() || `tmp_${Date.now()}`;
@@ -143,15 +162,6 @@ export async function POST(req: NextRequest) {
     try {
       await ensureUserSession(userId);
       await updateUserState(userId, state);
-
-      const goalIntentResult = await createGoalFromIntentMessage({ userId, message });
-      activeGoal = goalIntentResult?.goal ?? (await getActiveGoalForUser(userId));
-      if (goalIntentResult?.created) {
-        logInfo("STATE", "goal_created_from_intent", {
-          userId,
-          goalId: goalIntentResult.goal.id,
-        });
-      }
 
       const conversation = await resolveConversationForUser(userId, body.conversationId, message);
       conversationId = conversation.id;
@@ -175,6 +185,17 @@ export async function POST(req: NextRequest) {
         conversationId,
         role: "user",
       });
+
+      if (!crisisMode) {
+        const goalIntentResult = await createGoalFromIntentMessage({ userId, message });
+        activeGoal = goalIntentResult?.goal ?? (await getActiveGoalForUser(userId));
+        if (goalIntentResult?.created) {
+          logInfo("STATE", "goal_created_from_intent", {
+            userId,
+            goalId: goalIntentResult.goal.id,
+          });
+        }
+      }
     } catch (dbError: unknown) {
       persistenceAvailable = false;
       logError("DB", dbError, {
@@ -182,6 +203,66 @@ export async function POST(req: NextRequest) {
         userId,
         stage: "pre_ai_persistence",
       });
+    }
+
+    if (crisisMode) {
+      const crisisPayload = getCrisisResponse(riskLevel);
+
+      await registerCrisisEvent({
+        userId,
+        level: riskLevel,
+        message,
+        response: crisisPayload.response,
+      });
+
+      if (persistenceAvailable) {
+        try {
+          await saveConversationMessage({
+            conversationId,
+            userId,
+            role: "assistant",
+            content: crisisPayload.response,
+          });
+          logInfo("DB", "message_saved", {
+            userId,
+            conversationId,
+            role: "assistant",
+            crisisMode: true,
+          });
+        } catch (dbError: unknown) {
+          persistenceAvailable = false;
+          logError("DB", dbError, {
+            route: "/api/chat",
+            userId,
+            stage: "crisis_response_persistence",
+          });
+        }
+      }
+
+      logInfo("RISK", "crisis_mode_activated", {
+        userId,
+        conversationId,
+        riskLevel,
+      });
+
+      const crisisResponse = NextResponse.json({
+        success: true,
+        response: crisisPayload.response,
+        state,
+        conversationId,
+        goal: null,
+        fallback: true,
+        persistenceAvailable,
+        crisis: true,
+        riskLevel,
+        alerts: crisisPayload.resources,
+      });
+
+      if (identity.shouldSetCookie) {
+        attachSessionCookie(crisisResponse, identity.sessionToken);
+      }
+
+      return crisisResponse;
     }
 
     if (!process.env.OPENROUTER_API_KEY?.trim()) {

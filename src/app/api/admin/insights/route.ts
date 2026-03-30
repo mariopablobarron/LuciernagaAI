@@ -4,6 +4,7 @@ import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { generateDecision, type DecisionMetrics } from "@/services/decision";
 import { generateInsights, getInsightConfidence } from "@/services/insights";
+import { getRecentCrisisStats } from "@/services/risk";
 import { getDominantState } from "@/services/state";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +15,10 @@ type AlertItem = {
   message: string;
 };
 
-function buildAlerts(metrics: DecisionMetrics): AlertItem[] {
+function buildAlerts(
+  metrics: DecisionMetrics,
+  crisisStats: { total: number; high: number; critical: number }
+): AlertItem[] {
   const alerts: AlertItem[] = [];
 
   if (metrics.retentionDay3 < 0.4) {
@@ -38,6 +42,14 @@ function buildAlerts(metrics: DecisionMetrics): AlertItem[] {
       type: "warning",
       title: "Bloqueo dominante",
       message: "El estado emocional dominante es bloqueo.",
+    });
+  }
+
+  if (crisisStats.total > 0) {
+    alerts.push({
+      type: "critical",
+      title: "Eventos de crisis detectados",
+      message: `Se registraron ${crisisStats.total} evento(s) de riesgo alto/crítico en los últimos 7 días (${crisisStats.critical} críticos).`,
     });
   }
 
@@ -149,6 +161,7 @@ export async function GET(req: NextRequest) {
     const expectedCheckins = Math.max(usersActiveLast7d.length * 7, 1);
     const checkinCompletion = smoothRate(totalCheckinsLast7d, expectedCheckins, 0.35, 6);
     const checkinDrop = Math.max(0, 1 - checkinCompletion);
+    const crisisStats = await getRecentCrisisStats(sevenDaysAgo);
 
     const confidence = getInsightConfidence({
       totalUsers,
@@ -187,7 +200,7 @@ export async function GET(req: NextRequest) {
         activeReturningUsers,
       },
     });
-    const alerts = buildAlerts(metrics);
+    const alerts = buildAlerts(metrics, crisisStats);
 
     const logMetric = getDecisionMetricForLog(metrics);
     await prisma.decisionLog.create({
@@ -206,6 +219,7 @@ export async function GET(req: NextRequest) {
     logInfo("INSIGHT", "admin_insights_generated", {
       alerts: alerts.length,
       insights: insights.length,
+      crisisEvents: crisisStats.total,
     });
 
     return NextResponse.json({

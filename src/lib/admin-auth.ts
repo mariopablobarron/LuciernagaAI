@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import type { NextRequest, NextResponse } from "next/server";
+import { getConfig } from "@/lib/env";
 import { logError } from "@/lib/logger";
 
 type AdminSessionPayload = {
@@ -37,11 +38,14 @@ function base64UrlDecode(value: string): string {
 }
 
 function getAdminSecret(): string {
-  const configuredSecret =
-    process.env.ADMIN_AUTH_SECRET?.trim() || process.env.AUTH_TOKEN_SECRET?.trim();
-
+  const configuredSecret = process.env.ADMIN_AUTH_SECRET?.trim();
   if (configuredSecret) {
     return configuredSecret;
+  }
+
+  const authTokenSecret = getConfig().AUTH_TOKEN_SECRET;
+  if (authTokenSecret) {
+    return authTokenSecret;
   }
 
   if (process.env.NODE_ENV === "production") {
@@ -52,8 +56,9 @@ function getAdminSecret(): string {
 }
 
 function getAdminCredentials(): { username: string; password: string } {
-  const username = process.env.ADMIN_USERNAME?.trim();
-  const password = process.env.ADMIN_PASSWORD?.trim();
+  const { ADMIN_USERNAME, ADMIN_PASSWORD } = getConfig();
+  const username = ADMIN_USERNAME.trim();
+  const password = ADMIN_PASSWORD.trim();
 
   if (username && password) {
     return { username, password };
@@ -145,7 +150,13 @@ export function normalizeAdminNextPath(value: string | null | undefined): string
 export function validateAdminCredentials(username: string, password: string): boolean {
   try {
     const expected = getAdminCredentials();
-    return safeEqual(username, expected.username) && safeEqual(password, expected.password);
+    const providedUsername = username.trim();
+    const providedPassword = password.trim();
+
+    return (
+      safeEqual(providedUsername, expected.username) &&
+      safeEqual(providedPassword, expected.password)
+    );
   } catch (error: unknown) {
     logError("AUTH", error, { area: "validate_admin_credentials" });
     return false;

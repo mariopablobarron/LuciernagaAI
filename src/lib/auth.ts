@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from "crypto";
+import { createHmac, randomUUID, timingSafeEqual } from "crypto";
 import type { NextRequest, NextResponse } from "next/server";
 import { logError, logInfo } from "@/lib/logger";
 
@@ -13,7 +13,7 @@ type TokenVerificationResult =
   | { kind: "expired"; payload: SessionPayload }
   | { kind: "invalid" };
 
-export type IdentitySource = "session" | "generated" | "refreshed";
+export type IdentitySource = "session" | "generated" | "refreshed" | "static";
 
 export type ResolvedIdentity = {
   userId: string;
@@ -33,6 +33,8 @@ const SESSION_COOKIE_NAME = "mw_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 24;
 const SESSION_TTL_MS = SESSION_TTL_SECONDS * 1000;
 const USER_ID_PATTERN = /^[a-zA-Z0-9._:-]{3,64}$/;
+const MVP_STATIC_IDENTITY_ENABLED = process.env.MVP_STATIC_IDENTITY === "true";
+const MVP_STATIC_USER_ID = "demo-user";
 
 function getSessionSecret(): string {
   const authSecret = process.env.AUTH_TOKEN_SECRET?.trim();
@@ -72,6 +74,11 @@ function signValue(input: string): string {
 
 function isValidUserId(value: string): boolean {
   return USER_ID_PATTERN.test(value);
+}
+
+function createGeneratedUserId(): string {
+  const raw = randomUUID().replace(/-/g, "").slice(0, 24);
+  return `usr_${raw}`;
 }
 
 export function issueSessionToken(userId: string): string {
@@ -185,19 +192,21 @@ function getTokenFromRequest(req: NextRequest): {
   };
 }
 
-function buildGeneratedUserId(req: NextRequest): string {
-  const forwardedFor = req.headers.get("x-forwarded-for") || "";
-  const firstIp = forwardedFor.split(",")[0]?.trim() || "unknown";
-  const userAgent = req.headers.get("user-agent") || "unknown";
-  const fingerprint = createHmac("sha1", getSessionSecret())
-    .update(`${firstIp}|${userAgent}`)
-    .digest("hex")
-    .slice(0, 16);
-
-  return `anon_${fingerprint}`;
-}
-
 export function resolveIdentity(req: NextRequest): ResolvedIdentity {
+  if (MVP_STATIC_IDENTITY_ENABLED && process.env.NODE_ENV !== "production") {
+    // ⚠️ MVP MODE: identidad fija para validar persistencia sin login
+    // Reemplazar por auth real en producción
+    logInfo("CHAT", "resolve_identity_mvp_static", {
+      userId: MVP_STATIC_USER_ID,
+    });
+    return {
+      userId: MVP_STATIC_USER_ID,
+      source: "static",
+      sessionToken: "",
+      shouldSetCookie: false,
+    };
+  }
+
   const requestTokenInfo = getTokenFromRequest(req);
   const requestToken = requestTokenInfo.token;
   logInfo("CHAT", "resolve_identity_started", {
@@ -240,18 +249,35 @@ export function resolveIdentity(req: NextRequest): ResolvedIdentity {
     }
   }
 
-  const generatedUserId = buildGeneratedUserId(req);
-  const sessionToken = issueSessionToken(generatedUserId);
-  logInfo("CHAT", "resolve_identity_generated_anonymous_user", {
-    userId: generatedUserId,
-  });
+  // En modo normal, si no hay sesión válida exigimos autenticación explícita.
+  // MVP MODE (opt-in) queda arriba para entornos de demo.
+  throw new InvalidSessionTokenError();
+}
 
-  return {
-    userId: generatedUserId,
-    source: "generated",
-    sessionToken,
-    shouldSetCookie: true,
-  };
+export function bootstrapSessionIdentity(req: NextRequest): ResolvedIdentity {
+  try {
+    return resolveIdentity(req);
+  } catch (error: unknown) {
+    if (!(error instanceof InvalidSessionTokenError)) {
+      throw error;
+    }
+
+    // MVP MODE: solo cuando está explícitamente activo en entorno no productivo.
+    // Fuera de ese modo, bootstrap crea sesión aislada por usuario (sin identidad compartida).
+    const userId = createGeneratedUserId();
+    const sessionToken = issueSessionToken(userId);
+
+    logInfo("CHAT", "bootstrap_session_generated", {
+      userId,
+    });
+
+    return {
+      userId,
+      source: "generated",
+      sessionToken,
+      shouldSetCookie: true,
+    };
+  }
 }
 
 export function attachSessionCookie(res: NextResponse, sessionToken?: string): void {

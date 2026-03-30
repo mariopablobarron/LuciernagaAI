@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Progress } from "@/components/ui/progress";
 import type { EmotionalProfile } from "@/types/emotional-profile";
 

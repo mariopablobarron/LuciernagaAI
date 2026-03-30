@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/Card";
 
 type AdminMetricCardProps = {
   label: string;

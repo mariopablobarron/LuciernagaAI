@@ -5,9 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
 import { SAAS_CONFIG } from "@/lib/saas";
 
 function normalizeNextPath(value: string | null): string {

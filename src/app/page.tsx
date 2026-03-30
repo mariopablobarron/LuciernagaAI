@@ -9,8 +9,8 @@ import HomeWorkspace, { type WorkspaceTab } from "@/components/home/HomeWorkspac
 import InsightsPanel from "@/components/InsightsPanel";
 import Sidebar, { type SidebarConversation } from "@/components/Sidebar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/Input";
 import { PRODUCT_DISCLAIMERS } from "@/lib/legal";
 import {
   bootstrapBrowserSession,
@@ -669,6 +669,65 @@ export default function HomePage() {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function consumeTelegramLink(): Promise<void> {
+      if (typeof window === "undefined") {
+        return;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const telegramLinkToken = params.get("telegram_link")?.trim();
+      if (!telegramLinkToken) {
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/auth/link-telegram", {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token: telegramLinkToken }),
+        });
+
+        const payload = (await response.json().catch(() => ({}))) as {
+          success?: boolean;
+          error?: string;
+        };
+
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.error || "No se pudo vincular Telegram.");
+        }
+
+        if (!cancelled) {
+          await refreshSessionProfile().catch(() => null);
+          setSaveProgressStatus("Telegram vinculado correctamente a esta cuenta.");
+        }
+      } catch (linkError: unknown) {
+        if (!cancelled) {
+          const message =
+            linkError instanceof Error ? linkError.message : "No se pudo vincular Telegram.";
+          setSaveProgressStatus(`Vinculación Telegram: ${message}`);
+        }
+      } finally {
+        if (!cancelled) {
+          const nextUrl = new URL(window.location.href);
+          nextUrl.searchParams.delete("telegram_link");
+          window.history.replaceState({}, "", nextUrl.pathname + nextUrl.search);
+        }
+      }
+    }
+
+    void consumeTelegramLink();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {

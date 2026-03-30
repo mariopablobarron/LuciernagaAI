@@ -6,8 +6,8 @@ import { usePathname } from "next/navigation";
 import { LogOut, ShieldCheck, Sparkles } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
 import { Separator } from "@/components/ui/separator";
 import { SAAS_ADMIN_NAV, SAAS_CONFIG } from "@/lib/saas";
 
@@ -30,7 +30,7 @@ export function AdminShell({
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,color-mix(in_oklab,var(--accent)_18%,transparent),transparent_30%),linear-gradient(180deg,color-mix(in_oklab,var(--background)_94%,white_6%),var(--background))] p-4 text-foreground md:p-6">
-      <div className="mx-auto max-w-425 space-y-6">
+      <div className="mx-auto max-w-md space-y-6">
         <Card className="overflow-hidden border-border/80 bg-card/90 shadow-lg shadow-black/5 backdrop-blur">
           <CardContent className="space-y-5 p-5 md:p-6">
             <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">

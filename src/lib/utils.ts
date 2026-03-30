@@ -9,23 +9,28 @@ export function getErrorMessage(error: unknown): string {
   if (error instanceof Error && error.message) {
     return error.message;
   }
+
   return "Unknown error";
 }
 
-export async function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
-  let timeoutId: NodeJS.Timeout | undefined;
+export async function withTimeout<T>(
+  promise: Promise<T>,
+  timeoutMs: number,
+  timeoutMessage = "Operation timed out"
+): Promise<T> {
+  let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
 
   const timeoutPromise = new Promise<never>((_, reject) => {
-    timeoutId = setTimeout(() => {
-      reject(new Error(`Request timeout after ${timeoutMs}ms`));
+    timeoutHandle = setTimeout(() => {
+      reject(new Error(timeoutMessage));
     }, timeoutMs);
   });
 
   try {
     return await Promise.race([promise, timeoutPromise]);
   } finally {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
+    if (timeoutHandle) {
+      clearTimeout(timeoutHandle);
     }
   }
 }

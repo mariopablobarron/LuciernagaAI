@@ -141,13 +141,13 @@ export async function GET(req: NextRequest) {
       where: { createdAt: { gte: threeDaysAgo } },
     });
 
-    const usersWithCheckinDay3 = await prisma.dailyCheckin.findMany({
+    const usersWithCheckinDay3: Array<{ userId: string }> = await prisma.dailyCheckin.findMany({
       where: { createdAt: { gte: threeDaysAgo } },
       select: { userId: true },
       distinct: ["userId"],
     });
 
-    const usersActiveLast7d = await prisma.dailyCheckin.findMany({
+    const usersActiveLast7d: Array<{ userId: string }> = await prisma.dailyCheckin.findMany({
       where: { createdAt: { gte: sevenDaysAgo } },
       select: { userId: true },
       distinct: ["userId"],

@@ -1,24 +1,14 @@
-"use client";
-
-import { useState, type ReactNode } from "react";
-import { PanelLeftOpen, PanelRightOpen, Sparkles } from "lucide-react";
-import LayoutSidebar from "@/components/layout/Sidebar";
-import RightPanel from "@/components/layout/RightPanel";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent } from "@/components/ui/Card";
-import { Separator } from "@/components/ui/separator";
-import { SAAS_CONFIG } from "@/lib/saas";
+import type { ReactNode } from "react";
 
 type AppLayoutProps = {
-  title: string;
-  subtitle: string;
+  title?: string;
+  subtitle?: string;
   summary?: ReactNode;
   prelude?: ReactNode;
-  sidebar: ReactNode;
-  main: ReactNode;
-  rightPanel: ReactNode;
+  sidebar?: ReactNode;
+  main?: ReactNode;
+  rightPanel?: ReactNode;
+  children?: ReactNode;
 };
 
 export default function AppLayout({
@@ -29,82 +19,35 @@ export default function AppLayout({
   sidebar,
   main,
   rightPanel,
+  children,
 }: AppLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [rightPanelOpen, setRightPanelOpen] = useState(false);
+  const mainContent = main ?? children;
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_color-mix(in_oklab,var(--accent)_16%,transparent),transparent_28%),linear-gradient(180deg,color-mix(in_oklab,var(--background)_94%,white_6%),var(--background))] text-foreground">
-      <div className="mx-auto flex min-h-screen max-w-[1800px] flex-col gap-4 p-3 md:p-4 xl:p-6">
-        <Card className="overflow-hidden border-border/80 bg-card/85 shadow-lg shadow-black/5 backdrop-blur">
-          <CardContent className="space-y-5 p-4 md:p-6">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-              <div className="max-w-3xl">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="secondary" className="gap-1 rounded-full px-3 py-1">
-                    <Sparkles className="size-3.5" />
-                    {SAAS_CONFIG.name}
-                  </Badge>
-                  <Badge variant="success" className="rounded-full px-3 py-1">
-                    Conversación guiada
-                  </Badge>
-                </div>
-                <h1 className="mt-3 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
-                  {title}
-                </h1>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
-                  {subtitle}
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="lg:hidden"
-                  onClick={() => setSidebarOpen(true)}
-                >
-                  <PanelLeftOpen className="size-4" />
-                  Conversaciones
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="xl:hidden"
-                  onClick={() => setRightPanelOpen(true)}
-                >
-                  <PanelRightOpen className="size-4" />
-                  Contexto
-                </Button>
-                <ThemeToggle />
-              </div>
-            </div>
-
-            {summary ? (
-              <>
-                <Separator />
-                <div className="flex flex-wrap items-center gap-2 text-sm">{summary}</div>
-              </>
+    <div className="min-h-screen bg-background px-3 py-4 text-foreground sm:px-4 lg:px-6">
+      <div className="mx-auto w-full max-w-450 space-y-4">
+        {title || subtitle || summary ? (
+          <header className="rounded-3xl border border-border/80 bg-card/95 p-5 shadow-sm">
+            {title ? (
+              <h1 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h1>
             ) : null}
-          </CardContent>
-        </Card>
+            {subtitle ? (
+              <p className="mt-2 max-w-5xl text-sm text-muted-foreground">{subtitle}</p>
+            ) : null}
+            {summary ? (
+              <div className="mt-4 flex flex-wrap items-center gap-2">{summary}</div>
+            ) : null}
+          </header>
+        ) : null}
 
-        {prelude ? <div className="space-y-4">{prelude}</div> : null}
+        {prelude ? <section className="space-y-4">{prelude}</section> : null}
 
-        <div className="flex min-h-[32rem] flex-1 flex-col gap-4 lg:grid lg:grid-cols-[18rem_minmax(0,1fr)] xl:grid-cols-[18rem_minmax(0,1fr)_22rem]">
-          <LayoutSidebar open={sidebarOpen} onOpenChange={setSidebarOpen}>
-            {sidebar}
-          </LayoutSidebar>
-
-          <div className="min-h-[32rem] lg:min-h-0">{main}</div>
-
-          <RightPanel open={rightPanelOpen} onOpenChange={setRightPanelOpen}>
-            {rightPanel}
-          </RightPanel>
-        </div>
+        <section className="grid min-h-[72vh] gap-4 xl:grid-cols-[320px_minmax(0,1fr)_360px]">
+          {sidebar ? <aside className="min-h-0">{sidebar}</aside> : null}
+          <main className="min-h-0">{mainContent}</main>
+          {rightPanel ? <aside className="min-h-0">{rightPanel}</aside> : null}
+        </section>
       </div>
-    </main>
+    </div>
   );
 }

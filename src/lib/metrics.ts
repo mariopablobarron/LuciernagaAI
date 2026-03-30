@@ -12,23 +12,20 @@ export async function getActionCompletionRate(
 ): Promise<number> {
   const prisma = getPrismaClient();
   const since = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000);
+  const byUser = userId.trim().length > 0;
 
   const [totalCreated, totalCompleted] = await Promise.all([
     prisma.action.count({
       where: {
         createdAt: { gte: since },
-        goal: {
-          userId,
-        },
+        ...(byUser ? { goal: { userId } } : {}),
       },
     }),
     prisma.action.count({
       where: {
         completed: true,
         createdAt: { gte: since },
-        goal: {
-          userId,
-        },
+        ...(byUser ? { goal: { userId } } : {}),
       },
     }),
   ]);
@@ -46,20 +43,19 @@ export async function getActionCompletionRate(
 export async function getAvoidanceRate(userId: string, daysBack: number = 7): Promise<number> {
   const prisma = getPrismaClient();
   const since = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000);
+  const byUser = userId.trim().length > 0;
 
   const [totalActions, totalAvoidance] = await Promise.all([
     prisma.action.count({
       where: {
         createdAt: { gte: since },
-        goal: {
-          userId,
-        },
+        ...(byUser ? { goal: { userId } } : {}),
       },
     }),
     prisma.avoidanceEvent.count({
       where: {
-        userId,
         createdAt: { gte: since },
+        ...(byUser ? { userId } : {}),
       },
     }),
   ]);
@@ -311,7 +307,7 @@ export async function getActionsPerConversation(daysBack: number = 7) {
 
     return {
       totalSuggested,
-      totalConversations: totalConversations || 1, // evita división por cero
+      totalConversations,
       actionsPerConversation: totalConversations > 0 ? totalSuggested / totalConversations : 0,
     };
   } catch {

@@ -486,6 +486,17 @@ export async function POST(req: NextRequest) {
         },
       });
 
+      if (state === "claridad") {
+        await trackSafe({
+          userId,
+          type: "VALUE_MOMENT_DETECTED",
+          metadata: {
+            source: "clarity_state",
+            conversationId,
+          },
+        });
+      }
+
       conversationMessageCount = await countMessagesForConversation(conversationId);
 
       try {
@@ -578,12 +589,36 @@ export async function POST(req: NextRequest) {
                 userId,
                 type: "ACTION_COMPLETED",
                 metadata: {
+                  actionId: pendingActionBeforeTurn?.id,
+                  actionDescription: pendingActionBeforeTurn?.description,
                   goalId: activeGoal.id,
                   goalTitle: activeGoal.title,
                   completedCount: activeGoal.completedCount,
                   totalCount: activeGoal.totalCount,
+                  conversationId,
                 },
               });
+
+              await trackSafe({
+                userId,
+                type: "VALUE_MOMENT_DETECTED",
+                metadata: {
+                  source: "action_completed",
+                  goalId: activeGoal.id,
+                  conversationId,
+                },
+              });
+
+              if (goalAvoidanceCount > 0 && pendingActionBeforeTurn) {
+                await trackSafe({
+                  userId,
+                  type: "REENGAGEMENT_SUCCESS",
+                  metadata: {
+                    actionId: pendingActionBeforeTurn.id,
+                    conversationId,
+                  },
+                });
+              }
             }
           } else {
             if (postponeIntent) {
@@ -628,6 +663,16 @@ export async function POST(req: NextRequest) {
             }
 
             if (!shouldBypassActionLock(state)) {
+              await trackSafe({
+                userId,
+                type: "AVOIDANCE_CONFRONTED",
+                metadata: {
+                  actionId: pendingAction.id,
+                  reason: "not_completed",
+                  conversationId,
+                },
+              });
+
               actionLockAssistantMessage = buildActionRequiredMessage({
                 actionTitle: pendingAction.description,
                 goalTitle: activeGoal?.title ?? null,
@@ -697,6 +742,17 @@ export async function POST(req: NextRequest) {
                 goalId: goalIntentResult.goal.id,
                 goalTitle: goalIntentResult.goal.title,
                 actionCount: goalIntentResult.goal.totalCount,
+                conversationId,
+              },
+            });
+
+            await trackSafe({
+              userId,
+              type: "VALUE_MOMENT_DETECTED",
+              metadata: {
+                source: "goal_created",
+                goalId: goalIntentResult.goal.id,
+                conversationId,
               },
             });
           }
@@ -706,6 +762,20 @@ export async function POST(req: NextRequest) {
         actionGeneratedThisTurn = Boolean(
           pendingActionAfterGoalResolution && (!pendingActionBeforeTurn || goalCreatedThisTurn)
         );
+
+        if (actionGeneratedThisTurn && pendingActionAfterGoalResolution) {
+          await trackSafe({
+            userId,
+            type: "ACTION_SUGGESTED",
+            metadata: {
+              actionId: pendingActionAfterGoalResolution.id,
+              actionText: pendingActionAfterGoalResolution.description,
+              goalId: activeGoal?.id,
+              conversationId,
+              source: "chat",
+            },
+          });
+        }
 
         transformationPhase = inferTransformationPhase({
           state,

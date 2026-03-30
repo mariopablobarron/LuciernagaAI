@@ -28,6 +28,18 @@ interface TrackEventParams {
 }
 
 /**
+ * Metadata recomendada por tipo de evento (documentación operativa):
+ * - MESSAGE_SENT: { conversationId, messageLength, intent }
+ * - MESSAGE_RECEIVED: { conversationId, responseLength, fallback, streaming? }
+ * - ACTION_SUGGESTED: { actionId, actionText, goalId?, conversationId, source }
+ * - ACTION_COMPLETED: { actionId, actionDescription?, goalId, goalTitle, completedCount, totalCount, conversationId }
+ * - GOAL_CREATED: { goalId, goalTitle, actionCount, conversationId }
+ * - VALUE_MOMENT_DETECTED: { source: "goal_created" | "action_completed" | "clarity_state", goalId?, conversationId }
+ * - AVOIDANCE_CONFRONTED: { actionId, reason, conversationId }
+ * - REENGAGEMENT_SUCCESS: { actionId, conversationId }
+ */
+
+/**
  * Registra un evento en la base de datos.
  * Lanza errores si falla.
  */

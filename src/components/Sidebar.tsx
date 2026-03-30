@@ -162,6 +162,23 @@ export default function Sidebar({
             <Link href={adminAuthenticated ? "/admin" : "/admin/login?next=/admin"}>Admin</Link>
           </Button>
         </div>
+
+        <Link
+          href="/impulso"
+          className={`flex items-center justify-between rounded-2xl border px-4 py-3 text-sm transition hover:border-amber-400/60 hover:bg-amber-400/5 ${
+            pathname.startsWith("/impulso")
+              ? "border-amber-400/40 bg-amber-400/10 text-amber-400"
+              : "border-border bg-muted/30 text-foreground"
+          }`}
+        >
+          <div>
+            <p className="font-semibold leading-snug">⚡ Modo Impulso</p>
+            <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">
+              Diagnóstico, retos personalizados y racha diaria para convertir intención en ejecución.
+            </p>
+          </div>
+          <ArrowRight className="ml-3 size-4 shrink-0 text-muted-foreground" />
+        </Link>
       </div>
 
       <Separator className="my-4" />

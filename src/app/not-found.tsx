@@ -2,20 +2,22 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-white p-4">
-      <div className="max-w-md w-full text-center">
-        <div className="text-6xl mb-4">🗺️</div>
-        <h1 className="text-4xl font-bold text-gray-800 mb-2">404</h1>
-        <p className="text-gray-600 mb-4">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,color-mix(in_oklab,var(--accent)_16%,transparent),transparent_28%),linear-gradient(180deg,color-mix(in_oklab,var(--background)_96%,white_4%),var(--background))] p-4">
+      <div className="mx-auto flex min-h-screen max-w-md items-center justify-center">
+        <div className="w-full rounded-3xl border border-border/80 bg-card/95 p-8 text-center shadow-sm">
+          <div className="mb-4 text-6xl">🗺️</div>
+          <h1 className="mb-2 text-4xl font-bold text-foreground">404</h1>
+          <p className="mb-4 text-muted-foreground">
           Esta página no existe. Pero el resto del sitio sí.
-        </p>
-        <Link
-          href="/"
-          className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition"
-        >
-          ← Volver al inicio
-        </Link>
+          </p>
+          <Link
+            href="/"
+            className="inline-flex rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground transition hover:bg-primary/90"
+          >
+            ← Volver al inicio
+          </Link>
+        </div>
       </div>
-    </div>
+    </main>
   );
 }

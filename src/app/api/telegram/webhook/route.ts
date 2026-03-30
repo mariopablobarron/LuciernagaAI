@@ -142,6 +142,15 @@ async function sendTelegramMessage(chatId: number, text: string): Promise<void> 
 // ---- Webhook handler ----
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
+  // Verify Telegram webhook secret if configured
+  const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
+  if (webhookSecret) {
+    const incomingSecret = req.headers.get("x-telegram-bot-api-secret-token");
+    if (incomingSecret !== webhookSecret) {
+      return NextResponse.json({ ok: false }, { status: 401 });
+    }
+  }
+
   let chatId: number | undefined;
 
   try {

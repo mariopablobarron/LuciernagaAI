@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
 type Action = {
@@ -110,7 +110,7 @@ export default function DashboardPage() {
   if (error) {
     return (
       <div className="flex h-full items-center justify-center">
-        <div className="rounded-2xl border border-red-200 bg-red-50 px-6 py-4 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-100">
+        <div className="rounded-2xl border border-signal-danger/30 bg-signal-danger/12 px-6 py-4 text-sm text-foreground">
           {error}
         </div>
       </div>
@@ -219,7 +219,7 @@ export default function DashboardPage() {
                   key={action.id}
                   className="flex items-start gap-3 rounded-xl border border-border bg-muted/30 px-4 py-3 text-sm"
                 >
-                  <span className="mt-0.5 inline-block size-2.5 shrink-0 rounded-full bg-amber-400" />
+                  <span className="mt-0.5 inline-block size-2.5 shrink-0 rounded-full bg-signal-warning" />
                   <span className="text-foreground">{action.description}</span>
                 </li>
               ))}
@@ -241,9 +241,9 @@ export default function DashboardPage() {
                 key={i}
                 className={`rounded-xl border px-4 py-3 text-sm ${
                   insight.severity === "high"
-                    ? "border-red-200 bg-red-50 text-red-900 dark:border-red-900 dark:bg-red-950/40 dark:text-red-100"
+                    ? "border-signal-danger/30 bg-signal-danger/12 text-foreground"
                     : insight.severity === "medium"
-                      ? "border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100"
+                      ? "border-signal-warning/30 bg-signal-warning/12 text-foreground"
                       : "border-border bg-muted/40 text-foreground"
                 }`}
               >

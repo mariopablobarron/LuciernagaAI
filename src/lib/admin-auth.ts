@@ -56,9 +56,8 @@ function getAdminSecret(): string {
 }
 
 function getAdminCredentials(): { username: string; password: string } {
-  const { ADMIN_USERNAME, ADMIN_PASSWORD } = getConfig();
-  const username = ADMIN_USERNAME.trim();
-  const password = ADMIN_PASSWORD.trim();
+  const username = process.env.ADMIN_USERNAME?.trim() ?? "";
+  const password = process.env.ADMIN_PASSWORD?.trim() ?? "";
 
   if (username && password) {
     return { username, password };

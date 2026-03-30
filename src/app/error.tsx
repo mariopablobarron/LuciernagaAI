@@ -17,16 +17,16 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-red-50 to-white p-4">
-      <div className="max-w-md w-full">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,color-mix(in_oklab,var(--signal-danger)_18%,transparent),transparent_28%),linear-gradient(180deg,color-mix(in_oklab,var(--background)_96%,white_4%),var(--background))] p-4">
+      <div className="mx-auto w-full max-w-md rounded-3xl border border-border/80 bg-card/95 p-8 shadow-sm">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-red-600 mb-2">⚠️ Algo salió mal</h1>
-          <p className="text-gray-600 text-sm mb-6">
+          <h1 className="mb-2 text-4xl font-bold text-foreground">⚠️ Algo salió mal</h1>
+          <p className="mb-6 text-sm text-muted-foreground">
             Ocurrió un error inesperado. No es tu culpa. Intenta de nuevo.
           </p>
           
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 text-left">
-            <p className="text-xs text-red-700 font-mono break-words">
+          <div className="mb-6 rounded-lg border border-signal-danger/30 bg-signal-danger/12 p-4 text-left">
+            <p className="break-words font-mono text-xs text-foreground">
               {error.message || "Error desconocido"}
             </p>
           </div>
@@ -34,13 +34,13 @@ export default function Error({
           <div className="flex gap-3">
             <button
               onClick={() => reset()}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition"
+              className="flex-1 rounded-lg bg-primary px-4 py-2 font-semibold text-primary-foreground transition hover:bg-primary/90"
             >
               🔄 Reintentar
             </button>
             <button
               onClick={() => window.location.href = "/"}
-              className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-lg transition"
+              className="flex-1 rounded-lg border border-border bg-secondary px-4 py-2 font-semibold text-secondary-foreground transition hover:bg-secondary/80"
             >
               🏠 Inicio
             </button>
@@ -49,9 +49,9 @@ export default function Error({
 
         {/* Debug info (only in dev) */}
         {process.env.NODE_ENV === "development" && (
-          <div className="mt-8 bg-gray-100 p-4 rounded text-xs">
-            <p className="font-bold text-gray-700 mb-2">🐛 Debug Info:</p>
-            <pre className="text-gray-600 overflow-auto max-h-32">
+          <div className="mt-8 rounded border border-border bg-muted/40 p-4 text-xs">
+            <p className="mb-2 font-bold text-foreground">🐛 Debug Info:</p>
+            <pre className="max-h-32 overflow-auto text-muted-foreground">
               {JSON.stringify(
                 {
                   message: error.message,

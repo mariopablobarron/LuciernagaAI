@@ -260,11 +260,11 @@ export async function getActionsPerConversation(daysBack: number = 7) {
   const since = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000);
 
   try {
-    // Contar eventos ACTION_SUGGESTED únicos
+    // Contar eventos ACTION_CREATED únicos
     const actionSuggested = await prisma.event.groupBy({
       by: ["userId"],
       where: {
-        type: "ACTION_SUGGESTED",
+        type: "ACTION_CREATED",
         createdAt: { gte: since },
       },
       _count: true,
@@ -273,7 +273,7 @@ export async function getActionsPerConversation(daysBack: number = 7) {
     // Contar IDs únicos de conversación (via metadata.conversationId)
     const allActionEvents = await prisma.event.findMany({
       where: {
-        type: "ACTION_SUGGESTED",
+        type: "ACTION_CREATED",
         createdAt: { gte: since },
       },
       select: {

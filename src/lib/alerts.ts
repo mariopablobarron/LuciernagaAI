@@ -1,5 +1,13 @@
 // Sistema de alertas para Telegram y Email
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 export interface Alert {
   type: "critical" | "warning" | "info";
   title: string;
@@ -97,8 +105,8 @@ async function sendEmail(alert: Alert): Promise<void> {
 
   const subject = `${alert.type.toUpperCase()} - ${alert.title}`;
   const htmlContent = `
-    <h2>${alert.title}</h2>
-    <p>${alert.message}</p>
+    <h2>${escapeHtml(alert.title)}</h2>
+    <p>${escapeHtml(alert.message)}</p>
     ${alert.metric ? `<p><strong>${alert.metric}:</strong> ${alert.value}</p>` : ""}
     <hr>
     <p>Luciérnaga Decision Engine</p>

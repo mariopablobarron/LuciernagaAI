@@ -9,8 +9,8 @@ import HomeWorkspace, { type WorkspaceTab } from "@/components/home/HomeWorkspac
 import InsightsPanel from "@/components/InsightsPanel";
 import Sidebar, { type SidebarConversation } from "@/components/Sidebar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent } from "@/components/ui/Card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/Input";
+import { Input } from "@/components/ui/input";
 import { PRODUCT_DISCLAIMERS } from "@/lib/legal";
 import {
   bootstrapBrowserSession,
@@ -1869,7 +1869,7 @@ export default function HomePage() {
               </label>
 
               {saveProgressStatus ? (
-                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-3 text-sm text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-100">
+                <div className="rounded-2xl border border-signal-success/30 bg-signal-success/12 px-3 py-3 text-sm text-foreground">
                   {saveProgressStatus}
                 </div>
               ) : null}

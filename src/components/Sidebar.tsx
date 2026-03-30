@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
 import { ArrowRight, LogOut, Plus, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -165,9 +165,9 @@ export default function Sidebar({
 
         <Link
           href="/impulso"
-          className={`flex items-center justify-between rounded-2xl border px-4 py-3 text-sm transition hover:border-amber-400/60 hover:bg-amber-400/5 ${
+          className={`flex items-center justify-between rounded-2xl border px-4 py-3 text-sm transition hover:border-signal-warning/50 hover:bg-signal-warning/10 ${
             pathname.startsWith("/impulso")
-              ? "border-amber-400/40 bg-amber-400/10 text-amber-400"
+              ? "border-signal-warning/40 bg-signal-warning/12 text-foreground"
               : "border-border bg-muted/30 text-foreground"
           }`}
         >
@@ -294,7 +294,7 @@ export default function Sidebar({
                     >
                       <span
                         className={`mt-1 inline-block h-2.5 w-2.5 rounded-full ${
-                          action.completed ? "bg-emerald-500" : "bg-amber-400"
+                          action.completed ? "bg-signal-success" : "bg-signal-warning"
                         }`}
                       />
                       <span
@@ -310,7 +310,7 @@ export default function Sidebar({
                   ))}
                 </div>
                 {actionLock ? (
-                  <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
+                  <div className="mt-3 rounded-xl border border-signal-warning/30 bg-signal-warning/12 px-3 py-3 text-sm text-foreground">
                     <p className="font-semibold">{actionLock.actionTitle}</p>
                     <p className="mt-1">{actionLock.message}</p>
                   </div>

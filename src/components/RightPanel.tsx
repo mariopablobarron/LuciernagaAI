@@ -1,8 +1,19 @@
-import { Card } from "@/components/ui/Card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 
-export default function RightPanel({ goal }: any) {
+type Goal = {
+  title?: string;
+  progress?: number;
+  completed?: number;
+  total?: number;
+};
+
+type RightPanelProps = {
+  goal?: Goal | null;
+};
+
+export default function RightPanel({ goal }: RightPanelProps) {
   return (
     <div className="hidden w-80 border-l p-4 lg:block">
       <Card className="space-y-3 p-4">

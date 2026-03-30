@@ -1,4 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { generateDecision as generateDomainDecision } from "@/domain/decisionEngine";
+import type {
+  Decision as DomainDecision,
+  Insight as DomainInsight,
+  UserState as DomainUserState,
+} from "@/domain/types";
+import { buildUserState } from "@/domain/userStateEngine";
 import {
   attachSessionCookie,
   clearSessionCookie,
@@ -220,6 +227,28 @@ function buildHardPaywallMessage(): string {
   ].join("\n");
 }
 
+function mapRiskLevelToCrisisCount(level: RiskLevel): number {
+  return level === "high" || level === "critical" ? 1 : 0;
+}
+
+function buildChatInsight(params: {
+  retentionDay3?: number;
+  retentionDay7?: number;
+  checkinDrop?: number;
+  avoidanceRate?: number;
+  actionCompletionRate?: number;
+  crisisCount?: number;
+}): DomainInsight {
+  return {
+    retentionDay3: params.retentionDay3 ?? 0.5,
+    retentionDay7: params.retentionDay7 ?? 0.5,
+    checkinDrop: params.checkinDrop ?? 0.4,
+    avoidanceRate: params.avoidanceRate ?? 0,
+    actionCompletionRate: params.actionCompletionRate ?? 0.4,
+    crisisCount: params.crisisCount ?? 0,
+  };
+}
+
 export async function POST(req: NextRequest) {
   try {
     logInfo("CHAT", "request_received", {
@@ -392,6 +421,11 @@ export async function POST(req: NextRequest) {
     let actionCompletedThisTurn = false;
     let conversationMessageCount = 0;
     let conversionTrigger = state === "claridad";
+    let domainInsight = buildChatInsight({
+      crisisCount: mapRiskLevelToCrisisCount(riskLevel),
+    });
+    let domainState: DomainUserState = buildUserState(domainInsight);
+    let domainDecision: DomainDecision = generateDomainDecision(domainState, domainInsight);
     let transformationPhase: ReturnType<typeof inferTransformationPhase> = "bloqueo";
     let transformationSummary = "";
     let mentorMode: ReturnType<typeof getMentorMode> = {
@@ -489,9 +523,10 @@ export async function POST(req: NextRequest) {
       if (state === "claridad") {
         await trackSafe({
           userId,
-          type: "VALUE_MOMENT_DETECTED",
+          type: "MESSAGE_RECEIVED",
           metadata: {
             source: "clarity_state",
+            signal: "value_moment",
             conversationId,
           },
         });
@@ -601,7 +636,7 @@ export async function POST(req: NextRequest) {
 
               await trackSafe({
                 userId,
-                type: "VALUE_MOMENT_DETECTED",
+                type: "ACTION_COMPLETED",
                 metadata: {
                   source: "action_completed",
                   goalId: activeGoal.id,
@@ -612,9 +647,10 @@ export async function POST(req: NextRequest) {
               if (goalAvoidanceCount > 0 && pendingActionBeforeTurn) {
                 await trackSafe({
                   userId,
-                  type: "REENGAGEMENT_SUCCESS",
+                  type: "ACTION_COMPLETED",
                   metadata: {
                     actionId: pendingActionBeforeTurn.id,
+                    source: "reengagement_success",
                     conversationId,
                   },
                 });
@@ -665,7 +701,7 @@ export async function POST(req: NextRequest) {
             if (!shouldBypassActionLock(state)) {
               await trackSafe({
                 userId,
-                type: "AVOIDANCE_CONFRONTED",
+                type: "AVOIDANCE_DETECTED",
                 metadata: {
                   actionId: pendingAction.id,
                   reason: "not_completed",
@@ -748,7 +784,7 @@ export async function POST(req: NextRequest) {
 
             await trackSafe({
               userId,
-              type: "VALUE_MOMENT_DETECTED",
+              type: "GOAL_CREATED",
               metadata: {
                 source: "goal_created",
                 goalId: goalIntentResult.goal.id,
@@ -766,7 +802,7 @@ export async function POST(req: NextRequest) {
         if (actionGeneratedThisTurn && pendingActionAfterGoalResolution) {
           await trackSafe({
             userId,
-            type: "ACTION_SUGGESTED",
+            type: "ACTION_CREATED",
             metadata: {
               actionId: pendingActionAfterGoalResolution.id,
               actionText: pendingActionAfterGoalResolution.description,
@@ -817,6 +853,25 @@ export async function POST(req: NextRequest) {
           conversionTrigger,
         });
         await updateUserTransformationPhase(userId, transformationPhase);
+
+        const totalActions = activeGoal?.totalCount ?? 0;
+        const completedActions = activeGoal?.completedCount ?? 0;
+        const pendingActions = Math.max(totalActions - completedActions, 0);
+        const actionCompletionRate = totalActions > 0 ? completedActions / totalActions : 0;
+        const avoidanceRate =
+          totalActions > 0 ? Math.min(1, goalAvoidanceCount / Math.max(totalActions, 1)) : 0;
+        const checkinDropProxy = Math.min(1, pendingActions / Math.max(totalActions, 1));
+
+        domainInsight = buildChatInsight({
+          retentionDay3: transformationPhase === "bloqueo" ? 0.3 : 0.55,
+          retentionDay7: transformationPhase === "accion" ? 0.7 : 0.5,
+          checkinDrop: checkinDropProxy,
+          avoidanceRate,
+          actionCompletionRate,
+          crisisCount: mapRiskLevelToCrisisCount(riskLevel),
+        });
+        domainState = buildUserState(domainInsight);
+        domainDecision = generateDomainDecision(domainState, domainInsight);
       }
     } catch (dbError: unknown) {
       persistenceAvailable = false;
@@ -961,6 +1016,16 @@ export async function POST(req: NextRequest) {
         type: "crisis",
         response: crisisPayload.response,
         state,
+        userState: "CRISIS",
+        decision: generateDomainDecision(
+          "CRISIS",
+          buildChatInsight({
+            crisisCount: 1,
+            checkinDrop: 1,
+            retentionDay3: 0.1,
+            retentionDay7: 0.1,
+          })
+        ),
         conversationId,
         goal: null,
         emotionalProfile,
@@ -1168,6 +1233,8 @@ export async function POST(req: NextRequest) {
           conversationId,
           responseLength: assistantResponse.length,
           fallback: aiResult.fallback,
+          userState: domainState,
+          decisionType: domainDecision.type,
         },
       });
 
@@ -1176,6 +1243,8 @@ export async function POST(req: NextRequest) {
         success: true,
         response: assistantResponse,
         state,
+        userState: domainState,
+        decision: domainDecision,
         conversationId,
         goal: serializeGoal(activeGoal),
         action:
@@ -1209,6 +1278,8 @@ export async function POST(req: NextRequest) {
     const metaPayload = {
       success: true,
       state,
+      userState: domainState,
+      decision: domainDecision,
       conversationId,
       goal: serializeGoal(activeGoal),
       action:
@@ -1315,6 +1386,8 @@ export async function POST(req: NextRequest) {
             responseLength: finalText.length,
             fallback: streamFallback,
             streaming: true,
+            userState: domainState,
+            decisionType: domainDecision.type,
           },
         });
 

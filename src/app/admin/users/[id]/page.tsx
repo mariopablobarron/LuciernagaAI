@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, MessageSquareText, ShieldAlert, Target } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 
@@ -220,8 +220,8 @@ export default function AdminUserDetailPage() {
       </div>
 
       {error ? (
-        <Card className="border-rose-200 bg-rose-50">
-          <CardContent className="p-4 text-rose-800">{error}</CardContent>
+        <Card className="border-signal-danger/30 bg-signal-danger/12">
+          <CardContent className="p-4 text-foreground">{error}</CardContent>
         </Card>
       ) : null}
 
@@ -278,11 +278,15 @@ export default function AdminUserDetailPage() {
                 </div>
                 <div className="rounded-xl border border-border bg-muted/35 px-3 py-2">
                   <p className="text-xs text-muted-foreground">Crisis 7d</p>
-                  <p className="font-semibold text-rose-700">{data.activity7d.crisisEvents}</p>
+                  <p className="font-semibold text-[color:color-mix(in_oklab,var(--signal-danger)_60%,var(--foreground))]">
+                    {data.activity7d.crisisEvents}
+                  </p>
                 </div>
                 <div className="rounded-xl border border-border bg-muted/35 px-3 py-2">
                   <p className="text-xs text-muted-foreground">Evasión 7d</p>
-                  <p className="font-semibold text-amber-700">{data.activity7d.avoidanceEvents}</p>
+                  <p className="font-semibold text-[color:color-mix(in_oklab,var(--signal-warning)_60%,var(--foreground))]">
+                    {data.activity7d.avoidanceEvents}
+                  </p>
                 </div>
               </div>
 
@@ -467,16 +471,16 @@ export default function AdminUserDetailPage() {
                   data.crisisEvents.map((event) => (
                     <div
                       key={event.id}
-                      className="rounded-xl border border-rose-200 bg-rose-50/60 p-3"
+                      className="rounded-xl border border-signal-danger/30 bg-signal-danger/12 p-3"
                     >
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge variant="danger">{event.level}</Badge>
-                        <span className="text-xs text-rose-900/70">
+                        <span className="text-xs text-muted-foreground">
                           {formatDate(event.createdAt)}
                         </span>
                       </div>
-                      <p className="mt-2 text-sm text-rose-950">{event.message}</p>
-                      <p className="mt-1 text-xs text-rose-900/80">Respuesta: {event.response}</p>
+                      <p className="mt-2 text-sm text-foreground">{event.message}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">Respuesta: {event.response}</p>
                     </div>
                   ))
                 )}
@@ -494,17 +498,17 @@ export default function AdminUserDetailPage() {
                   data.avoidanceEvents.map((event) => (
                     <div
                       key={event.id}
-                      className="rounded-xl border border-amber-200 bg-amber-50/60 p-3"
+                      className="rounded-xl border border-signal-warning/30 bg-signal-warning/12 p-3"
                     >
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge variant="warning">{event.type}</Badge>
-                        <span className="text-xs text-amber-900/70">
+                        <span className="text-xs text-muted-foreground">
                           {formatDate(event.createdAt)}
                         </span>
                       </div>
-                      <p className="mt-2 text-sm text-amber-950">{event.action.description}</p>
+                      <p className="mt-2 text-sm text-foreground">{event.action.description}</p>
                       {event.action.goalTitle ? (
-                        <p className="mt-1 text-xs text-amber-900/80">
+                        <p className="mt-1 text-xs text-muted-foreground">
                           Objetivo: {event.action.goalTitle}
                         </p>
                       ) : null}

@@ -1,42 +1,21 @@
 import { getPrismaClient } from "@/db/prisma";
+import type { EventType } from "@/domain/types";
 import { logError, logInfo } from "@/lib/logger";
-import type { Prisma } from "@prisma/client";
-
-export type EventType =
-  | "MESSAGE_SENT"
-  | "MESSAGE_RECEIVED"
-  | "ACTION_SUGGESTED"
-  | "ACTION_CREATED"
-  | "ACTION_COMPLETED"
-  | "ACTION_SKIPPED"
-  | "GOAL_CREATED"
-  | "GOAL_COMPLETED"
-  | "CRISIS_DETECTED"
-  | "AVOIDANCE_DETECTED"
-  | "AVOIDANCE_ESCALATED"
-  | "AVOIDANCE_CONFRONTED"
-  | "REENGAGEMENT_SUCCESS"
-  | "VALUE_MOMENT_DETECTED"
-  | "USER_ONBOARDED"
-  | "CHECKIN_SUBMITTED"
-  | "PROFILE_COMPLETED";
 
 interface TrackEventParams {
   userId: string;
   type: EventType;
-  metadata?: Prisma.JsonValue;
+  metadata?: Record<string, unknown>;
 }
 
 /**
  * Metadata recomendada por tipo de evento (documentación operativa):
  * - MESSAGE_SENT: { conversationId, messageLength, intent }
  * - MESSAGE_RECEIVED: { conversationId, responseLength, fallback, streaming? }
- * - ACTION_SUGGESTED: { actionId, actionText, goalId?, conversationId, source }
+ * - ACTION_CREATED: { actionId, actionText, goalId?, conversationId, source }
  * - ACTION_COMPLETED: { actionId, actionDescription?, goalId, goalTitle, completedCount, totalCount, conversationId }
  * - GOAL_CREATED: { goalId, goalTitle, actionCount, conversationId }
- * - VALUE_MOMENT_DETECTED: { source: "goal_created" | "action_completed" | "clarity_state", goalId?, conversationId }
- * - AVOIDANCE_CONFRONTED: { actionId, reason, conversationId }
- * - REENGAGEMENT_SUCCESS: { actionId, conversationId }
+ * - AVOIDANCE_DETECTED: { actionId, reason?, conversationId }
  */
 
 /**

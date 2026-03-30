@@ -65,5 +65,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 # Use dumb-init to handle graceful shutdown
 ENTRYPOINT ["/usr/sbin/dumb-init", "--"]
 
-# Start Next.js server
-CMD ["npm", "start"]
+# Apply pending migrations then start Next.js server
+CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]

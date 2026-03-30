@@ -23,35 +23,35 @@ export default function Message({ role, content, isError = false, streaming = fa
       <article
         className={`max-w-xl rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ${
           isUser
-            ? "rounded-br-md bg-slate-900 text-white"
+            ? "rounded-br-md border border-primary/20 bg-primary text-primary-foreground"
             : isError
-              ? "rounded-bl-md border border-red-200 bg-red-50 text-red-900"
+              ? "rounded-bl-md border border-signal-danger/30 bg-signal-danger/12 text-foreground"
               : isCrisis
-                ? "rounded-bl-md border border-rose-300 bg-rose-50 text-rose-950"
+                ? "rounded-bl-md border border-signal-danger/30 bg-signal-danger/12 text-foreground"
                 : isActionRequired
-                  ? "rounded-bl-md border border-amber-200 bg-amber-50 text-amber-950"
-                  : "rounded-bl-md border border-slate-200 bg-white text-slate-800"
+                  ? "rounded-bl-md border border-signal-warning/30 bg-signal-warning/12 text-foreground"
+                  : "rounded-bl-md border border-border bg-card text-card-foreground"
         }`}
       >
         {isCrisis ? (
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-rose-700">
+          <p className="mb-2 inline-flex rounded-full border border-signal-danger/30 bg-signal-danger/14 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-foreground">
             Crisis
           </p>
         ) : null}
         {isActionRequired ? (
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-amber-700">
+          <p className="mb-2 inline-flex rounded-full border border-signal-warning/30 bg-signal-warning/14 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-foreground">
             Acción requerida
           </p>
         ) : null}
         {showMeta ? (
           <div className="mb-2 flex flex-wrap gap-2">
             {meta?.searchUsed ? (
-              <span className="rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-700">
+              <span className="rounded-full border border-emotion-doubt/30 bg-emotion-doubt/14 px-2 py-0.5 text-[11px] font-semibold text-foreground">
                 Internet usado
               </span>
             ) : null}
             {meta?.fallback ? (
-              <span className="rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-[11px] font-semibold text-rose-700">
+              <span className="rounded-full border border-signal-warning/30 bg-signal-warning/14 px-2 py-0.5 text-[11px] font-semibold text-foreground">
                 Fallback IA
               </span>
             ) : null}

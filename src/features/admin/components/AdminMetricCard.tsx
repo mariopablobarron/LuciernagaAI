@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Card, CardContent } from "@/components/ui/Card";
+import { Card, CardContent } from "@/components/ui/card";
 
 type AdminMetricCardProps = {
   label: string;
@@ -11,11 +11,11 @@ type AdminMetricCardProps = {
 
 const accentStyles = {
   slate: "text-foreground",
-  emerald: "text-emerald-700 dark:text-emerald-300",
-  sky: "text-sky-700 dark:text-sky-300",
-  amber: "text-amber-700 dark:text-amber-300",
-  rose: "text-rose-700 dark:text-rose-300",
-  violet: "text-violet-700 dark:text-violet-300",
+  emerald: "text-[color:color-mix(in_oklab,var(--signal-success)_55%,var(--foreground))]",
+  sky: "text-[color:color-mix(in_oklab,var(--emotion-doubt)_78%,var(--foreground))]",
+  amber: "text-[color:color-mix(in_oklab,var(--signal-warning)_60%,var(--foreground))]",
+  rose: "text-[color:color-mix(in_oklab,var(--signal-danger)_60%,var(--foreground))]",
+  violet: "text-[color:color-mix(in_oklab,var(--emotion-doubt)_60%,var(--foreground))]",
 } as const;
 
 export function AdminMetricCard({

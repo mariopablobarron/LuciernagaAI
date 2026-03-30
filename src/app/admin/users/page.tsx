@@ -5,9 +5,9 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, RefreshCw, Search, ShieldAlert, UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 
 type AdminUsersResponse = {
@@ -212,7 +212,7 @@ export default function AdminUsersPage() {
             <Card className="border-border/80 bg-muted/40">
               <CardContent className="p-4">
                 <p className="text-xs uppercase tracking-wide text-muted-foreground">Con riesgo</p>
-                <p className="mt-2 text-2xl font-semibold text-amber-700">
+                <p className="mt-2 text-2xl font-semibold text-[color:color-mix(in_oklab,var(--signal-warning)_60%,var(--foreground))]">
                   {
                     users.filter(
                       (user) => user.riskLevel === "high" || user.riskLevel === "critical"
@@ -226,7 +226,7 @@ export default function AdminUsersPage() {
                 <p className="text-xs uppercase tracking-wide text-muted-foreground">
                   Crisis activa
                 </p>
-                <p className="mt-2 text-2xl font-semibold text-rose-700">
+                <p className="mt-2 text-2xl font-semibold text-[color:color-mix(in_oklab,var(--signal-danger)_60%,var(--foreground))]">
                   {users.filter((user) => user.crisisActive).length}
                 </p>
               </CardContent>
@@ -246,8 +246,8 @@ export default function AdminUsersPage() {
       </Card>
 
       {error ? (
-        <Card className="border-rose-200 bg-rose-50">
-          <CardContent className="p-4 text-rose-800">{error}</CardContent>
+        <Card className="border-signal-danger/30 bg-signal-danger/12">
+          <CardContent className="p-4 text-foreground">{error}</CardContent>
         </Card>
       ) : null}
 

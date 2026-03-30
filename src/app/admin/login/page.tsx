@@ -5,9 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { SAAS_CONFIG } from "@/lib/saas";
 
 function normalizeNextPath(value: string | null): string {
@@ -112,7 +112,7 @@ function AdminLoginForm() {
               </label>
 
               {error ? (
-                <div className="rounded-2xl border border-rose-200 bg-rose-50 px-3 py-3 text-sm text-rose-800 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-100">
+                <div className="rounded-2xl border border-signal-danger/30 bg-signal-danger/12 px-3 py-3 text-sm text-foreground">
                   {error}
                 </div>
               ) : null}

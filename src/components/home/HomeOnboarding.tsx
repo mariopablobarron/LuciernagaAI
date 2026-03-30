@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { ArrowRight, Clock, Lightbulb } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent } from "@/components/ui/Card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 
 const SITUATIONS = [

@@ -60,11 +60,7 @@ function getSessionSecret(): string {
   logInfo("CHAT", "auth_token_secret_fallback_in_use", {
     nodeEnv: process.env.NODE_ENV || "development",
   });
-  return (
-    process.env.SESSION_SECRET?.trim() ||
-    process.env.OPENROUTER_API_KEY?.trim() ||
-    "dev-insecure-session-secret"
-  );
+  return process.env.SESSION_SECRET?.trim() || "dev-insecure-session-secret";
 }
 
 function base64UrlEncode(value: string): string {

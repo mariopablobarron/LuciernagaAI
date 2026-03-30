@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { clearAdminSessionCookie, resolveAdminAuth } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
+import { generateDecision as generateDomainDecision } from "@/domain/decisionEngine";
+import type {
+  DecisionType,
+  Insight as DomainInsight,
+  UserState as DomainUserState,
+} from "@/domain/types";
+import { buildUserState } from "@/domain/userStateEngine";
 import { dispatchAutomatedAlerts } from "@/lib/alerts";
 import { logError, logInfo } from "@/lib/logger";
 import { generateDecision, type DecisionMetrics } from "@/services/decision";
@@ -122,6 +129,26 @@ interface Decision {
   title: string;
   description: string;
   action: string;
+}
+
+function isDomainUserState(value: unknown): value is DomainUserState {
+  return (
+    value === "CRISIS" ||
+    value === "BLOQUEADO" ||
+    value === "EVASIVO" ||
+    value === "ESTABLE" ||
+    value === "ACTIVO"
+  );
+}
+
+function isDecisionType(value: unknown): value is DecisionType {
+  return (
+    value === "ESCALAR_CRISIS" ||
+    value === "DESTRABAR_BLOQUEO" ||
+    value === "REDUCIR_EVASION" ||
+    value === "ACELERAR_ACCION" ||
+    value === "MANTENER_RUMBO"
+  );
 }
 
 function generateTodayDecisions(
@@ -352,6 +379,20 @@ export async function GET(req: NextRequest) {
     };
 
     const decision = generateDecision(metrics, dominantState);
+    const [globalActionCompletionRate, globalAvoidanceRate] = await Promise.all([
+      getActionCompletionRate("", 7),
+      getAvoidanceRate("", 7),
+    ]);
+    const domainInsight: DomainInsight = {
+      retentionDay3,
+      retentionDay7,
+      checkinDrop,
+      avoidanceRate: globalAvoidanceRate,
+      actionCompletionRate: globalActionCompletionRate,
+      crisisCount: crisisStats.total,
+    };
+    const domainState = buildUserState(domainInsight);
+    const domainDecision = generateDomainDecision(domainState, domainInsight);
     const insights = generateInsights({
       messages: statesFromMessages,
       retentionDay3,
@@ -476,6 +517,22 @@ export async function GET(req: NextRequest) {
       crisisUsers: [] as string[],
     };
 
+    const stateDistribution: Record<DomainUserState, number> = {
+      CRISIS: 0,
+      BLOQUEADO: 0,
+      EVASIVO: 0,
+      ESTABLE: 0,
+      ACTIVO: 0,
+    };
+    const decisionTypeCounts: Record<DecisionType, number> = {
+      ESCALAR_CRISIS: 0,
+      DESTRABAR_BLOQUEO: 0,
+      REDUCIR_EVASION: 0,
+      ACELERAR_ACCION: 0,
+      MANTENER_RUMBO: 0,
+    };
+    let decisionSamples = 0;
+
     try {
       const [eventData, allActionCompletionRate, allAvoidanceRate, actionsPerConv, segments] =
         await Promise.all([
@@ -498,6 +555,34 @@ export async function GET(req: NextRequest) {
       };
 
       userSegments = segments;
+
+      const recentMessageReceived = await prisma.event.findMany({
+        where: {
+          createdAt: { gte: sevenDaysAgo },
+          type: "MESSAGE_RECEIVED",
+        },
+        select: {
+          metadata: true,
+        },
+        take: 500,
+        orderBy: { createdAt: "desc" },
+      });
+
+      for (const item of recentMessageReceived) {
+        const metadata = item.metadata as Record<string, unknown> | null;
+        if (!metadata) continue;
+
+        const stateValue = metadata.userState;
+        if (isDomainUserState(stateValue)) {
+          stateDistribution[stateValue] += 1;
+          decisionSamples += 1;
+        }
+
+        const decisionType = metadata.decisionType;
+        if (isDecisionType(decisionType)) {
+          decisionTypeCounts[decisionType] += 1;
+        }
+      }
     } catch (eventError: unknown) {
       logError("TRACKING", eventError, {
         route: "/api/admin/insights",
@@ -510,8 +595,16 @@ export async function GET(req: NextRequest) {
       eventMetrics.actionCompletionRate,
       eventMetrics.avoidanceRate,
       eventMetrics.actionsPerConversation,
-      eventMetrics.eventsByType["VALUE_MOMENT_DETECTED"] ?? 0
+      eventMetrics.eventsByType["ACTION_CREATED"] ?? 0
     );
+
+    const stateRatios = {
+      CRISIS: decisionSamples > 0 ? stateDistribution.CRISIS / decisionSamples : 0,
+      BLOQUEADO: decisionSamples > 0 ? stateDistribution.BLOQUEADO / decisionSamples : 0,
+      EVASIVO: decisionSamples > 0 ? stateDistribution.EVASIVO / decisionSamples : 0,
+      ESTABLE: decisionSamples > 0 ? stateDistribution.ESTABLE / decisionSamples : 0,
+      ACTIVO: decisionSamples > 0 ? stateDistribution.ACTIVO / decisionSamples : 0,
+    };
 
     return NextResponse.json({
       metrics: {
@@ -549,10 +642,23 @@ export async function GET(req: NextRequest) {
         priority: decision.priority,
         action: decision.action,
       },
+      domainDecision: {
+        state: domainState,
+        type: domainDecision.type,
+        reason: domainDecision.reason,
+        confidence: domainDecision.confidence,
+        recommendedActions: domainDecision.recommendedActions,
+      },
       decisionsToday: todaysDecisions,
       alerts,
       insights,
       events: eventMetrics,
+      decisionMetrics: {
+        samples: decisionSamples,
+        stateDistribution,
+        stateRatios,
+        decisionTypeCounts,
+      },
       crisis: {
         last24h: crisis24h,
         latestEvents: recentCrisisEvents24h.map((event) => ({

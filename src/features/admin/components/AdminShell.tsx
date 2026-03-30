@@ -6,8 +6,8 @@ import { usePathname } from "next/navigation";
 import { LogOut, ShieldCheck, Sparkles } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent } from "@/components/ui/Card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { SAAS_ADMIN_NAV, SAAS_CONFIG } from "@/lib/saas";
 

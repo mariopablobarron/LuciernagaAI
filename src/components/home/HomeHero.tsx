@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { ArrowRight, MessageSquareDashed, Sparkles, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent } from "@/components/ui/Card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   DEFAULT_ONBOARDING_EXAMPLE,
   ONBOARDING_EXAMPLE_PROMPTS,
@@ -81,10 +81,10 @@ export default function HomeHero({ onUseChat, onUseExample, onStartOnboarding }:
 
         <Link
           href="/impulso"
-          className="group flex items-center justify-between rounded-2xl border border-amber-400/30 bg-amber-400/5 px-5 py-4 transition hover:border-amber-400/60 hover:bg-amber-400/10"
+          className="group flex items-center justify-between rounded-2xl border border-signal-warning/30 bg-signal-warning/10 px-5 py-4 transition hover:border-signal-warning/50 hover:bg-signal-warning/14"
         >
           <div className="flex items-start gap-4">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-400/15 text-amber-500">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-signal-warning/18 text-foreground">
               <Zap className="size-4" />
             </div>
             <div>

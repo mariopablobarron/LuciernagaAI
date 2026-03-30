@@ -13,9 +13,9 @@ import {
 } from "lucide-react";
 import type { BrowserSessionUser } from "@/lib/session-client";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -449,7 +449,7 @@ export default function HomeWorkspace({
                       </Button>
                     </div>
                     {saveProgressStatus ? (
-                      <div className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-3 text-sm text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-100">
+                      <div className="mt-3 rounded-2xl border border-signal-success/30 bg-signal-success/12 px-3 py-3 text-sm text-foreground">
                         {saveProgressStatus}
                       </div>
                     ) : null}
@@ -484,8 +484,8 @@ export default function HomeWorkspace({
               </CardHeader>
               <CardContent className="space-y-3">
                 {actionLock ? (
-                  <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-800 dark:text-amber-300">
+                  <div className="rounded-2xl border border-signal-warning/30 bg-signal-warning/12 p-4 text-sm text-foreground">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                       Acción pendiente prioritaria
                     </p>
                     <p className="mt-2 font-semibold">{actionLock.actionTitle}</p>
@@ -560,7 +560,7 @@ export default function HomeWorkspace({
                 </Button>
               </div>
               {checkinStatus ? (
-                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-3 text-sm text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-100">
+                <div className="rounded-2xl border border-signal-success/30 bg-signal-success/12 px-3 py-3 text-sm text-foreground">
                   {checkinStatus.message}
                 </div>
               ) : null}

@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import type { EmotionalProfile } from "@/types/emotional-profile";
 
@@ -187,20 +187,20 @@ export default function InsightsPanel({
   );
 
   const actionLockSection = actionLock ? (
-    <Card className="border-amber-200 bg-amber-50 shadow-sm dark:border-amber-900 dark:bg-amber-950/40">
+    <Card className="border-signal-warning/30 bg-signal-warning/12 shadow-sm">
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-semibold text-amber-950 dark:text-amber-100">
+        <CardTitle className="text-sm font-semibold text-foreground">
           Responsabilidad activa
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3 text-sm text-amber-900 dark:text-amber-100">
+      <CardContent className="space-y-3 text-sm text-foreground">
         <p className="font-semibold">{actionLock.actionTitle}</p>
         <p>{actionLock.message}</p>
         <div className="grid gap-2">
-          <div className="rounded-xl border border-amber-200 bg-white px-3 py-2 dark:border-amber-900 dark:bg-amber-950/40">
+          <div className="rounded-xl border border-signal-warning/30 bg-background/85 px-3 py-2">
             Escribe: &quot;ya lo hice&quot;
           </div>
-          <div className="rounded-xl border border-amber-200 bg-white px-3 py-2 dark:border-amber-900 dark:bg-amber-950/40">
+          <div className="rounded-xl border border-signal-warning/30 bg-background/85 px-3 py-2">
             O pospón explícitamente: &quot;lo hago luego&quot;
           </div>
         </div>
@@ -221,7 +221,7 @@ export default function InsightsPanel({
             {alerts.map((alert, index) => (
               <div
                 key={`${alert}-${index}`}
-                className="rounded-2xl border border-rose-200 bg-rose-50 px-3 py-3 text-sm text-rose-800 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-100"
+                className="rounded-2xl border border-signal-danger/30 bg-signal-danger/12 px-3 py-3 text-sm text-foreground"
               >
                 {alert}
               </div>

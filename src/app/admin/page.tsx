@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/Card";
+import { Card, CardContent } from "@/components/ui/card";
 import { AdminMetricCard } from "@/features/admin/components/AdminMetricCard";
 import { AdminPanel } from "@/features/admin/components/AdminPanel";
 import { AdminShell } from "@/features/admin/components/AdminShell";
@@ -148,8 +148,8 @@ export default function AdminPage() {
   if (error) {
     return (
       <main className="min-h-screen bg-background p-6">
-        <Card className="mx-auto max-w-2xl border-rose-200 bg-rose-50 dark:border-rose-900 dark:bg-rose-950/40">
-          <CardContent className="p-6 text-rose-800 dark:text-rose-100">{error}</CardContent>
+        <Card className="mx-auto max-w-2xl border-signal-danger/30 bg-signal-danger/12">
+          <CardContent className="p-6 text-foreground">{error}</CardContent>
         </Card>
       </main>
     );
@@ -172,7 +172,7 @@ export default function AdminPage() {
       onLogout={handleLogout}
     >
       {degraded ? (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <div className="rounded-2xl border border-signal-warning/30 bg-signal-warning/12 px-4 py-3 text-sm text-foreground">
           {degraded}
         </div>
       ) : null}
@@ -210,13 +210,13 @@ export default function AdminPage() {
           />
         </div>
 
-        <div className="rounded-2xl border border-rose-200 bg-rose-50 p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-rose-700">
+        <div className="rounded-2xl border border-emotion-doubt/30 bg-emotion-doubt/10 p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Decision automatica
           </p>
-          <p className="mt-2 text-xl font-semibold text-rose-900">{data.decision.decision}</p>
-          <p className="mt-2 text-sm text-rose-900/80">{data.decision.reason}</p>
-          <p className="mt-3 text-sm font-medium text-rose-800">
+          <p className="mt-2 text-xl font-semibold text-foreground">{data.decision.decision}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{data.decision.reason}</p>
+          <p className="mt-3 text-sm font-medium text-foreground">
             Accion sugerida: {data.decision.action}
           </p>
         </div>
@@ -266,11 +266,11 @@ export default function AdminPage() {
           title="Billing readiness"
           description="Extraccion de patron de Open SaaS: dejar billing desacoplado y listo, sin forzar Stripe antes de tiempo."
         >
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-sm font-semibold text-slate-900">
+          <div className="rounded-2xl border border-border bg-muted/40 p-4">
+            <p className="text-sm font-semibold text-foreground">
               Proveedor previsto: {SAAS_CONFIG.billing.provider}
             </p>
-            <p className="mt-2 text-sm text-slate-600">
+            <p className="mt-2 text-sm text-muted-foreground">
               Estado actual: {SAAS_CONFIG.billing.enabled ? "activo" : "no integrado"}.
             </p>
           </div>
@@ -306,35 +306,35 @@ export default function AdminPage() {
 
           <div className="space-y-3">
             {data.crisis.latestEvents.length === 0 ? (
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+              <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
                 Sin eventos high/critical en las ultimas 24h.
               </div>
             ) : (
               data.crisis.latestEvents.map((event, idx) => (
                 <div
                   key={`${event.userId}-${event.createdAt}-${idx}`}
-                  className={`rounded-2xl border-l-4 bg-white p-4 shadow-sm ${
+                  className={`rounded-2xl border-l-4 bg-card p-4 shadow-sm ${
                     event.level === "critical"
-                      ? "border-rose-600 bg-rose-50/40"
-                      : "border-amber-500 bg-amber-50/40"
+                      ? "border-signal-danger bg-signal-danger/10"
+                      : "border-signal-warning bg-signal-warning/10"
                   }`}
                 >
                   <div className="flex flex-wrap items-center gap-2 text-xs">
-                    <span className="rounded bg-slate-100 px-2 py-1 font-mono text-slate-700">
+                    <span className="rounded bg-muted px-2 py-1 font-mono text-foreground">
                       {event.userId}
                     </span>
                     <span
                       className={`rounded px-2 py-1 font-semibold uppercase ${
                         event.level === "critical"
-                          ? "bg-rose-100 text-rose-800"
-                          : "bg-amber-100 text-amber-800"
+                          ? "bg-signal-danger/15 text-foreground"
+                          : "bg-signal-warning/15 text-foreground"
                       }`}
                     >
                       {event.level}
                     </span>
-                    <span className="text-slate-500">{formatDateTime(event.createdAt)}</span>
+                    <span className="text-muted-foreground">{formatDateTime(event.createdAt)}</span>
                   </div>
-                  <p className="mt-2 text-sm text-slate-800">{event.message}</p>
+                  <p className="mt-2 text-sm text-foreground">{event.message}</p>
                 </div>
               ))
             )}
@@ -348,17 +348,17 @@ export default function AdminPage() {
         >
           <div className="space-y-3">
             {data.alerts.length === 0 ? (
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+              <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
                 Sin alertas criticas.
               </div>
             ) : (
               data.alerts.map((alert, idx) => (
                 <div
                   key={idx}
-                  className="rounded-2xl border-l-4 border-rose-500 bg-white p-4 shadow-sm"
+                  className="rounded-2xl border-l-4 border-signal-danger bg-signal-danger/10 p-4 shadow-sm"
                 >
-                  <h3 className="font-semibold text-rose-900">{alert.title}</h3>
-                  <p className="mt-1 text-sm text-slate-700">{alert.message}</p>
+                  <h3 className="font-semibold text-foreground">{alert.title}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">{alert.message}</p>
                 </div>
               ))
             )}
@@ -384,30 +384,30 @@ export default function AdminPage() {
 
         <div className="space-y-3">
           {data.avoidance.topActions.length === 0 ? (
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+            <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
               Sin acciones evitadas en los ultimos 7 dias.
             </div>
           ) : (
             data.avoidance.topActions.map((item) => (
               <div
                 key={item.actionId}
-                className="rounded-2xl border-l-4 border-amber-500 bg-white p-4 shadow-sm"
+                className="rounded-2xl border-l-4 border-signal-warning bg-card p-4 shadow-sm"
               >
                 <div className="flex flex-wrap items-center gap-2 text-xs">
-                  <span className="rounded bg-slate-100 px-2 py-1 font-semibold text-slate-700">
+                  <span className="rounded bg-muted px-2 py-1 font-semibold text-foreground">
                     {item.total} eventos
                   </span>
-                  <span className="rounded bg-amber-100 px-2 py-1 font-semibold text-amber-800">
+                  <span className="rounded bg-signal-warning/15 px-2 py-1 font-semibold text-foreground">
                     {item.postpone} postpone
                   </span>
-                  <span className="rounded bg-rose-100 px-2 py-1 font-semibold text-rose-800">
+                  <span className="rounded bg-signal-danger/15 px-2 py-1 font-semibold text-foreground">
                     {item.refuse} refuse
                   </span>
                   {item.goalTitle ? (
-                    <span className="text-slate-500">Objetivo: {item.goalTitle}</span>
+                    <span className="text-muted-foreground">Objetivo: {item.goalTitle}</span>
                   ) : null}
                 </div>
-                <p className="mt-2 text-sm font-semibold text-slate-900">{item.description}</p>
+                <p className="mt-2 text-sm font-semibold text-foreground">{item.description}</p>
               </div>
             ))
           )}
@@ -421,10 +421,15 @@ export default function AdminPage() {
       >
         <div className="space-y-3">
           {data.insights.map((insight, idx) => (
-            <div key={idx} className="rounded-2xl border-l-4 border-sky-500 bg-white p-4 shadow-sm">
-              <h3 className="font-semibold text-sky-900">{insight.title}</h3>
-              <p className="mt-1 text-sm text-slate-700">{insight.content}</p>
-              <p className="mt-2 text-sm font-medium text-sky-700">{insight.action}</p>
+            <div
+              key={idx}
+              className="rounded-2xl border-l-4 border-emotion-doubt bg-card p-4 shadow-sm"
+            >
+              <h3 className="font-semibold text-foreground">{insight.title}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{insight.content}</p>
+              <p className="mt-2 text-sm font-medium text-[color:color-mix(in_oklab,var(--emotion-doubt)_78%,var(--foreground))]">
+                {insight.action}
+              </p>
             </div>
           ))}
         </div>
@@ -437,21 +442,21 @@ export default function AdminPage() {
               {data.decisionHistory.map((item) => (
                 <div
                   key={item.id}
-                  className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+                  className="rounded-2xl border border-border bg-card p-4 shadow-sm"
                 >
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                    <span className="rounded bg-slate-100 px-2 py-1 font-semibold text-slate-700">
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                    <span className="rounded bg-muted px-2 py-1 font-semibold text-foreground">
                       {item.metric}
                     </span>
                     <span>{formatDateTime(item.createdAt)}</span>
                     <span>valor {item.value.toFixed(2)}</span>
                   </div>
-                  <p className="mt-2 text-sm font-semibold text-slate-900">{item.decision}</p>
+                  <p className="mt-2 text-sm font-semibold text-foreground">{item.decision}</p>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+            <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
               Sin decisiones historicas registradas todavia.
             </div>
           )}
@@ -463,36 +468,38 @@ export default function AdminPage() {
               {data.insightHistory.map((item) => (
                 <div
                   key={item.id}
-                  className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+                  className="rounded-2xl border border-border bg-card p-4 shadow-sm"
                 >
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                    <span className="rounded bg-slate-100 px-2 py-1 font-semibold text-slate-700">
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                    <span className="rounded bg-muted px-2 py-1 font-semibold text-foreground">
                       {item.type}
                     </span>
                     <span>{formatDateTime(item.createdAt)}</span>
                     <span
                       className={`rounded px-2 py-1 font-semibold ${
                         item.priority === "high"
-                          ? "bg-rose-100 text-rose-800"
+                          ? "bg-signal-danger/15 text-foreground"
                           : item.priority === "medium"
-                            ? "bg-amber-100 text-amber-800"
-                            : "bg-emerald-100 text-emerald-800"
+                            ? "bg-signal-warning/15 text-foreground"
+                            : "bg-signal-success/15 text-foreground"
                       }`}
                     >
                       {item.priority}
                     </span>
-                    <span className="rounded bg-slate-100 px-2 py-1 font-semibold text-slate-700">
+                    <span className="rounded bg-muted px-2 py-1 font-semibold text-foreground">
                       confianza {item.confidence}
                     </span>
                   </div>
-                  <p className="mt-2 text-sm font-semibold text-slate-900">{item.title}</p>
-                  <p className="mt-1 text-sm text-slate-700">{item.content}</p>
-                  <p className="mt-2 text-sm font-medium text-sky-700">{item.action}</p>
+                  <p className="mt-2 text-sm font-semibold text-foreground">{item.title}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{item.content}</p>
+                  <p className="mt-2 text-sm font-medium text-[color:color-mix(in_oklab,var(--emotion-doubt)_78%,var(--foreground))]">
+                    {item.action}
+                  </p>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+            <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
               Sin insights historicos registrados todavia.
             </div>
           )}

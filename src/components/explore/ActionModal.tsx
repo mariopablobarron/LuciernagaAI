@@ -166,9 +166,7 @@ function getMotivationalText(actionId: string): string {
     "action-3":
       "Cada pendiente te consume energía. Ciérralo y libera ese espacio.",
     "action-4":
-      "Los patrones se repiten porque no los vemos. Míralo esta vez.",
-    "action-5":
-      "Reconocer lo hecho refuerza tu capacidad de seguir avanzando.",
+      "Tu cabeza necesita orden. Aquí puedes dejarla clara.",
   };
   return (
     textMap[actionId] ||
@@ -185,9 +183,7 @@ function getPlaceholder(actionId: string): string {
     "action-3":
       "La tarea pendiente que más pesa es... y necesito cerrarla porque...",
     "action-4":
-      "Esto se repite cuando... y siempre termina en...",
-    "action-5":
-      "Hoy logré... y estoy orgulloso de... porque...",
+      "Lo que anda desordenado en mi cabeza es... y afecta...",
   };
   return (
     placeholderMap[actionId] || "Escribe aquí tu respuesta honesta..."

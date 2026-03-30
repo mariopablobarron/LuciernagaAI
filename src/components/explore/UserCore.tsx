@@ -11,97 +11,71 @@ type UserCoreProps = {
 };
 
 export default function UserCore({ state }: UserCoreProps) {
-  const emotionEmoji = getEmotionEmoji(state.emotionalState);
-  const emotionLabel = getEmotionLabel(state.emotionalState);
   const completionPercentage = (state.completedActions / state.totalActions) * 100;
 
   return (
-    <div className="relative w-32 h-32">
+    <div className="relative w-56 h-56">
       {/* Outer rotating ring */}
-      <div className="absolute inset-0 rounded-full border border-border/30 animate-spin" style={{ animationDuration: "20s" }} />
+      <div className="absolute inset-0 rounded-full border border-border/40 animate-spin" style={{ animationDuration: "25s" }} />
 
       {/* Middle ring */}
-      <div className="absolute inset-2 rounded-full border border-border/20 animate-spin" style={{ animationDuration: "30s", animationDirection: "reverse" }} />
+      <div className="absolute inset-3 rounded-full border border-border/30 animate-spin" style={{ animationDuration: "35s", animationDirection: "reverse" }} />
 
       {/* Main circle */}
-      <div className="absolute inset-4 rounded-full bg-gradient-to-br from-card to-muted/50 border-2 border-border/50 shadow-lg flex flex-col items-center justify-center group cursor-default">
+      <div className="absolute inset-6 rounded-full bg-gradient-to-br from-card via-card to-muted/40 border-2 border-border/60 shadow-xl flex flex-col items-center justify-center group cursor-default">
         {/* Content */}
-        <div className="text-center space-y-2">
-          <div className="text-3xl leading-none">{emotionEmoji}</div>
-          <div className="text-xs font-semibold text-foreground capitalize">
-            {emotionLabel}
+        <div className="text-center space-y-3 px-6">
+          <div className="space-y-1">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">
+              Empieza aquí
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              ¿Qué estás evitando ahora mismo?
+            </p>
+          </div>
+
+          {/* Progress section */}
+          <div className="space-y-2 pt-2">
+            <div className="w-20 h-1.5 bg-muted rounded-full overflow-hidden mx-auto border border-border/40">
+              <div
+                className="h-full bg-gradient-to-r from-emotion-doubt to-emotion-clarity transition-all duration-700 rounded-full"
+                style={{ width: `${completionPercentage}%` }}
+              />
+            </div>
+            <div className="text-xs font-medium text-foreground">
+              {state.completedActions}/{state.totalActions} acciones
+            </div>
           </div>
         </div>
 
+        {/* Pulse animation */}
+        <div className="absolute inset-0 rounded-full border border-foreground/5 animate-pulse" />
+
         {/* Progress ring */}
         <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100">
-          {/* Background circle */}
           <circle
             cx="50"
             cy="50"
             r="48"
             fill="none"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.5"
             className="text-border/20"
           />
-          {/* Progress circle */}
           <circle
             cx="50"
             cy="50"
             r="48"
             fill="none"
             stroke="currentColor"
-            strokeWidth="2"
-            className={`text-emotion-clarity transition-all duration-700 ${getEmotionColor(
-              state.emotionalState
-            )}`}
+            strokeWidth="1.5"
+            className={`text-emotion-clarity transition-all duration-700`}
             strokeDasharray={`${completionPercentage * 3.016} 301.6`}
             strokeLinecap="round"
             style={{ transform: "rotate(-90deg)", transformOrigin: "50% 50%" }}
           />
         </svg>
       </div>
-
-      {/* Stats below */}
-      <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 text-center space-y-1">
-        <div className="text-xs font-semibold text-foreground">
-          {state.completedActions}/{state.totalActions}
-        </div>
-        <div className="text-xs text-muted-foreground">
-          {Math.round(completionPercentage)}% completado
-        </div>
-      </div>
     </div>
   );
-}
-
-function getEmotionEmoji(emotion: string): string {
-  const emojiMap: Record<string, string> = {
-    blocked: "🚫",
-    anxious: "⚡",
-    doubt: "❓",
-    clarity: "✨",
-  };
-  return emojiMap[emotion] || "❓";
-}
-
-function getEmotionLabel(emotion: string): string {
-  const labelMap: Record<string, string> = {
-    blocked: "Bloqueado",
-    anxious: "Ansioso",
-    doubt: "Duda",
-    clarity: "Claridad",
-  };
-  return labelMap[emotion] || "Duda";
-}
-
-function getEmotionColor(emotion: string): string {
-  const colorMap: Record<string, string> = {
-    blocked: "text-emotion-blocked",
-    anxious: "text-emotion-anxious",
-    doubt: "text-emotion-doubt",
-    clarity: "text-emotion-clarity",
-  };
-  return colorMap[emotion] || colorMap.doubt;
 }

@@ -23,7 +23,7 @@ type UserState = {
 const AVAILABLE_ACTIONS: ActionNode[] = [
   {
     id: "action-1",
-    title: "Escribe lo que evitas",
+    title: "Escribir lo que evitas",
     description: "Nombra eso que no quieres decir",
     icon: "📝",
     color: "blocked",
@@ -41,7 +41,7 @@ const AVAILABLE_ACTIONS: ActionNode[] = [
   },
   {
     id: "action-3",
-    title: "Cerrar tarea pendiente",
+    title: "Cerrar algo pendiente",
     description: "Libérate de lo que arrastras",
     icon: "✓",
     color: "doubt",
@@ -50,21 +50,12 @@ const AVAILABLE_ACTIONS: ActionNode[] = [
   },
   {
     id: "action-4",
-    title: "Explorar patrón recurrente",
+    title: "Ordenar tu cabeza",
     description: "Eso que se repite siempre",
-    icon: "🔄",
+    icon: "🧠",
     color: "anxious",
     completed: false,
     order: 3,
-  },
-  {
-    id: "action-5",
-    title: "Reconocer avance",
-    description: "Celebra lo hecho hasta hoy",
-    icon: "🚀",
-    color: "clarity",
-    completed: false,
-    order: 4,
   },
 ];
 
@@ -73,7 +64,7 @@ export default function ExplorePage() {
   const [userState, setUserState] = useState<UserState>({
     emotionalState: "doubt",
     completedActions: 0,
-    totalActions: AVAILABLE_ACTIONS.length,
+    totalActions: 4, // Keep 4 as the total even if we add more actions
   });
   const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);

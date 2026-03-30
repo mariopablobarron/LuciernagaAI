@@ -76,16 +76,15 @@ export default function ExploreCanvas({
 
   const centerX = containerSize.width / 2;
   const centerY = containerSize.height / 2;
-  // Responsive radius based on screen size
-  const radius = Math.min(containerSize.width, containerSize.height) * 0.25;
+  // Responsive radius based on screen size - increased for more space
+  const radius = Math.min(containerSize.width, containerSize.height) * 0.32;
 
   const activeAction = actions.find((a) => a.id === activeNodeId);
 
   // Filter visible actions (not completed, ordered by priority)
   const visibleActions = actions
     .filter((a) => !a.completed)
-    .sort((a, b) => a.order - b.order)
-    .slice(0, 4); // Show max 4 nodes around the user
+    .sort((a, b) => a.order - b.order);
 
   return (
     <div
@@ -177,12 +176,19 @@ export default function ExploreCanvas({
           );
         })}
 
-      {/* Progress indicator */}
-      <div className="absolute bottom-6 left-6 z-30">
+      {/* HUD Inferior - Progress and CTA */}
+      <div className="absolute bottom-6 left-6 z-30 space-y-4">
         <ProgressIndicator
           completed={userState.completedActions}
           total={userState.totalActions}
         />
+      </div>
+
+      {/* HUD Inferior - CTA */}
+      <div className="absolute bottom-6 right-6 z-30 text-right">
+        <p className="text-xs text-muted-foreground">
+          Haz una acción de menos de 5 minutos
+        </p>
       </div>
 
       {/* Reset button */}
@@ -232,17 +238,15 @@ export default function ExploreCanvas({
         />
       )}
 
-      {/* Initial guidance text */}
-      {userState.completedActions === 0 && visibleActions.length > 0 && (
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20 text-center space-y-2">
-          <p className="text-sm font-medium text-foreground">
-            Empieza por lo que más te cuesta decir.
-          </p>
-          <p className="text-xs text-muted-foreground">
-            No necesitas tenerlo claro.
-          </p>
-        </div>
-      )}
+      {/* HUD Superior */}
+      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20 text-center space-y-2">
+        <p className="text-sm text-muted-foreground">
+          Hoy estás en un punto estable
+        </p>
+        <p className="text-xs text-muted-foreground/70">
+          No necesitas tenerlo claro. Empieza por una sola cosa.
+        </p>
+      </div>
     </div>
   );
 }

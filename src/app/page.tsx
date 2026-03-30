@@ -56,6 +56,7 @@ type ChatApiResponse = {
   state?: string;
   emotionalProfile?: EmotionalProfile;
   insight?: string;
+  persistenceAvailable?: boolean;
   action?:
     | string
     | {
@@ -683,6 +684,12 @@ export default function HomePage() {
     setError(null);
     setLoading(true);
 
+    console.info("[CHAT_UI] send_started", {
+      conversationId: currentConversationId,
+      isDraft: resolvedConversation.isDraft,
+      length: trimmed.length,
+    });
+
     setConversations((previous) =>
       previous.map((conversation) =>
         conversation.id === currentConversationId
@@ -740,6 +747,10 @@ export default function HomePage() {
 
       if (!response.ok) {
         const message = payload.error || payload.response || `Error ${response.status}`;
+        console.error("[CHAT_UI] send_failed", {
+          status: response.status,
+          message,
+        });
         const assistantError: ChatMessage = {
           id: `assistant_error_${Date.now()}`,
           role: "assistant",
@@ -767,6 +778,7 @@ export default function HomePage() {
         payload.response?.trim() ||
         "No pude generar una respuesta en este momento.";
       const nextState = payload.state || "neutral";
+      const persistenceAvailable = payload.persistenceAvailable !== false;
       const nextActionLock =
         payload.type === "action_required" &&
         payload.action &&
@@ -791,9 +803,18 @@ export default function HomePage() {
         Array.isArray(payload.alerts) && payload.alerts.length > 0
           ? payload.alerts
           : fallbackInsight.alerts;
-      const resolvedConversationId = payload.conversationId || currentConversationId;
+      const resolvedConversationId = persistenceAvailable
+        ? payload.conversationId || currentConversationId
+        : currentConversationId;
       const nextGoal = payload.goal ?? null;
       const nextEmotionalProfile = payload.emotionalProfile ?? emotionalProfile;
+
+      console.info("[CHAT_UI] send_succeeded", {
+        type: payload.type || "normal",
+        persistenceAvailable,
+        returnedConversationId: payload.conversationId || null,
+        localConversationId: resolvedConversationId,
+      });
 
       setConversations((previous) => {
         const next = previous.map((conversation) =>
@@ -801,8 +822,8 @@ export default function HomePage() {
             ? {
                 ...conversation,
                 id: resolvedConversationId,
-                isDraft: false,
-                hasLoadedMessages: true,
+                isDraft: persistenceAvailable ? false : conversation.isDraft,
+                hasLoadedMessages: persistenceAvailable ? true : conversation.hasLoadedMessages,
                 updatedAt: new Date().toISOString(),
                 state: nextState,
                 insight: nextInsight,
@@ -839,12 +860,26 @@ export default function HomePage() {
       }
 
       try {
-        await refreshConversations(resolvedConversationId);
-        await loadMessages(resolvedConversationId);
-        if (!nextGoal) {
-          await refreshActiveGoal();
+        if (persistenceAvailable) {
+          await refreshConversations(resolvedConversationId);
+          await loadMessages(resolvedConversationId);
+          if (!nextGoal) {
+            await refreshActiveGoal();
+          }
+        } else {
+          setError(
+            "La respuesta llegó, pero no se pudo guardar en base de datos. Revisa los logs del servidor."
+          );
+          console.warn("[CHAT_UI] persistence_unavailable", {
+            conversationId: currentConversationId,
+            payloadConversationId: payload.conversationId || null,
+          });
         }
       } catch {
+        console.error("[CHAT_UI] refresh_failed_after_send", {
+          conversationId: resolvedConversationId,
+          persistenceAvailable,
+        });
         // La UI ya tiene estado local optimista; ignoramos refresco fallido.
       }
     } catch (requestError: unknown) {
@@ -852,6 +887,9 @@ export default function HomePage() {
         requestError instanceof Error && requestError.message
           ? requestError.message
           : "No se pudo conectar con el servidor.";
+      console.error("[CHAT_UI] network_error", {
+        message: fallbackMessage,
+      });
       const assistantError: ChatMessage = {
         id: `assistant_network_${Date.now()}`,
         role: "assistant",

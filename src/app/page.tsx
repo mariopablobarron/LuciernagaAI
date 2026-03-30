@@ -432,9 +432,7 @@ export default function HomePage() {
 
     return {
       name: displayName,
-      plan: sessionProfile?.planLabel
-        ? `Plan ${sessionProfile.planLabel}`
-        : "Plan Free",
+      plan: sessionProfile?.planLabel ? `Plan ${sessionProfile.planLabel}` : "Plan Free",
     };
   }, [sessionProfile]);
 
@@ -1044,6 +1042,7 @@ export default function HomePage() {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
+          "x-response-mode": "json",
         },
         body: JSON.stringify({
           message: trimmed,
@@ -1091,7 +1090,12 @@ export default function HomePage() {
                     messageCount: conversation.messageCount + 1,
                     messages: [
                       ...conversation.messages,
-                      { id: `assistant_error_${Date.now()}`, role: "assistant" as const, content: errMsg, isError: true },
+                      {
+                        id: `assistant_error_${Date.now()}`,
+                        role: "assistant" as const,
+                        content: errMsg,
+                        isError: true,
+                      },
                     ],
                   }
                 : conversation
@@ -1162,7 +1166,9 @@ export default function HomePage() {
                       ? {
                           ...conversation,
                           messages: conversation.messages.map((msg) =>
-                            msg.id === streamMsgId ? { ...msg, content: event.content as string } : msg
+                            msg.id === streamMsgId
+                              ? { ...msg, content: event.content as string }
+                              : msg
                           ),
                         }
                       : conversation
@@ -1220,7 +1226,9 @@ export default function HomePage() {
                   ...conversation,
                   id: sseResolvedConversationId,
                   isDraft: ssePersistenceAvailable ? false : conversation.isDraft,
-                  hasLoadedMessages: ssePersistenceAvailable ? true : conversation.hasLoadedMessages,
+                  hasLoadedMessages: ssePersistenceAvailable
+                    ? true
+                    : conversation.hasLoadedMessages,
                   updatedAt: new Date().toISOString(),
                   state: sseNextState,
                   insight: sseNextInsight,
@@ -1233,7 +1241,13 @@ export default function HomePage() {
                   conversionType: sseConversionType,
                   messages: conversation.messages.map((msg) =>
                     msg.id === streamMsgId
-                      ? { ...msg, meta: { searchUsed: Boolean(ssePayload.searchUsed), fallback: Boolean(ssePayload.fallback) } }
+                      ? {
+                          ...msg,
+                          meta: {
+                            searchUsed: Boolean(ssePayload.searchUsed),
+                            fallback: Boolean(ssePayload.fallback),
+                          },
+                        }
                       : msg
                   ),
                 }
@@ -1264,11 +1278,15 @@ export default function HomePage() {
               await refreshActiveGoal();
             }
           } else {
-            setError("La respuesta llegó, pero no se pudo guardar en base de datos. Revisa los logs del servidor.");
+            setError(
+              "La respuesta llegó, pero no se pudo guardar en base de datos. Revisa los logs del servidor."
+            );
           }
           await refreshSessionProfile().catch(() => null);
         } catch {
-          console.error("[CHAT_UI] refresh_failed_after_stream", { conversationId: sseResolvedConversationId });
+          console.error("[CHAT_UI] refresh_failed_after_stream", {
+            conversationId: sseResolvedConversationId,
+          });
         }
         return;
       }
@@ -1487,7 +1505,8 @@ export default function HomePage() {
               </span>
             </Badge>
             <Badge variant="secondary" className="rounded-full px-3 py-1">
-              Plan: <span className="ml-1 font-semibold">{sessionProfile?.planLabel || "Free"}</span>
+              Plan:{" "}
+              <span className="ml-1 font-semibold">{sessionProfile?.planLabel || "Free"}</span>
             </Badge>
             <Badge variant="secondary" className="rounded-full px-3 py-1">
               Progreso:{" "}
@@ -1519,7 +1538,8 @@ export default function HomePage() {
               }
               className="rounded-full px-3 py-1"
             >
-              Estado: <span className="ml-1 font-semibold capitalize">{safeConversation.state}</span>
+              Estado:{" "}
+              <span className="ml-1 font-semibold capitalize">{safeConversation.state}</span>
             </Badge>
           </>
         }

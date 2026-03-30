@@ -19,5 +19,3 @@ export function getPrismaClient(): PrismaClient {
 
   return globalForPrisma.prisma;
 }
-
-export const prisma = getPrismaClient();

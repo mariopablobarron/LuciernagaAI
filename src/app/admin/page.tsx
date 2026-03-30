@@ -83,20 +83,28 @@ export default function AdminPage() {
   const router = useRouter();
   const [data, setData] = useState<AdminInsightsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [degraded, setDegraded] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/insights")
       .then(async (res) => {
+        const payload = (await res.json().catch(() => null)) as AdminInsightsResponse | null;
+
         if (res.status === 401) {
           router.replace("/admin/login?next=/admin");
           return null;
         }
 
+        if (payload?.metrics && payload?.decision && payload?.alerts && payload?.insights) {
+          if (!res.ok) {
+            setDegraded("El panel está en modo degradado. Revisa la base de datos o las migraciones.");
+          }
+          return payload;
+        }
+
         if (!res.ok) {
           throw new Error("No se pudieron cargar los insights.");
         }
-
-        const payload = (await res.json()) as AdminInsightsResponse;
         return payload;
       })
       .then((payload) => {
@@ -139,6 +147,12 @@ export default function AdminPage() {
           Cerrar sesión
         </button>
       </div>
+
+      {degraded ? (
+        <div className="rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          {degraded}
+        </div>
+      ) : null}
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div className="p-4 bg-white rounded shadow">

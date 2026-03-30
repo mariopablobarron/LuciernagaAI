@@ -52,6 +52,7 @@ jest.mock("@/services/goals", () => ({
   detectAvoidance: jest.fn(),
   detectActionPostponeIntent: jest.fn(),
   detectActionRefusalIntent: jest.fn(),
+  getAvoidanceCountForAction: jest.fn(),
   getFirstPendingAction: jest.fn(),
   getActiveGoalForUser: jest.fn(),
   registerAvoidanceEvent: jest.fn(),
@@ -104,6 +105,7 @@ import {
   detectAvoidance,
   detectActionPostponeIntent,
   detectActionRefusalIntent,
+  getAvoidanceCountForAction,
   getFirstPendingAction,
   getActiveGoalForUser,
   registerAvoidanceEvent,
@@ -167,6 +169,7 @@ describe("POST /api/chat", () => {
     (detectAvoidance as jest.Mock).mockReturnValue(false);
     (detectActionPostponeIntent as jest.Mock).mockReturnValue(false);
     (detectActionRefusalIntent as jest.Mock).mockReturnValue(false);
+    (getAvoidanceCountForAction as jest.Mock).mockResolvedValue(0);
     (getFirstPendingAction as jest.Mock).mockImplementation(
       (goal) => goal?.actions?.find((action: { completed: boolean }) => !action.completed) ?? null
     );
@@ -373,7 +376,9 @@ describe("POST /api/chat", () => {
     expect(body.conversionType).toBe("progress");
     expect(body.captureEmail).toBe(true);
     expect(body.response).toContain("Esto que acabas de definir es importante.");
-    expect(body.response).toContain("¿Quieres guardar tu progreso y continuar otro día? Déjame tu email.");
+    expect(body.response).toContain(
+      "¿Quieres guardar tu progreso y continuar otro día? Déjame tu email."
+    );
     expect(generateAIResponse).toHaveBeenCalledWith(
       "Ya lo veo claro",
       "claridad",

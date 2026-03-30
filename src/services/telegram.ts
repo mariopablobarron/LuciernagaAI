@@ -52,10 +52,55 @@ export async function createTelegramUserWithConsent(telegramChatId: number): Pro
 
 export async function touchTelegramUser(userId: string): Promise<void> {
   const prisma = getPrismaClient();
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { lastSeen: new Date(), messageCount: { increment: 1 } },
+    });
+  } catch {
+    // Fallback: update only lastSeen if messageCount column is unavailable
+    try {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { lastSeen: new Date() },
+      });
+    } catch (err: unknown) {
+      logError("TELEGRAM", err, { area: "touchTelegramUser", userId });
+    }
+  }
+}
+
+export async function deactivateTelegramUser(userId: string): Promise<void> {
+  const prisma = getPrismaClient();
   await prisma.user.update({
     where: { id: userId },
-    data: { lastSeen: new Date() },
+    data: { isActive: false },
   });
+  logInfo("TELEGRAM", "user_deactivated", { userId });
+}
+
+export type PendingActionSummary = {
+  goalTitle: string;
+  actions: string[];
+};
+
+export async function getPendingActions(userId: string): Promise<PendingActionSummary[]> {
+  const prisma = getPrismaClient();
+  const goals = await prisma.goal.findMany({
+    where: { userId, status: "active" },
+    select: {
+      title: true,
+      actions: {
+        where: { completed: false },
+        orderBy: { createdAt: "asc" },
+        take: 3,
+        select: { description: true },
+      },
+    },
+  });
+  return goals
+    .filter((g) => g.actions.length > 0)
+    .map((g) => ({ goalTitle: g.title, actions: g.actions.map((a) => a.description) }));
 }
 
 export async function getOrCreateTelegramConversation(userId: string): Promise<string> {

@@ -1,15 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  Flame,
-  Hourglass,
-  Mail,
-  ShieldCheck,
-  Sparkles,
-  Target,
-  Zap,
-} from "lucide-react";
+import { Flame, Hourglass, Mail, ShieldCheck, Sparkles, Target, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,10 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  fetchBrowserSession,
-  type BrowserSessionUser,
-} from "@/lib/session-client";
+import { fetchBrowserSession, type BrowserSessionUser } from "@/lib/session-client";
 import type {
   DailyImpulseLogSnapshot,
   DiagnosticQuestion,
@@ -278,7 +267,10 @@ export default function ImpulseDashboard() {
         setChallenges(payload.activeChallenges);
       }
       if (payload.dailyLog) {
-        setLogs((current) => [payload.dailyLog!, ...current.filter((item) => item.id !== payload.dailyLog!.id)]);
+        setLogs((current) => [
+          payload.dailyLog!,
+          ...current.filter((item) => item.id !== payload.dailyLog!.id),
+        ]);
       }
 
       setCheckinText("");
@@ -362,17 +354,15 @@ export default function ImpulseDashboard() {
                   Entrena claridad, no solo conversación
                 </h1>
                 <p className="mt-2 max-w-3xl text-sm text-muted-foreground md:text-base">
-                  Diagnóstico inicial, perfil operativo, retos cortos, check-in diario y señales
-                  de comportamiento para convertir pensamiento en ejecución.
+                  Diagnóstico inicial, perfil operativo, retos cortos, check-in diario y señales de
+                  comportamiento para convertir pensamiento en ejecución.
                 </p>
               </div>
             </div>
 
-            <div className="grid min-w-[240px] gap-3 text-sm">
+            <div className="grid min-w-60 gap-3 text-sm">
               <div className="rounded-2xl border border-border bg-muted/30 p-3">
-                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                  Cuenta
-                </p>
+                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Cuenta</p>
                 <p className="mt-1 font-medium text-foreground">
                   {sessionUser?.isAnonymous ? "Sesión anónima" : sessionUser?.email || "Pendiente"}
                 </p>
@@ -398,7 +388,9 @@ export default function ImpulseDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
-              <p className="font-medium text-foreground">{profile?.title || "Sin diagnóstico aún"}</p>
+              <p className="font-medium text-foreground">
+                {profile?.title || "Sin diagnóstico aún"}
+              </p>
               <p className="text-muted-foreground">
                 {profile?.operationalFocus ||
                   "Completa el test inicial y el sistema te asignará un perfil de trabajo."}
@@ -416,7 +408,8 @@ export default function ImpulseDashboard() {
             <CardContent className="space-y-2 text-sm">
               <p className="text-2xl font-semibold text-foreground">{streak?.currentDays ?? 0}</p>
               <p className="text-muted-foreground">
-                Mejor racha: {streak?.bestDays ?? 0}. Último check-in: {formatDate(streak?.lastCheckInDate)}
+                Mejor racha: {streak?.bestDays ?? 0}. Último check-in:{" "}
+                {formatDate(streak?.lastCheckInDate)}
               </p>
             </CardContent>
           </Card>
@@ -435,7 +428,10 @@ export default function ImpulseDashboard() {
                 </p>
               ) : (
                 insights.slice(0, 2).map((insight) => (
-                  <div key={insight.title} className="rounded-2xl border border-border bg-muted/30 p-3">
+                  <div
+                    key={insight.title}
+                    className="rounded-2xl border border-border bg-muted/30 p-3"
+                  >
                     <p className="font-medium text-foreground">{insight.title}</p>
                     <p className="mt-1 text-muted-foreground">{insight.action}</p>
                   </div>
@@ -472,7 +468,10 @@ export default function ImpulseDashboard() {
                   <p className="text-sm text-muted-foreground">Cargando diagnóstico...</p>
                 ) : (
                   questions.map((question, index) => (
-                    <div key={question.id} className="rounded-2xl border border-border bg-muted/20 p-4">
+                    <div
+                      key={question.id}
+                      className="rounded-2xl border border-border bg-muted/20 p-4"
+                    >
                       <p className="text-sm font-medium text-foreground">
                         {index + 1}. {question.prompt}
                       </p>
@@ -507,7 +506,10 @@ export default function ImpulseDashboard() {
                     {profile ? "Recalcular perfil" : "Guardar diagnóstico"}
                   </Button>
                   {profile ? (
-                    <Badge variant={sectionVariant(profile.code)} className="rounded-full px-3 py-1">
+                    <Badge
+                      variant={sectionVariant(profile.code)}
+                      className="rounded-full px-3 py-1"
+                    >
                       {profile.title} · Total {profile.scores.total}/100
                     </Badge>
                   ) : null}
@@ -529,7 +531,10 @@ export default function ImpulseDashboard() {
                     ["Disciplina", profile.scores.disciplina],
                     ["Social", profile.scores.social],
                   ].map(([label, value]) => (
-                    <div key={label as string} className="rounded-2xl border border-border bg-muted/20 p-4">
+                    <div
+                      key={label as string}
+                      className="rounded-2xl border border-border bg-muted/20 p-4"
+                    >
                       <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
                         {label}
                       </p>
@@ -569,7 +574,10 @@ export default function ImpulseDashboard() {
                   </div>
                 ) : (
                   challenges.map((challenge) => (
-                    <div key={challenge.id} className="rounded-2xl border border-border bg-muted/20 p-4">
+                    <div
+                      key={challenge.id}
+                      className="rounded-2xl border border-border bg-muted/20 p-4"
+                    >
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge variant="secondary" className="rounded-full px-3 py-1">
                           {challenge.type}
@@ -666,7 +674,10 @@ export default function ImpulseDashboard() {
                     </p>
                   ) : (
                     logs.slice(0, 5).map((log) => (
-                      <div key={log.id} className="rounded-2xl border border-border bg-muted/20 p-3">
+                      <div
+                        key={log.id}
+                        className="rounded-2xl border border-border bg-muted/20 p-3"
+                      >
                         <div className="flex flex-wrap items-center gap-2">
                           <Badge variant="secondary" className="rounded-full px-3 py-1">
                             {log.emotionalState || "neutral"}
@@ -740,7 +751,10 @@ export default function ImpulseDashboard() {
                     </p>
                   ) : (
                     futureMessages.map((message) => (
-                      <div key={message.id} className="rounded-2xl border border-border bg-muted/20 p-4">
+                      <div
+                        key={message.id}
+                        className="rounded-2xl border border-border bg-muted/20 p-4"
+                      >
                         <div className="flex flex-wrap items-center gap-2">
                           <Badge variant="secondary" className="rounded-full px-3 py-1">
                             Disponible

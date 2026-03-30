@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import Chat, { type ChatMessage } from "@/components/Chat";
 import HomeHero from "@/components/home/HomeHero";
+import HomeOnboarding from "@/components/home/HomeOnboarding";
 import HomeWorkspace, { type WorkspaceTab } from "@/components/home/HomeWorkspace";
 import InsightsPanel from "@/components/InsightsPanel";
 import Sidebar, { type SidebarConversation } from "@/components/Sidebar";
@@ -332,6 +333,9 @@ export default function HomePage() {
   const [adminLoading, setAdminLoading] = useState(true);
   const [workspaceTab, setWorkspaceTab] = useState<WorkspaceTab>("chat");
   const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState<0 | 1 | 2 | 3>(0);
+  const [onboardingSituation, setOnboardingSituation] = useState("");
+  const [onboardingTime, setOnboardingTime] = useState("");
 
   const handleUnauthorizedSession = () => {
     setSessionReady(false);
@@ -1521,10 +1525,38 @@ export default function HomePage() {
         }
         prelude={
           <>
-            <HomeHero
-              onUseChat={() => setWorkspaceTab("chat")}
-              onUseExample={handleUseStarterExample}
-            />
+            {onboardingStep === 0 ? (
+              <HomeHero
+                onUseChat={() => setWorkspaceTab("chat")}
+                onUseExample={handleUseStarterExample}
+                onStartOnboarding={() => setOnboardingStep(1)}
+              />
+            ) : (
+              <HomeOnboarding
+                step={onboardingStep as 1 | 2 | 3}
+                situation={onboardingSituation}
+                time={onboardingTime}
+                onSelectSituation={(value) => {
+                  setOnboardingSituation(value);
+                  setOnboardingStep(2);
+                }}
+                onSelectTime={(value) => {
+                  setOnboardingTime(value);
+                  setOnboardingStep(3);
+                }}
+                onSubmitGoal={(goal) => {
+                  const message =
+                    `${onboardingSituation} Tengo ${onboardingTime} ahora. ` +
+                    `Lo que quiero resolver: ${goal}`;
+                  setOnboardingStep(0);
+                  handleUseStarterExample(message);
+                }}
+                onSkip={() => {
+                  setOnboardingStep(0);
+                  setWorkspaceTab("chat");
+                }}
+              />
+            )}
             <Card className="border-border/70 bg-card/80 shadow-sm">
               <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="space-y-1">

@@ -56,6 +56,7 @@ export type CoachContext = {
     emotionalState: UserState;
     summary: string;
     hesitationDetected?: boolean;
+    trend?: "mejor" | "igual" | "peor" | string;
   } | null;
   flow?: {
     currentIntent: string;
@@ -315,11 +316,19 @@ function buildContinuityGuidance(context: CoachContext): string {
       ? continuity.pendingActions.join(" | ")
       : "Sin acciones pendientes registradas";
 
+  const trendLabel =
+    continuity.trend === "mejor"
+      ? "Tendencia positiva — el usuario lleva mejorando. Refuerza el avance, no sobreexpliques."
+      : continuity.trend === "peor"
+        ? "Tendencia negativa — el usuario lleva empeorando. Sé más directo y propón una acción mínima."
+        : "";
+
   return `Continuidad conversacional disponible:
 - Resumen previo: ${continuity.summary}
 - Último objetivo: ${continuity.lastGoal ?? "No registrado"}
 - Acciones pendientes: ${pendingActionsText}
 - Estado emocional previo: ${continuity.emotionalState}
+${trendLabel ? `- ${trendLabel}` : ""}
 ${continuity.hesitationDetected ? "- Hubo señales recientes de evitación o postergación." : ""}
 
 Reglas de continuidad obligatorias:

@@ -15,9 +15,10 @@ import {
 type HomeHeroProps = {
   onUseChat: () => void;
   onUseExample: (value: string) => void;
+  onStartOnboarding?: () => void;
 };
 
-export default function HomeHero({ onUseChat, onUseExample }: HomeHeroProps) {
+export default function HomeHero({ onUseChat, onUseExample, onStartOnboarding }: HomeHeroProps) {
   return (
     <Card className="overflow-hidden border-border/80 bg-card/92 shadow-sm">
       <CardContent className="space-y-5 p-5 md:p-6">
@@ -41,10 +42,17 @@ export default function HomeHero({ onUseChat, onUseExample }: HomeHeroProps) {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Button type="button" onClick={onUseChat}>
-              Usa el chat
-              <ArrowRight className="size-4" />
-            </Button>
+            {onStartOnboarding ? (
+              <Button type="button" onClick={onStartOnboarding}>
+                Empezar guiado
+                <ArrowRight className="size-4" />
+              </Button>
+            ) : (
+              <Button type="button" onClick={onUseChat}>
+                Usa el chat
+                <ArrowRight className="size-4" />
+              </Button>
+            )}
             <Button
               type="button"
               variant="outline"

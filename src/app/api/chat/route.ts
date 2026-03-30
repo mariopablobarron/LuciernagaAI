@@ -39,6 +39,7 @@ import {
   detectActionRefusalIntent,
   getFirstPendingAction,
   getActiveGoalForUser,
+  getAvoidanceCountForAction,
   registerAvoidanceEvent,
 } from "@/services/goals";
 import { runFlow, loadDialogueState, saveDialogueState } from "@/services/flows";
@@ -302,22 +303,34 @@ export async function POST(req: NextRequest) {
       return planLimitedResponse;
     }
 
-    const rateLimit = checkRateLimit(`chat:${userId}`, 10, 60_000);
-    if (!rateLimit.allowed) {
+    const ip =
+      (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
+    const rateLimits = [
+      checkRateLimit(`chat:burst:${userId}`, 5, 60_000),          // 5 / min per user
+      checkRateLimit(`chat:hour:${userId}`, 30, 3_600_000),       // 30 / hour per user
+      checkRateLimit(`chat:ip:${ip}`, 100, 3_600_000),            // 100 / hour per IP
+    ];
+    const blockedLimit = rateLimits.find((r) => !r.allowed);
+    if (blockedLimit) {
+      const isHourly = blockedLimit.retryAfterSeconds > 60;
       const limitedResponse = NextResponse.json(
         {
           success: false,
-          error: "Demasiadas solicitudes. Intenta de nuevo en unos segundos.",
-          response: "Demasiadas solicitudes. Intenta de nuevo en unos segundos.",
+          error: isHourly
+            ? "Has alcanzado el límite por hora. Vuelve en unos minutos."
+            : "Demasiadas solicitudes. Intenta de nuevo en unos segundos.",
+          response: isHourly
+            ? "Has alcanzado el límite por hora. Vuelve en unos minutos."
+            : "Demasiadas solicitudes. Intenta de nuevo en unos segundos.",
           state: "neutral",
-          retryAfterSeconds: rateLimit.retryAfterSeconds,
+          retryAfterSeconds: blockedLimit.retryAfterSeconds,
         },
         {
           status: 429,
           headers: {
-            "Retry-After": String(rateLimit.retryAfterSeconds),
-            "X-RateLimit-Limit": String(rateLimit.limit),
-            "X-RateLimit-Remaining": String(rateLimit.remaining),
+            "Retry-After": String(blockedLimit.retryAfterSeconds),
+            "X-RateLimit-Limit": String(blockedLimit.limit),
+            "X-RateLimit-Remaining": String(blockedLimit.remaining),
           },
         }
       );
@@ -379,28 +392,16 @@ export async function POST(req: NextRequest) {
     let actionCompletedThisTurn = false;
     let conversationMessageCount = 0;
     let conversionTrigger = state === "claridad";
-    let transformationPhase = inferTransformationPhase({
-      state,
-      intent: detectedIntent,
-      hasGoal: false,
-      totalActions: 0,
-      pendingActionsCount: 0,
-      completedActionsCount: 0,
-      avoidanceCount: 0,
-      conversationMessageCount: 0,
-    });
-    let transformationSummary = describeTransformationPhase(transformationPhase);
-    let mentorMode = getMentorMode({
-      state,
-      riskLevel,
-      transformationPhase,
-      activeGoal: false,
-      pendingActionsCount: 0,
-      avoidanceCount: 0,
-      avoidanceDetected: avoidanceDetectedThisTurn,
-      repeatedPattern: false,
-      conversationMessageCount: 0,
-    });
+    let transformationPhase: ReturnType<typeof inferTransformationPhase> = "bloqueo";
+    let transformationSummary = "";
+    let mentorMode: ReturnType<typeof getMentorMode> = {
+      mode: "supportive",
+      validate: true,
+      confront: false,
+      pushAction: false,
+      stopConversation: false,
+      reason: "pending_db",
+    };
     let onboardingContext = getConversationalOnboarding({
       state,
       intent: detectedIntent,
@@ -496,6 +497,10 @@ export async function POST(req: NextRequest) {
         let pendingAction = getFirstPendingAction(activeGoal);
         const pendingActionBeforeTurn = pendingAction;
         goalPendingActionsCount = countPendingActions(activeGoal);
+        // Pre-load historical avoidance count so mentorMode sees it from message 1
+        if (pendingAction) {
+          goalAvoidanceCount = await getAvoidanceCountForAction(userId, pendingAction.id);
+        }
         const repeatedPattern =
           conversationMessageCount > 3 &&
           (emotionalProfile.dominantPattern === "evita_decidir" ||
@@ -677,8 +682,7 @@ export async function POST(req: NextRequest) {
           repeatedPattern,
           conversationMessageCount,
         });
-        conversionTrigger =
-          goalCreatedThisTurn || actionGeneratedThisTurn || state === "claridad";
+        conversionTrigger = goalCreatedThisTurn || actionGeneratedThisTurn || state === "claridad";
         onboardingContext = getConversationalOnboarding({
           state,
           intent: detectedIntent,
@@ -921,7 +925,12 @@ export async function POST(req: NextRequest) {
 
       if (persistenceAvailable) {
         try {
-          await saveConversationMessage({ conversationId, userId, role: "assistant", content: assistantResponse });
+          await saveConversationMessage({
+            conversationId,
+            userId,
+            role: "assistant",
+            content: assistantResponse,
+          });
         } catch (dbError: unknown) {
           persistenceAvailable = false;
           logError("DB", dbError, { route: "/api/chat", userId, stage: "impulse_persistence" });
@@ -935,7 +944,8 @@ export async function POST(req: NextRequest) {
         state,
         conversationId,
         goal: serializeGoal(activeGoal),
-        action: activeAction?.description ?? "Define una sola accion concreta para hoy y ejecútala.",
+        action:
+          activeAction?.description ?? "Define una sola accion concreta para hoy y ejecútala.",
         emotionalProfile,
         searchUsed: false,
         fallback: aiResult.fallback,
@@ -963,6 +973,7 @@ export async function POST(req: NextRequest) {
       continuity: {
         ...conversationContext,
         hesitationDetected: goalAvoidanceCount > 0 || avoidanceDetectedThisTurn,
+        trend: emotionalProfile.progressTrend,
       },
       flow: {
         currentIntent: flowContext.currentIntent,
@@ -973,7 +984,8 @@ export async function POST(req: NextRequest) {
       mentor: mentorMode,
       transformation: { phase: transformationPhase, summary: transformationSummary },
       legal: {
-        limitsNote: "Luciernaga AI orienta y empuja accion, pero no sustituye terapia ni soporte de emergencia.",
+        limitsNote:
+          "Luciernaga AI orienta y empuja accion, pero no sustituye terapia ni soporte de emergencia.",
         critical: false,
       },
       onboarding: onboardingContext,
@@ -983,8 +995,86 @@ export async function POST(req: NextRequest) {
         hasActiveGoal: Boolean(activeGoal),
         conversionTrigger,
       },
-      web: searchQuery ? { query: searchQuery, usage: "practical_decision" as const, results: searchResults } : null,
+      web: searchQuery
+        ? { query: searchQuery, usage: "practical_decision" as const, results: searchResults }
+        : null,
     };
+
+    const shouldUseJsonResponse =
+      process.env.NODE_ENV === "test" ||
+      req.headers.get("x-response-mode") === "json" ||
+      req.nextUrl.searchParams.get("responseMode") === "json";
+
+    if (shouldUseJsonResponse) {
+      const aiResult = await generateAIResponse(message, state, emotionalProfile, coachContext);
+
+      let assistantResponse = completionMicroFeedback
+        ? `${completionMicroFeedback}\n\n${aiResult.response}`
+        : aiResult.response;
+
+      assistantResponse = finalizeLuciernagaResponse(assistantResponse, {
+        state,
+        mentor: mentorMode,
+        goal: buildGoalCoachContext(activeGoal, message, {
+          avoidanceCount: goalAvoidanceCount,
+          avoidanceDetected: avoidanceDetectedThisTurn,
+        }),
+        onboarding: onboardingContext,
+      });
+      assistantResponse = appendConversionPrompt(assistantResponse, conversionTrigger);
+      assistantResponse = appendSoftPaywallPrompt(assistantResponse, softPaywallPrompt);
+      assistantResponse = appendCaptureEmailPrompt(assistantResponse, captureEmailRecommended);
+
+      if (persistenceAvailable) {
+        try {
+          await saveConversationMessage({
+            conversationId,
+            userId,
+            role: "assistant",
+            content: assistantResponse,
+          });
+        } catch (dbError: unknown) {
+          persistenceAvailable = false;
+          logError("DB", dbError, {
+            route: "/api/chat",
+            userId,
+            stage: "post_ai_persistence_json",
+          });
+        }
+      }
+
+      const activeAction = getFirstPendingAction(activeGoal);
+      const jsonResponse = NextResponse.json({
+        success: true,
+        response: assistantResponse,
+        state,
+        conversationId,
+        goal: serializeGoal(activeGoal),
+        action:
+          activeAction?.description ??
+          (activeGoal
+            ? "Cierra hoy una sola accion visible de tu objetivo activo."
+            : "Define una sola accion concreta para hoy y ejecútala."),
+        emotionalProfile,
+        searchUsed: searchResults.length > 0,
+        fallback: aiResult.fallback,
+        flow: serializeFlow(flowContext),
+        persistenceAvailable,
+        mentorMode: mentorMode.mode,
+        transformationPhase,
+        conversionTrigger,
+        conversionType,
+        captureEmail: captureEmailRecommended,
+        captureEmailMessage: captureEmailRecommended ? captureEmailMessage : null,
+      });
+
+      if (identity.shouldSetCookie) {
+        attachSessionCookie(jsonResponse, identity.sessionToken);
+      }
+
+      return jsonResponse;
+    }
+
     const systemPrompt = buildCoachPrompt(state, emotionalProfile, coachContext);
 
     const activeAction = getFirstPendingAction(activeGoal);
@@ -1037,14 +1127,21 @@ export async function POST(req: NextRequest) {
 
         if (!rawText) {
           // Fallback: generate non-streaming response
-          const fallbackResult = await generateAIResponse(message, state, emotionalProfile, coachContext);
+          const fallbackResult = await generateAIResponse(
+            message,
+            state,
+            emotionalProfile,
+            coachContext
+          );
           rawText = fallbackResult.response;
           streamFallback = fallbackResult.fallback;
           send({ type: "delta", delta: rawText });
         }
 
         // Post-process
-        let finalText = completionMicroFeedback ? `${completionMicroFeedback}\n\n${rawText}` : rawText;
+        let finalText = completionMicroFeedback
+          ? `${completionMicroFeedback}\n\n${rawText}`
+          : rawText;
         finalText = finalizeLuciernagaResponse(finalText, {
           state,
           mentor: mentorMode,
@@ -1065,16 +1162,34 @@ export async function POST(req: NextRequest) {
         // Persist
         if (streamPersistence) {
           try {
-            await saveConversationMessage({ conversationId: streamConversationId, userId: streamUserId, role: "assistant", content: finalText });
+            await saveConversationMessage({
+              conversationId: streamConversationId,
+              userId: streamUserId,
+              role: "assistant",
+              content: finalText,
+            });
           } catch (dbError: unknown) {
             streamPersistence = false;
-            logError("DB", dbError, { route: "/api/chat", userId: streamUserId, stage: "stream_persistence" });
+            logError("DB", dbError, {
+              route: "/api/chat",
+              userId: streamUserId,
+              stage: "stream_persistence",
+            });
           }
         }
 
-        logInfo("AI", "stream_completed", { userId: streamUserId, conversationId: streamConversationId, fallback: streamFallback });
+        logInfo("AI", "stream_completed", {
+          userId: streamUserId,
+          conversationId: streamConversationId,
+          fallback: streamFallback,
+        });
 
-        send({ type: "meta", ...metaPayload, fallback: streamFallback, persistenceAvailable: streamPersistence });
+        send({
+          type: "meta",
+          ...metaPayload,
+          fallback: streamFallback,
+          persistenceAvailable: streamPersistence,
+        });
         send({ type: "done" });
         controller.close();
       },

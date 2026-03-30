@@ -6,13 +6,16 @@ import { analyzeEmotionalProfile, getEmotionalProfile } from "@/services/emotion
 import { detectUserState } from "@/services/state";
 import {
   createTelegramUserWithConsent,
+  deactivateTelegramUser,
   deleteTelegramUserData,
   findTelegramUser,
   getOrCreateTelegramConversation,
+  getPendingActions,
   isCrisisState,
   logTelegramCrisis,
   touchTelegramUser,
 } from "@/services/telegram";
+import { sendAdminUserAlert } from "@/lib/alerts";
 import { DEFAULT_EMOTIONAL_PROFILE } from "@/types/emotional-profile";
 
 // ---- Telegram types ----
@@ -33,6 +36,28 @@ interface TelegramUpdate {
 
 const TELEGRAM_API = "https://api.telegram.org";
 
+const SAFETY_KEYWORDS = [
+  "suicid",
+  "matarme",
+  "quitarme la vida",
+  "no quiero vivir",
+  "quiero morir",
+  "hacerme daño",
+  "me voy a hacer daño",
+  "no vale la pena vivir",
+];
+
+const SAFETY_RESPONSE = `Lo que me estás contando es muy serio y quiero que sepas que no estás solo/a.
+
+Por favor contacta ahora con una línea de crisis:
+🆘 España: 024 (línea de atención a la conducta suicida)
+🆘 México: 800 290 0024 (SAPTEL)
+🆘 Argentina: (011) 5275-1135 (Centro de Asistencia al Suicida)
+
+Si estás en peligro inmediato, llama al número de emergencias de tu país (112 / 911).
+
+Estoy aquí, pero esto necesita atención humana ahora.`;
+
 const CONSENT_MESSAGE = `Antes de empezar necesito tu consentimiento.
 
 Este asistente utiliza inteligencia artificial para acompañarte en decisiones personales.
@@ -45,8 +70,18 @@ Consulta la política: ${process.env.APP_BASE_URL ?? "https://luciernaga.ai"}/pr
 
 Escribe ACEPTO para continuar.`;
 
-const WELCOME_MESSAGE =
-  "Gracias. Ya puedes comenzar. ¿Qué te preocupa ahora mismo?";
+const PRIVACY_MESSAGE = `📋 *Política de privacidad*
+
+Tus mensajes se almacenan de forma segura para mantener la continuidad de la conversación.
+
+🔹 No compartimos tu información con terceros
+🔹 Puedes eliminar todos tus datos en cualquier momento
+🔹 Para borrar tus datos escribe: /borrar_datos
+🔹 Para desactivar recordatorios escribe: /salir
+
+Más información: ${process.env.APP_BASE_URL ?? "https://luciernaga.ai"}/privacidad`;
+
+const WELCOME_MESSAGE = "Gracias. Ya puedes comenzar. ¿Qué te preocupa ahora mismo?";
 
 const DELETE_CONFIRM_MESSAGE =
   "✅ Todos tus datos han sido eliminados. Si quieres volver a usar el asistente escríbeme cuando quieras.";
@@ -54,7 +89,15 @@ const DELETE_CONFIRM_MESSAGE =
 const DELETE_ERROR_MESSAGE =
   "No se pudieron eliminar tus datos en este momento. Inténtalo más tarde o contacta con soporte.";
 
-// ---- Telegram API helper ----
+const SALIR_MESSAGE =
+  "👋 Entendido. Has desactivado los recordatorios. Estaré aquí cuando quieras retomar.";
+
+// ---- Helpers ----
+
+function hasSafetyKeyword(text: string): boolean {
+  const normalized = text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return SAFETY_KEYWORDS.some((kw) => normalized.includes(kw));
+}
 
 async function sendTelegramMessage(chatId: number, text: string): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -110,6 +153,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ ok: true });
     }
 
+    // ---- Handle /privacidad ----
+    if (text === "/privacidad") {
+      await sendTelegramMessage(chatId, PRIVACY_MESSAGE);
+      return NextResponse.json({ ok: true });
+    }
+
     // ---- Look up user ----
     let user = await findTelegramUser(chatId);
 
@@ -130,8 +179,70 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         await sendTelegramMessage(chatId, WELCOME_MESSAGE);
         return NextResponse.json({ ok: true });
       }
-      // User doesn't exist or hasn't consented
       await sendTelegramMessage(chatId, CONSENT_MESSAGE);
+      return NextResponse.json({ ok: true });
+    }
+
+    // ---- Handle /salir (requires consent check above) ----
+    if (text === "/salir") {
+      try {
+        await deactivateTelegramUser(userId);
+      } catch (err: unknown) {
+        logError("TELEGRAM", err, { area: "/salir", userId });
+      }
+      await sendTelegramMessage(chatId, SALIR_MESSAGE);
+      return NextResponse.json({ ok: true });
+    }
+
+    // ---- Handle /estado ----
+    if (text === "/estado") {
+      try {
+        const pending = await getPendingActions(userId);
+        if (pending.length === 0) {
+          await sendTelegramMessage(chatId, "No tienes acciones pendientes en este momento.");
+        } else {
+          const lines = pending.flatMap((p) => [
+            `🎯 ${p.goalTitle}`,
+            ...p.actions.map((a) => `  • ${a}`),
+          ]);
+          await sendTelegramMessage(chatId, `Tus acciones pendientes:\n\n${lines.join("\n")}`);
+        }
+      } catch (err: unknown) {
+        logError("TELEGRAM", err, { area: "/estado", userId });
+        await sendTelegramMessage(chatId, "No pude cargar tu estado en este momento.");
+      }
+      return NextResponse.json({ ok: true });
+    }
+
+    // ---- Safety gate ----
+    if (hasSafetyKeyword(text)) {
+      logError("TELEGRAM", new Error("safety_trigger"), { area: "safety_gate", userId });
+      await sendTelegramMessage(chatId, SAFETY_RESPONSE);
+      await sendAdminUserAlert({
+        userId,
+        lastMessage: text,
+        state: "riesgo",
+        reason: "Palabras clave de riesgo vital detectadas",
+      }).catch(() => undefined);
+      // Persist crisis event
+      try {
+        const conversationId = await getOrCreateTelegramConversation(userId);
+        await saveConversationMessage({
+          conversationId,
+          userId,
+          role: "user",
+          content: text,
+          updateTitleFromUserMessage: false,
+        });
+        await saveConversationMessage({
+          conversationId,
+          userId,
+          role: "assistant",
+          content: SAFETY_RESPONSE,
+        });
+      } catch {
+        // Non-critical
+      }
       return NextResponse.json({ ok: true });
     }
 
@@ -175,9 +286,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       logError("TELEGRAM", dbError, { area: "message_persistence", userId });
     }
 
-    // ---- Crisis detection ----
+    // ---- Crisis detection + admin alert ----
     if (isCrisisState(state)) {
       await logTelegramCrisis(userId, text, aiResult.response);
+      await sendAdminUserAlert({
+        userId,
+        lastMessage: text,
+        state,
+        reason: `Estado emocional: ${state}`,
+      }).catch(() => undefined);
     }
 
     // ---- Send reply ----

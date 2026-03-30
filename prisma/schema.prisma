@@ -37,6 +37,9 @@ model User {
   consentGiven    Boolean          @default(false)
   consentAt       DateTime?
   source          String?
+  isActive        Boolean          @default(true)
+  messageCount    Int              @default(0)
+  lastMessageAt   DateTime?
   conversations   Conversation[]   @relation("UserConversations")
   messages        Message[]        @relation("UserMessages")
   goals           Goal[]

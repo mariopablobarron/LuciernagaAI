@@ -94,7 +94,9 @@ export default function Chat({
               Conversación guiada
             </p>
             <CardTitle className="mt-1 text-base">{title}</CardTitle>
-            <p className="mt-1 text-sm text-muted-foreground">Asistente emocional + foco en acción</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Asistente emocional + foco en acción
+            </p>
           </div>
         </div>
         {responseSignals?.searchUsed || responseSignals?.fallback || responseSignals?.flow ? (
@@ -241,7 +243,7 @@ export default function Chat({
                 : "Describe qué estás evitando o qué te cuesta arrancar..."
             }
             disabled={loading}
-            className="min-h-[84px] resize-none bg-background"
+            className="min-h-21 resize-none bg-background"
           />
           <Button
             type="button"

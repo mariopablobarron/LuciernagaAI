@@ -44,7 +44,10 @@ export const SAAS_CONFIG = {
 export const SAAS_ADMIN_NAV = [
   { id: "overview", label: "Resumen", description: "KPI de negocio y salud del producto" },
   { id: "segments", label: "Segmentos", description: "Nuevos, activos, retorno e inactivos" },
+  { id: "billing", label: "Billing", description: "Estado de planes e integracion de cobros" },
   { id: "crisis", label: "Crisis", description: "Eventos high/critical y contencion" },
+  { id: "alerts", label: "Alerts", description: "Alertas operativas priorizadas" },
   { id: "avoidance", label: "Evasion", description: "Resistencia y deuda de ejecucion" },
+  { id: "insights", label: "Insights", description: "Lecturas accionables de producto" },
   { id: "history", label: "Historial", description: "Decisiones e insights persistidos" },
 ] as const;

@@ -120,6 +120,13 @@ export async function saveConversationMessage(params: {
       where: { id: params.conversationId },
       data: updateData,
     });
+
+    if (params.role === "user" && params.userId) {
+      await tx.user.update({
+        where: { id: params.userId },
+        data: { lastMessageAt: now },
+      }).catch(() => undefined); // non-fatal if migration not yet applied
+    }
   });
 }
 

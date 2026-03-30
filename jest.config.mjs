@@ -8,6 +8,8 @@ const createJestConfig = nextJest({
 const customJestConfig = {
   coverageProvider: "v8",
   testEnvironment: "node",
+  globalTeardown: "<rootDir>/jest.teardown.ts",
+  openHandlesTimeout: 0,
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
   },

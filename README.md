@@ -1,429 +1,236 @@
-# 🌙 Luciérnaga - AI Mentorship Chat
+# Luciérnaga AI — Plataforma de Mentoría Conversacional
 
-A production-ready Next.js application that provides confrontational, state-aware mentorship through an AI chat interface.
-
-**Status:** ✅ Production Ready | **Stack:** Next.js 16 + TypeScript + OpenRouter API | **Deployed:** Coolify Docker
+**Stack:** Next.js 15 (App Router) · TypeScript · Prisma · PostgreSQL · OpenRouter
+**Deploy:** Docker + Coolify · Auto-deploy desde `main`
+**Estado:** Producción ✅
 
 ---
 
-## 🚀 Quick Start
+## Inicio rápido
 
-### Development
 ```bash
-npm install
-OPENROUTER_API_KEY=sk-or-your-key npm run dev
-# Open http://localhost:3000
-```
-
-### Production (Coolify)
-See **[QUICKSTART.md](QUICKSTART.md)** for 5-minute deploy.
-
----
-
-## 📋 Documentation
-
-| Document | Purpose |
-|----------|---------|
-| [QUICKSTART.md](QUICKSTART.md) | 5-minute deployment guide |
-| [DEPLOYMENT.md](DEPLOYMENT.md) | Complete Coolify setup (step-by-step) |
-| [PRODUCTION.md](PRODUCTION.md) | Pre/post deployment checklist |
-
----
-
-## 🏗️ Architecture
-
-### Stack
-- **Frontend:** Next.js 16.2.1 (App Router) + React 19 + TypeScript + Tailwind CSS v4
-- **Backend:** Next.js API Routes + OpenRouter (OpenAI gpt-4o-mini)
-- **Deployment:** Docker + Coolify
-- **Database:** PostgreSQL (optional, not required for MVP)
-
-### Endpoints
-```
-GET  /api/health                 → System health check
-POST /api/chat-direct            → Chat with AI mentor (no DB)
-POST /api/mock-chat              → Test endpoint (mock response)
-GET  /api/admin/insights         → Admin insights (protected)
-GET  /api/*                      → 404 Not Found
-```
-
-### Error Handling
-- ✅ Global error boundary (no white screen)
-- ✅ Structured error logging
-- ✅ Semantic HTTP status codes
-- ✅ User-friendly error messages
-
----
-
-## 🎯 Features Implemented
-
-### MVP (Live)
-- [x] Chat interface with OpenRouter integration
-- [x] State detection (perdido, ansioso, bloqueado, normal)
-- [x] Confrontational prompts (psychology-driven)
-- [x] Health check endpoint
-- [x] Error handling + error boundary
-- [x] Production-grade logging
-- [x] Docker containerization
-- [x] ZERO crashes (graceful degradation)
-
-### Future
-- [ ] User session persistence (PostgreSQL)
-- [ ] Conversation history
-- [ ] Admin dashboard
-- [ ] User feedback collection
-- [ ] Prompt iteration based on metrics
-
----
-
-## ⚙️ Configuration
-
-### Required Environment Variables
-```
-OPENROUTER_API_KEY=sk-or-YOUR-KEY   # Get from https://openrouter.ai/keys
-NODE_ENV=production                 # production | development
-AUTH_TOKEN_SECRET=replace-me        # HMAC secret for session tokens
-ADMIN_USERNAME=admin                # Admin login username
-ADMIN_PASSWORD=replace-me           # Admin login password
-```
-
-### Optional
-```
-DATABASE_URL=postgresql://...       # For persistence (future)
-LOG_LEVEL=info                      # info | debug | error
-PORT=3000                           # Server port (Coolify manages)
-ADMIN_AUTH_SECRET=replace-me        # Optional dedicated secret for admin cookies
-```
-
-### Setup
-```bash
-# Create .env file
 cp .env.example .env
-
-# Add your OpenRouter API key
-echo "OPENROUTER_API_KEY=sk-or-YOUR-KEY" >> .env
-```
-
-### Admin Access
-- ` /admin` y ` /api/admin/*` ahora requieren autenticación admin.
-- En producción define `ADMIN_USERNAME` y `ADMIN_PASSWORD` en Coolify.
-- En desarrollo, si no defines variables, el fallback es:
-  - usuario: `admin`
-  - contraseña: `admin123`
-
----
-
-## 🔧 Build & Deploy
-
-### Local Development
-```bash
+# Rellena las variables (ver sección Entorno)
 npm install
 npm run dev
-# Open http://localhost:3000
-```
-
-### Local Production Testing
-```bash
-npm run build
-npm run start
-# Open http://localhost:3000
-```
-
-### Docker (Production)
-```bash
-# Build image
-docker build -t mentor-web .
-
-# Run container
-docker run -p 3000:3000 \
-  -e NODE_ENV=production \
-  -e OPENROUTER_API_KEY=sk-or-your-key \
-  mentor-web
-
-# Test
-curl http://localhost:3000/api/health | jq .
-```
-
-### Coolify (VPS Deployment)
-See [QUICKSTART.md](QUICKSTART.md) - takes 5 minutes.
-
----
-
-## 📊 API Examples
-
-### Health Check
-```bash
-curl http://localhost:3000/api/health
-```
-Response:
-```json
-{
-  "ready": true,
-  "statusCode": 200,
-  "server": { "status": "✅ RUNNING" },
-  "dependencies": { "openrouter": "✅" }
-}
-```
-
-### Chat with Mentor
-```bash
-curl -X POST http://localhost:3000/api/chat-direct \
-  -H "Content-Type: application/json" \
-  -d '{"message":"no sé qué hacer","userId":"user_123"}'
-```
-Response:
-```json
-{
-  "ok": true,
-  "reply": "Confrontational mentor response...",
-  "state": "perdido",
-  "timestamp": "2026-03-29T..."
-}
-```
-
-### Error Example
-```bash
-curl -X POST http://localhost:3000/api/chat-direct \
-  -H "Content-Type: application/json" \
-  -d '{"message":"","userId":""}'
-```
-Response (400):
-```json
-{
-  "reply": "Necesito que me cuentes qué te pasa",
-  "error": "EMPTY_INPUT"
-}
+# http://localhost:3000
 ```
 
 ---
 
-## 📝 Scripts
+## Entorno
 
-```bash
-npm run dev      # Development server (hot reload)
-npm run build    # Build for production
-npm run start    # Production server (next start)
-npm run lint     # Run ESLint
+### Obligatorias
 
-# Docker
-docker build -t mentor-web .                    # Build image
-docker run -p 3000:3000 mentor-web             # Run container
-docker-compose up -d                           # Or use docker-compose
-bash scripts/docker-test.sh                    # Run tests in Docker
+```env
+DATABASE_URL=postgresql://user:pass@host:5432/mentor_web
+OPENROUTER_API_KEY=sk-or-...
+AUTH_TOKEN_SECRET=cadena-aleatoria-larga
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=contraseña-segura
+ADMIN_AUTH_SECRET=otra-cadena-aleatoria
+APP_BASE_URL=https://tu-dominio.com
+TELEGRAM_BOT_TOKEN=<token del BotFather>
+```
+
+### Opcionales
+
+```env
+ADMIN_TELEGRAM_ID=<tu chat_id de Telegram para alertas>
+SESSION_SECRET=<secreto extra para sesiones>
 ```
 
 ---
 
-## 📧 Workflow
+## Arquitectura
 
-### Development
-1. Make changes in code
-2. Test locally: `npm run dev`
-3. Commit: `git add . && git commit -m "message"`
-
-### Deployment (Coolify Auto-Deploy)
-1. Push to GitHub: `git push origin main`
-2. Coolify automatically deploys
-3. View changes at: https://your-domain.com
-
-### Manual Testing
-```bash
-# Test endpoint
-curl https://your-domain.com/api/health | jq .
-
-# Test chat
-curl -X POST https://your-domain.com/api/chat-direct \
-  -H "Content-Type: application/json" \
-  -d '{"message":"test","userId":"test"}'
-```
-
----
-
-## 🔍 Monitoring
-
-### Health Check (Production)
-```bash
-curl https://your-domain.com/api/health
-# Status 200 = ✅ Healthy
-# Status 503 = ❌ Missing API key
-```
-
-### Log Markers (Watch for these)
-```
-[CHAT-DIRECT] 📨 Petición recibida          ← Request in
-[CHAT-DIRECT] 🎯 Estado detectado: perdido  ← State detected
-[CHAT-DIRECT] 🌐 Llamando OpenRouter...     ← API call
-[CHAT-DIRECT] ✨ Éxito (320 chars)          ← Success
-```
-
-### Common Errors
-| Error | Cause | Fix |
-|-------|-------|-----|
-| 501 MISSING_API_KEY | No API key | Add OPENROUTER_API_KEY to .env |
-| 502 OPENROUTER_ERROR | API external | Check OpenRouter status |
-| 502 EMPTY_RESPONSE | API bug | Retry or check model |
-| 500 INTERNAL_ERROR | Server bug | Check logs, report issue |
-
----
-
-## 🧪 Testing
-
-### Manual Testing Checklist
-- [ ] Health endpoint returns 200
-- [ ] Chat accepts message with any state
-- [ ] Errors show user-friendly messages
-- [ ] No white screen of death
-- [ ] Browser console has [FRONTEND] logs
-- [ ] Response time < 5 seconds
-- [ ] Mobile responsive layout
-
-### Automated Testing (Todo)
-```bash
-npm run test  # (Not implemented yet)
-```
-
----
-
-## 📦 Project Structure
-
-```
-mentor-web/
+```text
+src/
 ├── app/
-│   ├── page.tsx                 # Chat UI
-│   ├── layout.tsx               # Root layout
-│   ├── error.tsx                # Error boundary ✨
-│   ├── not-found.tsx            # 404 page ✨
-│   ├── globals.css              # Styles
-│   └── api/
-│       ├── chat-direct/route.ts # Main endpoint ✨
-│       ├── health/route.ts      # Health check
-│       └── mock-chat/route.ts   # Test endpoint
-├── lib/                         # Utilities (future)
-├── public/                      # Static files
-├── prisma/                      # Database schema (optional)
-├── Dockerfile                   # Production image ✨
-├── docker-compose.yml           # Local testing ✨
-├── next.config.ts               # Next.js config
-├── tsconfig.json                # TypeScript config
-├── package.json                 # Dependencies
-└── .env.production              # Env template ✨
-
-✨ = New files for production
+│   ├── page.tsx                  # Chat principal (SSE streaming)
+│   ├── editor/page.tsx           # Editor de contenido
+│   ├── admin/                    # Panel admin protegido
+│   ├── dashboard/                # Dashboard de usuario
+│   ├── impulso/                  # Modo Impulso (gamificación)
+│   │   ├── page.tsx
+│   │   ├── diagnostico/
+│   │   ├── perfil/
+│   │   ├── retos/
+│   │   └── checkin/
+│   └── api/                      # Rutas API (ver tabla abajo)
+├── components/                   # UI compartida
+├── services/                     # Lógica de negocio
+├── lib/                          # Utilidades y helpers
+└── types/                        # TypeScript types
+prisma/
+├── schema.prisma                 # Modelos de BD
+└── migrations/                   # Historial de migraciones
 ```
 
 ---
 
-## 🚨 Known Issues & Limitations
+## API — Referencia completa
 
-### Current (MVP)
-- No user session persistence (stateless)
-- State detection is keyword-based (not ML)
-- Single model: OpenAI gpt-4o-mini
-- No rate limiting yet
+### Chat
 
-### Planned Fixes
-- Add PostgreSQL for persistence (Priority 1)
-- Build admin dashboard (Priority 2)
-- ML-based state detection (Priority 3)
-- Multi-model support (Priority 4)
+- `POST /api/chat`: chat principal, responde con SSE streaming o JSON.
+- `POST /api/chat-direct`: chat sin DB (legacy, sin sesión).
+- `POST /api/mock-chat`: respuesta mock para tests.
+
+### Conversaciones y mensajes
+
+- `GET /api/conversations`: lista conversaciones del usuario.
+- `GET /api/messages`: mensajes de una conversación.
+- `GET/POST /api/goals`: objetivo activo / crear objetivo.
+- `PATCH /api/actions`: marcar acción completada.
+- `POST /api/checkin`: check-in diario con estado emocional.
+
+### Modo Impulso (API)
+
+- `GET/POST /api/diagnostic`: test diagnóstico + guardar resultado.
+- `GET/POST /api/challenge/assign`: asignar retos personalizados.
+- `GET /api/insights`: insights de comportamiento (14 días).
+- `GET/POST /api/future-message`: mensajes programados.
+
+### Auth
+
+- `POST /api/auth/bootstrap`: iniciar sesión anónima.
+- `POST /api/auth/login`: login con email.
+- `GET /api/auth/token`: validar token.
+- `POST /api/auth/capture-email`: capturar email de usuario anónimo.
+
+### Admin (panel)
+
+- `GET /api/admin/insights`: métricas e insights operativos.
+- `POST /api/admin/login`: login admin.
+- `POST /api/admin/logout`: logout admin.
+- `GET /api/admin/users`: listado de usuarios.
+- `GET /api/admin/users/[id]`: detalle de usuario.
+
+### Telegram
+
+- `POST /api/telegram/webhook`: webhook del bot de Telegram.
+
+### Sistema
+
+- `GET /api/health`: health check.
+- `GET /api/ready`: readiness check.
+- `GET /api/legal`: aviso legal.
+- `GET /api/alerts`: disparar alertas manuales.
 
 ---
 
-## 🔐 Security
+## Base de datos — Modelos principales
 
-### Production Checks
-- ✅ No API keys in git
-- ✅ Secrets managed via environment variables
-- ✅ HTTPS enforced (Coolify SSL)
-- ✅ Security headers configured
-- ✅ Error messages don't leak internals
-- ✅ CORS configured
-
-### TODO
-- [ ] Rate limiting per IP
-- [ ] Request validation
-- [ ] SQL injection prevention (when using DB)
-- [ ] XSS protection
-- [ ] CSRF tokens
+- `User`: usuarios (web + Telegram). Incluye `telegramId`, `consentGiven`, `source`, `isActive`, `messageCount`.
+- `Conversation`: conversaciones asociadas a un usuario.
+- `Message`: mensajes individuales (`role`: user / assistant).
+- `Goal`: objetivo activo del usuario.
+- `Action`: acciones dentro de un objetivo.
+- `UserState`: estado emocional actual (`state`, `crisisActive`, `primaryEmotion`).
+- `DailyLog`: log diario con `emotionalState`, `mood`, `momentum`.
+- `CrisisEvent`: eventos de crisis con `level` y `response`.
+- `UserProfile`: perfil de Modo Impulso (scores por categoría).
+- `UserChallenge`: retos activos del usuario.
+- `Streak`: racha diaria de check-ins.
+- `Subscription`: plan del usuario (`free` / `pro`).
 
 ---
 
-## 🐛 Troubleshooting
+## Funcionalidades
 
-### Build fails locally
+### Chat con streaming
+
+- Respuestas token a token vía SSE (`text/event-stream`)
+- Detección de estado emocional (`neutral`, `duda`, `bloqueo`, `ansiedad`, `claridad`)
+- Sistema de metas y acciones con presión progresiva
+- Perfil emocional persistente por usuario
+- Detección de crisis y escalada automática
+
+### Modo Impulso
+
+- Diagnóstico psicológico-operativo (12 preguntas)
+- 5 perfiles: `BLOQUEADO`, `ANSIOSO`, `DESMOTIVADO`, `PERDIDO`, `POTENCIAL_ALTO`
+- Retos personalizados de 3-7 días
+- Racha diaria con check-in
+- Insights de comportamiento (14 días)
+- Mensajes programados con fecha de desbloqueo
+
+### Telegram Bot
+
+- Flujo de consentimiento obligatorio (`ACEPTO`)
+- Conversaciones persistidas en DB
+- Comandos: `/start`, `/estado`, `/privacidad`, `/salir`, `/borrar_datos`
+- Detección de crisis y alerta al admin
+- Recordatorios automáticos (cron) para usuarios inactivos
+
+### Admin
+
+- Panel web en `/admin` (auth por cookie)
+- Dashboard Appsmith con: lista de usuarios, detalle, distribución emocional, acciones, crisis
+- Modo Acompañamiento: priorización de usuarios, score 7 días, recomendación de intervención
+- Alertas a Telegram admin vía `ADMIN_TELEGRAM_ID`
+
+---
+
+## Scripts
+
 ```bash
-# Clear cache and rebuild
-rm -rf .next node_modules
-npm install
-npm run build
+npm run dev          # Servidor de desarrollo
+npm run build        # Build de producción
+npm run start        # Servidor de producción
+npm run lint         # ESLint
+npm run test         # Jest
+
+npx prisma migrate deploy   # Aplicar migraciones (producción)
+npx prisma generate         # Regenerar cliente Prisma
+npx prisma studio           # Explorador de BD visual
 ```
 
-### "API key not found" error
+---
+
+## Despliegue
+
+Ver [COOLIFY_DEPLOY_STEPS.md](COOLIFY_DEPLOY_STEPS.md) para guía completa.
+
+**Resumen:**
+
+1. Push a `main` → GitHub Action dispara webhook de Coolify
+2. Coolify: build Docker → `prisma migrate deploy` → start
+3. Health check en `/api/health`
+
+### Registrar webhook de Telegram (una sola vez)
+
 ```bash
-# Set API key
-export OPENROUTER_API_KEY=sk-or-your-key
-npm run dev
+curl -X POST "https://api.telegram.org/bot<TOKEN>/setWebhook" \
+  -d "url=https://TU_DOMINIO/api/telegram/webhook"
 ```
 
-### Slow responses
+---
+
+## Seguridad
+
+- Sesiones via cookie `httpOnly` + HMAC firmado
+- Admin protegido por sesión separada
+- Tokens de Telegram y API keys solo en variables de entorno
+- Sin secretos en código fuente ni en git
+- Rate limiting en `/api/chat`
+- Validación de entrada en todos los endpoints
+
+---
+
+## Monitoreo
+
 ```bash
-# Check OpenRouter status
-curl https://status.openrouter.ai
+# Health
+curl https://tu-dominio.com/api/health
 
-# Increase timeout in browser DevTools
-curl -X POST ... &
-sleep 10
-# See response
-```
-
-### White screen of death
-```bash
-# Check browser console (F12)
-# Look for [FRONTEND] error messages
-# Check /api/health returns 200
+# Logs en Coolify → Service → Logs
+# Prefijos: [CHAT] [AI] [DB] [TELEGRAM] [REMINDERS] [RISK]
 ```
 
 ---
 
-## 📚 Learning Resources
-
-- [Next.js Docs](https://nextjs.org/docs)
-- [OpenRouter API](https://openrouter.ai/docs)
-- [Docker Docs](https://docs.docker.com/)
-- [Coolify Docs](https://coolify.io/docs)
-
----
-
-## 🤝 Contributing
-
-Any issues or questions?
-1. Check logs: `docker logs mentor-web`
-2. Check health: `curl /api/health`
-3. Review [DEPLOYMENT.md](DEPLOYMENT.md)
-4. Report issue with logs
-
----
-
-## 📄 License
-
-MIT
-
----
-
-## 👤 Author
-
-Luciérnaga AI Mentorship Platform
-
-**Version:** 1.0  
-**Last Updated:** 2026-03-29  
-**Status:** Production Ready ✅
-
----
-
-## 🎯 Next Steps
-
-1. **Deploy to Coolify** → [QUICKSTART.md](QUICKSTART.md)
-2. **Test with real users** → Collect feedback
-3. **Iterate prompts** → Based on user responses
-4. **Add database** → PostgreSQL persistence
-5. **Build dashboard** → Admin analytics
+**Repo:** mariopablobarron/LuciernagaAI
+**Rama principal:** `main`
+**Última actualización:** 2026-03-30

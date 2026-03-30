@@ -14,6 +14,7 @@ import {
   resolveConversationForUser,
   saveConversationMessage,
 } from "@/services/conversation";
+import { createGoalFromIntentMessage, getActiveGoalForUser } from "@/services/goals";
 import { detectUserState, updateUserState } from "@/services/state";
 import type { ChatRequestBody, UserState } from "@/types/chat";
 
@@ -42,6 +43,29 @@ function buildErrorResponse(
   );
 }
 
+function serializeGoal(goal: Awaited<ReturnType<typeof getActiveGoalForUser>>) {
+  if (!goal) {
+    return null;
+  }
+
+  return {
+    id: goal.id,
+    title: goal.title,
+    status: goal.status,
+    createdAt: goal.createdAt.toISOString(),
+    updatedAt: goal.updatedAt.toISOString(),
+    completedCount: goal.completedCount,
+    totalCount: goal.totalCount,
+    progress: goal.progress,
+    actions: goal.actions.map((action) => ({
+      id: action.id,
+      description: action.description,
+      completed: action.completed,
+      createdAt: action.createdAt.toISOString(),
+    })),
+  };
+}
+
 export async function POST(req: NextRequest) {
   try {
     logInfo("CHAT", "request_received", {
@@ -62,7 +86,6 @@ export async function POST(req: NextRequest) {
       hasMessage: !!body.message,
       messageLength: body.message?.length ?? 0,
       conversationId: body.conversationId ?? null,
-      providedUserId: body.userId ?? null,
     });
 
     const message = body.message?.trim() ?? "";
@@ -110,37 +133,56 @@ export async function POST(req: NextRequest) {
       return limitedResponse;
     }
 
-    await ensureUserSession(userId);
-
     const state = detectUserState(message);
     logInfo("STATE", "state_detected", { userId, state, messageLength: message.length });
+    let persistenceAvailable = true;
+    let activeGoal: Awaited<ReturnType<typeof getActiveGoalForUser>> | null = null;
+    let conversationId = body.conversationId?.trim() || `tmp_${Date.now()}`;
+    let isNewConversationTitle = false;
 
-    await updateUserState(userId, state);
+    try {
+      await ensureUserSession(userId);
+      await updateUserState(userId, state);
 
-    const conversation = await resolveConversationForUser(
-      userId,
-      body.conversationId,
-      message
-    );
+      const goalIntentResult = await createGoalFromIntentMessage({ userId, message });
+      activeGoal = goalIntentResult?.goal ?? (await getActiveGoalForUser(userId));
+      if (goalIntentResult?.created) {
+        logInfo("STATE", "goal_created_from_intent", {
+          userId,
+          goalId: goalIntentResult.goal.id,
+        });
+      }
 
-    logInfo("DB", "conversation_resolved", {
-      userId,
-      conversationId: conversation.id,
-      requestedConversationId: body.conversationId ?? null,
-    });
+      const conversation = await resolveConversationForUser(userId, body.conversationId, message);
+      conversationId = conversation.id;
+      isNewConversationTitle = conversation.title === "Nueva conversación";
 
-    await saveConversationMessage({
-      conversationId: conversation.id,
-      userId,
-      role: "user",
-      content: message,
-      updateTitleFromUserMessage: conversation.title === "Nueva conversación",
-    });
-    logInfo("DB", "message_saved", {
-      userId,
-      conversationId: conversation.id,
-      role: "user",
-    });
+      logInfo("DB", "conversation_resolved", {
+        userId,
+        conversationId,
+        requestedConversationId: body.conversationId ?? null,
+      });
+
+      await saveConversationMessage({
+        conversationId,
+        userId,
+        role: "user",
+        content: message,
+        updateTitleFromUserMessage: isNewConversationTitle,
+      });
+      logInfo("DB", "message_saved", {
+        userId,
+        conversationId,
+        role: "user",
+      });
+    } catch (dbError: unknown) {
+      persistenceAvailable = false;
+      logError("DB", dbError, {
+        route: "/api/chat",
+        userId,
+        stage: "pre_ai_persistence",
+      });
+    }
 
     if (!process.env.OPENROUTER_API_KEY?.trim()) {
       logError("AI", new Error("Missing OPENROUTER_API_KEY"), { route: "/api/chat" });
@@ -154,31 +196,42 @@ export async function POST(req: NextRequest) {
 
     logInfo("AI", "openrouter_call_requested", {
       userId,
-      conversationId: conversation.id,
+      conversationId,
       state,
       messageLength: message.length,
     });
     const aiResult = await generateAIResponse(message, state);
     logInfo("AI", "openrouter_call_completed", {
       userId,
-      conversationId: conversation.id,
+      conversationId,
       state,
       fallback: aiResult.fallback,
       errorType: aiResult.errorType ?? null,
       errorMessage: aiResult.errorMessage ?? null,
     });
 
-    await saveConversationMessage({
-      conversationId: conversation.id,
-      userId,
-      role: "assistant",
-      content: aiResult.response,
-    });
-    logInfo("DB", "message_saved", {
-      userId,
-      conversationId: conversation.id,
-      role: "assistant",
-    });
+    if (persistenceAvailable) {
+      try {
+        await saveConversationMessage({
+          conversationId,
+          userId,
+          role: "assistant",
+          content: aiResult.response,
+        });
+        logInfo("DB", "message_saved", {
+          userId,
+          conversationId,
+          role: "assistant",
+        });
+      } catch (dbError: unknown) {
+        persistenceAvailable = false;
+        logError("DB", dbError, {
+          route: "/api/chat",
+          userId,
+          stage: "post_ai_persistence",
+        });
+      }
+    }
 
     if (aiResult.fallback && aiResult.errorType === "provider_failure") {
       logError("AI", new Error(aiResult.errorMessage || "Provider failure"), {
@@ -191,8 +244,10 @@ export async function POST(req: NextRequest) {
       success: true,
       response: aiResult.response,
       state,
-      conversationId: conversation.id,
+      conversationId,
+      goal: serializeGoal(activeGoal),
       fallback: aiResult.fallback,
+      persistenceAvailable,
     });
     if (identity.shouldSetCookie) {
       attachSessionCookie(response, identity.sessionToken);

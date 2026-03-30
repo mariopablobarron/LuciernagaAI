@@ -66,6 +66,7 @@ model Insight {
   title     String
   content   String
   action    String
+  confidence String  @default("medium") // low, medium, high
   priority  String   @default("medium") // low, medium, high
   createdAt DateTime @default(now())
 }
@@ -74,6 +75,7 @@ model UserState {
   id        String   @id @default(cuid())
   userId    String   @unique
   state     String   // "neutral" | "bloqueado" | "perdido" | "ansioso"
+  mood      String?
   updatedAt DateTime @updatedAt
 
   @@index([state, updatedAt])

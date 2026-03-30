@@ -1,5 +1,6 @@
 import { logInfo } from "@/lib/logger";
 import type { UserState } from "@/types/chat";
+import type { InsightConfidence } from "@/services/insights";
 
 export interface DecisionMetrics {
   retentionDay3: number;
@@ -7,6 +8,7 @@ export interface DecisionMetrics {
   dropOffPoint: string;
   checkinDrop: number;
   dominantState: string;
+  confidence?: InsightConfidence;
 }
 
 export interface DecisionResult {
@@ -25,13 +27,28 @@ function normalizeState(state: string): UserState {
 
 export function generateDecision(metrics: DecisionMetrics, userState: string): DecisionResult {
   const normalizedUserState = normalizeState(userState);
+  const confidence = metrics.confidence ?? "medium";
+
+  if (confidence === "low") {
+    const result: DecisionResult = {
+      decision: "Recoger más datos antes de intervenir",
+      reason:
+        "La muestra actual es insuficiente para activar una decisión de alta prioridad con seguridad.",
+      priority: "medium",
+      action:
+        "Aumentar muestra de usuarios/check-ins durante 7 días y re-evaluar reglas con mayor confianza.",
+    };
+    logInfo("DECISION", "decision_generated", { trigger: "low_confidence", result });
+    return result;
+  }
 
   if (metrics.retentionDay3 < 0.4) {
     const result: DecisionResult = {
       decision: "Intervenir onboarding de forma inmediata",
       reason: `Retention Day 3 crítica (${(metrics.retentionDay3 * 100).toFixed(1)}%)`,
       priority: "high",
-      action: "Reducir fricción inicial, simplificar primeros 3 pasos y activar seguimiento proactivo.",
+      action:
+        "Reducir fricción inicial, simplificar primeros 3 pasos y activar seguimiento proactivo.",
     };
     logInfo("DECISION", "decision_generated", { trigger: "retentionDay3", result });
     return result;
@@ -42,7 +59,8 @@ export function generateDecision(metrics: DecisionMetrics, userState: string): D
       decision: "Simplificar interacción diaria",
       reason: `Check-in drop elevado (${(metrics.checkinDrop * 100).toFixed(1)}%)`,
       priority: "high",
-      action: "Reducir número de preguntas por check-in y ofrecer respuesta guiada con un solo clic.",
+      action:
+        "Reducir número de preguntas por check-in y ofrecer respuesta guiada con un solo clic.",
     };
     logInfo("DECISION", "decision_generated", { trigger: "checkinDrop", result });
     return result;

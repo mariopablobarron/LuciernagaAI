@@ -15,14 +15,19 @@ jest.mock("@/lib/auth", () => {
 });
 
 jest.mock("@/services/conversation", () => ({
+  createConversationForUser: jest.fn(),
   ensureUserSession: jest.fn(),
   listConversationsForUser: jest.fn(),
 }));
 
 import { NextRequest } from "next/server";
-import { GET } from "./route";
+import { GET, POST } from "./route";
 import { InvalidSessionTokenError, resolveIdentity, clearSessionCookie } from "@/lib/auth";
-import { ensureUserSession, listConversationsForUser } from "@/services/conversation";
+import {
+  createConversationForUser,
+  ensureUserSession,
+  listConversationsForUser,
+} from "@/services/conversation";
 
 describe("GET /api/conversations", () => {
   beforeEach(() => {
@@ -64,6 +69,61 @@ describe("GET /api/conversations", () => {
 
     const req = new NextRequest("http://localhost/api/conversations");
     const response = await GET(req);
+    const body = await response.json();
+
+    expect(response.status).toBe(401);
+    expect(body.success).toBe(false);
+    expect(body.code).toBe("INVALID_SESSION_TOKEN");
+    expect(clearSessionCookie).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("POST /api/conversations", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("crea una conversación para el usuario autenticado", async () => {
+    (resolveIdentity as jest.Mock).mockReturnValue({
+      userId: "usr_test_2",
+      source: "session",
+      sessionToken: "token",
+      shouldSetCookie: false,
+    });
+    (ensureUserSession as jest.Mock).mockResolvedValue(undefined);
+    (createConversationForUser as jest.Mock).mockResolvedValue({
+      id: "conv_new_1",
+      title: "Objetivo semanal",
+      createdAt: new Date("2026-03-30T00:00:00.000Z"),
+      updatedAt: new Date("2026-03-30T00:00:00.000Z"),
+    });
+
+    const req = new NextRequest("http://localhost/api/conversations", {
+      method: "POST",
+      body: JSON.stringify({ title: "Objetivo semanal" }),
+      headers: { "content-type": "application/json" },
+    });
+
+    const response = await POST(req);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(body.conversation.id).toBe("conv_new_1");
+    expect(createConversationForUser).toHaveBeenCalledWith("usr_test_2", "Objetivo semanal");
+  });
+
+  it("retorna 401 si el token es inválido", async () => {
+    (resolveIdentity as jest.Mock).mockImplementation(() => {
+      throw new InvalidSessionTokenError();
+    });
+
+    const req = new NextRequest("http://localhost/api/conversations", {
+      method: "POST",
+      body: JSON.stringify({ title: "Nueva conversación" }),
+      headers: { "content-type": "application/json" },
+    });
+    const response = await POST(req);
     const body = await response.json();
 
     expect(response.status).toBe(401);

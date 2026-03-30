@@ -3,7 +3,7 @@ import { clearAdminSessionCookie, resolveAdminAuth } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { generateDecision, type DecisionMetrics } from "@/services/decision";
-import { generateInsights } from "@/services/insights";
+import { generateInsights, getInsightConfidence } from "@/services/insights";
 import { getDominantState } from "@/services/state";
 
 export const dynamic = "force-dynamic";
@@ -60,6 +60,15 @@ function getDecisionMetricForLog(metrics: DecisionMetrics): { metric: string; va
   return { metric: "overall", value: metrics.retentionDay7 };
 }
 
+function smoothRate(numerator: number, denominator: number, prior = 0.5, strength = 4): number {
+  if (denominator <= 0) {
+    return prior;
+  }
+
+  const value = (numerator + prior * strength) / (denominator + strength);
+  return Math.min(1, Math.max(0, value));
+}
+
 export async function GET(req: NextRequest) {
   try {
     const adminAuth = resolveAdminAuth(req);
@@ -89,6 +98,11 @@ export async function GET(req: NextRequest) {
       where: { createdAt: { gte: sevenDaysAgo } },
     });
 
+    const totalUsers = await prisma.user.count();
+    const newUsers = await prisma.user.count({
+      where: { createdAt: { gte: threeDaysAgo } },
+    });
+
     const usersWithCheckinDay3 = await prisma.dailyCheckin.findMany({
       where: { createdAt: { gte: threeDaysAgo } },
       select: { userId: true },
@@ -100,6 +114,20 @@ export async function GET(req: NextRequest) {
       select: { userId: true },
       distinct: ["userId"],
     });
+
+    const activeUserIds = usersActiveLast7d.map((item) => item.userId);
+    const activeUsers =
+      activeUserIds.length > 0
+        ? await prisma.user.findMany({
+            where: { id: { in: activeUserIds } },
+            select: { id: true, createdAt: true },
+          })
+        : [];
+
+    const activeNewUsers = activeUsers.filter((user) => user.createdAt >= threeDaysAgo).length;
+    const activeReturningUsers = Math.max(activeUsers.length - activeNewUsers, 0);
+    const returningUsers = Math.max(totalUsers - newUsers, 0);
+    const inactiveUsers = Math.max(totalUsers - activeUsers.length, 0);
 
     const totalCheckinsLast7d = await prisma.dailyCheckin.count({
       where: { createdAt: { gte: sevenDaysAgo } },
@@ -115,13 +143,18 @@ export async function GET(req: NextRequest) {
     const statesFromMessages = recentMessages.map((m: { content: string }) => m.content);
     const dominantState = getDominantState(statesFromMessages);
 
-    const retentionDay3 =
-      usersCreatedLast7d > 0 ? usersWithCheckinDay3.length / usersCreatedLast7d : 0;
-    const retentionDay7 =
-      usersCreatedLast7d > 0 ? usersActiveLast7d.length / usersCreatedLast7d : 0;
+    const retentionDay3 = smoothRate(usersWithCheckinDay3.length, usersCreatedLast7d, 0.45, 4);
+    const retentionDay7 = smoothRate(usersActiveLast7d.length, usersCreatedLast7d, 0.4, 4);
 
     const expectedCheckins = Math.max(usersActiveLast7d.length * 7, 1);
-    const checkinDrop = Math.max(0, 1 - totalCheckinsLast7d / expectedCheckins);
+    const checkinCompletion = smoothRate(totalCheckinsLast7d, expectedCheckins, 0.35, 6);
+    const checkinDrop = Math.max(0, 1 - checkinCompletion);
+
+    const confidence = getInsightConfidence({
+      totalUsers,
+      totalMessages: recentMessages.length,
+      totalCheckinsLast7d,
+    });
 
     const dropOffPoint = retentionDay3 < 0.25 ? "day_1" : retentionDay3 < 0.4 ? "day_3" : "day_7";
 
@@ -131,6 +164,7 @@ export async function GET(req: NextRequest) {
       dropOffPoint,
       checkinDrop,
       dominantState,
+      confidence,
     };
 
     const decision = generateDecision(metrics, dominantState);
@@ -141,6 +175,17 @@ export async function GET(req: NextRequest) {
       checkinDrop,
       dropOffPoint,
       dominantState,
+      totalUsers,
+      totalMessages: recentMessages.length,
+      totalCheckinsLast7d,
+      expectedCheckinsLast7d: expectedCheckins,
+      segments: {
+        newUsers,
+        returningUsers,
+        inactiveUsers,
+        activeNewUsers,
+        activeReturningUsers,
+      },
     });
     const alerts = buildAlerts(metrics);
 
@@ -170,6 +215,8 @@ export async function GET(req: NextRequest) {
         dropOffPoint,
         checkinDrop,
         dominantState,
+        confidence,
+        sampleSize: totalUsers,
       },
       decision: {
         decision: decision.decision,

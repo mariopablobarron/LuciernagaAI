@@ -112,6 +112,14 @@ export default function Sidebar({
           </li>
           <li>
             <Link
+              href="/#mi-progreso"
+              className="block rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+            >
+              Mi progreso
+            </Link>
+          </li>
+          <li>
+            <Link
               href={adminAuthenticated ? "/admin" : "/admin/login?next=/admin"}
               className={`block rounded-xl border px-3 py-2 text-sm font-medium transition ${
                 pathname === "/admin"
@@ -203,7 +211,7 @@ export default function Sidebar({
         )}
       </section>
 
-      <section className="mb-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
+      <section id="mi-progreso" className="mb-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
           Progreso
         </p>

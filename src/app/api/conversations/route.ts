@@ -6,7 +6,11 @@ import {
   resolveIdentity,
 } from "@/lib/auth";
 import { logError, logInfo } from "@/lib/logger";
-import { ensureUserSession, listConversationsForUser } from "@/services/conversation";
+import {
+  createConversationForUser,
+  ensureUserSession,
+  listConversationsForUser,
+} from "@/services/conversation";
 
 export async function GET(req: NextRequest) {
   try {
@@ -56,6 +60,69 @@ export async function GET(req: NextRequest) {
       {
         success: false,
         error: "No se pudieron cargar las conversaciones",
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const identity = resolveIdentity(req);
+    const userId = identity.userId;
+
+    let title = "";
+    try {
+      const body = (await req.json()) as { title?: unknown };
+      if (typeof body.title === "string") {
+        title = body.title.trim();
+      }
+    } catch {
+      // Body opcional; si no llega JSON válido se crea con título por defecto.
+    }
+
+    await ensureUserSession(userId);
+    const conversation = await createConversationForUser(userId, title);
+
+    logInfo("CHAT", "conversation_created", {
+      userId,
+      conversationId: conversation.id,
+    });
+
+    const response = NextResponse.json({
+      success: true,
+      conversation: {
+        id: conversation.id,
+        title: conversation.title,
+        createdAt: conversation.createdAt.toISOString(),
+        updatedAt: conversation.updatedAt.toISOString(),
+      },
+    });
+
+    if (identity.shouldSetCookie) {
+      attachSessionCookie(response, identity.sessionToken);
+    }
+
+    return response;
+  } catch (error: unknown) {
+    if (error instanceof InvalidSessionTokenError) {
+      const unauthorized = NextResponse.json(
+        {
+          success: false,
+          error: "Token inválido o expirado",
+          code: "INVALID_SESSION_TOKEN",
+        },
+        { status: 401 }
+      );
+      clearSessionCookie(unauthorized);
+      return unauthorized;
+    }
+
+    logError("CHAT", error, { route: "/api/conversations", method: "POST" });
+    return NextResponse.json(
+      {
+        success: false,
+        error: "No se pudo crear la conversación",
       },
       { status: 500 }
     );

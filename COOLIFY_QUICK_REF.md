@@ -16,6 +16,7 @@
 ## 📍 STEP 2: COOLIFY DASHBOARD
 
 **Access:**
+
 - If you have Coolify: `https://your-coolify-server.com`
 - First time? SSH to VPS: `ssh root@YOUR_VPS_IP`
 - Install: `curl -fsSL https://cdn.coollabs.io/coolify/install.sh | bash`
@@ -30,7 +31,7 @@ Dashboard > Projects > + New Project
 PROJECT DETAILS:
   Name:        mentor-web
   Description: AI Mentorship Chat App
-  
+
 Click: CREATE
 ```
 
@@ -43,7 +44,7 @@ Project Settings > Integrations > GitHub
 
   Repository: mariopablobarron/LuciernagaAI
   Branch:     main
-  
+
 Click: CONNECT & AUTHORIZE
 ```
 
@@ -60,11 +61,11 @@ SERVICE DETAILS:
   Branch:          main
   Dockerfile:      ./Dockerfile
   Build Context:   .
-  
+
 PORT MAPPING:
   Container Port:  3000
   Public:          Toggle ON ✅
-  
+
 Click: SAVE
 
 STATUS: You should see "Preparing..." or similar
@@ -136,6 +137,7 @@ Status will change to: RUNNING ✅
 ## ✅ STEP 9: VERIFY IT WORKS
 
 ### Test 1: Health Check
+
 ```bash
 curl https://your-domain-or-ip:3000/api/health | jq .
 
@@ -148,6 +150,7 @@ Expected:
 ```
 
 ### Test 2: In Browser
+
 ```
 1. Open: https://your-domain-or-ip:3000
 2. Type: "no sé qué hacer"
@@ -156,6 +159,7 @@ Expected:
 ```
 
 ### Test 3: Chat Endpoint
+
 ```bash
 curl -X POST https://your-domain-or-ip:3000/api/chat-direct \
   -H "Content-Type: application/json" \
@@ -198,6 +202,7 @@ Wait 2 minutes for SSL cert
 ## 📊 MONITORING
 
 ### View Logs
+
 ```
 Service > Logs (real-time)
 
@@ -209,6 +214,7 @@ Watch for these signs of success:
 ```
 
 ### View Metrics
+
 ```
 Service > Monitor
   • CPU usage
@@ -218,6 +224,7 @@ Service > Monitor
 ```
 
 ### Restart Service
+
 ```
 Service > Actions > Restart
 
@@ -229,20 +236,33 @@ then health check runs
 
 ## 🆘 TROUBLESHOOTING
 
-| Issue | Fix |
-|-------|-----|
-| **Build fails** | Check logs. Usually: Dockerfile path wrong or GitHub access denied |
-| **"API key missing"** | Verify OPENROUTER_API_KEY is in Secrets (not Environment) |
-| **502 errors** | Check OpenRouter status: https://status.openrouter.ai |
-| **Health check fails** | Wait 40 seconds. If still fails, check `/api/health` returns 200 |
-| **Slow responses** | Normal first time (cold start). Should be <5 sec after |
-| **White screen** | Check browser console (F12). Should see `[FRONTEND]` logs |
+| Issue                  | Fix                                                                |
+| ---------------------- | ------------------------------------------------------------------ |
+| **Build fails**        | Check logs. Usually: Dockerfile path wrong or GitHub access denied |
+| **"API key missing"**  | Verify OPENROUTER_API_KEY is in Secrets (not Environment)          |
+| **502 errors**         | Check OpenRouter status: https://status.openrouter.ai              |
+| **Health check fails** | Wait 40 seconds. If still fails, check `/api/health` returns 200   |
+| **Slow responses**     | Normal first time (cold start). Should be <5 sec after             |
+| **White screen**       | Check browser console (F12). Should see `[FRONTEND]` logs          |
 
 ---
 
 ## 🔄 AUTO-DEPLOY ON PUSH
 
-After first deployment:
+This repo now includes a workflow:
+
+- [ .github/workflows/coolify-auto-deploy.yml ](.github/workflows/coolify-auto-deploy.yml)
+
+Final one-time setup needed:
+
+1. In GitHub repo settings add this secret:
+
+- Name: `COOLIFY_DEPLOY_WEBHOOK_URL`
+- Value: your Coolify Deploy Webhook URL
+
+2. Keep pushing to `main` as usual.
+
+After that:
 
 ```bash
 # On your Mac:
@@ -250,7 +270,8 @@ git add .
 git commit -m "your message"
 git push origin main
 
-# Coolify sees the push and automatically:
+# GitHub Action triggers the Coolify deploy webhook automatically.
+# Coolify then:
 #   1. Builds new image
 #   2. Stops old container
 #   3. Starts new one
@@ -268,7 +289,7 @@ No need to click Deploy again! 🎉
 ✅ Health monitoring  
 ✅ Error boundaries (no white screen)  
 ✅ Clever mentor responses  
-✅ 0 downtime deployments  
+✅ 0 downtime deployments
 
 ---
 
@@ -297,13 +318,13 @@ No need to click Deploy again! 🎉
 
 ## ⏱️ TIMELINE
 
-| Step | Time | Total |
-|------|------|-------|
-| Coolify setup | 5 min | 5 min |
-| Add GitHub + Docker | 5 min | 10 min |
-| First build | 5 min | 15 min |
+| Step                   | Time  | Total  |
+| ---------------------- | ----- | ------ |
+| Coolify setup          | 5 min | 5 min  |
+| Add GitHub + Docker    | 5 min | 10 min |
+| First build            | 5 min | 15 min |
 | Startup + health check | 2 min | 17 min |
-| Verify + test | 3 min | 20 min |
+| Verify + test          | 3 min | 20 min |
 
 **Total to production:** ~20 minutes ⚡
 

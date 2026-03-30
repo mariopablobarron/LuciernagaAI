@@ -9,6 +9,7 @@
 ## STEP 1: ACCESS COOLIFY DASHBOARD
 
 Go to your Coolify instance:
+
 ```
 https://your-coolify-domain.com
 or
@@ -16,6 +17,7 @@ https://your-vps-ip:3000  (if first time setup)
 ```
 
 **If you don't have Coolify yet:**
+
 1. Find your VPS IP address
 2. SSH into VPS: `ssh root@YOUR_VPS_IP`
 3. Install Coolify:
@@ -32,7 +34,7 @@ In Coolify Dashboard:
 
 ```
 1. Login with credentials (if already setup)
-   
+
 2. Click "Projects" (top left)
 
 3. Click "+ New Project"
@@ -69,16 +71,16 @@ In Coolify Dashboard:
 1. In Project → Dashboard → "+ Add Service"
 
 2. Choose "Docker"
-   
+
 3. Click "GitHub" (Import from GitHub)
 
 4. Fill in details:
-   
+
    Repository:        mariopablobarron/LuciernagaAI
    Branch:            main
    Dockerfile Path:   ./Dockerfile
    Build Context:     .  (root)
-   
+
    Port Mapping:
    • Container Port:  3000
    • Exposed Port:    80 (Coolify will add HTTPS)
@@ -98,6 +100,7 @@ In Coolify UI → Service Settings → Environment:
 ### 🔴 REQUIRED (must add)
 
 Mark as **SECRET** ⭐:
+
 ```
 OPENROUTER_API_KEY = sk-or-XXX-your-key
 
@@ -107,6 +110,7 @@ OPENROUTER_API_KEY = sk-or-XXX-your-key
 ### 🟡 OPTIONAL (auto-set)
 
 These are usually auto-set:
+
 ```
 NODE_ENV = production
 NEXT_TELEMETRY_DISABLED = 1
@@ -153,6 +157,7 @@ Total time: ~5-10 minutes
 ```
 
 **Watch the logs:**
+
 - Green messages = ✅ Good
 - Red messages = ❌ Error
 - Yellow messages = ⚠️ Warning
@@ -164,6 +169,7 @@ Total time: ~5-10 minutes
 Once "Deployment Successful" appears:
 
 ### Test health endpoint:
+
 ```bash
 curl https://your-coolify-domain.com/api/health | jq .
 
@@ -177,6 +183,7 @@ Expected response:
 ```
 
 ### Test in browser:
+
 ```
 1. Open https://your-coolify-domain.com
 2. Type: "no sé qué hacer"
@@ -186,6 +193,7 @@ Expected response:
 ```
 
 ### Test chat endpoint:
+
 ```bash
 curl -X POST https://your-coolify-domain.com/api/chat-direct \
   -H "Content-Type: application/json" \
@@ -226,6 +234,7 @@ Wait ~2 minutes for SSL certificate.
 ## STEP 10: MONITOR & TROUBLESHOOT
 
 ### View logs (real-time):
+
 ```
 Service → Logs → Watch for [CHAT-DIRECT] markers
 
@@ -238,15 +247,16 @@ Signs of success:
 
 ### Common Issues:
 
-| Problem | Solution |
-|---------|----------|
-| **Build fails** | Check Dockerfile: `git show 1983f8f:Dockerfile` |
-| **"API key missing"** | Verify OPENROUTER_API_KEY in Coolify secrets |
-| **502 errors** | Check logs for OpenRouter errors |
-| **Slow responses** | Check OpenRouter status: https://status.openrouter.ai |
-| **Health check fails** | Verify `/api/health` returns 200 |
+| Problem                | Solution                                              |
+| ---------------------- | ----------------------------------------------------- |
+| **Build fails**        | Check Dockerfile: `git show 1983f8f:Dockerfile`       |
+| **"API key missing"**  | Verify OPENROUTER_API_KEY in Coolify secrets          |
+| **502 errors**         | Check logs for OpenRouter errors                      |
+| **Slow responses**     | Check OpenRouter status: https://status.openrouter.ai |
+| **Health check fails** | Verify `/api/health` returns 200                      |
 
 ### Restart service:
+
 ```
 Service → Actions → Restart
 (Wait 30 seconds for startup)
@@ -256,13 +266,25 @@ Service → Actions → Restart
 
 ## STEP 11: AUTO-DEPLOY ON PUSH
 
-After first successful deployment:
+This repo now includes:
+
+- [ .github/workflows/coolify-auto-deploy.yml ](.github/workflows/coolify-auto-deploy.yml)
+
+One-time setup in GitHub:
+
+1. Open repo Settings → Secrets and variables → Actions
+2. Add secret:
+   - Name: `COOLIFY_DEPLOY_WEBHOOK_URL`
+   - Value: your Coolify deploy webhook URL
+
+After that, every push to `main` triggers deployment automatically.
 
 **Automatic Updates:**
+
 1. Make changes locally
 2. Push to GitHub: `git push origin main`
-3. Coolify sees the push (GitHub webhook)
-4. **Automatically builds and deploys**
+3. GitHub Action calls your Coolify deploy webhook
+4. **Coolify automatically builds and deploys**
 
 No need to click Deploy again! 🎉
 
@@ -290,6 +312,7 @@ No need to click Deploy again! 🎉
 ## 🆘 NEED HELP?
 
 ### Quick Test Before Coolify:
+
 ```bash
 docker build -t mentor-web .
 docker run -p 3000:3000 \
@@ -301,11 +324,13 @@ curl http://localhost:3000/api/health
 ```
 
 ### Check Dockerfile is correct:
+
 ```bash
 cat Dockerfile | head -20
 ```
 
 ### Verify GitHub:
+
 ```bash
 git log --oneline -1
 git push origin main

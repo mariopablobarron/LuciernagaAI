@@ -1,0 +1,31 @@
+name: Coolify Auto Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: coolify-auto-deploy
+  cancel-in-progress: true
+
+jobs:
+  trigger-coolify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate webhook secret
+        run: |
+          if [ -z "${{ secrets.COOLIFY_DEPLOY_WEBHOOK_URL }}" ]; then
+            echo "Missing GitHub secret: COOLIFY_DEPLOY_WEBHOOK_URL"
+            exit 1
+          fi
+
+      - name: Trigger Coolify deployment webhook
+        run: |
+          curl --fail --silent --show-error \
+            --request GET \
+            "${{ secrets.COOLIFY_DEPLOY_WEBHOOK_URL }}"
+
+      - name: Done
+        run: echo "Coolify deploy webhook triggered."

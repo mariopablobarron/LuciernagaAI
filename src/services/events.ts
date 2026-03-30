@@ -14,6 +14,9 @@ export type EventType =
   | "CRISIS_DETECTED"
   | "AVOIDANCE_DETECTED"
   | "AVOIDANCE_ESCALATED"
+  | "AVOIDANCE_CONFRONTED"
+  | "REENGAGEMENT_SUCCESS"
+  | "VALUE_MOMENT_DETECTED"
   | "USER_ONBOARDED"
   | "CHECKIN_SUBMITTED"
   | "PROFILE_COMPLETED";
@@ -38,7 +41,8 @@ export async function trackEvent(params: TrackEventParams): Promise<void> {
     };
 
     if (params.metadata !== undefined) {
-      data.metadata = params.metadata;
+      // Cast necessary for Prisma JSON type compatibility
+      data.metadata = params.metadata as unknown as typeof data.metadata;
     }
 
     await prisma.event.create({

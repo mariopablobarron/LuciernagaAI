@@ -7,7 +7,13 @@ import { generateDecision, type DecisionMetrics } from "@/services/decision";
 import { generateInsights, getInsightConfidence } from "@/services/insights";
 import { getRecentCrisisStats, listRecentCrisisEvents } from "@/services/risk";
 import { getDominantState } from "@/services/state";
-import { getActionCompletionRate, getAvoidanceRate, getEventMetrics } from "@/lib/metrics";
+import {
+  getActionCompletionRate,
+  getAvoidanceRate,
+  getEventMetrics,
+  getActionsPerConversation,
+  getUserSegments,
+} from "@/lib/metrics";
 
 export const dynamic = "force-dynamic";
 
@@ -105,6 +111,77 @@ function truncateMessage(message: string, maxLength = 140): string {
   }
 
   return `${normalized.slice(0, maxLength - 3)}...`;
+}
+
+/**
+ * Genera decisiones operacionales basadas en métricas del sistema
+ */
+interface Decision {
+  id: string;
+  priority: "high" | "medium" | "low";
+  title: string;
+  description: string;
+  action: string;
+}
+
+function generateTodayDecisions(
+  actionCompletionRate: number,
+  avoidanceRate: number,
+  actionsPerConversation: number,
+  valueMomentsCount: number
+): Decision[] {
+  const decisions: Decision[] = [];
+
+  // Decisión 1: Tasa de completación de acciones
+  if (actionCompletionRate < 0.4) {
+    decisions.push({
+      id: "low_completion_rate",
+      priority: "high",
+      title: "Acciones no suficientemente ejecutables",
+      description:
+        "Las acciones sugeridas tienen tasa de completación < 40%. Necesitan ser más específicas, manejables o motivantes.",
+      action: "Revisar calidad de generación de acciones. Hacerlas más pequeñas y claras.",
+    });
+  }
+
+  // Decisión 2: Tasa de evitación
+  if (avoidanceRate > 0.5) {
+    decisions.push({
+      id: "high_avoidance_rate",
+      priority: "high",
+      title: "Sistema no confronta lo suficiente",
+      description:
+        "Más del 50% de acciones están siendo evitadas. El sistema necesita ser más directo y explorar resistencias.",
+      action:
+        "Incrementar confrontación empática. Explorar por qué se evitan y ajustar siguiente acción.",
+    });
+  }
+
+  // Decisión 3: Acciones por conversación
+  if (actionsPerConversation < 0.5) {
+    decisions.push({
+      id: "low_actions_per_conversation",
+      priority: "medium",
+      title: "Baja intensidad de coaching",
+      description:
+        "El sistema genera < 0.5 acciones por conversación. Falta urgencia o identificación de oportunidades.",
+      action: "Entrenar modelo para detectar y sugerir acciones con más frecuencia.",
+    });
+  }
+
+  // Decisión 4: Momentos de claridad
+  if (valueMomentsCount < 5) {
+    decisions.push({
+      id: "low_value_moments",
+      priority: "medium",
+      title: "Usuarios no alcanzan claridad",
+      description:
+        "Se detectan pcos momentos de claridad/insight en usuarios. Falta profundidad en conversaciones.",
+      action: "Entrenar para hacer preguntas más poderosas que generen momentos de claridad.",
+    });
+  }
+
+  return decisions;
 }
 
 export async function GET(req: NextRequest) {
@@ -382,33 +459,59 @@ export async function GET(req: NextRequest) {
       messagesPerUserLast7d: 0,
       actionsCompletedLast7d: 0,
       actionsCreatedLast7d: 0,
+      actionsPerConversation: 0,
       actionCompletionRate: 0,
       avoidanceRate: 0,
       eventsByType: {} as Record<string, number>,
     };
 
+    let userSegments = {
+      blockedUsersCount: 0,
+      activeUsersCount: 0,
+      avoidanceUsersCount: 0,
+      crisisUsersCount: 0,
+      blockedUsers: [] as string[],
+      activeUsers: [] as string[],
+      avoidanceUsers: [] as string[],
+      crisisUsers: [] as string[],
+    };
+
     try {
-      const [eventData, allActionCompletionRate, allAvoidanceRate] = await Promise.all([
-        getEventMetrics(7),
-        getActionCompletionRate("", 7),
-        getAvoidanceRate("", 7),
-      ]);
+      const [eventData, allActionCompletionRate, allAvoidanceRate, actionsPerConv, segments] =
+        await Promise.all([
+          getEventMetrics(7),
+          getActionCompletionRate("", 7),
+          getAvoidanceRate("", 7),
+          getActionsPerConversation(7),
+          getUserSegments(7),
+        ]);
 
       eventMetrics = {
         totalEventsLast7d: eventData.totalEvents,
         messagesPerUserLast7d: eventData.averageEventsPerUser,
         actionsCompletedLast7d: eventData.eventsByType["ACTION_COMPLETED"] ?? 0,
         actionsCreatedLast7d: eventData.eventsByType["ACTION_CREATED"] ?? 0,
+        actionsPerConversation: actionsPerConv.actionsPerConversation,
         actionCompletionRate: allActionCompletionRate,
         avoidanceRate: allAvoidanceRate,
         eventsByType: eventData.eventsByType,
       };
+
+      userSegments = segments;
     } catch (eventError: unknown) {
       logError("TRACKING", eventError, {
         route: "/api/admin/insights",
         stage: "event_metrics_calculation",
       });
     }
+
+    // Generate today's operational decisions
+    const todaysDecisions = generateTodayDecisions(
+      eventMetrics.actionCompletionRate,
+      eventMetrics.avoidanceRate,
+      eventMetrics.actionsPerConversation,
+      eventMetrics.eventsByType["VALUE_MOMENT_DETECTED"] ?? 0
+    );
 
     return NextResponse.json({
       metrics: {
@@ -433,6 +536,12 @@ export async function GET(req: NextRequest) {
         activeNewUsers,
         activeReturningUsers,
         inactiveUsers,
+        behaviorBased: {
+          blockedUsersCount: userSegments.blockedUsersCount,
+          activeUsersCount: userSegments.activeUsersCount,
+          avoidanceUsersCount: userSegments.avoidanceUsersCount,
+          crisisUsersCount: userSegments.crisisUsersCount,
+        },
       },
       decision: {
         decision: decision.decision,
@@ -440,6 +549,7 @@ export async function GET(req: NextRequest) {
         priority: decision.priority,
         action: decision.action,
       },
+      decisionsToday: todaysDecisions,
       alerts,
       insights,
       events: eventMetrics,

@@ -254,3 +254,145 @@ export async function getHighEngagementUsers(
     return [];
   }
 }
+
+/**
+ * Calcula acciones por conversación para medir intensidad de coaching.
+ * Retorna: { totalSuggested, totalConversations, actionsPerConversation }
+ */
+export async function getActionsPerConversation(daysBack: number = 7) {
+  const prisma = getPrismaClient();
+  const since = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000);
+
+  try {
+    // Contar eventos ACTION_SUGGESTED únicos
+    const actionSuggested = await prisma.event.groupBy({
+      by: ["userId"],
+      where: {
+        type: "ACTION_SUGGESTED",
+        createdAt: { gte: since },
+      },
+      _count: true,
+    });
+
+    // Contar IDs únicos de conversación (via metadata.conversationId)
+    const allActionEvents = await prisma.event.findMany({
+      where: {
+        type: "ACTION_SUGGESTED",
+        createdAt: { gte: since },
+      },
+      select: {
+        userId: true,
+        metadata: true,
+      },
+    });
+
+    const conversationMap = new Map<string, Set<string>>();
+    for (const event of allActionEvents) {
+      const meta = event.metadata as Record<string, unknown>;
+      const conversationId = meta?.conversationId as string | undefined;
+
+      if (event.userId && conversationId) {
+        if (!conversationMap.has(event.userId)) {
+          conversationMap.set(event.userId, new Set());
+        }
+        conversationMap.get(event.userId)?.add(conversationId);
+      }
+    }
+
+    let totalSuggested = 0;
+    let totalConversations = 0;
+
+    for (const group of actionSuggested) {
+      totalSuggested += group._count;
+      if (group.userId) {
+        totalConversations += conversationMap.get(group.userId)?.size ?? 0;
+      }
+    }
+
+    return {
+      totalSuggested,
+      totalConversations: totalConversations || 1, // evita división por cero
+      actionsPerConversation: totalConversations > 0 ? totalSuggested / totalConversations : 0,
+    };
+  } catch {
+    return {
+      totalSuggested: 0,
+      totalConversations: 0,
+      actionsPerConversation: 0,
+    };
+  }
+}
+
+/**
+ * Segmenta usuarios basado en patrones de comportamiento reciente.
+ * Retorna: { blockedUsers, activeUsers, avoidanceUsers, crisisUsers }
+ */
+export async function getUserSegments(daysBack: number = 7) {
+  const prisma = getPrismaClient();
+  const since = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000);
+
+  try {
+    // Obtener todos los usuarios únicos con eventos
+    const allUsers = await prisma.event.groupBy({
+      by: ["userId"],
+      where: {
+        createdAt: { gte: since },
+      },
+    });
+
+    const blockedUsers = new Set<string>();
+    const activeUsers = new Set<string>();
+    const avoidanceUsers = new Set<string>();
+    const crisisUsers = new Set<string>();
+
+    for (const group of allUsers) {
+      if (!group.userId) continue;
+
+      // Obtener eventos del usuario
+      const userEvents = await prisma.event.findMany({
+        where: {
+          userId: group.userId,
+          createdAt: { gte: since },
+        },
+        select: {
+          type: true,
+        },
+      });
+
+      const eventTypes = userEvents.map((e) => e.type);
+
+      // Clasificar usuario basado en patrones de eventos
+      if (eventTypes.some((t) => t === "CRISIS_DETECTED")) {
+        crisisUsers.add(group.userId);
+      } else if (eventTypes.filter((t) => t === "AVOIDANCE_DETECTED").length > 2) {
+        avoidanceUsers.add(group.userId);
+      } else if (eventTypes.includes("ACTION_COMPLETED") || eventTypes.includes("GOAL_COMPLETED")) {
+        activeUsers.add(group.userId);
+      } else if (eventTypes.filter((t) => t === "ACTION_SKIPPED").length > 1) {
+        blockedUsers.add(group.userId);
+      }
+    }
+
+    return {
+      blockedUsersCount: blockedUsers.size,
+      activeUsersCount: activeUsers.size,
+      avoidanceUsersCount: avoidanceUsers.size,
+      crisisUsersCount: crisisUsers.size,
+      blockedUsers: Array.from(blockedUsers),
+      activeUsers: Array.from(activeUsers),
+      avoidanceUsers: Array.from(avoidanceUsers),
+      crisisUsers: Array.from(crisisUsers),
+    };
+  } catch {
+    return {
+      blockedUsersCount: 0,
+      activeUsersCount: 0,
+      avoidanceUsersCount: 0,
+      crisisUsersCount: 0,
+      blockedUsers: [],
+      activeUsers: [],
+      avoidanceUsers: [],
+      crisisUsers: [],
+    };
+  }
+}

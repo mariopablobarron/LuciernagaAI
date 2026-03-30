@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/Card";
+import { Card, CardContent } from "@/components/ui/card";
 import { AdminMetricCard } from "@/features/admin/components/AdminMetricCard";
 import { AdminPanel } from "@/features/admin/components/AdminPanel";
 import { AdminShell } from "@/features/admin/components/AdminShell";

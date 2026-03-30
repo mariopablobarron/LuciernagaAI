@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { LockKeyhole, ShieldCheck, Sparkles } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/Card";
+import { Card, CardContent } from "@/components/ui/card";
 import { SAAS_CONFIG } from "@/lib/saas";
 
 type AuthShellProps = {

@@ -67,19 +67,13 @@ function normalizeSyntheticLocalPart(userId: string): string {
   return safeValue || "anon";
 }
 
-function shouldDisableFreePlanLimit(): boolean {
-  const explicitUnlimited = process.env.FREE_PLAN_UNLIMITED === "true";
-  return explicitUnlimited || process.env.NODE_ENV !== "production";
-}
-
 function buildAccessState(params: {
   plan: CanonicalUserPlan;
   hasPlan: boolean;
   subscriptionStatus: string;
   messagesUsedToday: number;
 }): UserAccessState {
-  const noLimitForTesting = shouldDisableFreePlanLimit();
-  const messageLimitPerDay = params.hasPlan || noLimitForTesting ? null : FREE_PLAN_MESSAGE_LIMIT;
+  const messageLimitPerDay = params.hasPlan ? null : FREE_PLAN_MESSAGE_LIMIT;
   const messagesRemainingToday = params.hasPlan
     ? null
     : Math.max(0, FREE_PLAN_MESSAGE_LIMIT - params.messagesUsedToday);
@@ -90,7 +84,7 @@ function buildAccessState(params: {
     subscriptionStatus: params.subscriptionStatus,
     hasPlan: params.hasPlan,
     messagesUsedToday: params.messagesUsedToday,
-    messagesRemainingToday: messageLimitPerDay === null ? null : messagesRemainingToday,
+    messagesRemainingToday,
     messageLimitPerDay,
   };
 }
@@ -420,9 +414,7 @@ export async function linkIdentityToEmail(params: {
       data: {
         name: existingUser.name ?? nextName,
         lastSeen:
-          currentUser.lastSeen > existingUser.lastSeen
-            ? currentUser.lastSeen
-            : existingUser.lastSeen,
+          currentUser.lastSeen > existingUser.lastSeen ? currentUser.lastSeen : existingUser.lastSeen,
       },
     });
 
@@ -437,76 +429,6 @@ export async function linkIdentityToEmail(params: {
     });
 
     return { userId: existingUser.id };
-  });
-}
-
-export async function linkTelegramIdentity(params: {
-  currentUserId: string;
-  telegramUserId: string;
-}): Promise<{ userId: string }> {
-  const prisma = getPrismaClient();
-
-  return prisma.$transaction(async (tx) => {
-    const now = new Date();
-    const currentUser = await tx.user.findUnique({ where: { id: params.currentUserId } });
-    if (!currentUser) {
-      throw new Error("CURRENT_USER_NOT_FOUND");
-    }
-
-    const telegramUser = await tx.user.findUnique({ where: { id: params.telegramUserId } });
-    if (!telegramUser) {
-      throw new Error("TELEGRAM_USER_NOT_FOUND");
-    }
-
-    if (telegramUser.id === currentUser.id) {
-      await tx.user.update({
-        where: { id: currentUser.id },
-        data: {
-          source: "telegram",
-          consentGiven: true,
-          consentAt: telegramUser.consentAt ?? now,
-          telegramId: telegramUser.telegramId ?? currentUser.telegramId,
-          lastSeen: now,
-        },
-      });
-      return { userId: currentUser.id };
-    }
-
-    if (telegramUser.telegramId) {
-      const telegramBoundElsewhere = await tx.user.findFirst({
-        where: {
-          telegramId: telegramUser.telegramId,
-          NOT: { id: { in: [currentUser.id, telegramUser.id] } },
-        },
-        select: { id: true },
-      });
-      if (telegramBoundElsewhere) {
-        throw new Error("TELEGRAM_ALREADY_LINKED");
-      }
-    }
-
-    await tx.user.update({
-      where: { id: currentUser.id },
-      data: {
-        telegramId: telegramUser.telegramId ?? currentUser.telegramId,
-        consentGiven: true,
-        consentAt: telegramUser.consentAt ?? currentUser.consentAt ?? now,
-        source: "telegram",
-        lastSeen: now,
-      },
-    });
-
-    await moveUserOwnedRecords({
-      tx,
-      sourceUserId: telegramUser.id,
-      targetUserId: currentUser.id,
-    });
-
-    await tx.user.delete({
-      where: { id: telegramUser.id },
-    });
-
-    return { userId: currentUser.id };
   });
 }
 

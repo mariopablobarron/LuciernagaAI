@@ -7,6 +7,16 @@ type InsightsPanelProps = {
   emotionalProfile: EmotionalProfile;
   insight: string;
   action: string;
+  responseSignals?: {
+    searchUsed: boolean;
+    fallback: boolean;
+    flow: {
+      currentIntent: string;
+      currentStep: number;
+      activeFlow: string | null;
+      instruction: string | null;
+    } | null;
+  };
   actionLock?: {
     message: string;
     actionTitle: string;
@@ -58,12 +68,15 @@ export default function InsightsPanel({
   emotionalProfile,
   insight,
   action,
+  responseSignals,
   actionLock,
   alerts,
   goal,
   goalLoading = false,
   onToggleAction,
 }: InsightsPanelProps) {
+  const flow = responseSignals?.flow;
+
   return (
     <aside className="h-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
       <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
@@ -118,6 +131,46 @@ export default function InsightsPanel({
       <section className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
         <p className="text-xs font-semibold text-slate-500">Insight</p>
         <p className="mt-2 text-sm text-slate-700">{insight}</p>
+      </section>
+
+      <section className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
+        <p className="text-xs font-semibold text-slate-500">Motor de respuesta</p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+              responseSignals?.searchUsed
+                ? "border border-sky-200 bg-sky-50 text-sky-700"
+                : "border border-slate-200 bg-white text-slate-500"
+            }`}
+          >
+            {responseSignals?.searchUsed ? "Internet usado" : "Sin búsqueda externa"}
+          </span>
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+              responseSignals?.fallback
+                ? "border border-rose-200 bg-rose-50 text-rose-700"
+                : "border border-emerald-200 bg-emerald-50 text-emerald-700"
+            }`}
+          >
+            {responseSignals?.fallback ? "Fallback activo" : "Proveedor IA estable"}
+          </span>
+        </div>
+        {flow?.activeFlow ? (
+          <div className="mt-3 rounded-lg border border-violet-200 bg-violet-50 px-3 py-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-violet-700">
+              Flujo conversacional activo
+            </p>
+            <p className="mt-1 text-sm font-semibold text-violet-950">
+              {flow.activeFlow} · paso {flow.currentStep}
+            </p>
+            <p className="mt-1 text-xs text-violet-800">Intent: {flow.currentIntent}</p>
+            {flow.instruction ? (
+              <p className="mt-2 text-sm text-violet-900">{flow.instruction}</p>
+            ) : null}
+          </div>
+        ) : (
+          <p className="mt-3 text-sm text-slate-600">Sin flujo guiado activo en este turno.</p>
+        )}
       </section>
 
       <section className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">

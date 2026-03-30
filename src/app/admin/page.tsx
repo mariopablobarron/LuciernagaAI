@@ -64,6 +64,23 @@ interface AdminInsightsResponse {
       refuse: number;
     }>;
   };
+  decisionHistory?: Array<{
+    id: string;
+    metric: string;
+    value: number;
+    decision: string;
+    createdAt: string;
+  }>;
+  insightHistory?: Array<{
+    id: string;
+    type: string;
+    title: string;
+    content: string;
+    action: string;
+    priority: Priority;
+    confidence: "low" | "medium" | "high";
+    createdAt: string;
+  }>;
 }
 
 function formatPercent(value: number): string {
@@ -341,6 +358,67 @@ export default function AdminPage() {
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <section className="space-y-3">
+          <h2 className="text-lg font-bold">Historial de decisiones</h2>
+          {data.decisionHistory && data.decisionHistory.length > 0 ? (
+            data.decisionHistory.map((item) => (
+              <div key={item.id} className="rounded bg-white p-4 shadow">
+                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                  <span className="rounded bg-slate-100 px-2 py-1 font-semibold text-slate-700">
+                    {item.metric}
+                  </span>
+                  <span>{formatDateTime(item.createdAt)}</span>
+                  <span>valor {item.value.toFixed(2)}</span>
+                </div>
+                <p className="mt-2 text-sm font-semibold text-slate-900">{item.decision}</p>
+              </div>
+            ))
+          ) : (
+            <div className="rounded bg-white p-4 text-sm text-gray-600 shadow">
+              Sin decisiones históricas registradas todavía.
+            </div>
+          )}
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-lg font-bold">Historial de insights</h2>
+          {data.insightHistory && data.insightHistory.length > 0 ? (
+            data.insightHistory.map((item) => (
+              <div key={item.id} className="rounded bg-white p-4 shadow">
+                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                  <span className="rounded bg-slate-100 px-2 py-1 font-semibold text-slate-700">
+                    {item.type}
+                  </span>
+                  <span>{formatDateTime(item.createdAt)}</span>
+                  <span
+                    className={`rounded px-2 py-1 font-semibold ${
+                      item.priority === "high"
+                        ? "bg-red-100 text-red-800"
+                        : item.priority === "medium"
+                          ? "bg-amber-100 text-amber-800"
+                          : "bg-emerald-100 text-emerald-800"
+                    }`}
+                  >
+                    {item.priority}
+                  </span>
+                  <span className="rounded bg-slate-100 px-2 py-1 font-semibold text-slate-700">
+                    confianza {item.confidence}
+                  </span>
+                </div>
+                <p className="mt-2 text-sm font-semibold text-slate-900">{item.title}</p>
+                <p className="mt-1 text-sm text-slate-700">{item.content}</p>
+                <p className="mt-2 text-sm font-medium text-blue-700">{item.action}</p>
+              </div>
+            ))
+          ) : (
+            <div className="rounded bg-white p-4 text-sm text-gray-600 shadow">
+              Sin insights históricos registrados todavía.
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );

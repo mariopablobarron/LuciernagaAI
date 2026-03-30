@@ -85,6 +85,7 @@ describe("POST /api/checkin", () => {
 
     expect(response.status).toBe(200);
     expect(body.userId).toBe("usr_session_1");
+    expect(body.emotionalProfile.primaryEmotion).toBe("calma");
     expect(updateUserState).toHaveBeenCalledWith("usr_session_1", "claridad");
     expect(updateEmotionalProfile).toHaveBeenCalledWith(
       "usr_session_1",

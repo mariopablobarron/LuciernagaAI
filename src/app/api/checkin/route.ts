@@ -68,9 +68,11 @@ export async function POST(req: NextRequest) {
 
     // 3. GUARDAR/ACTUALIZAR ESTADO
     await updateUserState(userId, state);
+    let emotionalProfile = analyzeEmotionalProfile(responseText, []);
     try {
-      await updateEmotionalProfile(userId, analyzeEmotionalProfile(responseText, []));
+      await updateEmotionalProfile(userId, emotionalProfile);
     } catch (emotionalError: unknown) {
+      emotionalProfile = analyzeEmotionalProfile(responseText, []);
       logError("EMOTION", emotionalError, {
         route: "/api/checkin",
         userId,
@@ -94,6 +96,7 @@ export async function POST(req: NextRequest) {
       ok: true,
       checkin,
       state,
+      emotionalProfile,
       checkinsToday: todayCheckins,
       userId,
     });

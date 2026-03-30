@@ -9,6 +9,17 @@ export type ChatMessage = {
   content: string;
   isError?: boolean;
   variant?: "action_required";
+  meta?: {
+    searchUsed?: boolean;
+    fallback?: boolean;
+  };
+};
+
+type ChatFlow = {
+  currentIntent: string;
+  currentStep: number;
+  activeFlow: string | null;
+  instruction: string | null;
 };
 
 type ActionLock = {
@@ -23,6 +34,11 @@ type ChatProps = {
   loading: boolean;
   error: string | null;
   actionLock?: ActionLock | null;
+  responseSignals?: {
+    searchUsed: boolean;
+    fallback: boolean;
+    flow: ChatFlow | null;
+  };
   onInputChange: (value: string) => void;
   onSend: (overrideText?: string) => Promise<void> | void;
 };
@@ -34,6 +50,7 @@ export default function Chat({
   loading,
   error,
   actionLock,
+  responseSignals,
   onInputChange,
   onSend,
 }: ChatProps) {
@@ -55,6 +72,28 @@ export default function Chat({
       <header className="border-b border-slate-200 px-5 py-4">
         <h1 className="text-base font-semibold text-slate-900">{title}</h1>
         <p className="text-xs text-slate-500">Asistente emocional + foco en acción</p>
+        {responseSignals?.searchUsed || responseSignals?.fallback || responseSignals?.flow ? (
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {responseSignals.searchUsed ? (
+              <span className="rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-[11px] font-semibold text-sky-700">
+                Internet usado
+              </span>
+            ) : null}
+            {responseSignals.fallback ? (
+              <span className="rounded-full border border-rose-200 bg-rose-50 px-2.5 py-1 text-[11px] font-semibold text-rose-700">
+                Fallback activo
+              </span>
+            ) : null}
+            {responseSignals.flow?.activeFlow ? (
+              <span className="rounded-full border border-violet-200 bg-violet-50 px-2.5 py-1 text-[11px] font-semibold text-violet-700">
+                Flujo {responseSignals.flow.activeFlow} · paso {responseSignals.flow.currentStep}
+              </span>
+            ) : null}
+          </div>
+        ) : null}
+        {responseSignals?.flow?.instruction ? (
+          <p className="mt-2 text-xs text-slate-600">{responseSignals.flow.instruction}</p>
+        ) : null}
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
@@ -71,6 +110,7 @@ export default function Chat({
                 content={message.content}
                 isError={message.isError}
                 variant={message.variant}
+                meta={message.meta}
               />
             ))
           )}

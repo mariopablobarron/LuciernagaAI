@@ -5,6 +5,10 @@ import {
   InvalidSessionTokenError,
   resolveIdentity,
 } from "@/lib/auth";
+import {
+  sendAvoidanceEscalationAlert,
+  sendCrisisEscalationAlert,
+} from "@/lib/alerts";
 import { logError, logInfo } from "@/lib/logger";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getErrorMessage } from "@/lib/utils";
@@ -96,6 +100,20 @@ function serializeGoal(goal: Awaited<ReturnType<typeof getActiveGoalForUser>>) {
   };
 }
 
+function serializeFlow(flow: {
+  currentIntent: string;
+  currentStep: number;
+  activeFlow: string | null;
+  instruction: string | null;
+}) {
+  return {
+    currentIntent: flow.currentIntent,
+    currentStep: flow.currentStep,
+    activeFlow: flow.activeFlow,
+    instruction: flow.instruction,
+  };
+}
+
 function buildActionRequiredResponse(params: {
   message: string;
   state: UserState;
@@ -107,6 +125,12 @@ function buildActionRequiredResponse(params: {
     description: string;
   };
   persistenceAvailable: boolean;
+  flow: {
+    currentIntent: string;
+    currentStep: number;
+    activeFlow: string | null;
+    instruction: string | null;
+  };
 }): NextResponse {
   return NextResponse.json({
     success: true,
@@ -119,6 +143,8 @@ function buildActionRequiredResponse(params: {
     emotionalProfile: params.emotionalProfile,
     fallback: true,
     persistenceAvailable: params.persistenceAvailable,
+    searchUsed: false,
+    flow: serializeFlow(params.flow),
     action: {
       id: params.action.id,
       title: params.action.description,
@@ -126,7 +152,7 @@ function buildActionRequiredResponse(params: {
   });
 }
 
-function isCrisisLevel(level: RiskLevel): boolean {
+function isCrisisLevel(level: RiskLevel): level is "high" | "critical" {
   return level === "high" || level === "critical";
 }
 
@@ -353,11 +379,25 @@ export async function POST(req: NextRequest) {
                 actionId: pendingAction.id,
                 type: "postpone",
               });
+              await sendAvoidanceEscalationAlert({
+                userId,
+                type: "postpone",
+                count: goalAvoidanceCount,
+                actionTitle: pendingAction.description,
+                goalTitle: activeGoal?.title ?? null,
+              });
             } else if (detectActionRefusalIntent(message)) {
               goalAvoidanceCount = await registerAvoidanceEvent({
                 userId,
                 actionId: pendingAction.id,
                 type: "refuse",
+              });
+              await sendAvoidanceEscalationAlert({
+                userId,
+                type: "refuse",
+                count: goalAvoidanceCount,
+                actionTitle: pendingAction.description,
+                goalTitle: activeGoal?.title ?? null,
               });
             }
 
@@ -371,6 +411,7 @@ export async function POST(req: NextRequest) {
                 emotionalProfile,
                 action: pendingAction,
                 persistenceAvailable,
+                flow: flowContext,
               });
             }
           }
@@ -391,6 +432,7 @@ export async function POST(req: NextRequest) {
             emotionalProfile,
             action: pendingAction,
             persistenceAvailable,
+            flow: flowContext,
           });
         }
 
@@ -447,6 +489,7 @@ export async function POST(req: NextRequest) {
               description: "Acción pendiente",
             },
             persistenceAvailable,
+            flow: flowContext,
           });
         }
       }
@@ -467,6 +510,11 @@ export async function POST(req: NextRequest) {
         level: containmentLevel,
         message,
         response: crisisPayload.response,
+      });
+      await sendCrisisEscalationAlert({
+        userId,
+        level: containmentLevel,
+        message,
       });
 
       if (persistenceAvailable) {
@@ -516,6 +564,8 @@ export async function POST(req: NextRequest) {
         detectedRiskLevel: riskLevel,
         crisisActive: true,
         crisisActiveUntil,
+        searchUsed: false,
+        flow: serializeFlow(flowContext),
         alerts: crisisPayload.resources,
       });
 
@@ -640,6 +690,7 @@ export async function POST(req: NextRequest) {
       emotionalProfile,
       searchUsed: searchResults.length > 0,
       fallback: aiResult.fallback,
+      flow: serializeFlow(flowContext),
       persistenceAvailable,
     });
     if (identity.shouldSetCookie) {

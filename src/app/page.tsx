@@ -17,6 +17,9 @@ type Conversation = {
   insight: string;
   action: string;
   alerts: string[];
+  searchUsed: boolean;
+  fallback: boolean;
+  flow: FlowSignal | null;
   hasLoadedMessages: boolean;
   isDraft: boolean;
 };
@@ -48,6 +51,13 @@ type ActionLockState = {
   };
 };
 
+type FlowSignal = {
+  currentIntent: string;
+  currentStep: number;
+  activeFlow: string | null;
+  instruction: string | null;
+};
+
 type ChatApiResponse = {
   type?: "action_required";
   message?: string;
@@ -64,9 +74,12 @@ type ChatApiResponse = {
         title: string;
       };
   alerts?: string[];
+  searchUsed?: boolean;
+  fallback?: boolean;
   error?: string;
   conversationId?: string;
   goal?: ActiveGoal | null;
+  flow?: FlowSignal | null;
 };
 
 type ConversationsApiResponse = {
@@ -108,6 +121,14 @@ type SessionBootstrapResponse = {
   ok?: boolean;
   userId?: string;
   source?: string;
+  error?: string;
+};
+
+type CheckinApiResponse = {
+  ok?: boolean;
+  state?: string;
+  emotionalProfile?: EmotionalProfile;
+  checkinsToday?: number;
   error?: string;
 };
 
@@ -165,6 +186,22 @@ function trimTitle(input: string): string {
   return normalized.length > 48 ? `${normalized.slice(0, 48)}...` : normalized;
 }
 
+function formatIntentLabel(intent: string): string {
+  if (intent === "goal_creation") return "crear objetivo";
+  if (intent === "action_done") return "acción completada";
+  if (intent === "postpone") return "postergar";
+  if (intent === "refusal") return "rechazo";
+  if (intent === "problem") return "problema";
+  if (intent === "doubt") return "duda";
+  return intent || "sin clasificar";
+}
+
+function formatFlowLabel(flowName: string | null): string {
+  if (flowName === "decision") return "decisión";
+  if (flowName === "avoidance") return "evitación";
+  return "sin flujo";
+}
+
 function createDraftConversation(index: number): Conversation {
   const now = new Date().toISOString();
   const defaults = buildStateInsight("neutral");
@@ -179,6 +216,9 @@ function createDraftConversation(index: number): Conversation {
     insight: defaults.insight,
     action: defaults.action,
     alerts: defaults.alerts,
+    searchUsed: false,
+    fallback: false,
+    flow: null,
     hasLoadedMessages: true,
     isDraft: true,
   };
@@ -216,6 +256,9 @@ function mapApiConversationToLocal(
     insight: existing?.insight || defaults.insight,
     action: existing?.action || defaults.action,
     alerts: existing?.alerts || defaults.alerts,
+    searchUsed: existing?.searchUsed ?? false,
+    fallback: existing?.fallback ?? false,
+    flow: existing?.flow ?? null,
     hasLoadedMessages: existing?.hasLoadedMessages ?? false,
     isDraft: false,
   };
@@ -244,6 +287,14 @@ export default function HomePage() {
   const [emotionalProfile, setEmotionalProfile] =
     useState<EmotionalProfile>(DEFAULT_EMOTIONAL_PROFILE);
   const [goalLoading, setGoalLoading] = useState(false);
+  const [checkinInput, setCheckinInput] = useState("");
+  const [checkinLoading, setCheckinLoading] = useState(false);
+  const [checkinStatus, setCheckinStatus] = useState<{
+    message: string;
+    checkinsToday: number;
+    state: string;
+    savedAt: string;
+  } | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
   const [sessionLoading, setSessionLoading] = useState(true);
   const [adminAuthenticated, setAdminAuthenticated] = useState(false);
@@ -650,6 +701,99 @@ export default function HomePage() {
     }
   };
 
+  const handleCheckinSubmit = async () => {
+    const responseText = checkinInput.trim();
+    if (!responseText || checkinLoading) {
+      return;
+    }
+
+    if (!sessionReady) {
+      try {
+        await bootstrapSession();
+      } catch {
+        handleUnauthorizedSession();
+        return;
+      }
+    }
+
+    setCheckinLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/checkin", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ response: responseText }),
+      });
+
+      const payload = (await response.json().catch(() => ({}))) as Partial<CheckinApiResponse>;
+
+      if (response.status === 401) {
+        handleUnauthorizedSession();
+        return;
+      }
+
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.error || "No se pudo guardar el check-in.");
+      }
+
+      const nextState = payload.state || safeConversation.state;
+      const fallbackInsight = buildStateInsight(nextState);
+      const seededConversation =
+        conversations.length === 0 ? createDraftConversation(1) : null;
+
+      if (payload.emotionalProfile) {
+        setEmotionalProfile(payload.emotionalProfile);
+      }
+
+      setConversations((previous) => {
+        if (previous.length === 0 && seededConversation) {
+          return [
+            {
+              ...seededConversation,
+              state: nextState,
+              insight: fallbackInsight.insight,
+              action: fallbackInsight.action,
+              alerts: fallbackInsight.alerts,
+            },
+          ];
+        }
+
+        return previous.map((conversation) =>
+          conversation.id === safeConversation.id
+            ? {
+                ...conversation,
+                state: nextState,
+                insight: fallbackInsight.insight,
+                action: fallbackInsight.action,
+                alerts: fallbackInsight.alerts,
+              }
+            : conversation
+        );
+      });
+      if (seededConversation) {
+        setActiveConversationId(seededConversation.id);
+      }
+
+      setCheckinStatus({
+        message: "Check-in guardado y estado actualizado.",
+        checkinsToday: payload.checkinsToday ?? 1,
+        state: nextState,
+        savedAt: new Date().toISOString(),
+      });
+      setCheckinInput("");
+    } catch (submitError: unknown) {
+      const message =
+        submitError instanceof Error ? submitError.message : "No se pudo guardar el check-in.";
+      setError(message);
+    } finally {
+      setCheckinLoading(false);
+    }
+  };
+
   const handleSend = async (overrideText?: string) => {
     const trimmed = (overrideText ?? input).trim();
     if (!sessionReady) {
@@ -793,6 +937,10 @@ export default function HomePage() {
         role: "assistant",
         content: assistantText,
         variant: nextActionLock ? "action_required" : undefined,
+        meta: {
+          searchUsed: Boolean(payload.searchUsed),
+          fallback: Boolean(payload.fallback),
+        },
       };
 
       const fallbackInsight = buildStateInsight(nextState);
@@ -808,6 +956,7 @@ export default function HomePage() {
         : currentConversationId;
       const nextGoal = payload.goal ?? null;
       const nextEmotionalProfile = payload.emotionalProfile ?? emotionalProfile;
+      const nextFlow = payload.flow ?? null;
 
       console.info("[CHAT_UI] send_succeeded", {
         type: payload.type || "normal",
@@ -829,6 +978,9 @@ export default function HomePage() {
                 insight: nextInsight,
                 action: nextAction,
                 alerts: nextAlerts,
+                searchUsed: Boolean(payload.searchUsed),
+                fallback: Boolean(payload.fallback),
+                flow: nextFlow,
                 messageCount: conversation.messageCount + 1,
                 messages: [...conversation.messages, assistantMessage],
               }
@@ -917,56 +1069,142 @@ export default function HomePage() {
   return (
     <div className="h-screen bg-slate-100 text-slate-900">
       <div className="mx-auto h-full max-w-[1700px] p-4 lg:p-6">
-        <section className="mb-4 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Continuidad de sesión
-          </p>
-          <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-slate-700">
-            <span>
-              Objetivo activo:{" "}
-              <span className="font-semibold">{activeGoal?.title || "Sin objetivo"}</span>
-            </span>
-            <span className="text-slate-400">•</span>
-            <span>
-              Progreso:{" "}
-              <span className="font-semibold">
-                {progress.completedActions}/{progress.totalActions}
+        <div className="mb-4 grid grid-cols-1 gap-4 xl:grid-cols-[1.6fr_1fr]">
+          <section className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Continuidad de sesión
+            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-slate-700">
+              <span>
+                Objetivo activo:{" "}
+                <span className="font-semibold">{activeGoal?.title || "Sin objetivo"}</span>
               </span>
-            </span>
-            {pendingActionsCount > 0 ? (
-              <span className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-800">
-                {pendingActionsCount === 1
-                  ? "Tienes 1 acción pendiente"
-                  : `Tienes ${pendingActionsCount} acciones pendientes`}
+              <span className="text-slate-400">•</span>
+              <span>
+                Progreso:{" "}
+                <span className="font-semibold">
+                  {progress.completedActions}/{progress.totalActions}
+                </span>
               </span>
-            ) : (
-              <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700">
-                Sin acciones pendientes
-              </span>
-            )}
-            {effectiveActionLock ? (
-              <span className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-800">
-                Modo responsabilidad activo
-              </span>
+              {pendingActionsCount > 0 ? (
+                <span className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-800">
+                  {pendingActionsCount === 1
+                    ? "Tienes 1 acción pendiente"
+                    : `Tienes ${pendingActionsCount} acciones pendientes`}
+                </span>
+              ) : (
+                <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700">
+                  Sin acciones pendientes
+                </span>
+              )}
+              {effectiveActionLock ? (
+                <span className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-800">
+                  Modo responsabilidad activo
+                </span>
+              ) : null}
+              {safeConversation.searchUsed ? (
+                <span className="rounded-md border border-sky-200 bg-sky-50 px-2 py-1 text-xs font-semibold text-sky-700">
+                  Internet usado
+                </span>
+              ) : null}
+              {safeConversation.fallback ? (
+                <span className="rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-xs font-semibold text-rose-700">
+                  Fallback IA activo
+                </span>
+              ) : null}
+              {safeConversation.flow?.activeFlow ? (
+                <span className="rounded-md border border-violet-200 bg-violet-50 px-2 py-1 text-xs font-semibold text-violet-700">
+                  Flujo {formatFlowLabel(safeConversation.flow.activeFlow)} · paso{" "}
+                  {safeConversation.flow.currentStep}
+                </span>
+              ) : null}
+            </div>
+            {safeConversation.flow?.activeFlow ? (
+              <div className="mt-3 rounded-xl border border-violet-200 bg-violet-50 px-3 py-3 text-sm text-violet-950">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-violet-700">
+                  Coach empujando flujo activo
+                </p>
+                <p className="mt-1 font-semibold">
+                  {formatFlowLabel(safeConversation.flow.activeFlow)} · intent{" "}
+                  {formatIntentLabel(safeConversation.flow.currentIntent)}
+                </p>
+                {safeConversation.flow.instruction ? (
+                  <p className="mt-1 text-violet-900">{safeConversation.flow.instruction}</p>
+                ) : null}
+              </div>
             ) : null}
-          </div>
-          {effectiveActionLock ? (
-            <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-sm text-amber-950">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-800">
-                Acción pendiente prioritaria
-              </p>
-              <p className="mt-1 font-semibold">{effectiveActionLock.action.title}</p>
-              <p className="mt-1 text-amber-900">{effectiveActionLock.message}</p>
+            {effectiveActionLock ? (
+              <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-sm text-amber-950">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-800">
+                  Acción pendiente prioritaria
+                </p>
+                <p className="mt-1 font-semibold">{effectiveActionLock.action.title}</p>
+                <p className="mt-1 text-amber-900">{effectiveActionLock.message}</p>
+              </div>
+            ) : pendingGoalAction ? (
+              <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-700">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                  Siguiente acción sugerida
+                </p>
+                <p className="mt-1 font-medium text-slate-900">{pendingGoalAction.description}</p>
+              </div>
+            ) : null}
+          </section>
+
+          <section className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Check-in diario
+                </p>
+                <p className="mt-1 text-sm text-slate-600">
+                  Registra cómo llegas hoy aunque no quieras abrir otra conversación.
+                </p>
+              </div>
+              {checkinStatus ? (
+                <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700">
+                  {checkinStatus.checkinsToday} hoy
+                </span>
+              ) : null}
             </div>
-          ) : pendingGoalAction ? (
-            <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-700">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                Siguiente acción sugerida
-              </p>
-              <p className="mt-1 font-medium text-slate-900">{pendingGoalAction.description}</p>
+            <textarea
+              value={checkinInput}
+              onChange={(event) => setCheckinInput(event.target.value)}
+              rows={3}
+              disabled={checkinLoading}
+              placeholder="Ejemplo: Hoy estoy bloqueado y me cuesta arrancar."
+              className="mt-3 w-full resize-none rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-700 focus:bg-white disabled:opacity-60"
+            />
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+              <div className="text-xs text-slate-500">
+                {checkinStatus ? (
+                  <span>
+                    Último guardado: {new Date(checkinStatus.savedAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}{" "}
+                    · estado {checkinStatus.state}
+                  </span>
+                ) : (
+                  <span>Sin check-in registrado en esta sesión.</span>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => void handleCheckinSubmit()}
+                disabled={checkinLoading || !checkinInput.trim()}
+                className="rounded-xl border border-slate-900 bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {checkinLoading ? "Guardando..." : "Guardar check-in"}
+              </button>
             </div>
-          ) : null}
-        </section>
+            {checkinStatus ? (
+              <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-3 text-sm text-emerald-900">
+                {checkinStatus.message}
+              </div>
+            ) : null}
+          </section>
+        </div>
 
         <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-12">
           <div className="min-h-[280px] lg:col-span-3 lg:min-h-0">
@@ -999,6 +1237,11 @@ export default function HomePage() {
               input={input}
               loading={loading || sessionLoading}
               error={error}
+              responseSignals={{
+                searchUsed: safeConversation.searchUsed,
+                fallback: safeConversation.fallback,
+                flow: safeConversation.flow,
+              }}
               actionLock={
                 effectiveActionLock
                   ? {
@@ -1018,6 +1261,11 @@ export default function HomePage() {
               emotionalProfile={emotionalProfile}
               insight={safeConversation.insight}
               action={safeConversation.action}
+              responseSignals={{
+                searchUsed: safeConversation.searchUsed,
+                fallback: safeConversation.fallback,
+                flow: safeConversation.flow,
+              }}
               actionLock={
                 effectiveActionLock
                   ? {

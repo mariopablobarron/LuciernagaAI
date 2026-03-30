@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { clearAdminSessionCookie, resolveAdminAuth } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
+import { dispatchAutomatedAlerts } from "@/lib/alerts";
 import { logError, logInfo } from "@/lib/logger";
 import { generateDecision, type DecisionMetrics } from "@/services/decision";
 import { generateInsights, getInsightConfidence } from "@/services/insights";
@@ -298,25 +299,78 @@ export async function GET(req: NextRequest) {
       },
     });
     const alerts = buildAlerts(metrics, crisisStats, avoidanceStats);
+    const recentDecisionLog = await prisma.decisionLog.findFirst({
+      orderBy: { createdAt: "desc" },
+    });
+    const sixHoursAgo = new Date(now.getTime() - 6 * 60 * 60 * 1000);
+    const latestInsightSnapshots = await prisma.insight.findMany({
+      where: {
+        createdAt: { gte: sixHoursAgo },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 30,
+    });
 
     const logMetric = getDecisionMetricForLog(metrics);
-    await prisma.decisionLog.create({
-      data: {
-        metric: logMetric.metric,
-        value: logMetric.value,
-        decision: decision.decision,
-      },
-    });
+    const shouldPersistDecision =
+      !recentDecisionLog ||
+      recentDecisionLog.metric !== logMetric.metric ||
+      recentDecisionLog.decision !== decision.decision ||
+      Math.abs(now.getTime() - recentDecisionLog.createdAt.getTime()) > 30 * 60 * 1000;
+
+    if (shouldPersistDecision) {
+      await prisma.decisionLog.create({
+        data: {
+          metric: logMetric.metric,
+          value: logMetric.value,
+          decision: decision.decision,
+        },
+      });
+    }
+
+    const persistedInsightKeys = new Set(
+      latestInsightSnapshots.map((item) => `${item.type}:${item.title}:${item.action}`)
+    );
+    const insightsToPersist = insights
+      .filter((item) => !persistedInsightKeys.has(`${item.type}:${item.title}:${item.action}`))
+      .slice(0, 6);
+
+    if (insightsToPersist.length > 0) {
+      await prisma.insight.createMany({
+        data: insightsToPersist.map((insight) => ({
+          type: insight.type,
+          title: insight.title,
+          content: insight.content,
+          action: insight.action,
+          confidence: insight.confidence,
+          priority: insight.priority,
+        })),
+      });
+    }
+
+    const [decisionHistory, insightHistory, automatedAlertsSent] = await Promise.all([
+      prisma.decisionLog.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 12,
+      }),
+      prisma.insight.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 12,
+      }),
+      dispatchAutomatedAlerts(alerts, 45 * 60 * 1000),
+    ]);
 
     logInfo("DECISION", "decision_log_saved", {
       metric: logMetric.metric,
       value: logMetric.value,
       priority: decision.priority,
+      created: shouldPersistDecision,
     });
     logInfo("INSIGHT", "admin_insights_generated", {
       alerts: alerts.length,
       insights: insights.length,
       crisisEvents: crisisStats.total,
+      automatedAlertsSent,
     });
 
     return NextResponse.json({
@@ -362,6 +416,23 @@ export async function GET(req: NextRequest) {
           refuse: item.refuse,
         })),
       },
+      decisionHistory: decisionHistory.map((item) => ({
+        id: item.id,
+        metric: item.metric,
+        value: item.value,
+        decision: item.decision,
+        createdAt: item.createdAt.toISOString(),
+      })),
+      insightHistory: insightHistory.map((item) => ({
+        id: item.id,
+        type: item.type,
+        title: item.title,
+        content: item.content,
+        action: item.action,
+        priority: item.priority,
+        confidence: item.confidence,
+        createdAt: item.createdAt.toISOString(),
+      })),
     });
   } catch (error: unknown) {
     logError("DECISION", error, { route: "/api/admin/insights" });
@@ -399,6 +470,8 @@ export async function GET(req: NextRequest) {
           },
           topActions: [],
         },
+        decisionHistory: [],
+        insightHistory: [],
       },
       { status: 500 }
     );

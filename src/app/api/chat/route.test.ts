@@ -18,6 +18,11 @@ jest.mock("@/lib/rate-limit", () => ({
   checkRateLimit: jest.fn(),
 }));
 
+jest.mock("@/lib/alerts", () => ({
+  sendAvoidanceEscalationAlert: jest.fn(),
+  sendCrisisEscalationAlert: jest.fn(),
+}));
+
 jest.mock("@/services/conversation", () => ({
   ensureUserSession: jest.fn(),
   listRecentUserMessagesForUser: jest.fn(),
@@ -71,6 +76,7 @@ jest.mock("@/services/risk", () => ({
 import { NextRequest } from "next/server";
 import { POST } from "./route";
 import { InvalidSessionTokenError, resolveIdentity, clearSessionCookie } from "@/lib/auth";
+import { sendAvoidanceEscalationAlert, sendCrisisEscalationAlert } from "@/lib/alerts";
 import { checkRateLimit } from "@/lib/rate-limit";
 import {
   ensureUserSession,
@@ -206,6 +212,12 @@ describe("POST /api/chat", () => {
     expect(body.conversationId).toBe("conv_1");
     expect(body.response).toBe("Respuesta de prueba");
     expect(body.emotionalProfile.primaryEmotion).toBe("calma");
+    expect(body.flow).toEqual({
+      currentIntent: "greeting",
+      currentStep: 0,
+      activeFlow: null,
+      instruction: null,
+    });
     expect(updateEmotionalProfile).toHaveBeenCalledTimes(1);
   });
 
@@ -259,6 +271,11 @@ describe("POST /api/chat", () => {
     expect(createGoalFromIntentMessage).not.toHaveBeenCalled();
     expect(activateUserCrisis).toHaveBeenCalledTimes(1);
     expect(registerCrisisEvent).toHaveBeenCalledTimes(1);
+    expect(sendCrisisEscalationAlert).toHaveBeenCalledWith({
+      userId: "usr_test_1",
+      level: "critical",
+      message: "me quiero matar",
+    });
   });
 
   it("mantiene modo contención mientras crisisActive esté vigente", async () => {
@@ -520,6 +537,13 @@ describe("POST /api/chat", () => {
       userId: "usr_test_1",
       actionId: "action_1",
       type: "postpone",
+    });
+    expect(sendAvoidanceEscalationAlert).toHaveBeenCalledWith({
+      userId: "usr_test_1",
+      type: "postpone",
+      count: 2,
+      actionTitle: "Enviar el borrador al cliente",
+      goalTitle: "Terminar propuesta",
     });
     expect(body.type).toBe("action_required");
     expect(body.message).toBe(

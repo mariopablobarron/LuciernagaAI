@@ -5,6 +5,10 @@ type MessageProps = {
   content: string;
   isError?: boolean;
   variant?: "action_required";
+  meta?: {
+    searchUsed?: boolean;
+    fallback?: boolean;
+  };
 };
 
 export default function Message({
@@ -12,9 +16,11 @@ export default function Message({
   content,
   isError = false,
   variant,
+  meta,
 }: MessageProps) {
   const isUser = role === "user";
   const isActionRequired = variant === "action_required";
+  const showMeta = !isUser && (meta?.searchUsed || meta?.fallback);
 
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
@@ -33,6 +39,20 @@ export default function Message({
           <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-amber-700">
             Acción requerida
           </p>
+        ) : null}
+        {showMeta ? (
+          <div className="mb-2 flex flex-wrap gap-2">
+            {meta?.searchUsed ? (
+              <span className="rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-700">
+                Internet usado
+              </span>
+            ) : null}
+            {meta?.fallback ? (
+              <span className="rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-[11px] font-semibold text-rose-700">
+                Fallback IA
+              </span>
+            ) : null}
+          </div>
         ) : null}
         <p className="whitespace-pre-wrap">{content}</p>
       </article>

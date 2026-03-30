@@ -1,11 +1,56 @@
 // Sistema de alertas para Telegram y Email
 
-interface Alert {
+export interface Alert {
   type: "critical" | "warning" | "info";
   title: string;
   message: string;
   metric?: string;
   value?: number;
+}
+
+const AUTOMATED_ALERT_COOLDOWN_MS = 30 * 60 * 1000;
+
+const globalForAlerts = globalThis as {
+  luciernagaAutomatedAlerts?: Map<string, number>;
+};
+
+function getAutomatedAlertsCache(): Map<string, number> {
+  if (!globalForAlerts.luciernagaAutomatedAlerts) {
+    globalForAlerts.luciernagaAutomatedAlerts = new Map<string, number>();
+  }
+
+  return globalForAlerts.luciernagaAutomatedAlerts;
+}
+
+function truncateText(value: string, maxLength = 140): string {
+  const normalized = value.trim().replace(/\s+/g, " ");
+  if (normalized.length <= maxLength) {
+    return normalized;
+  }
+
+  return `${normalized.slice(0, maxLength - 3)}...`;
+}
+
+function reserveAutomatedAlert(
+  key: string,
+  cooldownMs = AUTOMATED_ALERT_COOLDOWN_MS
+): boolean {
+  const cache = getAutomatedAlertsCache();
+  const now = Date.now();
+
+  for (const [cacheKey, timestamp] of cache.entries()) {
+    if (now - timestamp >= cooldownMs) {
+      cache.delete(cacheKey);
+    }
+  }
+
+  const previousTimestamp = cache.get(key);
+  if (previousTimestamp && now - previousTimestamp < cooldownMs) {
+    return false;
+  }
+
+  cache.set(key, now);
+  return true;
 }
 
 async function sendTelegram(alert: Alert): Promise<void> {
@@ -91,6 +136,105 @@ export async function sendAlert(alert: Alert): Promise<void> {
   await Promise.all([sendTelegram(alert), sendEmail(alert)]);
 }
 
+export async function sendAutomatedAlert(
+  alert: Alert,
+  options?: {
+    dedupeKey?: string;
+    cooldownMs?: number;
+  }
+): Promise<boolean> {
+  const dedupeKey =
+    options?.dedupeKey ??
+    [alert.type, alert.title, alert.metric ?? "none", alert.value ?? 0].join(":");
+
+  const shouldDispatch = reserveAutomatedAlert(
+    dedupeKey,
+    options?.cooldownMs ?? AUTOMATED_ALERT_COOLDOWN_MS
+  );
+
+  if (!shouldDispatch) {
+    return false;
+  }
+
+  await sendAlert(alert);
+  return true;
+}
+
+export async function dispatchAutomatedAlerts(
+  alerts: Alert[],
+  cooldownMs = AUTOMATED_ALERT_COOLDOWN_MS
+): Promise<number> {
+  let dispatched = 0;
+
+  for (const alert of alerts) {
+    const sent = await sendAutomatedAlert(alert, {
+      dedupeKey: `batch:${alert.type}:${alert.title}`,
+      cooldownMs,
+    });
+
+    if (sent) {
+      dispatched += 1;
+    }
+  }
+
+  return dispatched;
+}
+
+export async function sendCrisisEscalationAlert(params: {
+  userId: string;
+  level: "high" | "critical";
+  message: string;
+}): Promise<boolean> {
+  return sendAutomatedAlert(
+    {
+      type: "critical",
+      title:
+        params.level === "critical"
+          ? "CRISIS crítica detectada en conversación"
+          : "Crisis alta detectada en conversación",
+      message: `Usuario ${params.userId}. Mensaje: ${truncateText(params.message)}`,
+      metric: "crisisLevel",
+      value: params.level === "critical" ? 2 : 1,
+    },
+    {
+      dedupeKey: `crisis:${params.userId}:${params.level}`,
+      cooldownMs: 15 * 60 * 1000,
+    }
+  );
+}
+
+export async function sendAvoidanceEscalationAlert(params: {
+  userId: string;
+  type: "postpone" | "refuse";
+  count: number;
+  actionTitle: string;
+  goalTitle?: string | null;
+}): Promise<boolean> {
+  if (params.type !== "refuse" && params.count < 2) {
+    return false;
+  }
+
+  return sendAutomatedAlert(
+    {
+      type: params.type === "refuse" ? "critical" : "warning",
+      title:
+        params.type === "refuse"
+          ? "Rechazo explícito de acción clave"
+          : "Evitación repetida de acción pendiente",
+      message:
+        `Usuario ${params.userId}. Acción: ${params.actionTitle}. ` +
+        `${params.goalTitle ? `Objetivo: ${params.goalTitle}. ` : ""}` +
+        `Eventos acumulados: ${params.count}.`,
+      metric: "avoidanceCount",
+      value: params.count,
+    },
+    {
+      dedupeKey: `avoidance:${params.userId}:${params.actionTitle}:${params.type}`,
+      cooldownMs: 20 * 60 * 1000,
+    }
+  );
+}
+
 export async function checkAndAlert(metrics: {
   retentionDay3: number;
   checkinDrop: number;
@@ -98,7 +242,7 @@ export async function checkAndAlert(metrics: {
 }): Promise<void> {
   // Crisis de retención
   if (metrics.retentionDay3 < 0.3) {
-    await sendAlert({
+    await sendAutomatedAlert({
       type: "critical",
       title: "CRISIS: Retención crítica en día 3",
       message:
@@ -110,7 +254,7 @@ export async function checkAndAlert(metrics: {
 
   // Abandono alto en check-ins
   if (metrics.checkinDrop > 0.7) {
-    await sendAlert({
+    await sendAutomatedAlert({
       type: "critical",
       title: "ALERTA: 70% abandono en check-ins",
       message: "El check-in es demasiado complejo. Usuarios abandonan antes de terminar.",
@@ -121,7 +265,7 @@ export async function checkAndAlert(metrics: {
 
   // Mayoría bloqueados
   if (metrics.dominantState === "bloqueo") {
-    await sendAlert({
+    await sendAutomatedAlert({
       type: "warning",
       title: "Usuarios principalmente en bloqueo",
       message: "La mayoría de usuarios reportan parálisis o bloqueo mental.",
@@ -132,7 +276,7 @@ export async function checkAndAlert(metrics: {
 
   // Warning en retención día 3
   if (metrics.retentionDay3 < 0.4 && metrics.retentionDay3 >= 0.3) {
-    await sendAlert({
+    await sendAutomatedAlert({
       type: "warning",
       title: "Retención baja en día 3",
       message: "Retención < 40%. Considera simplificar el onboarding.",

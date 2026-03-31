@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import ExploreCanvas from "@/components/explore/ExploreCanvas";
 import { Toaster } from "@/components/ui/sonner";
@@ -117,6 +118,8 @@ export default function ExplorePage() {
     );
   }
 
+  const allCompleted = userState.completedActions >= userState.totalActions;
+
   return (
     <div className="relative h-screen w-full overflow-hidden bg-gradient-to-br from-background via-background to-muted/20">
       <ExploreCanvas
@@ -127,6 +130,18 @@ export default function ExplorePage() {
         onActionComplete={handleActionComplete}
         onReset={handleReset}
       />
+
+      {allCompleted && (
+        <div className="absolute inset-x-0 bottom-8 flex justify-center z-20">
+          <Link
+            href="/app"
+            className="px-8 py-3 rounded-full bg-black text-white text-sm font-medium hover:opacity-90 transition shadow-lg"
+          >
+            Continuar en el chat →
+          </Link>
+        </div>
+      )}
+
       <Toaster />
     </div>
   );

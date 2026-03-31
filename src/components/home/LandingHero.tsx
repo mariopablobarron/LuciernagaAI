@@ -68,7 +68,7 @@ export default function LandingHero() {
                 variant="outline"
                 asChild
               >
-                <Link href="/impulso">Acceder a tu cuenta</Link>
+                <Link href="/app">Acceder a tu cuenta</Link>
               </Button>
             </div>
 

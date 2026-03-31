@@ -21,27 +21,35 @@ export default function ActionNodes({
     setIsVisible(true);
   }, []);
 
-  // Colores para los nodos según emoción
-  const emotionColors: Record<string, { bg: string; glow: string; text: string }> = {
+  // Colores para los nodos - minimalista premium con vibrancia
+  const emotionColors: Record<string, { bg: string; border: string; glow: string; text: string; accent: string }> = {
     blocked: {
-      bg: "bg-gradient-to-br from-slate-800 to-slate-700",
-      glow: "shadow-[0_0_30px_rgba(30,27,75,0.6)]",
-      text: "text-slate-100",
+      bg: "bg-gradient-to-br from-gray-800 to-gray-700",
+      border: "border-gray-600/50",
+      glow: "shadow-[0_0_40px_rgba(75,85,99,0.4)]",
+      text: "text-gray-100",
+      accent: "hover:from-gray-700 hover:to-gray-600",
     },
     anxious: {
-      bg: "bg-gradient-to-br from-orange-800 to-red-700",
-      glow: "shadow-[0_0_30px_rgba(180,83,9,0.6)]",
-      text: "text-orange-100",
+      bg: "bg-gradient-to-br from-orange-700 to-amber-600",
+      border: "border-orange-500/50",
+      glow: "shadow-[0_0_40px_rgba(217,119,6,0.5)]",
+      text: "text-orange-50",
+      accent: "hover:from-orange-600 hover:to-amber-500",
     },
     doubt: {
-      bg: "bg-gradient-to-br from-indigo-800 to-purple-700",
-      glow: "shadow-[0_0_30px_rgba(67,56,202,0.6)]",
-      text: "text-indigo-100",
+      bg: "bg-gradient-to-br from-purple-700 to-indigo-600",
+      border: "border-purple-500/50",
+      glow: "shadow-[0_0_40px_rgba(147,51,234,0.5)]",
+      text: "text-purple-50",
+      accent: "hover:from-purple-600 hover:to-indigo-500",
     },
     clarity: {
-      bg: "bg-gradient-to-br from-emerald-800 to-teal-700",
-      glow: "shadow-[0_0_30px_rgba(5,150,105,0.6)]",
-      text: "text-emerald-100",
+      bg: "bg-gradient-to-br from-cyan-600 to-teal-500",
+      border: "border-cyan-400/50",
+      glow: "shadow-[0_0_40px_rgba(34,211,238,0.5)]",
+      text: "text-cyan-50",
+      accent: "hover:from-cyan-500 hover:to-teal-400",
     },
   };
 
@@ -76,28 +84,28 @@ export default function ActionNodes({
           >
             <button
               onClick={() => onNodeClick(node.id)}
-              className={`group relative flex h-24 w-24 flex-col items-center justify-center rounded-2xl border border-white/20 p-3 text-center transition-all duration-300 hover:border-white/40 sm:h-28 sm:w-28 cursor-pointer ${colors.bg} ${
+              className={`group relative flex h-24 w-24 sm:h-28 sm:w-28 flex-col items-center justify-center rounded-2xl border p-3 text-center transition-all duration-300 cursor-pointer ${colors.bg} ${colors.border} ${colors.accent} ${
                 isActive ? `${colors.glow} scale-125` : "hover:scale-110"
               }`}
             >
-              {/* Glow effect on hover */}
+              {/* Efecto de brillo sutil */}
               <div
-                className={`pointer-events-none absolute -inset-4 rounded-2xl bg-radial-gradient from-white/10 via-transparent to-transparent blur-lg transition-opacity duration-300 group-hover:opacity-100 ${
-                  isActive ? "opacity-100" : "opacity-0"
+                className={`pointer-events-none absolute -inset-4 rounded-2xl bg-radial-gradient from-white/5 via-transparent to-transparent blur-xl transition-opacity duration-300 ${
+                  isActive ? "opacity-100" : "opacity-0 group-hover:opacity-50"
                 }`}
               />
 
-              {/* Icono */}
-              <div className="relative text-3xl sm:text-4xl">{node.icon}</div>
+              {/* Icono - más grande y legible */}
+              <div className="relative text-3xl sm:text-4xl drop-shadow-sm">{node.icon}</div>
 
-              {/* Título */}
-              <p className={`relative text-xs font-semibold leading-tight ${colors.text} group-hover:text-white transition-colors mt-1`}>
+              {/* Título - tipografía más bold */}
+              <p className={`relative text-xs sm:text-sm font-bold leading-tight ${colors.text} transition-colors mt-2`}>
                 {node.title.split(" ").slice(0, 2).join(" ")}
               </p>
 
               {/* Indicador de completado */}
               {node.completed && (
-                <div className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-signal-success text-white text-xs">
+                <div className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white text-xs font-bold shadow-lg">
                   ✓
                 </div>
               )}

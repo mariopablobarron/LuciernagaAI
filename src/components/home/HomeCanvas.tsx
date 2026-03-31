@@ -63,12 +63,12 @@ export default function HomeCanvas() {
   const [nodes, setNodes] = useState<ActionNodeType[]>(ACTION_NODES);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Map emotional states to background gradients
+  // Map emotional states to background gradients - modernos y vibrantes
   const emotionGradients: Record<EmotionalStateType, string> = {
-    blocked: "from-slate-900 via-slate-800 to-slate-900", // Oscuro, pesado
-    anxious: "from-orange-950 via-red-900 to-orange-950", // Cálido, turbulento
-    doubt: "from-indigo-900 via-purple-900 to-indigo-900", // Reflexivo, profundo
-    clarity: "from-emerald-900 via-teal-800 to-emerald-900", // Fresco, claro
+    blocked: "from-gray-950 via-gray-900 to-gray-950", // Gris oscuro elegante
+    anxious: "from-amber-950 via-orange-900 to-amber-950", // Cálido vibrante
+    doubt: "from-purple-950 via-indigo-900 to-purple-950", // Profundo y moderno
+    clarity: "from-teal-950 via-cyan-900 to-teal-950", // Fresco y premium
   };
 
   const handleNodeClick = (nodeId: string) => {

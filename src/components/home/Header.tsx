@@ -16,16 +16,13 @@ export default function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="relative flex items-center justify-center w-10 h-10">
-              <div className="absolute inset-0 bg-gradient-to-br from-emotion-clarity to-emotion-doubt rounded-lg opacity-20 group-hover:opacity-30 transition-opacity" />
-              <div className="relative text-xl font-bold">🔥</div>
-            </div>
-            <span className="text-lg font-bold bg-gradient-to-r from-emotion-clarity via-emotion-doubt to-emotion-blocked bg-clip-text text-transparent">
+          {/* Logo - más minimalista */}
+          <Link href="/" className="flex items-center gap-2.5 group transition-opacity hover:opacity-80">
+            <div className="text-2xl">🔥</div>
+            <span className="text-lg font-black tracking-tight text-foreground">
               Luciernaga
             </span>
           </Link>

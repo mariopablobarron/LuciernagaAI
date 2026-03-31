@@ -32,12 +32,19 @@ export default function ChatModal({
     textareaRef.current?.focus();
   }, []);
 
-  // Colores para el modal según emoción
+  // Colores para el modal - minimalista premium
   const emotionBg: Record<EmotionalStateType, string> = {
-    blocked: "from-slate-800/80 to-slate-900/80",
-    anxious: "from-orange-800/80 to-red-900/80",
-    doubt: "from-indigo-800/80 to-purple-900/80",
-    clarity: "from-emerald-800/80 to-teal-900/80",
+    blocked: "from-gray-800/95 to-gray-900/95",
+    anxious: "from-orange-800/95 to-amber-900/95",
+    doubt: "from-purple-800/95 to-indigo-900/95",
+    clarity: "from-cyan-800/95 to-teal-900/95",
+  };
+
+  const emotionAccent: Record<EmotionalStateType, string> = {
+    blocked: "text-gray-100",
+    anxious: "text-orange-50",
+    doubt: "text-purple-50",
+    clarity: "text-cyan-50",
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -76,19 +83,19 @@ export default function ChatModal({
         }`}
       >
         <div
-          className={`rounded-3xl border border-white/20 bg-gradient-to-br ${emotionBg[emotionalState]} p-8 shadow-2xl`}
-        >
-          {/* Header con icono y título */}
-          <div className="mb-6 flex items-start justify-between gap-4">
-            <div className="flex items-center gap-4 flex-1">
-              <div className="text-4xl">{node.icon}</div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-white text-lg leading-tight">
-                  {node.title}
-                </h3>
-                <p className="text-sm text-white/60 mt-1">{node.description}</p>
+            className={`rounded-3xl border border-white/10 bg-gradient-to-br ${emotionBg[emotionalState]} p-8 shadow-2xl backdrop-blur`}
+          >
+            {/* Header con icono y título */}
+            <div className="mb-8 flex items-start justify-between gap-4">
+              <div className="flex items-center gap-4 flex-1">
+                <div className="text-5xl drop-shadow-lg">{node.icon}</div>
+                <div className="flex-1 min-w-0">
+                  <h3 className={`font-black text-lg leading-tight ${emotionAccent[emotionalState]}`}>
+                    {node.title}
+                  </h3>
+                  <p className="text-sm text-white/50 mt-2 font-medium">{node.description}</p>
+                </div>
               </div>
-            </div>
 
             {/* Close button */}
             <button
@@ -101,9 +108,9 @@ export default function ChatModal({
 
           {/* Chat area */}
           {!submitted ? (
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {/* Prompt dinamático */}
-              <div className="text-sm text-white/70 bg-white/5 rounded-xl p-3 backdrop-blur-sm">
+              <div className={`text-sm font-medium ${emotionAccent[emotionalState]} bg-white/5 rounded-xl p-4 backdrop-blur-sm border border-white/10`}>
                 {node.id === "avoid"
                   ? "¿Qué específicamente estás evitando?"
                   : node.id === "next"
@@ -118,10 +125,10 @@ export default function ChatModal({
                 ref={textareaRef}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Escribe sin filtro..."
-                rows={4}
+                placeholder="Sin filtro. Sin juicio."
+                rows={5}
                 disabled={isSubmitting}
-                className="min-h-28 resize-none bg-white/10 border-white/20 text-white placeholder-white/40 focus:border-white/40 rounded-xl"
+                className="min-h-32 resize-none bg-white/10 border border-white/20 text-white placeholder-white/40 focus:border-white/30 rounded-xl font-medium"
               />
 
               {/* Actions */}

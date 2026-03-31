@@ -1,7 +1,5 @@
-"use client";
+import { redirect } from "next/navigation";
 
-import HomeCanvas from "@/components/home/HomeCanvas";
-
-export default function HomePage() {
-  return <HomeCanvas />;
+export default function Page() {
+  redirect("/");
 }

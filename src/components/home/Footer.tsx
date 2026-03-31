@@ -5,20 +5,20 @@ import { Heart, Mail } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border/50 bg-muted/30 py-12 md:py-16">
+    <footer className="border-t border-white/10 bg-background/50 backdrop-blur-sm py-12 md:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div className="space-y-4">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="text-xl font-bold">🔥</div>
-              <span className="font-bold text-foreground">Luciernaga</span>
+            <Link href="/" className="flex items-center gap-2.5 group transition-opacity hover:opacity-80">
+              <div className="text-2xl">🔥</div>
+              <span className="font-black text-foreground tracking-tight">Luciernaga</span>
             </Link>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground leading-relaxed font-medium">
               Transformación de hábitos real para jóvenes que quieren cambiar su vida.
             </p>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Heart className="w-3 h-3 text-emotion-blocked" />
+            <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium">
+              <Heart className="w-3 h-3 text-cyan-500" />
               Hecho con propósito
             </div>
           </div>

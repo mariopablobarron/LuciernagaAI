@@ -76,8 +76,8 @@ export default function ExploreCanvas({
 
   const centerX = containerSize.width / 2;
   const centerY = containerSize.height / 2;
-  // Responsive radius based on screen size - increased for more space
-  const radius = Math.min(containerSize.width, containerSize.height) * 0.32;
+  // Responsive radius - adjusted for hierarchy (more space for primary node)
+  const radius = Math.min(containerSize.width, containerSize.height) * 0.35;
 
   const activeAction = actions.find((a) => a.id === activeNodeId);
 
@@ -191,7 +191,7 @@ export default function ExploreCanvas({
       {/* HUD Inferior - CTA */}
       <div className="absolute bottom-6 right-6 z-30 text-right">
         <p className="text-xs text-muted-foreground">
-          Haz una acción de menos de 5 minutos
+          Haz algo pequeño. O seguirás igual.
         </p>
       </div>
 
@@ -242,13 +242,13 @@ export default function ExploreCanvas({
         />
       )}
 
-      {/* HUD Superior */}
-      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20 text-center space-y-2">
-        <p className="text-sm text-muted-foreground">
-          Hoy estás en un punto estable
+      {/* HUD Superior - Microcopy emocional */}
+      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20 text-center space-y-1.5">
+        <p className="text-xs font-medium text-foreground">
+          {activeNodeId ? "Perfecto. Escribo con honestidad." : "No tiene que ser perfecto"}
         </p>
         <p className="text-xs text-muted-foreground/70">
-          No necesitas tenerlo claro. Empieza por una sola cosa.
+          {activeNodeId ? "" : "Solo empieza"}
         </p>
       </div>
     </div>

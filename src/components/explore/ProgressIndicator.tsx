@@ -14,16 +14,13 @@ export default function ProgressIndicator({
   return (
     <div className="space-y-2">
       <div className="text-xs font-semibold text-foreground">
-        Progreso de hoy
+        {completed === 0 ? "Has empezado. Eso ya cuenta." : `${completed}/${total} acciones`}
       </div>
       <div className="w-32 h-1.5 bg-muted rounded-full overflow-hidden border border-border/50">
         <div
           className="h-full bg-gradient-to-r from-emotion-doubt to-emotion-clarity transition-all duration-500 rounded-full"
           style={{ width: `${percentage}%` }}
         />
-      </div>
-      <div className="text-xs text-muted-foreground">
-        {completed}/{total} acciones
       </div>
     </div>
   );

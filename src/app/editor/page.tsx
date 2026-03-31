@@ -44,7 +44,7 @@ export default function EditorPage() {
 
               <div className="flex flex-wrap items-center gap-2">
                 <Button asChild type="button" variant="outline">
-                  <Link href="/">
+                  <Link href="/app">
                     <ArrowLeft className="size-4" />
                     Volver al chat
                   </Link>

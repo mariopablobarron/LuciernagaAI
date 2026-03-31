@@ -103,7 +103,7 @@ export default function Sidebar({
     <aside className="flex h-full flex-col rounded-3xl border border-border/80 bg-card/95 p-4 shadow-sm">
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-3">
-          <Link href="/" className="inline-flex items-center">
+          <Link href="/app" className="inline-flex items-center">
             <Image
               src={logoSrc}
               alt="Startidea"
@@ -137,11 +137,11 @@ export default function Sidebar({
           <Button
             asChild
             type="button"
-            variant={pathname === "/" ? "default" : "outline"}
+            variant={pathname === "/app" ? "default" : "outline"}
             size="sm"
             className="justify-center"
           >
-            <Link href="/">Chat</Link>
+            <Link href="/app">Chat</Link>
           </Button>
           <Button
             asChild

@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import "@/lib/builder";
 import ExploreCanvas from "@/components/explore/ExploreCanvas";
-import BuilderSlot from "@/components/builder/BuilderSlot";
 import { Toaster } from "@/components/ui/sonner";
 
 type ActionNode = {
@@ -121,11 +119,6 @@ export default function ExplorePage() {
 
   return (
     <div className="relative h-screen w-full overflow-hidden bg-gradient-to-br from-background via-background to-muted/20">
-      {/* Builder.io — zona de copy editable (heading, subheading, CTA) */}
-      <div className="absolute inset-x-0 top-0 z-10 pointer-events-none">
-        <BuilderSlot model="explore-ui" />
-      </div>
-
       <ExploreCanvas
         actions={actions}
         userState={userState}

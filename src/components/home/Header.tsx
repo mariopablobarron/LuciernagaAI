@@ -51,7 +51,7 @@ export default function Header() {
               asChild
               className="hidden sm:inline-flex"
             >
-              <Link href="/impulso">Acceder</Link>
+              <Link href="/app">Acceder</Link>
             </Button>
             <Button
               size="sm"
@@ -91,7 +91,7 @@ export default function Header() {
                 </a>
               ))}
               <Button asChild size="sm" variant="outline" className="w-full">
-                <Link href="/impulso">Acceder</Link>
+                <Link href="/app">Acceder</Link>
               </Button>
               <Button asChild size="sm" className="w-full">
                 <Link href="/explore">Empezar ahora</Link>

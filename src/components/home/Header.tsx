@@ -12,6 +12,7 @@ export default function Header() {
     { label: "Cómo funciona", href: "#how" },
     { label: "Beneficios", href: "#benefits" },
     { label: "Transformación", href: "#transformation" },
+    { label: "Contacto", href: "/contact" },
   ];
 
   return (

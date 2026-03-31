@@ -19,6 +19,7 @@
   "dependencies": {
     "@blocknote/mantine": "^0.47.3",
     "@blocknote/react": "^0.47.3",
+    "@builder.io/react": "^9.2.0",
     "@prisma/adapter-pg": "^7.6.0",
     "@prisma/client": "^7.6.0",
     "@radix-ui/react-dialog": "^1.1.15",

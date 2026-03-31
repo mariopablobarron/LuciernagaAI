@@ -173,3 +173,13 @@
     background: color-mix(in oklab, var(--primary) 18%, transparent);
   }
 }
+
+@layer utilities {
+  .bg-radial-gradient {
+    background: radial-gradient(circle, var(--tw-gradient-stops));
+  }
+
+  .group:hover > .group-hover\:opacity-100 {
+    opacity: 1;
+  }
+}

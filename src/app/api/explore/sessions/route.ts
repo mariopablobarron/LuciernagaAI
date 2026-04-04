@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/db/prisma";
+import { getPrismaClient } from "@/db/prisma";
 import { randomUUID } from "crypto";
 
 export async function POST(req: NextRequest) {
@@ -15,6 +15,7 @@ export async function POST(req: NextRequest) {
     }
 
     const sessionId = randomUUID();
+    const prisma = getPrismaClient();
 
     const session = await prisma.exploreSession.create({
       data: {
@@ -53,6 +54,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    const prisma = getPrismaClient();
     const sessions = await prisma.exploreSession.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },

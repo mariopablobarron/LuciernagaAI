@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/db/prisma";
+import { getPrismaClient } from "@/db/prisma";
 
 export async function GET(
   req: NextRequest,
@@ -7,6 +7,7 @@ export async function GET(
 ) {
   try {
     const { sessionId } = params;
+    const prisma = getPrismaClient();
 
     const session = await prisma.exploreSession.findUnique({
       where: { sessionId },
@@ -36,6 +37,7 @@ export async function PATCH(
   try {
     const { sessionId } = params;
     const body = await req.json();
+    const prisma = getPrismaClient();
 
     const {
       completedActions,

@@ -10,7 +10,7 @@ export default function Header() {
 
   const navLinks = [
     { label: "Inicio", href: "/" },
-    { label: "Cómo funciona", href: "#how" },
+    { label: "El reto 30 días", href: "/reto" },
     { label: "Impulso", href: "/impulso" },
     { label: "Contacto", href: "/contact" },
   ];

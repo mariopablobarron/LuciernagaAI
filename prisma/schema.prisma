@@ -61,6 +61,8 @@ model User {
   trustedContact  TrustedContact?
   supportMessages SupportMessage[]
   familyPings     FamilyPing[]
+  invitations     Invitation[]
+  invitesEarned   Int              @default(0)
 }
 
 model Message {
@@ -419,6 +421,35 @@ model UserPreferences {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── Beta / waitlist & invitations ────────────────────────────────────────────
+
+/// Someone who completed the 3-mission onboarding flow to request beta access.
+model WaitlistEntry {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  mission1   String   @db.Text
+  mission2   String   @db.Text
+  mission3   String   @db.Text
+  status     String   @default("approved") // "approved" | "rejected"
+  inviteCode String?  // if they came via invite
+  createdAt  DateTime @default(now())
+
+  @@index([status, createdAt])
+}
+
+/// An invitation code a user earns via milestones (streak 7d, goal complete, 30d active).
+model Invitation {
+  id          String    @id @default(cuid())
+  code        String    @unique @default(cuid())
+  userId      String
+  usedByEmail String?
+  usedAt      DateTime?
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }
 
 // ─── Family / trusted contact system ──────────────────────────────────────────

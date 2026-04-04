@@ -1,5 +1,6 @@
 import { getPrismaClient } from "@/db/prisma";
 import type { StreakSnapshot } from "@/types/impulse";
+import { earnInvite } from "@/services/invites";
 
 function getStartOfDay(reference = new Date()): Date {
   const next = new Date(reference);
@@ -87,6 +88,13 @@ export async function updateStreak(
       status,
     },
   });
+
+  // Award invite at milestone days (only when crossing the threshold, not on repeat same-day calls)
+  const prev = current.currentDays;
+  if ((prev < 7 && currentDays >= 7) || (prev < 30 && currentDays >= 30)) {
+    const reason = currentDays >= 30 ? "streak_30d" : "streak_7d";
+    void earnInvite(userId, reason);
+  }
 
   return serializeStreak(updated);
 }

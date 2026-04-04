@@ -7,14 +7,14 @@ const testimonials = [
     name: "María, 24 años",
     role: "Estudiante",
     content:
-      "Pensé que necesitaba un cambio masivo. Luciernaga me mostró que pequeñas acciones diarias son lo que funciona. En 3 semanas cambié mi hábito de sueño.",
+      "Pensé que necesitaba un cambio masivo. Luciérnaga me mostró que pequeñas acciones diarias son lo que funciona. En 3 semanas cambié mi hábito de sueño.",
     avatar: "👩",
   },
   {
     name: "Carlos, 28 años",
     role: "Emprendedor",
     content:
-      "Tenía 10 hábitos que quería cambiar. Me sentía paralizado. Luciernaga me hizo enfocarse en uno. Ahora tengo 4 hábitos nuevos sin sentir presión.",
+      "Tenía 10 hábitos que quería cambiar. Me sentía paralizado. Luciérnaga me hizo enfocarse en uno. Ahora tengo 4 hábitos nuevos sin sentir presión.",
     avatar: "👨",
   },
   {
@@ -28,7 +28,7 @@ const testimonials = [
     name: "Juan, 31 años",
     role: "Diseñador",
     content:
-      "He probado apps, libros, coaches. Nada funcionaba. Luciernaga es diferente porque realmente te conoce. Los insights que me da son precisos.",
+      "He probado apps, libros, coaches. Nada funcionaba. Luciérnaga es diferente porque realmente te conoce. Los insights que me da son precisos.",
     avatar: "🧑‍🎨",
   },
 ];

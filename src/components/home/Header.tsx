@@ -26,7 +26,7 @@ export default function Header() {
               <div className="relative text-xl font-bold">🔥</div>
             </div>
             <span className="text-lg font-bold bg-linear-to-r from-emotion-clarity via-emotion-doubt to-emotion-blocked bg-clip-text text-transparent">
-              Luciernaga
+              Luciérnaga
             </span>
           </Link>
 

@@ -7,10 +7,10 @@ export type SaasPlan = {
 };
 
 export const SAAS_CONFIG = {
-  name: "Luciernaga AI",
+  name: "Luciérnaga AI",
   description:
-    "SaaS de mentoria conversacional con IA, enfoque en accion, continuidad emocional y gestion de riesgo.",
-  marketingTitle: "Luciernaga AI | Mentor conversacional con accion real",
+    "Plataforma de mentoría conversacional con IA. Claridad emocional, acción real y seguimiento continuo para transformar tu vida en 30 días.",
+  marketingTitle: "Luciérnaga AI — Mentoría con IA para transformar tu vida",
   auth: {
     mode: "session-cookie",
     selfServeAuthReady: false,

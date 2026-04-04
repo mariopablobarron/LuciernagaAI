@@ -34,8 +34,8 @@ export default function LandingHero() {
                 </span>
               </h1>
               <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">
-                Luciernaga te guía a través de la transformación real. No es teoría. No es
-                perfección. Es acción pequeña, consistente, que genera cambios duraderos.
+                Luciérnaga te guía en la transformación real. No es teoría. No es
+                perfección. Es acción concreta, diaria, que genera cambios que duran.
               </p>
             </div>
 

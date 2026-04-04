@@ -1,107 +1,81 @@
 "use client";
 
 import Link from "next/link";
-import { Heart, Mail } from "lucide-react";
+import { Heart } from "lucide-react";
 
 export default function Footer() {
   return (
     <footer className="border-t border-white/10 bg-background/50 backdrop-blur-sm py-12 md:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           {/* Brand */}
           <div className="space-y-4">
             <Link href="/" className="flex items-center gap-2.5 group transition-opacity hover:opacity-80">
               <div className="text-2xl">🔥</div>
-              <span className="font-black text-foreground tracking-tight">Luciernaga</span>
+              <span className="font-black text-foreground tracking-tight">Luciérnaga</span>
             </Link>
-            <p className="text-sm text-muted-foreground leading-relaxed font-medium">
-              Transformación de hábitos real para jóvenes que quieren cambiar su vida.
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Mentoría con IA para personas que quieren transformar su vida con acción real, no promesas vacías.
             </p>
             <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium">
               <Heart className="w-3 h-3 text-cyan-500" />
-              Hecho con propósito
+              Hecho con propósito en Latinoamérica
             </div>
           </div>
 
           {/* Product */}
           <div className="space-y-4">
             <h4 className="font-semibold text-foreground">Producto</h4>
-            <ul className="space-y-2">
+            <ul className="space-y-2.5">
               <li>
                 <Link href="/unirse" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Empezar
+                  Unirse al reto
                 </Link>
               </li>
               <li>
-                <Link href="/impulso" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Dashboard
+                <Link href="/reto" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  El reto 30 días
                 </Link>
               </li>
               <li>
-                <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Tu progreso
+                <Link href="/app" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Acceder
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Resources */}
+          {/* Legal & Contact */}
           <div className="space-y-4">
             <h4 className="font-semibold text-foreground">Información</h4>
-            <ul className="space-y-2">
+            <ul className="space-y-2.5">
               <li>
-                <Link href="/api/legal" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Privacidad
+                <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Política de privacidad
                 </Link>
               </li>
               <li>
-                <a href="#contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Contacto
-                </a>
+                <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Términos de servicio
+                </Link>
               </li>
               <li>
-                <a href="#faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Preguntas
-                </a>
+                <Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Contacto
+                </Link>
               </li>
             </ul>
-          </div>
-
-          {/* Newsletter */}
-          <div className="space-y-4">
-            <h4 className="font-semibold text-foreground">Mantente cerca</h4>
-            <p className="text-sm text-muted-foreground">
-              Tips de transformación directamente en tu inbox.
-            </p>
-            <div className="flex">
-              <input
-                type="email"
-                placeholder="tu@email.com"
-                className="flex-1 px-3 py-2 text-sm rounded-l-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none"
-              />
-              <button className="px-3 py-2 bg-emotion-clarity text-white rounded-r-lg hover:opacity-90 transition-opacity">
-                <Mail className="w-4 h-4" />
-              </button>
-            </div>
           </div>
         </div>
 
         {/* Bottom */}
         <div className="border-t border-border/30 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-muted-foreground">
-            © 2024 Luciernaga AI. Transformando vidas jóvenes. Hecho con ❤️ en Latinoamérica.
+            © {new Date().getFullYear()} Luciérnaga AI. Todos los derechos reservados.
           </p>
-          <div className="flex gap-4">
-            <a href="#" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-              Twitter
-            </a>
-            <a href="#" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-              Instagram
-            </a>
-            <a href="#" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-              LinkedIn
-            </a>
-          </div>
+          <p className="text-xs text-muted-foreground">
+            Luciérnaga AI no sustituye terapia ni intervención psicológica profesional.
+          </p>
         </div>
       </div>
     </footer>

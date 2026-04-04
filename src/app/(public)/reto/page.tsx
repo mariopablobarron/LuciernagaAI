@@ -181,7 +181,7 @@ export default function RetoPage() {
           </div>
           <div className="space-y-4">
             {[
-              { day: 1, icon: "🌱", title: "Acceso completo", desc: "Desde el primer día tienes al AI más directo que existe." },
+              { day: 1, icon: "🌱", title: "Acceso completo", desc: "Desde el primer día tienes acceso a la IA más directa que existe." },
               { day: 7, icon: "🔥", title: "Primera invitación", desc: "Ganas 1 invitación para traer a alguien que lo necesite." },
               { day: 14, icon: "⚡", title: "Modo avanzado", desc: "La IA ajusta su intensidad a tu progreso acumulado." },
               { day: 30, icon: "🏆", title: "3 invitaciones + certificado", desc: "Completar el reto te convierte en embajador del cambio." },

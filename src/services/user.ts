@@ -1,9 +1,10 @@
 import type { Prisma } from "@prisma/client";
 import { getPrismaClient } from "@/db/prisma";
+import { PLANS } from "@/lib/plans";
 
 const SYNTHETIC_EMAIL_DOMAIN = "session.luciernaga.local";
 const ACTIVE_SUBSCRIPTION_STATUSES = new Set(["active", "trialing"]);
-export const FREE_PLAN_MESSAGE_LIMIT = 10;
+export const FREE_PLAN_MESSAGE_LIMIT = PLANS.free.limits.messagesPerConversation;
 export type CanonicalUserPlan = "free" | "pro";
 
 type UserStateRecord = {

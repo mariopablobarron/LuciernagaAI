@@ -210,6 +210,12 @@ export default function LandingPageDesign() {
                   </div>
                 </div>
               </div>
+              <div className="flex items-center gap-2 pt-1">
+                <span className="text-base">🇪🇸</span>
+                <p className="text-xs text-zinc-500">
+                  El único coach IA conversacional en español enfocado en acción real
+                </p>
+              </div>
             </div>
 
             {/* Right: Chat mockup */}

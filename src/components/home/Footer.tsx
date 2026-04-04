@@ -28,6 +28,11 @@ export default function Footer() {
             <h4 className="font-semibold text-foreground">Producto</h4>
             <ul className="space-y-2.5">
               <li>
+                <Link href="/precios" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Precios
+                </Link>
+              </li>
+              <li>
                 <Link href="/unirse" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Unirse al reto
                 </Link>

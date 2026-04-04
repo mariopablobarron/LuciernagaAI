@@ -87,7 +87,10 @@ function UnirseContent() {
         }),
       });
 
-      if (!res.ok) throw new Error("Error al enviar");
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(data.error ?? `Error ${res.status}`);
+      }
       const lEmail = email.toLowerCase().trim();
       localStorage.setItem("luc_waitlist_email", lEmail);
       localStorage.setItem(
@@ -95,8 +98,8 @@ function UnirseContent() {
         JSON.stringify({ m1: finalAnswers[0], m2: finalAnswers[1], m3: finalAnswers[2] })
       );
       setStep("done");
-    } catch {
-      setError("Algo falló. Inténtalo de nuevo.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Algo falló. Inténtalo de nuevo.");
     } finally {
       setLoading(false);
     }

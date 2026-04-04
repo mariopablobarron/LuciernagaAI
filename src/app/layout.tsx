@@ -47,10 +47,10 @@ export const metadata: Metadata = {
     apple: "/favicon.ico",
   },
   openGraph: {
-    images: ["/placeholder.png"],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
-    images: ["/placeholder.png"],
+    images: ["/opengraph-image"],
   },
 };
 

@@ -554,3 +554,13 @@ model PasswordResetToken {
 
   @@index([userId])
 }
+
+/// Result of the public diagnostic quiz (anonymous users included).
+model QuizResult {
+  id        String   @id @default(cuid())
+  userId    String   // anonymous or authenticated user id
+  state     String   // "bloqueo" | "ansiedad" | "duda" | "claridad" | "neutral"
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}

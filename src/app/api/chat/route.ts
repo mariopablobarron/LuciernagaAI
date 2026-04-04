@@ -11,6 +11,7 @@ import { getErrorMessage } from "@/lib/utils";
 import { getUserSessionProfile } from "@/services/user";
 import { processMessage } from "@/application/chat/processMessage";
 import type { UserState } from "@/domain/types";
+import { FREE_LIMIT_MESSAGE } from "@/lib/plans";
 
 function buildErrorResponse(
   message: string,
@@ -74,8 +75,8 @@ export async function POST(req: NextRequest) {
     const res = NextResponse.json(
       {
         success: false,
-        error: `${hardPaywallMessage}\n\nHas alcanzado el limite diario del plan Free hoy.`,
-        response: `${hardPaywallMessage}\n\nHas alcanzado el limite diario del plan Free hoy.`,
+        error: `${hardPaywallMessage}\n\n${FREE_LIMIT_MESSAGE}`,
+        response: `${hardPaywallMessage}\n\n${FREE_LIMIT_MESSAGE}`,
         state: "neutral",
         code: "PLAN_LIMIT_REACHED",
         plan: accessState.planLabel,

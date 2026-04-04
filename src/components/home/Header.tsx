@@ -7,9 +7,8 @@ import { useState } from "react";
 
 const NAV = [
   { label: "Chat", href: "/app" },
-  { label: "Impulso", href: "/impulso" },
+  { label: "Precios", href: "/precios" },
   { label: "Test gratuito", href: "/test", highlight: true },
-  { label: "Mi progreso", href: "/dashboard" },
 ];
 
 export default function Header() {

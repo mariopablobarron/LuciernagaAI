@@ -18,6 +18,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import UpgradeBanner from "@/components/shared/UpgradeBanner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -421,6 +422,10 @@ export default function HomeWorkspace({
                     </Badge>
                   ) : null}
                 </div>
+
+                {sessionProfile?.plan === "free" && (
+                  <UpgradeBanner message="Actualiza a Pro y desbloquea conversaciones ilimitadas, Modo Impulso y más." />
+                )}
 
                 {(captureEmailRecommended ||
                   Boolean(sessionProfile && !sessionProfile.isAnonymous)) && (

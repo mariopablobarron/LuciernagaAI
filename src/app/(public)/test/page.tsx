@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ArrowRight, CheckCircle2, Link2 } from "lucide-react";
+import { COMPONENTS } from "@/styles/design-system";
 
 type EmotionalState = "bloqueo" | "ansiedad" | "duda" | "claridad" | "neutral";
 
@@ -180,7 +181,7 @@ function ShareButtons({ stateLabel, stateEmoji }: { stateLabel: string; stateEmo
   const [copied, setCopied] = useState(false);
 
   const shareText = `${stateEmoji} Acabo de descubrir que estoy en estado de "${stateLabel}". ¿Y tú?`;
-  const shareUrl = "https://luciernaga.ai/test";
+  const shareUrl = `${window.location.origin}/test`;
   const fullText = `${shareText} Test gratuito de diagnóstico mental: ${shareUrl}`;
 
   function handleTwitter() {
@@ -217,22 +218,22 @@ function ShareButtons({ stateLabel, stateEmoji }: { stateLabel: string; stateEmo
       <div className="flex gap-2">
         <button
           onClick={handleTwitter}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-zinc-700 bg-zinc-900/50 text-zinc-300 hover:border-zinc-500 hover:text-white transition-colors text-sm"
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-3 min-h-11 rounded-xl border border-zinc-700 bg-zinc-900/50 text-zinc-300 hover:border-zinc-500 hover:text-white transition-colors text-sm"
         >
           𝕏 Twitter
         </button>
         <button
           onClick={handleWhatsApp}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-zinc-700 bg-zinc-900/50 text-zinc-300 hover:border-zinc-500 hover:text-white transition-colors text-sm"
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-3 min-h-11 rounded-xl border border-zinc-700 bg-zinc-900/50 text-zinc-300 hover:border-zinc-500 hover:text-white transition-colors text-sm"
         >
           WhatsApp
         </button>
         <button
           onClick={handleCopy}
           title="Copiar link"
-          className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-zinc-700 bg-zinc-900/50 text-zinc-300 hover:border-zinc-500 hover:text-white transition-colors text-sm"
+          className="flex items-center justify-center gap-2 px-4 py-3 min-h-11 rounded-xl border border-zinc-700 bg-zinc-900/50 text-zinc-300 hover:border-zinc-500 hover:text-white transition-colors text-sm"
         >
-          {copied ? <span className="text-indigo-400">✓</span> : <Link2 className="w-4 h-4" />}
+          {copied ? <span className="text-violet-400">✓</span> : <Link2 className="w-4 h-4" />}
         </button>
       </div>
     </div>
@@ -248,30 +249,42 @@ export default function TestPage() {
   const [email, setEmail] = useState("");
   const [emailStatus, setEmailStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [result, setResult] = useState<EmotionalState | null>(null);
+  const [previousState, setPreviousState] = useState<EmotionalState | null>(null);
+  const autoAdvanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function handleOptionSelect(optionIdx: number) {
+    if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
+
     const newAnswers = [...answers];
     newAnswers[currentQ] = optionIdx;
     setAnswers(newAnswers);
-  }
 
-  function handleNext() {
-    if (currentQ < QUESTIONS.length - 1) {
-      setCurrentQ(currentQ + 1);
-    } else {
-      const state = calculateState(answers);
-      setResult(state);
-      setScreen("email");
-      // Track completion in background — fire and forget
-      fetch("/api/quiz/result", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ state }),
-      }).catch(() => {});
-    }
+    autoAdvanceTimer.current = setTimeout(() => {
+      if (currentQ < QUESTIONS.length - 1) {
+        setCurrentQ((q) => q + 1);
+      } else {
+        const state = calculateState(newAnswers);
+        setResult(state);
+        setScreen("email");
+        fetch("/api/quiz/result", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ state }),
+        })
+          .then((r) => r.json())
+          .then((data: { previousState?: string }) => {
+            const ps = data.previousState;
+            if (ps && ["bloqueo", "ansiedad", "duda", "claridad", "neutral"].includes(ps)) {
+              setPreviousState(ps as EmotionalState);
+            }
+          })
+          .catch(() => {});
+      }
+    }, 450);
   }
 
   function handleBack() {
+    if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
     if (currentQ > 0) {
       setCurrentQ(currentQ - 1);
     } else {
@@ -290,7 +303,6 @@ export default function TestPage() {
         });
         setEmailStatus(res.ok ? "sent" : "error");
         if (res.ok && result) {
-          // Fire-and-forget: send personalized follow-up email
           fetch("/api/quiz/email", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -312,12 +324,12 @@ export default function TestPage() {
       <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-16">
         <div className="max-w-xl w-full text-center space-y-8">
           <div className="space-y-4">
-            <p className="text-sm font-semibold uppercase tracking-widest text-indigo-400">
+            <p className="text-sm font-semibold uppercase tracking-widest text-violet-400">
               Diagnóstico gratuito
             </p>
             <h1 className="text-4xl md:text-5xl font-bold leading-tight">
               ¿Qué te está{" "}
-              <span className="bg-linear-to-r from-indigo-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
                 frenando ahora?
               </span>
             </h1>
@@ -326,7 +338,7 @@ export default function TestPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 py-4">
+          <div className="grid grid-cols-3 gap-3 py-2">
             {[
               { emoji: "🧱", label: "Bloqueo" },
               { emoji: "⚡", label: "Ansiedad" },
@@ -344,7 +356,7 @@ export default function TestPage() {
 
           <button
             onClick={() => setScreen("quiz")}
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-indigo-500 text-white font-semibold rounded-xl hover:bg-indigo-400 transition-colors text-lg w-full sm:w-auto"
+            className={`${COMPONENTS.buttonPrimary} inline-flex items-center justify-center gap-2 px-8 py-4 text-base w-full sm:w-auto`}
           >
             Empezar diagnóstico <ArrowRight className="w-5 h-5" />
           </button>
@@ -360,7 +372,7 @@ export default function TestPage() {
   if (screen === "quiz") {
     const question = QUESTIONS[currentQ];
     return (
-      <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-16">
+      <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-12">
         <div className="max-w-xl w-full space-y-8">
           {/* Progress */}
           <div className="space-y-2">
@@ -368,9 +380,9 @@ export default function TestPage() {
               <span>Pregunta {currentQ + 1} de {QUESTIONS.length}</span>
               <span>{Math.round(progress)}%</span>
             </div>
-            <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+            <div className={COMPONENTS.progressBar}>
               <div
-                className="h-full bg-indigo-500 rounded-full transition-all duration-300"
+                className={`${COMPONENTS.progressFill} transition-all duration-300`}
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -389,7 +401,7 @@ export default function TestPage() {
                   onClick={() => handleOptionSelect(idx)}
                   className={`w-full text-left px-5 py-4 rounded-xl border transition-all duration-150 ${
                     currentAnswer === idx
-                      ? "border-indigo-500 bg-indigo-500/15 text-white"
+                      ? "border-violet-500 bg-violet-500/15 text-white"
                       : "border-zinc-800 bg-zinc-900/50 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-900"
                   }`}
                 >
@@ -397,7 +409,7 @@ export default function TestPage() {
                     <div
                       className={`w-4 h-4 rounded-full border-2 shrink-0 transition-colors ${
                         currentAnswer === idx
-                          ? "border-indigo-400 bg-indigo-400"
+                          ? "border-violet-400 bg-violet-400"
                           : "border-zinc-600"
                       }`}
                     />
@@ -409,20 +421,16 @@ export default function TestPage() {
           </div>
 
           {/* Navigation */}
-          <div className="flex gap-3">
+          <div className="flex items-center justify-between">
             <button
               onClick={handleBack}
-              className="px-5 py-3 border border-zinc-700 text-zinc-400 font-medium rounded-xl hover:bg-zinc-900/50 transition-colors text-sm"
+              className="px-5 py-3 min-h-11 border border-zinc-700 text-zinc-400 font-medium rounded-xl hover:bg-zinc-900/50 transition-colors text-sm"
             >
-              Atrás
+              ← Atrás
             </button>
-            <button
-              onClick={handleNext}
-              disabled={currentAnswer === null}
-              className="flex-1 px-5 py-3 bg-indigo-500 text-white font-semibold rounded-xl hover:bg-indigo-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm"
-            >
-              {currentQ < QUESTIONS.length - 1 ? "Siguiente →" : "Ver mi resultado →"}
-            </button>
+            {currentAnswer !== null && (
+              <p className="text-xs text-zinc-600 animate-pulse">Continuando…</p>
+            )}
           </div>
         </div>
       </div>
@@ -447,23 +455,23 @@ export default function TestPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="tu@email.com"
-              className="w-full px-4 py-3 rounded-xl border border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus:outline-none focus:border-indigo-500 transition-colors text-sm"
+              className={COMPONENTS.inputField}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && email.trim()) handleEmailSubmit(false);
+                if (e.key === "Enter" && email.trim()) void handleEmailSubmit(false);
               }}
             />
             <button
-              onClick={() => handleEmailSubmit(false)}
+              onClick={() => void handleEmailSubmit(false)}
               disabled={!email.trim() || emailStatus === "sending"}
-              className="w-full px-5 py-3 bg-indigo-500 text-white font-semibold rounded-xl hover:bg-indigo-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm"
+              className={`${COMPONENTS.buttonPrimary} w-full py-3 text-sm disabled:opacity-40 disabled:cursor-not-allowed`}
             >
-              {emailStatus === "sending" ? "Enviando..." : "Ver resultado →"}
+              {emailStatus === "sending" ? "Enviando…" : "Ver resultado →"}
             </button>
           </div>
 
           <button
-            onClick={() => handleEmailSubmit(true)}
-            className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
+            onClick={() => void handleEmailSubmit(true)}
+            className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors py-3 min-h-11 block w-full"
           >
             Continuar sin email
           </button>
@@ -491,6 +499,39 @@ export default function TestPage() {
             </h2>
           </div>
 
+          {/* Progress comparison — only shown if user has a previous result */}
+          {previousState && previousState !== result && (
+            <div className="rounded-xl border border-zinc-700 bg-zinc-900/60 p-5">
+              <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-3">
+                Tu evolución
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="flex-1 text-center px-3 py-2.5 rounded-lg bg-zinc-800 border border-zinc-700">
+                  <div className="text-xl mb-1">{STATE_RESULTS[previousState].emoji}</div>
+                  <div className="text-xs text-zinc-400 font-medium">{STATE_RESULTS[previousState].label}</div>
+                  <div className="text-xs text-zinc-600 mt-0.5">antes</div>
+                </div>
+                <div className="text-zinc-600 text-lg">→</div>
+                <div className={`flex-1 text-center px-3 py-2.5 rounded-lg border ${stateData.badgeBg} ${stateData.borderColor}`}>
+                  <div className="text-xl mb-1">{stateData.emoji}</div>
+                  <div className={`text-xs font-semibold ${stateData.accentColor}`}>{stateData.label}</div>
+                  <div className="text-xs text-zinc-500 mt-0.5">ahora</div>
+                </div>
+              </div>
+              {(previousState === "bloqueo" || previousState === "ansiedad") &&
+                (result === "claridad" || result === "duda") && (
+                  <p className="text-xs text-zinc-400 mt-3 leading-relaxed">
+                    Eso no pasa solo. Has trabajado en esto.
+                  </p>
+                )}
+              {result === "bloqueo" || result === "ansiedad" ? (
+                <p className="text-xs text-zinc-400 mt-3 leading-relaxed">
+                  Esta semana es más difícil que la última. Es información, no fracaso.
+                </p>
+              ) : null}
+            </div>
+          )}
+
           {/* Pattern */}
           <div className={`rounded-xl border ${stateData.borderColor} ${stateData.badgeBg} p-5 space-y-2`}>
             <p className={`text-xs font-semibold uppercase tracking-widest ${stateData.accentColor}`}>
@@ -508,8 +549,8 @@ export default function TestPage() {
           </div>
 
           {/* Action */}
-          <div className="rounded-xl border border-indigo-500/40 bg-indigo-500/10 p-5 space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-widest text-indigo-400">
+          <div className="rounded-xl border border-violet-500/40 bg-violet-500/10 p-5 space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-widest text-violet-400">
               Tu acción para ahora
             </p>
             <p className="text-sm text-white leading-relaxed font-medium">{stateData.action}</p>
@@ -543,15 +584,15 @@ export default function TestPage() {
                     "Señales de riesgo antes de que escalen",
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-2 text-xs text-zinc-400">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-violet-400 shrink-0 mt-0.5" />
                       {item}
                     </li>
                   ))}
                 </ul>
               </div>
               <Link
-                href="/app/explore"
-                className="inline-flex items-center justify-center gap-2 w-full px-5 py-3 bg-indigo-500 text-white font-semibold rounded-xl hover:bg-indigo-400 transition-colors text-sm"
+                href="/signup"
+                className={`${COMPONENTS.buttonPrimary} inline-flex items-center justify-center gap-2 w-full py-3 text-sm`}
               >
                 Empezar gratis <ArrowRight className="w-4 h-4" />
               </Link>
@@ -569,7 +610,7 @@ export default function TestPage() {
                 setResult(null);
                 setScreen("intro");
               }}
-              className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+              className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors py-2"
             >
               Repetir el test
             </button>

@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { MessageCircle, Plus } from "lucide-react";
 import AppLayout from "@/components/layout/AppLayout";
+import { FloatingButton } from "@/components/effects/FloatingButton";
 import Chat, { type ChatMessage } from "@/components/Chat";
 import AssessmentFlow from "@/components/AssessmentFlow";
 import QuickCheckin from "@/components/QuickCheckin";
@@ -1956,6 +1958,14 @@ export default function HomePage() {
             onToggleAction={handleToggleAction}
           />
         }
+      />
+
+      <FloatingButton
+        icon={<MessageCircle className="w-6 h-6" />}
+        label="Nueva conversación"
+        position="bottom-right"
+        onClick={handleNewConversation}
+        color="cyan"
       />
 
       <Dialog open={upgradeDialogOpen} onOpenChange={setUpgradeDialogOpen}>

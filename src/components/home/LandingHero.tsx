@@ -9,8 +9,11 @@ export default function LandingHero() {
     <section className="relative overflow-hidden py-20 md:py-32 lg:py-40">
       {/* Animated background gradient */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-emotion-clarity/20 to-transparent rounded-full blur-3xl opacity-30 animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-emotion-doubt/20 to-transparent rounded-full blur-3xl opacity-30 animate-pulse" style={{ animationDelay: "1s" }} />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-linear-to-br from-emotion-clarity/20 to-transparent rounded-full blur-3xl opacity-30 animate-pulse" />
+        <div
+          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-linear-to-br from-emotion-doubt/20 to-transparent rounded-full blur-3xl opacity-30 animate-pulse"
+          style={{ animationDelay: "1s" }}
+        />
       </div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -26,12 +29,13 @@ export default function LandingHero() {
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
                 <span className="block">Cambia tu vida</span>
-                <span className="bg-gradient-to-r from-emotion-clarity via-emotion-doubt to-emotion-blocked bg-clip-text text-transparent">
+                <span className="bg-linear-to-r from-emotion-clarity via-emotion-doubt to-emotion-blocked bg-clip-text text-transparent">
                   un hábito a la vez
                 </span>
               </h1>
               <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">
-                Luciernaga te guía a través de la transformación real. No es teoría. No es perfección. Es acción pequeña, consistente, que genera cambios duraderos.
+                Luciernaga te guía a través de la transformación real. No es teoría. No es
+                perfección. Es acción pequeña, consistente, que genera cambios duraderos.
               </p>
             </div>
 
@@ -56,37 +60,37 @@ export default function LandingHero() {
               <Button
                 size="lg"
                 asChild
-                className="bg-gradient-to-r from-emotion-clarity to-emotion-doubt hover:opacity-90 text-white font-semibold group"
+                className="bg-linear-to-r from-emotion-clarity to-emotion-doubt hover:opacity-90 text-white font-semibold group"
               >
                 <Link href="/explore">
                   Empieza tu transformación
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                asChild
-              >
+              <Button size="lg" variant="outline" asChild>
                 <Link href="/app">Acceder a tu cuenta</Link>
               </Button>
             </div>
 
             {/* Social Proof */}
             <div className="pt-8 border-t border-border/50">
-              <p className="text-xs text-muted-foreground mb-3">Jóvenes que ya transformaron sus vidas</p>
+              <p className="text-xs text-muted-foreground mb-3">
+                Jóvenes que ya transformaron sus vidas
+              </p>
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2">
                   {[1, 2, 3, 4].map((i) => (
                     <div
                       key={i}
-                      className="w-8 h-8 rounded-full bg-gradient-to-br from-emotion-clarity to-emotion-doubt border-2 border-background flex items-center justify-center text-xs font-bold text-white"
+                      className="w-8 h-8 rounded-full bg-linear-to-br from-emotion-clarity to-emotion-doubt border-2 border-background flex items-center justify-center text-xs font-bold text-white"
                     >
                       {i}
                     </div>
                   ))}
                 </div>
-                <span className="text-sm text-muted-foreground">+200 personas en transformación</span>
+                <span className="text-sm text-muted-foreground">
+                  +200 personas en transformación
+                </span>
               </div>
             </div>
           </div>
@@ -97,13 +101,19 @@ export default function LandingHero() {
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="relative w-80 h-80">
                 {/* Outer rotating circle */}
-                <div className="absolute inset-0 rounded-full border-2 border-emotion-clarity/30 animate-spin" style={{ animationDuration: "20s" }} />
-                
+                <div
+                  className="absolute inset-0 rounded-full border-2 border-emotion-clarity/30 animate-spin"
+                  style={{ animationDuration: "20s" }}
+                />
+
                 {/* Middle circle */}
-                <div className="absolute inset-8 rounded-full border-2 border-emotion-doubt/30 animate-spin" style={{ animationDuration: "30s", animationDirection: "reverse" }} />
+                <div
+                  className="absolute inset-8 rounded-full border-2 border-emotion-doubt/30 animate-spin"
+                  style={{ animationDuration: "30s", animationDirection: "reverse" }}
+                />
 
                 {/* Inner gradient circle */}
-                <div className="absolute inset-16 rounded-full bg-gradient-to-br from-emotion-clarity/20 via-emotion-doubt/20 to-emotion-blocked/20 backdrop-blur-sm border border-border/50 shadow-2xl flex items-center justify-center">
+                <div className="absolute inset-16 rounded-full bg-linear-to-br from-emotion-clarity/20 via-emotion-doubt/20 to-emotion-blocked/20 backdrop-blur-sm border border-border/50 shadow-2xl flex items-center justify-center">
                   <div className="text-center space-y-2">
                     <div className="text-5xl">🚀</div>
                     <p className="text-sm font-semibold text-foreground">Tu transformación</p>
@@ -113,7 +123,12 @@ export default function LandingHero() {
 
                 {/* Floating elements */}
                 <div className="absolute -top-4 -right-4 text-2xl animate-bounce">🔥</div>
-                <div className="absolute -bottom-4 -left-4 text-2xl animate-bounce" style={{ animationDelay: "0.5s" }}>⚡</div>
+                <div
+                  className="absolute -bottom-4 -left-4 text-2xl animate-bounce"
+                  style={{ animationDelay: "0.5s" }}
+                >
+                  ⚡
+                </div>
                 <div className="absolute top-1/2 -right-12 text-2xl animate-pulse">✨</div>
               </div>
             </div>

@@ -1,4 +1,8 @@
-export type UserState = "CRISIS" | "BLOQUEADO" | "EVASIVO" | "ESTABLE" | "ACTIVO";
+// Estado emocional/conversacional — detectado del texto del usuario
+export type UserState = "neutral" | "duda" | "bloqueo" | "ansiedad" | "claridad";
+
+// Estado sistémico/conductual — derivado de métricas de engagement
+export type SystemState = "CRISIS" | "BLOQUEADO" | "EVASIVO" | "ESTABLE" | "ACTIVO";
 
 export type EventType =
   | "MESSAGE_SENT"

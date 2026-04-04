@@ -1,5 +1,5 @@
 import { logInfo } from "@/lib/logger";
-import type { UserState } from "@/types/chat";
+import type { UserState } from "@/domain/types";
 import type { InsightConfidence } from "@/services/insights";
 
 export interface DecisionMetrics {

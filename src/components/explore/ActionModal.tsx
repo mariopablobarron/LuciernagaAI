@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
 type ActionNode = {
@@ -18,7 +17,7 @@ type ActionModalProps = {
   action: ActionNode;
   isOpen: boolean;
   onClose: () => void;
-  onComplete: () => void;
+  onComplete: (content: string) => void;
 };
 
 export default function ActionModal({
@@ -32,18 +31,15 @@ export default function ActionModal({
 
   useEffect(() => {
     if (isOpen) {
-      setInput("");
+      const t = setTimeout(() => setInput(""), 0);
+      return () => clearTimeout(t);
     }
   }, [isOpen]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!input.trim()) return;
-
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setIsSubmitting(false);
-    onComplete();
+    onComplete(input.trim());
   };
 
   const getColorVar = (color: string) => {

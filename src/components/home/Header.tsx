@@ -16,13 +16,16 @@ export default function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo - más minimalista */}
-          <Link href="/" className="flex items-center gap-2.5 group transition-opacity hover:opacity-80">
-            <div className="text-2xl">🔥</div>
-            <span className="text-lg font-black tracking-tight text-foreground">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="relative flex items-center justify-center w-10 h-10">
+              <div className="absolute inset-0 bg-linear-to-br from-emotion-clarity to-emotion-doubt rounded-lg opacity-20 group-hover:opacity-30 transition-opacity" />
+              <div className="relative text-xl font-bold">🔥</div>
+            </div>
+            <span className="text-lg font-bold bg-linear-to-r from-emotion-clarity via-emotion-doubt to-emotion-blocked bg-clip-text text-transparent">
               Luciernaga
             </span>
           </Link>
@@ -42,18 +45,13 @@ export default function Header() {
 
           {/* CTA Buttons */}
           <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              asChild
-              className="hidden sm:inline-flex"
-            >
+            <Button variant="outline" size="sm" asChild className="hidden sm:inline-flex">
               <Link href="/app">Acceder</Link>
             </Button>
             <Button
               size="sm"
               asChild
-              className="bg-gradient-to-r from-emotion-clarity to-emotion-doubt hover:opacity-90"
+              className="bg-linear-to-r from-emotion-clarity to-emotion-doubt hover:opacity-90"
             >
               <Link href="/explore">Empezar ahora</Link>
             </Button>
@@ -64,11 +62,7 @@ export default function Header() {
               className="md:hidden p-2 hover:bg-muted rounded-lg transition-colors"
               aria-label="Toggle menu"
             >
-              {mobileMenuOpen ? (
-                <X className="w-5 h-5" />
-              ) : (
-                <Menu className="w-5 h-5" />
-              )}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -87,10 +81,10 @@ export default function Header() {
                   {link.label}
                 </a>
               ))}
-              <Button asChild size="sm" variant="outline" className="w-full">
+              <Button asChild size="sm" variant="outline" className="w-full" onClick={() => setMobileMenuOpen(false)}>
                 <Link href="/app">Acceder</Link>
               </Button>
-              <Button asChild size="sm" className="w-full">
+              <Button asChild size="sm" className="w-full" onClick={() => setMobileMenuOpen(false)}>
                 <Link href="/explore">Empezar ahora</Link>
               </Button>
             </div>

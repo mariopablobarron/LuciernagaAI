@@ -13,6 +13,7 @@ import {
   linkIdentityToEmail,
   normalizeEmail,
 } from "@/services/user";
+import { buildAdminAlert, notifyAdmin } from "@/services/telegram";
 
 type CaptureEmailBody = {
   email?: string;
@@ -89,6 +90,14 @@ export async function POST(req: NextRequest) {
       userId: linkedIdentity.userId,
       email: user.email,
     });
+
+    notifyAdmin(
+      buildAdminAlert({
+        tipo: "email_captured",
+        userId: linkedIdentity.userId,
+        email: normalizeEmail(rawEmail),
+      })
+    );
 
     return response;
   } catch (error: unknown) {

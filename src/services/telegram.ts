@@ -1,6 +1,7 @@
 import { getPrismaClient } from "@/db/prisma";
 import { buildSyntheticEmail } from "@/services/user";
 import { logError, logInfo } from "@/lib/logger";
+import { fetchWithTimeout } from "@/lib/fetchWithTimeout";
 
 export type TelegramUser = {
   id: string;
@@ -156,4 +157,83 @@ const CRISIS_STATES = new Set(["ansiedad", "bloqueo", "riesgo"]);
 
 export function isCrisisState(state: string): boolean {
   return CRISIS_STATES.has(state.toLowerCase());
+}
+
+// ─── Notification helpers ─────────────────────────────────────────────────────
+// Fire-and-forget: never await these from request handlers.
+
+const TELEGRAM_NOTIFY_BASE = "https://api.telegram.org";
+
+export type TelegramParseMode = "Markdown" | "HTML";
+
+/** Sends a Telegram message. Fire-and-forget — errors are swallowed. */
+export function sendTelegramNotification(
+  chatId: string | number,
+  text: string,
+  parseMode: TelegramParseMode = "Markdown"
+): void {
+  const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
+  if (!token || !chatId) return;
+
+  void fetchWithTimeout(
+    `${TELEGRAM_NOTIFY_BASE}/bot${token}/sendMessage`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, text, parse_mode: parseMode }),
+    },
+    5_000
+  ).catch(() => {});
+}
+
+/** Shortcut: send a message to the admin chat. */
+export function notifyAdmin(text: string, parseMode: TelegramParseMode = "Markdown"): void {
+  const adminChatId = process.env.ADMIN_TELEGRAM_ID?.trim();
+  if (!adminChatId) return;
+  sendTelegramNotification(adminChatId, text, parseMode);
+}
+
+// ─── Admin alert builder ──────────────────────────────────────────────────────
+
+type NewUserAlert      = { tipo: "new_user";        userId: string };
+type EmailAlert        = { tipo: "email_captured";  userId: string; email: string };
+type StateChangeAlert  = { tipo: "state_change";    userId: string; actionType: string; previousState: string; newState: string };
+type CrisisAlert       = { tipo: "crisis";          userId: string; crisisLevel: string; lastMessage?: string };
+type StreakAlert        = { tipo: "streak_milestone"; userId: string; streakDays: number };
+
+export type AdminAlertInput =
+  | NewUserAlert
+  | EmailAlert
+  | StateChangeAlert
+  | CrisisAlert
+  | StreakAlert;
+
+/** Builds a Markdown-formatted admin notification string. */
+export function buildAdminAlert(input: AdminAlertInput): string {
+  switch (input.tipo) {
+    case "new_user":
+      return `👤 *Nuevo usuario*\n\nID: \`${input.userId}\``;
+
+    case "email_captured":
+      return `📧 *Usuario identificado*\n\nID: \`${input.userId}\`\nEmail: ${input.email}`;
+
+    case "state_change":
+      return (
+        `🧠 *Luciernaga Alerta*\n\n` +
+        `👤 Usuario: \`${input.userId}\`\n` +
+        `🎯 Acción: ${input.actionType}\n` +
+        `💡 Estado: ${input.previousState} → *${input.newState}*`
+      );
+
+    case "crisis":
+      return (
+        `🚨 *Crisis detectada*\n\n` +
+        `👤 Usuario: \`${input.userId}\`\n` +
+        `⚡ Nivel: *${input.crisisLevel}*` +
+        (input.lastMessage ? `\n💬 _${input.lastMessage.slice(0, 120)}_` : "")
+      );
+
+    case "streak_milestone":
+      return `🔥 *Racha destacada*\n\nID: \`${input.userId}\`\nRacha: *${input.streakDays} días*`;
+  }
 }

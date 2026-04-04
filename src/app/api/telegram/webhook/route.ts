@@ -18,6 +18,8 @@ import {
 import { issueTelegramLinkToken } from "@/lib/telegram-link";
 import { sendAdminUserAlert } from "@/lib/alerts";
 import { DEFAULT_EMOTIONAL_PROFILE } from "@/types/emotional-profile";
+import { getPrismaClient } from "@/db/prisma";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 // ---- Telegram types ----
 
@@ -106,6 +108,104 @@ function buildTelegramLinkMessage(token: string): string {
   ].join("\n");
 }
 
+// ---- Admin command helpers ----
+
+function isAdmin(chatId: number): boolean {
+  const adminId = process.env.ADMIN_TELEGRAM_ID?.trim();
+  return !!adminId && chatId.toString() === adminId;
+}
+
+async function buildStatsMessage(): Promise<string> {
+  const prisma = getPrismaClient();
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const [activeToday, newToday, messagesTotal, stateRows] = await Promise.all([
+    prisma.user.count({ where: { lastSeen: { gte: startOfDay } } }),
+    prisma.user.count({ where: { createdAt: { gte: startOfDay } } }),
+    prisma.message.count({ where: { createdAt: { gte: startOfDay } } }),
+    prisma.userState.groupBy({
+      by: ["state"],
+      _count: { state: true },
+      orderBy: { _count: { state: "desc" } },
+    }),
+  ]);
+
+  const stateLines = stateRows
+    .map((r) => `  ${r.state}: ${r._count.state}`)
+    .join("\n");
+
+  return [
+    `📊 *Stats del día*`,
+    `Activos: ${activeToday} | Nuevos: ${newToday} | Mensajes: ${messagesTotal}`,
+    "",
+    `🧠 Estados:`,
+    stateLines || "  Sin datos",
+  ].join("\n");
+}
+
+async function buildUsuariosMessage(): Promise<string> {
+  const prisma = getPrismaClient();
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+  const users = await prisma.user.findMany({
+    where: { lastSeen: { gte: since } },
+    select: { id: true, source: true, lastSeen: true },
+    orderBy: { lastSeen: "desc" },
+    take: 20,
+  });
+
+  if (users.length === 0) return "Sin usuarios activos en las últimas 24h.";
+
+  const lines = users.map(
+    (u) =>
+      `• \`${u.id}\` [${u.source ?? "web"}] — ${u.lastSeen.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`
+  );
+  return `👥 *Activos (24h)* — ${users.length} usuarios\n\n${lines.join("\n")}`;
+}
+
+async function buildCrisisMessage(): Promise<string> {
+  const prisma = getPrismaClient();
+
+  const rows = await prisma.userState.findMany({
+    where: { crisisActive: true },
+    select: { userId: true, state: true, crisisActivatedAt: true },
+    orderBy: { crisisActivatedAt: "desc" },
+    take: 15,
+  });
+
+  if (rows.length === 0) return "✅ Sin usuarios en crisis activa ahora mismo.";
+
+  const lines = rows.map(
+    (r) =>
+      `• \`${r.userId}\` — ${r.state}` +
+      (r.crisisActivatedAt
+        ? ` (desde ${r.crisisActivatedAt.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })})`
+        : "")
+  );
+  return `🚨 *Crisis activas* — ${rows.length}\n\n${lines.join("\n")}`;
+}
+
+async function buildEstadoAdminMessage(): Promise<string> {
+  const prisma = getPrismaClient();
+
+  const rows = await prisma.userState.groupBy({
+    by: ["state"],
+    _count: { state: true },
+    orderBy: { _count: { state: "desc" } },
+  });
+
+  if (rows.length === 0) return "Sin datos de estado emocional.";
+
+  const total = rows.reduce((sum, r) => sum + r._count.state, 0);
+  const lines = rows.map((r) => {
+    const pct = ((r._count.state / total) * 100).toFixed(0);
+    return `  ${r.state}: ${r._count.state} (${pct}%)`;
+  });
+
+  return `🧠 *Distribución emocional actual*\n\nTotal: ${total} usuarios\n\n${lines.join("\n")}`;
+}
+
 // ---- Helpers ----
 
 function hasSafetyKeyword(text: string): boolean {
@@ -142,6 +242,14 @@ async function sendTelegramMessage(chatId: number, text: string): Promise<void> 
 // ---- Webhook handler ----
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
+  // Global rate limit: 100 req/min — protects against webhook abuse
+  const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "telegram";
+  const rl = checkRateLimit(`webhook:global:${ip}`, 100, 60_000);
+  if (!rl.allowed) {
+    // Return 200 to Telegram so it doesn't retry aggressively
+    return NextResponse.json({ ok: true });
+  }
+
   // Verify Telegram webhook secret if configured
   const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
   if (webhookSecret) {
@@ -220,8 +328,49 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ ok: true });
     }
 
-    // ---- Handle /estado ----
+    // ---- Handle /vincular ----
+    if (text === "/vincular") {
+      const token = issueTelegramLinkToken(userId);
+      await sendTelegramMessage(chatId, buildTelegramLinkMessage(token));
+      return NextResponse.json({ ok: true });
+    }
+
+    // ---- Admin commands (only respond to ADMIN_TELEGRAM_ID) ----
+    if (text === "/stats" || text === "/usuarios" || text === "/crisis") {
+      if (!isAdmin(chatId)) {
+        await sendTelegramMessage(chatId, "⛔ Comando no disponible.");
+        return NextResponse.json({ ok: true });
+      }
+      try {
+        let reply: string;
+        if (text === "/stats") {
+          reply = await buildStatsMessage();
+        } else if (text === "/usuarios") {
+          reply = await buildUsuariosMessage();
+        } else {
+          reply = await buildCrisisMessage();
+        }
+        await sendTelegramMessage(chatId, reply);
+      } catch (err: unknown) {
+        logError("TELEGRAM", err, { area: "admin_command", command: text });
+        await sendTelegramMessage(chatId, "Error al obtener datos.");
+      }
+      return NextResponse.json({ ok: true });
+    }
+
+    // /estado: admin sees distribution, regular users see their pending actions
     if (text === "/estado") {
+      if (isAdmin(chatId)) {
+        try {
+          const reply = await buildEstadoAdminMessage();
+          await sendTelegramMessage(chatId, reply);
+        } catch (err: unknown) {
+          logError("TELEGRAM", err, { area: "admin_estado", userId });
+          await sendTelegramMessage(chatId, "Error al obtener distribución.");
+        }
+        return NextResponse.json({ ok: true });
+      }
+      // ---- user /estado (existing logic below) ----
       try {
         const pending = await getPendingActions(userId);
         if (pending.length === 0) {
@@ -237,13 +386,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         logError("TELEGRAM", err, { area: "/estado", userId });
         await sendTelegramMessage(chatId, "No pude cargar tu estado en este momento.");
       }
-      return NextResponse.json({ ok: true });
-    }
-
-    // ---- Handle /vincular ----
-    if (text === "/vincular") {
-      const token = issueTelegramLinkToken(userId);
-      await sendTelegramMessage(chatId, buildTelegramLinkMessage(token));
       return NextResponse.json({ ok: true });
     }
 

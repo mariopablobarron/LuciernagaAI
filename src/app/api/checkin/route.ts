@@ -17,6 +17,20 @@ import {
   updateActiveChallengesFromCheckin,
 } from "@/services/impulse-challenges";
 import { updateStreak } from "@/services/streak";
+import { buildAdminAlert, notifyAdmin, sendTelegramNotification } from "@/services/telegram";
+import { checkRateLimit } from "@/lib/rate-limit";
+
+const STREAK_MILESTONES = new Set([7, 14, 30]);
+
+function buildStreakCongrats(days: number): string {
+  if (days >= 30) {
+    return `🏆 *¡30 días seguidos!*\n\nEso no es suerte, es disciplina real.\nEstás construyendo algo que dura.`;
+  }
+  if (days >= 14) {
+    return `🌟 *¡14 días de racha!*\n\nDos semanas sin parar. La mayoría ni lo intenta.\nSigue así.`;
+  }
+  return `🔥 *¡7 días seguidos!*\n\nUna semana completa. El hábito ya está tomando forma.\n¿Qué ha cambiado en ti esta semana?`;
+}
 
 function extractMood(message: string): string {
   const lower = message.toLowerCase();
@@ -58,6 +72,15 @@ export async function POST(req: NextRequest) {
     const identity = await resolveIdentity(req);
     const userId = identity.userId;
 
+    // Rate limit: 5 checkins/min per user
+    const rl = checkRateLimit(`checkin:${userId}`, 5, 60_000);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "TOO_MANY_REQUESTS", message: "Demasiados check-ins. Intenta en unos segundos." },
+        { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+      );
+    }
+
     logInfo("STATE", "daily_checkin_create_started", { userId });
 
     // 1. Legacy DailyCheckin record (backward compat)
@@ -94,8 +117,22 @@ export async function POST(req: NextRequest) {
       incrementCheckin: true,
     });
 
-    // 5. Impulso: update streak
+    // 5. Impulso: update streak + milestone notifications
     const streak = await updateStreak(userId);
+
+    if (STREAK_MILESTONES.has(streak.currentDays)) {
+      notifyAdmin(
+        buildAdminAlert({ tipo: "streak_milestone", userId, streakDays: streak.currentDays })
+      );
+      // Send congrats to user via Telegram if linked
+      const prisma2 = getPrismaClient();
+      const userRecord = await prisma2.user
+        .findUnique({ where: { id: userId }, select: { telegramId: true } })
+        .catch(() => null);
+      if (userRecord?.telegramId) {
+        sendTelegramNotification(userRecord.telegramId, buildStreakCongrats(streak.currentDays));
+      }
+    }
 
     // 6. Impulso: advance active challenges
     const updatedChallenges = await updateActiveChallengesFromCheckin({

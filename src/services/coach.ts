@@ -9,7 +9,7 @@ import type { MentorMode } from "@/services/mentor-protocol";
 import type { ConversationalOnboardingContext } from "@/services/onboarding";
 import type { TransformationPhase } from "@/services/transformation";
 import type { CanonicalUserPlan } from "@/services/user";
-import type { UserState } from "@/types/chat";
+import type { UserState } from "@/domain/types";
 import {
   DEFAULT_EMOTIONAL_PROFILE,
   type DominantPattern,

@@ -1,6 +1,6 @@
 import type { RiskLevel } from "@/services/risk";
 import type { TransformationPhase } from "@/services/transformation";
-import type { UserState } from "@/types/chat";
+import type { UserState } from "@/domain/types";
 
 export type MentorProtocolContext = {
   state: UserState;

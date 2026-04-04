@@ -1,5 +1,5 @@
 import { ONBOARDING_STARTER_QUESTION } from "@/lib/onboarding";
-import type { UserState } from "@/types/chat";
+import type { UserState } from "@/domain/types";
 
 export type OnboardingStage = "opening" | "reflection" | "first_action";
 

@@ -5,7 +5,6 @@ import ActionNode from "./ActionNode";
 import UserCore from "./UserCore";
 import ActionModal from "./ActionModal";
 import ProgressIndicator from "./ProgressIndicator";
-import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";
 
 type ActionNode = {
@@ -29,7 +28,7 @@ type ExploreCanvasProps = {
   userState: UserState;
   activeNodeId: string | null;
   onNodeClick: (nodeId: string) => void;
-  onActionComplete: (nodeId: string) => void;
+  onActionComplete: (nodeId: string, content: string) => void;
   onReset: () => void;
 };
 
@@ -78,8 +77,6 @@ export default function ExploreCanvas({
   const centerY = containerSize.height / 2;
   // Responsive radius - adjusted for hierarchy (more space for primary node)
   const radius = Math.min(containerSize.width, containerSize.height) * 0.35;
-
-  const activeAction = actions.find((a) => a.id === activeNodeId);
 
   // Filter visible actions (not completed, ordered by priority)
   const visibleActions = actions
@@ -153,7 +150,7 @@ export default function ExploreCanvas({
           );
 
           const isActive = activeNodeId === action.id;
-          const isPrimary = action.id === "action-1"; // "Escribir lo que evitas"
+          const isPrimary = index === 0;
           const otherNodesActive = activeNodeId !== null && activeNodeId !== action.id;
 
           return (
@@ -235,8 +232,8 @@ export default function ExploreCanvas({
           onClose={() => {
             setSelectedAction(null);
           }}
-          onComplete={() => {
-            onActionComplete(selectedAction.id);
+          onComplete={(content) => {
+            onActionComplete(selectedAction.id, content);
             setSelectedAction(null);
           }}
         />

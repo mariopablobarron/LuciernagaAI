@@ -176,7 +176,7 @@ export default function HomeOnboarding({
           value={goalText}
           onChange={(e) => setGoalText(e.target.value)}
           placeholder="Ej: Llevan semanas sin hablarme en el trabajo y no sé cómo retomar..."
-          className="min-h-[88px] resize-none text-sm"
+          className="min-h-22 resize-none text-sm"
           onKeyDown={(e) => {
             if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && goalText.trim()) {
               onSubmitGoal(goalText.trim());

@@ -14,7 +14,15 @@
     "system-check": "bash scripts/system-check.sh",
     "hardening:auto": "node scripts/auto-update-hardening-board.mjs",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "agent": "bash scripts/testing-agent.sh",
+    "agent:run": "bash scripts/testing-agent.sh run",
+    "agent:watch": "bash scripts/testing-agent.sh watch",
+    "agent:health": "bash scripts/testing-agent.sh health",
+    "agent:monitor": "bash scripts/testing-agent.sh monitor",
+    "agent:ci": "bash scripts/testing-agent.sh ci",
+    "agent:audit": "bash scripts/testing-agent.sh audit",
+    "agent:hooks": "bash scripts/testing-agent.sh hooks"
   },
   "dependencies": {
     "@blocknote/mantine": "^0.47.3",

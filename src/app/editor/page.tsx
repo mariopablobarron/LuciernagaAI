@@ -11,13 +11,13 @@ import { Card, CardContent } from "@/components/ui/card";
 const BlockEditor = dynamic(() => import("@/components/BlockEditor"), {
   ssr: false,
   loading: () => (
-    <div className="h-full min-h-[520px] animate-pulse rounded-3xl border border-border/80 bg-card/95 p-4 shadow-sm" />
+    <div className="h-full min-h-130 animate-pulse rounded-3xl border border-border/80 bg-card/95 p-4 shadow-sm" />
   ),
 });
 
 export default function EditorPage() {
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_right,_color-mix(in_oklab,var(--accent)_16%,transparent),transparent_30%),linear-gradient(180deg,color-mix(in_oklab,var(--background)_95%,white_5%),var(--background))] p-4 lg:p-6">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_right,color-mix(in_oklab,var(--accent)_16%,transparent),transparent_30%),linear-gradient(180deg,color-mix(in_oklab,var(--background)_95%,white_5%),var(--background))] p-4 lg:p-6">
       <div className="mx-auto flex h-[calc(100vh-2rem)] max-w-7xl flex-col gap-4 lg:h-[calc(100vh-3rem)]">
         <Card className="border-border/80 bg-card/92 shadow-lg shadow-black/5">
           <CardContent className="space-y-5 p-5 md:p-6">

@@ -8,7 +8,7 @@ import {
 import { detectUserState } from "@/services/state";
 import { generateMentorReply } from "@/services/ai";
 import { logError, logInfo } from "@/lib/logger";
-import type { UserState } from "@/types/chat";
+import type { UserState } from "@/domain/types";
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error && error.message) {

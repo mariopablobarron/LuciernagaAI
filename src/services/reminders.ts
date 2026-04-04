@@ -2,6 +2,7 @@ import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { buildReminderEmail, sendUserEmail } from "@/lib/email";
 import { isSyntheticEmail } from "@/services/user";
+import { fetchWithTimeout } from "@/lib/fetchWithTimeout";
 
 const TELEGRAM_API = "https://api.telegram.org";
 const REMINDER_WINDOW_HOURS = 24;
@@ -127,11 +128,15 @@ export async function sendTelegramReminder(user: TelegramReminderUser): Promise<
     `¿Qué está pasando?`;
 
   const chatId = parseInt(user.telegramId, 10);
-  const res = await fetch(`${TELEGRAM_API}/bot${token}/sendMessage`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ chat_id: chatId, text: message }),
-  });
+  const res = await fetchWithTimeout(
+    `${TELEGRAM_API}/bot${token}/sendMessage`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, text: message }),
+    },
+    5_000
+  );
 
   if (res.ok) {
     logInfo("REMINDERS", "telegram_reminder_sent", { userId: user.id, chatId });

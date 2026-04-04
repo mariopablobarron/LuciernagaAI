@@ -1,5 +1,11 @@
 import { GET } from "./route";
 
+jest.mock("@/db/prisma", () => ({
+  getPrismaClient: jest.fn(() => ({
+    $queryRaw: jest.fn().mockResolvedValue([{ "?column?": 1 }]),
+  })),
+}));
+
 describe("GET /api/health", () => {
   const originalOpenRouterKey = process.env.OPENROUTER_API_KEY;
 
@@ -7,26 +13,26 @@ describe("GET /api/health", () => {
     process.env.OPENROUTER_API_KEY = originalOpenRouterKey;
   });
 
-  it("retorna status ok y openrouter=false sin key", async () => {
+  it("incluye OPENROUTER_API_KEY en missingVars cuando no hay key", async () => {
     delete process.env.OPENROUTER_API_KEY;
 
     const response = await GET();
     const body = await response.json();
 
     expect(response.status).toBe(200);
-    expect(body.status).toBe("ok");
-    expect(body.openrouter).toBe(false);
+    expect(["ok", "degraded"]).toContain(body.status);
+    expect(body.checks.missingVars).toContain("OPENROUTER_API_KEY");
     expect(typeof body.timestamp).toBe("string");
   });
 
-  it("retorna openrouter=true cuando existe key", async () => {
+  it("no incluye OPENROUTER_API_KEY en missingVars cuando existe key", async () => {
     process.env.OPENROUTER_API_KEY = "test-key";
 
     const response = await GET();
     const body = await response.json();
 
     expect(response.status).toBe(200);
-    expect(body.status).toBe("ok");
-    expect(body.openrouter).toBe(true);
+    expect(["ok", "degraded"]).toContain(body.status);
+    expect(body.checks.missingVars).not.toContain("OPENROUTER_API_KEY");
   });
 });

@@ -1,8 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { attachSessionCookie, bootstrapSessionIdentity } from "@/lib/auth";
 import { logError, logInfo } from "@/lib/logger";
+import { buildAdminAlert, notifyAdmin } from "@/services/telegram";
+import { sendWelcomeSequence } from "@/services/telegramOnboarding";
+import { getPrismaClient } from "@/db/prisma";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 async function buildBootstrapResponse(req: NextRequest): Promise<NextResponse> {
+  const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
+  const rl = checkRateLimit(`bootstrap:ip:${ip}`, 10, 60_000);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { ok: false, error: "TOO_MANY_REQUESTS" },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    );
+  }
+
   const identity = await bootstrapSessionIdentity(req);
 
   const response = NextResponse.json({
@@ -36,6 +49,24 @@ async function buildBootstrapResponse(req: NextRequest): Promise<NextResponse> {
     userId: identity.userId,
     shouldSetCookie: identity.shouldSetCookie,
   });
+
+  // New user: notify admin + send Telegram welcome if they came via bot
+  if (identity.source === "generated") {
+    notifyAdmin(buildAdminAlert({ tipo: "new_user", userId: identity.userId }));
+
+    // If the user came from Telegram (tg_ prefix), fire welcome sequence
+    if (identity.userId.startsWith("tg_")) {
+      const telegramId = identity.userId.replace("tg_", "");
+      const prisma = getPrismaClient();
+      const user = await prisma.user.findUnique({
+        where: { id: identity.userId },
+        select: { telegramId: true },
+      }).catch(() => null);
+
+      const resolvedId = user?.telegramId ?? telegramId;
+      void sendWelcomeSequence(identity.userId, resolvedId);
+    }
+  }
 
   return response;
 }

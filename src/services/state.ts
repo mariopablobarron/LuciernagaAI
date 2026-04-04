@@ -1,4 +1,4 @@
-import type { UserState } from "@/types/chat";
+import type { UserState } from "@/domain/types";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { DEFAULT_EMOTIONAL_PROFILE } from "@/types/emotional-profile";

@@ -1,6 +1,6 @@
-import type { Decision, Insight, UserState } from "@/domain/types";
+import type { Decision, Insight, SystemState } from "@/domain/types";
 
-export function generateDecision(state: UserState, insight: Insight): Decision {
+export function generateDecision(state: SystemState, insight: Insight): Decision {
   if (state === "CRISIS") {
     return {
       type: "ESCALAR_CRISIS",

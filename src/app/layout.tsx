@@ -1,8 +1,12 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SAAS_CONFIG } from "@/lib/saas";
+import { validateEnv } from "@/lib/env";
 import "./globals.css";
+
+// Fail fast on missing critical env vars (throws in prod, warns in dev)
+validateEnv();
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,6 +31,11 @@ function getMetadataBase(): URL {
     return new URL("http://localhost:3000");
   }
 }
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
 
 export const metadata: Metadata = {
   metadataBase: getMetadataBase(),

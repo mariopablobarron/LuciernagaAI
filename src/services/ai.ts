@@ -5,7 +5,7 @@ import {
   buildFallbackResponse,
   type CoachContext,
 } from "@/services/coach";
-import type { UserState } from "@/types/chat";
+import type { UserState } from "@/domain/types";
 import {
   DEFAULT_EMOTIONAL_PROFILE,
   type EmotionalProfile,

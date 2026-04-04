@@ -188,6 +188,7 @@ model Action {
   avoidanceEvents AvoidanceEvent[]
 
   @@index([goalId, createdAt])
+  @@index([goalId, completed])
 }
 
 model AvoidanceEvent {
@@ -290,6 +291,7 @@ model UserChallenge {
   challenge      Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
 
   @@index([userId, status, startedAt])
+  @@index([userId, updatedAt])
   @@index([challengeId, status])
 }
 

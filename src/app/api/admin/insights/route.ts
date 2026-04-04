@@ -5,7 +5,7 @@ import { generateDecision as generateDomainDecision } from "@/domain/decisionEng
 import type {
   DecisionType,
   Insight as DomainInsight,
-  UserState as DomainUserState,
+  SystemState,
 } from "@/domain/types";
 import { buildUserState } from "@/domain/userStateEngine";
 import { dispatchAutomatedAlerts } from "@/lib/alerts";
@@ -131,7 +131,7 @@ interface Decision {
   action: string;
 }
 
-function isDomainUserState(value: unknown): value is DomainUserState {
+function isSystemState(value: unknown): value is SystemState {
   return (
     value === "CRISIS" ||
     value === "BLOQUEADO" ||
@@ -517,7 +517,7 @@ export async function GET(req: NextRequest) {
       crisisUsers: [] as string[],
     };
 
-    const stateDistribution: Record<DomainUserState, number> = {
+    const stateDistribution: Record<SystemState, number> = {
       CRISIS: 0,
       BLOQUEADO: 0,
       EVASIVO: 0,
@@ -573,7 +573,7 @@ export async function GET(req: NextRequest) {
         if (!metadata) continue;
 
         const stateValue = metadata.userState;
-        if (isDomainUserState(stateValue)) {
+        if (isSystemState(stateValue)) {
           stateDistribution[stateValue] += 1;
           decisionSamples += 1;
         }

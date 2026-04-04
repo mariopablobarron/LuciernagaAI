@@ -427,7 +427,7 @@ export default function AdminPage() {
             >
               <h3 className="font-semibold text-foreground">{insight.title}</h3>
               <p className="mt-1 text-sm text-muted-foreground">{insight.content}</p>
-              <p className="mt-2 text-sm font-medium text-[color:color-mix(in_oklab,var(--emotion-doubt)_78%,var(--foreground))]">
+              <p className="mt-2 text-sm font-medium text-[color-mix(in_oklab,var(--emotion-doubt)_78%,var(--foreground))]">
                 {insight.action}
               </p>
             </div>
@@ -492,7 +492,7 @@ export default function AdminPage() {
                   </div>
                   <p className="mt-2 text-sm font-semibold text-foreground">{item.title}</p>
                   <p className="mt-1 text-sm text-muted-foreground">{item.content}</p>
-                  <p className="mt-2 text-sm font-medium text-[color:color-mix(in_oklab,var(--emotion-doubt)_78%,var(--foreground))]">
+                  <p className="mt-2 text-sm font-medium text-[color-mix(in_oklab,var(--emotion-doubt)_78%,var(--foreground))]">
                     {item.action}
                   </p>
                 </div>

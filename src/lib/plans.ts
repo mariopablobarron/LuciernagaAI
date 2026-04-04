@@ -26,3 +26,15 @@ export const PLANS = {
 } as const;
 
 export const FREE_LIMIT_MESSAGE = 'Has alcanzado el límite del plan gratuito. Actualiza a Pro para conversaciones ilimitadas.';
+
+/** Stripe price IDs — set these env vars in Coolify */
+export function getStripePriceId(plan: 'pro_monthly' | 'pro_annual'): string {
+  const key = plan === 'pro_monthly'
+    ? 'STRIPE_PRICE_PRO_MONTHLY'
+    : 'STRIPE_PRICE_PRO_ANNUAL';
+  const id = process.env[key]?.trim();
+  if (!id) throw new Error(`[Plans] Missing env var: ${key}`);
+  return id;
+}
+
+export const STRIPE_TRIAL_DAYS = 7;

@@ -16,6 +16,10 @@ export type AppConfig = {
   TELEGRAM_BOT_USERNAME: string;
   ADMIN_TELEGRAM_ID: string;
   APP_BASE_URL: string;
+  STRIPE_SECRET_KEY: string;
+  STRIPE_WEBHOOK_SECRET: string;
+  STRIPE_PRICE_PRO_MONTHLY: string;
+  STRIPE_PRICE_PRO_ANNUAL: string;
 };
 
 // Required in every environment
@@ -32,6 +36,10 @@ const REQUIRED_IN_PRODUCTION: (keyof AppConfig)[] = [
   "TELEGRAM_BOT_TOKEN",
   "ADMIN_TELEGRAM_ID",
   "APP_BASE_URL",
+  "STRIPE_SECRET_KEY",
+  "STRIPE_WEBHOOK_SECRET",
+  "STRIPE_PRICE_PRO_MONTHLY",
+  "STRIPE_PRICE_PRO_ANNUAL",
 ];
 
 function readVar(name: keyof AppConfig): string {
@@ -96,5 +104,9 @@ export function getConfig(): AppConfig {
     TELEGRAM_BOT_USERNAME: optional("TELEGRAM_BOT_USERNAME"),
     ADMIN_TELEGRAM_ID: optional("ADMIN_TELEGRAM_ID"),
     APP_BASE_URL: optional("APP_BASE_URL", "http://localhost:3000"),
+    STRIPE_SECRET_KEY: optional("STRIPE_SECRET_KEY"),
+    STRIPE_WEBHOOK_SECRET: optional("STRIPE_WEBHOOK_SECRET"),
+    STRIPE_PRICE_PRO_MONTHLY: optional("STRIPE_PRICE_PRO_MONTHLY"),
+    STRIPE_PRICE_PRO_ANNUAL: optional("STRIPE_PRICE_PRO_ANNUAL"),
   };
 }

@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { Check } from 'lucide-react';
 import Header from '@/components/home/Header';
 import Footer from '@/components/home/Footer';
+import CheckoutButton from '@/components/billing/CheckoutButton';
+import PortalButton from '@/components/billing/PortalButton';
 
 const FREE_FEATURES = [
   '10 conversaciones al mes',
@@ -36,6 +38,7 @@ export default function PreciosPage() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
+          {/* Free */}
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-8 space-y-6">
             <div>
               <p className="text-sm font-medium text-zinc-400 mb-1">Gratis</p>
@@ -52,14 +55,20 @@ export default function PreciosPage() {
                 </li>
               ))}
             </ul>
-            <Link href="/app" className="block text-center py-3 rounded-xl border border-zinc-700 text-sm font-semibold text-zinc-300 hover:text-white hover:border-zinc-500 transition-all">
+            <Link
+              href="/app"
+              className="block text-center py-3 rounded-xl border border-zinc-700 text-sm font-semibold text-zinc-300 hover:text-white hover:border-zinc-500 transition-all"
+            >
               Empezar gratis
             </Link>
           </div>
 
+          {/* Pro */}
           <div className="rounded-2xl border-2 border-violet-500/60 bg-violet-500/5 p-8 space-y-6 relative">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-              <span className="bg-violet-600 text-white text-xs font-bold px-3 py-1 rounded-full">MÁS POPULAR</span>
+              <span className="bg-violet-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                MÁS POPULAR
+              </span>
             </div>
             <div>
               <p className="text-sm font-medium text-violet-400 mb-1">Pro</p>
@@ -77,18 +86,46 @@ export default function PreciosPage() {
                 </li>
               ))}
             </ul>
-            <Link href="/unirse?plan=pro" className="block text-center py-3 rounded-xl text-sm font-bold text-white bg-violet-600 hover:bg-violet-500 transition-all shadow-lg shadow-violet-500/20">
-              Empezar 7 días gratis
-            </Link>
+            <div className="space-y-2">
+              <CheckoutButton interval="monthly" label="Empezar 7 días gratis" />
+              <CheckoutButton
+                interval="annual"
+                label="Plan anual — 79€/año"
+                variant="secondary"
+              />
+            </div>
+            <p className="text-xs text-zinc-600 text-center">
+              7 días de prueba gratis · Sin cargo hasta el día 8 · Cancelas cuando quieras
+            </p>
           </div>
         </div>
 
+        {/* Portal link for existing subscribers */}
+        <div className="text-center">
+          <p className="text-sm text-zinc-500 mb-2">¿Ya eres Pro?</p>
+          <PortalButton />
+        </div>
+
+        {/* FAQ */}
         <div className="space-y-4 pt-4">
           <h2 className="text-xl font-bold text-center mb-6">Preguntas frecuentes</h2>
           {[
-            { q: '¿Necesito tarjeta para el plan gratuito?', a: 'No. El plan gratuito no requiere ningún dato de pago.' },
-            { q: '¿Puedo cancelar cuando quiera?', a: 'Sí. Cancelas en cualquier momento sin permanencia ni penalización.' },
-            { q: '¿Luciérnaga reemplaza a un psicólogo?', a: 'No. Luciérnaga es una herramienta de mentoría conversacional. No sustituye terapia profesional.' },
+            {
+              q: '¿Necesito tarjeta para el plan gratuito?',
+              a: 'No. El plan gratuito no requiere ningún dato de pago.',
+            },
+            {
+              q: '¿Puedo cancelar cuando quiera?',
+              a: 'Sí. Cancelas en cualquier momento sin permanencia ni penalización. Si cancelas durante el periodo de prueba, no se te cobra nada.',
+            },
+            {
+              q: '¿Qué pasa cuando termina el periodo de prueba?',
+              a: 'Al día 8 se carga el primer mes (9€). Recibirás un email de Stripe antes del cargo.',
+            },
+            {
+              q: '¿Luciérnaga reemplaza a un psicólogo?',
+              a: 'No. Luciérnaga es una herramienta de mentoría conversacional. No sustituye terapia profesional.',
+            },
           ].map(({ q, a }) => (
             <div key={q} className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
               <p className="font-semibold text-white text-sm mb-2">{q}</p>

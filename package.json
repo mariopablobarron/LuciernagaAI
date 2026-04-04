@@ -15,6 +15,7 @@
     "hardening:auto": "node scripts/auto-update-hardening-board.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "tg-tasks": "node scripts/tg-tasks.mjs",
     "agent": "bash scripts/testing-agent.sh",
     "agent:run": "bash scripts/testing-agent.sh run",
     "agent:watch": "bash scripts/testing-agent.sh watch",

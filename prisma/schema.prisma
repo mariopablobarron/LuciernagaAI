@@ -423,6 +423,21 @@ model UserPreferences {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+// ─── Admin task queue (Telegram → Claude Code) ────────────────────────────────
+
+/// Instructions sent by the admin via Telegram, queued for local execution.
+model AdminTask {
+  id          String    @id @default(cuid())
+  instruction String    @db.Text
+  source      String    @default("telegram")
+  status      String    @default("pending") // "pending" | "done" | "skipped"
+  result      String?   @db.Text
+  createdAt   DateTime  @default(now())
+  doneAt      DateTime?
+
+  @@index([status, createdAt])
+}
+
 // ─── Beta / waitlist & invitations ────────────────────────────────────────────
 
 /// Someone who completed the 3-mission onboarding flow to request beta access.

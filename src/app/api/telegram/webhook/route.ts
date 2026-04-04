@@ -187,6 +187,54 @@ async function buildCrisisMessage(): Promise<string> {
   return `🚨 *Crisis activas* — ${rows.length}\n\n${lines.join("\n")}`;
 }
 
+async function buildRetentionMessage(): Promise<string> {
+  const prisma = getPrismaClient();
+  const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  const [totalUsers, activeWeek, waitlist, challenges] = await Promise.all([
+    prisma.user.count(),
+    prisma.message.findMany({
+      where: { createdAt: { gte: since }, role: "user" },
+      select: { userId: true },
+      distinct: ["userId"],
+    }),
+    prisma.waitlistEntry.count({ where: { status: "approved" } }),
+    prisma.streak.count({ where: { status: "active", updatedAt: { gte: since } } }),
+  ]);
+
+  return [
+    `📈 *Retención rápida*`,
+    `Usuarios totales: ${totalUsers}`,
+    `Activos esta semana: ${activeWeek.length} (${totalUsers > 0 ? Math.round((activeWeek.length / totalUsers) * 100) : 0}%)`,
+    `Waitlist aprobados: ${waitlist}`,
+    `Rachas activas (7d): ${challenges}`,
+  ].join("\n");
+}
+
+async function buildTasksMessage(): Promise<string> {
+  const prisma = getPrismaClient();
+  const tasks = await prisma.adminTask.findMany({
+    where: { status: "pending" },
+    orderBy: { createdAt: "asc" },
+    take: 10,
+  });
+
+  if (tasks.length === 0) return "✅ Sin tareas pendientes.";
+
+  const lines = tasks.map(
+    (t, i) => `${i + 1}. [${t.id.slice(-6)}] ${t.instruction.slice(0, 80)}${t.instruction.length > 80 ? "…" : ""}`
+  );
+  return `📋 *Tareas pendientes* (${tasks.length})\n\n${lines.join("\n")}\n\nEjecuta con: npm run tg-tasks`;
+}
+
+async function queueAdminTask(instruction: string): Promise<string> {
+  const prisma = getPrismaClient();
+  const task = await prisma.adminTask.create({
+    data: { instruction },
+  });
+  return task.id;
+}
+
 async function buildEstadoAdminMessage(): Promise<string> {
   const prisma = getPrismaClient();
 
@@ -337,7 +385,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     // ---- Admin commands (only respond to ADMIN_TELEGRAM_ID) ----
-    if (text === "/stats" || text === "/usuarios" || text === "/crisis") {
+    const adminCommands = ["/stats", "/usuarios", "/crisis", "/retencion", "/tareas", "/ayuda"];
+    if (adminCommands.includes(text) || text.startsWith("/hecho")) {
       if (!isAdmin(chatId)) {
         await sendTelegramMessage(chatId, "⛔ Comando no disponible.");
         return NextResponse.json({ ok: true });
@@ -348,13 +397,46 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           reply = await buildStatsMessage();
         } else if (text === "/usuarios") {
           reply = await buildUsuariosMessage();
-        } else {
+        } else if (text === "/crisis") {
           reply = await buildCrisisMessage();
+        } else if (text === "/retencion") {
+          reply = await buildRetentionMessage();
+        } else if (text === "/tareas") {
+          reply = await buildTasksMessage();
+        } else if (text === "/ayuda") {
+          reply = [
+            "🛠 *Comandos admin*",
+            "/stats — resumen del día",
+            "/usuarios — activos últimas 24h",
+            "/crisis — usuarios en crisis activa",
+            "/retencion — métricas de retención",
+            "/estado — distribución emocional",
+            "/tareas — tareas pendientes de Telegram",
+            "",
+            "Cualquier otro mensaje se guarda como tarea para ejecutar con: npm run tg-tasks",
+          ].join("\n");
+        } else {
+          reply = "Comando no reconocido.";
         }
         await sendTelegramMessage(chatId, reply);
       } catch (err: unknown) {
         logError("TELEGRAM", err, { area: "admin_command", command: text });
         await sendTelegramMessage(chatId, "Error al obtener datos.");
+      }
+      return NextResponse.json({ ok: true });
+    }
+
+    // ---- Admin free-form message → task queue ----
+    if (isAdmin(chatId)) {
+      try {
+        const taskId = await queueAdminTask(text);
+        await sendTelegramMessage(
+          chatId,
+          `✅ Tarea anotada \`[${taskId.slice(-6)}]\`\n\nEjecuta con: \`npm run tg-tasks\`\n\nO revisa con /tareas`
+        );
+      } catch (err: unknown) {
+        logError("TELEGRAM", err, { area: "admin_task_queue", text });
+        await sendTelegramMessage(chatId, "No pude guardar la tarea.");
       }
       return NextResponse.json({ ok: true });
     }

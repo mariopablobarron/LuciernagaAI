@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ArrowLeft, Flame } from 'lucide-react';
 import Link from 'next/link';
+import { COMPONENTS, LAYOUTS, GRADIENTS, TYPOGRAPHY } from '@/styles/design-system';
 
 type EmotionalState = 'blocked' | 'anxious' | 'doubt' | 'clarity' | 'unmotivated' | 'neutral';
 

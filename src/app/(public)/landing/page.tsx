@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import { ArrowRight, Sparkles } from 'lucide-react';
+import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
+    <div className={`min-h-screen bg-gradient-to-br ${GRADIENTS.background} text-white`}>
       {/* HERO - 2 Column Layout */}
       <section className="relative min-h-[calc(100vh-80px)] grid md:grid-cols-2 gap-12 items-center px-4 py-24 max-w-6xl mx-auto">
         {/* Left: Text */}

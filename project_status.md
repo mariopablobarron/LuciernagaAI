@@ -16,7 +16,8 @@
   - `avoidanceCount` se pre-carga al inicio y se resetea al completar acción
 - [ ] Revisar flujo de crisis
   - Crisis se activa por keywords pero se desactiva solo por tiempo (`crisisActiveUntil`)
-  - No hay flujo explícito de "salida de crisis" que el usuario pueda activar conscientemente
+  - Ya existe salida explícita de crisis vía endpoint `POST /api/user/crisis-exit`
+  - Falta validar el flujo completo en producción con usuarios reales
   - `sendAdminUserAlert` en Telegram falla silenciosamente si `ADMIN_TELEGRAM_ID` no está configurado
 
 ---
@@ -26,7 +27,8 @@
 - [ ] Ajustar tono del coach
   - El modo `confrontation` se activa si `avoidanceCount >= 2` histórico (nunca se limpia)
   - El modo `supportive` con `pushAction: true` desde el mensaje 2 puede ser agresivo
-  - Falta calibrar por `progressTrend`: no confrontar a un usuario que lleva 3 días mejorando
+  - Ya se añadió calibración por `progressTrend` y `avoidanceStreak` para evitar confrontación prematura
+  - Falta validación con datos reales para ajustar umbrales
 - [ ] Test con usuarios reales
   - Onboarding guiado (3 pasos) no ha sido validado con nadie aún
   - Flujo de consentimiento Telegram no ha sido testeado en producción
@@ -40,21 +42,21 @@
 
 ## MEJORAS
 
-- [ ] `engagementScore` para el panel admin
+- [x] `engagementScore` para el panel admin
   - Actualmente el panel usa 6+ columnas para inferir engagement
-  - Un score 0–100 simplificaría la priorización en Modo Acompañamiento
-- [ ] Racha de evasión (`avoidanceStreak`)
+  - Score 0–100 implementado y visible en lista de usuarios admin
+- [x] Racha de evasión (`avoidanceStreak`)
   - Solo existe `avoidanceCount` total; no hay "turnos consecutivos evadiendo"
-  - Útil para calibrar cuándo escalar a confrontación real
+  - Implementado en servicios y conectado al protocolo del mentor
 - [ ] Optimizar `searchWeb`
   - Se llama en cada mensaje donde `needsExternalInfo` es true
   - Sin caché: si el mismo usuario hace la misma pregunta, se vuelve a buscar
-- [ ] Mejorar UI sidebar
+- [x] Mejorar UI sidebar
   - El sidebar no muestra estado emocional actual ni racha
   - Conversaciones sin título muestran "Nueva conversación" — falta auto-título
-- [ ] Onboarding web — consentimiento GDPR
+- [x] Onboarding web — consentimiento GDPR
   - El onboarding guiado (3 pasos) existe pero no incluye un gate de consentimiento
-  - Los usuarios Telegram tienen el gate obligatorio; los web no
+  - Gate implementado en web + persistencia vía `POST /api/user/consent`
 - [ ] Modo Impulso en Telegram
   - El diagnóstico, retos y racha solo son accesibles por web
   - Un flujo conversacional `/diagnostico` en Telegram sería alcance significativo
@@ -80,6 +82,9 @@
 - [x] Panel admin — usuarios, detalle, insights operativos
 - [x] Dashboard usuario — objetivo, acciones, estado emocional, insights
 - [x] Auditoría de variables — gaps documentados en variables de contexto
+- [x] Flujo explícito de salida de crisis (usuario) — `POST /api/user/crisis-exit`
+- [x] Consentimiento GDPR en onboarding web + pruebas focalizadas
+- [x] Unificación de rutas para evitar colisión entre `/` y catch-all
 
 ---
 

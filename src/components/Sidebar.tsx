@@ -22,6 +22,9 @@ type SidebarProgress = {
   completedActions: number;
   totalActions: number;
   dominantState: string;
+  emotionalState?: string;
+  streakDays?: number;
+  progressTrend?: string;
 };
 
 type SidebarProfile = {
@@ -252,6 +255,34 @@ export default function Sidebar({
             <p className="mt-2 text-sm text-muted-foreground">
               Continuidad visible para que el trabajo no dependa solo de la memoria.
             </p>
+            {progress.emotionalState || progress.streakDays !== undefined ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {progress.emotionalState ? (
+                  <Badge variant="secondary" className="rounded-full px-3 py-1 capitalize">
+                    {progress.emotionalState}
+                  </Badge>
+                ) : null}
+                {progress.progressTrend ? (
+                  <Badge
+                    variant={
+                      progress.progressTrend === "mejor"
+                        ? "success"
+                        : progress.progressTrend === "empeora"
+                          ? "warning"
+                          : "secondary"
+                    }
+                    className="rounded-full px-3 py-1"
+                  >
+                    Tendencia: {progress.progressTrend}
+                  </Badge>
+                ) : null}
+                {(progress.streakDays ?? 0) > 0 ? (
+                  <Badge variant="secondary" className="rounded-full px-3 py-1">
+                    🔥 {progress.streakDays} días racha
+                  </Badge>
+                ) : null}
+              </div>
+            ) : null}
           </div>
 
           <div className="rounded-2xl border border-border bg-muted/40 p-4">

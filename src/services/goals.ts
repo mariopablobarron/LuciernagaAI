@@ -677,6 +677,36 @@ export async function getAvoidanceCountForAction(
   return prisma.avoidanceEvent.count({ where: { userId, actionId } });
 }
 
+/**
+ * Calcula cuántos "turnos consecutivos" de evasión ha tenido el usuario
+ * dentro de la ventana de tiempo indicada (por defecto, últimas 24 h).
+ * Dos eventos con menos de 3 minutos de diferencia se consideran el mismo turno.
+ */
+export async function getAvoidanceStreakForUser(userId: string, windowHours = 24): Promise<number> {
+  const prisma = getPrismaClient();
+  const since = new Date(Date.now() - windowHours * 60 * 60 * 1000);
+
+  const events = await prisma.avoidanceEvent.findMany({
+    where: { userId, createdAt: { gte: since } },
+    orderBy: { createdAt: "asc" },
+    select: { createdAt: true },
+  });
+
+  if (events.length === 0) return 0;
+
+  // Agrupa eventos en "turnos" si están a menos de 3 min entre sí.
+  const TURN_GAP_MS = 3 * 60 * 1000;
+  let turns = 1;
+  for (let i = 1; i < events.length; i++) {
+    const gap = events[i].createdAt.getTime() - events[i - 1].createdAt.getTime();
+    if (gap > TURN_GAP_MS) {
+      turns++;
+    }
+  }
+
+  return turns;
+}
+
 export async function resetAvoidanceForAction(actionId: string): Promise<void> {
   const prisma = getPrismaClient();
   await prisma.avoidanceEvent.deleteMany({ where: { actionId } });

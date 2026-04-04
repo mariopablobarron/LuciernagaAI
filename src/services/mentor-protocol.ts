@@ -9,9 +9,11 @@ export type MentorProtocolContext = {
   activeGoal: boolean;
   pendingActionsCount: number;
   avoidanceCount: number;
+  avoidanceStreak?: number;
   avoidanceDetected: boolean;
   repeatedPattern: boolean;
   conversationMessageCount: number;
+  progressTrend?: string;
 };
 
 export type MentorMode = {
@@ -48,6 +50,21 @@ export function getMentorMode(context: MentorProtocolContext): MentorMode {
     context.repeatedPattern ||
     (context.pendingActionsCount > 0 && context.avoidanceDetected)
   ) {
+    // Si el usuario lleva días mejorando (trend positivo) y la racha es baja,
+    // preferimos directivo en lugar de confrontación directa.
+    const streak = context.avoidanceStreak ?? context.avoidanceCount;
+    if (context.progressTrend === "mejor" && streak < 3 && context.avoidanceCount < 4) {
+      return {
+        mode: "directive",
+        validate: true,
+        confront: false,
+        pushAction: true,
+        stopConversation: false,
+        reason:
+          "Hay evasión puntual pero el usuario lleva racha positiva; se mantiene modo directivo sin confrontación dura.",
+      };
+    }
+
     return {
       mode: "confrontation",
       validate: context.state === "ansiedad",

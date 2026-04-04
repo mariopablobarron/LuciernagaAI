@@ -26,6 +26,7 @@ type AdminUsersResponse = {
     subscriptionStatus: string;
     profileTitle: string | null;
     streakDays: number;
+    engagementScore: number;
     counts: {
       conversations: number;
       messages: number;
@@ -33,6 +34,7 @@ type AdminUsersResponse = {
       checkins7d: number;
       crisisEvents7d: number;
       avoidanceEvents7d: number;
+      messages7d: number;
     };
   }>;
   pagination: {
@@ -212,7 +214,7 @@ export default function AdminUsersPage() {
             <Card className="border-border/80 bg-muted/40">
               <CardContent className="p-4">
                 <p className="text-xs uppercase tracking-wide text-muted-foreground">Con riesgo</p>
-                <p className="mt-2 text-2xl font-semibold text-[color:color-mix(in_oklab,var(--signal-warning)_60%,var(--foreground))]">
+                <p className="mt-2 text-2xl font-semibold text-[color-mix(in_oklab,var(--signal-warning)_60%,var(--foreground))]">
                   {
                     users.filter(
                       (user) => user.riskLevel === "high" || user.riskLevel === "critical"
@@ -226,7 +228,7 @@ export default function AdminUsersPage() {
                 <p className="text-xs uppercase tracking-wide text-muted-foreground">
                   Crisis activa
                 </p>
-                <p className="mt-2 text-2xl font-semibold text-[color:color-mix(in_oklab,var(--signal-danger)_60%,var(--foreground))]">
+                <p className="mt-2 text-2xl font-semibold text-[color-mix(in_oklab,var(--signal-danger)_60%,var(--foreground))]">
                   {users.filter((user) => user.crisisActive).length}
                 </p>
               </CardContent>
@@ -314,8 +316,8 @@ export default function AdminUsersPage() {
                       <p className="font-semibold text-foreground">{user.counts.conversations}</p>
                     </div>
                     <div className="rounded-xl border border-border bg-muted/35 px-3 py-2">
-                      <p className="text-xs text-muted-foreground">Mensajes</p>
-                      <p className="font-semibold text-foreground">{user.counts.messages}</p>
+                      <p className="text-xs text-muted-foreground">Msgs 7d</p>
+                      <p className="font-semibold text-foreground">{user.counts.messages7d}</p>
                     </div>
                     <div className="rounded-xl border border-border bg-muted/35 px-3 py-2">
                       <p className="text-xs text-muted-foreground">Check-ins 7d</p>
@@ -325,6 +327,25 @@ export default function AdminUsersPage() {
                       <p className="text-xs text-muted-foreground">Racha</p>
                       <p className="font-semibold text-foreground">{user.streakDays} dias</p>
                     </div>
+                  </div>
+
+                  <div className="mt-1 flex items-center gap-2 text-sm">
+                    <span className="text-xs text-muted-foreground">Engagement</span>
+                    <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted/60">
+                      <div
+                        className={`h-full rounded-full transition-all ${
+                          user.engagementScore >= 65
+                            ? "bg-emerald-500"
+                            : user.engagementScore >= 35
+                              ? "bg-amber-400"
+                              : "bg-rose-400"
+                        }`}
+                        style={{ width: `${user.engagementScore}%` }}
+                      />
+                    </div>
+                    <span className="w-8 text-right font-semibold tabular-nums text-foreground">
+                      {user.engagementScore}
+                    </span>
                   </div>
 
                   <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">

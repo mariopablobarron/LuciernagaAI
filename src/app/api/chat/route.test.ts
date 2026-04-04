@@ -53,6 +53,7 @@ jest.mock("@/services/goals", () => ({
   detectActionPostponeIntent: jest.fn(),
   detectActionRefusalIntent: jest.fn(),
   getAvoidanceCountForAction: jest.fn(),
+  getAvoidanceStreakForUser: jest.fn(),
   getFirstPendingAction: jest.fn(),
   getActiveGoalForUser: jest.fn(),
   registerAvoidanceEvent: jest.fn(),
@@ -106,6 +107,7 @@ import {
   detectActionPostponeIntent,
   detectActionRefusalIntent,
   getAvoidanceCountForAction,
+  getAvoidanceStreakForUser,
   getFirstPendingAction,
   getActiveGoalForUser,
   registerAvoidanceEvent,
@@ -170,6 +172,7 @@ describe("POST /api/chat", () => {
     (detectActionPostponeIntent as jest.Mock).mockReturnValue(false);
     (detectActionRefusalIntent as jest.Mock).mockReturnValue(false);
     (getAvoidanceCountForAction as jest.Mock).mockResolvedValue(0);
+    (getAvoidanceStreakForUser as jest.Mock).mockResolvedValue(0);
     (getFirstPendingAction as jest.Mock).mockImplementation(
       (goal) => goal?.actions?.find((action: { completed: boolean }) => !action.completed) ?? null
     );

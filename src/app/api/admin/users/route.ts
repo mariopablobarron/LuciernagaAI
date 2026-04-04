@@ -20,6 +20,7 @@ type ListItem = {
   subscriptionStatus: string;
   profileTitle: string | null;
   streakDays: number;
+  engagementScore: number;
   counts: {
     conversations: number;
     messages: number;
@@ -27,6 +28,7 @@ type ListItem = {
     checkins7d: number;
     crisisEvents7d: number;
     avoidanceEvents7d: number;
+    messages7d: number;
   };
 };
 
@@ -40,6 +42,37 @@ function parsePositiveInt(value: string | null, fallback: number): number {
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
+}
+
+function computeEngagementScore(params: {
+  lastSeenMs: number;
+  streakDays: number;
+  checkins7d: number;
+  messages7d: number;
+  avoidanceEvents7d: number;
+  crisisEvents7d: number;
+  hasGoal: boolean;
+  plan: string;
+}): number {
+  const nowMs = Date.now();
+  const daysSinceActive = (nowMs - params.lastSeenMs) / (1000 * 60 * 60 * 24);
+  const recencyScore = clamp(Math.round(30 * Math.max(0, 1 - daysSinceActive / 7)), 0, 30);
+  const checkinScore = clamp(Math.round((params.checkins7d / 7) * 20), 0, 20);
+  const streakBonus = clamp(params.streakDays * 2, 0, 15);
+  const activityBonus = clamp(Math.round((params.messages7d / 10) * 15), 0, 15);
+  const goalBonus = (params.hasGoal ? 5 : 0) + (params.plan === "pro" ? 5 : 0);
+  const avoidancePenalty = clamp(params.avoidanceEvents7d * 3, 0, 10);
+  const crisisPenalty = clamp(params.crisisEvents7d * 5, 0, 10);
+
+  const raw =
+    recencyScore +
+    checkinScore +
+    streakBonus +
+    activityBonus +
+    goalBonus -
+    avoidancePenalty -
+    crisisPenalty;
+  return clamp(Math.round(raw), 0, 100);
 }
 
 export async function GET(req: NextRequest) {
@@ -155,47 +188,64 @@ export async function GET(req: NextRequest) {
 
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
-    const [states, profiles, streaks, subscriptions, checkins7d, crisis7d, avoidance7d] =
-      await Promise.all([
-        prisma.userState.findMany({
-          where: { userId: { in: userIds } },
-          select: { userId: true, state: true, riskLevel: true, crisisActive: true },
-        }),
-        prisma.userProfile.findMany({
-          where: { userId: { in: userIds } },
-          include: {
-            profile: {
-              select: {
-                title: true,
-              },
+    const [
+      states,
+      profiles,
+      streaks,
+      subscriptions,
+      checkins7d,
+      crisis7d,
+      avoidance7d,
+      messages7d,
+    ] = await Promise.all([
+      prisma.userState.findMany({
+        where: { userId: { in: userIds } },
+        select: { userId: true, state: true, riskLevel: true, crisisActive: true },
+      }),
+      prisma.userProfile.findMany({
+        where: { userId: { in: userIds } },
+        include: {
+          profile: {
+            select: {
+              title: true,
             },
           },
-        }),
-        prisma.streak.findMany({
-          where: { userId: { in: userIds } },
-          select: { userId: true, currentDays: true },
-        }),
-        prisma.subscription.findMany({
-          where: { userId: { in: userIds } },
-          select: { userId: true, plan: true, status: true, createdAt: true },
-          orderBy: [{ userId: "asc" }, { createdAt: "desc" }],
-        }),
-        prisma.dailyCheckin.groupBy({
-          by: ["userId"],
-          where: { userId: { in: userIds }, createdAt: { gte: sevenDaysAgo } },
-          _count: { _all: true },
-        }),
-        prisma.crisisEvent.groupBy({
-          by: ["userId"],
-          where: { userId: { in: userIds }, createdAt: { gte: sevenDaysAgo } },
-          _count: { _all: true },
-        }),
-        prisma.avoidanceEvent.groupBy({
-          by: ["userId"],
-          where: { userId: { in: userIds }, createdAt: { gte: sevenDaysAgo } },
-          _count: { _all: true },
-        }),
-      ]);
+        },
+      }),
+      prisma.streak.findMany({
+        where: { userId: { in: userIds } },
+        select: { userId: true, currentDays: true },
+      }),
+      prisma.subscription.findMany({
+        where: { userId: { in: userIds } },
+        select: { userId: true, plan: true, status: true, createdAt: true },
+        orderBy: [{ userId: "asc" }, { createdAt: "desc" }],
+      }),
+      prisma.dailyCheckin.groupBy({
+        by: ["userId"],
+        where: { userId: { in: userIds }, createdAt: { gte: sevenDaysAgo } },
+        _count: { _all: true },
+      }),
+      prisma.crisisEvent.groupBy({
+        by: ["userId"],
+        where: { userId: { in: userIds }, createdAt: { gte: sevenDaysAgo } },
+        _count: { _all: true },
+      }),
+      prisma.avoidanceEvent.groupBy({
+        by: ["userId"],
+        where: { userId: { in: userIds }, createdAt: { gte: sevenDaysAgo } },
+        _count: { _all: true },
+      }),
+      prisma.message.groupBy({
+        by: ["userId"],
+        where: {
+          userId: { in: userIds },
+          role: "user",
+          createdAt: { gte: sevenDaysAgo },
+        },
+        _count: { _all: true },
+      }),
+    ]);
 
     const stateByUser = new Map(states.map((item) => [item.userId, item]));
     const profileByUser = new Map(profiles.map((item) => [item.userId, item]));
@@ -214,11 +264,20 @@ export async function GET(req: NextRequest) {
     const checkins7dByUser = new Map(checkins7d.map((item) => [item.userId, item._count._all]));
     const crisis7dByUser = new Map(crisis7d.map((item) => [item.userId, item._count._all]));
     const avoidance7dByUser = new Map(avoidance7d.map((item) => [item.userId, item._count._all]));
+    const messages7dByUser = new Map(
+      messages7d.map((item) => [item.userId as string, item._count._all])
+    );
 
     const items: ListItem[] = users.map((user) => {
       const state = stateByUser.get(user.id);
       const profile = profileByUser.get(user.id);
       const subscription = latestSubscriptionByUser.get(user.id);
+      const plan = subscription?.plan || "free";
+      const streakDays = streakByUser.get(user.id) || 0;
+      const checkins = checkins7dByUser.get(user.id) || 0;
+      const msgs7d = messages7dByUser.get(user.id) || 0;
+      const avoidance = avoidance7dByUser.get(user.id) || 0;
+      const crisisCount = crisis7dByUser.get(user.id) || 0;
 
       return {
         id: user.id,
@@ -231,17 +290,28 @@ export async function GET(req: NextRequest) {
         state: state?.state || "neutral",
         riskLevel: state?.riskLevel || "low",
         crisisActive: Boolean(state?.crisisActive),
-        plan: subscription?.plan || "free",
+        plan,
         subscriptionStatus: subscription?.status || "inactive",
         profileTitle: profile?.profile?.title || null,
-        streakDays: streakByUser.get(user.id) || 0,
+        streakDays,
+        engagementScore: computeEngagementScore({
+          lastSeenMs: user.lastSeen.getTime(),
+          streakDays,
+          checkins7d: checkins,
+          messages7d: msgs7d,
+          avoidanceEvents7d: avoidance,
+          crisisEvents7d: crisisCount,
+          hasGoal: user._count.goals > 0,
+          plan,
+        }),
         counts: {
           conversations: user._count.conversations,
           messages: user._count.messages,
           goals: user._count.goals,
-          checkins7d: checkins7dByUser.get(user.id) || 0,
-          crisisEvents7d: crisis7dByUser.get(user.id) || 0,
-          avoidanceEvents7d: avoidance7dByUser.get(user.id) || 0,
+          checkins7d: checkins,
+          crisisEvents7d: crisisCount,
+          avoidanceEvents7d: avoidance,
+          messages7d: msgs7d,
         },
       };
     });

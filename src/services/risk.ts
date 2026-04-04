@@ -132,8 +132,7 @@ export function getCrisisResponse(level: RiskLevel): CrisisResponse {
 
   if (level === "critical") {
     return {
-      response:
-        `Voy a frenar el flujo normal aqui porque tu seguridad va primero. Busca apoyo humano inmediato ahora mismo: llama a emergencias si hay riesgo inminente y contacta de inmediato con 024 en Espana o 988 en Estados Unidos. No te quedes solo con esto; avisa ya a una persona real de confianza para que este contigo.\n\n${disclaimer}`,
+      response: `Voy a frenar el flujo normal aqui porque tu seguridad va primero. Busca apoyo humano inmediato ahora mismo: llama a emergencias si hay riesgo inminente y contacta de inmediato con 024 en Espana o 988 en Estados Unidos. No te quedes solo con esto; avisa ya a una persona real de confianza para que este contigo.\n\n${disclaimer}\n\nCuando estés en un lugar seguro y con alguien de confianza, escríbeme "ya estoy acompañado" y continuamos juntos.`,
       resources,
       shouldEscalate: true,
       legalFlag: true,
@@ -144,8 +143,7 @@ export function getCrisisResponse(level: RiskLevel): CrisisResponse {
 
   if (level === "high") {
     return {
-      response:
-        `No voy a seguir con el flujo normal de la conversacion porque aqui lo prioritario es tu seguridad. Quiero que contactes hoy, ahora, con una persona real de confianza y con ayuda profesional. Si el riesgo sube o sientes peligro inmediato, llama al 112 o 911, y usa 024 en Espana o 988 en Estados Unidos para apoyo urgente.\n\n${disclaimer}`,
+      response: `No voy a seguir con el flujo normal de la conversacion porque aqui lo prioritario es tu seguridad. Quiero que contactes hoy, ahora, con una persona real de confianza y con ayuda profesional. Si el riesgo sube o sientes peligro inmediato, llama al 112 o 911, y usa 024 en Espana o 988 en Estados Unidos para apoyo urgente.\n\n${disclaimer}\n\nCuando estés en un lugar seguro, escríbeme "ya estoy acompañado" y seguimos.`,
       resources,
       shouldEscalate: true,
       legalFlag: true,
@@ -156,8 +154,7 @@ export function getCrisisResponse(level: RiskLevel): CrisisResponse {
 
   if (level === "medium") {
     return {
-      response:
-        `Lo que te pasa importa y merece cuidado. No tienes que sostener esto en soledad; estoy aquí para acompañarte paso a paso. Si en algún momento se vuelve demasiado intenso, busca apoyo de una persona real de confianza. Si hay urgencia, llama al 112/911 y utiliza 024 (España) o 988 (EE.UU.).\n\n${PRODUCT_DISCLAIMERS[0]}`,
+      response: `Lo que te pasa importa y merece cuidado. No tienes que sostener esto en soledad; estoy aquí para acompañarte paso a paso. Si en algún momento se vuelve demasiado intenso, busca apoyo de una persona real de confianza. Si hay urgencia, llama al 112/911 y utiliza 024 (España) o 988 (EE.UU.).\n\n${PRODUCT_DISCLAIMERS[0]}`,
       resources: [],
       shouldEscalate: false,
       legalFlag: false,

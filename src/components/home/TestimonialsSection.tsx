@@ -6,32 +6,36 @@ const testimonials = [
   {
     name: "María, 24 años",
     role: "Estudiante",
-    content: "Pensé que necesitaba un cambio masivo. Luciernaga me mostró que pequeñas acciones diarias son lo que funciona. En 3 semanas cambié mi hábito de sueño.",
+    content:
+      "Pensé que necesitaba un cambio masivo. Luciernaga me mostró que pequeñas acciones diarias son lo que funciona. En 3 semanas cambié mi hábito de sueño.",
     avatar: "👩",
   },
   {
     name: "Carlos, 28 años",
     role: "Emprendedor",
-    content: "Tenía 10 hábitos que quería cambiar. Me sentía paralizado. Luciernaga me hizo enfocarse en uno. Ahora tengo 4 hábitos nuevos sin sentir presión.",
+    content:
+      "Tenía 10 hábitos que quería cambiar. Me sentía paralizado. Luciernaga me hizo enfocarse en uno. Ahora tengo 4 hábitos nuevos sin sentir presión.",
     avatar: "👨",
   },
   {
     name: "Sofía, 22 años",
     role: "Profesional",
-    content: "Lo que más me gusta es que no hay presión. Si fallo un día, no es castigo. Es aprendizaje. Eso cambió completamente cómo me relaciono con mis objetivos.",
+    content:
+      "Lo que más me gusta es que no hay presión. Si fallo un día, no es castigo. Es aprendizaje. Eso cambió completamente cómo me relaciono con mis objetivos.",
     avatar: "👩‍💼",
   },
   {
     name: "Juan, 31 años",
     role: "Diseñador",
-    content: "He probado apps, libros, coaches. Nada funcionaba. Luciernaga es diferente porque realmente te conoce. Los insights que me da son precisos.",
+    content:
+      "He probado apps, libros, coaches. Nada funcionaba. Luciernaga es diferente porque realmente te conoce. Los insights que me da son precisos.",
     avatar: "🧑‍🎨",
   },
 ];
 
 export default function TestimonialsSection() {
   return (
-    <section className="py-20 md:py-32 bg-gradient-to-b from-background via-muted/5 to-background">
+    <section className="py-20 md:py-32 bg-linear-to-b from-background via-muted/5 to-background">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
@@ -66,12 +70,8 @@ export default function TestimonialsSection() {
               <div className="flex items-center gap-3">
                 <div className="text-2xl">{testimonial.avatar}</div>
                 <div>
-                  <p className="text-sm font-semibold text-foreground">
-                    {testimonial.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {testimonial.role}
-                  </p>
+                  <p className="text-sm font-semibold text-foreground">{testimonial.name}</p>
+                  <p className="text-xs text-muted-foreground">{testimonial.role}</p>
                 </div>
               </div>
             </div>
@@ -81,21 +81,15 @@ export default function TestimonialsSection() {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 md:gap-8 text-center p-8 rounded-3xl border border-border/50 bg-card/30">
           <div>
-            <div className="text-3xl md:text-4xl font-bold text-emotion-clarity mb-2">
-              +200
-            </div>
+            <div className="text-3xl md:text-4xl font-bold text-emotion-clarity mb-2">+200</div>
             <p className="text-sm text-muted-foreground">Personas transformando</p>
           </div>
           <div>
-            <div className="text-3xl md:text-4xl font-bold text-emotion-clarity mb-2">
-              92%
-            </div>
+            <div className="text-3xl md:text-4xl font-bold text-emotion-clarity mb-2">92%</div>
             <p className="text-sm text-muted-foreground">Completaron su primer hábito</p>
           </div>
           <div>
-            <div className="text-3xl md:text-4xl font-bold text-emotion-clarity mb-2">
-              4.8/5
-            </div>
+            <div className="text-3xl md:text-4xl font-bold text-emotion-clarity mb-2">4.8/5</div>
             <p className="text-sm text-muted-foreground">Rating promedio</p>
           </div>
         </div>

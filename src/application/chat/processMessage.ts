@@ -1,9 +1,12 @@
 import { generateDecision as generateDomainDecision } from "@/domain/decisionEngine";
-import type { Decision as DomainDecision, Insight as DomainInsight, SystemState } from "@/domain/types";
+import type {
+  Decision as DomainDecision,
+  Insight as DomainInsight,
+  SystemState,
+} from "@/domain/types";
 import { buildUserState } from "@/domain/userStateEngine";
 import { sendAvoidanceEscalationAlert, sendCrisisEscalationAlert } from "@/lib/alerts";
 import { logError, logInfo } from "@/lib/logger";
-import { getErrorMessage } from "@/lib/utils";
 import { generateAIResponse, streamOpenRouterTokens } from "@/services/ai";
 import { generateImpulseResponse } from "@/services/impulse-ai";
 import { trackSafe } from "@/services/events";
@@ -36,6 +39,7 @@ import {
   getFirstPendingAction,
   getActiveGoalForUser,
   getAvoidanceCountForAction,
+  getAvoidanceStreakForUser,
   registerAvoidanceEvent,
 } from "@/services/goals";
 import { runFlow, loadDialogueState, saveDialogueState } from "@/services/flows";
@@ -102,9 +106,15 @@ function isCrisisInterventionMessage(message: string): boolean {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
   const signals = [
-    "ya hable con", "ya pedi ayuda", "ya contacte", "ya llame al 112",
-    "ya llame al 911", "estoy con mi familia", "estoy acompanado",
-    "estoy acompañado", "ya estoy seguro",
+    "ya hable con",
+    "ya pedi ayuda",
+    "ya contacte",
+    "ya llame al 112",
+    "ya llame al 911",
+    "estoy con mi familia",
+    "estoy acompanado",
+    "estoy acompañado",
+    "ya estoy seguro",
   ];
   return signals.some((s) => normalized.includes(s));
 }
@@ -176,9 +186,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
       : Math.max(0, session.messageLimitPerDay - (session.messagesUsedToday + 1));
 
   const softPaywallActive =
-    !session.hasPlan &&
-    remainingMessagesAfterTurn !== null &&
-    remainingMessagesAfterTurn <= 2;
+    !session.hasPlan && remainingMessagesAfterTurn !== null && remainingMessagesAfterTurn <= 2;
 
   // ── 1. Quick synchronous analysis ──────────────────────────────────────
   const state = detectUserState(message);
@@ -186,10 +194,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
   const riskLevel = detectRiskLevel(message);
   let emotionalProfile = analyzeEmotionalProfile(message, []);
   const dialogueState = loadDialogueState(userId);
-  const flowContext = runFlow(
-    { ...dialogueState, currentIntent: detectedIntent },
-    message
-  );
+  const flowContext = runFlow({ ...dialogueState, currentIntent: detectedIntent }, message);
   saveDialogueState(userId, {
     currentIntent: flowContext.currentIntent,
     currentStep: flowContext.currentStep,
@@ -201,8 +206,11 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
   let crisisSource: "detected" | "active_state" | "none" = crisisMode ? "detected" : "none";
 
   logInfo("STATE", "state_detected", {
-    userId, state, intent: detectedIntent,
-    activeFlow: flowContext.activeFlow, flowStep: flowContext.currentStep,
+    userId,
+    state,
+    intent: detectedIntent,
+    activeFlow: flowContext.activeFlow,
+    flowStep: flowContext.currentStep,
     messageLength: message.length,
   });
   logInfo("RISK", "risk_level_detected", { userId, riskLevel, crisisMode });
@@ -214,6 +222,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
   let searchQuery: string | null = null;
   let conversationId = input.conversationId?.trim() || `tmp_${Date.now()}`;
   let goalAvoidanceCount = 0;
+  let goalAvoidanceStreak = 0;
   let goalPendingActionsCount = 0;
   let goalCreatedThisTurn = false;
   let actionGeneratedThisTurn = false;
@@ -228,13 +237,21 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
   let transformationPhase: ReturnType<typeof inferTransformationPhase> = "bloqueo";
   let transformationSummary = "";
   let mentorMode: ReturnType<typeof getMentorMode> = {
-    mode: "supportive", validate: true, confront: false,
-    pushAction: false, stopConversation: false, reason: "pending_db",
+    mode: "supportive",
+    validate: true,
+    confront: false,
+    pushAction: false,
+    stopConversation: false,
+    reason: "pending_db",
   };
   let onboardingContext = getConversationalOnboarding({
-    state, intent: detectedIntent, hasGoal: false,
-    pendingActionsCount: 0, conversationMessageCount: 0,
-    goalCreatedThisTurn: false, actionGeneratedThisTurn: false,
+    state,
+    intent: detectedIntent,
+    hasGoal: false,
+    pendingActionsCount: 0,
+    conversationMessageCount: 0,
+    goalCreatedThisTurn: false,
+    actionGeneratedThisTurn: false,
   });
   let captureEmailRecommended = false;
   const captureEmailMessage = "¿Quieres guardar tu progreso y continuar otro día? Déjame tu email.";
@@ -264,8 +281,14 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
       crisisSource = "detected";
       crisisActiveUntil = activeUntil.toISOString();
       await trackSafe({
-        userId, type: "CRISIS_DETECTED",
-        metadata: { riskLevel, source: "detected", activatedAt: new Date().toISOString(), expiresAt: activeUntil.toISOString() },
+        userId,
+        type: "CRISIS_DETECTED",
+        metadata: {
+          riskLevel,
+          source: "detected",
+          activatedAt: new Date().toISOString(),
+          expiresAt: activeUntil.toISOString(),
+        },
       });
     }
 
@@ -273,18 +296,33 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     conversationId = conversation.id;
     const isNewConversationTitle = conversation.title === "Nueva conversación";
 
-    logInfo("DB", "conversation_resolved", { userId, conversationId, requestedConversationId: input.conversationId ?? null });
+    logInfo("DB", "conversation_resolved", {
+      userId,
+      conversationId,
+      requestedConversationId: input.conversationId ?? null,
+    });
 
     await saveConversationMessage({
-      conversationId, userId, role: "user", content: message,
+      conversationId,
+      userId,
+      role: "user",
+      content: message,
       updateTitleFromUserMessage: isNewConversationTitle,
     });
     logInfo("DB", "message_saved", { userId, conversationId, role: "user" });
 
-    await trackSafe({ userId, type: "MESSAGE_SENT", metadata: { conversationId, messageLength: message.length, intent: detectedIntent } });
+    await trackSafe({
+      userId,
+      type: "MESSAGE_SENT",
+      metadata: { conversationId, messageLength: message.length, intent: detectedIntent },
+    });
 
     if (state === "claridad") {
-      await trackSafe({ userId, type: "MESSAGE_RECEIVED", metadata: { source: "clarity_state", signal: "value_moment", conversationId } });
+      await trackSafe({
+        userId,
+        type: "MESSAGE_RECEIVED",
+        metadata: { source: "clarity_state", signal: "value_moment", conversationId },
+      });
     }
 
     conversationMessageCount = await countMessagesForConversation(conversationId);
@@ -295,12 +333,22 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
       await updateEmotionalProfile(userId, emotionalProfile);
     } catch (emotionalError: unknown) {
       emotionalProfile = analyzeEmotionalProfile(message, []);
-      logError("EMOTION", emotionalError, { route: "/api/chat", userId, stage: "update_emotional_profile" });
+      logError("EMOTION", emotionalError, {
+        route: "/api/chat",
+        userId,
+        stage: "update_emotional_profile",
+      });
     }
 
     await upsertDailyImpulseLog({
-      userId, note: message, emotionalState: state, mood: null, incrementMessage: true,
-    }).catch((err: unknown) => logError("IMPULSE", err, { route: "/api/chat", userId, stage: "upsert_daily_log" }));
+      userId,
+      note: message,
+      emotionalState: state,
+      mood: null,
+      incrementMessage: true,
+    }).catch((err: unknown) =>
+      logError("IMPULSE", err, { route: "/api/chat", userId, stage: "upsert_daily_log" })
+    );
 
     if (!crisisMode) {
       activeGoal = await getActiveGoalForUser(userId);
@@ -311,6 +359,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
       if (pendingAction) {
         goalAvoidanceCount = await getAvoidanceCountForAction(userId, pendingAction.id);
       }
+      goalAvoidanceStreak = await getAvoidanceStreakForUser(userId);
 
       const repeatedPattern =
         conversationMessageCount > 3 &&
@@ -318,17 +367,28 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
           emotionalProfile.dominantPattern === "procrastinación");
 
       transformationPhase = inferTransformationPhase({
-        state, intent: detectedIntent, hasGoal: Boolean(activeGoal),
+        state,
+        intent: detectedIntent,
+        hasGoal: Boolean(activeGoal),
         totalActions: activeGoal?.totalCount ?? 0,
         pendingActionsCount: goalPendingActionsCount,
         completedActionsCount: activeGoal?.completedCount ?? 0,
-        avoidanceCount: goalAvoidanceCount, conversationMessageCount,
+        avoidanceCount: goalAvoidanceCount,
+        conversationMessageCount,
       });
       transformationSummary = describeTransformationPhase(transformationPhase);
       mentorMode = getMentorMode({
-        state, riskLevel, transformationPhase, activeGoal: Boolean(activeGoal),
-        pendingActionsCount: goalPendingActionsCount, avoidanceCount: goalAvoidanceCount,
-        avoidanceDetected: avoidanceDetectedThisTurn, repeatedPattern, conversationMessageCount,
+        state,
+        riskLevel,
+        transformationPhase,
+        activeGoal: Boolean(activeGoal),
+        pendingActionsCount: goalPendingActionsCount,
+        avoidanceCount: goalAvoidanceCount,
+        avoidanceStreak: goalAvoidanceStreak,
+        avoidanceDetected: avoidanceDetectedThisTurn,
+        repeatedPattern,
+        conversationMessageCount,
+        progressTrend: emotionalProfile.progressTrend,
       });
 
       if (pendingAction) {
@@ -349,51 +409,128 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
 
           if (activeGoal) {
             logInfo("STATE", "goal_action_auto_completed", { userId, goalId: activeGoal.id });
-            await trackSafe({ userId, type: "ACTION_COMPLETED", metadata: { actionId: pendingActionBeforeTurn?.id, actionDescription: pendingActionBeforeTurn?.description, goalId: activeGoal.id, goalTitle: activeGoal.title, completedCount: activeGoal.completedCount, totalCount: activeGoal.totalCount, conversationId } });
+            await trackSafe({
+              userId,
+              type: "ACTION_COMPLETED",
+              metadata: {
+                actionId: pendingActionBeforeTurn?.id,
+                actionDescription: pendingActionBeforeTurn?.description,
+                goalId: activeGoal.id,
+                goalTitle: activeGoal.title,
+                completedCount: activeGoal.completedCount,
+                totalCount: activeGoal.totalCount,
+                conversationId,
+              },
+            });
           }
         } else {
           if (postponeIntent) {
-            goalAvoidanceCount = await registerAvoidanceEvent({ userId, actionId: pendingAction.id, type: "postpone" });
-            await sendAvoidanceEscalationAlert({ userId, type: "postpone", count: goalAvoidanceCount, actionTitle: pendingAction.description, goalTitle: activeGoal?.title ?? null });
+            goalAvoidanceCount = await registerAvoidanceEvent({
+              userId,
+              actionId: pendingAction.id,
+              type: "postpone",
+            });
+            await sendAvoidanceEscalationAlert({
+              userId,
+              type: "postpone",
+              count: goalAvoidanceCount,
+              actionTitle: pendingAction.description,
+              goalTitle: activeGoal?.title ?? null,
+            });
           } else if (refusalIntent) {
-            goalAvoidanceCount = await registerAvoidanceEvent({ userId, actionId: pendingAction.id, type: "refuse" });
-            await sendAvoidanceEscalationAlert({ userId, type: "refuse", count: goalAvoidanceCount, actionTitle: pendingAction.description, goalTitle: activeGoal?.title ?? null });
+            goalAvoidanceCount = await registerAvoidanceEvent({
+              userId,
+              actionId: pendingAction.id,
+              type: "refuse",
+            });
+            await sendAvoidanceEscalationAlert({
+              userId,
+              type: "refuse",
+              count: goalAvoidanceCount,
+              actionTitle: pendingAction.description,
+              goalTitle: activeGoal?.title ?? null,
+            });
           } else if (sidestepAvoidance) {
-            goalAvoidanceCount = await registerAvoidanceEvent({ userId, actionId: pendingAction.id, type: "avoidance" });
-            await sendAvoidanceEscalationAlert({ userId, type: "avoidance", count: goalAvoidanceCount, actionTitle: pendingAction.description, goalTitle: activeGoal?.title ?? null });
+            goalAvoidanceCount = await registerAvoidanceEvent({
+              userId,
+              actionId: pendingAction.id,
+              type: "avoidance",
+            });
+            await sendAvoidanceEscalationAlert({
+              userId,
+              type: "avoidance",
+              count: goalAvoidanceCount,
+              actionTitle: pendingAction.description,
+              goalTitle: activeGoal?.title ?? null,
+            });
           }
 
           if (!shouldBypassActionLock(state)) {
-            await trackSafe({ userId, type: "AVOIDANCE_DETECTED", metadata: { actionId: pendingAction.id, reason: "not_completed", conversationId } });
+            await trackSafe({
+              userId,
+              type: "AVOIDANCE_DETECTED",
+              metadata: { actionId: pendingAction.id, reason: "not_completed", conversationId },
+            });
             actionLockAssistantMessage = buildActionRequiredMessage({
-              actionTitle: pendingAction.description, goalTitle: activeGoal?.title ?? null,
-              avoidanceCount: goalAvoidanceCount, unfinishedActionsCount: goalPendingActionsCount, mentorMode,
+              actionTitle: pendingAction.description,
+              goalTitle: activeGoal?.title ?? null,
+              avoidanceCount: goalAvoidanceCount,
+              unfinishedActionsCount: goalPendingActionsCount,
+              mentorMode,
             });
             actionLockPayload = {
-              success: true, type: "action_required",
-              message: actionLockAssistantMessage, response: actionLockAssistantMessage,
-              state, conversationId, goal: serializeGoal(activeGoal), emotionalProfile,
-              fallback: true, persistenceAvailable, searchUsed: false,
-              flow: serializeFlow(flowContext), mentorMode: mentorMode.mode,
-              transformationPhase, captureEmail: false, captureEmailMessage: null,
+              success: true,
+              type: "action_required",
+              message: actionLockAssistantMessage,
+              response: actionLockAssistantMessage,
+              state,
+              conversationId,
+              goal: serializeGoal(activeGoal),
+              emotionalProfile,
+              fallback: true,
+              persistenceAvailable,
+              searchUsed: false,
+              flow: serializeFlow(flowContext),
+              mentorMode: mentorMode.mode,
+              transformationPhase,
+              captureEmail: false,
+              captureEmailMessage: null,
               action: { id: pendingAction.id, title: pendingAction.description },
             };
           }
         }
       }
 
-      if (!actionCompletedThisTurn && !actionLockPayload && pendingAction && !shouldBypassActionLock(state)) {
+      if (
+        !actionCompletedThisTurn &&
+        !actionLockPayload &&
+        pendingAction &&
+        !shouldBypassActionLock(state)
+      ) {
         actionLockAssistantMessage = buildActionRequiredMessage({
-          actionTitle: pendingAction.description, goalTitle: activeGoal?.title ?? null,
-          avoidanceCount: goalAvoidanceCount, unfinishedActionsCount: goalPendingActionsCount, mentorMode,
+          actionTitle: pendingAction.description,
+          goalTitle: activeGoal?.title ?? null,
+          avoidanceCount: goalAvoidanceCount,
+          unfinishedActionsCount: goalPendingActionsCount,
+          mentorMode,
         });
         actionLockPayload = {
-          success: true, type: "action_required",
-          message: actionLockAssistantMessage, response: actionLockAssistantMessage,
-          state, conversationId, goal: serializeGoal(activeGoal), emotionalProfile,
-          fallback: true, persistenceAvailable, searchUsed: false,
-          flow: serializeFlow(flowContext), mentorMode: mentorMode.mode, transformationPhase,
-          captureEmail: false, captureEmailMessage: null,
+          success: true,
+          type: "action_required",
+          message: actionLockAssistantMessage,
+          response: actionLockAssistantMessage,
+          state,
+          conversationId,
+          goal: serializeGoal(activeGoal),
+          emotionalProfile,
+          fallback: true,
+          persistenceAvailable,
+          searchUsed: false,
+          flow: serializeFlow(flowContext),
+          mentorMode: mentorMode.mode,
+          transformationPhase,
+          captureEmail: false,
+          captureEmailMessage: null,
           action: { id: pendingAction.id, title: pendingAction.description },
         };
       }
@@ -404,8 +541,20 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
         goalPendingActionsCount = countPendingActions(activeGoal);
         if (goalIntentResult?.created) {
           goalCreatedThisTurn = true;
-          logInfo("STATE", "goal_created_from_intent", { userId, goalId: goalIntentResult.goal.id });
-          await trackSafe({ userId, type: "GOAL_CREATED", metadata: { goalId: goalIntentResult.goal.id, goalTitle: goalIntentResult.goal.title, actionCount: goalIntentResult.goal.totalCount, conversationId } });
+          logInfo("STATE", "goal_created_from_intent", {
+            userId,
+            goalId: goalIntentResult.goal.id,
+          });
+          await trackSafe({
+            userId,
+            type: "GOAL_CREATED",
+            metadata: {
+              goalId: goalIntentResult.goal.id,
+              goalTitle: goalIntentResult.goal.title,
+              actionCount: goalIntentResult.goal.totalCount,
+              conversationId,
+            },
+          });
         }
       }
 
@@ -415,27 +564,52 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
       );
 
       if (actionGeneratedThisTurn && pendingActionAfterGoalResolution) {
-        await trackSafe({ userId, type: "ACTION_CREATED", metadata: { actionId: pendingActionAfterGoalResolution.id, actionText: pendingActionAfterGoalResolution.description, goalId: activeGoal?.id, conversationId, source: "chat" } });
+        await trackSafe({
+          userId,
+          type: "ACTION_CREATED",
+          metadata: {
+            actionId: pendingActionAfterGoalResolution.id,
+            actionText: pendingActionAfterGoalResolution.description,
+            goalId: activeGoal?.id,
+            conversationId,
+            source: "chat",
+          },
+        });
       }
 
       transformationPhase = inferTransformationPhase({
-        state, intent: detectedIntent, hasGoal: Boolean(activeGoal),
+        state,
+        intent: detectedIntent,
+        hasGoal: Boolean(activeGoal),
         totalActions: activeGoal?.totalCount ?? 0,
         pendingActionsCount: goalPendingActionsCount,
         completedActionsCount: activeGoal?.completedCount ?? 0,
-        avoidanceCount: goalAvoidanceCount, conversationMessageCount,
+        avoidanceCount: goalAvoidanceCount,
+        conversationMessageCount,
       });
       transformationSummary = describeTransformationPhase(transformationPhase);
       mentorMode = getMentorMode({
-        state, riskLevel, transformationPhase, activeGoal: Boolean(activeGoal),
-        pendingActionsCount: goalPendingActionsCount, avoidanceCount: goalAvoidanceCount,
-        avoidanceDetected: avoidanceDetectedThisTurn, repeatedPattern, conversationMessageCount,
+        state,
+        riskLevel,
+        transformationPhase,
+        activeGoal: Boolean(activeGoal),
+        pendingActionsCount: goalPendingActionsCount,
+        avoidanceCount: goalAvoidanceCount,
+        avoidanceStreak: goalAvoidanceStreak,
+        avoidanceDetected: avoidanceDetectedThisTurn,
+        repeatedPattern,
+        conversationMessageCount,
+        progressTrend: emotionalProfile.progressTrend,
       });
       conversionTrigger = goalCreatedThisTurn || actionGeneratedThisTurn || state === "claridad";
       onboardingContext = getConversationalOnboarding({
-        state, intent: detectedIntent, hasGoal: Boolean(activeGoal),
-        pendingActionsCount: goalPendingActionsCount, conversationMessageCount,
-        goalCreatedThisTurn, actionGeneratedThisTurn,
+        state,
+        intent: detectedIntent,
+        hasGoal: Boolean(activeGoal),
+        pendingActionsCount: goalPendingActionsCount,
+        conversationMessageCount,
+        goalCreatedThisTurn,
+        actionGeneratedThisTurn,
       });
 
       const sessionProfile = await getUserSessionProfile(userId);
@@ -443,7 +617,8 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
         isAnonymous: sessionProfile.isAnonymous,
         goalCount: activeGoal ? 1 : 0,
         actionCount: activeGoal?.totalCount ?? 0,
-        conversationMessageCount, conversionTrigger,
+        conversationMessageCount,
+        conversionTrigger,
       });
       await updateUserTransformationPhase(userId, transformationPhase);
 
@@ -451,13 +626,16 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
       const completedActions = activeGoal?.completedCount ?? 0;
       const pendingActions = Math.max(totalActions - completedActions, 0);
       const actionCompletionRate = totalActions > 0 ? completedActions / totalActions : 0;
-      const avoidanceRate = totalActions > 0 ? Math.min(1, goalAvoidanceCount / Math.max(totalActions, 1)) : 0;
+      const avoidanceRate =
+        totalActions > 0 ? Math.min(1, goalAvoidanceCount / Math.max(totalActions, 1)) : 0;
       const checkinDropProxy = Math.min(1, pendingActions / Math.max(totalActions, 1));
 
       domainInsight = buildChatInsight({
         retentionDay3: transformationPhase === "bloqueo" ? 0.3 : 0.55,
         retentionDay7: transformationPhase === "accion" ? 0.7 : 0.5,
-        checkinDrop: checkinDropProxy, avoidanceRate, actionCompletionRate,
+        checkinDrop: checkinDropProxy,
+        avoidanceRate,
+        actionCompletionRate,
         crisisCount: mapRiskLevelToCrisisCount(riskLevel),
       });
       domainState = buildUserState(domainInsight);
@@ -469,20 +647,38 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
   }
 
   const conversionType = conversionTrigger ? "progress" : undefined;
-  const softPaywallPrompt =
-    softPaywallActive && (conversionTrigger || Boolean(activeGoal));
+  const softPaywallPrompt = softPaywallActive && (conversionTrigger || Boolean(activeGoal));
 
   // ── 4. Action lock response ─────────────────────────────────────────────
   if (actionLockPayload && actionLockAssistantMessage) {
     if (captureEmailRecommended) {
-      actionLockAssistantMessage = appendCaptureEmailPrompt(actionLockAssistantMessage, captureEmailRecommended);
+      actionLockAssistantMessage = appendCaptureEmailPrompt(
+        actionLockAssistantMessage,
+        captureEmailRecommended
+      );
     }
-    actionLockPayload = { ...actionLockPayload, captureEmail: captureEmailRecommended, captureEmailMessage: captureEmailRecommended ? captureEmailMessage : null, message: actionLockAssistantMessage, response: actionLockAssistantMessage };
+    actionLockPayload = {
+      ...actionLockPayload,
+      captureEmail: captureEmailRecommended,
+      captureEmailMessage: captureEmailRecommended ? captureEmailMessage : null,
+      message: actionLockAssistantMessage,
+      response: actionLockAssistantMessage,
+    };
 
     if (persistenceAvailable) {
       try {
-        await saveConversationMessage({ conversationId, userId, role: "assistant", content: actionLockAssistantMessage });
-        logInfo("DB", "message_saved", { userId, conversationId, role: "assistant", actionLock: true });
+        await saveConversationMessage({
+          conversationId,
+          userId,
+          role: "assistant",
+          content: actionLockAssistantMessage,
+        });
+        logInfo("DB", "message_saved", {
+          userId,
+          conversationId,
+          role: "assistant",
+          actionLock: true,
+        });
       } catch (dbError: unknown) {
         persistenceAvailable = false;
         logError("DB", dbError, { route: "/api/chat", userId, stage: "action_lock_persistence" });
@@ -498,31 +694,79 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     const containmentLevel: RiskLevel = isCrisisLevel(riskLevel) ? riskLevel : "high";
     const crisisPayload = getCrisisResponse(containmentLevel);
 
-    await registerCrisisEvent({ userId, level: containmentLevel, message, response: crisisPayload.response });
+    await registerCrisisEvent({
+      userId,
+      level: containmentLevel,
+      message,
+      response: crisisPayload.response,
+    });
     await sendCrisisEscalationAlert({ userId, level: containmentLevel, message });
 
     if (persistenceAvailable) {
       try {
-        await saveConversationMessage({ conversationId, userId, role: "assistant", content: crisisPayload.response });
-        logInfo("DB", "message_saved", { userId, conversationId, role: "assistant", crisisMode: true });
+        await saveConversationMessage({
+          conversationId,
+          userId,
+          role: "assistant",
+          content: crisisPayload.response,
+        });
+        logInfo("DB", "message_saved", {
+          userId,
+          conversationId,
+          role: "assistant",
+          crisisMode: true,
+        });
       } catch (dbError: unknown) {
         persistenceAvailable = false;
-        logError("DB", dbError, { route: "/api/chat", userId, stage: "crisis_response_persistence" });
+        logError("DB", dbError, {
+          route: "/api/chat",
+          userId,
+          stage: "crisis_response_persistence",
+        });
       }
     }
 
-    logInfo("RISK", "crisis_mode_activated", { userId, conversationId, riskLevel, containmentLevel, crisisSource, crisisActiveUntil });
+    logInfo("RISK", "crisis_mode_activated", {
+      userId,
+      conversationId,
+      riskLevel,
+      containmentLevel,
+      crisisSource,
+      crisisActiveUntil,
+    });
 
     return {
       data: {
-        success: true, type: "crisis",
-        response: crisisPayload.response, state, systemState: "CRISIS",
-        decision: generateDomainDecision("CRISIS", buildChatInsight({ crisisCount: 1, checkinDrop: 1, retentionDay3: 0.1, retentionDay7: 0.1 })),
-        conversationId, goal: null, emotionalProfile, fallback: true, persistenceAvailable,
-        crisis: true, continueChat: crisisPayload.continueChat, riskLevel: containmentLevel,
-        detectedRiskLevel: riskLevel, crisisActive: true, crisisActiveUntil, searchUsed: false,
-        flow: serializeFlow(flowContext), alerts: crisisPayload.resources,
-        legalFlag: crisisPayload.legalFlag, legalDisclaimer: crisisPayload.disclaimer,
+        success: true,
+        type: "crisis",
+        response: crisisPayload.response,
+        state,
+        systemState: "CRISIS",
+        decision: generateDomainDecision(
+          "CRISIS",
+          buildChatInsight({
+            crisisCount: 1,
+            checkinDrop: 1,
+            retentionDay3: 0.1,
+            retentionDay7: 0.1,
+          })
+        ),
+        conversationId,
+        goal: null,
+        emotionalProfile,
+        fallback: true,
+        persistenceAvailable,
+        crisis: true,
+        continueChat: crisisPayload.continueChat,
+        riskLevel: containmentLevel,
+        detectedRiskLevel: riskLevel,
+        crisisActive: true,
+        crisisActiveUntil,
+        searchUsed: false,
+        flow: serializeFlow(flowContext),
+        alerts: crisisPayload.resources,
+        legalFlag: crisisPayload.legalFlag,
+        legalDisclaimer: crisisPayload.disclaimer,
       },
     };
   }
@@ -534,11 +778,15 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
   }
 
   logInfo("AI", "openrouter_call_requested", {
-    userId, conversationId, state,
+    userId,
+    conversationId,
+    state,
     primaryEmotion: emotionalProfile.primaryEmotion,
     dominantPattern: emotionalProfile.dominantPattern,
     energyLevel: emotionalProfile.energyLevel,
-    messageLength: message.length, mentorMode: mentorMode.mode, transformationPhase,
+    messageLength: message.length,
+    mentorMode: mentorMode.mode,
+    transformationPhase,
   });
 
   // ── 7. Web search ──────────────────────────────────────────────────────
@@ -555,7 +803,8 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
 
   // ── 8. Build coach context ─────────────────────────────────────────────
   const conversationContext = buildConversationContext({
-    state, lastGoal: activeGoal?.title ?? null,
+    state,
+    lastGoal: activeGoal?.title ?? null,
     pendingActions: activeGoal?.actions.filter((a) => !a.completed).map((a) => a.description) ?? [],
   });
 
@@ -570,15 +819,38 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     : "Define una sola accion concreta para hoy y ejecútala.";
 
   const coachContext = {
-    goal: buildGoalCoachContext(activeGoal, message, { avoidanceCount: goalAvoidanceCount, avoidanceDetected: avoidanceDetectedThisTurn }),
-    continuity: { ...conversationContext, hesitationDetected: goalAvoidanceCount > 0 || avoidanceDetectedThisTurn, trend: emotionalProfile.progressTrend },
-    flow: { currentIntent: flowContext.currentIntent, currentStep: flowContext.currentStep, activeFlow: flowContext.activeFlow, instruction: flowContext.instruction },
+    goal: buildGoalCoachContext(activeGoal, message, {
+      avoidanceCount: goalAvoidanceCount,
+      avoidanceDetected: avoidanceDetectedThisTurn,
+    }),
+    continuity: {
+      ...conversationContext,
+      hesitationDetected: goalAvoidanceCount > 0 || avoidanceDetectedThisTurn,
+      trend: emotionalProfile.progressTrend,
+    },
+    flow: {
+      currentIntent: flowContext.currentIntent,
+      currentStep: flowContext.currentStep,
+      activeFlow: flowContext.activeFlow,
+      instruction: flowContext.instruction,
+    },
     mentor: mentorMode,
     transformation: { phase: transformationPhase, summary: transformationSummary },
-    legal: { limitsNote: "Luciernaga AI orienta y empuja accion, pero no sustituye terapia ni soporte de emergencia.", critical: false },
+    legal: {
+      limitsNote:
+        "Luciernaga AI orienta y empuja accion, pero no sustituye terapia ni soporte de emergencia.",
+      critical: false,
+    },
     onboarding: onboardingContext,
-    access: { userPlan: session.userPlan, remainingMessages: remainingMessagesAfterTurn, hasActiveGoal: Boolean(activeGoal), conversionTrigger },
-    web: searchQuery ? { query: searchQuery, usage: "practical_decision" as const, results: searchResults } : null,
+    access: {
+      userPlan: session.userPlan,
+      remainingMessages: remainingMessagesAfterTurn,
+      hasActiveGoal: Boolean(activeGoal),
+      conversionTrigger,
+    },
+    web: searchQuery
+      ? { query: searchQuery, usage: "practical_decision" as const, results: searchResults }
+      : null,
   };
 
   // ── 9. Impulse mode (non-streaming JSON) ──────────────────────────────
@@ -587,7 +859,12 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
 
     if (persistenceAvailable) {
       try {
-        await saveConversationMessage({ conversationId, userId, role: "assistant", content: aiResult.response });
+        await saveConversationMessage({
+          conversationId,
+          userId,
+          role: "assistant",
+          content: aiResult.response,
+        });
       } catch (dbError: unknown) {
         persistenceAvailable = false;
         logError("DB", dbError, { route: "/api/chat", userId, stage: "impulse_persistence" });
@@ -596,12 +873,23 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
 
     return {
       data: {
-        success: true, response: aiResult.response, state, conversationId,
-        goal: serializeGoal(activeGoal), action: activeAction?.description ?? defaultAction,
-        emotionalProfile, searchUsed: false, fallback: aiResult.fallback,
-        flow: serializeFlow(flowContext), persistenceAvailable,
-        mentorMode: mentorMode.mode, transformationPhase, conversionTrigger, conversionType,
-        captureEmail: captureEmailRecommended, captureEmailMessage: captureEmailRecommended ? captureEmailMessage : null,
+        success: true,
+        response: aiResult.response,
+        state,
+        conversationId,
+        goal: serializeGoal(activeGoal),
+        action: activeAction?.description ?? defaultAction,
+        emotionalProfile,
+        searchUsed: false,
+        fallback: aiResult.fallback,
+        flow: serializeFlow(flowContext),
+        persistenceAvailable,
+        mentorMode: mentorMode.mode,
+        transformationPhase,
+        conversionTrigger,
+        conversionType,
+        captureEmail: captureEmailRecommended,
+        captureEmailMessage: captureEmailRecommended ? captureEmailMessage : null,
       },
     };
   }
@@ -609,32 +897,69 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
   // ── 10. JSON path ──────────────────────────────────────────────────────
   if (jsonMode) {
     const aiResult = await generateAIResponse(message, state, emotionalProfile, coachContext);
-    let assistantResponse = completionMicroFeedback ? `${completionMicroFeedback}\n\n${aiResult.response}` : aiResult.response;
-    assistantResponse = finalizeLuciernagaResponse(assistantResponse, { state, mentor: mentorMode, goal: buildGoalCoachContext(activeGoal, message, { avoidanceCount: goalAvoidanceCount, avoidanceDetected: avoidanceDetectedThisTurn }), onboarding: onboardingContext });
+    let assistantResponse = completionMicroFeedback
+      ? `${completionMicroFeedback}\n\n${aiResult.response}`
+      : aiResult.response;
+    assistantResponse = finalizeLuciernagaResponse(assistantResponse, {
+      state,
+      mentor: mentorMode,
+      goal: buildGoalCoachContext(activeGoal, message, {
+        avoidanceCount: goalAvoidanceCount,
+        avoidanceDetected: avoidanceDetectedThisTurn,
+      }),
+      onboarding: onboardingContext,
+    });
     assistantResponse = appendConversionPrompt(assistantResponse, conversionTrigger);
     assistantResponse = appendSoftPaywallPrompt(assistantResponse, softPaywallPrompt);
     assistantResponse = appendCaptureEmailPrompt(assistantResponse, captureEmailRecommended);
 
     if (persistenceAvailable) {
       try {
-        await saveConversationMessage({ conversationId, userId, role: "assistant", content: assistantResponse });
+        await saveConversationMessage({
+          conversationId,
+          userId,
+          role: "assistant",
+          content: assistantResponse,
+        });
       } catch (dbError: unknown) {
         persistenceAvailable = false;
         logError("DB", dbError, { route: "/api/chat", userId, stage: "post_ai_persistence_json" });
       }
     }
 
-    await trackSafe({ userId, type: "MESSAGE_RECEIVED", metadata: { conversationId, responseLength: assistantResponse.length, fallback: aiResult.fallback, userState: domainState, decisionType: domainDecision.type } });
+    await trackSafe({
+      userId,
+      type: "MESSAGE_RECEIVED",
+      metadata: {
+        conversationId,
+        responseLength: assistantResponse.length,
+        fallback: aiResult.fallback,
+        userState: domainState,
+        decisionType: domainDecision.type,
+      },
+    });
 
     return {
       data: {
-        success: true, response: assistantResponse, state, systemState: domainState,
-        decision: domainDecision, conversationId, goal: serializeGoal(activeGoal),
+        success: true,
+        response: assistantResponse,
+        state,
+        systemState: domainState,
+        decision: domainDecision,
+        conversationId,
+        goal: serializeGoal(activeGoal),
         action: activeAction?.description ?? defaultAction,
-        emotionalProfile, searchUsed: searchResults.length > 0, fallback: aiResult.fallback,
-        flow: serializeFlow(flowContext), persistenceAvailable,
-        mentorMode: mentorMode.mode, transformationPhase, conversionTrigger, conversionType,
-        captureEmail: captureEmailRecommended, captureEmailMessage: captureEmailRecommended ? captureEmailMessage : null,
+        emotionalProfile,
+        searchUsed: searchResults.length > 0,
+        fallback: aiResult.fallback,
+        flow: serializeFlow(flowContext),
+        persistenceAvailable,
+        mentorMode: mentorMode.mode,
+        transformationPhase,
+        conversionTrigger,
+        conversionType,
+        captureEmail: captureEmailRecommended,
+        captureEmailMessage: captureEmailRecommended ? captureEmailMessage : null,
       },
     };
   }
@@ -642,11 +967,22 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
   // ── 11. SSE streaming path ─────────────────────────────────────────────
   const systemPrompt = buildCoachPrompt(state, emotionalProfile, coachContext);
   const metaPayload = {
-    success: true, state, systemState: domainState, decision: domainDecision, conversationId,
-    goal: serializeGoal(activeGoal), action: activeAction?.description ?? defaultAction,
-    emotionalProfile, searchUsed: searchResults.length > 0, flow: serializeFlow(flowContext),
-    mentorMode: mentorMode.mode, transformationPhase, conversionTrigger, conversionType,
-    captureEmail: captureEmailRecommended, captureEmailMessage: captureEmailRecommended ? captureEmailMessage : null,
+    success: true,
+    state,
+    systemState: domainState,
+    decision: domainDecision,
+    conversationId,
+    goal: serializeGoal(activeGoal),
+    action: activeAction?.description ?? defaultAction,
+    emotionalProfile,
+    searchUsed: searchResults.length > 0,
+    flow: serializeFlow(flowContext),
+    mentorMode: mentorMode.mode,
+    transformationPhase,
+    conversionTrigger,
+    conversionType,
+    captureEmail: captureEmailRecommended,
+    captureEmailMessage: captureEmailRecommended ? captureEmailMessage : null,
   };
 
   const streamUserId = userId;
@@ -674,14 +1010,29 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
       }
 
       if (!rawText) {
-        const fallbackResult = await generateAIResponse(message, state, emotionalProfile, coachContext);
+        const fallbackResult = await generateAIResponse(
+          message,
+          state,
+          emotionalProfile,
+          coachContext
+        );
         rawText = fallbackResult.response;
         streamFallback = fallbackResult.fallback;
         send({ type: "delta", delta: rawText });
       }
 
-      let finalText = completionMicroFeedback ? `${completionMicroFeedback}\n\n${rawText}` : rawText;
-      finalText = finalizeLuciernagaResponse(finalText, { state, mentor: mentorMode, goal: buildGoalCoachContext(activeGoal, message, { avoidanceCount: goalAvoidanceCount, avoidanceDetected: avoidanceDetectedThisTurn }), onboarding: onboardingContext });
+      let finalText = completionMicroFeedback
+        ? `${completionMicroFeedback}\n\n${rawText}`
+        : rawText;
+      finalText = finalizeLuciernagaResponse(finalText, {
+        state,
+        mentor: mentorMode,
+        goal: buildGoalCoachContext(activeGoal, message, {
+          avoidanceCount: goalAvoidanceCount,
+          avoidanceDetected: avoidanceDetectedThisTurn,
+        }),
+        onboarding: onboardingContext,
+      });
       finalText = appendConversionPrompt(finalText, conversionTrigger);
       finalText = appendSoftPaywallPrompt(finalText, softPaywallPrompt);
       finalText = appendCaptureEmailPrompt(finalText, captureEmailRecommended);
@@ -692,18 +1043,47 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
 
       if (streamPersistence) {
         try {
-          await saveConversationMessage({ conversationId: streamConversationId, userId: streamUserId, role: "assistant", content: finalText });
+          await saveConversationMessage({
+            conversationId: streamConversationId,
+            userId: streamUserId,
+            role: "assistant",
+            content: finalText,
+          });
         } catch (dbError: unknown) {
           streamPersistence = false;
-          logError("DB", dbError, { route: "/api/chat", userId: streamUserId, stage: "stream_persistence" });
+          logError("DB", dbError, {
+            route: "/api/chat",
+            userId: streamUserId,
+            stage: "stream_persistence",
+          });
         }
       }
 
-      await trackSafe({ userId: streamUserId, type: "MESSAGE_RECEIVED", metadata: { conversationId: streamConversationId, responseLength: finalText.length, fallback: streamFallback, streaming: true, userState: domainState, decisionType: domainDecision.type } });
+      await trackSafe({
+        userId: streamUserId,
+        type: "MESSAGE_RECEIVED",
+        metadata: {
+          conversationId: streamConversationId,
+          responseLength: finalText.length,
+          fallback: streamFallback,
+          streaming: true,
+          userState: domainState,
+          decisionType: domainDecision.type,
+        },
+      });
 
-      logInfo("AI", "stream_completed", { userId: streamUserId, conversationId: streamConversationId, fallback: streamFallback });
+      logInfo("AI", "stream_completed", {
+        userId: streamUserId,
+        conversationId: streamConversationId,
+        fallback: streamFallback,
+      });
 
-      send({ type: "meta", ...metaPayload, fallback: streamFallback, persistenceAvailable: streamPersistence });
+      send({
+        type: "meta",
+        ...metaPayload,
+        fallback: streamFallback,
+        persistenceAvailable: streamPersistence,
+      });
       send({ type: "done" });
       controller.close();
     },

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import Chat, { type ChatMessage } from "@/components/Chat";
@@ -328,6 +329,7 @@ export default function HomePage() {
   const [captureEmailPrompt, setCaptureEmailPrompt] = useState<string | null>(null);
   const [captureDialogOpen, setCaptureDialogOpen] = useState(false);
   const [sessionReady, setSessionReady] = useState(false);
+  const [streakDays, setStreakDays] = useState(0);
   const [sessionLoading, setSessionLoading] = useState(true);
   const [adminAuthenticated, setAdminAuthenticated] = useState(false);
   const [adminLoading, setAdminLoading] = useState(true);
@@ -336,6 +338,10 @@ export default function HomePage() {
   const [onboardingStep, setOnboardingStep] = useState<0 | 1 | 2 | 3>(0);
   const [onboardingSituation, setOnboardingSituation] = useState("");
   const [onboardingTime, setOnboardingTime] = useState("");
+  const [onboardingConsentChecked, setOnboardingConsentChecked] = useState(false);
+  const [onboardingConsentGiven, setOnboardingConsentGiven] = useState(false);
+  const [onboardingConsentSaving, setOnboardingConsentSaving] = useState(false);
+  const [onboardingConsentError, setOnboardingConsentError] = useState<string | null>(null);
 
   const handleUnauthorizedSession = () => {
     setSessionReady(false);
@@ -374,6 +380,59 @@ export default function HomePage() {
     setError(null);
   };
 
+  const ensureOnboardingConsent = async (): Promise<boolean> => {
+    if (onboardingConsentGiven) {
+      return true;
+    }
+
+    if (!onboardingConsentChecked) {
+      setOnboardingConsentError("Necesitamos tu consentimiento para iniciar el onboarding guiado.");
+      return false;
+    }
+
+    try {
+      setOnboardingConsentSaving(true);
+      setOnboardingConsentError(null);
+
+      const response = await fetch("/api/user/consent", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = (await response.json().catch(() => ({}))) as {
+        success?: boolean;
+        error?: string;
+        consentGiven?: boolean;
+      };
+
+      if (!response.ok || !data.success || !data.consentGiven) {
+        throw new Error(data.error || "No se pudo guardar el consentimiento.");
+      }
+
+      setOnboardingConsentGiven(true);
+      return true;
+    } catch (consentError: unknown) {
+      setOnboardingConsentError(
+        consentError instanceof Error
+          ? consentError.message
+          : "No se pudo registrar el consentimiento. Intenta de nuevo."
+      );
+      return false;
+    } finally {
+      setOnboardingConsentSaving(false);
+    }
+  };
+
+  const handleStartOnboarding = async (): Promise<void> => {
+    const canContinue = await ensureOnboardingConsent();
+    if (canContinue) {
+      setOnboardingStep(1);
+    }
+  };
+
   const activeConversation = useMemo(() => {
     if (activeConversationId) {
       return conversations.find((conversation) => conversation.id === activeConversationId);
@@ -409,8 +468,11 @@ export default function HomePage() {
       completedActions,
       totalActions: Math.max(totalActions, 1),
       dominantState: getDominantState(conversations),
+      emotionalState: emotionalProfile.primaryEmotion,
+      progressTrend: emotionalProfile.progressTrend,
+      streakDays,
     };
-  }, [activeGoal, conversations]);
+  }, [activeGoal, conversations, emotionalProfile, streakDays]);
 
   const pendingActionsCount = useMemo(() => {
     if (!activeGoal) {
@@ -646,6 +708,21 @@ export default function HomePage() {
         }
         if (!cancelled) {
           await refreshActiveGoal();
+        }
+        if (!cancelled) {
+          fetch("/api/user/state")
+            .then((r) => r.json())
+            .then((data: { streakDays?: number; consentGiven?: boolean }) => {
+              if (!cancelled && typeof data.streakDays === "number") {
+                setStreakDays(data.streakDays);
+              }
+              if (!cancelled && data.consentGiven === true) {
+                setOnboardingConsentGiven(true);
+                setOnboardingConsentChecked(true);
+                setOnboardingConsentError(null);
+              }
+            })
+            .catch(() => undefined);
         }
       } catch {
         if (!cancelled) {
@@ -1608,7 +1685,17 @@ export default function HomePage() {
               <HomeHero
                 onUseChat={() => setWorkspaceTab("chat")}
                 onUseExample={handleUseStarterExample}
-                onStartOnboarding={() => setOnboardingStep(1)}
+                onStartOnboarding={handleStartOnboarding}
+                consentChecked={onboardingConsentChecked}
+                consentRequired={!onboardingConsentGiven}
+                consentSaving={onboardingConsentSaving}
+                consentError={onboardingConsentError}
+                onConsentChange={(checked) => {
+                  setOnboardingConsentChecked(checked);
+                  if (checked) {
+                    setOnboardingConsentError(null);
+                  }
+                }}
               />
             ) : (
               <HomeOnboarding
@@ -1647,12 +1734,12 @@ export default function HomePage() {
                     {PRODUCT_DISCLAIMERS[1]} Si hay riesgo alto, prioriza ayuda humana inmediata.
                   </p>
                 </div>
-                <a
+                <Link
                   href="/api/legal"
                   className="text-sm font-medium text-foreground underline underline-offset-4"
                 >
                   Ver límites del sistema
-                </a>
+                </Link>
               </CardContent>
             </Card>
           </>

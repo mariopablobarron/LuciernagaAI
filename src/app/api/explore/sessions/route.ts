@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
         name,
         situation,
         goal,
-        urgency: urgency || "week",
+        urgency: urgency || "No especificado",
         emotionalState: "doubt",
         completedActions: [],
         totalActions: 4,

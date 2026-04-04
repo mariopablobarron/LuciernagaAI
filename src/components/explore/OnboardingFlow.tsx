@@ -9,7 +9,7 @@ export type OnboardingData = {
   name: string;
   situation: string;
   goal: string;
-  urgency: "today" | "week" | "month";
+  urgency: string;
 };
 
 type OnboardingFlowProps = {
@@ -37,8 +37,8 @@ const STEPS = [
   },
   {
     id: "urgency",
-    title: "¿Cuándo necesitas hacerlo?",
-    subtitle: "Eso marca qué tan urgente es",
+    title: "¿Cuándo lo necesitas?",
+    subtitle: "Sé específico: fecha, plazo, contexto",
     icon: "⏰",
   },
 ];
@@ -49,7 +49,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     name: "",
     situation: "",
     goal: "",
-    urgency: "week",
+    urgency: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -59,7 +59,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
   const handleInputChange = (
     field: keyof OnboardingData,
-    value: string | "today" | "week" | "month"
+    value: string
   ) => {
     setData((prev) => ({
       ...prev,
@@ -123,33 +123,13 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
       case "urgency":
         return (
-          <div className="space-y-3">
-            {(["today", "week", "month"] as const).map((option) => (
-              <button
-                key={option}
-                onClick={() => handleInputChange("urgency", option)}
-                className={`w-full p-4 rounded-xl border-2 transition-all text-left ${
-                  data.urgency === option
-                    ? "border-primary bg-primary/10"
-                    : "border-border hover:border-muted-foreground"
-                }`}
-              >
-                <div className="font-medium text-foreground capitalize">
-                  {option === "today" && "Hoy"}
-                  {option === "week" && "Esta semana"}
-                  {option === "month" && "Este mes"}
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {option === "today" &&
-                    "Necesito hacerlo ahora mismo"}
-                  {option === "week" &&
-                    "Es una prioridad cercana"}
-                  {option === "month" &&
-                    "Puedo esperar un poco"}
-                </p>
-              </button>
-            ))}
-          </div>
+          <Textarea
+            placeholder="Ej: Antes del viernes, En 2 semanas, Hoy después de las 5pm..."
+            value={data.urgency}
+            onChange={(e) => handleInputChange("urgency", e.target.value)}
+            className="min-h-24 resize-none text-base"
+            autoFocus
+          />
         );
 
       default:
@@ -166,7 +146,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       case "goal":
         return data.goal.trim().length > 10;
       case "urgency":
-        return true;
+        return data.urgency.trim().length > 0;
       default:
         return false;
     }
@@ -225,7 +205,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             {currentStep === 2 &&
               "Uno pequeño. Concreto. Alcanzable."}
             {currentStep === 3 &&
-              "Eso va a centrar tu exploración aquí"}
+              "Sé específico: una fecha, plazo o contexto"}
           </p>
 
           {/* Actions */}

@@ -51,6 +51,7 @@ model User {
   dailyLogs       DailyLog[]
   futureMessages  FutureMessage[]
   streak          Streak?
+  exploreSessions ExploreSession[] @relation("UserExploreSessions")
 }
 
 model Message {
@@ -321,4 +322,29 @@ model Streak {
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([status, updatedAt])
+}
+
+model ExploreSession {
+  id               String     @id @default(cuid())
+  userId           String?
+  sessionId        String     @unique
+  name             String
+  situation        String
+  goal             String
+  urgency          String     @default("week")
+  emotionalState   String     @default("doubt")
+  completedActions String[]   @default([])
+  totalActions     Int        @default(4)
+  progressPercent  Int        @default(0)
+  responses        Json?      @default("{}")
+  sessionNotes     String?
+  startedAt        DateTime   @default(now())
+  completedAt      DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  user             User?      @relation("UserExploreSessions", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, updatedAt])
+  @@index([sessionId])
+  @@index([startedAt])
 }

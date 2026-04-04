@@ -24,6 +24,17 @@ type UserState = {
   goal?: string;
 };
 
+type ExploreSession = {
+  id: string;
+  sessionId: string;
+  name: string;
+  situation: string;
+  goal: string;
+  urgency: string;
+  completedActions: string[];
+  progressPercent: number;
+};
+
 const AVAILABLE_ACTIONS: ActionNode[] = [
   {
     id: "action-1",
@@ -66,6 +77,7 @@ const AVAILABLE_ACTIONS: ActionNode[] = [
 export default function ExplorePage() {
   const [onboardingComplete, setOnboardingComplete] = useState(false);
   const [onboardingData, setOnboardingData] = useState<OnboardingData | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [actions, setActions] = useState<ActionNode[]>(AVAILABLE_ACTIONS);
   const [userState, setUserState] = useState<UserState>({
     emotionalState: "doubt",
@@ -82,7 +94,55 @@ export default function ExplorePage() {
     }, 500);
   }, []);
 
-  const handleOnboardingComplete = (data: OnboardingData) => {
+  // Save session when onboarding completes
+  const saveSession = async (data: OnboardingData) => {
+    try {
+      const response = await fetch("/api/explore/sessions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: null, // No authentication for now
+          name: data.name,
+          situation: data.situation,
+          goal: data.goal,
+          urgency: data.urgency,
+        }),
+      });
+
+      if (response.ok) {
+        const session: ExploreSession = await response.json();
+        setSessionId(session.sessionId);
+        return session.sessionId;
+      }
+    } catch (error) {
+      console.error("Error saving session:", error);
+    }
+    return null;
+  };
+
+  // Update session progress
+  const updateSessionProgress = async (
+    sid: string,
+    completedActionIds: string[]
+  ) => {
+    try {
+      await fetch(`/api/explore/sessions/${sid}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          completedActions: completedActionIds,
+        }),
+      });
+    } catch (error) {
+      console.error("Error updating session:", error);
+    }
+  };
+
+  const handleOnboardingComplete = async (data: OnboardingData) => {
     setOnboardingData(data);
     setOnboardingComplete(true);
 
@@ -93,13 +153,19 @@ export default function ExplorePage() {
       situation: data.situation,
       goal: data.goal,
     }));
+
+    // Save session to database
+    const sid = await saveSession(data);
+    if (sid) {
+      setSessionId(sid);
+    }
   };
 
   const handleNodeClick = (nodeId: string) => {
     setActiveNodeId(nodeId);
   };
 
-  const handleActionComplete = (nodeId: string) => {
+  const handleActionComplete = async (nodeId: string) => {
     setActions((prev) =>
       prev.map((action) =>
         action.id === nodeId ? { ...action, completed: true } : action
@@ -111,6 +177,15 @@ export default function ExplorePage() {
       ...prev,
       completedActions: completedCount,
     }));
+
+    // Update session progress
+    const updatedActions = actions
+      .filter((a) => a.completed || a.id === nodeId)
+      .map((a) => a.id);
+
+    if (sessionId) {
+      await updateSessionProgress(sessionId, updatedActions);
+    }
 
     setActiveNodeId(null);
   };

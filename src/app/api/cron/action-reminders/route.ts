@@ -4,7 +4,8 @@ import { sendTelegramNotification } from "@/services/telegram";
 import { logError, logInfo } from "@/lib/logger";
 
 // GET /api/cron/action-reminders?secret=CRON_SECRET
-// Run every 5–15 minutes. Sends pending Telegram reminders.
+// Run once per hour. Sends at most 1 Telegram reminder per user per day,
+// respecting the user's preferred reminderTime ("HH:MM"). Default: 09:00.
 export async function GET(req: NextRequest) {
   const secret = req.nextUrl.searchParams.get("secret");
   if (!secret || secret !== process.env.CRON_SECRET?.trim())
@@ -13,26 +14,59 @@ export async function GET(req: NextRequest) {
   try {
     const prisma = getPrismaClient();
     const now = new Date();
+    const currentHour = now.getUTCHours();
+    const currentMinute = now.getUTCMinutes();
 
+    // Load pending reminders with user preferences
     const due = await prisma.actionReminder.findMany({
       where: { sent: false, remindAt: { lte: now } },
-      take: 50,
-      include: { user: { select: { telegramId: true } } },
+      take: 100,
+      include: {
+        user: {
+          select: {
+            telegramId: true,
+            preferences: { select: { reminderTime: true } },
+          },
+        },
+      },
     });
 
     let sent = 0;
+    let skipped = 0;
+    const sentUserIds = new Set<string>();
+
     for (const reminder of due) {
       const telegramId = reminder.user.telegramId;
-      if (telegramId) {
-        const text =
-          `⏰ *Recordatorio de acción*\n\n` +
-          `Hace un rato te comprometiste con esto:\n\n` +
-          `_${reminder.actionText}_\n\n` +
-          `¿Ya lo hiciste? Abre la app y cuéntame cómo te fue.`;
+      if (!telegramId) continue;
 
-        sendTelegramNotification(telegramId, text);
-        sent++;
+      // Enforce 1 reminder per user per day
+      if (sentUserIds.has(reminder.userId)) {
+        skipped++;
+        continue;
       }
+
+      // Respect preferred time window (±30 min). Default 09:00 UTC.
+      const prefTime = reminder.user.preferences?.reminderTime ?? "09:00";
+      const [prefHour, prefMin] = prefTime.split(":").map(Number);
+      const preferredMinutesOfDay = prefHour * 60 + prefMin;
+      const currentMinutesOfDay = currentHour * 60 + currentMinute;
+      const diff = Math.abs(currentMinutesOfDay - preferredMinutesOfDay);
+
+      if (diff > 30) {
+        // Outside the 30-min window around the user's preferred time — wait
+        skipped++;
+        continue;
+      }
+
+      const text =
+        `⏰ *Recordatorio diario*\n\n` +
+        `Tienes una acción pendiente:\n\n` +
+        `_${reminder.actionText}_\n\n` +
+        `¿Ya lo hiciste? Abre la app y cuéntame.`;
+
+      sendTelegramNotification(telegramId, text);
+      sentUserIds.add(reminder.userId);
+      sent++;
 
       await prisma.actionReminder.update({
         where: { id: reminder.id },
@@ -40,8 +74,8 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    logInfo("CRON", "action_reminders_sent", { total: due.length, sent });
-    return NextResponse.json({ ok: true, processed: due.length, sent });
+    logInfo("CRON", "action_reminders_sent", { total: due.length, sent, skipped });
+    return NextResponse.json({ ok: true, processed: due.length, sent, skipped });
   } catch (error) {
     logError("CRON", error, { action: "action_reminders_failed" });
     return NextResponse.json({ error: "Internal error" }, { status: 500 });

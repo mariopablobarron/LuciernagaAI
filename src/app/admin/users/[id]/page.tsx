@@ -676,6 +676,9 @@ export default function AdminUserDetailPage() {
               </CardTitle>
               <CardDescription>Privadas — solo visibles desde el panel de admin.</CardDescription>
             </CardHeader>
+            <div className="mx-6 mb-4 rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-xs text-yellow-300 leading-relaxed">
+              <strong>Aviso legal:</strong> Esta sección es exclusiva para profesionales de salud mental habilitados. El uso por parte de personal no clínico puede constituir una infracción ética y regulatoria (LOPDGDD / GDPR, art. 9 — datos de salud). Si no eres psicólogo/a u otro profesional sanitario colegiado, no introduzcas observaciones diagnósticas ni de salud mental en este campo.
+            </div>
             <CardContent className="space-y-4">
               <div className="flex gap-2">
                 <Textarea

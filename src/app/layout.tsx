@@ -1,16 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import dynamic from "next/dynamic";
 import { ThemeProvider } from "@/components/theme-provider";
+import { BuilderRegistrationsWrapper } from "@/components/BuilderRegistrations";
 import { SAAS_CONFIG } from "@/lib/saas";
 import { validateEnv } from "@/lib/env";
 import "./globals.css";
-
-// Pre-loads the Builder.io component bundle client-side across all pages
-const BuilderRegistrations = dynamic(
-  () => import("@/lib/builderComponents"),
-  { ssr: false },
-);
 
 // Fail fast on missing critical env vars (throws in prod, warns in dev)
 validateEnv();
@@ -73,7 +67,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <BuilderRegistrations />
+        <BuilderRegistrationsWrapper />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
         </ThemeProvider>

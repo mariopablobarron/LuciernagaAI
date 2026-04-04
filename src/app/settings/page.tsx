@@ -1,10 +1,30 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Bell, Lock, Eye, Globe } from 'lucide-react';
+import { ArrowLeft, Bell, CheckCircle2, ExternalLink, Globe, Lock, Eye, Send } from 'lucide-react';
 import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
 
+type TelegramStatus = {
+  linked: boolean;
+  telegramId: string | null;
+  botUsername: string;
+};
+
 export default function SettingsPage() {
+  const [telegram, setTelegram] = useState<TelegramStatus | null>(null);
+
+  useEffect(() => {
+    fetch('/api/user/telegram-status', { credentials: 'include' })
+      .then((r) => r.json())
+      .then((d: TelegramStatus) => setTelegram(d))
+      .catch(() => {});
+  }, []);
+
+  const botUrl = telegram?.botUsername
+    ? `https://t.me/${telegram.botUsername}`
+    : 'https://t.me/';
+
   return (
     <div className={`bg-linear-to-br ${GRADIENTS.background} py-8 px-4`}>
       <div className={`${LAYOUTS.sectionInner} max-w-3xl space-y-8`}>
@@ -16,7 +36,73 @@ export default function SettingsPage() {
           <h1 className={`${TYPOGRAPHY.h1} text-white`}>Configuración</h1>
         </div>
 
-        {/* Notifications Section */}
+        {/* ── Telegram ──────────────────────────────────────────────── */}
+        <div className={`${COMPONENTS.card} p-6 space-y-5`}>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#229ED9]/15 flex items-center justify-center">
+              <Send className="w-4 h-4 text-[#229ED9]" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-white">Telegram</h2>
+              <p className="text-xs text-zinc-500">Recibe recordatorios y chatea fuera de la app</p>
+            </div>
+          </div>
+
+          {/* Status */}
+          {telegram === null ? (
+            <div className="h-14 rounded-xl bg-zinc-800/50 animate-pulse" />
+          ) : telegram.linked ? (
+            <div className="flex items-center gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/8 px-4 py-3">
+              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+              <div>
+                <p className="text-sm font-semibold text-emerald-300">Cuenta conectada</p>
+                <p className="text-xs text-zinc-500 mt-0.5">
+                  Ya recibes mensajes y recordatorios en Telegram.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="rounded-xl border border-zinc-700/50 bg-zinc-800/30 p-4 space-y-3">
+                <p className="text-sm font-semibold text-white">Cómo conectar</p>
+                <ol className="space-y-2">
+                  {[
+                    { step: '1', text: 'Abre el bot de Luciérnaga en Telegram' },
+                    { step: '2', text: 'Pulsa Iniciar o escribe /start' },
+                    { step: '3', text: 'Envía el comando /vincular' },
+                    { step: '4', text: 'Haz clic en el enlace que te mande el bot' },
+                  ].map((item) => (
+                    <li key={item.step} className="flex items-start gap-3 text-sm text-zinc-300">
+                      <span className="shrink-0 w-5 h-5 rounded-full bg-violet-500/20 text-violet-400 text-xs font-bold flex items-center justify-center mt-0.5">
+                        {item.step}
+                      </span>
+                      {item.text}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+
+              <a
+                href={botUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl font-semibold text-white bg-[#229ED9] hover:bg-[#1a8bc4] transition-colors"
+              >
+                <Send className="w-4 h-4" />
+                Abrir bot en Telegram
+                <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+              </a>
+
+              {telegram.botUsername && (
+                <p className="text-center text-xs text-zinc-600">
+                  @{telegram.botUsername}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* ── Notifications ──────────────────────────────────────────── */}
         <div className={`${COMPONENTS.card} p-6 space-y-4`}>
           <div className="flex items-center gap-3 mb-4">
             <Bell className="w-5 h-5 text-cyan-400" />
@@ -41,7 +127,7 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Privacy Section */}
+        {/* ── Privacy ────────────────────────────────────────────────── */}
         <div className={`${COMPONENTS.card} p-6 space-y-4`}>
           <div className="flex items-center gap-3 mb-4">
             <Eye className="w-5 h-5 text-violet-400" />
@@ -64,7 +150,7 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Security Section */}
+        {/* ── Security ───────────────────────────────────────────────── */}
         <div className={`${COMPONENTS.card} p-6 space-y-4`}>
           <div className="flex items-center gap-3 mb-4">
             <Lock className="w-5 h-5 text-cyan-400" />
@@ -84,7 +170,7 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Theme Section */}
+        {/* ── Preferences ────────────────────────────────────────────── */}
         <div className={`${COMPONENTS.card} p-6 space-y-4`}>
           <div className="flex items-center gap-3 mb-4">
             <Globe className="w-5 h-5 text-violet-400" />
@@ -111,7 +197,7 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Danger Zone */}
+        {/* ── Danger zone ────────────────────────────────────────────── */}
         <div className={`${COMPONENTS.card} p-6 space-y-3 border-l-4 border-l-red-500`}>
           <h2 className="text-lg font-semibold text-red-400">Zona de peligro</h2>
           <p className="text-sm text-zinc-400">Estas acciones no se pueden deshacer.</p>

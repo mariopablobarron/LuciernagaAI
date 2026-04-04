@@ -13,6 +13,7 @@ export type AppConfig = {
   ADMIN_PASSWORD: string;
   OPENROUTER_API_KEY: string;
   TELEGRAM_BOT_TOKEN: string;
+  TELEGRAM_BOT_USERNAME: string;
   ADMIN_TELEGRAM_ID: string;
   APP_BASE_URL: string;
 };
@@ -92,6 +93,7 @@ export function getConfig(): AppConfig {
     ADMIN_PASSWORD: require("ADMIN_PASSWORD"),
     OPENROUTER_API_KEY: require("OPENROUTER_API_KEY"),
     TELEGRAM_BOT_TOKEN: optional("TELEGRAM_BOT_TOKEN"),
+    TELEGRAM_BOT_USERNAME: optional("TELEGRAM_BOT_USERNAME"),
     ADMIN_TELEGRAM_ID: optional("ADMIN_TELEGRAM_ID"),
     APP_BASE_URL: optional("APP_BASE_URL", "http://localhost:3000"),
   };

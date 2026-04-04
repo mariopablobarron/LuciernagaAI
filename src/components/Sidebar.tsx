@@ -3,8 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo, useRef, useState } from "react";
-import { ArrowRight, Check, LogOut, Pencil, Plus, Search, ShieldCheck, Trash2, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowRight, Check, Copy, Gift, LogOut, Pencil, Plus, Search, ShieldCheck, Trash2, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -97,6 +97,28 @@ export default function Sidebar({
   const [editingTitle, setEditingTitle] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
+
+  type InviteItem = { code: string; url: string; used: boolean; usedByEmail: string | null };
+  const [invites, setInvites] = useState<InviteItem[]>([]);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/user/invites", { credentials: "include" })
+      .then((r) => r.json())
+      .then((d: { ok: boolean; invites?: InviteItem[] }) => {
+        if (d.ok) setInvites(d.invites ?? []);
+      })
+      .catch(() => {});
+  }, []);
+
+  function copyInvite(code: string, url: string) {
+    void navigator.clipboard.writeText(url).then(() => {
+      setCopiedCode(code);
+      setTimeout(() => setCopiedCode(null), 2000);
+    });
+  }
+
+  const availableInvites = invites.filter((i) => !i.used);
 
   const pendingActionsCount = useMemo(() => {
     if (!activeGoal) {
@@ -493,6 +515,61 @@ export default function Sidebar({
       <Separator className="my-4" />
 
       <FamilySettings />
+
+      <Separator className="my-4" />
+
+      {/* Invitaciones */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              Invitaciones
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {availableInvites.length > 0
+                ? `${availableInvites.length} disponible${availableInvites.length > 1 ? "s" : ""}`
+                : "Gana invitaciones con tu racha"}
+            </p>
+          </div>
+          <Gift className="size-4 shrink-0 text-fuchsia-400" />
+        </div>
+
+        {availableInvites.length > 0 ? (
+          <div className="space-y-2">
+            {availableInvites.slice(0, 3).map((inv) => (
+              <div
+                key={inv.code}
+                className="flex items-center justify-between gap-2 rounded-xl border border-border bg-muted/30 px-3 py-2"
+              >
+                <p className="truncate text-xs text-muted-foreground font-mono">
+                  /i/{inv.code.slice(0, 8)}…
+                </p>
+                <button
+                  type="button"
+                  onClick={() => copyInvite(inv.code, inv.url)}
+                  className="flex shrink-0 items-center gap-1 rounded-lg border border-border px-2 py-1 text-[11px] font-medium hover:bg-muted transition-colors"
+                >
+                  {copiedCode === inv.code ? (
+                    <><Check className="size-3 text-green-500" /> Copiado</>
+                  ) : (
+                    <><Copy className="size-3" /> Copiar</>
+                  )}
+                </button>
+              </div>
+            ))}
+            {availableInvites.length > 3 && (
+              <p className="text-xs text-muted-foreground text-center">
+                +{availableInvites.length - 3} más en /api/user/invites
+              </p>
+            )}
+          </div>
+        ) : (
+          <div className="rounded-xl border border-dashed border-border bg-muted/20 p-3 text-xs text-muted-foreground space-y-1">
+            <p>🔥 <strong>7 días de racha</strong> → 1 invitación</p>
+            <p>🏆 <strong>30 días de racha</strong> → 1 invitación más</p>
+          </div>
+        )}
+      </div>
 
       <Separator className="my-4" />
 

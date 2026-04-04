@@ -15,6 +15,7 @@ const badgeVariants = cva(
         violet: 'bg-violet-500/10 text-violet-400 border border-violet-500/20 hover:border-violet-500/50 hover:bg-violet-500/20',
         fuchsia: 'bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20 hover:border-fuchsia-500/50 hover:bg-fuchsia-500/20',
         outline: 'border border-zinc-700 text-zinc-400 hover:border-cyan-500 hover:text-cyan-400',
+        secondary: 'bg-zinc-500/10 text-zinc-400 border border-zinc-500/20 hover:border-zinc-500/50 hover:bg-zinc-500/20',
       },
       size: {
         sm: 'text-xs',

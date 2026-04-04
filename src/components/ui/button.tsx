@@ -40,6 +40,18 @@ const buttonVariants = cva(
           active:scale-95
           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950
         `,
+        outline: `
+          border border-zinc-700 text-zinc-400
+          hover:border-cyan-500/50 hover:text-white hover:bg-zinc-900/50
+          active:scale-95
+          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950
+        `,
+        default: `
+          border border-zinc-700 text-zinc-400
+          hover:border-cyan-500/50 hover:text-white hover:bg-zinc-900/50
+          active:scale-95
+          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950
+        `,
       },
       size: {
         xs: 'px-3 py-1.5 text-xs',
@@ -47,6 +59,8 @@ const buttonVariants = cva(
         md: 'px-6 py-3 text-base',
         lg: 'px-8 py-4 text-lg',
         xl: 'px-10 py-5 text-xl',
+        icon: 'h-9 w-9 p-0',
+        'icon-sm': 'h-7 w-7 p-0',
       },
       fullWidth: {
         true: 'w-full',
@@ -100,8 +114,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     });
 
     if (asChild && React.isValidElement(children)) {
-      return React.cloneElement(children as React.ReactElement<any>, {
-        className: `${buttonClass} ${children.props.className || ''}`,
+      const childProps = children.props as Record<string, unknown>;
+      return React.cloneElement(children as React.ReactElement<Record<string, unknown>>, {
+        className: `${buttonClass} ${String(childProps.className ?? '')}`,
         ref,
       });
     }

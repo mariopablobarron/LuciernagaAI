@@ -1,7 +1,7 @@
 'use client';
 
 import { Lightbulb, AlertCircle, Zap, TrendingUp } from 'lucide-react';
-import type { DomainUserState } from '@/domain/types';
+import type { UserState as DomainUserState } from '@/domain/types';
 
 type Recommendation = {
   id: string;

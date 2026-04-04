@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 
 interface FloatingButtonProps {
   icon: React.ReactNode;
@@ -9,6 +9,7 @@ interface FloatingButtonProps {
   onClick: () => void;
   position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
   size?: 'sm' | 'md' | 'lg';
+  color?: string;
 }
 
 const positionMap = {

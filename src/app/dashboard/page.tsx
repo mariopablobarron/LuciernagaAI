@@ -12,7 +12,7 @@ export default function DashboardPage() {
     conversationCount: 12,
     actionsCompleted: 8,
     totalActions: 12,
-    currentState: 'clarity' as const,
+    currentState: 'claridad' as const,
     streak: 7,
     bestStreak: 15,
     activeGoal: {

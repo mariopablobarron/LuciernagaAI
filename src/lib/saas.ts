@@ -21,21 +21,21 @@ export const SAAS_CONFIG = {
   },
   billing: {
     provider: "stripe",
-    enabled: false,
+    enabled: true,
     plans: [
       {
         id: "free",
         name: "Free",
         priceLabel: "0 €",
         status: "ready",
-        description: "Acceso inicial con límite diario y continuidad resumida.",
+        description: "Acceso inicial con 10 conversaciones/mes y diagnóstico gratuito.",
       },
       {
         id: "pro",
         name: "Pro",
-        priceLabel: "Pendiente",
-        status: "planned",
-        description: "Plan avanzado con mas seguimiento, analytics y soporte.",
+        priceLabel: "9 €/mes",
+        status: "ready",
+        description: "Conversaciones ilimitadas, Modo Impulso 21 días, retos personalizados.",
       },
     ] satisfies SaasPlan[],
   },

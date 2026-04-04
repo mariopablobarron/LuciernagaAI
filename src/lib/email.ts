@@ -1,5 +1,122 @@
 // Transactional email sending for user-facing messages
 
+export type QuizState = "bloqueo" | "ansiedad" | "duda" | "claridad" | "neutral";
+
+const QUIZ_STATE_CONTENT: Record<
+  QuizState,
+  { emoji: string; label: string; action: string; headline: string }
+> = {
+  bloqueo: {
+    emoji: "🧱",
+    label: "Bloqueo mental",
+    headline: "Sabes lo que tienes que hacer — pero no puedes empezar.",
+    action:
+      "Abre ahora el documento, archivo o herramienta del proyecto. Solo abrirlo, sin hacer nada más. En los próximos 2 minutos.",
+  },
+  ansiedad: {
+    emoji: "⚡",
+    label: "Ansiedad de acción",
+    headline: "Tienes energía — pero se convierte en presión, no en avance.",
+    action:
+      "Escribe en papel o en un documento: «¿Qué es lo peor concreto que puede pasar?» Una frase. Sin adornos. Nómbralo.",
+  },
+  duda: {
+    emoji: "🌫️",
+    label: "Niebla de dirección",
+    headline: "Tienes ganas — pero no sabes hacia dónde.",
+    action:
+      "Responde en 30 segundos: ¿Cuál es el UN objetivo que, si avanzara esta semana, sentiría que hay progreso real? Escríbelo ahora.",
+  },
+  claridad: {
+    emoji: "✨",
+    label: "Momento de claridad",
+    headline: "Sabes lo que quieres y tienes energía para avanzar.",
+    action:
+      "Define en una frase el resultado concreto de hoy. No la lista entera: solo la cosa más importante que, si la haces, el día habrá valido.",
+  },
+  neutral: {
+    emoji: "🔵",
+    label: "Estado neutro",
+    headline: "Estás en punto muerto — ni bloqueado ni en impulso claro.",
+    action:
+      "Elige una tarea de menos de 20 minutos que lleves postergando. Ponla en tu agenda de hoy con hora exacta.",
+  },
+};
+
+export function buildQuizLeadEmail(params: {
+  to: string;
+  state: QuizState;
+  appUrl: string;
+}): UserEmail {
+  const { to, state, appUrl } = params;
+  const content = QUIZ_STATE_CONTENT[state];
+
+  const subject = `${content.emoji} Tu diagnóstico: ${content.label}`;
+
+  const text =
+    `Tu resultado del test de Luciérnaga\n\n` +
+    `Estado detectado: ${content.label}\n\n` +
+    `${content.headline}\n\n` +
+    `Tu acción para ahora:\n${content.action}\n\n` +
+    `Luciérnaga te ayuda a hacer seguimiento de tu estado y avanzar con conversaciones orientadas a acción.\n\n` +
+    `Empieza gratis → ${appUrl}`;
+
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f9f9f7;font-family:system-ui,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9f9f7;padding:40px 0">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)">
+        <tr>
+          <td style="background:#1a1a1a;padding:24px 32px">
+            <span style="color:#818cf8;font-size:20px;font-weight:700;letter-spacing:-0.5px">Luciérnaga</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:32px">
+            <p style="margin:0 0 8px;font-size:14px;color:#888">Tu resultado del test</p>
+            <h1 style="margin:0 0 4px;font-size:26px">${escapeHtml(content.emoji)}</h1>
+            <h2 style="margin:0 0 24px;font-size:20px;font-weight:700;color:#111;line-height:1.3">
+              ${escapeHtml(content.label)}
+            </h2>
+            <p style="margin:0 0 24px;font-size:15px;color:#444;line-height:1.6;font-style:italic">
+              "${escapeHtml(content.headline)}"
+            </p>
+            <div style="background:#eef2ff;border-left:3px solid #6366f1;border-radius:4px;padding:14px 16px;margin-bottom:28px">
+              <p style="margin:0 0 6px;font-size:11px;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:.5px">
+                Tu acción para ahora
+              </p>
+              <p style="margin:0;font-size:15px;color:#1e1b4b;line-height:1.6;font-weight:500">
+                ${escapeHtml(content.action)}
+              </p>
+            </div>
+            <p style="margin:0 0 24px;font-size:14px;color:#555;line-height:1.6">
+              Luciérnaga detecta tu estado en cada conversación y te orienta a la acción concreta.
+              Sin consejos genéricos. Sin rodeos.
+            </p>
+            <a href="${appUrl}" style="display:inline-block;background:#6366f1;color:#fff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;font-weight:600">
+              Empezar gratis →
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:20px 32px;border-top:1px solid #eee">
+            <p style="margin:0;font-size:12px;color:#999;line-height:1.5">
+              Luciérnaga acompaña — no sustituye ayuda profesional.<br>
+              Para darte de baja, responde &quot;baja&quot; a este correo.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  return { to, subject, html, text };
+}
+
 const SENDGRID_URL = "https://api.sendgrid.com/v3/mail/send";
 
 function getEmailConfig(): { apiKey: string; from: string } | null {

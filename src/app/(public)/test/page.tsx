@@ -289,6 +289,14 @@ export default function TestPage() {
           body: JSON.stringify({ email: email.trim() }),
         });
         setEmailStatus(res.ok ? "sent" : "error");
+        if (res.ok && result) {
+          // Fire-and-forget: send personalized follow-up email
+          fetch("/api/quiz/email", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email.trim(), state: result }),
+          }).catch(() => {});
+        }
       } catch {
         setEmailStatus("error");
       }

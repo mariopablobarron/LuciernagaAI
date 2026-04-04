@@ -44,6 +44,10 @@ function readVar(name: keyof AppConfig): string {
  * listing every missing variable. Call once at app startup.
  */
 export function validateEnv(): void {
+  // Skip during Next.js build phase — env vars are injected at runtime by Coolify,
+  // not available when the image is being compiled.
+  if (process.env.NEXT_PHASE === "phase-production-build") return;
+
   const isProd = process.env.NODE_ENV === "production";
   const toCheck = isProd
     ? [...REQUIRED_VARS, ...REQUIRED_IN_PRODUCTION]

@@ -244,10 +244,10 @@ export default function ExplorePage() {
 
   const getColorStyles = (color: string) => {
     const colorMap: Record<string, { bg: string; border: string; text: string }> = {
-      blocked: { bg: 'bg-red-500/10', border: 'border-red-500/30', text: 'text-red-400' },
-      anxious: { bg: 'bg-amber-500/10', border: 'border-amber-500/30', text: 'text-amber-400' },
-      doubt: { bg: 'bg-purple-500/10', border: 'border-purple-500/30', text: 'text-purple-400' },
-      clarity: { bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', text: 'text-emerald-400' },
+      blocked: { bg: 'bg-gradient-to-br from-red-900/30 to-pink-900/20', border: 'border-red-500/40', text: 'text-red-300' },
+      anxious: { bg: 'bg-gradient-to-br from-orange-900/30 to-amber-900/20', border: 'border-amber-500/40', text: 'text-amber-300' },
+      doubt: { bg: 'bg-gradient-to-br from-purple-900/30 to-violet-900/20', border: 'border-purple-500/40', text: 'text-purple-300' },
+      clarity: { bg: 'bg-gradient-to-br from-cyan-900/30 to-teal-900/20', border: 'border-cyan-500/40', text: 'text-cyan-300' },
     };
     return colorMap[color] || colorMap.doubt;
   };
@@ -255,20 +255,21 @@ export default function ExplorePage() {
   const styles = currentAction ? getColorStyles(currentAction.color) : { bg: '', border: '', text: '' };
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-zinc-950">
-      {/* Gradient background */}
+    <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-black via-zinc-950 to-purple-950">
+      {/* Gradient background with fluorescent accents */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-500/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-fuchsia-500/20 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
       </div>
 
       <div className="relative min-h-screen flex flex-col items-center justify-center px-4 py-12">
         {/* Header */}
         <div className="text-center space-y-4 max-w-2xl mb-16">
-          <h1 className="text-5xl md:text-6xl font-bold text-white">
+          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
             Una cosa a la vez
           </h1>
-          <p className="text-lg text-zinc-400">
+          <p className="text-lg bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent font-medium">
             Elige lo que necesitas trabajar ahora
           </p>
         </div>
@@ -276,12 +277,12 @@ export default function ExplorePage() {
         {/* Progress Bar */}
         <div className="w-full max-w-md mb-12">
           <div className="flex justify-between items-center mb-3">
-            <p className="text-sm font-medium text-zinc-400">Progreso</p>
-            <p className="text-sm font-bold text-white">{completedCount}/{userState.totalActions}</p>
+            <p className="text-sm font-medium text-cyan-400">Progreso</p>
+            <p className="text-sm font-bold text-fuchsia-300">{completedCount}/{userState.totalActions}</p>
           </div>
-          <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+          <div className="h-2 bg-zinc-800/50 rounded-full overflow-hidden border border-purple-500/30">
             <div
-              className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-300"
+              className="h-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-cyan-500 transition-all duration-300 shadow-lg shadow-fuchsia-500/50"
               style={{ width: `${(completedCount / userState.totalActions) * 100}%` }}
             />
           </div>
@@ -289,7 +290,7 @@ export default function ExplorePage() {
 
         {/* Carousel Card */}
         {currentAction && (
-          <div className={`w-full max-w-2xl p-12 rounded-2xl border-2 transition-all duration-300 ${styles.bg} ${styles.border}`}>
+          <div className={`w-full max-w-2xl p-12 rounded-2xl border-2 transition-all duration-300 backdrop-blur-md ${styles.bg} ${styles.border} shadow-2xl shadow-purple-500/30`}>
             {/* Icon */}
             <div className="text-7xl mb-6 text-center">{currentAction.icon}</div>
 
@@ -310,22 +311,22 @@ export default function ExplorePage() {
             {!currentAction.completed && (
               <div className="space-y-4 mb-6">
                 {/* Hint Bubble */}
-                <div className="relative p-4 rounded-lg bg-zinc-800/50 border border-zinc-700">
+                <div className="relative p-4 rounded-lg bg-gradient-to-br from-purple-900/40 to-cyan-900/20 border border-purple-500/40 backdrop-blur-sm">
                   <div className="flex gap-3 items-start">
                     <span className="text-lg flex-shrink-0">💭</span>
-                    <p className="text-sm text-zinc-300 leading-relaxed">
+                    <p className="text-sm text-cyan-200 leading-relaxed">
                       {HINT_TEXT[currentAction.type]}
                     </p>
                   </div>
                   {/* Tail */}
-                  <div className="absolute -bottom-2 left-6 w-4 h-4 bg-zinc-800/50 border-b border-r border-zinc-700 rounded-br-sm transform rotate-45" />
+                  <div className="absolute -bottom-2 left-6 w-4 h-4 bg-gradient-to-br from-purple-900/40 to-cyan-900/20 border-b border-r border-purple-500/40 rounded-br-sm transform rotate-45" />
                 </div>
 
                 {/* Textarea */}
                 <textarea
                   id={`input-${currentAction.id}`}
                   placeholder="Escribe tu respuesta aquí..."
-                  className="w-full p-4 rounded-lg bg-zinc-900/50 border border-zinc-700 text-white placeholder:text-zinc-500 focus:outline-none focus:border-indigo-500 min-h-24"
+                  className="w-full p-4 rounded-lg bg-black/40 border border-purple-500/30 text-white placeholder:text-zinc-500 focus:outline-none focus:border-fuchsia-500 focus:shadow-lg focus:shadow-fuchsia-500/30 min-h-24 transition-all backdrop-blur-sm"
                 />
               </div>
             )}
@@ -341,7 +342,7 @@ export default function ExplorePage() {
                   }
                 }}
                 disabled={submitting}
-                className="w-full py-3 px-6 rounded-lg bg-indigo-500 text-white font-bold hover:bg-indigo-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 px-6 rounded-lg bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-bold hover:from-violet-400 hover:to-fuchsia-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-fuchsia-500/30 hover:shadow-fuchsia-500/50"
               >
                 {submitting ? 'Guardando...' : 'Completar'}
               </button>
@@ -354,7 +355,7 @@ export default function ExplorePage() {
           <button
             onClick={handlePrev}
             disabled={currentIndex === 0}
-            className="p-3 rounded-lg border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-3 rounded-lg border border-purple-500/50 text-purple-400 hover:text-fuchsia-300 hover:border-fuchsia-500/50 hover:bg-purple-500/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:text-zinc-600"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -365,8 +366,8 @@ export default function ExplorePage() {
               <button
                 key={i}
                 onClick={() => setCurrentIndex(i)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  i === currentIndex ? 'bg-indigo-500 w-8' : 'bg-zinc-700'
+                className={`rounded-full transition-all ${
+                  i === currentIndex ? 'bg-gradient-to-r from-violet-500 to-fuchsia-500 w-8 h-2 shadow-lg shadow-fuchsia-500/50' : 'bg-purple-500/30 w-2 h-2 hover:bg-purple-500/50'
                 }`}
               />
             ))}
@@ -375,7 +376,7 @@ export default function ExplorePage() {
           <button
             onClick={handleNext}
             disabled={currentIndex === actions.length - 1}
-            className="p-3 rounded-lg border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-3 rounded-lg border border-purple-500/50 text-purple-400 hover:text-fuchsia-300 hover:border-fuchsia-500/50 hover:bg-purple-500/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:text-zinc-600"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
@@ -391,13 +392,13 @@ export default function ExplorePage() {
           <div className="mt-12 w-full max-w-2xl space-y-4">
             <Link
               href={`/app?context=explore&completed=${completedCount}`}
-              className="w-full block py-4 px-6 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-center hover:from-indigo-400 hover:to-purple-400 transition-all hover:shadow-lg hover:shadow-indigo-500/50"
+              className="w-full block py-4 px-6 rounded-xl bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-violet-500 text-white font-bold text-center hover:from-cyan-400 hover:via-fuchsia-400 hover:to-violet-400 transition-all shadow-lg shadow-fuchsia-500/40 hover:shadow-fuchsia-500/60"
             >
               {allCompleted ? '🎉 Todo listo · Ir al chat' : 'Continuar en el chat →'}
             </Link>
             <button
               onClick={handleReset}
-              className="w-full py-2 text-sm text-zinc-400 hover:text-white transition-colors"
+              className="w-full py-2 text-sm text-purple-400 hover:text-fuchsia-300 transition-colors"
             >
               ↺ Reiniciar
             </button>

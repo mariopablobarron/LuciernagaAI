@@ -36,7 +36,7 @@ export default function ChatModal({
   const emotionBg: Record<EmotionalStateType, string> = {
     blocked: "from-gray-800/95 to-gray-900/95",
     anxious: "from-orange-800/95 to-amber-900/95",
-    doubt: "from-purple-800/95 to-indigo-900/95",
+    doubt: "from-cyan-800/95 to-cyan-900/95",
     clarity: "from-cyan-800/95 to-teal-900/95",
   };
 

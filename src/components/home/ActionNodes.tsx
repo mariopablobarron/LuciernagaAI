@@ -38,11 +38,11 @@ export default function ActionNodes({
       accent: "hover:from-orange-600 hover:to-amber-500",
     },
     doubt: {
-      bg: "bg-gradient-to-br from-purple-700 to-indigo-600",
-      border: "border-purple-500/50",
-      glow: "shadow-[0_0_40px_rgba(147,51,234,0.5)]",
-      text: "text-purple-50",
-      accent: "hover:from-purple-600 hover:to-indigo-500",
+      bg: "bg-gradient-to-br from-cyan-700 to-cyan-600",
+      border: "border-cyan-500/50",
+      glow: "shadow-[0_0_40px_rgba(34,211,238,0.5)]",
+      text: "text-cyan-50",
+      accent: "hover:from-cyan-600 hover:to-cyan-500",
     },
     clarity: {
       bg: "bg-gradient-to-br from-cyan-600 to-teal-500",

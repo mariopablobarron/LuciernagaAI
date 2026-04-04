@@ -12,10 +12,10 @@ export default function LandingPage() {
         {/* Left: Text */}
         <div className="space-y-8 order-2 md:order-1">
           <div className="space-y-2">
-            <p className="text-sm font-semibold uppercase tracking-widest text-indigo-400">⚡ Transformación Real</p>
+            <p className="text-sm font-semibold uppercase tracking-widest text-cyan-400">⚡ Transformación Real</p>
             <h1 className="text-5xl md:text-6xl font-bold leading-tight">
               Cambia tu vida{' '}
-              <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-cyan-400 via-cyan-300 to-cyan-400 bg-clip-text text-transparent">
                 un hábito a la vez
               </span>
             </h1>
@@ -26,7 +26,7 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <Link
               href="/explore"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-400 transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-cyan-500 text-white font-semibold rounded-lg hover:bg-cyan-400 transition-colors"
             >
               Empieza gratis <ArrowRight className="w-4 h-4" />
             </Link>
@@ -46,7 +46,7 @@ export default function LandingPage() {
         <div className="hidden md:block order-1 md:order-2">
           <div className="card-surface p-6 space-y-4 max-h-96 overflow-hidden relative">
             {/* Glow effect */}
-            <div className="absolute inset-0 -z-10 bg-gradient-to-br from-indigo-500/20 via-transparent to-purple-500/20 blur-2xl" />
+            <div className="absolute inset-0 -z-10 bg-gradient-to-br from-cyan-500/20 via-transparent to-cyan-500/20 blur-2xl" />
             
             {/* Mock chat messages */}
             <div className="space-y-3">
@@ -60,7 +60,7 @@ export default function LandingPage() {
                   <div
                     className={`max-w-xs px-4 py-2 rounded-lg ${
                       msg.role === 'user'
-                        ? 'bg-indigo-500/20 border border-indigo-500/30 text-white'
+                        ? 'bg-cyan-500/20 border border-cyan-500/30 text-white'
                         : 'bg-zinc-800/50 border border-zinc-700 text-zinc-300'
                     }`}
                   >
@@ -77,7 +77,7 @@ export default function LandingPage() {
       <section id="how-it-works" className="py-20 px-4 bg-zinc-900/30 border-y border-zinc-800">
         <div className="max-w-4xl mx-auto space-y-12">
           <div className="text-center space-y-4">
-            <p className="text-sm font-semibold text-indigo-400 uppercase tracking-wider">Cómo funciona</p>
+            <p className="text-sm font-semibold text-cyan-400 uppercase tracking-wider">Cómo funciona</p>
             <h2 className="text-4xl md:text-5xl font-bold">Tu transformación en 3 pasos</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -87,7 +87,7 @@ export default function LandingPage() {
               { num: '3', title: 'Recibes un próximo paso', desc: 'Específico, accionable, que puedes hacer hoy en 10 minutos.' },
             ].map((step) => (
               <div key={step.num} className="card-surface p-8 text-center space-y-4">
-                <div className="text-5xl font-bold text-indigo-400">{step.num}</div>
+                <div className="text-5xl font-bold text-cyan-400">{step.num}</div>
                 <h3 className="text-xl font-bold">{step.title}</h3>
                 <p className="text-zinc-400 text-sm leading-relaxed">{step.desc}</p>
               </div>
@@ -99,7 +99,7 @@ export default function LandingPage() {
       {/* TESTIMONIALS */}
       <section className="py-20 px-4 max-w-5xl mx-auto">
         <div className="text-center mb-12 space-y-4">
-          <p className="text-sm font-semibold text-indigo-400 uppercase tracking-wider">Historias reales</p>
+          <p className="text-sm font-semibold text-cyan-400 uppercase tracking-wider">Historias reales</p>
           <h2 className="text-4xl font-bold">Personas que ya empezaron</h2>
         </div>
         <div className="grid md:grid-cols-3 gap-6">
@@ -116,7 +116,7 @@ export default function LandingPage() {
               </div>
               <p className="text-zinc-300 italic text-sm">"{testimonial.quote}"</p>
               <div className="flex items-center gap-3 pt-4 border-t border-zinc-800">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center font-bold">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-cyan-400 flex items-center justify-center font-bold">
                   {testimonial.name[0]}
                 </div>
                 <div>
@@ -133,7 +133,7 @@ export default function LandingPage() {
       <section className="py-20 px-4 bg-zinc-900/30 border-y border-zinc-800">
         <div className="max-w-4xl mx-auto space-y-12">
           <div className="text-center space-y-4">
-            <p className="text-sm font-semibold text-indigo-400 uppercase tracking-wider">Planes</p>
+            <p className="text-sm font-semibold text-cyan-400 uppercase tracking-wider">Planes</p>
             <h2 className="text-4xl font-bold">Elige tu camino</h2>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
@@ -161,7 +161,7 @@ export default function LandingPage() {
                 key={i}
                 className={`rounded-xl border p-8 space-y-6 ${
                   plan.featured
-                    ? 'ring-2 ring-indigo-500 bg-indigo-500/5'
+                    ? 'ring-2 ring-cyan-500 bg-cyan-500/5'
                     : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700'
                 }`}
               >
@@ -175,7 +175,7 @@ export default function LandingPage() {
                 <ul className="space-y-3">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-center gap-2 text-sm text-zinc-300">
-                      <span className="text-indigo-400 font-bold">✓</span>
+                      <span className="text-cyan-400 font-bold">✓</span>
                       {feature}
                     </li>
                   ))}
@@ -184,7 +184,7 @@ export default function LandingPage() {
                   href={plan.href}
                   className={`w-full py-2 px-4 rounded-lg font-semibold text-center transition-colors block ${
                     plan.featured
-                      ? 'bg-indigo-500 text-white hover:bg-indigo-400'
+                      ? 'bg-cyan-500 text-white hover:bg-cyan-400'
                       : 'border border-zinc-700 text-white hover:bg-zinc-900'
                   }`}
                 >

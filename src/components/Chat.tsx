@@ -108,7 +108,7 @@ function inlineMarkdown(text: string): React.ReactNode[] {
     }
     if (part.startsWith("`") && part.endsWith("`")) {
       return (
-        <code key={i} className="rounded bg-zinc-800 px-1 py-0.5 font-mono text-xs text-indigo-300">
+        <code key={i} className="rounded bg-zinc-800 px-1 py-0.5 font-mono text-xs text-cyan-300">
           {part.slice(1, -1)}
         </code>
       );
@@ -182,7 +182,7 @@ function MessageBubble({
             className={`rounded-2xl rounded-tr-sm px-3.5 py-2.5 ${
               message.isError
                 ? "border border-red-500/30 bg-red-950/30 text-red-200"
-                : "bg-indigo-600 text-white"
+                : "bg-cyan-600 text-white"
             }`}
           >
             <p className="text-sm leading-relaxed">{message.content}</p>
@@ -205,8 +205,8 @@ function MessageBubble({
   return (
     <div className="flex items-start gap-2.5 px-1">
       {/* AI avatar */}
-      <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-500/20 ring-1 ring-indigo-500/30">
-        <Sparkles className="h-3 w-3 text-indigo-400" />
+      <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-500/20 ring-1 ring-cyan-500/30">
+        <Sparkles className="h-3 w-3 text-cyan-400" />
       </div>
 
       <div className="group relative max-w-[82%]">
@@ -342,8 +342,8 @@ export default function Chat({
 
       {/* ── Flow indicator ──────────────────────────────────────────────── */}
       {flowActive && (
-        <div className="shrink-0 border-b border-zinc-800/60 bg-indigo-950/30 px-4 py-2">
-          <p className="text-xs text-indigo-400">
+        <div className="shrink-0 border-b border-zinc-800/60 bg-cyan-950/30 px-4 py-2">
+          <p className="text-xs text-cyan-400">
             Flujo activo: <span className="font-semibold">{flowActive}</span>
             {responseSignals?.flow?.instruction && (
               <span className="ml-2 text-zinc-500">— {responseSignals.flow.instruction}</span>
@@ -372,8 +372,8 @@ export default function Chat({
         {isEmpty ? (
           /* Empty state */
           <div className="flex h-full flex-col items-center justify-center px-6 py-12 text-center">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-500/10 ring-1 ring-indigo-500/20">
-              <Sparkles className="h-5 w-5 text-indigo-400" />
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-cyan-500/10 ring-1 ring-cyan-500/20">
+              <Sparkles className="h-5 w-5 text-cyan-400" />
             </div>
             <h3 className="mb-1 text-base font-semibold text-white">¿En qué te puedo ayudar hoy?</h3>
             <p className="mb-6 text-sm text-zinc-500">
@@ -404,14 +404,14 @@ export default function Chat({
             {/* Typing / loading indicator (before assistant responds) */}
             {loading && !streamingMessageId && (
               <div className="flex items-start gap-2.5 px-1">
-                <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-500/20 ring-1 ring-indigo-500/30">
-                  <Sparkles className="h-3 w-3 text-indigo-400" />
+                <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-500/20 ring-1 ring-cyan-500/30">
+                  <Sparkles className="h-3 w-3 text-cyan-400" />
                 </div>
                 <div className="rounded-2xl rounded-tl-sm border border-zinc-800 bg-zinc-900 px-3.5 py-2.5">
                   <div className="flex items-center gap-1 py-0.5">
-                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-indigo-400 [animation-delay:0ms]" />
-                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-indigo-400 [animation-delay:150ms]" />
-                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-indigo-400 [animation-delay:300ms]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan-400 [animation-delay:0ms]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan-400 [animation-delay:150ms]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan-400 [animation-delay:300ms]" />
                   </div>
                 </div>
               </div>

@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
+import { Button } from '@/components/ui/Button';
+import { InteractiveCard } from '@/components/effects/InteractiveCard';
 
 export default function LandingPage() {
   return (
@@ -26,19 +28,20 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <Link
               href="/explore"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-cyan-500 text-white font-semibold rounded-lg hover:bg-cyan-400 transition-colors"
+              className="inline-flex items-center justify-center gap-2 font-semibold rounded-lg transition-all duration-200 px-8 py-4 text-lg bg-gradient-to-r from-cyan-500 to-violet-500 text-white hover:from-cyan-400 hover:to-violet-400 active:scale-95 shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 hover:translate-y-[-2px]"
             >
               Empieza gratis <ArrowRight className="w-4 h-4" />
             </Link>
-            <button
+            <Button
               onClick={() => {
                 const el = document.getElementById('how-it-works');
                 el?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-zinc-700 text-white font-semibold rounded-lg hover:bg-zinc-900/50 transition-colors"
+              variant="secondary"
+              size="lg"
             >
               Ver demo
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -108,7 +111,7 @@ export default function LandingPage() {
             { quote: 'Tres semanas y ya completé mi primer reto.', name: 'Miguel', age: '34' },
             { quote: 'El check-in diario me cambió la rutina.', name: 'Priya', age: '31' },
           ].map((testimonial, i) => (
-            <div key={i} className="card-surface p-6 space-y-4">
+            <InteractiveCard key={i} className="card-surface p-6 space-y-4">
               <div className="flex gap-1">
                 {[...Array(5)].map((_, j) => (
                   <span key={j} className="text-amber-400">★</span>
@@ -124,7 +127,7 @@ export default function LandingPage() {
                   <p className="text-xs text-zinc-500">{testimonial.age} años</p>
                 </div>
               </div>
-            </div>
+            </InteractiveCard>
           ))}
         </div>
       </section>
@@ -180,16 +183,29 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  href={plan.href}
-                  className={`w-full py-2 px-4 rounded-lg font-semibold text-center transition-colors block ${
-                    plan.featured
-                      ? 'bg-cyan-500 text-white hover:bg-cyan-400'
-                      : 'border border-zinc-700 text-white hover:bg-zinc-900'
-                  }`}
-                >
-                  {plan.cta}
-                </Link>
+                {plan.featured ? (
+                  <Button
+                    asChild
+                    variant="primary"
+                    size="md"
+                    fullWidth
+                  >
+                    <Link href={plan.href}>
+                      {plan.cta}
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button
+                    asChild
+                    variant="secondary"
+                    size="md"
+                    fullWidth
+                  >
+                    <Link href={plan.href}>
+                      {plan.cta}
+                    </Link>
+                  </Button>
+                )}
               </div>
             ))}
           </div>
@@ -200,18 +216,22 @@ export default function LandingPage() {
       <section className="relative min-h-96 flex flex-col items-center justify-center px-4 py-20 overflow-hidden">
         {/* Radial glow */}
         <div className="absolute inset-0 -z-10 opacity-30">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-transparent to-purple-500/20 blur-3xl" />
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 via-transparent to-violet-500/20 blur-3xl" />
         </div>
 
         <div className="max-w-3xl text-center space-y-6">
           <h2 className="text-5xl md:text-6xl font-bold">¿Listo para tu primer paso?</h2>
           <p className="text-lg text-zinc-400">Empieza en menos de 60 segundos. Sin registro obligatorio.</p>
-          <Link
-            href="/explore"
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-indigo-500 to-indigo-400 text-white font-bold rounded-lg hover:from-indigo-400 hover:to-indigo-300 transition-all hover:shadow-lg hover:shadow-indigo-500/50"
+          <Button
+            asChild
+            variant="primary"
+            size="lg"
+            animated
           >
-            Abrir Luciernaga AI <ArrowRight className="w-5 h-5" />
-          </Link>
+            <Link href="/explore">
+              Abrir Luciernaga AI <ArrowRight className="w-5 h-5" />
+            </Link>
+          </Button>
           <p className="text-xs text-zinc-500 pt-4">
             Luciernaga AI no sustituye terapia ni intervención psicológica profesional.
           </p>

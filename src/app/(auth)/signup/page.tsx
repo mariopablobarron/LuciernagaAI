@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { TYPOGRAPHY, COMPONENTS, GRADIENTS } from '@/styles/design-system';
+import { Button } from '@/components/ui/Button';
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -99,12 +100,15 @@ export default function SignupPage() {
           </label>
 
           {/* Submit */}
-          <button
+          <Button
             type="submit"
-            className={`${COMPONENTS.buttonPrimary} w-full`}
+            variant="primary"
+            size="lg"
+            fullWidth
+            animated
           >
             Crear cuenta
-          </button>
+          </Button>
         </form>
 
         {/* Sign in link */}

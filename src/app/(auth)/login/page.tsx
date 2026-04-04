@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { TYPOGRAPHY, COMPONENTS, GRADIENTS } from '@/styles/design-system';
+import { Button } from '@/components/ui/Button';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -61,12 +62,15 @@ export default function LoginPage() {
           </div>
 
           {/* Submit */}
-          <button
+          <Button
             type="submit"
-            className={`${COMPONENTS.buttonPrimary} w-full`}
+            variant="primary"
+            size="lg"
+            fullWidth
+            animated
           >
             Inicia sesión
-          </button>
+          </Button>
         </form>
 
         {/* Divider */}

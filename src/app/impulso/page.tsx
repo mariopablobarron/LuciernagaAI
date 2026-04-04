@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { Flame, Zap, Shield, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
+import { InteractiveCard } from '@/components/effects/InteractiveCard';
+import { Sparkles } from '@/components/effects/Sparkles';
+import { Glow } from '@/components/effects/Glow';
 
 export default function ImpulsoPage() {
   const [activeTab, setActiveTab] = useState<'diagnostico' | 'retos' | 'insights' | 'mensajes'>('diagnostico');
@@ -87,7 +90,7 @@ export default function ImpulsoPage() {
               { title: 'Deep Work Blocks', progress: 21, status: 'completed', days: '21/21' },
               { title: 'Evening Reflection', progress: 8, status: 'active', days: '8/21' },
             ].map((reto, i) => (
-              <div key={i} className={`${COMPONENTS.card} space-y-4`}>
+              <InteractiveCard key={i} className={`${COMPONENTS.card} space-y-4`}>
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="text-lg font-bold text-white">{reto.title}</h3>
@@ -107,7 +110,7 @@ export default function ImpulsoPage() {
                     style={{ width: `${reto.progress}%` }}
                   />
                 </div>
-              </div>
+              </InteractiveCard>
             ))}
             <button className={`${COMPONENTS.buttonSecondary} w-full`}>
               + Asignar nuevo reto
@@ -125,7 +128,7 @@ export default function ImpulsoPage() {
             ].map((insight, i) => {
               const Icon = insight.icon;
               return (
-                <div
+                <InteractiveCard
                   key={i}
                   className={`${COMPONENTS.card} p-6 flex items-start gap-4 ${
                     insight.type === 'warning' ? 'border-l-4 border-l-cyan-500' : 'border-l-4 border-l-violet-500'
@@ -136,7 +139,7 @@ export default function ImpulsoPage() {
                     <p className="font-semibold text-white">{insight.title}</p>
                     <p className="text-sm text-zinc-400 mt-1">{insight.message}</p>
                   </div>
-                </div>
+                </InteractiveCard>
               );
             })}
           </div>

@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe';
 import { getPrismaClient } from '@/db/prisma';
 import { notifyAdmin, buildAdminAlert } from '@/services/telegram';
 import { logError, logInfo, logWarn } from '@/lib/logger';
+import { STRIPE_PLANS } from '@/lib/stripe';
 import Stripe from 'stripe';
 
 export const dynamic = 'force-dynamic';
@@ -119,7 +120,11 @@ export async function POST(req: NextRequest) {
     const rawBody = await req.text();
     event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
   } catch (err) {
-    logError('BILLING', err, { area: 'webhook_signature' });
+    logError('BILLING', err, {
+      area: 'webhook_signature',
+      sigHeader: sig.substring(0, 30) + '…',  // partial, safe to log
+      secretPrefix: webhookSecret.substring(0, 7),
+    });
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
@@ -148,10 +153,16 @@ export async function POST(req: NextRequest) {
           const sub = await stripe.subscriptions.retrieve(session.subscription as string);
           const user = await upgradeToPro(sub, session.customer_email);
           if (user) {
-            notifyAdmin(
-              buildAdminAlert({ tipo: 'new_user', userId: user.id }) +
-              `\n💳 *Nueva suscripción Pro*\nEmail: \`${user.email}\``
-            );
+            const planKey = (sub.metadata?.plan ?? 'pro_monthly') as keyof typeof STRIPE_PLANS;
+            const planInfo = STRIPE_PLANS[planKey] ?? STRIPE_PLANS.pro_monthly;
+            notifyAdmin(buildAdminAlert({
+              tipo: 'payment',
+              userId: user.id,
+              email: user.email,
+              plan: planKey === 'pro_annual' ? 'Anual' : 'Mensual',
+              status: sub.status,
+              amount: planInfo.label,
+            }));
             logInfo('BILLING', 'subscription_activated', {
               userId: user.id,
               subscriptionId: sub.id,
@@ -192,7 +203,12 @@ export async function POST(req: NextRequest) {
         const user = await cancelSubscription(sub.id);
         if (user) {
           logInfo('BILLING', 'subscription_cancelled', { userId: user.id, subscriptionId: sub.id });
-          notifyAdmin(`❌ *Suscripción cancelada*\nUsuario: \`${user.id}\`\nEmail: \`${user.email}\``);
+          notifyAdmin(buildAdminAlert({
+            tipo: 'cancellation',
+            userId: user.id,
+            email: user.email,
+            subscriptionId: sub.id,
+          }));
         }
         break;
       }

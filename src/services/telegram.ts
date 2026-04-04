@@ -200,13 +200,17 @@ type EmailAlert        = { tipo: "email_captured";  userId: string; email: strin
 type StateChangeAlert  = { tipo: "state_change";    userId: string; actionType: string; previousState: string; newState: string };
 type CrisisAlert       = { tipo: "crisis";          userId: string; crisisLevel: string; lastMessage?: string };
 type StreakAlert        = { tipo: "streak_milestone"; userId: string; streakDays: number };
+type PaymentAlert      = { tipo: "payment";         userId: string; email: string; plan: string; status: string; amount: string };
+type CancellationAlert = { tipo: "cancellation";    userId: string; email: string; subscriptionId: string };
 
 export type AdminAlertInput =
   | NewUserAlert
   | EmailAlert
   | StateChangeAlert
   | CrisisAlert
-  | StreakAlert;
+  | StreakAlert
+  | PaymentAlert
+  | CancellationAlert;
 
 /** Builds a Markdown-formatted admin notification string. */
 export function buildAdminAlert(input: AdminAlertInput): string {
@@ -235,5 +239,25 @@ export function buildAdminAlert(input: AdminAlertInput): string {
 
     case "streak_milestone":
       return `🔥 *Racha destacada*\n\nID: \`${input.userId}\`\nRacha: *${input.streakDays} días*`;
+
+    case "payment": {
+      const isTrialing = input.status === "trialing";
+      const emoji = isTrialing ? "🎉" : "💰";
+      const statusLabel = isTrialing ? "Prueba gratuita iniciada (7 días)" : "Pago confirmado";
+      return (
+        `${emoji} *${statusLabel}*\n\n` +
+        `📧 Email: \`${input.email}\`\n` +
+        `📦 Plan: *${input.plan}* — ${input.amount}\n` +
+        `👤 ID: \`${input.userId}\``
+      );
+    }
+
+    case "cancellation":
+      return (
+        `❌ *Suscripción cancelada*\n\n` +
+        `📧 Email: \`${input.email}\`\n` +
+        `👤 ID: \`${input.userId}\`\n` +
+        `🔑 Sub: \`${input.subscriptionId}\``
+      );
   }
 }

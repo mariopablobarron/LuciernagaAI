@@ -75,14 +75,22 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Mobile toggle */}
-          <button
-            onClick={() => setOpen((v) => !v)}
-            className="md:hidden p-2.5 min-h-11 min-w-11 flex items-center justify-center rounded-lg text-zinc-300 hover:text-white hover:bg-white/8 transition-colors"
-            aria-label={open ? "Cerrar menú" : "Abrir menú"}
-          >
-            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          {/* Mobile: CTA visible + toggle */}
+          <div className="md:hidden flex items-center gap-2">
+            <Link
+              href="/unirse"
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-violet-600 hover:bg-violet-500 transition-all"
+            >
+              Empezar gratis
+            </Link>
+            <button
+              onClick={() => setOpen((v) => !v)}
+              className="p-2.5 min-h-11 min-w-11 flex items-center justify-center rounded-lg text-zinc-300 hover:text-white hover:bg-white/8 transition-colors"
+              aria-label={open ? "Cerrar menú" : "Abrir menú"}
+            >
+              {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
       </div>
 

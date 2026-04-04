@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Bell, CheckCircle2, ExternalLink, Globe, Lock, Eye, Send } from 'lucide-react';
+import { ArrowLeft, Bell, CheckCircle2, ExternalLink, Globe, Lock, Eye, EyeOff, Send } from 'lucide-react';
 import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
 
 type TelegramStatus = {
@@ -11,8 +11,15 @@ type TelegramStatus = {
   botUsername: string;
 };
 
+type PasswordForm = { current: string; next: string; confirm: string };
+
 export default function SettingsPage() {
   const [telegram, setTelegram] = useState<TelegramStatus | null>(null);
+  const [showPwForm, setShowPwForm] = useState(false);
+  const [pwForm, setPwForm] = useState<PasswordForm>({ current: '', next: '', confirm: '' });
+  const [showPw, setShowPw] = useState(false);
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwMsg, setPwMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
     fetch('/api/user/telegram-status', { credentials: 'include' })
@@ -20,6 +27,45 @@ export default function SettingsPage() {
       .then((d: TelegramStatus) => setTelegram(d))
       .catch(() => {});
   }, []);
+
+  async function handleChangePassword(e: React.SyntheticEvent) {
+    e.preventDefault();
+    setPwMsg(null);
+    if (pwForm.next !== pwForm.confirm) {
+      setPwMsg({ type: 'error', text: 'Las contraseñas nuevas no coinciden.' });
+      return;
+    }
+    if (pwForm.next.length < 8) {
+      setPwMsg({ type: 'error', text: 'Mínimo 8 caracteres.' });
+      return;
+    }
+    setPwLoading(true);
+    try {
+      const res = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ current: pwForm.current, next: pwForm.next }),
+      });
+      const data = (await res.json()) as { success: boolean; error?: string };
+      if (!res.ok || !data.success) {
+        const msgs: Record<string, string> = {
+          CURRENT_REQUIRED: 'Introduce tu contraseña actual.',
+          INVALID_CREDENTIALS: 'La contraseña actual no es correcta.',
+          PASSWORD_TOO_SHORT: 'Mínimo 8 caracteres.',
+        };
+        setPwMsg({ type: 'error', text: msgs[data.error ?? ''] ?? 'Error al cambiar la contraseña.' });
+      } else {
+        setPwMsg({ type: 'success', text: 'Contraseña actualizada correctamente.' });
+        setPwForm({ current: '', next: '', confirm: '' });
+        setShowPwForm(false);
+      }
+    } catch {
+      setPwMsg({ type: 'error', text: 'Error al cambiar la contraseña.' });
+    } finally {
+      setPwLoading(false);
+    }
+  }
 
   const botUrl = telegram?.botUsername
     ? `https://t.me/${telegram.botUsername}`
@@ -158,9 +204,71 @@ export default function SettingsPage() {
           </div>
 
           <div className="space-y-3 border-t border-zinc-800 pt-4">
-            <button className={`${COMPONENTS.buttonSecondary} w-full`}>
-              Cambiar contraseña
-            </button>
+
+            {/* Change password */}
+            {!showPwForm ? (
+              <button
+                onClick={() => { setShowPwForm(true); setPwMsg(null); }}
+                className={`${COMPONENTS.buttonSecondary} w-full`}
+              >
+                Cambiar contraseña
+              </button>
+            ) : (
+              <form onSubmit={handleChangePassword} className="space-y-4 rounded-xl border border-zinc-700/50 p-4">
+                <p className="text-sm font-semibold text-white">Cambiar contraseña</p>
+
+                {pwMsg && (
+                  <div className={`rounded-lg px-3 py-2 text-sm ${pwMsg.type === 'success' ? 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : 'border border-red-500/30 bg-red-500/10 text-red-300'}`}>
+                    {pwMsg.text}
+                  </div>
+                )}
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-zinc-400">Contraseña actual</label>
+                  <div className="relative">
+                    <input
+                      type={showPw ? 'text' : 'password'} value={pwForm.current} required
+                      onChange={(e) => setPwForm({ ...pwForm, current: e.target.value })}
+                      placeholder="••••••••" className={`${COMPONENTS.inputField} pr-10 py-2 text-sm`}
+                    />
+                    <button type="button" onClick={() => setShowPw((v) => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300">
+                      {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-zinc-400">Nueva contraseña</label>
+                  <input
+                    type={showPw ? 'text' : 'password'} value={pwForm.next} required minLength={8}
+                    onChange={(e) => setPwForm({ ...pwForm, next: e.target.value })}
+                    placeholder="Mínimo 8 caracteres" className={`${COMPONENTS.inputField} py-2 text-sm`}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-zinc-400">Confirmar nueva contraseña</label>
+                  <input
+                    type={showPw ? 'text' : 'password'} value={pwForm.confirm} required
+                    onChange={(e) => setPwForm({ ...pwForm, confirm: e.target.value })}
+                    placeholder="••••••••" className={`${COMPONENTS.inputField} py-2 text-sm`}
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <button type="submit" disabled={pwLoading}
+                    className={`${COMPONENTS.buttonPrimary} flex-1 py-2 text-sm disabled:opacity-60`}>
+                    {pwLoading ? 'Guardando…' : 'Guardar'}
+                  </button>
+                  <button type="button" onClick={() => { setShowPwForm(false); setPwMsg(null); }}
+                    className={`${COMPONENTS.buttonSecondary} px-4 py-2 text-sm`}>
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            )}
+
             <button className={`${COMPONENTS.buttonSecondary} w-full`}>
               Activar autenticación de dos factores
             </button>

@@ -4,7 +4,7 @@
  */
 
 import type Stripe from "stripe";
-import { getStripe } from "@/lib/stripe";
+import { stripe } from "@/lib/stripe";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { STRIPE_TRIAL_DAYS } from "@/lib/plans";
@@ -29,7 +29,7 @@ export async function getOrCreateStripeCustomer(userId: string): Promise<string>
   if (!user) throw new Error(`[Billing] User not found: ${userId}`);
   if (user.stripeCustomerId) return user.stripeCustomerId;
 
-  const stripe = getStripe();
+  
   const customer = await stripe.customers.create({
     email: user.email,
     name: user.name ?? undefined,
@@ -53,7 +53,7 @@ export async function createCheckoutSession(params: {
   interval: "monthly" | "annual";
 }): Promise<string> {
   const customerId = await getOrCreateStripeCustomer(params.userId);
-  const stripe = getStripe();
+  
   const base = APP_BASE_URL();
 
   const session = await stripe.checkout.sessions.create({
@@ -85,7 +85,7 @@ export async function createCheckoutSession(params: {
 
 export async function createPortalSession(userId: string): Promise<string> {
   const customerId = await getOrCreateStripeCustomer(userId);
-  const stripe = getStripe();
+  
   const base = APP_BASE_URL();
 
   const session = await stripe.billingPortal.sessions.create({
@@ -183,5 +183,5 @@ export function constructWebhookEvent(
   signature: string,
   secret: string
 ): Stripe.Event {
-  return getStripe().webhooks.constructEvent(payload, signature, secret);
+  return stripe.webhooks.constructEvent(payload, signature, secret);
 }

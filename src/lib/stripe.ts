@@ -1,28 +1,22 @@
-import Stripe from "stripe";
+import Stripe from 'stripe';
 
-let _stripe: Stripe | null = null;
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2024-12-18.acacia',
+});
 
-export function getStripe(): Stripe {
-  if (_stripe) return _stripe;
-
-  const secretKey = process.env.STRIPE_SECRET_KEY?.trim();
-  if (!secretKey) {
-    throw new Error("[Stripe] STRIPE_SECRET_KEY is not set");
-  }
-
-  _stripe = new Stripe(secretKey, {
-    apiVersion: "2025-03-31.basil",
-    typescript: true,
-  });
-
-  return _stripe;
-}
-
-/** Returns null instead of throwing — use in optional Stripe paths */
-export function getStripeOptional(): Stripe | null {
-  try {
-    return getStripe();
-  } catch {
-    return null;
-  }
-}
+export const STRIPE_PLANS = {
+  pro_monthly: {
+    priceId: process.env.STRIPE_PRICE_PRO_MONTHLY!,
+    amount: 900,
+    currency: 'eur',
+    interval: 'month' as const,
+    label: '9€/mes',
+  },
+  pro_annual: {
+    priceId: process.env.STRIPE_PRICE_PRO_ANNUAL!,
+    amount: 7900,
+    currency: 'eur',
+    interval: 'year' as const,
+    label: '79€/año',
+  },
+};

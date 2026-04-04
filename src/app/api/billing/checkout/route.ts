@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { resolveIdentity, InvalidSessionTokenError } from "@/lib/auth";
 import { createCheckoutSession } from "@/services/billing";
-import { getStripePriceId } from "@/lib/plans";
+import { STRIPE_PLANS } from "@/lib/stripe";
 import { logError } from "@/lib/logger";
 import { checkRateLimit } from "@/lib/rate-limit";
 
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
 
     const body = (await req.json()) as { interval?: string };
     const interval = body.interval === "annual" ? "annual" : "monthly";
-    const priceId = getStripePriceId(interval === "annual" ? "pro_annual" : "pro_monthly");
+    const priceId = STRIPE_PLANS[interval === "annual" ? "pro_annual" : "pro_monthly"].priceId;
 
     const checkoutUrl = await createCheckoutSession({
       userId: identity.userId,

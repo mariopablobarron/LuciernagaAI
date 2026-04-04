@@ -199,7 +199,7 @@ export default function ImpulsoPage() {
         <div className="absolute bottom-1/4 right-0 w-100 h-100 bg-fuchsia-500/8 rounded-full blur-3xl" />
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
 
         {/* ── Header ─────────────────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

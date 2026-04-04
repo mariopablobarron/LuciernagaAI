@@ -30,7 +30,7 @@ export function AdminShell({
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,color-mix(in_oklab,var(--accent)_18%,transparent),transparent_30%),linear-gradient(180deg,color-mix(in_oklab,var(--background)_94%,white_6%),var(--background))] p-4 text-foreground md:p-6">
-      <div className="mx-auto max-w-md space-y-6">
+      <div className="mx-auto max-w-7xl space-y-6">
         <Card className="overflow-hidden border-border/80 bg-card/90 shadow-lg shadow-black/5 backdrop-blur">
           <CardContent className="space-y-5 p-5 md:p-6">
             <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">

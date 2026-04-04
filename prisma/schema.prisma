@@ -51,6 +51,8 @@ model User {
   dailyLogs       DailyLog[]
   futureMessages  FutureMessage[]
   streak          Streak?
+  clinicalNotes   ClinicalNote[]
+  assessments     Assessment[]
 }
 
 model Message {
@@ -323,4 +325,49 @@ model Streak {
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([status, updatedAt])
+}
+
+// ─── Psychologist tools ────────────────────────────────────────────────────────
+
+/// Private clinical notes written by the psychologist for a user.
+model ClinicalNote {
+  id        String   @id @default(cuid())
+  userId    String
+  content   String
+  tags      String[] @default([])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+/// A standardised scale (PHQ-9, GAD-7, custom) assigned to a user by the psychologist.
+model Assessment {
+  id        String               @id @default(cuid())
+  userId    String
+  type      String               // "phq9" | "gad7" | "custom"
+  title     String
+  questions Json                 // Array<{ id: string; text: string; scale: number }>
+  status    String               @default("pending") // "pending" | "completed"
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  response  AssessmentResponse?
+
+  @@index([userId, status, createdAt])
+}
+
+/// User's responses to an assessment.
+model AssessmentResponse {
+  id           String     @id @default(cuid())
+  assessmentId String     @unique
+  userId       String
+  answers      Json       // Array<{ questionId: string; score: number }>
+  totalScore   Int
+  severity     String     // "minimal" | "mild" | "moderate" | "moderately_severe" | "severe"
+  completedAt  DateTime   @default(now())
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@index([userId, completedAt])
 }

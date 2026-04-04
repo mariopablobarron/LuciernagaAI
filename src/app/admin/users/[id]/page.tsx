@@ -1,14 +1,38 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, MessageSquareText, ShieldAlert, Target } from "lucide-react";
+import { ArrowLeft, Brain, ClipboardList, MessageSquareText, NotebookPen, ShieldAlert, Target, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Textarea } from "@/components/ui/textarea";
 import { AdminShell } from "@/features/admin/components/AdminShell";
+
+// ─── Psychologist panel types ──────────────────────────────────────────────────
+
+type ClinicalNote = { id: string; content: string; tags: string[]; createdAt: string };
+type AssessmentItem = {
+  id: string; type: string; title: string; status: string; createdAt: string;
+  response: { totalScore: number; severity: string; completedAt: string } | null;
+};
+type TimelineEntry = { date: string; emotionalState: string; mood: string | null; momentum: number | null; hasCheckin: boolean };
+type CrisisMarker = { date: string; level: string };
+
+const SEVERITY_LABELS: Record<string, string> = {
+  minimal: "Mínimo", mild: "Leve", moderate: "Moderado",
+  moderately_severe: "Mod. severo", severe: "Severo",
+};
+const SEVERITY_COLORS: Record<string, string> = {
+  minimal: "text-emerald-400", mild: "text-yellow-400",
+  moderate: "text-orange-400", moderately_severe: "text-orange-500", severe: "text-red-500",
+};
+const STATE_COLORS: Record<string, string> = {
+  activo: "bg-emerald-500", bloqueado: "bg-red-500", ansioso: "bg-amber-500",
+  desmotivado: "bg-purple-500", perdido: "bg-blue-400", neutral: "bg-zinc-500", unknown: "bg-zinc-700",
+};
 
 type UserDetailResponse = {
   user: {
@@ -156,6 +180,16 @@ export default function AdminUserDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Psychologist panel state
+  const [notes, setNotes] = useState<ClinicalNote[]>([]);
+  const [noteInput, setNoteInput] = useState("");
+  const [noteSaving, setNoteSaving] = useState(false);
+  const [assessments, setAssessments] = useState<AssessmentItem[]>([]);
+  const [assigning, setAssigning] = useState(false);
+  const [timeline, setTimeline] = useState<TimelineEntry[]>([]);
+  const [crisisMarkers, setCrisisMarkers] = useState<CrisisMarker[]>([]);
+  const userId = useRef<string | null>(null);
+
   useEffect(() => {
     async function fetchDetail() {
       if (!params?.id) {
@@ -183,6 +217,23 @@ export default function AdminUserDetailPage() {
         }
 
         setData(payload);
+        userId.current = params?.id ?? null;
+
+        // Load psychologist panel data in parallel
+        const id = params?.id;
+        if (id) {
+          void Promise.all([
+            fetch(`/api/admin/clinical-notes/${id}`, { credentials: "include" })
+              .then((r) => r.json() as Promise<{ notes: ClinicalNote[] }>)
+              .then((d) => setNotes(d.notes ?? [])),
+            fetch(`/api/admin/assessments/${id}`, { credentials: "include" })
+              .then((r) => r.json() as Promise<{ assessments: AssessmentItem[] }>)
+              .then((d) => setAssessments(d.assessments ?? [])),
+            fetch(`/api/admin/users/${id}/emotional-history?days=30`, { credentials: "include" })
+              .then((r) => r.json() as Promise<{ timeline: TimelineEntry[]; crisisMarkers: CrisisMarker[] }>)
+              .then((d) => { setTimeline(d.timeline ?? []); setCrisisMarkers(d.crisisMarkers ?? []); }),
+          ]);
+        }
       } catch (fetchError: unknown) {
         const message =
           fetchError instanceof Error ? fetchError.message : "Error cargando ficha del usuario.";
@@ -194,6 +245,50 @@ export default function AdminUserDetailPage() {
 
     void fetchDetail();
   }, [params?.id, router]);
+
+  async function handleSaveNote() {
+    if (!noteInput.trim() || !userId.current) return;
+    setNoteSaving(true);
+    try {
+      const res = await fetch(`/api/admin/clinical-notes/${userId.current}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ content: noteInput.trim() }),
+      });
+      const d = (await res.json()) as { note: ClinicalNote };
+      setNotes((prev) => [d.note, ...prev]);
+      setNoteInput("");
+    } finally {
+      setNoteSaving(false);
+    }
+  }
+
+  async function handleDeleteNote(noteId: string) {
+    if (!userId.current) return;
+    await fetch(`/api/admin/clinical-notes/${userId.current}?noteId=${noteId}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    setNotes((prev) => prev.filter((n) => n.id !== noteId));
+  }
+
+  async function handleAssignAssessment(type: "phq9" | "gad7") {
+    if (!userId.current) return;
+    setAssigning(true);
+    try {
+      const res = await fetch(`/api/admin/assessments/${userId.current}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ type }),
+      });
+      const d = (await res.json()) as { assessment: AssessmentItem };
+      setAssessments((prev) => [{ ...d.assessment, response: null }, ...prev]);
+    } finally {
+      setAssigning(false);
+    }
+  }
 
   async function handleLogout() {
     try {
@@ -217,6 +312,21 @@ export default function AdminUserDetailPage() {
             Volver al listado
           </Link>
         </Button>
+        {params?.id && (
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+          >
+            <a
+              href={`/api/admin/users/${params.id}/export-pdf`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Exportar expediente (PDF)
+            </a>
+          </Button>
+        )}
       </div>
 
       {error ? (
@@ -518,6 +628,149 @@ export default function AdminUserDetailPage() {
               </CardContent>
             </Card>
           </div>
+
+          {/* ── EMOTIONAL TIMELINE ────────────────────────────────────── */}
+          <Card className="border-border/80 bg-card/95">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <Brain className="size-4" />
+                Estado emocional — últimos 30 días
+              </CardTitle>
+              <CardDescription>Un cuadrado por día. Color = estado registrado en check-in.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {timeline.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Sin datos de check-in en los últimos 30 días.</p>
+              ) : (
+                <div className="flex flex-wrap gap-1.5">
+                  {timeline.map((entry) => {
+                    const isCrisis = crisisMarkers.some((m) => m.date === entry.date);
+                    const color = STATE_COLORS[entry.emotionalState] ?? STATE_COLORS.unknown;
+                    return (
+                      <div
+                        key={entry.date}
+                        title={`${entry.date} · ${entry.emotionalState}${entry.momentum ? ` · energía ${entry.momentum}` : ""}${isCrisis ? " · ⚠ crisis" : ""}`}
+                        className={`h-7 w-7 rounded-md ${color} ${isCrisis ? "ring-2 ring-red-500" : ""} cursor-default`}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+              <div className="mt-3 flex flex-wrap gap-3 text-xs text-muted-foreground">
+                {Object.entries(STATE_COLORS).filter(([k]) => k !== "unknown").map(([state, cls]) => (
+                  <span key={state} className="flex items-center gap-1">
+                    <span className={`inline-block h-3 w-3 rounded-sm ${cls}`} />
+                    {state}
+                  </span>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* ── CLINICAL NOTES ────────────────────────────────────────── */}
+          <Card className="border-border/80 bg-card/95">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <NotebookPen className="size-4" />
+                Notas clínicas
+              </CardTitle>
+              <CardDescription>Privadas — solo visibles desde el panel de admin.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-2">
+                <Textarea
+                  value={noteInput}
+                  onChange={(e) => setNoteInput(e.target.value)}
+                  placeholder="Observación clínica, patrón detectado, nota de sesión..."
+                  rows={3}
+                  className="resize-none text-sm"
+                />
+                <Button
+                  onClick={() => void handleSaveNote()}
+                  disabled={noteSaving || !noteInput.trim()}
+                  size="sm"
+                  className="self-end"
+                >
+                  Guardar
+                </Button>
+              </div>
+              {notes.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Sin notas registradas.</p>
+              ) : (
+                <div className="space-y-2">
+                  {notes.map((note) => (
+                    <div key={note.id} className="group rounded-xl border border-border bg-muted/30 p-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="text-sm text-foreground whitespace-pre-wrap">{note.content}</p>
+                        <button
+                          onClick={() => void handleDeleteNote(note.id)}
+                          className="shrink-0 text-muted-foreground opacity-0 group-hover:opacity-100 transition hover:text-red-400"
+                        >
+                          <Trash2 className="size-3.5" />
+                        </button>
+                      </div>
+                      <p className="mt-1 text-xs text-muted-foreground">{new Date(note.createdAt).toLocaleString()}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* ── ASSESSMENTS ───────────────────────────────────────────── */}
+          <Card className="border-border/80 bg-card/95">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <ClipboardList className="size-4" />
+                Escalas de evaluación
+              </CardTitle>
+              <CardDescription>Asigna PHQ-9 o GAD-7. El usuario las recibe en la app.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={assigning}
+                  onClick={() => void handleAssignAssessment("phq9")}
+                >
+                  Asignar PHQ-9
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={assigning}
+                  onClick={() => void handleAssignAssessment("gad7")}
+                >
+                  Asignar GAD-7
+                </Button>
+              </div>
+              {assessments.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Sin evaluaciones asignadas.</p>
+              ) : (
+                <div className="space-y-2">
+                  {assessments.map((a) => (
+                    <div key={a.id} className="rounded-xl border border-border p-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-sm font-medium text-foreground">{a.title}</p>
+                        <Badge variant={a.status === "completed" ? "secondary" : "warning"}>
+                          {a.status === "completed" ? "Completada" : "Pendiente"}
+                        </Badge>
+                      </div>
+                      {a.response ? (
+                        <p className={`mt-1 text-sm font-semibold ${SEVERITY_COLORS[a.response.severity] ?? ""}`}>
+                          Puntuación {a.response.totalScore} · {SEVERITY_LABELS[a.response.severity] ?? a.response.severity}
+                        </p>
+                      ) : (
+                        <p className="mt-1 text-xs text-muted-foreground">Esperando respuesta del usuario</p>
+                      )}
+                      <p className="mt-1 text-xs text-muted-foreground">{new Date(a.createdAt).toLocaleString()}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           <Card className="border-border/80 bg-card/95">
             <CardHeader className="pb-3">

@@ -1,6 +1,6 @@
 "use client";
 
-import { KeyboardEvent } from "react";
+import { KeyboardEvent, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -47,6 +47,8 @@ type ChatProps = {
   };
   onSend: (overrideText?: string) => Promise<void> | void;
   onUseStarterExample?: (value: string) => void;
+  /** localStorage key for draft persistence. When set, keystrokes are saved automatically. */
+  draftKey?: string;
 };
 
 export default function Chat({
@@ -56,8 +58,37 @@ export default function Chat({
   onInputChange,
   loading = false,
   onSend,
+  draftKey,
 }: ChatProps) {
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Restore draft on mount
+  useEffect(() => {
+    if (!draftKey) return;
+    const saved = localStorage.getItem(draftKey);
+    if (saved && !input) {
+      if (setInput) setInput(saved);
+      else onInputChange?.(saved);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draftKey]);
+
+  // Clear draft when input is emptied (after send)
+  useEffect(() => {
+    if (!draftKey) return;
+    if (input === "") localStorage.removeItem(draftKey);
+  }, [draftKey, input]);
+
   const handleInputChange = (value: string) => {
+    // Debounced draft save: write to localStorage 400ms after the last keystroke
+    if (draftKey) {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+      saveTimer.current = setTimeout(() => {
+        if (value) localStorage.setItem(draftKey, value);
+        else localStorage.removeItem(draftKey);
+      }, 400);
+    }
+
     if (setInput) {
       setInput(value);
       return;

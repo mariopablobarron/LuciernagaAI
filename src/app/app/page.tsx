@@ -1794,6 +1794,7 @@ export default function HomePage() {
                 onInputChange={setInput}
                 onSend={handleSend}
                 onUseStarterExample={handleUseStarterExample}
+                draftKey={`chat-draft:${safeConversation.id}`}
               />
             }
             onNewConversation={handleNewConversation}

@@ -1,59 +1,59 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { ArrowLeft, Lock, Unlock, MessageSquare } from 'lucide-react';
-import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
+import Link from "next/link";
+import { ArrowLeft, Lock, Unlock, MessageSquare } from "lucide-react";
+import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from "@/styles/design-system";
 
 export default function MensajesPage() {
   const mensajes = [
     {
       day: 1,
-      title: 'Tu primer día',
-      preview: 'El hecho de que estés aquí significa que algo en ti quiere cambiar...',
+      title: "Tu primer día",
+      preview: "El hecho de que estés aquí significa que algo en ti quiere cambiar...",
       locked: false,
-      status: 'completado',
+      status: "completado",
     },
     {
       day: 3,
-      title: 'El enjambre de dudas',
-      preview: 'Alrededor del día 3, la mente intenta sabotearte...',
+      title: "El enjambre de dudas",
+      preview: "Alrededor del día 3, la mente intenta sabotearte...",
       locked: false,
-      status: 'completado',
+      status: "completado",
     },
     {
       day: 7,
-      title: 'Tu primera semana',
-      preview: 'Hiciste un cambio en el patrón. Esto es real. Ahora viene lo difícil...',
+      title: "Tu primera semana",
+      preview: "Hiciste un cambio en el patrón. Esto es real. Ahora viene lo difícil...",
       locked: false,
-      status: 'desbloqueado',
+      status: "desbloqueado",
     },
     {
       day: 10,
-      title: 'La meseta',
-      preview: 'Ahora el cambio se siente normal. Muchos abandonan aquí...',
+      title: "La meseta",
+      preview: "Ahora el cambio se siente normal. Muchos abandonan aquí...",
       locked: true,
-      status: 'bloqueado',
+      status: "bloqueado",
     },
     {
       day: 14,
-      title: 'Punto de quiebre',
-      preview: 'Aquí es donde muchos recaen. Pero tú tienes herramientas que antes no tenías...',
+      title: "Punto de quiebre",
+      preview: "Aquí es donde muchos recaen. Pero tú tienes herramientas que antes no tenías...",
       locked: true,
-      status: 'bloqueado',
+      status: "bloqueado",
     },
     {
       day: 18,
-      title: 'Recta final',
-      preview: 'Solo 3 días. Sientes que puedes con esto. Y es verdad...',
+      title: "Recta final",
+      preview: "Solo 3 días. Sientes que puedes con esto. Y es verdad...",
       locked: true,
-      status: 'bloqueado',
+      status: "bloqueado",
     },
     {
       day: 21,
-      title: 'Tu nuevo hábito',
-      preview: 'Felicitaciones. Ahora el cambio es tuyo. ¿Qué sigue?',
+      title: "Tu nuevo hábito",
+      preview: "Felicitaciones. Ahora el cambio es tuyo. ¿Qué sigue?",
       locked: true,
-      status: 'bloqueado',
+      status: "bloqueado",
     },
   ];
 
@@ -94,7 +94,7 @@ export default function MensajesPage() {
             <div
               key={i}
               className={`${COMPONENTS.card} p-6 space-y-3 relative transition-all ${
-                mensaje.locked ? 'opacity-75' : ''
+                mensaje.locked ? "opacity-75" : ""
               }`}
             >
               {mensaje.locked && (
@@ -113,7 +113,7 @@ export default function MensajesPage() {
                   </div>
 
                   {!mensaje.locked ? (
-                    <p className="text-sm text-zinc-300 italic">"{mensaje.preview}"</p>
+                    <p className="text-sm text-zinc-300 italic">&quot;{mensaje.preview}&quot;</p>
                   ) : (
                     <p className="text-sm text-zinc-500">Se desbloquea el día {mensaje.day}</p>
                   )}
@@ -141,10 +141,13 @@ export default function MensajesPage() {
         </div>
 
         {/* Info Section */}
-        <div className={`${COMPONENTS.card} p-8 space-y-4 text-center bg-zinc-900/50 border-l-4 border-l-violet-500`}>
+        <div
+          className={`${COMPONENTS.card} p-8 space-y-4 text-center bg-zinc-900/50 border-l-4 border-l-violet-500`}
+        >
           <h3 className={`${TYPOGRAPHY.h3} text-white`}>Sobre estos mensajes</h3>
           <p className="text-zinc-400 max-w-lg mx-auto">
-            Cada mensaje está diseñado para apoyarte en momentos específicos de tu viaje de 21 días. Son reflexiones personalizadas basadas en patrones reales de transformación.
+            Cada mensaje está diseñado para apoyarte en momentos específicos de tu viaje de 21 días.
+            Son reflexiones personalizadas basadas en patrones reales de transformación.
           </p>
           <p className="text-xs text-zinc-500">
             Los mensajes se desbloquean automáticamente cuando llegas a cada día del programa.

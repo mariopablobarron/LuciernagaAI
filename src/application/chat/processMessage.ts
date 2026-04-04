@@ -21,6 +21,7 @@ import {
 import {
   countMessagesForConversation,
   ensureUserSession,
+  listMessagesForConversation,
   listRecentUserMessagesForUser,
   resolveConversationForUser,
   saveConversationMessage,
@@ -217,6 +218,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
 
   // ── 2. Mutable state for DB phase ──────────────────────────────────────
   let persistenceAvailable = true;
+  let conversationHistory: Array<{ role: "user" | "assistant"; content: string }> = [];
   let activeGoal: Awaited<ReturnType<typeof getActiveGoalForUser>> | null = null;
   let searchResults: Awaited<ReturnType<typeof searchWeb>> = [];
   let searchQuery: string | null = null;
@@ -310,6 +312,19 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
       updateTitleFromUserMessage: isNewConversationTitle,
     });
     logInfo("DB", "message_saved", { userId, conversationId, role: "user" });
+
+    // Load last 8 turns of conversation history (excluding the just-saved message)
+    try {
+      const msgs = await listMessagesForConversation({ userId, conversationId });
+      if (msgs && msgs.length > 1) {
+        conversationHistory = msgs
+          .slice(0, -1) // exclude current user message (just saved)
+          .slice(-8)    // keep last 8 turns max
+          .map((m) => ({ role: m.role, content: m.content }));
+      }
+    } catch {
+      // history is optional; continue without it
+    }
 
     await trackSafe({
       userId,
@@ -896,7 +911,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
 
   // ── 10. JSON path ──────────────────────────────────────────────────────
   if (jsonMode) {
-    const aiResult = await generateAIResponse(message, state, emotionalProfile, coachContext);
+    const aiResult = await generateAIResponse(message, state, emotionalProfile, coachContext, conversationHistory);
     let assistantResponse = completionMicroFeedback
       ? `${completionMicroFeedback}\n\n${aiResult.response}`
       : aiResult.response;
@@ -1000,7 +1015,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
       let streamFallback = false;
 
       try {
-        for await (const token of streamOpenRouterTokens(message, systemPrompt)) {
+        for await (const token of streamOpenRouterTokens(message, systemPrompt, conversationHistory)) {
           rawText += token;
           send({ type: "delta", delta: token });
         }
@@ -1014,7 +1029,8 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
           message,
           state,
           emotionalProfile,
-          coachContext
+          coachContext,
+          conversationHistory,
         );
         rawText = fallbackResult.response;
         streamFallback = fallbackResult.fallback;

@@ -9,13 +9,16 @@ type PendingAssessment = { id: string; type: string; title: string; questions: Q
 
 const SCORE_LABELS = ["Nunca", "Varios días", "Más de la mitad", "Casi todos los días"];
 
-const SEVERITY_LABELS: Record<string, string> = {
-  minimal: "Mínimo", mild: "Leve", moderate: "Moderado",
-  moderately_severe: "Moderadamente severo", severe: "Severo",
-};
+// const SEVERITY_LABELS: Record<string, string> = {
+//   minimal: "Mínimo", mild: "Leve", moderate: "Moderado",
+//   moderately_severe: "Moderadamente severo", severe: "Severo",
+// };
 const SEVERITY_COLORS: Record<string, string> = {
-  minimal: "text-emerald-400", mild: "text-yellow-400",
-  moderate: "text-orange-400", moderately_severe: "text-orange-500", severe: "text-red-500",
+  minimal: "text-emerald-400",
+  mild: "text-yellow-400",
+  moderate: "text-orange-400",
+  moderately_severe: "text-orange-500",
+  severe: "text-red-500",
 };
 
 type Props = { userId?: string };
@@ -24,7 +27,11 @@ export default function AssessmentFlow({ userId }: Props) {
   const [assessment, setAssessment] = useState<PendingAssessment | null>(null);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [submitted, setSubmitted] = useState(false);
-  const [result, setResult] = useState<{ totalScore: number; severity: string; severityLabel: string } | null>(null);
+  const [result, setResult] = useState<{
+    totalScore: number;
+    severity: string;
+    severityLabel: string;
+  } | null>(null);
   const [loading, setLoading] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 

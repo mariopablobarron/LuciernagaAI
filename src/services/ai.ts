@@ -77,11 +77,14 @@ function sanitizeCoachContext(coachContext: CoachContext): CoachContext {
   return coachContext;
 }
 
+type ConversationTurn = { role: "user" | "assistant"; content: string };
+
 async function requestOpenRouter(
   message: string,
   userState: UserState,
   emotionalProfile: EmotionalProfile,
-  coachContext: CoachContext
+  coachContext: CoachContext,
+  history: ConversationTurn[] = [],
 ): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY?.trim();
   if (!apiKey) {
@@ -125,6 +128,7 @@ async function requestOpenRouter(
               role: "system",
               content: buildCoachPrompt(userState, emotionalProfile, safeCoachContext),
             },
+            ...history,
             { role: "user", content: message },
           ],
           temperature: 0.7,
@@ -177,7 +181,8 @@ export async function generateAIResponse(
   message: string,
   userState: string,
   emotionalProfile: EmotionalProfile = DEFAULT_EMOTIONAL_PROFILE,
-  coachContext: CoachContext = {}
+  coachContext: CoachContext = {},
+  history: ConversationTurn[] = [],
 ): Promise<{
   response: string;
   fallback: boolean;
@@ -187,7 +192,7 @@ export async function generateAIResponse(
   const typedState = normalizeState(userState);
 
   try {
-    const response = await requestOpenRouter(message, typedState, emotionalProfile, coachContext);
+    const response = await requestOpenRouter(message, typedState, emotionalProfile, coachContext, history);
     logInfo("AI", "ai_response_generated", {
       state: typedState,
       primaryEmotion: emotionalProfile.primaryEmotion,
@@ -323,6 +328,7 @@ export async function generateImpulseResponse(input: ImpulseResponseInput): Prom
 export async function* streamOpenRouterTokens(
   message: string,
   systemPrompt: string,
+  history: ConversationTurn[] = [],
 ): AsyncGenerator<string, void, unknown> {
   const apiKey = process.env.OPENROUTER_API_KEY?.trim();
   if (!apiKey) {
@@ -345,6 +351,7 @@ export async function* streamOpenRouterTokens(
           model: OPENROUTER_MODEL,
           messages: [
             { role: "system", content: systemPrompt },
+            ...history,
             { role: "user", content: message },
           ],
           temperature: 0.7,

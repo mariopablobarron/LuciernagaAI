@@ -2,6 +2,7 @@ import { getPrismaClient } from "@/db/prisma";
 import { PRODUCT_DISCLAIMERS, RESPONSIBLE_USE_NOTES, formatCrisisResourceLines } from "@/lib/legal";
 import { logError, logInfo } from "@/lib/logger";
 import { buildAdminAlert, notifyAdmin } from "@/services/telegram";
+import { safeFamilyNotify, notifyTrustedContactOnCrisis } from "@/services/family";
 
 export type RiskLevel = "low" | "medium" | "high" | "critical";
 
@@ -208,6 +209,11 @@ export async function registerCrisisEvent(payload: CrisisEventPayload): Promise<
           crisisLevel: payload.level,
           lastMessage: payload.message,
         })
+      );
+      // Also notify the user's trusted contact (family)
+      safeFamilyNotify(
+        () => notifyTrustedContactOnCrisis(payload.userId),
+        "crisis_trusted_contact",
       );
     }
   } catch (error: unknown) {

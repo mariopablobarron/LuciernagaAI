@@ -1,9 +1,23 @@
 "use client";
 
 import { KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
-import { AlertTriangle, ArrowDown, Check, Copy, Send, Shield, Sparkles } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowDown,
+  BookOpen,
+  Check,
+  Copy,
+  Heart,
+  Send,
+  Shield,
+  Sparkles,
+  ThumbsDown,
+  ThumbsUp,
+  X,
+  Zap,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { Textarea } from "@/components/ui/textarea";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -51,6 +65,15 @@ export type ChatProps = {
   onUseStarterExample?: (value: string) => void;
   /** localStorage key for draft persistence. */
   draftKey?: string;
+  /** Conversation ID — used for rating. */
+  conversationId?: string;
+  /** Called when user rates the session. */
+  onRateSession?: (rating: 1 | -1) => void;
+  /** Journaling mode: AI doesn't respond, messages stored as notes. */
+  journalMode?: boolean;
+  onToggleJournal?: () => void;
+  /** Proactive context-aware question shown when chat is empty. */
+  proactivePrompt?: string | null;
 };
 
 // ─── Starter prompts ──────────────────────────────────────────────────────────
@@ -104,7 +127,11 @@ function inlineMarkdown(text: string): React.ReactNode[] {
   const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
   return parts.map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**")) {
-      return <strong key={i} className="font-semibold text-white">{part.slice(2, -2)}</strong>;
+      return (
+        <strong key={i} className="font-semibold text-white">
+          {part.slice(2, -2)}
+        </strong>
+      );
     }
     if (part.startsWith("`") && part.endsWith("`")) {
       return (
@@ -119,13 +146,7 @@ function inlineMarkdown(text: string): React.ReactNode[] {
 
 // ─── Message bubble ───────────────────────────────────────────────────────────
 
-function MessageBubble({
-  message,
-  isStreaming,
-}: {
-  message: ChatMessage;
-  isStreaming: boolean;
-}) {
+function MessageBubble({ message, isStreaming }: { message: ChatMessage; isStreaming: boolean }) {
   const [copied, setCopied] = useState(false);
   const isUser = message.role === "user";
 
@@ -191,10 +212,11 @@ function MessageBubble({
             onClick={() => void handleCopy()}
             className="absolute -left-8 top-1 opacity-0 transition-opacity group-hover:opacity-100"
           >
-            {copied
-              ? <Check className="h-3.5 w-3.5 text-emerald-400" />
-              : <Copy className="h-3.5 w-3.5 text-zinc-600 hover:text-zinc-400" />
-            }
+            {copied ? (
+              <Check className="h-3.5 w-3.5 text-emerald-400" />
+            ) : (
+              <Copy className="h-3.5 w-3.5 text-zinc-600 hover:text-zinc-400" />
+            )}
           </button>
         </div>
       </div>
@@ -240,12 +262,52 @@ function MessageBubble({
             onClick={() => void handleCopy()}
             className="absolute -right-8 top-1 opacity-0 transition-opacity group-hover:opacity-100"
           >
-            {copied
-              ? <Check className="h-3.5 w-3.5 text-emerald-400" />
-              : <Copy className="h-3.5 w-3.5 text-zinc-600 hover:text-zinc-400" />
-            }
+            {copied ? (
+              <Check className="h-3.5 w-3.5 text-emerald-400" />
+            ) : (
+              <Copy className="h-3.5 w-3.5 text-zinc-600 hover:text-zinc-400" />
+            )}
           </button>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Urgent / crisis panel ────────────────────────────────────────────────────
+
+function UrgentPanel({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="shrink-0 border-b border-red-500/30 bg-red-950/30 px-4 py-4">
+      <div className="mb-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Shield className="h-4 w-4 text-red-400" />
+          <span className="text-sm font-semibold text-red-300">Modo crisis activado</span>
+        </div>
+        <button type="button" onClick={onClose} className="text-zinc-500 hover:text-zinc-300">
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+      <div className="space-y-3 text-xs text-zinc-300">
+        <div className="rounded-xl border border-red-500/20 bg-red-900/20 px-3 py-2.5">
+          <p className="mb-1 font-semibold text-red-300">Respiración 4-7-8</p>
+          <p>Inhala 4 seg · retén 7 seg · exhala 8 seg. Repite 3 veces.</p>
+        </div>
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 px-3 py-2.5">
+          <p className="mb-1 font-semibold text-zinc-200">Técnica 5-4-3-2-1</p>
+          <p>5 cosas que ves · 4 que tocas · 3 que oyes · 2 que hueles · 1 que saboreas.</p>
+        </div>
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 px-3 py-2.5">
+          <p className="mb-1 font-semibold text-zinc-200">Recursos de emergencia</p>
+          <p>
+            Teléfono de la Esperanza: <span className="font-semibold text-white">717 003 717</span>
+          </p>
+          <p className="mt-0.5">
+            Crisis Now (Latinoamérica):{" "}
+            <span className="font-semibold text-white">800 290 0024</span>
+          </p>
+        </div>
+        <p className="text-zinc-500">Cuéntame lo que está pasando. Estoy aquí contigo.</p>
       </div>
     </div>
   );
@@ -265,11 +327,18 @@ export default function Chat({
   onSend,
   onUseStarterExample,
   draftKey,
+  conversationId,
+  onRateSession,
+  journalMode = false,
+  onToggleJournal,
+  proactivePrompt,
 }: ChatProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [atBottom, setAtBottom] = useState(true);
+  const [urgentMode, setUrgentMode] = useState(false);
+  const [sessionRating, setSessionRating] = useState<1 | -1 | null>(null);
 
   // ── Draft save / restore ──────────────────────────────────────────────────
 
@@ -313,7 +382,10 @@ export default function Chat({
         else localStorage.removeItem(draftKey);
       }, 400);
     }
-    if (setInput) { setInput(value); return; }
+    if (setInput) {
+      setInput(value);
+      return;
+    }
     onInputChange?.(value);
   };
 
@@ -339,7 +411,6 @@ export default function Chat({
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-zinc-950">
-
       {/* ── Flow indicator ──────────────────────────────────────────────── */}
       {flowActive && (
         <div className="shrink-0 border-b border-zinc-800/60 bg-cyan-950/30 px-4 py-2">
@@ -349,6 +420,22 @@ export default function Chat({
               <span className="ml-2 text-zinc-500">— {responseSignals.flow.instruction}</span>
             )}
           </p>
+        </div>
+      )}
+
+      {/* ── Crisis panel ─────────────────────────────────────────────────── */}
+      {urgentMode && <UrgentPanel onClose={() => setUrgentMode(false)} />}
+
+      {/* ── Journal mode banner ──────────────────────────────────────────── */}
+      {journalMode && (
+        <div className="shrink-0 border-b border-indigo-500/20 bg-indigo-950/20 px-4 py-2">
+          <div className="flex items-center gap-2">
+            <BookOpen className="h-3.5 w-3.5 text-indigo-400" />
+            <p className="text-xs text-indigo-300">
+              <span className="font-semibold">Modo diario activo.</span> La IA no responderá.
+              Escribe libremente.
+            </p>
+          </div>
         </div>
       )}
 
@@ -364,21 +451,29 @@ export default function Chat({
       )}
 
       {/* ── Messages area ───────────────────────────────────────────────── */}
-      <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        className="relative flex-1 overflow-y-auto"
-      >
+      <div ref={scrollRef} onScroll={handleScroll} className="relative flex-1 overflow-y-auto">
         {isEmpty ? (
           /* Empty state */
           <div className="flex h-full flex-col items-center justify-center px-6 py-12 text-center">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-cyan-500/10 ring-1 ring-cyan-500/20">
               <Sparkles className="h-5 w-5 text-cyan-400" />
             </div>
-            <h3 className="mb-1 text-base font-semibold text-white">¿En qué te puedo ayudar hoy?</h3>
-            <p className="mb-6 text-sm text-zinc-500">
-              Escribe lo que te pasa o elige un punto de partida.
-            </p>
+            <h3 className="mb-1 text-base font-semibold text-white">
+              ¿En qué te puedo ayudar hoy?
+            </h3>
+            {proactivePrompt ? (
+              <button
+                onClick={() => handleStarterClick(proactivePrompt)}
+                className="mb-5 max-w-xs rounded-2xl border border-indigo-500/30 bg-indigo-500/10 px-4 py-3 text-sm text-indigo-200 transition hover:bg-indigo-500/20 active:scale-[0.98]"
+              >
+                <span className="mr-1 text-indigo-400">✦</span>
+                {proactivePrompt}
+              </button>
+            ) : (
+              <p className="mb-6 text-sm text-zinc-500">
+                Escribe lo que te pasa o elige un punto de partida.
+              </p>
+            )}
             <div className="flex w-full max-w-sm flex-col gap-2">
               {STARTERS.map((text) => (
                 <button
@@ -414,6 +509,47 @@ export default function Chat({
                     <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan-400 [animation-delay:300ms]" />
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Rating row — shown after last AI message finishes */}
+            {!loading && conversationId && messages.some((m) => m.role === "assistant") && (
+              <div className="flex items-center gap-2 px-1 pb-1">
+                <Heart className="h-3 w-3 text-zinc-600" />
+                <span className="text-[11px] text-zinc-600">¿Fue útil esta sesión?</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSessionRating(1);
+                    onRateSession?.(1);
+                  }}
+                  className={`rounded-lg p-1.5 transition ${
+                    sessionRating === 1
+                      ? "bg-emerald-500/20 text-emerald-400"
+                      : "text-zinc-600 hover:bg-zinc-800 hover:text-emerald-400"
+                  }`}
+                  title="Útil"
+                >
+                  <ThumbsUp className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSessionRating(-1);
+                    onRateSession?.(-1);
+                  }}
+                  className={`rounded-lg p-1.5 transition ${
+                    sessionRating === -1
+                      ? "bg-red-500/20 text-red-400"
+                      : "text-zinc-600 hover:bg-zinc-800 hover:text-red-400"
+                  }`}
+                  title="No fue útil"
+                >
+                  <ThumbsDown className="h-3.5 w-3.5" />
+                </button>
+                {sessionRating !== null && (
+                  <span className="text-[11px] text-zinc-500">Gracias por tu feedback.</span>
+                )}
               </div>
             )}
 
@@ -458,9 +594,35 @@ export default function Chat({
           </Button>
         </div>
         <div className="mt-1.5 flex items-center justify-between px-1">
-          <p className="text-[10px] text-zinc-700">
-            Shift + Enter para nueva línea
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-[10px] text-zinc-700">Shift + Enter para nueva línea</p>
+            <button
+              type="button"
+              onClick={() => setUrgentMode((v) => !v)}
+              className={`flex items-center gap-1 rounded-lg px-1.5 py-0.5 text-[10px] transition ${
+                urgentMode ? "bg-red-500/20 text-red-400" : "text-zinc-600 hover:text-red-400"
+              }`}
+              title="Modo crisis"
+            >
+              <Zap className="h-3 w-3" />
+              Crisis
+            </button>
+            {onToggleJournal && (
+              <button
+                type="button"
+                onClick={onToggleJournal}
+                className={`flex items-center gap-1 rounded-lg px-1.5 py-0.5 text-[10px] transition ${
+                  journalMode
+                    ? "bg-indigo-500/20 text-indigo-400"
+                    : "text-zinc-600 hover:text-indigo-400"
+                }`}
+                title="Modo diario"
+              >
+                <BookOpen className="h-3 w-3" />
+                Diario
+              </button>
+            )}
+          </div>
           {input.length > 0 && (
             <p className={`text-[10px] ${input.length > 900 ? "text-amber-500" : "text-zinc-700"}`}>
               {input.length}/1000

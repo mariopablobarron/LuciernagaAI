@@ -15,20 +15,14 @@ interface ChatModalProps {
   onStateChange: (state: EmotionalStateType) => void;
 }
 
-export default function ChatModal({
-  node,
-  emotionalState,
-  onClose,
-  onComplete,
-}: ChatModalProps) {
+export default function ChatModal({ node, emotionalState, onClose, onComplete }: ChatModalProps) {
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible] = useState(true);
 
   useEffect(() => {
-    setIsVisible(true);
     textareaRef.current?.focus();
   }, []);
 
@@ -83,19 +77,19 @@ export default function ChatModal({
         }`}
       >
         <div
-            className={`rounded-3xl border border-white/10 bg-gradient-to-br ${emotionBg[emotionalState]} p-8 shadow-2xl backdrop-blur`}
-          >
-            {/* Header con icono y título */}
-            <div className="mb-8 flex items-start justify-between gap-4">
-              <div className="flex items-center gap-4 flex-1">
-                <div className="text-5xl drop-shadow-lg">{node.icon}</div>
-                <div className="flex-1 min-w-0">
-                  <h3 className={`font-black text-lg leading-tight ${emotionAccent[emotionalState]}`}>
-                    {node.title}
-                  </h3>
-                  <p className="text-sm text-white/50 mt-2 font-medium">{node.description}</p>
-                </div>
+          className={`rounded-3xl border border-white/10 bg-gradient-to-br ${emotionBg[emotionalState]} p-8 shadow-2xl backdrop-blur`}
+        >
+          {/* Header con icono y título */}
+          <div className="mb-8 flex items-start justify-between gap-4">
+            <div className="flex items-center gap-4 flex-1">
+              <div className="text-5xl drop-shadow-lg">{node.icon}</div>
+              <div className="flex-1 min-w-0">
+                <h3 className={`font-black text-lg leading-tight ${emotionAccent[emotionalState]}`}>
+                  {node.title}
+                </h3>
+                <p className="text-sm text-white/50 mt-2 font-medium">{node.description}</p>
               </div>
+            </div>
 
             {/* Close button */}
             <button
@@ -110,7 +104,9 @@ export default function ChatModal({
           {!submitted ? (
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Prompt dinamático */}
-              <div className={`text-sm font-medium ${emotionAccent[emotionalState]} bg-white/5 rounded-xl p-4 backdrop-blur-sm border border-white/10`}>
+              <div
+                className={`text-sm font-medium ${emotionAccent[emotionalState]} bg-white/5 rounded-xl p-4 backdrop-blur-sm border border-white/10`}
+              >
                 {node.id === "avoid"
                   ? "¿Qué específicamente estás evitando?"
                   : node.id === "next"
@@ -156,9 +152,7 @@ export default function ChatModal({
             <div className="space-y-4 text-center py-6">
               <div className="text-4xl">{node.icon}</div>
               <h4 className="text-lg font-semibold text-white">¡Listo!</h4>
-              <p className="text-sm text-white/70">
-                Tu respuesta ha sido guardada. Continuemos.
-              </p>
+              <p className="text-sm text-white/70">Tu respuesta ha sido guardada. Continuemos.</p>
               <div className="h-1 w-12 mx-auto rounded-full bg-gradient-to-r from-emotion-clarity to-emotion-doubt opacity-60" />
             </div>
           )}

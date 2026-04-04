@@ -12,6 +12,19 @@ import { SAAS_CONFIG } from "@/lib/saas";
 
 type AdminInsightsPartial = Partial<AdminInsightsResponse> | null;
 
+type RetentionMilestone = 1 | 3 | 7 | 14 | 30;
+type CohortRow = {
+  week: string;
+  totalUsers: number;
+  retention: Record<RetentionMilestone, { count: number; rate: number | null }>;
+};
+type RetentionData = {
+  cohorts: CohortRow[];
+  overall: Record<RetentionMilestone, number | null>;
+  totalUsers: number;
+  milestones: RetentionMilestone[];
+};
+
 function formatPercent(value: number): string {
   return `${(value * 100).toFixed(1)}%`;
 }
@@ -85,6 +98,14 @@ export default function AdminPage() {
   const [data, setData] = useState<AdminInsightsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [degraded, setDegraded] = useState<string | null>(null);
+  const [retention, setRetention] = useState<RetentionData | null>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/retention")
+      .then((r) => r.json())
+      .then((d: RetentionData) => setRetention(d))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetch("/api/admin/insights")
@@ -220,6 +241,93 @@ export default function AdminPage() {
             Accion sugerida: {data.decision.action}
           </p>
         </div>
+      </AdminPanel>
+
+      {/* Cohort Retention Table */}
+      <AdminPanel
+        id="retention"
+        title="Retención por cohorte (real)"
+        description="Para cada semana de alta: % de usuarios que volvieron al día 1, 3, 7, 14 y 30. Fuente: mensajes reales del usuario."
+      >
+        {!retention ? (
+          <p className="text-sm text-muted-foreground">Cargando retención...</p>
+        ) : retention.cohorts.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Sin datos todavía. Esperando primeros usuarios.</p>
+        ) : (
+          <>
+            {/* Overall row */}
+            <div className="grid grid-cols-6 gap-2 mb-4">
+              {([1, 3, 7, 14, 30] as RetentionMilestone[]).map((m) => {
+                const rate = retention.overall[m];
+                const pct = rate !== null ? Math.round(rate * 100) : null;
+                const color =
+                  pct === null ? "text-muted-foreground" :
+                  pct >= 50 ? "text-emerald-400" :
+                  pct >= 25 ? "text-amber-400" : "text-rose-400";
+                return (
+                  <div key={m} className="rounded-xl border border-border bg-muted/40 p-3 text-center">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">D{m}</p>
+                    <p className={`mt-1 text-lg font-bold ${color}`}>
+                      {pct !== null ? `${pct}%` : "—"}
+                    </p>
+                  </div>
+                );
+              })}
+              <div className="rounded-xl border border-border bg-muted/40 p-3 text-center">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Total</p>
+                <p className="mt-1 text-lg font-bold text-foreground">{retention.totalUsers}</p>
+              </div>
+            </div>
+
+            {/* Cohort table */}
+            <div className="overflow-x-auto rounded-xl border border-border">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border bg-muted/30">
+                    <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Semana</th>
+                    <th className="px-3 py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Altas</th>
+                    {([1, 3, 7, 14, 30] as RetentionMilestone[]).map((m) => (
+                      <th key={m} className="px-3 py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">D{m}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {retention.cohorts.map((cohort, i) => (
+                    <tr key={cohort.week} className={`border-b border-border ${i % 2 === 0 ? "bg-background" : "bg-muted/20"}`}>
+                      <td className="px-3 py-2 font-mono text-xs text-muted-foreground">{cohort.week}</td>
+                      <td className="px-3 py-2 text-center font-semibold text-foreground">{cohort.totalUsers}</td>
+                      {([1, 3, 7, 14, 30] as RetentionMilestone[]).map((m) => {
+                        const cell = cohort.retention[m];
+                        const pct = cell.rate !== null ? Math.round(cell.rate * 100) : null;
+                        const color =
+                          pct === null ? "text-muted-foreground" :
+                          pct >= 50 ? "text-emerald-400" :
+                          pct >= 25 ? "text-amber-400" : "text-rose-400";
+                        const bg =
+                          pct === null ? "" :
+                          pct >= 50 ? "bg-emerald-500/8" :
+                          pct >= 25 ? "bg-amber-500/8" : "bg-rose-500/8";
+                        return (
+                          <td key={m} className={`px-3 py-2 text-center ${bg}`}>
+                            <span className={`font-semibold ${color}`}>
+                              {pct !== null ? `${pct}%` : "—"}
+                            </span>
+                            {cell.count > 0 && (
+                              <span className="ml-1 text-[10px] text-muted-foreground">({cell.count})</span>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              — = aún no ha pasado suficiente tiempo para medir ese milestone en esta cohorte.
+            </p>
+          </>
+        )}
       </AdminPanel>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.35fr_0.95fr]">

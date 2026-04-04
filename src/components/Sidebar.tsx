@@ -12,6 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import FamilySettings from "@/components/FamilySettings";
+import SidebarRetoWidget from "@/components/SidebarRetoWidget";
 
 export type SidebarConversation = {
   id: string;
@@ -245,6 +246,8 @@ export default function Sidebar({
           </div>
           <ArrowRight className="ml-3 size-4 shrink-0 text-muted-foreground" />
         </Link>
+
+        <SidebarRetoWidget />
       </div>
 
       <Separator className="my-4" />

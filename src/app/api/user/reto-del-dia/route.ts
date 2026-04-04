@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { type NextRequest, NextResponse } from "next/server";
 import {
   attachSessionCookie,
@@ -7,6 +8,7 @@ import {
 } from "@/lib/auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
+import { generatePersonalizedChallenge } from "@/services/personalized-challenge";
 
 function isToday(date: Date): boolean {
   const now = new Date();
@@ -107,6 +109,14 @@ export async function PATCH(req: NextRequest) {
       });
     }
 
+    // When a challenge is completed, schedule generation of the next one
+    if (isCompleted) {
+      const nextUserId = identity.userId;
+      after(async () => {
+        await generatePersonalizedChallenge(nextUserId).catch(() => undefined);
+      });
+    }
+
     const response = NextResponse.json({
       ok: true,
       reto: serialize(updated),
@@ -121,6 +131,52 @@ export async function PATCH(req: NextRequest) {
       return res;
     }
     logError("RETO", error, { action: "checkin_reto_del_dia" });
+    return NextResponse.json({ ok: false }, { status: 500 });
+  }
+}
+
+// POST — generate a personalized challenge from conversation history
+export async function POST(req: NextRequest) {
+  try {
+    const identity = await resolveIdentity(req);
+    const prisma = getPrismaClient();
+
+    // Check if already has active challenge
+    const existing = await prisma.userChallenge.findFirst({
+      where: { userId: identity.userId, status: "active" },
+      include: { challenge: true },
+    });
+    if (existing) {
+      const response = NextResponse.json({ ok: true, reto: serialize(existing), alreadyActive: true });
+      if (identity.shouldSetCookie) attachSessionCookie(response, identity.sessionToken);
+      return response;
+    }
+
+    const generated = await generatePersonalizedChallenge(identity.userId);
+
+    if (!generated) {
+      return NextResponse.json(
+        { ok: false, error: "No hay suficiente contexto para generar un reto personalizado." },
+        { status: 422 }
+      );
+    }
+
+    const uc = await prisma.userChallenge.findFirst({
+      where: { userId: identity.userId, status: "active" },
+      include: { challenge: true },
+      orderBy: { startedAt: "desc" },
+    });
+
+    const response = NextResponse.json({ ok: true, reto: uc ? serialize(uc) : null });
+    if (identity.shouldSetCookie) attachSessionCookie(response, identity.sessionToken);
+    return response;
+  } catch (error) {
+    if (error instanceof InvalidSessionTokenError) {
+      const res = NextResponse.json({ ok: false }, { status: 401 });
+      clearSessionCookie(res);
+      return res;
+    }
+    logError("RETO", error, { action: "generate_personalized_challenge" });
     return NextResponse.json({ ok: false }, { status: 500 });
   }
 }

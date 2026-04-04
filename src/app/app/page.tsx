@@ -310,6 +310,7 @@ function mergeConversations(
 
 export default function HomePage() {
   const starterPrefilledConversationsRef = useRef<Set<string>>(new Set());
+  const pendingWaitlistMessageRef = useRef<string | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [input, setInput] = useState("");
@@ -719,12 +720,40 @@ export default function HomePage() {
         await bootstrapSession();
         bootstrapOk = true;
 
+        // ── Waitlist onboarding: read missions saved by /unirse ────────────────
+        if (typeof window !== "undefined") {
+          const wlEmail = localStorage.getItem("luc_waitlist_email");
+          const wlContext = localStorage.getItem("luc_waitlist_context");
+          if (wlEmail && wlContext) {
+            try {
+              const ctx = JSON.parse(wlContext) as { m1: string; m2: string; m3: string };
+              pendingWaitlistMessageRef.current = [
+                `Mi situación: ${ctx.m1}.`,
+                `He intentado antes: ${ctx.m2}.`,
+                `Si en 30 días nada cambia: ${ctx.m3}.`,
+                "Quiero empezar.",
+              ].join(" ");
+              localStorage.removeItem("luc_waitlist_context");
+              localStorage.removeItem("luc_waitlist_email");
+              void captureBrowserEmail({ email: wlEmail }).catch(() => undefined);
+            } catch {
+              // malformed storage — ignore
+            }
+          }
+        }
+
         const nextActive = await refreshConversations();
         if (!cancelled && nextActive) {
           await loadMessages(nextActive);
         }
         if (!cancelled) {
           await refreshActiveGoal();
+        }
+        // ── Send first message with waitlist context ───────────────────────────
+        if (!cancelled && pendingWaitlistMessageRef.current) {
+          const msg = pendingWaitlistMessageRef.current;
+          pendingWaitlistMessageRef.current = null;
+          setTimeout(() => void handleSend(msg), 400);
         }
         if (!cancelled) {
           fetch("/api/user/state")

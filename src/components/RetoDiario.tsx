@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle2, XCircle, Flame, ChevronRight } from "lucide-react";
+import { CheckCircle2, XCircle, Flame, ChevronRight, Sparkles } from "lucide-react";
 
 type RetoData = {
   id: string;
@@ -37,6 +37,8 @@ type Props = {
 export default function RetoDiario({ userId, onFailed, onCompleted }: Props) {
   const [reto, setReto] = useState<RetoData | null>(null);
   const [loading, setLoading] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [noReto, setNoReto] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [justActed, setJustActed] = useState<"done" | "skip" | null>(null);
 
@@ -45,10 +47,36 @@ export default function RetoDiario({ userId, onFailed, onCompleted }: Props) {
     fetch("/api/user/reto-del-dia", { credentials: "include" })
       .then((r) => r.json())
       .then((d: { ok: boolean; reto?: RetoData }) => {
-        if (d.ok && d.reto && d.reto.status === "active") setReto(d.reto);
+        if (d.ok && d.reto && d.reto.status === "active") {
+          setReto(d.reto);
+        } else if (d.ok) {
+          setNoReto(true);
+        }
       })
       .catch(() => {});
   }, [userId]);
+
+  async function generateReto() {
+    if (generating) return;
+    setGenerating(true);
+    setNoReto(false);
+    try {
+      const res = await fetch("/api/user/reto-del-dia", {
+        method: "POST",
+        credentials: "include",
+      });
+      const data = (await res.json()) as { ok: boolean; reto?: RetoData; error?: string };
+      if (data.ok && data.reto) {
+        setReto(data.reto);
+      } else {
+        setNoReto(true);
+      }
+    } catch {
+      setNoReto(true);
+    } finally {
+      setGenerating(false);
+    }
+  }
 
   async function checkin(done: boolean) {
     if (!reto || loading) return;
@@ -69,14 +97,59 @@ export default function RetoDiario({ userId, onFailed, onCompleted }: Props) {
         setReto(data.reto);
         setJustActed(done ? "done" : "skip");
         if (!done) onFailed?.(reto.title);
-        if (data.justCompleted) onCompleted?.();
+        if (data.justCompleted) {
+          onCompleted?.();
+          // Backend auto-generates next challenge; show generating state after brief delay
+          setTimeout(() => {
+            setReto(null);
+            setGenerating(true);
+            fetch("/api/user/reto-del-dia", { credentials: "include" })
+              .then((r) => r.json())
+              .then((d: { ok: boolean; reto?: RetoData }) => {
+                if (d.ok && d.reto?.status === "active") setReto(d.reto);
+                else setNoReto(true);
+              })
+              .catch(() => setNoReto(true))
+              .finally(() => setGenerating(false));
+          }, 3000);
+        }
       }
     } finally {
       setLoading(false);
     }
   }
 
-  if (!reto) return null;
+  if (!reto && !noReto && !generating) return null;
+
+  // ── No active challenge: generate prompt ─────────────────────────────────────
+  if (!reto) {
+    return (
+      <div className="mx-3 mt-3 overflow-hidden rounded-2xl border border-violet-500/15 bg-violet-950/10 px-4 py-3">
+        {generating ? (
+          <div className="flex items-center gap-2 text-sm text-violet-400">
+            <Sparkles className="h-4 w-4 animate-pulse" />
+            Generando tu reto personalizado...
+          </div>
+        ) : (
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold text-violet-400">Sin reto activo</p>
+              <p className="mt-0.5 text-xs text-zinc-500">
+                Analizo tu historial y creo un reto a tu medida.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => void generateReto()}
+              className="shrink-0 flex items-center gap-1.5 rounded-xl border border-violet-500/30 bg-violet-500/10 px-3 py-1.5 text-xs font-semibold text-violet-300 transition hover:bg-violet-500/20"
+            >
+              <Sparkles className="h-3.5 w-3.5" /> Generar
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   const emoji = TYPE_EMOJI[reto.type] ?? "🎯";
   const alreadyDone = reto.checkedInToday && reto.todayDone;

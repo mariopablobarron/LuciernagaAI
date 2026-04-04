@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { NextRequest, NextResponse } from "next/server";
 import { logError, logInfo } from "@/lib/logger";
 import { generateAIResponse } from "@/services/ai";
@@ -227,12 +228,69 @@ async function buildTasksMessage(): Promise<string> {
   return `📋 *Tareas pendientes* (${tasks.length})\n\n${lines.join("\n")}\n\nEjecuta con: npm run tg-tasks`;
 }
 
-async function queueAdminTask(instruction: string): Promise<string> {
+async function callAdminAI(question: string): Promise<string> {
+  const apiKey = process.env.OPENROUTER_API_KEY?.trim();
+  if (!apiKey) return "❌ OPENROUTER_API_KEY no configurada.";
+
   const prisma = getPrismaClient();
-  const task = await prisma.adminTask.create({
-    data: { instruction },
-  });
-  return task.id;
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const [totalUsers, activeToday, messagesTotal, activeStreaks, waitlist] = await Promise.all([
+    prisma.user.count(),
+    prisma.user.count({ where: { lastSeen: { gte: startOfDay } } }),
+    prisma.message.count({ where: { createdAt: { gte: startOfDay } } }),
+    prisma.streak.count({ where: { status: "active" } }),
+    prisma.waitlistEntry.count({ where: { status: "approved" } }),
+  ]);
+
+  const systemPrompt = [
+    "Eres el asistente de administración de Luciérnaga AI, una plataforma de coaching emocional e inteligencia artificial.",
+    "",
+    "Contexto actual del sistema:",
+    `- Usuarios totales: ${totalUsers}`,
+    `- Activos hoy: ${activeToday}`,
+    `- Mensajes hoy: ${messagesTotal}`,
+    `- Rachas activas: ${activeStreaks}`,
+    `- Waitlist aprobados: ${waitlist}`,
+    "",
+    "Puedes responder preguntas sobre métricas, estrategia, código, features, bugs, o cualquier cosa relacionada con el producto.",
+    "Sé directo, conciso y práctico. Responde en español. Usa emojis con moderación.",
+    "Máximo 400 palabras.",
+  ].join("\n");
+
+  try {
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": process.env.APP_BASE_URL ?? "https://luciernaga.ai",
+      },
+      body: JSON.stringify({
+        model: "anthropic/claude-sonnet-4-5",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: question },
+        ],
+        max_tokens: 600,
+        temperature: 0.4,
+      }),
+      signal: AbortSignal.timeout(25_000),
+    });
+
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      logError("TELEGRAM", new Error(`Admin AI HTTP ${res.status}`), { body: body.slice(0, 200) });
+      return `❌ Error de IA (${res.status}). Intenta de nuevo.`;
+    }
+
+    const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+    return data.choices?.[0]?.message?.content?.trim() ?? "Sin respuesta.";
+  } catch (err: unknown) {
+    logError("TELEGRAM", err, { area: "callAdminAI" });
+    return "❌ Timeout o error llamando a la IA.";
+  }
 }
 
 async function buildEstadoAdminMessage(): Promise<string> {
@@ -411,9 +469,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             "/crisis — usuarios en crisis activa",
             "/retencion — métricas de retención",
             "/estado — distribución emocional",
-            "/tareas — tareas pendientes de Telegram",
+            "/tareas — tareas pendientes antiguas",
             "",
-            "Cualquier otro mensaje se guarda como tarea para ejecutar con: npm run tg-tasks",
+            "💬 Cualquier mensaje libre → respuesta IA directa en segundos.",
           ].join("\n");
         } else {
           reply = "Comando no reconocido.";
@@ -426,18 +484,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ ok: true });
     }
 
-    // ---- Admin free-form message → task queue ----
+    // ---- Admin free-form message → direct AI response ----
     if (isAdmin(chatId)) {
-      try {
-        const taskId = await queueAdminTask(text);
-        await sendTelegramMessage(
-          chatId,
-          `✅ Tarea anotada \`[${taskId.slice(-6)}]\`\n\nEjecuta con: \`npm run tg-tasks\`\n\nO revisa con /tareas`
-        );
-      } catch (err: unknown) {
-        logError("TELEGRAM", err, { area: "admin_task_queue", text });
-        await sendTelegramMessage(chatId, "No pude guardar la tarea.");
-      }
+      await sendTelegramMessage(chatId, "⏳ Pensando...");
+      const adminChatId = chatId;
+      const adminText = text;
+      after(async () => {
+        const reply = await callAdminAI(adminText);
+        await sendTelegramMessage(adminChatId, reply);
+      });
       return NextResponse.json({ ok: true });
     }
 

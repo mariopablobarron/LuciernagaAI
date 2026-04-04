@@ -88,7 +88,12 @@ function UnirseContent() {
       });
 
       if (!res.ok) throw new Error("Error al enviar");
-      localStorage.setItem("luc_waitlist_email", email.toLowerCase().trim());
+      const lEmail = email.toLowerCase().trim();
+      localStorage.setItem("luc_waitlist_email", lEmail);
+      localStorage.setItem(
+        "luc_waitlist_context",
+        JSON.stringify({ m1: finalAnswers[0], m2: finalAnswers[1], m3: finalAnswers[2] })
+      );
       setStep("done");
     } catch {
       setError("Algo falló. Inténtalo de nuevo.");

@@ -2,7 +2,20 @@
 
 import { useEffect, useRef, useState } from "react";
 import { use } from "react";
-import { Heart, MessageCircle, Bell, TrendingUp, Target, Flame, Trophy, Send, Loader2, CheckCircle, AlertTriangle, RefreshCw } from "lucide-react";
+import {
+  Heart,
+  MessageCircle,
+  Bell,
+  TrendingUp,
+  Target,
+  Flame,
+  Trophy,
+  Send,
+  Loader2,
+  CheckCircle,
+  AlertTriangle,
+  RefreshCw,
+} from "lucide-react";
 
 type DashboardData = {
   userName: string;
@@ -22,17 +35,17 @@ type DashboardData = {
 };
 
 const STATE_LABELS: Record<string, { label: string; color: string }> = {
-  neutral:  { label: "Estable",    color: "bg-zinc-400" },
+  neutral: { label: "Estable", color: "bg-zinc-400" },
   claridad: { label: "Con claridad", color: "bg-emerald-500" },
-  duda:     { label: "Con dudas",  color: "bg-yellow-400" },
-  ansiedad: { label: "Ansioso/a",  color: "bg-orange-400" },
-  bloqueo:  { label: "Bloqueado/a", color: "bg-red-400" },
+  duda: { label: "Con dudas", color: "bg-yellow-400" },
+  ansiedad: { label: "Ansioso/a", color: "bg-orange-400" },
+  bloqueo: { label: "Bloqueado/a", color: "bg-red-400" },
 };
 
 const TREND_ICON: Record<string, string> = {
   mejor: "↑",
   igual: "→",
-  peor:  "↓",
+  peor: "↓",
 };
 
 function timeAgo(iso: string): string {
@@ -113,22 +126,22 @@ export default function FamilyPortal({ params }: { params: Promise<{ token: stri
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#0e0e10] px-6 text-center">
         <AlertTriangle className="h-10 w-10 text-amber-400" />
         <h1 className="text-lg font-semibold text-white">Enlace inválido</h1>
-        <p className="text-sm text-zinc-400">{error ?? "Este portal no existe o el enlace ha caducado."}</p>
+        <p className="text-sm text-zinc-400">
+          {error ?? "Este portal no existe o el enlace ha caducado."}
+        </p>
       </div>
     );
   }
 
   const stateInfo = STATE_LABELS[data.progress?.state ?? "neutral"] ?? STATE_LABELS.neutral;
   const trend = data.progress?.progressTrend ?? "igual";
-  const goalProgress =
-    data.progress?.goal
-      ? Math.round((data.progress.goal.completed / Math.max(data.progress.goal.total, 1)) * 100)
-      : null;
+  const goalProgress = data.progress?.goal
+    ? Math.round((data.progress.goal.completed / Math.max(data.progress.goal.total, 1)) * 100)
+    : null;
 
   return (
     <div className="min-h-screen bg-[#0e0e10] px-4 py-8 text-zinc-100">
       <div className="mx-auto max-w-lg space-y-6">
-
         {/* Header */}
         <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
           <div className="flex items-start justify-between gap-3">
@@ -205,7 +218,9 @@ export default function FamilyPortal({ params }: { params: Promise<{ token: stri
             <p className="text-sm font-medium text-white">{data.progress.goal.title}</p>
             <div className="mt-3">
               <div className="mb-1 flex justify-between text-xs text-zinc-500">
-                <span>{data.progress.goal.completed} / {data.progress.goal.total} acciones</span>
+                <span>
+                  {data.progress.goal.completed} / {data.progress.goal.total} acciones
+                </span>
                 <span>{goalProgress}%</span>
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-zinc-800">
@@ -238,12 +253,17 @@ export default function FamilyPortal({ params }: { params: Promise<{ token: stri
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
             <div className="mb-3 flex items-center gap-2">
               <Trophy className="h-4 w-4 text-yellow-400" />
-              <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Victorias compartidas</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
+                Victorias compartidas
+              </p>
             </div>
             <div className="space-y-2">
               {data.wins.map((w, i) => (
-                <div key={i} className="rounded-xl border border-zinc-800 bg-zinc-950/60 px-3 py-2.5">
-                  <p className="text-sm text-zinc-200">"{w.note}"</p>
+                <div
+                  key={i}
+                  className="rounded-xl border border-zinc-800 bg-zinc-950/60 px-3 py-2.5"
+                >
+                  <p className="text-sm text-zinc-200">&quot;{w.note}&quot;</p>
                   <p className="mt-1 text-[11px] text-zinc-600">{timeAgo(w.date)}</p>
                 </div>
               ))}
@@ -284,7 +304,11 @@ export default function FamilyPortal({ params }: { params: Promise<{ token: stri
                   onClick={() => void sendMessage()}
                   className="flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2 text-sm font-semibold text-black transition hover:bg-amber-400 disabled:opacity-40"
                 >
-                  {sending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                  {sending ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Send className="h-3.5 w-3.5" />
+                  )}
                   Enviar
                 </button>
               </div>
@@ -311,7 +335,8 @@ export default function FamilyPortal({ params }: { params: Promise<{ token: stri
             </p>
           </div>
           <p className="mb-4 text-sm text-zinc-400">
-            Manda un ping discreto. {data.userName} recibirá una notificación y puede responderte desde la app.
+            Manda un ping discreto. {data.userName} recibirá una notificación y puede responderte
+            desde la app.
           </p>
           {pinged ? (
             <div className="flex items-center gap-2 rounded-xl bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
@@ -326,7 +351,11 @@ export default function FamilyPortal({ params }: { params: Promise<{ token: stri
                 onClick={() => void sendPing()}
                 className="flex items-center gap-2 rounded-xl border border-zinc-700 px-4 py-2.5 text-sm font-medium text-zinc-300 transition hover:border-zinc-500 hover:text-white disabled:opacity-40"
               >
-                {pinging ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Bell className="h-3.5 w-3.5" />}
+                {pinging ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Bell className="h-3.5 w-3.5" />
+                )}
                 Enviar ping silencioso
               </button>
               {pingError && <p className="mt-2 text-xs text-red-400">{pingError}</p>}
@@ -335,8 +364,8 @@ export default function FamilyPortal({ params }: { params: Promise<{ token: stri
         </div>
 
         <p className="pb-4 text-center text-[11px] text-zinc-700">
-          Este portal solo muestra lo que {data.userName} ha elegido compartir contigo.
-          Las conversaciones siempre son privadas.
+          Este portal solo muestra lo que {data.userName} ha elegido compartir contigo. Las
+          conversaciones siempre son privadas.
         </p>
       </div>
     </div>

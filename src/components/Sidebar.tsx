@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import FamilySettings from "@/components/FamilySettings";
 
 export type SidebarConversation = {
   id: string;
@@ -488,6 +489,10 @@ export default function Sidebar({
           </div>
         </div>
       </div>
+
+      <Separator className="my-4" />
+
+      <FamilySettings />
 
       <Separator className="my-4" />
 

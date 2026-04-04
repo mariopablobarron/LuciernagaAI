@@ -1,14 +1,15 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { TYPOGRAPHY, COMPONENTS, GRADIENTS } from '@/styles/design-system';
+import { useState } from "react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { TYPOGRAPHY, COMPONENTS, GRADIENTS } from "@/styles/design-system";
 
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
-  const token = searchParams.get('token');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const token = searchParams.get("token");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -20,7 +21,9 @@ export default function ResetPasswordPage() {
 
   if (!token) {
     return (
-      <div className={`min-h-screen bg-gradient-to-br ${GRADIENTS.background} flex items-center justify-center px-4`}>
+      <div
+        className={`min-h-screen bg-gradient-to-br ${GRADIENTS.background} flex items-center justify-center px-4`}
+      >
         <div className={`${COMPONENTS.card} p-8 text-center max-w-md`}>
           <h1 className={`${TYPOGRAPHY.h1} text-white mb-4`}>Link inválido</h1>
           <p className="text-zinc-400">Este link de reseteo no es válido o ha expirado.</p>
@@ -30,7 +33,9 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${GRADIENTS.background} flex items-center justify-center px-4 py-12`}>
+    <div
+      className={`min-h-screen bg-gradient-to-br ${GRADIENTS.background} flex items-center justify-center px-4 py-12`}
+    >
       <div className="w-full max-w-md space-y-8">
         {!submitted ? (
           <>
@@ -99,12 +104,9 @@ export default function ResetPasswordPage() {
             </div>
 
             {/* CTA */}
-            <a
-              href="/login"
-              className={`${COMPONENTS.buttonPrimary} block w-full text-center`}
-            >
+            <Link href="/login" className={`${COMPONENTS.buttonPrimary} block w-full text-center`}>
               Inicia sesión con tu nueva contraseña
-            </a>
+            </Link>
           </>
         )}
       </div>

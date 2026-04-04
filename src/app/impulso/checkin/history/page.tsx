@@ -1,42 +1,42 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { ArrowLeft, Calendar, TrendingUp } from 'lucide-react';
-import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
+import Link from "next/link";
+import { ArrowLeft, Calendar, TrendingUp } from "lucide-react";
+import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from "@/styles/design-system";
 
 export default function CheckinHistoryPage() {
   const checkins = [
     {
-      date: 'Hoy',
-      state: 'clarity',
+      date: "Hoy",
+      state: "clarity",
       energy: 4,
-      note: 'Tuve una buena sesión de trabajo enfocado. Completé el objetivo del día sin distracciones.',
+      note: "Tuve una buena sesión de trabajo enfocado. Completé el objetivo del día sin distracciones.",
     },
     {
-      date: 'Ayer',
-      state: 'anxious',
+      date: "Ayer",
+      state: "anxious",
       energy: 3,
-      note: 'Me sentía con mucha energía dispersa pero conseguí canalizar en una tarea. Mejor que antes.',
+      note: "Me sentía con mucha energía dispersa pero conseguí canalizar en una tarea. Mejor que antes.",
     },
     {
-      date: 'Hace 2 días',
-      state: 'doubt',
+      date: "Hace 2 días",
+      state: "doubt",
       energy: 2,
-      note: 'Día de incertidumbre. No sabía qué priorizar pero hice una lista y eso ayudó.',
+      note: "Día de incertidumbre. No sabía qué priorizar pero hice una lista y eso ayudó.",
     },
     {
-      date: 'Hace 3 días',
-      state: 'clarity',
+      date: "Hace 3 días",
+      state: "clarity",
       energy: 5,
-      note: 'Excelente día. Energía alta y dirección clara. Completé múltiples tareas.',
+      note: "Excelente día. Energía alta y dirección clara. Completé múltiples tareas.",
     },
   ];
 
   const stateLabels = {
-    clarity: { label: 'Claro', color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
-    anxious: { label: 'Ansioso', color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
-    doubt: { label: 'Dudoso', color: 'text-violet-400', bg: 'bg-violet-500/10' },
-    blocked: { label: 'Bloqueado', color: 'text-red-400', bg: 'bg-red-500/10' },
+    clarity: { label: "Claro", color: "text-cyan-400", bg: "bg-cyan-500/10" },
+    anxious: { label: "Ansioso", color: "text-yellow-400", bg: "bg-yellow-500/10" },
+    doubt: { label: "Dudoso", color: "text-violet-400", bg: "bg-violet-500/10" },
+    blocked: { label: "Bloqueado", color: "text-red-400", bg: "bg-red-500/10" },
   };
 
   return (
@@ -44,7 +44,10 @@ export default function CheckinHistoryPage() {
       <div className={`${LAYOUTS.sectionInner} max-w-3xl space-y-8`}>
         {/* Header */}
         <div className="flex items-center gap-4">
-          <Link href="/impulso/checkin" className="text-zinc-400 hover:text-cyan-400 transition-colors">
+          <Link
+            href="/impulso/checkin"
+            className="text-zinc-400 hover:text-cyan-400 transition-colors"
+          >
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <h1 className={`${TYPOGRAPHY.h1} text-white`}>Historial de check-ins</h1>
@@ -79,19 +82,23 @@ export default function CheckinHistoryPage() {
                       {checkin.date}
                     </p>
                     <div className="flex items-center gap-3 mt-2">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${stateInfo.bg} ${stateInfo.color}`}>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-semibold ${stateInfo.bg} ${stateInfo.color}`}
+                      >
                         {stateInfo.label}
                       </span>
                       <span className="text-xs text-zinc-500">
                         Energía: {checkin.energy}/5
-                        {checkin.energy >= 4 && <TrendingUp className="w-3 h-3 inline ml-1 text-cyan-400" />}
+                        {checkin.energy >= 4 && (
+                          <TrendingUp className="w-3 h-3 inline ml-1 text-cyan-400" />
+                        )}
                       </span>
                     </div>
                   </div>
                 </div>
 
                 <p className="text-sm text-zinc-300 italic border-t border-zinc-800 pt-3">
-                  "{checkin.note}"
+                  &quot;{checkin.note}&quot;
                 </p>
               </div>
             );

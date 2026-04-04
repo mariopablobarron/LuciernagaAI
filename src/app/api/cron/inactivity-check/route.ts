@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const result = await checkInactiveUsers();
-    logInfo("CRON", "inactivity_check_done", result);
+    logInfo("CRON", "inactivity_check_done", result as unknown as Record<string, unknown>);
     return NextResponse.json({ ok: true, ...result });
   } catch (error) {
     logError("CRON", error, { action: "inactivity_check_failed" });

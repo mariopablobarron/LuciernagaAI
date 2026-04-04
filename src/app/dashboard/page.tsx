@@ -1,258 +1,146 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-
-type Action = {
-  id: string;
-  description: string;
-  completed: boolean;
-};
-
-type Goal = {
-  id: string;
-  title: string;
-  status: string;
-  progress: number;
-  completedCount: number;
-  totalCount: number;
-  actions: Action[];
-};
-
-type EmotionalProfile = {
-  primaryEmotion: string;
-  dominantPattern: string;
-  energyLevel: string;
-};
-
-type ImpulseInsight = {
-  type: string;
-  message: string;
-  severity: string;
-};
-
-type DashboardData = {
-  goal: Goal | null;
-  emotionalProfile: EmotionalProfile | null;
-  conversationCount: number;
-  insights: ImpulseInsight[];
-};
-
-function EmotionBadge({ label }: { label: string }) {
-  return (
-    <Badge variant="secondary" className="rounded-full px-3 py-1 capitalize">
-      {label}
-    </Badge>
-  );
-}
+import { MetricCard } from '@/components/shared/MetricCard';
+import { StateCard } from '@/components/shared/StateCard';
+import Link from 'next/link';
+import { Plus, Flame } from 'lucide-react';
 
 export default function DashboardPage() {
-  const [data, setData] = useState<DashboardData>({
-    goal: null,
-    emotionalProfile: null,
-    conversationCount: 0,
-    insights: [],
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const [goalsRes, conversationsRes, insightsRes] = await Promise.all([
-          fetch("/api/goals", { credentials: "include" }),
-          fetch("/api/conversations", { credentials: "include" }),
-          fetch("/api/insights", { credentials: "include" }),
-        ]);
-
-        if (goalsRes.status === 401 || conversationsRes.status === 401) {
-          setError("Sesión expirada. Recarga la página para continuar.");
-          return;
-        }
-
-        const goalsPayload = (await goalsRes.json().catch(() => ({}))) as {
-          goal?: Goal | null;
-        };
-        const conversationsPayload = (await conversationsRes.json().catch(() => ({}))) as {
-          conversations?: unknown[];
-          emotionalProfile?: EmotionalProfile | null;
-        };
-        const insightsPayload = (await insightsRes.json().catch(() => ({}))) as {
-          insights?: ImpulseInsight[];
-        };
-
-        setData({
-          goal: goalsPayload.goal ?? null,
-          emotionalProfile: conversationsPayload.emotionalProfile ?? null,
-          conversationCount: conversationsPayload.conversations?.length ?? 0,
-          insights: insightsPayload.insights ?? [],
-        });
-      } catch {
-        setError("No se pudo conectar con el servidor.");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    void load();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-        Cargando dashboard...
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="rounded-2xl border border-signal-danger/30 bg-signal-danger/12 px-6 py-4 text-sm text-foreground">
-          {error}
-        </div>
-      </div>
-    );
-  }
-
-  const { goal, emotionalProfile, conversationCount, insights } = data;
-  const pendingActions = goal?.actions.filter((a) => !a.completed) ?? [];
-  const completedActions = goal?.actions.filter((a) => a.completed) ?? [];
+  // Mock data - en producción vendría del API
+  const mockData = {
+    conversationCount: 12,
+    actionsCompleted: 8,
+    totalActions: 12,
+    currentState: 'clarity' as const,
+    streak: 7,
+    bestStreak: 15,
+    activeGoal: {
+      title: 'Completar proyecto X',
+      actions: [
+        { id: '1', description: 'Escribir descripción del proyecto', completed: true },
+        { id: '2', description: 'Crear estructura de carpetas', completed: true },
+        { id: '3', description: 'Setup base de datos', completed: false },
+        { id: '4', description: 'Implementar autenticación', completed: false },
+      ],
+    },
+  };
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Visión general de tu proceso, objetivo activo y estado emocional.
-        </p>
-      </div>
+    <div className="min-h-screen bg-zinc-950 py-8 px-4">
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Header */}
+        <div>
+          <h1 className="text-4xl font-bold text-white mb-2">Tu progreso</h1>
+          <p className="text-zinc-400">
+            {new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          </p>
+        </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Card id="goals">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Objetivo activo
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {goal ? (
-              <>
-                <p className="text-base font-medium text-foreground">{goal.title}</p>
-                <p className="mt-1 text-xs text-muted-foreground capitalize">{goal.status}</p>
-                <Progress value={goal.progress} className="mt-3 h-2" />
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {goal.completedCount}/{goal.totalCount} acciones completadas
-                </p>
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground">Sin objetivo activo. Usa el chat para definir uno.</p>
-            )}
-          </CardContent>
-        </Card>
+        {/* Metrics Row */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <MetricCard label="Conversaciones" value={mockData.conversationCount} />
+          <MetricCard
+            label="Acciones completadas"
+            value={`${mockData.actionsCompleted}/${mockData.totalActions}`}
+            type="progress"
+            progressValue={(mockData.actionsCompleted / mockData.totalActions) * 100}
+          />
+          <MetricCard label="Estado actual" value="Claro" type="badge" badgeColor="clarity" />
+          <MetricCard
+            label="Racha"
+            value={`${mockData.streak} días`}
+            icon={<Flame className="w-5 h-5 text-amber-500" />}
+          />
+        </div>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Estado emocional
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {emotionalProfile ? (
-              <div className="flex flex-wrap gap-2">
-                <EmotionBadge label={emotionalProfile.primaryEmotion} />
-                <EmotionBadge label={emotionalProfile.dominantPattern} />
-                <EmotionBadge label={`Energía: ${emotionalProfile.energyLevel}`} />
+        {/* Main Content */}
+        <div className="grid md:grid-cols-3 gap-6">
+          {/* Left Column - Active Goal */}
+          <div className="md:col-span-2 space-y-6">
+            <div className="card-surface p-6 space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white">{mockData.activeGoal.title}</h2>
+                <button className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-zinc-700 text-white hover:bg-zinc-900/50 transition-colors text-sm">
+                  <Plus className="w-4 h-4" />
+                  Agregar acción
+                </button>
               </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">Sin datos emocionales aún.</p>
-            )}
-          </CardContent>
-        </Card>
 
-        <Card id="progress">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Progreso
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Conversaciones</span>
-              <Badge variant="secondary" className="rounded-full px-3 py-1">
-                {conversationCount}
-              </Badge>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Acciones completadas</span>
-              <Badge variant="success" className="rounded-full px-3 py-1">
-                {completedActions.length}
-              </Badge>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Acciones pendientes</span>
-              <Badge variant={pendingActions.length > 0 ? "warning" : "secondary"} className="rounded-full px-3 py-1">
-                {pendingActions.length}
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            Acciones pendientes
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {pendingActions.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              {goal ? "Todas las acciones completadas. ¡Buen trabajo!" : "Define un objetivo en el chat para ver acciones aquí."}
-            </p>
-          ) : (
-            <ul className="space-y-2">
-              {pendingActions.map((action) => (
-                <li
-                  key={action.id}
-                  className="flex items-start gap-3 rounded-xl border border-border bg-muted/30 px-4 py-3 text-sm"
-                >
-                  <span className="mt-0.5 inline-block size-2.5 shrink-0 rounded-full bg-signal-warning" />
-                  <span className="text-foreground">{action.description}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </CardContent>
-      </Card>
-
-      {insights.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Insights de comportamiento
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {insights.slice(0, 3).map((insight, i) => (
-              <div
-                key={i}
-                className={`rounded-xl border px-4 py-3 text-sm ${
-                  insight.severity === "high"
-                    ? "border-signal-danger/30 bg-signal-danger/12 text-foreground"
-                    : insight.severity === "medium"
-                      ? "border-signal-warning/30 bg-signal-warning/12 text-foreground"
-                      : "border-border bg-muted/40 text-foreground"
-                }`}
-              >
-                {insight.message}
+              {/* Actions Checklist */}
+              <div className="space-y-3">
+                {mockData.activeGoal.actions.map((action) => (
+                  <div key={action.id} className="flex items-start gap-3 p-3 rounded-lg border border-zinc-800 hover:border-zinc-700 transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={action.completed}
+                      readOnly
+                      className="mt-1 w-5 h-5 rounded border-zinc-700 bg-zinc-900 cursor-pointer"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className={`font-medium ${action.completed ? 'text-zinc-500 line-through' : 'text-white'}`}>
+                        {action.description}
+                      </p>
+                    </div>
+                    {action.completed && <span className="text-emerald-500 text-sm font-semibold flex-shrink-0">✓</span>}
+                  </div>
+                ))}
               </div>
-            ))}
-          </CardContent>
-        </Card>
-      )}
+            </div>
+
+            {/* Quick Stats */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="card-surface p-6 text-center space-y-2">
+                <p className="text-sm text-muted-foreground">Mejor racha</p>
+                <p className="text-3xl font-bold text-white">{mockData.bestStreak}</p>
+                <p className="text-xs text-zinc-500">días</p>
+              </div>
+              <div className="card-surface p-6 text-center space-y-2">
+                <p className="text-sm text-muted-foreground">Progreso total</p>
+                <p className="text-3xl font-bold text-white">67%</p>
+                <div className="h-1 bg-zinc-800 rounded-full overflow-hidden mt-2">
+                  <div className="h-full w-2/3 bg-gradient-to-r from-indigo-500 to-indigo-400" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column - Profile & Insights */}
+          <div className="space-y-6">
+            {/* Emotional Profile */}
+            <StateCard
+              state="clarity"
+              pattern="Enfoque y acción"
+              energyLevel={4}
+              description="Estás en una buena posición para avanzar. Mantén el ritmo."
+            />
+
+            {/* Insights */}
+            <div className="card-surface p-6 space-y-4">
+              <h3 className="font-bold text-white">Insights</h3>
+              <div className="space-y-3">
+                {[
+                  { label: 'Patrón detectado', value: 'Avanzas más por las noches' },
+                  { label: 'Bloqueo típico', value: 'Perfeccionismo al empezar' },
+                  { label: 'Recomendación', value: 'Sesiones de 25 min funcionan mejor' },
+                ].map((insight, i) => (
+                  <div key={i} className="pb-3 border-b border-zinc-800 last:border-0 last:pb-0">
+                    <p className="text-xs text-muted-foreground">{insight.label}</p>
+                    <p className="text-sm text-white font-medium mt-1">{insight.value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* CTA */}
+            <Link
+              href="/app"
+              className="w-full py-3 px-4 rounded-lg bg-indigo-500 text-white font-semibold hover:bg-indigo-400 transition-colors text-center"
+            >
+              Ir al chat
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

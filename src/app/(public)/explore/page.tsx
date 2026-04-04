@@ -1,19 +1,17 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import ExploreCanvas from "@/components/explore/ExploreCanvas";
-import { Toaster } from "@/components/ui/sonner";
-import type { UserState as DomainUserState } from "@/domain/types";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Toaster } from '@/components/ui/sonner';
+import type { UserState as DomainUserState } from '@/domain/types';
 
 export type ExploreActionType =
-  | "name_block"
-  | "next_step"
-  | "close_pending"
-  | "order_thoughts";
+  | 'name_block'
+  | 'next_step'
+  | 'close_pending'
+  | 'order_thoughts';
 
 type ActionNode = {
   id: string;
@@ -21,13 +19,13 @@ type ActionNode = {
   title: string;
   description: string;
   icon: string;
-  color: "blocked" | "anxious" | "doubt" | "clarity";
+  color: 'blocked' | 'anxious' | 'doubt' | 'clarity';
   completed: boolean;
   order: number;
 };
 
 type CanvasUserState = {
-  emotionalState: "blocked" | "anxious" | "doubt" | "clarity";
+  emotionalState: 'blocked' | 'anxious' | 'doubt' | 'clarity';
   completedActions: number;
   totalActions: number;
 };
@@ -44,61 +42,62 @@ type TriggerResponse = {
   updatedState: DomainUserState;
 };
 
-// ─── Action catalog ───────────────────────────────────────────────────────────
-
-const ACTION_CATALOG: Omit<ActionNode, "completed" | "order">[] = [
+const ACTION_CATALOG: Omit<ActionNode, 'completed' | 'order'>[] = [
   {
-    id: "explore-name-block",
-    type: "name_block",
-    title: "Escribir lo que evitas",
-    description: "Nombra eso que no quieres decir",
-    icon: "📝",
-    color: "blocked",
+    id: 'explore-name-block',
+    type: 'name_block',
+    title: 'Escribir lo que evitas',
+    description: 'Nombra eso que no quieres decir',
+    icon: '📝',
+    color: 'blocked',
   },
   {
-    id: "explore-next-step",
-    type: "next_step",
-    title: "Definir siguiente paso",
-    description: "Qué haces cuando termines aquí",
-    icon: "🎯",
-    color: "clarity",
+    id: 'explore-next-step',
+    type: 'next_step',
+    title: 'Definir siguiente paso',
+    description: 'Qué haces cuando termines aquí',
+    icon: '🎯',
+    color: 'clarity',
   },
   {
-    id: "explore-close-pending",
-    type: "close_pending",
-    title: "Cerrar algo pendiente",
-    description: "Libérate de lo que arrastras",
-    icon: "✓",
-    color: "doubt",
+    id: 'explore-close-pending',
+    type: 'close_pending',
+    title: 'Cerrar algo pendiente',
+    description: 'Libérate de lo que arrastras',
+    icon: '✓',
+    color: 'doubt',
   },
   {
-    id: "explore-order-thoughts",
-    type: "order_thoughts",
-    title: "Ordenar tu cabeza",
-    description: "Eso que se repite siempre",
-    icon: "🧠",
-    color: "anxious",
+    id: 'explore-order-thoughts',
+    type: 'order_thoughts',
+    title: 'Ordenar tu cabeza',
+    description: 'Eso que se repite siempre',
+    icon: '🧠',
+    color: 'anxious',
   },
 ];
 
-// ─── State → canvas mapping ───────────────────────────────────────────────────
-
-/** Which action type leads the canvas for each domain state */
-const STATE_PRIORITY: Record<DomainUserState, ExploreActionType> = {
-  bloqueo: "name_block",
-  ansiedad: "order_thoughts",
-  duda: "next_step",
-  claridad: "next_step",
-  neutral: "name_block",
+const HINT_TEXT: Record<ExploreActionType, string> = {
+  name_block: '💡 Escribe la situación que te hace sentir bloqueado, sin filtros. Cuéntame qué es lo que realmente evitas decir o enfrentar.',
+  next_step: '💡 ¿Cuál es tu próximo movimiento? Describe en concreto qué vas a hacer cuando termines esto.',
+  close_pending: '💡 Hay algo que lleva tiempo dándote vueltas. Escribe qué es eso que necesitas cerrar o soltar.',
+  order_thoughts: '💡 ¿Cuál es ese pensamiento que se repite? Cuéntame qué patrón mental estás notando.',
 };
 
-/** Domain state → canvas emotional color */
-const STATE_TO_EMOTIONAL: Record<DomainUserState, CanvasUserState["emotionalState"]> = {
-  bloqueo: "blocked",
-  ansiedad: "anxious",
-  duda: "doubt",
-  claridad: "clarity",
-  neutral: "doubt",
+const STATE_PRIORITY: Record<DomainUserState, ExploreActionType> = {
+  bloqueo: 'name_block',
+  ansiedad: 'order_thoughts',
+  duda: 'next_step',
+  claridad: 'next_step',
+  neutral: 'name_block',
+};
+
+const STATE_TO_EMOTIONAL: Record<DomainUserState, CanvasUserState['emotionalState']> = {
+  bloqueo: 'blocked',
+  ansiedad: 'anxious',
+  duda: 'doubt',
+  claridad: 'clarity',
+  neutral: 'doubt',
 };
 
 function buildActions(
@@ -114,46 +113,42 @@ function buildActions(
   })).sort((a, b) => a.order - b.order);
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
-type LoadState = "loading" | "ready";
+type LoadState = 'loading' | 'ready';
 
 export default function ExplorePage() {
   const router = useRouter();
-  const [loadState, setLoadState] = useState<LoadState>("loading");
-  const [domainState, setDomainState] = useState<DomainUserState>("neutral");
+  const [loadState, setLoadState] = useState<LoadState>('loading');
+  const [domainState, setDomainState] = useState<DomainUserState>('neutral');
   const [actions, setActions] = useState<ActionNode[]>([]);
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
   const [userState, setUserState] = useState<CanvasUserState>({
-    emotionalState: "doubt",
+    emotionalState: 'doubt',
     completedActions: 0,
     totalActions: ACTION_CATALOG.length,
   });
-  const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
-  // ── Load real user state on mount ─────────────────────────────────────────
   useEffect(() => {
     let cancelled = false;
 
     async function loadUserState() {
       try {
-        const res = await fetch("/api/user/state", { credentials: "include" });
+        const res = await fetch('/api/user/state', { credentials: 'include' });
         if (cancelled) return;
 
-        // Fall back to neutral defaults on any error — explore should never block
         const data: UserStateResponse = res.ok
           ? ((await res.json()) as UserStateResponse)
-          : { success: false, state: "neutral", progress: 0, pendingActions: [] };
+          : { success: false, state: 'neutral', progress: 0, pendingActions: [] };
 
         if (cancelled) return;
 
-        const state: DomainUserState = data.state ?? "neutral";
+        const state: DomainUserState = data.state ?? 'neutral';
         applyDomainState(state, new Set());
       } catch {
-        if (!cancelled) applyDomainState("neutral", new Set());
+        if (!cancelled) applyDomainState('neutral', new Set());
       } finally {
-        if (!cancelled) setLoadState("ready");
+        if (!cancelled) setLoadState('ready');
       }
     }
 
@@ -163,55 +158,43 @@ export default function ExplorePage() {
     };
   }, []);
 
-  /** Syncs all canvas state slices from a single domain state snapshot */
   function applyDomainState(state: DomainUserState, completed: Set<string>) {
     setDomainState(state);
     setActions(buildActions(state, completed));
     setUserState({
-      emotionalState: STATE_TO_EMOTIONAL[state] ?? "doubt",
+      emotionalState: STATE_TO_EMOTIONAL[state] ?? 'doubt',
       completedActions: completed.size,
       totalActions: ACTION_CATALOG.length,
     });
   }
 
-  // ── Handlers ──────────────────────────────────────────────────────────────
-
-  const handleNodeClick = (nodeId: string) => {
-    setActiveNodeId(nodeId);
-  };
-
   const handleActionComplete = async (nodeId: string, content: string) => {
     const node = actions.find((a) => a.id === nodeId);
     if (!node || submitting) return;
 
-    // If the node type is "chat", redirect immediately with context
-    if ((node.type as string) === "chat") {
+    if ((node.type as string) === 'chat') {
       router.push(`/app?context=explore&action=${node.type}`);
       return;
     }
 
     setSubmitting(true);
 
-    // ── Optimistic update ─────────────────────────────────────────────────
     const nextCompleted = new Set(completedIds).add(nodeId);
     setCompletedIds(nextCompleted);
     setActions((prev) => prev.map((a) => (a.id === nodeId ? { ...a, completed: true } : a)));
     setUserState((prev) => ({ ...prev, completedActions: nextCompleted.size }));
-    setActiveNodeId(null);
 
-    // ── Persist + update state ────────────────────────────────────────────
     try {
-      const res = await fetch("/api/actions/trigger", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/actions/trigger', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type: node.type, content }),
       });
 
       if (res.ok) {
         const data = (await res.json()) as TriggerResponse;
         if (data.success && data.updatedState !== domainState) {
-          // Re-render canvas with new emotional state, preserving completed nodes
           applyDomainState(data.updatedState, nextCompleted);
         }
       }
@@ -226,17 +209,15 @@ export default function ExplorePage() {
     const empty = new Set<string>();
     setCompletedIds(empty);
     applyDomainState(domainState, empty);
-    setActiveNodeId(null);
+    setCurrentIndex(0);
   };
 
-  // ── Render ────────────────────────────────────────────────────────────────
-
-  if (loadState === "loading") {
+  if (loadState === 'loading') {
     return (
-      <div className="flex h-screen items-center justify-center bg-linear-to-br from-background via-background to-muted/20">
+      <div className="flex h-screen items-center justify-center bg-zinc-950">
         <div className="space-y-3 text-center">
-          <div className="inline-block animate-spin rounded-full border-2 border-muted border-t-foreground h-8 w-8" />
-          <p className="text-sm text-muted-foreground">Preparando tu espacio</p>
+          <div className="inline-block animate-spin rounded-full border-2 border-zinc-800 border-t-indigo-400 h-8 w-8" />
+          <p className="text-sm text-zinc-400">Preparando tu espacio</p>
         </div>
       </div>
     );
@@ -245,29 +226,185 @@ export default function ExplorePage() {
   const completedCount = userState.completedActions;
   const allCompleted = completedCount >= userState.totalActions;
   const hasAnyCompleted = completedCount > 0;
+  const currentAction = actions[currentIndex];
+  const visibleActions = actions.filter((a) => !a.completed);
+
+  const handleNext = () => {
+    const nextIndex = currentIndex + 1;
+    if (nextIndex < actions.length) {
+      setCurrentIndex(nextIndex);
+    }
+  };
+
+  const handlePrev = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
+  };
+
+  const getColorStyles = (color: string) => {
+    const colorMap: Record<string, { bg: string; border: string; text: string }> = {
+      blocked: { bg: 'bg-gradient-to-br from-red-900/30 to-pink-900/20', border: 'border-red-500/40', text: 'text-red-300' },
+      anxious: { bg: 'bg-gradient-to-br from-orange-900/30 to-amber-900/20', border: 'border-amber-500/40', text: 'text-amber-300' },
+      doubt: { bg: 'bg-gradient-to-br from-purple-900/30 to-violet-900/20', border: 'border-purple-500/40', text: 'text-purple-300' },
+      clarity: { bg: 'bg-gradient-to-br from-cyan-900/30 to-teal-900/20', border: 'border-cyan-500/40', text: 'text-cyan-300' },
+    };
+    return colorMap[color] || colorMap.doubt;
+  };
+
+  const styles = currentAction ? getColorStyles(currentAction.color) : { bg: '', border: '', text: '' };
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-linear-to-br from-background via-background to-muted/20">
-      <ExploreCanvas
-        actions={actions}
-        userState={userState}
-        activeNodeId={activeNodeId}
-        onNodeClick={handleNodeClick}
-        onActionComplete={handleActionComplete}
-        onReset={handleReset}
-      />
+    <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-black via-zinc-950 to-purple-950">
+      {/* Gradient background with fluorescent accents */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-500/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-fuchsia-500/20 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
+      </div>
 
-      {/* Show chat CTA after first action — not only when all complete */}
-      {hasAnyCompleted && (
-        <div className="absolute inset-x-0 bottom-8 flex justify-center z-20">
-          <Link
-            href={`/app?context=explore&completed=${completedCount}`}
-            className="px-8 py-3 rounded-full bg-black text-white text-sm font-medium hover:opacity-90 transition shadow-lg"
-          >
-            {allCompleted ? "Todo listo · Ir al chat →" : "Continuar en el chat →"}
-          </Link>
+      <div className="relative min-h-screen flex flex-col items-center justify-center px-4 py-12">
+        {/* Header */}
+        <div className="text-center space-y-4 max-w-2xl mb-16">
+          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
+            Una cosa a la vez
+          </h1>
+          <p className="text-lg bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent font-medium">
+            Elige lo que necesitas trabajar ahora
+          </p>
         </div>
-      )}
+
+        {/* Progress Bar */}
+        <div className="w-full max-w-md mb-12">
+          <div className="flex justify-between items-center mb-3">
+            <p className="text-sm font-medium text-cyan-400">Progreso</p>
+            <p className="text-sm font-bold text-fuchsia-300">{completedCount}/{userState.totalActions}</p>
+          </div>
+          <div className="h-2 bg-zinc-800/50 rounded-full overflow-hidden border border-purple-500/30">
+            <div
+              className="h-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-cyan-500 transition-all duration-300 shadow-lg shadow-fuchsia-500/50"
+              style={{ width: `${(completedCount / userState.totalActions) * 100}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Carousel Card */}
+        {currentAction && (
+          <div className={`w-full max-w-2xl p-12 rounded-2xl border-2 transition-all duration-300 backdrop-blur-md ${styles.bg} ${styles.border} shadow-2xl shadow-purple-500/30`}>
+            {/* Icon */}
+            <div className="text-7xl mb-6 text-center">{currentAction.icon}</div>
+
+            {/* Content */}
+            <div className="text-center space-y-4 mb-8">
+              <h2 className="text-3xl font-bold text-white">{currentAction.title}</h2>
+              <p className={`text-lg ${styles.text}`}>{currentAction.description}</p>
+            </div>
+
+            {/* Completion badge */}
+            {currentAction.completed && (
+              <div className="text-center mb-8 py-4 bg-emerald-500/20 border border-emerald-500/30 rounded-lg">
+                <p className="text-emerald-400 font-semibold">✓ Completado</p>
+              </div>
+            )}
+
+            {/* Input (if not completed) */}
+            {!currentAction.completed && (
+              <div className="space-y-4 mb-6">
+                {/* Hint Bubble */}
+                <div className="relative p-4 rounded-lg bg-gradient-to-br from-purple-900/40 to-cyan-900/20 border border-purple-500/40 backdrop-blur-sm">
+                  <div className="flex gap-3 items-start">
+                    <span className="text-lg flex-shrink-0">💭</span>
+                    <p className="text-sm text-cyan-200 leading-relaxed">
+                      {HINT_TEXT[currentAction.type]}
+                    </p>
+                  </div>
+                  {/* Tail */}
+                  <div className="absolute -bottom-2 left-6 w-4 h-4 bg-gradient-to-br from-purple-900/40 to-cyan-900/20 border-b border-r border-purple-500/40 rounded-br-sm transform rotate-45" />
+                </div>
+
+                {/* Textarea */}
+                <textarea
+                  id={`input-${currentAction.id}`}
+                  placeholder="Escribe tu respuesta aquí..."
+                  className="w-full p-4 rounded-lg bg-black/40 border border-purple-500/30 text-white placeholder:text-zinc-500 focus:outline-none focus:border-fuchsia-500 focus:shadow-lg focus:shadow-fuchsia-500/30 min-h-24 transition-all backdrop-blur-sm"
+                />
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            {!currentAction.completed && (
+              <button
+                onClick={() => {
+                  const input = document.getElementById(`input-${currentAction.id}`) as HTMLTextAreaElement;
+                  if (input?.value) {
+                    handleActionComplete(currentAction.id, input.value);
+                    input.value = '';
+                  }
+                }}
+                disabled={submitting}
+                className="w-full py-3 px-6 rounded-lg bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-bold hover:from-violet-400 hover:to-fuchsia-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-fuchsia-500/30 hover:shadow-fuchsia-500/50"
+              >
+                {submitting ? 'Guardando...' : 'Completar'}
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Navigation */}
+        <div className="flex items-center gap-4 mt-12">
+          <button
+            onClick={handlePrev}
+            disabled={currentIndex === 0}
+            className="p-3 rounded-lg border border-purple-500/50 text-purple-400 hover:text-fuchsia-300 hover:border-fuchsia-500/50 hover:bg-purple-500/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:text-zinc-600"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+
+          {/* Dots */}
+          <div className="flex gap-2">
+            {actions.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentIndex(i)}
+                className={`rounded-full transition-all ${
+                  i === currentIndex ? 'bg-gradient-to-r from-violet-500 to-fuchsia-500 w-8 h-2 shadow-lg shadow-fuchsia-500/50' : 'bg-purple-500/30 w-2 h-2 hover:bg-purple-500/50'
+                }`}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={handleNext}
+            disabled={currentIndex === actions.length - 1}
+            className="p-3 rounded-lg border border-purple-500/50 text-purple-400 hover:text-fuchsia-300 hover:border-fuchsia-500/50 hover:bg-purple-500/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:text-zinc-600"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Counter */}
+        <p className="mt-6 text-sm text-zinc-500">
+          {currentIndex + 1} de {actions.length}
+        </p>
+
+        {/* CTA - Show when any completed */}
+        {hasAnyCompleted && (
+          <div className="mt-12 w-full max-w-2xl space-y-4">
+            <Link
+              href={`/app?context=explore&completed=${completedCount}`}
+              className="w-full block py-4 px-6 rounded-xl bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-violet-500 text-white font-bold text-center hover:from-cyan-400 hover:via-fuchsia-400 hover:to-violet-400 transition-all shadow-lg shadow-fuchsia-500/40 hover:shadow-fuchsia-500/60"
+            >
+              {allCompleted ? '🎉 Todo listo · Ir al chat' : 'Continuar en el chat →'}
+            </Link>
+            <button
+              onClick={handleReset}
+              className="w-full py-2 text-sm text-purple-400 hover:text-fuchsia-300 transition-colors"
+            >
+              ↺ Reiniciar
+            </button>
+          </div>
+        )}
+      </div>
 
       <Toaster />
     </div>

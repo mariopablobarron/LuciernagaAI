@@ -1,262 +1,229 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import type { StreakSnapshot } from "@/types/impulse";
+import { useState } from 'react';
+import { ArrowLeft, Flame } from 'lucide-react';
+import Link from 'next/link';
 
-const MOODS = [
-  { value: "positive", label: "Bien", emoji: "💪" },
-  { value: "neutral", label: "Regular", emoji: "😐" },
-  { value: "negative", label: "Mal", emoji: "😔" },
-];
-
-const EMOTIONAL_STATES = [
-  { value: "activo", label: "Activo / Claro" },
-  { value: "ansioso", label: "Ansioso / Nervioso" },
-  { value: "bloqueado", label: "Bloqueado / Paralizado" },
-  { value: "desmotivado", label: "Sin ganas / Desmotivado" },
-  { value: "perdido", label: "Perdido / Sin dirección" },
-  { value: "neutral", label: "Neutral / Normal" },
-];
-
-type CheckinResult = {
-  ok: boolean;
-  streak: StreakSnapshot;
-  challenges: Array<{ title: string; completedDays: number; totalDays: number; status: string }>;
-};
+type EmotionalState = 'blocked' | 'anxious' | 'doubt' | 'clarity' | 'unmotivated' | 'neutral';
 
 export default function CheckinPage() {
-  const router = useRouter();
-  const [note, setNote] = useState("");
-  const [mood, setMood] = useState<string | null>(null);
-  const [emotionalState, setEmotionalState] = useState<string | null>(null);
-  const [momentum, setMomentum] = useState<number | null>(null);
-  const [challengeStatus, setChallengeStatus] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<CheckinResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [mood, setMood] = useState<'good' | 'regular' | 'bad' | null>(null);
+  const [emotionalState, setEmotionalState] = useState<EmotionalState | null>(null);
+  const [energyLevel, setEnergyLevel] = useState<number | null>(null);
+  const [challengeStatus, setChallengeStatus] = useState('');
+  const [note, setNote] = useState('');
+  const [submitted, setSubmitted] = useState(false);
 
-  async function submit() {
-    if (!note.trim() || !mood || !emotionalState) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/checkin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          response: note,
-          mood,
-          emotionalState,
-          momentum,
-          challengeStatus: challengeStatus.trim() || null,
-        }),
-      });
-      const data = (await res.json()) as CheckinResult;
-      setResult(data);
-    } catch {
-      setError("Error al guardar el check-in. Intenta de nuevo.");
-    } finally {
-      setLoading(false);
-    }
-  }
+  const isComplete = mood && emotionalState && energyLevel && note.trim();
 
-  if (result) {
-    const { streak, challenges } = result;
-    const justCompleted = challenges.filter((c) => c.status === "completed");
-    const stillActive = challenges.filter((c) => c.status === "active");
+  const emotionalOptions = [
+    { id: 'blocked', label: 'Bloqueado', icon: '🔒' },
+    { id: 'anxious', label: 'Ansioso', icon: '😰' },
+    { id: 'doubt', label: 'Con dudas', icon: '❓' },
+    { id: 'clarity', label: 'Claro', icon: '✨' },
+    { id: 'unmotivated', label: 'Sin ganas', icon: '😔' },
+    { id: 'neutral', label: 'Neutral', icon: '😐' },
+  ] as const;
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isComplete) return;
+
+    // Mock submit
+    setSubmitted(true);
+  };
+
+  if (submitted) {
     return (
-      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-6">
-        <div className="max-w-lg w-full space-y-6 text-center">
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center px-4 py-8">
+        <div className="max-w-lg w-full card-surface p-8 text-center space-y-6">
           <div className="text-6xl">✓</div>
-          <div className="space-y-2">
-            <h2 className="text-xl font-bold">Check-in registrado</h2>
-            <p className="text-zinc-400 text-sm">Buen trabajo por aparecer hoy.</p>
-          </div>
+          <h1 className="text-3xl font-bold text-white">Check-in registrado</h1>
+          <p className="text-zinc-400">Buen trabajo por aparecer hoy.</p>
 
           {/* Streak */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
-            <p className="text-zinc-500 text-xs font-mono uppercase tracking-widest mb-2">Racha</p>
-            <div className="flex items-center justify-center gap-3">
-              <span className="text-4xl font-bold text-amber-400">{streak.currentDays}</span>
-              <div className="text-left">
-                <p className="text-zinc-300 text-sm">días seguidos</p>
-                <p className="text-zinc-600 text-xs">Mejor: {streak.bestDays}</p>
-              </div>
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-6 space-y-2">
+            <div className="flex items-center justify-center gap-2">
+              <Flame className="w-6 h-6 text-amber-500" />
+              <p className="text-4xl font-bold text-white">7</p>
             </div>
-            {streak.status === "restarted" && (
-              <p className="text-orange-400 text-xs mt-2">Racha reiniciada — hoy volviste a empezar.</p>
-            )}
+            <p className="text-sm text-zinc-400">días seguidos</p>
+            <p className="text-xs text-zinc-500">Mejor: 15 días</p>
           </div>
 
-          {/* Completed challenges */}
-          {justCompleted.length > 0 && (
-            <div className="bg-emerald-900/20 border border-emerald-800/30 rounded-xl p-4">
-              <p className="text-emerald-400 text-sm font-medium mb-2">🎉 Reto completado</p>
-              {justCompleted.map((c) => (
-                <p key={c.title} className="text-zinc-300 text-sm">{c.title}</p>
-              ))}
+          {/* Completed Challenges */}
+          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-4 space-y-3">
+            <h3 className="font-bold text-emerald-500 text-sm">Retos completados hoy</h3>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-white">
+                <span className="text-emerald-500">✓</span>
+                Morning meditation (10 min)
+              </div>
+              <div className="flex items-center gap-2 text-sm text-white">
+                <span className="text-emerald-500">✓</span>
+                Write first paragraph
+              </div>
             </div>
-          )}
+          </div>
 
-          {/* Active challenge progress */}
-          {stillActive.length > 0 && (
-            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-left space-y-2">
-              <p className="text-zinc-500 text-xs font-mono uppercase tracking-widest">Progreso de retos</p>
-              {stillActive.map((c) => (
-                <div key={c.title} className="flex items-center justify-between text-sm">
-                  <span className="text-zinc-300 truncate">{c.title}</span>
-                  <span className="text-zinc-500 font-mono ml-3 flex-shrink-0">
-                    {c.completedDays}/{c.totalDays} días
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div className="space-y-3">
-            <button
-              onClick={() => router.push("/impulso/retos")}
-              className="w-full bg-amber-400 text-black font-bold py-3 rounded-xl text-sm hover:bg-amber-300 transition"
+          {/* Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+            <Link
+              href="/impulso/retos"
+              className="flex-1 py-2 px-4 rounded-lg bg-amber-500 text-white font-semibold hover:bg-amber-400 transition-colors text-center"
             >
               Ver retos
-            </button>
-            <button
-              onClick={() => router.push("/")}
-              className="w-full border border-zinc-700 text-zinc-300 py-3 rounded-xl text-sm hover:border-zinc-500 transition"
+            </Link>
+            <Link
+              href="/app"
+              className="flex-1 py-2 px-4 rounded-lg border border-zinc-700 text-white font-semibold hover:bg-zinc-900/50 transition-colors text-center"
             >
               Ir al chat
-            </button>
+            </Link>
           </div>
         </div>
       </div>
     );
   }
 
-  const canSubmit = note.trim().length > 0 && mood !== null && emotionalState !== null;
-
   return (
-    <div className="min-h-screen bg-black text-white px-6 py-10">
-      <div className="max-w-lg mx-auto space-y-6">
+    <div className="min-h-screen bg-zinc-950 py-8 px-4">
+      <div className="max-w-lg mx-auto space-y-8">
         {/* Header */}
-        <div className="flex items-center gap-3">
-          <button onClick={() => router.back()} className="text-zinc-500 hover:text-zinc-300 text-sm">
-            ←
-          </button>
+        <div className="flex items-center gap-4">
+          <Link href="/impulso" className="text-zinc-400 hover:text-white transition-colors">
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
           <div>
-            <h1 className="text-lg font-bold">Check-in de hoy</h1>
-            <p className="text-zinc-500 text-xs">
-              {new Date().toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })}
+            <h1 className="text-2xl font-bold text-white">Check-in de hoy</h1>
+            <p className="text-sm text-zinc-500">
+              {new Date().toLocaleDateString('es-ES', { weekday: 'short', month: 'short', day: 'numeric' })}
             </p>
           </div>
         </div>
 
-        {/* Mood */}
-        <div className="space-y-3">
-          <label className="text-zinc-400 text-sm block">¿Cómo estás hoy?</label>
-          <div className="grid grid-cols-3 gap-2">
-            {MOODS.map((m) => (
-              <button
-                key={m.value}
-                onClick={() => setMood(m.value)}
-                className={`py-3 rounded-xl border text-center transition ${
-                  mood === m.value
-                    ? "border-amber-400 bg-amber-400/10 text-amber-400"
-                    : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-600"
-                }`}
-              >
-                <span className="block text-xl">{m.emoji}</span>
-                <span className="text-xs mt-1">{m.label}</span>
-              </button>
-            ))}
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="card-surface p-8 space-y-8">
+          {/* 1. MOOD */}
+          <div className="space-y-4">
+            <label className="block text-sm font-semibold text-white">¿Cómo estuvo tu día?</label>
+            <div className="grid grid-cols-3 gap-4">
+              {[
+                { id: 'good', label: '💪 Bien', value: 'good' },
+                { id: 'regular', label: '😐 Regular', value: 'regular' },
+                { id: 'bad', label: '😔 Mal', value: 'bad' },
+              ].map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => setMood(option.value as 'good' | 'regular' | 'bad')}
+                  className={`py-3 rounded-lg font-semibold transition-all ${
+                    mood === option.value
+                      ? 'bg-amber-500 text-white border-2 border-amber-400'
+                      : 'bg-zinc-900 border-2 border-zinc-800 text-zinc-400 hover:border-zinc-700'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Emotional state */}
-        <div className="space-y-3">
-          <label className="text-zinc-400 text-sm block">¿Cuál se acerca más a tu estado?</label>
-          <div className="space-y-2">
-            {EMOTIONAL_STATES.map((s) => (
-              <button
-                key={s.value}
-                onClick={() => setEmotionalState(s.value)}
-                className={`w-full text-left px-4 py-2.5 rounded-xl border text-sm transition ${
-                  emotionalState === s.value
-                    ? "border-amber-400 bg-amber-400/10 text-amber-400"
-                    : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-600"
-                }`}
-              >
-                {s.label}
-              </button>
-            ))}
+          {/* 2. EMOTIONAL STATE */}
+          <div className="space-y-4">
+            <label className="block text-sm font-semibold text-white">¿Qué sentiste?</label>
+            <div className="grid grid-cols-2 gap-3">
+              {emotionalOptions.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => setEmotionalState(option.id)}
+                  className={`py-3 px-4 rounded-lg font-semibold transition-all text-sm ${
+                    emotionalState === option.id
+                      ? 'bg-indigo-500 text-white border-2 border-indigo-400'
+                      : 'bg-zinc-900 border-2 border-zinc-800 text-zinc-300 hover:border-zinc-700'
+                  }`}
+                >
+                  <span className="text-lg">{option.icon}</span>
+                  <span className="block mt-1">{option.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Momentum 1–5 */}
-        <div className="space-y-3">
-          <label className="text-zinc-400 text-sm block">
-            Energía disponible hoy <span className="text-zinc-600">(opcional)</span>
-          </label>
-          <div className="flex gap-2">
-            {[1, 2, 3, 4, 5].map((v) => (
-              <button
-                key={v}
-                onClick={() => setMomentum(momentum === v ? null : v)}
-                className={`flex-1 py-2.5 rounded-xl border text-sm font-mono transition ${
-                  momentum === v
-                    ? "border-amber-400 bg-amber-400/10 text-amber-400"
-                    : "border-zinc-800 bg-zinc-900 text-zinc-500 hover:border-zinc-600"
-                }`}
-              >
-                {v}
-              </button>
-            ))}
+          {/* 3. ENERGY LEVEL */}
+          <div className="space-y-4">
+            <label className="block text-sm font-semibold text-white">Nivel de energía</label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((level) => (
+                <button
+                  key={level}
+                  type="button"
+                  onClick={() => setEnergyLevel(level)}
+                  className={`flex-1 py-3 rounded-lg font-bold transition-all ${
+                    energyLevel === level
+                      ? 'bg-indigo-500 text-white'
+                      : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:border-zinc-700'
+                  }`}
+                >
+                  {level}
+                </button>
+              ))}
+            </div>
+            <div className="flex justify-between text-xs text-zinc-500">
+              <span>Muy baja</span>
+              <span>Muy alta</span>
+            </div>
           </div>
-          <div className="flex justify-between text-xs text-zinc-600 px-1">
-            <span>Muy baja</span>
-            <span>Muy alta</span>
+
+          {/* 4. CHALLENGE STATUS */}
+          <div className="space-y-3">
+            <label htmlFor="challenge" className="block text-sm font-semibold text-white">
+              Reto de hoy (opcional)
+            </label>
+            <input
+              id="challenge"
+              type="text"
+              value={challengeStatus}
+              onChange={(e) => setChallengeStatus(e.target.value)}
+              placeholder="Ej: Completé los 10 minutos de arranque"
+              className="input-field w-full"
+            />
           </div>
-        </div>
 
-        {/* Challenge status */}
-        <div className="space-y-2">
-          <label className="text-zinc-400 text-sm block">
-            ¿Avanzaste en tu reto hoy? <span className="text-zinc-600">(opcional)</span>
-          </label>
-          <input
-            type="text"
-            value={challengeStatus}
-            onChange={(e) => setChallengeStatus(e.target.value)}
-            placeholder="Ej: Completé los 10 minutos de arranque"
-            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-600"
-          />
-        </div>
+          {/* 5. NOTE */}
+          <div className="space-y-3">
+            <label htmlFor="note" className="block text-sm font-semibold text-white">
+              Nota <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <textarea
+                id="note"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Sé honesto. Qué hiciste, qué evitaste, cómo te sentiste."
+                className="input-field w-full min-h-32 resize-none"
+                required
+              />
+              <span className="absolute bottom-3 right-3 text-xs text-zinc-500">
+                {note.length}/500
+              </span>
+            </div>
+          </div>
 
-        {/* Note */}
-        <div className="space-y-2">
-          <label className="text-zinc-400 text-sm block">
-            ¿Qué pasó hoy? <span className="text-zinc-500">*</span>
-          </label>
-          <textarea
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="Sé honesto. Qué hiciste, qué evitaste, cómo te sentiste."
-            rows={4}
-            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-600 resize-none"
-          />
-          <p className="text-zinc-600 text-xs text-right">{note.length} caracteres</p>
-        </div>
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={!isComplete}
+            className="w-full py-3 px-4 rounded-lg bg-amber-500 text-white font-semibold hover:bg-amber-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Registrar check-in
+          </button>
 
-        {error && <p className="text-red-400 text-sm">{error}</p>}
-
-        <button
-          onClick={submit}
-          disabled={!canSubmit || loading}
-          className="w-full bg-amber-400 text-black font-bold py-3 rounded-xl text-sm hover:bg-amber-300 transition disabled:opacity-30"
-        >
-          {loading ? "Guardando..." : "Registrar check-in"}
-        </button>
+          <p className="text-xs text-zinc-500 text-center">
+            Tus respuestas nos ayudan a entenderte mejor.
+          </p>
+        </form>
       </div>
     </div>
   );

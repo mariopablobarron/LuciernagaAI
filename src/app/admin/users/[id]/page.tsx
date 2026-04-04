@@ -557,11 +557,19 @@ export default function AdminUserDetailPage() {
                   <p className="text-sm text-muted-foreground">Sin conversaciones registradas.</p>
                 ) : (
                   data.conversations.map((conversation) => (
-                    <div key={conversation.id} className="rounded-xl border border-border p-3">
-                      <p className="text-sm font-semibold text-foreground">{conversation.title}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {conversation.messageCount} mensajes · {formatDate(conversation.updatedAt)}
-                      </p>
+                    <div key={conversation.id} className="rounded-xl border border-border p-3 flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-foreground truncate">{conversation.title}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {conversation.messageCount} mensajes · {formatDate(conversation.updatedAt)}
+                        </p>
+                      </div>
+                      <Link
+                        href={`/admin/users/${data.user.id}/conversations/${conversation.id}`}
+                        className="shrink-0 text-xs font-semibold text-violet-400 hover:text-violet-300 transition-colors whitespace-nowrap"
+                      >
+                        Ver chat →
+                      </Link>
                     </div>
                   ))
                 )}

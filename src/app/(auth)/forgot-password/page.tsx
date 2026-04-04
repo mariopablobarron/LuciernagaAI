@@ -34,7 +34,7 @@ export default function ForgotPasswordPage() {
     <div className={`min-h-screen bg-linear-to-br ${GRADIENTS.background} flex items-center justify-center px-4 py-12`}>
       <div className="w-full max-w-md space-y-8">
         <div>
-          <Link href="/login" className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors text-sm mb-6">
+          <Link href="/login" className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors text-sm mb-6 py-2">
             <ArrowLeft className="w-4 h-4" />
             Volver al inicio de sesión
           </Link>

@@ -220,7 +220,7 @@ export default function ImpulsoPage() {
         </div>
 
         {/* ── Stats Row ──────────────────────────────────────────── */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {loading ? (
             <>
               <Skeleton className="h-24" />
@@ -274,7 +274,7 @@ export default function ImpulsoPage() {
         </div>
 
         {/* ── Tab Navigation ─────────────────────────────────────── */}
-        <div className="flex gap-1 border-b border-zinc-800/80">
+        <div className="flex gap-1 border-b border-zinc-800/80 overflow-x-auto scrollbar-none">
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const active = activeTab === tab.id;
@@ -310,7 +310,7 @@ export default function ImpulsoPage() {
               </>
             ) : error || !profile ? (
               <div className="space-y-6">
-                <div className="relative rounded-2xl border border-violet-500/20 bg-violet-500/5 p-10 text-center overflow-hidden">
+                <div className="relative rounded-2xl border border-violet-500/20 bg-violet-500/5 p-6 sm:p-10 text-center overflow-hidden">
                   <div className="w-16 h-16 rounded-2xl bg-violet-500/15 border border-violet-500/20 flex items-center justify-center mx-auto mb-5">
                     <span className="text-3xl">⚡</span>
                   </div>
@@ -330,7 +330,7 @@ export default function ImpulsoPage() {
                   </Link>
                   <p className="text-xs text-zinc-600 mt-4">5 minutos · Resultados inmediatos · Sin registro</p>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {[
                     { num: "01", icon: Brain, title: "Diagnóstico", desc: "12 preguntas sobre claridad, energía y disciplina.", color: "text-violet-400", bg: "bg-violet-500/10" },
                     { num: "02", icon: Zap, title: "Tu perfil", desc: "BLOQUEADO, ANSIOSO, DESMOTIVADO, PERDIDO o POTENCIAL_ALTO.", color: "text-amber-400", bg: "bg-amber-500/10" },
@@ -351,7 +351,7 @@ export default function ImpulsoPage() {
                     );
                   })}
                 </div>
-                <div className="card-surface p-6 flex items-center justify-between gap-6">
+                <div className="card-surface p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div>
                     <p className="font-semibold text-white text-sm mb-1">¿Prefieres empezar con el chat?</p>
                     <p className="text-xs text-zinc-400">El coach también puede ayudarte sin diagnóstico previo.</p>
@@ -365,7 +365,7 @@ export default function ImpulsoPage() {
               <>
                 {/* Profile Card */}
                 <div
-                  className={`rounded-2xl border bg-linear-to-br ${profileCfg.gradient} ${profileCfg.border} p-8 space-y-5`}
+                  className={`rounded-2xl border bg-linear-to-br ${profileCfg.gradient} ${profileCfg.border} p-6 sm:p-8 space-y-5`}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                     <div className="text-5xl">{profileCfg.emoji}</div>

@@ -1,32 +1,75 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Calendar, TrendingUp } from 'lucide-react';
+import { Calendar, Flame, TrendingUp } from 'lucide-react';
 import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
 
-export default function CheckinsPage() {
-  const checkins = [
-    { date: 'Hoy', state: 'clarity', energy: 4, streak: 7 },
-    { date: 'Ayer', state: 'anxious', energy: 3, streak: 6 },
-    { date: '3 días atrás', state: 'doubt', energy: 2, streak: 5 },
-    { date: '4 días atrás', state: 'clarity', energy: 5, streak: 4 },
-    { date: '5 días atrás', state: 'blocked', energy: 2, streak: 3 },
-  ];
+type StateData = {
+  streakDays: number;
+  state: string;
+  progressTrend: string;
+};
 
-  const stateColors = {
-    clarity: { bg: 'bg-cyan-500/10', text: 'text-cyan-400', label: 'Claro' },
-    anxious: { bg: 'bg-yellow-500/10', text: 'text-yellow-400', label: 'Ansioso' },
-    doubt: { bg: 'bg-violet-500/10', text: 'text-violet-400', label: 'Dudoso' },
-    blocked: { bg: 'bg-red-500/10', text: 'text-red-400', label: 'Bloqueado' },
-  };
+function Skeleton({ className }: { className?: string }) {
+  return <div className={`animate-pulse bg-zinc-800/60 rounded-xl ${className ?? ''}`} />;
+}
+
+const STATE_LABEL: Record<string, { label: string; bg: string; text: string }> = {
+  claridad: { label: 'Claridad', bg: 'bg-cyan-500/10', text: 'text-cyan-400' },
+  ansiedad: { label: 'Ansioso', bg: 'bg-yellow-500/10', text: 'text-yellow-400' },
+  duda: { label: 'Duda', bg: 'bg-violet-500/10', text: 'text-violet-400' },
+  bloqueo: { label: 'Bloqueado', bg: 'bg-red-500/10', text: 'text-red-400' },
+  neutral: { label: 'Neutral', bg: 'bg-zinc-500/10', text: 'text-zinc-400' },
+};
+
+export default function CheckinsPage() {
+  const [stateData, setStateData] = useState<StateData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch('/api/user/state', { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then(
+        (data: {
+          success?: boolean;
+          streakDays?: number;
+          state?: string;
+          progressTrend?: string;
+        } | null) => {
+          if (!cancelled && data?.success) {
+            setStateData({
+              streakDays: data.streakDays ?? 0,
+              state: data.state ?? 'neutral',
+              progressTrend: data.progressTrend ?? 'igual',
+            });
+          }
+        }
+      )
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const stateInfo = STATE_LABEL[stateData?.state ?? 'neutral'] ?? STATE_LABEL.neutral;
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${GRADIENTS.background} py-8 px-4`}>
+    <div className={`min-h-screen bg-linear-to-br ${GRADIENTS.background} py-8 px-4`}>
       <div className={`${LAYOUTS.sectionInner} max-w-3xl space-y-8`}>
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <h1 className={`${TYPOGRAPHY.h1} text-white`}>Mi historial de check-ins</h1>
-          <Link href="/impulso/checkin" className={`${COMPONENTS.buttonPrimary} inline-flex items-center gap-2`}>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h1 className={`${TYPOGRAPHY.h1} text-white`}>Check-ins</h1>
+          <Link
+            href="/impulso/checkin"
+            className={`${COMPONENTS.buttonPrimary} inline-flex items-center gap-2 self-start sm:self-auto`}
+          >
             <Calendar className="w-4 h-4" />
             Nuevo check-in
           </Link>
@@ -35,48 +78,69 @@ export default function CheckinsPage() {
         {/* Stats */}
         <div className={`${LAYOUTS.gridThreeCol}`}>
           <div className={`${COMPONENTS.card} text-center space-y-2 p-6`}>
-            <p className="text-3xl font-bold text-cyan-400">7</p>
+            {loading ? (
+              <Skeleton className="h-10 w-16 mx-auto" />
+            ) : (
+              <div className="flex items-center justify-center gap-1">
+                <Flame className="w-5 h-5 text-amber-400" />
+                <p className="text-3xl font-bold text-amber-400">{stateData?.streakDays ?? 0}</p>
+              </div>
+            )}
             <p className="text-sm text-zinc-400">Racha actual</p>
           </div>
+
           <div className={`${COMPONENTS.card} text-center space-y-2 p-6`}>
-            <p className="text-3xl font-bold text-violet-400">21</p>
-            <p className="text-sm text-zinc-400">Check-ins total</p>
+            {loading ? (
+              <Skeleton className="h-10 w-16 mx-auto" />
+            ) : (
+              <span
+                className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${stateInfo.bg} ${stateInfo.text}`}
+              >
+                {stateInfo.label}
+              </span>
+            )}
+            <p className="text-sm text-zinc-400">Estado actual</p>
           </div>
+
           <div className={`${COMPONENTS.card} text-center space-y-2 p-6`}>
-            <p className="text-3xl font-bold text-cyan-400">98%</p>
-            <p className="text-sm text-zinc-400">Consistencia</p>
+            {loading ? (
+              <Skeleton className="h-10 w-16 mx-auto" />
+            ) : (
+              <div className="flex items-center justify-center gap-1">
+                <TrendingUp className="w-5 h-5 text-cyan-400" />
+                <p className="text-lg font-bold text-cyan-400 capitalize">
+                  {stateData?.progressTrend ?? 'igual'}
+                </p>
+              </div>
+            )}
+            <p className="text-sm text-zinc-400">Tendencia</p>
           </div>
         </div>
 
-        {/* Checkins List */}
-        <div className="space-y-3">
-          {checkins.map((checkin, i) => {
-            const colors = stateColors[checkin.state as keyof typeof stateColors];
-            return (
-              <div key={i} className={`${COMPONENTS.card} p-6 flex items-center justify-between`}>
-                <div className="flex items-center gap-4">
-                  <div className="flex flex-col gap-1">
-                    <p className="font-semibold text-white">{checkin.date}</p>
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${colors.bg} ${colors.text}`}>
-                        {colors.label}
-                      </span>
-                      <span className="text-zinc-500">Energía: {checkin.energy}/5</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <p className="font-bold text-cyan-400">{checkin.streak}</p>
-                    <p className="text-xs text-zinc-500">días</p>
-                  </div>
-                  <button className={`${COMPONENTS.buttonSecondary} text-sm`}>
-                    Ver
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+        {/* CTA */}
+        <div className={`${COMPONENTS.card} p-8 text-center space-y-4`}>
+          <Calendar className="w-10 h-10 text-violet-400 mx-auto" />
+          <h2 className="text-lg font-semibold text-white">Registra cómo estás hoy</h2>
+          <p className="text-zinc-400 text-sm">
+            El check-in diario ayuda a Luciérnaga a entender tu estado y acompañarte mejor.
+          </p>
+          <Link
+            href="/impulso/checkin"
+            className={`${COMPONENTS.buttonPrimary} inline-flex items-center gap-2`}
+          >
+            <Calendar className="w-4 h-4" />
+            Hacer check-in ahora
+          </Link>
+        </div>
+
+        {/* History link */}
+        <div className="text-center">
+          <Link
+            href="/impulso/checkin/history"
+            className="text-zinc-500 hover:text-cyan-400 text-sm transition-colors"
+          >
+            Ver historial completo →
+          </Link>
         </div>
       </div>
     </div>

@@ -76,7 +76,7 @@ export default function SettingsPage() {
       <div className={`${LAYOUTS.sectionInner} max-w-3xl space-y-8`}>
         {/* Header */}
         <div className="flex items-center gap-4">
-          <Link href="/app" className="text-zinc-400 hover:text-cyan-400 transition-colors">
+          <Link href="/app" className="p-2 -ml-2 rounded-lg text-zinc-400 hover:text-cyan-400 hover:bg-white/5 transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <h1 className={`${TYPOGRAPHY.h1} text-white`}>Configuración</h1>

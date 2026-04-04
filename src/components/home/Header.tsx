@@ -79,7 +79,7 @@ export default function Header() {
           {/* Mobile toggle */}
           <button
             onClick={() => setOpen((v) => !v)}
-            className="md:hidden p-2 rounded-lg text-zinc-300 hover:text-white hover:bg-white/8 transition-colors"
+            className="md:hidden p-2.5 min-h-11 min-w-11 flex items-center justify-center rounded-lg text-zinc-300 hover:text-white hover:bg-white/8 transition-colors"
             aria-label={open ? "Cerrar menú" : "Abrir menú"}
           >
             {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}

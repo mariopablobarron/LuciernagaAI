@@ -1,71 +1,214 @@
 'use client';
 
+import { use, useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Share2, Archive, Trash2 } from 'lucide-react';
-import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
+import { ArrowLeft, Send } from 'lucide-react';
+import { COMPONENTS, GRADIENTS, LAYOUTS } from '@/styles/design-system';
 
-export default function ConversationDetailPage({ params }: { params: { id: string } }) {
-  const messages = [
-    { id: 1, role: 'user', content: 'Tengo una idea para un proyecto pero no sé por dónde empezar' },
-    { id: 2, role: 'ai', content: '¿Cuál es lo más pequeño que podrías hacer en 30 minutos para validar si la idea funciona?' },
-    { id: 3, role: 'user', content: 'Podría escribir un párrafo describiendo el problema que resuelve' },
-    { id: 4, role: 'ai', content: 'Perfecto. Eso es tu siguiente paso. ¿Cuándo lo harás? ¿Hoy o mañana?' },
-  ];
+type Message = {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  createdAt: string;
+};
+
+type ChatApiResponse = {
+  success?: boolean;
+  response?: string;
+  error?: string;
+};
+
+export default function ConversationDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (!id) return;
+    let cancelled = false;
+
+    fetch(`/api/messages?conversationId=${id}`, { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { messages?: Message[] } | null) => {
+        if (!cancelled && data?.messages) setMessages(data.messages);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, sending]);
+
+  const handleSend = useCallback(async () => {
+    const trimmed = input.trim();
+    if (!trimmed || sending) return;
+
+    const userMsg: Message = {
+      id: `u_${Date.now()}`,
+      role: 'user',
+      content: trimmed,
+      createdAt: new Date().toISOString(),
+    };
+    setMessages((prev) => [...prev, userMsg]);
+    setInput('');
+    setError(null);
+    setSending(true);
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json', 'x-response-mode': 'json' },
+        body: JSON.stringify({ message: trimmed, conversationId: id }),
+      });
+
+      const data = (await res.json()) as ChatApiResponse;
+
+      if (!res.ok || !data.success) {
+        setError(data.error ?? 'Error al enviar el mensaje.');
+        return;
+      }
+
+      const assistantMsg: Message = {
+        id: `a_${Date.now()}`,
+        role: 'assistant',
+        content: data.response ?? '',
+        createdAt: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, assistantMsg]);
+    } catch {
+      setError('Error de conexión. Inténtalo de nuevo.');
+    } finally {
+      setSending(false);
+      textareaRef.current?.focus();
+    }
+  }, [input, sending, id]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        void handleSend();
+      }
+    },
+    [handleSend],
+  );
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${GRADIENTS.background} flex flex-col py-8 px-4`}>
-      <div className={`${LAYOUTS.sectionInner} max-w-3xl flex-1 space-y-6 flex flex-col`}>
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/app/conversations" className="text-zinc-400 hover:text-cyan-400 transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <h1 className={`${TYPOGRAPHY.h1} text-white`}>Cómo empezar mi proyecto</h1>
-          </div>
-          <div className="flex gap-2">
-            <button className="p-2 text-zinc-400 hover:text-cyan-400 transition-colors">
-              <Share2 className="w-5 h-5" />
-            </button>
-            <button className="p-2 text-zinc-400 hover:text-yellow-400 transition-colors">
-              <Archive className="w-5 h-5" />
-            </button>
-          </div>
+    <div className={`min-h-screen bg-linear-to-br ${GRADIENTS.background} flex flex-col`}>
+      {/* Header */}
+      <header className="sticky top-0 z-10 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur px-4 py-4">
+        <div className={`${LAYOUTS.sectionInner} max-w-3xl flex items-center gap-4`}>
+          <Link
+            href="/app/conversations"
+            className="text-zinc-400 hover:text-cyan-400 transition-colors shrink-0"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          <h1 className="text-base font-semibold text-white truncate">Conversación</h1>
         </div>
+      </header>
 
-        {/* Messages */}
-        <div className="flex-1 space-y-4 overflow-y-auto">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
+      {/* Messages */}
+      <main className="flex-1 overflow-y-auto px-4 py-6">
+        <div className={`${LAYOUTS.sectionInner} max-w-3xl space-y-4`}>
+          {loading ? (
+            <>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`flex ${i % 2 === 0 ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div className="animate-pulse h-12 w-64 bg-zinc-800/60 rounded-xl" />
+                </div>
+              ))}
+            </>
+          ) : messages.length === 0 ? (
+            <p className="text-zinc-500 text-sm text-center py-12">
+              Sin mensajes. Escribe algo para comenzar.
+            </p>
+          ) : (
+            messages.map((message) => (
               <div
-                className={`max-w-md rounded-xl px-4 py-3 ${
-                  message.role === 'user'
-                    ? 'bg-cyan-600 text-white'
-                    : 'bg-zinc-800 text-zinc-100'
-                }`}
+                key={message.id}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                <p className="text-sm leading-relaxed">{message.content}</p>
+                <div
+                  className={`max-w-[85%] sm:max-w-lg rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
+                    message.role === 'user'
+                      ? 'bg-linear-to-br from-violet-600 to-fuchsia-600 text-white'
+                      : 'bg-zinc-800 text-zinc-100'
+                  }`}
+                >
+                  {message.content}
+                </div>
+              </div>
+            ))
+          )}
+
+          {sending && (
+            <div className="flex justify-start">
+              <div className="bg-zinc-800 rounded-2xl px-4 py-3 flex gap-1 items-center">
+                {[0, 1, 2].map((i) => (
+                  <span
+                    key={i}
+                    className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce"
+                    style={{ animationDelay: `${i * 120}ms` }}
+                  />
+                ))}
               </div>
             </div>
-          ))}
-        </div>
+          )}
 
-        {/* Input area */}
-        <div className={`${COMPONENTS.card} p-4 space-y-3`}>
-          <textarea
-            placeholder="Escribe tu respuesta..."
-            rows={3}
-            className={`${COMPONENTS.inputField} w-full resize-none`}
-          />
-          <div className="flex gap-2 justify-end">
-            <button className={`${COMPONENTS.buttonSecondary}`}>Cancelar</button>
-            <button className={`${COMPONENTS.buttonPrimary}`}>Enviar</button>
-          </div>
+          {error && <p className="text-xs text-red-400 text-center">{error}</p>}
+
+          <div ref={bottomRef} />
         </div>
-      </div>
+      </main>
+
+      {/* Input */}
+      <footer className="sticky bottom-0 border-t border-zinc-800 bg-zinc-950/90 backdrop-blur px-4 py-4">
+        <div className={`${LAYOUTS.sectionInner} max-w-3xl flex gap-3 items-end`}>
+          <textarea
+            ref={textareaRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Escribe tu mensaje… (Enter para enviar)"
+            rows={1}
+            className={`${COMPONENTS.inputField} flex-1 resize-none min-h-11 max-h-36 py-2.5`}
+            onInput={(e) => {
+              const el = e.currentTarget;
+              el.style.height = 'auto';
+              el.style.height = `${el.scrollHeight}px`;
+            }}
+          />
+          <button
+            onClick={() => void handleSend()}
+            disabled={!input.trim() || sending}
+            aria-label="Enviar"
+            className={`${COMPONENTS.buttonPrimary} p-3 shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
+          >
+            <Send className="w-4 h-4" />
+          </button>
+        </div>
+      </footer>
     </div>
   );
 }

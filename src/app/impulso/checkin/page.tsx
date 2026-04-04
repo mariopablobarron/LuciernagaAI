@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ArrowLeft, Flame } from 'lucide-react';
 import Link from 'next/link';
+import { COMPONENTS, LAYOUTS, GRADIENTS, TYPOGRAPHY } from '@/styles/design-system';
 
 type EmotionalState = 'blocked' | 'anxious' | 'doubt' | 'clarity' | 'unmotivated' | 'neutral';
 
@@ -35,8 +36,8 @@ export default function CheckinPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center px-4 py-8">
-        <div className="max-w-lg w-full card-surface p-8 text-center space-y-6">
+      <div className={`min-h-screen bg-gradient-to-br ${GRADIENTS.background} flex items-center justify-center px-4 py-8`}>
+        <div className={`max-w-lg w-full ${COMPONENTS.card} p-8 text-center space-y-6`}>
           <div className="text-6xl">✓</div>
           <h1 className="text-3xl font-bold text-white">Check-in registrado</h1>
           <p className="text-zinc-400">Buen trabajo por aparecer hoy.</p>
@@ -70,13 +71,13 @@ export default function CheckinPage() {
           <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <Link
               href="/impulso/retos"
-              className="flex-1 py-2 px-4 rounded-lg bg-amber-500 text-white font-semibold hover:bg-amber-400 transition-colors text-center"
+              className={`${COMPONENTS.buttonPrimary} flex-1 text-center`}
             >
               Ver retos
             </Link>
             <Link
               href="/app"
-              className="flex-1 py-2 px-4 rounded-lg border border-zinc-700 text-white font-semibold hover:bg-zinc-900/50 transition-colors text-center"
+              className={`${COMPONENTS.buttonSecondary} flex-1 text-center`}
             >
               Ir al chat
             </Link>
@@ -87,15 +88,15 @@ export default function CheckinPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 py-8 px-4">
+    <div className={`min-h-screen bg-gradient-to-br ${GRADIENTS.background} py-8 px-4`}>
       <div className="max-w-lg mx-auto space-y-8">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <Link href="/impulso" className="text-zinc-400 hover:text-white transition-colors">
+          <Link href="/impulso" className="text-zinc-400 hover:text-cyan-400 transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-white">Check-in de hoy</h1>
+            <h1 className={`${TYPOGRAPHY.h2} text-white`}>Check-in de hoy</h1>
             <p className="text-sm text-zinc-500">
               {new Date().toLocaleDateString('es-ES', { weekday: 'short', month: 'short', day: 'numeric' })}
             </p>
@@ -103,7 +104,7 @@ export default function CheckinPage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="card-surface p-8 space-y-8">
+        <form onSubmit={handleSubmit} className={`${COMPONENTS.card} p-8 space-y-8`}>
           {/* 1. MOOD */}
           <div className="space-y-4">
             <label className="block text-sm font-semibold text-white">¿Cómo estuvo tu día?</label>
@@ -119,7 +120,7 @@ export default function CheckinPage() {
                   onClick={() => setMood(option.value as 'good' | 'regular' | 'bad')}
                   className={`py-3 rounded-lg font-semibold transition-all ${
                     mood === option.value
-                      ? 'bg-amber-500 text-white border-2 border-amber-400'
+                      ? 'bg-cyan-500 text-white border-2 border-cyan-400'
                       : 'bg-zinc-900 border-2 border-zinc-800 text-zinc-400 hover:border-zinc-700'
                   }`}
                 >
@@ -140,7 +141,7 @@ export default function CheckinPage() {
                   onClick={() => setEmotionalState(option.id)}
                   className={`py-3 px-4 rounded-lg font-semibold transition-all text-sm ${
                     emotionalState === option.id
-                      ? 'bg-indigo-500 text-white border-2 border-indigo-400'
+                      ? 'bg-violet-500 text-white border-2 border-violet-400'
                       : 'bg-zinc-900 border-2 border-zinc-800 text-zinc-300 hover:border-zinc-700'
                   }`}
                 >
@@ -162,7 +163,7 @@ export default function CheckinPage() {
                   onClick={() => setEnergyLevel(level)}
                   className={`flex-1 py-3 rounded-lg font-bold transition-all ${
                     energyLevel === level
-                      ? 'bg-indigo-500 text-white'
+                      ? 'bg-cyan-500 text-white'
                       : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:border-zinc-700'
                   }`}
                 >
@@ -187,7 +188,7 @@ export default function CheckinPage() {
               value={challengeStatus}
               onChange={(e) => setChallengeStatus(e.target.value)}
               placeholder="Ej: Completé los 10 minutos de arranque"
-              className="input-field w-full"
+              className={`${COMPONENTS.inputField} w-full`}
             />
           </div>
 
@@ -202,7 +203,7 @@ export default function CheckinPage() {
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="Sé honesto. Qué hiciste, qué evitaste, cómo te sentiste."
-                className="input-field w-full min-h-32 resize-none"
+                className={`${COMPONENTS.inputField} w-full min-h-32 resize-none`}
                 required
               />
               <span className="absolute bottom-3 right-3 text-xs text-zinc-500">
@@ -215,7 +216,7 @@ export default function CheckinPage() {
           <button
             type="submit"
             disabled={!isComplete}
-            className="w-full py-3 px-4 rounded-lg bg-amber-500 text-white font-semibold hover:bg-amber-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`${COMPONENTS.buttonPrimary} w-full disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             Registrar check-in
           </button>

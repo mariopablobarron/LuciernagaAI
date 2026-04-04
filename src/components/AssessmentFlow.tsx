@@ -47,7 +47,7 @@ export default function AssessmentFlow({ userId }: Props) {
   if (!assessment || dismissed) return null;
   if (submitted && result) {
     return (
-      <Card className="border-indigo-500/30 bg-indigo-950/20 mb-4">
+      <Card className="border-cyan-500/30 bg-cyan-950/20 mb-4">
         <CardContent className="p-4 space-y-2">
           <p className="text-sm font-semibold text-white">Evaluación completada ✓</p>
           <p className="text-sm text-zinc-300">
@@ -89,11 +89,11 @@ export default function AssessmentFlow({ userId }: Props) {
   }
 
   return (
-    <Card className="border-indigo-500/30 bg-indigo-950/20 mb-4">
+    <Card className="border-cyan-500/30 bg-cyan-950/20 mb-4">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs text-indigo-400 font-semibold uppercase tracking-widest mb-1">
+            <p className="text-xs text-cyan-400 font-semibold uppercase tracking-widest mb-1">
               Tu psicólogo te ha enviado una evaluación
             </p>
             <CardTitle className="text-base text-white">{assessment.title}</CardTitle>

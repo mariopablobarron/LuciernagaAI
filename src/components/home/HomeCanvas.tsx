@@ -67,7 +67,7 @@ export default function HomeCanvas() {
   const emotionGradients: Record<EmotionalStateType, string> = {
     blocked: "from-gray-950 via-gray-900 to-gray-950", // Gris oscuro elegante
     anxious: "from-amber-950 via-orange-900 to-amber-950", // Cálido vibrante
-    doubt: "from-purple-950 via-indigo-900 to-purple-950", // Profundo y moderno
+    doubt: "from-cyan-950 via-cyan-900 to-cyan-950", // Fresco y moderno
     clarity: "from-teal-950 via-cyan-900 to-teal-950", // Fresco y premium
   };
 

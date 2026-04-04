@@ -32,7 +32,7 @@ export default function ConsentModal({ onAccept }: Props) {
 
         {/* Header */}
         <div>
-          <p className="text-xs text-indigo-400 font-semibold uppercase tracking-widest mb-1">
+          <p className="text-xs text-cyan-400 font-semibold uppercase tracking-widest mb-1">
             Luciernaga AI
           </p>
           <h2 className="text-xl font-bold text-white">Consentimiento informado</h2>
@@ -70,7 +70,7 @@ export default function ConsentModal({ onAccept }: Props) {
             type="checkbox"
             checked={checked}
             onChange={(e) => setChecked(e.target.checked)}
-            className="mt-0.5 h-4 w-4 rounded border-zinc-700 bg-zinc-900 accent-indigo-500"
+            className="mt-0.5 h-4 w-4 rounded border-zinc-700 bg-zinc-900 accent-cyan-500"
           />
           <span className="text-sm text-zinc-300">
             He leído y acepto el uso de Luciernaga AI tal como se describe arriba.
@@ -82,7 +82,7 @@ export default function ConsentModal({ onAccept }: Props) {
           <Button
             onClick={() => void handleAccept()}
             disabled={!checked || saving}
-            className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white"
+            className="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white"
           >
             {saving ? "Guardando..." : "Acepto y continúo"}
           </Button>

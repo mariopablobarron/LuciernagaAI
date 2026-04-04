@@ -32,7 +32,7 @@ export function StateCard({ state, pattern, energyLevel, description }: StateCar
               <div
                 key={level}
                 className={`h-2 flex-1 rounded-full transition-colors ${
-                  level <= energyLevel ? 'bg-indigo-500' : 'bg-zinc-800'
+                  level <= energyLevel ? 'bg-cyan-500' : 'bg-zinc-800'
                 }`}
               />
             ))}

@@ -2,45 +2,45 @@
 
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { TYPOGRAPHY, GRADIENTS, COMPONENTS, LAYOUTS } from '@/styles/design-system';
 
 export default function LandingPageDesign() {
   return (
-    <div className="min-h-screen bg-zinc-950 text-white font-sans">
+    <div className={`min-h-screen bg-gradient-to-br ${GRADIENTS.background} text-white font-sans`}>
       {/* ─── HERO SECTION ─── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-20 pb-12 overflow-hidden">
-        {/* Radial glow background */}
-        <div className="absolute inset-0 -z-10 opacity-40">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-gradient-to-r from-indigo-400 to-purple-400 blur-3xl" />
+      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 md:px-6 pt-20 md:pt-24 pb-12 overflow-hidden">
+        {/* Radial glow background - Fluorescent */}
+        <div className="absolute inset-0 -z-10 opacity-50">
+          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-violet-500/20 blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-fuchsia-500/20 blur-3xl" />
+          <div className="absolute top-1/2 right-0 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl" />
         </div>
 
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 mb-8 px-3 py-1 rounded-full border border-zinc-800 bg-zinc-900/50 backdrop-blur">
-          <span className="relative flex h-2 w-2 rounded-full bg-indigo-400">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
+        <div className={`inline-flex items-center gap-2 mb-8 px-3 py-1 rounded-full border border-purple-500/50 bg-purple-500/10 backdrop-blur`}>
+          <span className="relative flex h-2 w-2 rounded-full bg-cyan-400">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
           </span>
-          <span className="text-xs font-medium text-zinc-300">Mentoría conversacional con IA</span>
+          <span className="text-xs font-medium text-cyan-300">Mentoría conversacional con IA</span>
         </div>
 
         {/* H1 */}
-        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-center leading-tight mb-6 max-w-4xl">
-          Deja de darle{' '}
-          <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
-            vueltas.
-          </span>
-          <br />
+        <h1 className={`${TYPOGRAPHY.h1} text-center leading-tight mb-6 max-w-4xl bg-gradient-to-r ${GRADIENTS.primary} bg-clip-text text-transparent`}>
+          Deja de darle vueltas.
+          <br className="hidden md:block" />
           Empieza a actuar.
         </h1>
 
         {/* Subtitle */}
-        <p className="text-lg sm:text-xl text-zinc-400 text-center max-w-2xl mb-8 leading-relaxed">
+        <p className={`${TYPOGRAPHY.body} text-cyan-300/80 text-center max-w-2xl mb-8 leading-relaxed`}>
           Luciernaga AI convierte tu bloqueo en claridad y tu claridad en acción concreta.
         </p>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-12">
+        <div className="flex flex-col sm:flex-row gap-4 mb-12 w-full sm:w-auto">
           <Link
             href="/explore"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-zinc-950 font-semibold rounded-lg hover:bg-zinc-100 transition-colors"
+            className={`${COMPONENTS.buttonPrimary} inline-flex items-center justify-center gap-2`}
           >
             Empieza ahora <ArrowRight className="w-4 h-4" />
           </Link>
@@ -49,7 +49,7 @@ export default function LandingPageDesign() {
               e.preventDefault();
               document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-zinc-700 text-white font-semibold rounded-lg hover:bg-zinc-900/50 transition-colors"
+            className={`${COMPONENTS.buttonSecondary} inline-flex items-center justify-center gap-2`}
           >
             Ver cómo funciona
           </button>
@@ -68,11 +68,11 @@ export default function LandingPageDesign() {
           <div className="flex items-center">
             <div className="flex -space-x-3">
               {[
-                { initial: 'V', bg: 'bg-indigo-500' },
-                { initial: 'M', bg: 'bg-purple-500' },
-                { initial: 'P', bg: 'bg-pink-500' },
-                { initial: 'A', bg: 'bg-blue-500' },
-                { initial: 'L', bg: 'bg-cyan-500' },
+                { initial: 'V', bg: 'bg-violet-500' },
+                { initial: 'M', bg: 'bg-fuchsia-500' },
+                { initial: 'P', bg: 'bg-violet-600' },
+                { initial: 'A', bg: 'bg-cyan-500' },
+                { initial: 'L', bg: 'bg-cyan-400' },
               ].map((avatar, i) => (
                 <div
                   key={i}
@@ -96,10 +96,10 @@ export default function LandingPageDesign() {
         <div className="max-w-6xl mx-auto">
           {/* Section label */}
           <div className="text-center mb-12">
-            <p className="text-sm font-semibold text-indigo-400 tracking-widest uppercase mb-3">
+            <p className="text-sm font-semibold text-cyan-400 tracking-widest uppercase mb-3">
               Cómo funciona
             </p>
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
+            <h2 className={`${TYPOGRAPHY.h2} text-white mb-4`}>
               Diseñado para sacarte del bucle
             </h2>
             <p className="text-zinc-400 max-w-xl mx-auto">
@@ -108,7 +108,7 @@ export default function LandingPageDesign() {
           </div>
 
           {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className={LAYOUTS.gridThreeCol}>
             {[
               {
                 icon: '○',
@@ -128,15 +128,15 @@ export default function LandingPageDesign() {
             ].map((feature, i) => (
               <div
                 key={i}
-                className="group p-8 rounded-xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900 hover:border-zinc-700 transition-all hover:shadow-lg hover:shadow-indigo-500/10"
+                className={`group p-8 ${COMPONENTS.card} ${COMPONENTS.cardHover}`}
               >
                 {/* Icon */}
-                <div className="text-4xl font-light text-indigo-400 mb-4 group-hover:text-indigo-300 transition-colors">
+                <div className="text-4xl font-light text-violet-400 mb-4 group-hover:text-cyan-300 transition-colors">
                   {feature.icon}
                 </div>
 
                 {/* Title */}
-                <h3 className="text-xl font-bold text-white mb-3">
+                <h3 className={`${TYPOGRAPHY.h3} text-white mb-3`}>
                   {feature.title}
                 </h3>
 
@@ -146,7 +146,7 @@ export default function LandingPageDesign() {
                 </p>
 
                 {/* Hover indicator */}
-                <div className="mt-6 h-0.5 w-0 bg-gradient-to-r from-indigo-400 to-transparent group-hover:w-full transition-all duration-500" />
+                <div className="mt-6 h-0.5 w-0 bg-gradient-to-r from-violet-400 to-cyan-400 group-hover:w-full transition-all duration-500" />
               </div>
             ))}
           </div>
@@ -154,26 +154,26 @@ export default function LandingPageDesign() {
       </section>
 
       {/* ─── FINAL CTA SECTION ─── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 py-20 overflow-hidden">
+      <section className={`relative min-h-screen flex flex-col items-center justify-center px-4 py-20 overflow-hidden bg-gradient-to-br ${GRADIENTS.background}`}>
         {/* Radial glow background */}
         <div className="absolute inset-0 -z-10 opacity-30">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-transparent to-purple-500/20 blur-3xl" />
+          <div className="absolute inset-0 bg-gradient-to-br from-violet-500/20 via-transparent to-cyan-500/20 blur-3xl" />
         </div>
 
         {/* Content */}
         <div className="max-w-3xl text-center">
-          <h2 className="text-5xl sm:text-6xl font-bold text-white mb-6">
+          <h2 className={`${TYPOGRAPHY.h1} text-white mb-6`}>
             ¿Listo para tu primer paso?
           </h2>
 
-          <p className="text-lg sm:text-xl text-zinc-400 mb-12 leading-relaxed">
+          <p className={`${TYPOGRAPHY.body} text-zinc-400 mb-12 leading-relaxed`}>
             Empieza en menos de 60 segundos. Sin registro obligatorio.
           </p>
 
           {/* CTA Button */}
           <Link
             href="/explore"
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-indigo-500 to-indigo-400 text-white font-bold rounded-lg hover:from-indigo-400 hover:to-indigo-300 transition-all hover:shadow-lg hover:shadow-indigo-500/50"
+            className={`${COMPONENTS.buttonPrimary} inline-flex items-center justify-center gap-2`}
           >
             Abrir Luciernaga AI <ArrowRight className="w-5 h-5" />
           </Link>
@@ -193,7 +193,7 @@ export default function LandingPageDesign() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-2xl">🔥</span>
-                <span className="font-bold text-lg text-white">Luciernaga</span>
+                <span className={`${TYPOGRAPHY.h3} text-white`}>Luciernaga</span>
               </div>
               <p className="text-sm text-zinc-400">
                 Mentoría conversacional con IA para sacarte del bucle.
@@ -205,12 +205,12 @@ export default function LandingPageDesign() {
               <h4 className="font-semibold text-white mb-4">Producto</h4>
               <ul className="space-y-2 text-sm text-zinc-400">
                 <li>
-                  <Link href="/explore" className="hover:text-indigo-400 transition-colors">
+                  <Link href="/explore" className="hover:text-cyan-400 transition-colors">
                     Empieza ahora
                   </Link>
                 </li>
                 <li>
-                  <Link href="/dashboard" className="hover:text-indigo-400 transition-colors">
+                  <Link href="/dashboard" className="hover:text-cyan-400 transition-colors">
                     Tu progreso
                   </Link>
                 </li>
@@ -222,12 +222,12 @@ export default function LandingPageDesign() {
               <h4 className="font-semibold text-white mb-4">Legal</h4>
               <ul className="space-y-2 text-sm text-zinc-400">
                 <li>
-                  <Link href="/api/legal" className="hover:text-indigo-400 transition-colors">
+                  <Link href="/api/legal" className="hover:text-cyan-400 transition-colors">
                     Privacidad
                   </Link>
                 </li>
                 <li>
-                  <a href="mailto:hola@luciernaga.ai" className="hover:text-indigo-400 transition-colors">
+                  <a href="mailto:hola@luciernaga.ai" className="hover:text-cyan-400 transition-colors">
                     Contacto
                   </a>
                 </li>

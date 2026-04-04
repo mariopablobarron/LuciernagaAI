@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { COMPONENTS, TYPOGRAPHY } from "@/styles/design-system";
 
 export default function ContactForm() {
   const [name, setName] = useState("");
@@ -52,11 +53,11 @@ export default function ContactForm() {
 
   return (
     <div className="flex items-center justify-center">
-      <div className="w-full max-w-md card-surface p-8">
+      <div className={`w-full max-w-md ${COMPONENTS.card}`}>
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Name Field */}
           <div className="space-y-2">
-            <label htmlFor="name" className="block text-sm font-medium text-foreground">
+            <label htmlFor="name" className={`block ${TYPOGRAPHY.label}`}>
               Nombre
             </label>
             <input
@@ -66,14 +67,14 @@ export default function ContactForm() {
               onChange={(e) => setName(e.target.value)}
               placeholder="Tu nombre completo"
               disabled={isSubmitting}
-              className="input-field w-full"
+              className={COMPONENTS.inputField}
               required
             />
           </div>
 
           {/* Email Field */}
           <div className="space-y-2">
-            <label htmlFor="email" className="block text-sm font-medium text-foreground">
+            <label htmlFor="email" className={`block ${TYPOGRAPHY.label}`}>
               Email
             </label>
             <input
@@ -83,14 +84,14 @@ export default function ContactForm() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="tu@email.com"
               disabled={isSubmitting}
-              className="input-field w-full"
+              className={COMPONENTS.inputField}
               required
             />
           </div>
 
           {/* Message Field */}
           <div className="space-y-2">
-            <label htmlFor="message" className="block text-sm font-medium text-foreground">
+            <label htmlFor="message" className={`block ${TYPOGRAPHY.label}`}>
               Mensaje
             </label>
             <textarea
@@ -100,20 +101,20 @@ export default function ContactForm() {
               placeholder="Cuéntanos qué tienes en mente..."
               disabled={isSubmitting}
               rows={5}
-              className="input-field w-full resize-none"
+              className={`${COMPONENTS.inputField} resize-none`}
               required
             />
           </div>
 
           {/* Status Messages */}
           {submitStatus === "success" && (
-            <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/20 p-3 text-sm text-emerald-400">
+            <div className={COMPONENTS.badgeSuccess}>
               ¡Mensaje enviado! Nos pondremos en contacto pronto.
             </div>
           )}
 
           {submitStatus === "error" && (
-            <div className="rounded-lg bg-red-500/10 border border-red-500/20 p-3 text-sm text-red-400">
+            <div className={COMPONENTS.badgeError}>
               Por favor, completa todos los campos correctamente.
             </div>
           )}
@@ -122,12 +123,12 @@ export default function ContactForm() {
           <button
             type="submit"
             disabled={isSubmitting || !name.trim() || !email.trim() || !message.trim()}
-            className="w-full py-2 px-4 rounded-lg bg-indigo-500 text-white font-semibold hover:bg-indigo-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`${COMPONENTS.buttonPrimary} w-full py-2`}
           >
             {isSubmitting ? "Enviando..." : "Enviar mensaje"}
           </button>
 
-          <p className="text-xs text-muted-foreground text-center">
+          <p className="text-xs text-zinc-500 text-center">
             Responderemos en las próximas 24 horas.
           </p>
         </form>

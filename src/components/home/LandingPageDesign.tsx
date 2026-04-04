@@ -2,45 +2,45 @@
 
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { TYPOGRAPHY, GRADIENTS, COMPONENTS, LAYOUTS } from '@/styles/design-system';
 
 export default function LandingPageDesign() {
   return (
-    <div className="min-h-screen bg-zinc-950 text-white font-sans">
+    <div className={`min-h-screen bg-gradient-to-br ${GRADIENTS.background} text-white font-sans`}>
       {/* ─── HERO SECTION ─── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-20 pb-12 overflow-hidden">
-        {/* Radial glow background */}
-        <div className="absolute inset-0 -z-10 opacity-40">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-gradient-to-r from-indigo-400 to-purple-400 blur-3xl" />
+      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 md:px-6 pt-20 md:pt-24 pb-12 overflow-hidden">
+        {/* Radial glow background - Fluorescent */}
+        <div className="absolute inset-0 -z-10 opacity-50">
+          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-violet-500/20 blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-fuchsia-500/20 blur-3xl" />
+          <div className="absolute top-1/2 right-0 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl" />
         </div>
 
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 mb-8 px-3 py-1 rounded-full border border-zinc-800 bg-zinc-900/50 backdrop-blur">
-          <span className="relative flex h-2 w-2 rounded-full bg-indigo-400">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
+        <div className={`inline-flex items-center gap-2 mb-8 px-3 py-1 rounded-full border border-purple-500/50 bg-purple-500/10 backdrop-blur`}>
+          <span className="relative flex h-2 w-2 rounded-full bg-cyan-400">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
           </span>
-          <span className="text-xs font-medium text-zinc-300">Mentoría conversacional con IA</span>
+          <span className="text-xs font-medium text-cyan-300">Mentoría conversacional con IA</span>
         </div>
 
         {/* H1 */}
-        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-center leading-tight mb-6 max-w-4xl">
-          Deja de darle{' '}
-          <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
-            vueltas.
-          </span>
-          <br />
+        <h1 className={`${TYPOGRAPHY.h1} text-center leading-tight mb-6 max-w-4xl bg-gradient-to-r ${GRADIENTS.primary} bg-clip-text text-transparent`}>
+          Deja de darle vueltas.
+          <br className="hidden md:block" />
           Empieza a actuar.
         </h1>
 
         {/* Subtitle */}
-        <p className="text-lg sm:text-xl text-zinc-400 text-center max-w-2xl mb-8 leading-relaxed">
+        <p className={`${TYPOGRAPHY.body} text-cyan-300/80 text-center max-w-2xl mb-8 leading-relaxed`}>
           Luciernaga AI convierte tu bloqueo en claridad y tu claridad en acción concreta.
         </p>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-12">
+        <div className="flex flex-col sm:flex-row gap-4 mb-12 w-full sm:w-auto">
           <Link
             href="/explore"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-zinc-950 font-semibold rounded-lg hover:bg-zinc-100 transition-colors"
+            className={`${COMPONENTS.buttonPrimary} inline-flex items-center justify-center gap-2`}
           >
             Empieza ahora <ArrowRight className="w-4 h-4" />
           </Link>
@@ -49,7 +49,7 @@ export default function LandingPageDesign() {
               e.preventDefault();
               document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-zinc-700 text-white font-semibold rounded-lg hover:bg-zinc-900/50 transition-colors"
+            className={`${COMPONENTS.buttonSecondary} inline-flex items-center justify-center gap-2`}
           >
             Ver cómo funciona
           </button>

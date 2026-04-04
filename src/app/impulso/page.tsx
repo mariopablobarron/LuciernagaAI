@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Flame, Zap, Shield, Lock } from 'lucide-react';
 import Link from 'next/link';
+import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
 
 export default function ImpulsoPage() {
   const [activeTab, setActiveTab] = useState<'diagnostico' | 'retos' | 'insights' | 'mensajes'>('diagnostico');
@@ -15,29 +16,31 @@ export default function ImpulsoPage() {
   ] as const;
 
   return (
-    <div className="min-h-screen bg-zinc-950 py-8 px-4">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className={`min-h-screen bg-gradient-to-br ${GRADIENTS.background} py-8 md:py-12 px-4`}>
+      <div className={`${LAYOUTS.sectionInner} max-w-6xl space-y-8`}>
         {/* Header */}
         <div>
-          <h1 className="text-4xl font-bold text-white mb-2">Programa Impulso</h1>
-          <p className="text-zinc-400">21 días de acción consistente</p>
+          <h1 className={`${TYPOGRAPHY.h1} bg-gradient-to-r ${GRADIENTS.primary} bg-clip-text text-transparent mb-2`}>
+            Programa Impulso
+          </h1>
+          <p className="text-cyan-300/80 text-lg">21 días de acción consistente</p>
         </div>
 
         {/* Diagnostico Section */}
         {activeTab === 'diagnostico' && (
           <>
             {/* Profile Card */}
-            <div className="card-surface p-8 space-y-6">
+            <div className={`${COMPONENTS.card} space-y-6`}>
               <div className="text-center space-y-4">
                 <div className="text-5xl">🚀</div>
-                <h2 className="text-3xl font-bold text-white">Emprendedor</h2>
-                <p className="text-zinc-400 max-w-2xl">Tu perfil muestra energía alta y capacidad de acción. Tu desafío es mantener la consistencia a largo plazo.</p>
+                <h2 className={TYPOGRAPHY.h2}>Emprendedor</h2>
+                <p className="text-cyan-300/80 max-w-2xl">Tu perfil muestra energía alta y capacidad de acción. Tu desafío es mantener la consistencia a largo plazo.</p>
               </div>
             </div>
 
             {/* Streak Card */}
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="card-surface p-8 text-center space-y-3">
+            <div className={LAYOUTS.gridThreeCol}>
+              <div className={`${COMPONENTS.card} text-center space-y-3`}>
                 <div className="flex items-center justify-center gap-2">
                   <Flame className="w-6 h-6 text-amber-500" />
                   <p className="text-4xl font-bold text-white">7</p>

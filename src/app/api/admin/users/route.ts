@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
     const riskOnly = searchParams.get("risk") === "1";
 
     const page = parsePositiveInt(searchParams.get("page"), 1);
-    const pageSize = clamp(parsePositiveInt(searchParams.get("pageSize"), 20), 5, 100);
+    const pageSize = clamp(parsePositiveInt(searchParams.get("pageSize"), 50), 5, 200);
 
     const prisma = getPrismaClient();
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendAlert } from "@/lib/alerts";
+import { logError } from "@/lib/logger";
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest) {
       message: "Alert sent to Telegram and Email",
     });
   } catch (error) {
-    console.error(error);
+    logError("ALERTS", error, { route: "/api/alerts" });
     return NextResponse.json(
       { error: "Error sending alert" },
       { status: 500 }

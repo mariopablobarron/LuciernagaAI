@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { logError, logInfo } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,12 +25,7 @@ export async function POST(request: NextRequest) {
 
     // TODO: Aquí iría la lógica de envío real
     // Por ahora solo guardamos el mensaje en logs
-    console.log("Nuevo mensaje de contacto:", {
-      name,
-      email,
-      message,
-      timestamp: new Date().toISOString(),
-    });
+    logInfo("CONTACT", "nuevo_mensaje", { name, email, timestamp: new Date().toISOString() });
 
     // Opcionalmente: Enviar email usando un servicio como SendGrid, Resend, etc.
     // await sendEmailNotification(email, name, message);
@@ -39,7 +35,7 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error en endpoint de contacto:", error);
+    logError("CONTACT", error, { route: "/api/contact" });
     return NextResponse.json(
       { error: "Error al procesar la solicitud" },
       { status: 500 }

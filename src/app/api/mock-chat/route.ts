@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { detectUserState } from "@/lib/user-state";
+import { logError, logInfo } from "@/lib/logger";
 
 /**
  * Endpoint de testing/desarrollo
@@ -81,7 +82,7 @@ export async function POST(req: NextRequest) {
 
     const state = detectUserState(message || "");
 
-    console.log(`[MOCK] 🎭 Estado: ${state}, userId: ${userId}`);
+    logInfo("MOCK", "state_detected", { state, userId });
 
     return NextResponse.json({
       ok: true,
@@ -92,7 +93,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: unknown) {
     const details = error instanceof Error ? error.message : "Unknown error";
-    console.error("[MOCK] Error:", error);
+    logError("MOCK", error);
     return NextResponse.json(
       { error: "Error en mock", details },
       { status: 500 }

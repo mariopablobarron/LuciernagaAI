@@ -1,5 +1,8 @@
 // Sistema de alertas para Telegram y Email
 
+import { fetchWithTimeout } from "@/lib/fetchWithTimeout";
+import { logError, logWarn } from "@/lib/logger";
+
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -63,7 +66,7 @@ async function sendTelegram(alert: Alert): Promise<void> {
   const chatId = process.env.TELEGRAM_CHAT_ID;
 
   if (!botToken || !chatId) {
-    console.warn("Telegram credentials missing, skipping alert");
+    logWarn("ALERTS", "Telegram credentials missing, skipping alert");
     return;
   }
 
@@ -73,7 +76,7 @@ async function sendTelegram(alert: Alert): Promise<void> {
   }`;
 
   try {
-    const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+    const response = await fetchWithTimeout(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -86,10 +89,10 @@ async function sendTelegram(alert: Alert): Promise<void> {
     });
 
     if (!response.ok) {
-      console.error("Telegram error:", await response.text());
+      logError("ALERTS", new Error(`Telegram HTTP ${response.status}: ${await response.text().catch(() => "")}`));
     }
   } catch (error) {
-    console.error("Failed to send Telegram alert:", error);
+    logError("ALERTS", error, { area: "sendTelegram" });
   }
 }
 
@@ -99,7 +102,7 @@ async function sendEmail(alert: Alert): Promise<void> {
   const toEmail = process.env.ALERT_EMAIL;
 
   if (!emailProvider || !apiKey || !toEmail) {
-    console.warn("Email credentials missing, skipping alert");
+    logWarn("ALERTS", "Email credentials missing, skipping alert");
     return;
   }
 
@@ -114,7 +117,7 @@ async function sendEmail(alert: Alert): Promise<void> {
 
   if (emailProvider === "sendgrid") {
     try {
-      await fetch("https://api.sendgrid.com/v3/mail/send", {
+      await fetchWithTimeout("https://api.sendgrid.com/v3/mail/send", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiKey}`,
@@ -128,7 +131,7 @@ async function sendEmail(alert: Alert): Promise<void> {
         }),
       });
     } catch (error) {
-      console.error("SendGrid error:", error);
+      logError("ALERTS", error, { area: "sendEmail_sendgrid" });
     }
   }
 }
@@ -258,13 +261,13 @@ export async function sendAdminUserAlert(params: {
     `Último mensaje: ${truncateText(params.lastMessage)}`;
 
   try {
-    await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+    await fetchWithTimeout(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ chat_id: adminChatId, text }),
     });
   } catch (error) {
-    console.error("[ALERTS] sendAdminUserAlert failed:", error);
+    logError("ALERTS", error, { area: "sendAdminUserAlert" });
   }
 }
 

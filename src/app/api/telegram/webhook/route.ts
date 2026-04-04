@@ -20,6 +20,7 @@ import { sendAdminUserAlert } from "@/lib/alerts";
 import { DEFAULT_EMOTIONAL_PROFILE } from "@/types/emotional-profile";
 import { getPrismaClient } from "@/db/prisma";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { fetchWithTimeout } from "@/lib/fetchWithTimeout";
 
 // ---- Telegram types ----
 
@@ -223,7 +224,7 @@ async function sendTelegramMessage(chatId: number, text: string): Promise<void> 
     return;
   }
   try {
-    const res = await fetch(`${TELEGRAM_API}/bot${token}/sendMessage`, {
+    const res = await fetchWithTimeout(`${TELEGRAM_API}/bot${token}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ chat_id: chatId, text }),

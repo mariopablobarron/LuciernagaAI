@@ -4,12 +4,13 @@ import { useState } from 'react';
 import { ArrowRight, Loader2 } from 'lucide-react';
 
 type Props = {
-  interval: 'monthly' | 'annual';
+  plan: 'pro_monthly' | 'pro_annual';
   label: string;
   variant?: 'primary' | 'secondary';
+  email?: string;
 };
 
-export default function CheckoutButton({ interval, label, variant = 'primary' }: Props) {
+export default function CheckoutButton({ plan, label, variant = 'primary', email }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -20,7 +21,7 @@ export default function CheckoutButton({ interval, label, variant = 'primary' }:
       const res = await fetch('/api/billing/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ interval }),
+        body: JSON.stringify({ plan, email }),
       });
 
       const data = await res.json() as { url?: string; error?: string };

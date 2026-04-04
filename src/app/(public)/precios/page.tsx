@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Check } from 'lucide-react';
-import CheckoutButton from '@/components/billing/CheckoutButton';
+import CheckoutButton from '@/components/CheckoutButton';
 import PortalButton from '@/components/billing/PortalButton';
 
 export const metadata: Metadata = {
@@ -95,12 +95,13 @@ export default function PreciosPage() {
             ))}
           </ul>
           <div className="space-y-2">
-            <CheckoutButton interval="monthly" label="Empezar 7 días gratis" />
+            <CheckoutButton plan="pro_monthly">Empezar 7 días gratis</CheckoutButton>
             <CheckoutButton
-              interval="annual"
-              label="Plan anual — 79€/año"
-              variant="secondary"
-            />
+              plan="pro_annual"
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold text-zinc-300 border border-zinc-700 hover:border-zinc-500 hover:text-white transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              Plan anual — 79€/año
+            </CheckoutButton>
           </div>
           <p className="text-xs text-zinc-600 text-center">
             7 días de prueba gratis · Sin cargo hasta el día 8 · Cancelas cuando quieras

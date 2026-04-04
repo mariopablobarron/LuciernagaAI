@@ -1,69 +1,37 @@
-import { NextRequest, NextResponse } from "next/server";
-import { constructWebhookEvent, syncSubscription } from "@/services/billing";
-import { logError, logInfo, logWarn } from "@/lib/logger";
+import { NextRequest, NextResponse } from 'next/server';
+import { stripe } from '@/lib/stripe';
+import Stripe from 'stripe';
 
-export const dynamic = "force-dynamic";
-
-// Stripe requires the raw body — disable body parsing
 export async function POST(req: NextRequest) {
-  const signature = req.headers.get("stripe-signature");
-  if (!signature) {
-    return NextResponse.json({ error: "Missing stripe-signature" }, { status: 400 });
-  }
+  const body = await req.text();
+  const sig = req.headers.get('stripe-signature')!;
+  let event: Stripe.Event;
 
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
-  if (!webhookSecret) {
-    logWarn("BILLING", "STRIPE_WEBHOOK_SECRET not set — rejecting webhook");
-    return NextResponse.json({ error: "Webhook not configured" }, { status: 500 });
-  }
-
-  let event;
   try {
-    const rawBody = await req.text();
-    event = constructWebhookEvent(rawBody, signature, webhookSecret);
+    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
   } catch (err) {
-    logError("BILLING", err, { route: "webhook", area: "signature_verification" });
-    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+    console.error('[STRIPE] webhook signature error:', err);
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
-  logInfo("BILLING", "webhook_received", { type: event.type, id: event.id });
-
-  try {
-    switch (event.type) {
-      case "customer.subscription.created":
-      case "customer.subscription.updated":
-      case "customer.subscription.deleted": {
-        const subscription = event.data.object;
-        await syncSubscription(subscription);
-        break;
-      }
-
-      case "checkout.session.completed": {
-        // subscription is handled via customer.subscription.created
-        // nothing extra needed here unless you want to track one-time payments
-        logInfo("BILLING", "checkout_completed", {
-          sessionId: (event.data.object as { id: string }).id,
-        });
-        break;
-      }
-
-      case "invoice.payment_failed": {
-        const invoice = event.data.object as unknown as { customer: string; subscription: string };
-        logWarn("BILLING", "invoice_payment_failed", {
-          customerId: invoice.customer,
-          subscriptionId: invoice.subscription,
-        });
-        // Stripe will retry and eventually cancel — subscription.updated handles status change
-        break;
-      }
-
-      default:
-        // Unhandled event — ok
-        break;
+  switch (event.type) {
+    case 'checkout.session.completed': {
+      const session = event.data.object as Stripe.Checkout.Session;
+      console.log(`[STRIPE] Nueva suscripción: ${session.customer_email}`);
+      // TODO: actualizar plan del usuario en BD a 'pro'
+      break;
     }
-  } catch (err) {
-    logError("BILLING", err, { route: "webhook", eventType: event.type });
-    // Return 200 so Stripe doesn't retry — log the error for manual investigation
+    case 'customer.subscription.deleted': {
+      const sub = event.data.object as Stripe.Subscription;
+      console.log(`[STRIPE] Suscripción cancelada: ${sub.id}`);
+      // TODO: bajar plan del usuario en BD a 'free'
+      break;
+    }
+    case 'invoice.payment_failed': {
+      const invoice = event.data.object as Stripe.Invoice;
+      console.log(`[STRIPE] Pago fallido: ${invoice.customer_email}`);
+      break;
+    }
   }
 
   return NextResponse.json({ received: true });

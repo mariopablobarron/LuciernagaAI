@@ -39,7 +39,7 @@ export default function LandingPageDesign() {
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 mb-12 w-full sm:w-auto">
           <Link
-            href="/explore"
+            href="/unirse"
             className={`${COMPONENTS.buttonPrimary} inline-flex items-center justify-center gap-2`}
           >
             Empieza ahora <ArrowRight className="w-4 h-4" />
@@ -172,7 +172,7 @@ export default function LandingPageDesign() {
 
           {/* CTA Button */}
           <Link
-            href="/explore"
+            href="/unirse"
             className={`${COMPONENTS.buttonPrimary} inline-flex items-center justify-center gap-2`}
           >
             Abrir Luciernaga AI <ArrowRight className="w-5 h-5" />
@@ -205,7 +205,7 @@ export default function LandingPageDesign() {
               <h4 className="font-semibold text-white mb-4">Producto</h4>
               <ul className="space-y-2 text-sm text-zinc-400">
                 <li>
-                  <Link href="/explore" className="hover:text-cyan-400 transition-colors">
+                  <Link href="/unirse" className="hover:text-cyan-400 transition-colors">
                     Empieza ahora
                   </Link>
                 </li>

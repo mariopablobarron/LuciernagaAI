@@ -282,6 +282,14 @@ export default function ExplorePage() {
       </div>
 
       <div className="relative min-h-screen flex flex-col items-center justify-center px-4 py-12">
+        {/* Back to app */}
+        <Link
+          href="/app"
+          className="absolute top-6 left-6 flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
+        >
+          <ChevronLeft className="w-4 h-4" /> Volver al chat
+        </Link>
+
         {/* Header */}
         <div className="text-center space-y-4 max-w-2xl mb-16">
           <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">

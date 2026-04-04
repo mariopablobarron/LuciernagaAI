@@ -380,7 +380,7 @@ export default function DashboardPage() {
                 </span>
               </Link>
               <Link
-                href="/explore"
+                href="/app/explore"
                 className="w-full flex items-center gap-3 p-3.5 rounded-xl border border-zinc-800 hover:border-cyan-500/40 hover:bg-cyan-500/5 transition-all group"
               >
                 <Sparkles className="w-4 h-4 text-cyan-400" />

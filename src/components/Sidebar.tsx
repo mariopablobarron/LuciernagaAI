@@ -211,9 +211,18 @@ export default function Sidebar({
           <Button
             asChild
             type="button"
-            variant={pathname === "/admin" ? "default" : "outline"}
+            variant={pathname === "/app/explore" ? "default" : "outline"}
             size="sm"
             className="justify-center"
+          >
+            <Link href="/app/explore">Explorar</Link>
+          </Button>
+          <Button
+            asChild
+            type="button"
+            variant={pathname === "/admin" ? "default" : "outline"}
+            size="sm"
+            className="justify-center col-span-3"
           >
             <Link href={adminAuthenticated ? "/admin" : "/admin/login?next=/admin"}>Admin</Link>
           </Button>

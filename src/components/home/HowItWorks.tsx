@@ -91,7 +91,7 @@ export default function HowItWorks() {
             ¿Listo para cambiar? Empieza en menos de un minuto.
           </p>
           <Link
-            href="/explore"
+            href="/unirse"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-emotion-clarity to-emotion-doubt text-white font-semibold hover:opacity-90 transition-opacity"
           >
             Comenzar ahora

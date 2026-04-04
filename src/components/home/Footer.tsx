@@ -28,7 +28,7 @@ export default function Footer() {
             <h4 className="font-semibold text-foreground">Producto</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/explore" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/unirse" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Empezar
                 </Link>
               </li>

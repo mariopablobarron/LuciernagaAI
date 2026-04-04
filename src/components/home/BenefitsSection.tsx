@@ -96,7 +96,7 @@ export default function BenefitsSection() {
             Tienes 18 a 35 años. Sabes que algo tiene que cambiar. Estás en el lugar correcto.
           </p>
           <Link
-            href="/explore"
+            href="/unirse"
             className="inline-flex items-center gap-2 px-8 py-3 rounded-lg bg-gradient-to-r from-emotion-clarity to-emotion-doubt text-white font-semibold hover:opacity-90 transition-opacity"
           >
             Comienza tu transformación

@@ -53,7 +53,7 @@ export default function Header() {
               asChild
               className="bg-linear-to-r from-emotion-clarity to-emotion-doubt hover:opacity-90"
             >
-              <Link href="/explore">Empezar ahora</Link>
+              <Link href="/unirse">Empezar ahora</Link>
             </Button>
 
             {/* Mobile Menu Button */}
@@ -85,7 +85,7 @@ export default function Header() {
                 <Link href="/app">Acceder</Link>
               </Button>
               <Button asChild size="sm" className="w-full" onClick={() => setMobileMenuOpen(false)}>
-                <Link href="/explore">Empezar ahora</Link>
+                <Link href="/unirse">Empezar ahora</Link>
               </Button>
             </div>
           </nav>

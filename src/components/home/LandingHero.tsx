@@ -62,7 +62,7 @@ export default function LandingHero() {
                 asChild
                 className="bg-linear-to-r from-emotion-clarity to-emotion-doubt hover:opacity-90 text-white font-semibold group"
               >
-                <Link href="/explore">
+                <Link href="/unirse">
                   Empieza tu transformación
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>

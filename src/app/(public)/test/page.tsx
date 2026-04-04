@@ -550,7 +550,7 @@ export default function TestPage() {
                 </ul>
               </div>
               <Link
-                href="/explore"
+                href="/app/explore"
                 className="inline-flex items-center justify-center gap-2 w-full px-5 py-3 bg-indigo-500 text-white font-semibold rounded-xl hover:bg-indigo-400 transition-colors text-sm"
               >
                 Empezar gratis <ArrowRight className="w-4 h-4" />

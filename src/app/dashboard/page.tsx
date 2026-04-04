@@ -2,6 +2,7 @@
 
 import { MetricCard } from '@/components/shared/MetricCard';
 import { StateCard } from '@/components/shared/StateCard';
+import { RecommendationsCard } from '@/components/shared/RecommendationsCard';
 import Link from 'next/link';
 import { Plus, Flame } from 'lucide-react';
 
@@ -60,7 +61,7 @@ export default function DashboardPage() {
             <div className="card-surface p-6 space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-white">{mockData.activeGoal.title}</h2>
-                <button className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-zinc-700 text-white hover:bg-zinc-900/50 transition-colors text-sm">
+                <button className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-purple-500/50 text-purple-300 hover:text-fuchsia-300 hover:border-fuchsia-500/50 hover:bg-purple-500/10 transition-all text-sm">
                   <Plus className="w-4 h-4" />
                   Agregar acción
                 </button>
@@ -95,10 +96,10 @@ export default function DashboardPage() {
                 <p className="text-xs text-zinc-500">días</p>
               </div>
               <div className="card-surface p-6 text-center space-y-2">
-                <p className="text-sm text-muted-foreground">Progreso total</p>
-                <p className="text-3xl font-bold text-white">67%</p>
-                <div className="h-1 bg-zinc-800 rounded-full overflow-hidden mt-2">
-                  <div className="h-full w-2/3 bg-gradient-to-r from-indigo-500 to-indigo-400" />
+                <p className="text-sm text-cyan-400">Progreso total</p>
+                <p className="text-3xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">67%</p>
+                <div className="h-1.5 bg-zinc-800/50 rounded-full overflow-hidden mt-2 border border-purple-500/30">
+                  <div className="h-full w-2/3 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-cyan-500 shadow-lg shadow-fuchsia-500/50" />
                 </div>
               </div>
             </div>
@@ -114,27 +115,13 @@ export default function DashboardPage() {
               description="Estás en una buena posición para avanzar. Mantén el ritmo."
             />
 
-            {/* Insights */}
-            <div className="card-surface p-6 space-y-4">
-              <h3 className="font-bold text-white">Insights</h3>
-              <div className="space-y-3">
-                {[
-                  { label: 'Patrón detectado', value: 'Avanzas más por las noches' },
-                  { label: 'Bloqueo típico', value: 'Perfeccionismo al empezar' },
-                  { label: 'Recomendación', value: 'Sesiones de 25 min funcionan mejor' },
-                ].map((insight, i) => (
-                  <div key={i} className="pb-3 border-b border-zinc-800 last:border-0 last:pb-0">
-                    <p className="text-xs text-muted-foreground">{insight.label}</p>
-                    <p className="text-sm text-white font-medium mt-1">{insight.value}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* Recommendations - Dynamic based on state */}
+            <RecommendationsCard state={mockData.currentState} />
 
             {/* CTA */}
             <Link
               href="/app"
-              className="w-full py-3 px-4 rounded-lg bg-indigo-500 text-white font-semibold hover:bg-indigo-400 transition-colors text-center"
+              className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-semibold hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-fuchsia-500/30 hover:shadow-fuchsia-500/50 text-center"
             >
               Ir al chat
             </Link>

@@ -1,6 +1,22 @@
 import Link from "next/link";
+import { getBuilderContent } from "@/lib/builder";
+import BuilderContent from "@/components/BuilderContent";
 
-export default function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const sp = await searchParams;
+  const isBuilderPreview = "builder.preview" in sp;
+
+  const content = await getBuilderContent("page", "/");
+
+  // Builder content takes priority; fall back to default when none is published
+  if (content || isBuilderPreview) {
+    return <BuilderContent model="page" content={content} />;
+  }
+
   return (
     <main className="min-h-screen bg-linear-to-b from-white to-neutral-100 flex flex-col items-center justify-center px-6">
 

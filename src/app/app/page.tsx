@@ -8,6 +8,7 @@ import { FloatingButton } from "@/components/effects/FloatingButton";
 import Chat, { type ChatMessage } from "@/components/Chat";
 import AssessmentFlow from "@/components/AssessmentFlow";
 import QuickCheckin from "@/components/QuickCheckin";
+import RetoDiario from "@/components/RetoDiario";
 import HomeHero from "@/components/home/HomeHero";
 import HomeOnboarding from "@/components/home/HomeOnboarding";
 import HomeWorkspace, { type WorkspaceTab } from "@/components/home/HomeWorkspace";
@@ -1853,8 +1854,16 @@ export default function HomePage() {
             chat={
               <>
                 <AssessmentFlow userId={sessionProfile?.id} />
-                <div className="shrink-0 px-3 pt-3">
+                <div className="shrink-0">
                   <QuickCheckin userId={sessionProfile?.id} />
+                  <RetoDiario
+                    userId={sessionProfile?.id}
+                    onFailed={(retoTitle) =>
+                      void handleSend(
+                        `Hoy no pude hacer el reto: ${retoTitle}. ¿Qué hago?`
+                      )
+                    }
+                  />
                 </div>
               <Chat
                 title={safeConversation.title}

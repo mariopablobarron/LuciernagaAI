@@ -322,6 +322,7 @@ export default function Chat({
   onInputChange,
   loading = false,
   streamingMessageId,
+  error,
   actionLock,
   responseSignals,
   onSend,
@@ -447,6 +448,25 @@ export default function Chat({
             <span className="italic">{actionLock.actionTitle}</span>
           </p>
           <p className="mt-0.5 text-xs text-amber-500/80">{actionLock.message}</p>
+        </div>
+      )}
+
+      {/* ── Session / API error banner ──────────────────────────────────── */}
+      {error && (
+        <div className="shrink-0 border-b border-red-500/30 bg-red-950/30 px-4 py-2.5">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-red-400" />
+              <p className="text-xs text-red-300">{error}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="shrink-0 rounded px-2 py-0.5 text-[10px] font-semibold text-red-400 hover:bg-red-500/20 transition-colors"
+            >
+              Recargar
+            </button>
+          </div>
         </div>
       )}
 

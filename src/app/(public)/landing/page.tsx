@@ -28,7 +28,7 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <Link
-              href="/explore"
+              href="/unirse"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-linear-to-r from-violet-500 to-fuchsia-500 text-white font-semibold rounded-xl hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-fuchsia-500/25"
             >
               Empieza gratis <ArrowRight className="w-4 h-4" />
@@ -167,7 +167,7 @@ export default function LandingPage() {
                 price: "Gratis",
                 features: ["Chat ilimitado", "Detección de estado", "Primer reto gratis", "Acceso exploración"],
                 cta: "Empezar ahora",
-                href: "/explore",
+                href: "/unirse",
                 featured: false,
               },
               {
@@ -235,7 +235,7 @@ export default function LandingPage() {
             Empieza en menos de 60 segundos. Sin registro obligatorio.
           </p>
           <Link
-            href="/explore"
+            href="/unirse"
             className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-linear-to-r from-violet-500 to-fuchsia-500 text-white font-bold rounded-xl hover:from-violet-400 hover:to-fuchsia-400 transition-all hover:shadow-lg hover:shadow-fuchsia-500/40"
           >
             Abrir Luciérnaga AI <ArrowRight className="w-5 h-5" />

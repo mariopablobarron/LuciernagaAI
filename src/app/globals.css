@@ -188,76 +188,122 @@
     background: radial-gradient(circle, var(--tw-gradient-stops));
   }
 
-  .group:hover > .group-hover\:opacity-100 {
-    opacity: 1;
-  }
-
   /* Emotional state utilities */
   .emotion-blocked {
-    @apply text-red-500;
+    color: #ef4444;
   }
 
   .emotion-anxious {
-    @apply text-amber-500;
+    color: #f59e0b;
   }
 
   .emotion-doubt {
-    @apply text-purple-500;
+    color: #a855f7;
   }
 
   .emotion-clarity {
-    @apply text-emerald-500;
+    color: #10b981;
   }
 
   .bg-emotion-blocked {
-    @apply bg-red-500/10;
+    background-color: rgba(239, 68, 68, 0.1);
   }
 
   .bg-emotion-anxious {
-    @apply bg-amber-500/10;
+    background-color: rgba(245, 158, 11, 0.1);
   }
 
   .bg-emotion-doubt {
-    @apply bg-purple-500/10;
+    background-color: rgba(168, 85, 247, 0.1);
   }
 
   .bg-emotion-clarity {
-    @apply bg-emerald-500/10;
+    background-color: rgba(16, 185, 129, 0.1);
   }
 
   /* Cards and surfaces */
   .card-surface {
-    @apply rounded-xl border border-zinc-800 bg-zinc-900/50 backdrop-blur;
+    border-radius: 0.75rem;
+    border: 1px solid #27272a;
+    background-color: rgba(24, 24, 27, 0.5);
+    backdrop-filter: blur(10px);
   }
 
   .card-surface-hover {
-    @apply card-surface hover:bg-zinc-900 hover:border-zinc-700 transition-all;
+    border-radius: 0.75rem;
+    border: 1px solid #27272a;
+    background-color: rgba(24, 24, 27, 0.5);
+    backdrop-filter: blur(10px);
+    transition: all 0.2s ease-out;
+  }
+
+  .card-surface-hover:hover {
+    background-color: rgba(24, 24, 27, 1);
+    border-color: #3f3f46;
   }
 
   /* Buttons */
   .btn-primary {
-    @apply px-4 py-2 rounded-lg bg-indigo-500 text-white font-semibold hover:bg-indigo-400 transition-colors;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    background-color: #6366f1;
+    color: #ffffff;
+    font-weight: 600;
+    transition: background-color 0.2s;
+  }
+
+  .btn-primary:hover {
+    background-color: #818cf8;
   }
 
   .btn-secondary {
-    @apply px-4 py-2 rounded-lg border border-zinc-700 text-white font-semibold hover:bg-zinc-900/50 transition-colors;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #3f3f46;
+    color: #ffffff;
+    font-weight: 600;
+    transition: background-color 0.2s;
+  }
+
+  .btn-secondary:hover {
+    background-color: rgba(24, 24, 27, 0.5);
   }
 
   .btn-ghost {
-    @apply px-4 py-2 rounded-lg text-zinc-400 hover:text-white transition-colors;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    color: #a1a1aa;
+    transition: color 0.2s;
+  }
+
+  .btn-ghost:hover {
+    color: #ffffff;
   }
 
   /* Inputs */
   .input-field {
-    @apply px-3 py-2 rounded-lg border border-zinc-800 bg-zinc-900/50 text-white placeholder:text-zinc-500 focus:outline-none focus:border-indigo-500;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid #27272a;
+    background-color: rgba(24, 24, 27, 0.5);
+    color: #ffffff;
+  }
+
+  .input-field::placeholder {
+    color: #71717a;
+  }
+
+  .input-field:focus {
+    outline: none;
+    border-color: #6366f1;
   }
 
   /* Text utilities */
   .text-muted {
-    @apply text-zinc-400;
+    color: #a1a1aa;
   }
 
   .text-subtle {
-    @apply text-zinc-500;
+    color: #71717a;
   }
 }

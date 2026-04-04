@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getBuilderContent } from "@/lib/builder";
 import BuilderContent from "@/components/BuilderContent";
+import LandingPageDesign from "@/components/home/LandingPageDesign";
 
 // Routes managed by the app — the catch-all must never intercept these
 const BLOCKED_SEGMENTS = new Set([
@@ -38,6 +39,10 @@ export default async function BuilderPage({
   const content = await getBuilderContent("page", urlPath);
 
   if (!content && !isBuilderPreview) {
+    // Render landing design for root path when Builder content is unavailable
+    if (urlPath === "/") {
+      return <LandingPageDesign />;
+    }
     notFound();
   }
 

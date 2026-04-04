@@ -1,12 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { CheckCircle, MessageCircle, TrendingUp, Zap } from "lucide-react";
 
 const steps = [
   {
     icon: MessageCircle,
     title: "Conversa con honestidad",
-    description: "Sin filtros. Sin juicio. Cuéntale a Luciernaga qué te pasa, qué evitas, qué te frena.",
+    description:
+      "Sin filtros. Sin juicio. Cuéntale a Luciernaga qué te pasa, qué evitas, qué te frena.",
     color: "emotion-blocked",
   },
   {
@@ -31,7 +33,10 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section id="how" className="py-20 md:py-32 bg-gradient-to-b from-background via-muted/5 to-background">
+    <section
+      id="how"
+      className="py-20 md:py-32 bg-gradient-to-b from-background via-muted/5 to-background"
+    >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
@@ -39,7 +44,8 @@ export default function HowItWorks() {
             Cómo funciona
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Cuatro pasos simples que generan transformación real. Sin complejidad. Sin distracciones.
+            Cuatro pasos simples que generan transformación real. Sin complejidad. Sin
+            distracciones.
           </p>
         </div>
 
@@ -58,17 +64,15 @@ export default function HowItWorks() {
                 </div>
 
                 {/* Icon */}
-                <div className={`w-12 h-12 rounded-lg bg-${step.color}/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                <div
+                  className={`w-12 h-12 rounded-lg bg-${step.color}/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}
+                >
                   <Icon className={`w-6 h-6 text-${step.color}`} />
                 </div>
 
                 {/* Content */}
-                <h3 className="text-lg font-semibold text-foreground mb-2">
-                  {step.title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {step.description}
-                </p>
+                <h3 className="text-lg font-semibold text-foreground mb-2">{step.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
 
                 {/* Arrow indicator */}
                 {index < steps.length - 1 && (
@@ -86,15 +90,20 @@ export default function HowItWorks() {
           <p className="text-muted-foreground mb-6">
             ¿Listo para cambiar? Empieza en menos de un minuto.
           </p>
-          <a
+          <Link
             href="/explore"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-emotion-clarity to-emotion-doubt text-white font-semibold hover:opacity-90 transition-opacity"
           >
             Comenzar ahora
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 7l5 5m0 0l-5 5m5-5H6"
+              />
             </svg>
-          </a>
+          </Link>
         </div>
       </div>
     </section>

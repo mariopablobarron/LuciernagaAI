@@ -16,6 +16,8 @@ model Conversation {
   id             String    @id @default(cuid())
   userId         String?
   title          String    @default("Nueva conversación")
+  rating         Int?      // 1 = helpful, -1 = not helpful
+  journalMode    Boolean   @default(false) // silent / no AI responses
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   messages       Json      @default("[]")
@@ -53,6 +55,12 @@ model User {
   streak          Streak?
   clinicalNotes   ClinicalNote[]
   assessments     Assessment[]
+  wins            Win[]
+  actionReminders ActionReminder[]
+  preferences     UserPreferences?
+  trustedContact  TrustedContact?
+  supportMessages SupportMessage[]
+  familyPings     FamilyPing[]
 }
 
 model Message {
@@ -370,4 +378,118 @@ model AssessmentResponse {
   assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
 
   @@index([userId, completedAt])
+}
+
+// ─── User features ─────────────────────────────────────────────────────────────
+
+/// A win/victory the user records manually.
+model Win {
+  id               String   @id @default(cuid())
+  userId           String
+  note             String
+  sharedWithFamily Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+/// Scheduled action reminder sent via Telegram.
+model ActionReminder {
+  id             String    @id @default(cuid())
+  userId         String
+  actionText     String
+  remindAt       DateTime
+  sent           Boolean   @default(false)
+  sentAt         DateTime?
+  conversationId String?
+  createdAt      DateTime  @default(now())
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, remindAt])
+  @@index([sent, remindAt])
+}
+
+/// Per-user app preferences.
+model UserPreferences {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  aiTone       String   @default("directo") // "directo" | "socratico" | "calido"
+  reminderTime String?  // "HH:MM" local time for daily check-in nudge
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── Family / trusted contact system ──────────────────────────────────────────
+
+/// A person the user trusts to have limited visibility and receive crisis alerts.
+model TrustedContact {
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  name        String
+  email       String
+  phone       String?
+  relation    String? // "madre" | "padre" | "pareja" | "amigo" | "hermano/a" | "terapeuta"
+
+  /// Token embedded in the family portal URL — acts as access credential.
+  accessToken String  @unique @default(cuid())
+
+  /// What data the user allows the family member to see.
+  shareProgress Boolean @default(false) // emotional trend + goal progress
+  shareWins     Boolean @default(false)  // notified when user records a win
+  shareStreak   Boolean @default(false)  // streak milestone notifications
+
+  /// Notification triggers.
+  notifyOnCrisis     Boolean @default(true)
+  notifyOnInactivity Boolean @default(true)
+  inactivityDays     Int     @default(3) // alert after N days without activity
+
+  /// Metadata / audit.
+  inviteSentAt   DateTime?
+  lastAccessAt   DateTime? // last time family opened the portal
+  lastNotifiedAt DateTime? // last outbound notification of any kind
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  supportMessages SupportMessage[]
+
+  @@index([userId])
+  @@index([accessToken])
+}
+
+/// A message of support sent by the trusted contact to the user (shown in-app).
+model SupportMessage {
+  id               String          @id @default(cuid())
+  userId           String          // recipient (the app user)
+  trustedContactId String?
+  fromName         String          // display name shown to user
+  content          String          @db.Text
+  scheduledAt      DateTime?       // optional delayed delivery
+  deliveredAt      DateTime?       // when shown to user
+  readAt           DateTime?       // when user tapped "read"
+  createdAt        DateTime        @default(now())
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trustedContact TrustedContact? @relation(fields: [trustedContactId], references: [id], onDelete: SetNull)
+
+  @@index([userId, deliveredAt])
+  @@index([trustedContactId, createdAt])
+}
+
+/// A ping ("are you ok?") sent by the trusted contact; user can dismiss it.
+model FamilyPing {
+  id               String    @id @default(cuid())
+  userId           String
+  trustedContactId String
+  respondedAt      DateTime?
+  response         String?   // "ok" | "not_ok" | null (unanswered)
+  createdAt        DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([trustedContactId, createdAt])
 }

@@ -10,19 +10,14 @@ interface ActionNodesProps {
   onNodeComplete: (nodeId: string) => void;
 }
 
-export default function ActionNodes({
-  nodes,
-  activeNodeId,
-  onNodeClick,
-}: ActionNodesProps) {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
+export default function ActionNodes({ nodes, activeNodeId, onNodeClick }: ActionNodesProps) {
+  const [isVisible, setIsVisible] = useState(true);
 
   // Colores para los nodos - minimalista premium con vibrancia
-  const emotionColors: Record<string, { bg: string; border: string; glow: string; text: string; accent: string }> = {
+  const emotionColors: Record<
+    string,
+    { bg: string; border: string; glow: string; text: string; accent: string }
+  > = {
     blocked: {
       bg: "bg-gradient-to-br from-gray-800 to-gray-700",
       border: "border-gray-600/50",
@@ -99,7 +94,9 @@ export default function ActionNodes({
               <div className="relative text-3xl sm:text-4xl drop-shadow-sm">{node.icon}</div>
 
               {/* Título - tipografía más bold */}
-              <p className={`relative text-xs sm:text-sm font-bold leading-tight ${colors.text} transition-colors mt-2`}>
+              <p
+                className={`relative text-xs sm:text-sm font-bold leading-tight ${colors.text} transition-colors mt-2`}
+              >
                 {node.title.split(" ").slice(0, 2).join(" ")}
               </p>
 

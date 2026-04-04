@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import Chat, { type ChatMessage } from "@/components/Chat";
 import AssessmentFlow from "@/components/AssessmentFlow";
+import QuickCheckin from "@/components/QuickCheckin";
 import HomeHero from "@/components/home/HomeHero";
 import HomeOnboarding from "@/components/home/HomeOnboarding";
 import HomeWorkspace, { type WorkspaceTab } from "@/components/home/HomeWorkspace";
@@ -50,6 +51,7 @@ type Conversation = {
   isDraft: boolean;
   conversionTrigger: boolean;
   conversionType: "progress" | null;
+  journalMode: boolean;
 };
 
 type GoalAction = {
@@ -244,6 +246,7 @@ function createDraftConversation(index: number): Conversation {
     isDraft: true,
     conversionTrigger: false,
     conversionType: null,
+    journalMode: false,
   };
 }
 
@@ -286,6 +289,7 @@ function mapApiConversationToLocal(
     isDraft: false,
     conversionTrigger: existing?.conversionTrigger ?? false,
     conversionType: existing?.conversionType ?? null,
+    journalMode: existing?.journalMode ?? false,
   };
 }
 
@@ -332,6 +336,7 @@ export default function HomePage() {
   const [sessionReady, setSessionReady] = useState(false);
   const [streakDays, setStreakDays] = useState(0);
   const [sessionLoading, setSessionLoading] = useState(true);
+  const [proactivePrompt, setProactivePrompt] = useState<string | null>(null);
   const [adminAuthenticated, setAdminAuthenticated] = useState(false);
   const [adminLoading, setAdminLoading] = useState(true);
   const [workspaceTab, setWorkspaceTab] = useState<WorkspaceTab>("chat");
@@ -379,6 +384,14 @@ export default function HomePage() {
 
     setSessionReady(true);
     setError(null);
+
+    // Fetch context-aware proactive prompt in background
+    fetch("/api/user/proactive-prompt", { credentials: "include" })
+      .then((r) => r.json())
+      .then((data: { prompt?: string }) => {
+        if (data.prompt) setProactivePrompt(data.prompt);
+      })
+      .catch(() => {});
   };
 
   const ensureOnboardingConsent = async (): Promise<boolean> => {
@@ -900,6 +913,62 @@ export default function HomePage() {
     }
   };
 
+  const handleRenameConversation = async (id: string, title: string) => {
+    await fetch(`/api/conversations/${id}`, {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title }),
+    });
+    setConversations((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, title } : c)),
+    );
+  };
+
+  const handleDeleteConversation = async (id: string) => {
+    await fetch(`/api/conversations/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    setConversations((prev) => prev.filter((c) => c.id !== id));
+    if (activeConversationId === id) {
+      const remaining = conversations.filter((c) => c.id !== id);
+      if (remaining.length > 0) {
+        setActiveConversationId(remaining[0].id);
+      } else {
+        const next = createDraftConversation(0);
+        setConversations([next]);
+        setActiveConversationId(next.id);
+      }
+    }
+  };
+
+  const handleRateSession = (rating: 1 | -1) => {
+    const id = activeConversationId;
+    if (!id) return;
+    void fetch(`/api/conversations/${id}`, {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rating }),
+    });
+  };
+
+  const handleToggleJournal = () => {
+    const id = activeConversationId;
+    if (!id) return;
+    const current = safeConversation.journalMode;
+    setConversations((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, journalMode: !current } : c)),
+    );
+    void fetch(`/api/conversations/${id}`, {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ journalMode: !current }),
+    });
+  };
+
   const handleAdminLogout = async () => {
     setAdminLoading(true);
     try {
@@ -1172,6 +1241,12 @@ export default function HomePage() {
           : conversation
       )
     );
+
+    // Journal mode: skip AI, just record the message locally
+    if (resolvedConversation.journalMode) {
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch("/api/chat", {
@@ -1765,6 +1840,8 @@ export default function HomePage() {
             onSelectConversation={handleSelectConversation}
             onNewConversation={handleNewConversation}
             onAdminLogout={handleAdminLogout}
+            onRenameConversation={handleRenameConversation}
+            onDeleteConversation={handleDeleteConversation}
           />
         }
         main={
@@ -1774,6 +1851,9 @@ export default function HomePage() {
             chat={
               <>
                 <AssessmentFlow userId={sessionProfile?.id} />
+                <div className="shrink-0 px-3 pt-3">
+                  <QuickCheckin userId={sessionProfile?.id} />
+                </div>
               <Chat
                 title={safeConversation.title}
                 messages={safeConversation.messages}
@@ -1798,6 +1878,11 @@ export default function HomePage() {
                 onSend={handleSend}
                 onUseStarterExample={handleUseStarterExample}
                 draftKey={`chat-draft:${safeConversation.id}`}
+                conversationId={safeConversation.isDraft ? undefined : safeConversation.id}
+                onRateSession={handleRateSession}
+                journalMode={safeConversation.journalMode}
+                onToggleJournal={safeConversation.isDraft ? undefined : handleToggleJournal}
+                proactivePrompt={safeConversation.messages.length === 0 ? proactivePrompt : null}
               />
               </>
             }

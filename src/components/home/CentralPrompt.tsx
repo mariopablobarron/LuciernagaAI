@@ -8,12 +8,7 @@ interface CentralPromptProps {
 }
 
 export default function CentralPrompt({ emotionalState }: CentralPromptProps) {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    // Trigger animation on mount
-    setIsVisible(true);
-  }, []);
+  const [isVisible] = useState(true);
 
   // Prompts dinámicas según estado emocional
   const prompts: Record<EmotionalStateType, { main: string; sub: string }> = {
@@ -38,7 +33,9 @@ export default function CentralPrompt({ emotionalState }: CentralPromptProps) {
   const currentPrompt = prompts[emotionalState];
 
   return (
-    <div className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center transition-all duration-700 ${isVisible ? "opacity-100" : "opacity-0"}`}>
+    <div
+      className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center transition-all duration-700 ${isVisible ? "opacity-100" : "opacity-0"}`}
+    >
       {/* Contenido */}
       <div className="relative space-y-6 max-w-2xl px-4">
         {/* Pregunta principal - tipografía bold y moderna */}

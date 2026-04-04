@@ -55,21 +55,23 @@ Total: 50 paginas
 
 ### 1.2 Control de cambios
 
-| Version | Fecha               | Tipo de cambio                                                                        | Secciones impactadas     | Responsable    |
-| ------- | ------------------- | ------------------------------------------------------------------------------------- | ------------------------ | -------------- |
-| v0.1    | 30 de marzo de 2026 | Estructura base del manual maestro                                                    | 1-16 (plantilla inicial) | Equipo tecnico |
-| v0.2    | 30 de marzo de 2026 | Se incorporan skills operativas para desarrollo, QA, seguridad y operacion            | 12, 13, 14, 15, 16       | Equipo tecnico |
-| v0.3    | 30 de marzo de 2026 | Se incorporan contratos API operativos con request/responses y errores                | 7                        | Equipo tecnico |
-| v0.4    | 30 de marzo de 2026 | Se completan contratos API de Nivel 1 (chat-direct, conversations, messages, actions) | 7                        | Equipo tecnico |
-| v0.5    | 30 de marzo de 2026 | Se completan contratos API de Nivel 2 (admin login, admin logout, alerts)             | 7                        | Equipo tecnico |
-| v0.6    | 30 de marzo de 2026 | Se completa contrato API de Nivel 3 (mock-chat) y se cierra expansion de catalogo     | 7                        | Equipo tecnico |
-| v0.7    | 30 de marzo de 2026 | Se completa modelo de datos detallado y matriz de controles de seguridad por endpoint | 8, 9                     | Equipo tecnico |
-| v0.8    | 30 de marzo de 2026 | Se convierte hardening en plan por sprint y se agrega matriz de pruebas de seguridad  | 9, 14                    | Equipo tecnico |
-| v0.9    | 30 de marzo de 2026 | Se agrega checklist semanal de hardening con comandos y evidencia minima por semana   | 9, 14                    | Equipo tecnico |
-| v0.10   | 30 de marzo de 2026 | Se agrega tablero de ejecucion semanal para seguimiento operativo diario              | 9, 14                    | Equipo tecnico |
-| v0.11   | 30 de marzo de 2026 | Se automatiza la actualizacion del tablero semanal via script y workflow programado   | 9, 12                    | Equipo tecnico |
-| v0.12   | 30 de marzo de 2026 | Se agrega escalamiento automatico con issue cuando una semana queda bloqueada         | 9, 12, 13                | Equipo tecnico |
-| v0.13   | 30 de marzo de 2026 | Se agrega cierre automatico de issue cuando la semana sale de estado bloqueado        | 9, 12, 13                | Equipo tecnico |
+| Version | Fecha               | Tipo de cambio                                                                          | Secciones impactadas     | Responsable    |
+| ------- | ------------------- | --------------------------------------------------------------------------------------- | ------------------------ | -------------- |
+| v0.1    | 30 de marzo de 2026 | Estructura base del manual maestro                                                      | 1-16 (plantilla inicial) | Equipo tecnico |
+| v0.2    | 30 de marzo de 2026 | Se incorporan skills operativas para desarrollo, QA, seguridad y operacion              | 12, 13, 14, 15, 16       | Equipo tecnico |
+| v0.3    | 30 de marzo de 2026 | Se incorporan contratos API operativos con request/responses y errores                  | 7                        | Equipo tecnico |
+| v0.4    | 30 de marzo de 2026 | Se completan contratos API de Nivel 1 (chat-direct, conversations, messages, actions)   | 7                        | Equipo tecnico |
+| v0.5    | 30 de marzo de 2026 | Se completan contratos API de Nivel 2 (admin login, admin logout, alerts)               | 7                        | Equipo tecnico |
+| v0.6    | 30 de marzo de 2026 | Se completa contrato API de Nivel 3 (mock-chat) y se cierra expansion de catalogo       | 7                        | Equipo tecnico |
+| v0.7    | 30 de marzo de 2026 | Se completa modelo de datos detallado y matriz de controles de seguridad por endpoint   | 8, 9                     | Equipo tecnico |
+| v0.8    | 30 de marzo de 2026 | Se convierte hardening en plan por sprint y se agrega matriz de pruebas de seguridad    | 9, 14                    | Equipo tecnico |
+| v0.9    | 30 de marzo de 2026 | Se agrega checklist semanal de hardening con comandos y evidencia minima por semana     | 9, 14                    | Equipo tecnico |
+| v0.10   | 30 de marzo de 2026 | Se agrega tablero de ejecucion semanal para seguimiento operativo diario                | 9, 14                    | Equipo tecnico |
+| v0.11   | 30 de marzo de 2026 | Se automatiza la actualizacion del tablero semanal via script y workflow programado     | 9, 12                    | Equipo tecnico |
+| v0.12   | 30 de marzo de 2026 | Se agrega escalamiento automatico con issue cuando una semana queda bloqueada           | 9, 12, 13                | Equipo tecnico |
+| v0.13   | 30 de marzo de 2026 | Se agrega cierre automatico de issue cuando la semana sale de estado bloqueado          | 9, 12, 13                | Equipo tecnico |
+| v0.14   | 4 de abril de 2026  | Se agregan scripts de operacion: backup PostgreSQL diario, telegram test, doc generator | 12, 13, 16               | Equipo tecnico |
+| v0.15   | 4 de abril de 2026  | Se arreglan 9 errores de linter en componentes frontend, lint 0 errores                 | 6                        | Equipo tecnico |
 
 Cambios relevantes de v0.2:
 
@@ -131,6 +133,22 @@ Cambios relevantes de v0.13:
 
 - El workflow cierra automaticamente la issue de bloqueo cuando la semana pasa a en_curso o hecho.
 - Se agrega comentario de cierre con estado actual y enlace al run de CI.
+
+Cambios relevantes de v0.14:
+
+- Se implementan tres scripts de operacion: backup PostgreSQL diario, test Telegram, doc generator.
+- Script `scripts/db-backup-daily.sh`: backup diario con compresion gzip-9, SHA256 checksums, retencion configurable (default 14 dias).
+- Script `scripts/test-telegram-send.mjs`: valida conectividad de bot Telegram y envia mensaje de prueba.
+- Script `scripts/auto-update-commands-doc.mjs`: genera `docs/comandos-operativos.md` de forma idempotente (sin reescrituras innecesarias).
+- Cinco nuevos comandos npm: `backup:daily`, `backup:restore:latest`, `test:telegram`, `docs:commands:update`, `docs:commands:check`.
+- Documentacion operativa: `docs/daily-backup.md` con setup cron y procedimientos de restaura.
+- Documentacion de comando: `docs/comandos-operativos.md` con 23 comandos npm, 15 operativos, 4 variables clave.
+
+Cambios relevantes de v0.15:
+
+- Se arreglan 9 errores de linter: 4 comillas sin escape (react/no-unescaped-entities), 2 setState en useEffect, 1 uso de <a> vs <Link>, 2 variables sin usar.
+- Lint status: reducido de 9 errores a 0 errores (5 warnings menores).
+- Archivos editados: landing/page.tsx, impulso/page.tsx, ActionNodes.tsx, BenefitsSection.tsx, CentralPrompt.tsx, ChatModal.tsx, HowItWorks.tsx, explore/page.tsx, AssessmentFlow.tsx, Chat.tsx.
 
 Aprobaciones:
 
@@ -1088,13 +1106,13 @@ Escala de estado:
 - hecho
 - bloqueado
 
-| Semana   | Sprint   | Owner          | Estado    | Fecha inicio | Fecha fin objetivo | Bloqueador actual                                                                                                             | Evidencia                                           | Ultima actualizacion     |
-| -------- | -------- | -------------- | --------- | ------------ | ------------------ | ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------ |
-| Semana 1 | Sprint 1 | Backend        | en_curso  | 2026-03-30   | 2026-04-05         | -                                                                                                                             | auto(lint:ok,test:ok) local-run                     | 2026-03-30T17:57:20.623Z |
-| Semana 2 | Sprint 2 | Backend/DevOps | pendiente | -            | -                  | -                                                                                                                             | -                                                   | -                        |
-| Semana 3 | Sprint 3 | Backend/Infra  | pendiente | -            | -                  | -                                                                                                                             | -                                                   | -                        |
-| Semana 4 | Sprint 4 | Backend        | pendiente | -            | -                  | -                                                                                                                             | -                                                   | -                        |
-| Semana 5 | Sprint 5 | Backend        | pendiente | -            | -                  | -                                                                                                                             | -                                                   | -                        |
+| Semana   | Sprint   | Owner          | Estado    | Fecha inicio | Fecha fin objetivo | Bloqueador actual | Evidencia                       | Ultima actualizacion     |
+| -------- | -------- | -------------- | --------- | ------------ | ------------------ | ----------------- | ------------------------------- | ------------------------ |
+| Semana 1 | Sprint 1 | Backend        | en_curso  | 2026-03-30   | 2026-04-05         | -                 | auto(lint:ok,test:ok) local-run | 2026-03-30T17:57:20.623Z |
+| Semana 2 | Sprint 2 | Backend/DevOps | pendiente | -            | -                  | -                 | -                               | -                        |
+| Semana 3 | Sprint 3 | Backend/Infra  | pendiente | -            | -                  | -                 | -                               | -                        |
+| Semana 4 | Sprint 4 | Backend        | pendiente | -            | -                  | -                 | -                               | -                        |
+| Semana 5 | Sprint 5 | Backend        | pendiente | -            | -                  | -                 | -                               | -                        |
 
 Reglas de uso del tablero:
 
@@ -1256,6 +1274,149 @@ Implementacion: [src/lib/logger.ts](../src/lib/logger.ts)
 
 Implementacion: [src/lib/alerts.ts](../src/lib/alerts.ts)
 
+### 13.4 Scripts operativos automatizados
+
+Tres scripts complementan la operacion diaria del sistema: backup automatizado, validacion de integraciones externas y mantenimiento de documentacion operativa.
+
+#### 13.4.1 Backup PostgreSQL diario
+
+**Script:** [scripts/db-backup-daily.sh](../scripts/db-backup-daily.sh)
+
+**Proposito:** Generar copias de seguridad comprimidas de la base de datos PostgreSQL con retencion configurable.
+
+**Características:**
+
+- Compresion gzip-9 (máxima)
+- Checksum SHA256 automatico
+- Retencion configurable (default 14 días)
+- Symlink a último backup para recuperación rápida
+- Validacion fail-fast de prerequisitos
+
+**Requisitos:**
+
+- DATABASE_URL configurada
+- Binarios: pg_dump, gzip, find, ln
+
+**Uso manual:**
+
+```bash
+npm run backup:daily
+# Salida: ./backups/db/mentor_web_YYYY-MM-DD_HHMMSS.sql.gz
+```
+
+**Uso con cron (produccion):**
+
+```bash
+# Crontab entry (ejecuta diario 02:30 UTC)
+30 2 * * * cd /ruta/mentor-web && BACKUP_RETENTION_DAYS=14 npm run backup:daily >> logs/db-backup.log 2>&1
+```
+
+**Restaura:**
+
+```bash
+# Último backup
+npm run backup:restore:latest
+
+# Backup específico
+gunzip -c ./backups/db/mentor_web_YYYY-MM-DD_HHMMSS.sql.gz | psql "$DATABASE_URL"
+```
+
+**Monitoreo:**
+
+```bash
+# Verificar logs de backup
+tail -50 logs/db-backup.log
+
+# Chequear tamaño de backups
+du -sh ./backups/db/
+
+# Validar integridad SHA256
+sha256sum -c ./backups/db/*.sha256
+```
+
+Documentacion detallada: [docs/daily-backup.md](../docs/daily-backup.md)
+
+#### 13.4.2 Test de conectividad Telegram
+
+**Script:** [scripts/test-telegram-send.mjs](../scripts/test-telegram-send.mjs)
+
+**Proposito:** Validar conectividad con bot Telegram y enviar mensaje de prueba en tiempo real.
+
+**Características:**
+
+- Deteccion automatica de chat_id (fallback en cascada)
+- Manejo de errores con response validation
+- Soporta multiples formas de identificar destino
+
+**Requisitos:**
+
+- TELEGRAM_BOT_TOKEN configurado
+- Al menos una de: ADMIN_TELEGRAM_ID, TELEGRAM_CHAT_ID, o getUpdates fallback
+
+**Uso:**
+
+```bash
+npm run test:telegram
+# Output: "TELEGRAM_SEND_OK" o error detallado
+```
+
+**Cascada de resolución de chat_id:**
+
+1. ADMIN_TELEGRAM_ID (variable de entorno)
+2. TELEGRAM_CHAT_ID (variable de entorno)
+3. Llamada a getUpdates API (si ambas anteriores no existen)
+
+**Integracion en monitoreo:**
+
+```bash
+# Validar bot cada hora
+0 * * * * npm run test:telegram >> logs/telegram-health.log 2>&1
+```
+
+#### 13.4.3 Generador automático de documentacion de comandos
+
+**Script:** [scripts/auto-update-commands-doc.mjs](../scripts/auto-update-commands-doc.mjs)
+
+**Proposito:** Mantener `docs/comandos-operativos.md` actualizado de forma idempotente durante desarrollo y CI/CD.
+
+**Características:**
+
+- Lee 23 comandos npm desde package.json
+- Agrega 15 comandos operativos (Prisma, curl, docker, git)
+- Genera tablas markdown linter-compliant
+- **Idempotente:** solo reescribe si detecta cambios
+- Modo check: exit code 1 si documentacion está desactualizada
+
+**Comandos:**
+
+```bash
+# Regenerar si hay cambios
+npm run docs:commands:update
+# Output: "commands-doc: updated" o "commands-doc: no changes"
+
+# Verificar sin escribir (para CI/CD)
+npm run docs:commands:check
+# Exit code: 0 si actual, 1 si stale
+```
+
+**Uso en CI/CD:**
+
+```bash
+# Pre-commit hook (validar antes de commit)
+npm run docs:commands:check || exit 1
+
+# Post-merge workflow (regenerar después de merge)
+npm run docs:commands:update && git add docs/comandos-operativos.md
+```
+
+**Salida generada:** [docs/comandos-operativos.md](../docs/comandos-operativos.md)
+
+Contiene:
+
+- 23 comandos npm con descripciones detalladas
+- 15 comandos operativos (Prisma, curl, docker, git)
+- 4 variables clave de configuracion
+
 ---
 
 ## 14) QA, testing y liberacion (2 paginas)
@@ -1361,26 +1522,89 @@ Apoyo documental: [DECISION_ENGINE.md](../DECISION_ENGINE.md)
 
 ### 16.1 Checklist pre lanzamiento
 
-- Variables de entorno completas
-- Migraciones aplicadas
-- Healthcheck estable
-- Pruebas criticas ejecutadas
-- Credenciales admin seguras
+- Variables de entorno completas (DATABASE_URL, OPENROUTER_API_KEY, TELEGRAM_BOT_TOKEN, etc.)
+- Migraciones aplicadas (`npx prisma migrate deploy`)
+- Healthcheck estable (`curl https://dominio/api/health`)
+- Pruebas criticas ejecutadas (`npm test`)
+- Credenciales admin seguras y cambiadas post-deploy
+- Test Telegram OK (`npm run test:telegram`)
+- Backup configurado en cron server
 
 ### 16.2 Checklist post despliegue
 
-- Verificar /api/health
-- Verificar /api/ready
-- Probar login admin
-- Probar chat extremo a extremo
-- Revisar logs y alertas
+- Verificar `/api/health` (status ok, openrouter boolean)
+- Verificar `/api/ready` (database connected)
+- Probar login admin (credenciales nuevas funciona)
+- Probar chat extremo a extremo (mensaje → respuesta IA)
+- Revisar logs y alertas (`tail -100 logs/`)
+- Ejecutar primer backup manual (`npm run backup:daily`)
+- Validar symlink a latest (`ls -la ./backups/db/latest.sql.gz`)
+- Revisar documentacion de comandos actualizada (`docs/comandos-operativos.md`)
 
-### 16.3 Glosario rapido
+### 16.3 Scripts operativos disponibles
+
+**Backup diario:**
+
+```bash
+# Ejecucion manual
+npm run backup:daily
+
+# Restaurar último
+npm run backup:restore:latest
+
+# Restaurar específico
+gunzip -c ./backups/db/mentor_web_YYYY-MM-DD_HHMMSS.sql.gz | psql "$DATABASE_URL"
+```
+
+Documentacion: [docs/daily-backup.md](../docs/daily-backup.md)
+
+**Test Telegram:**
+
+```bash
+npm run test:telegram
+```
+
+Detecta automáticamente chat_id por: ADMIN_TELEGRAM_ID → TELEGRAM_CHAT_ID → getUpdates fallback
+
+**Generar comando docs:**
+
+```bash
+# Regenerar si cambios en package.json
+npm run docs:commands:update
+
+# Verificar si docs actual (para CI)
+npm run docs:commands:check
+```
+
+Referencia: [docs/comandos-operativos.md](../docs/comandos-operativos.md)
+
+**Verificar sistema:**
+
+```bash
+npm run system-check
+```
+
+### 16.4 Glosario rapido
 
 - D3: retencion al dia 3
 - D7: retencion al dia 7
 - Checkin drop: caida relativa de cumplimiento de check-ins
 - Fallback IA: respuesta segura cuando proveedor falla
+- Idempotente: operacion que al ejecutarse multiples veces produce mismo resultado
+- Symlink: enlace simbolico (máximo 14 dias, latest.sql.gz para recuperación rápida)
+- Rate limit: límite de requests por ventana de tiempo y usuario
+- Crisis active: ventana {crisisActivatedAt, crisisActiveUntil} cuando usuario en riesgo alto
+
+### 16.5 Archivos de referencia operativa
+
+Principales ubicaciones para troubleshooting:
+
+- Logs aplicacion: `logs/` (db-backup.log, errors, etc.)
+- Backups: `./backups/db/` (máximo 14 dias)
+- Documentacion: `docs/` (daily-backup.md, comandos-operativos.md)
+- Variables críticas: `.env` (DATABASE_URL, TELEGRAM_BOT_TOKEN, AUTH_TOKEN_SECRET)
+- Scripts: `scripts/` (db-backup-daily.sh, test-telegram-send.mjs, auto-update-commands-doc.mjs)
+- Configuracion app: `next.config.ts`, `prisma/schema.prisma`, `package.json`
 
 ---
 

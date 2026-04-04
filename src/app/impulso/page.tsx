@@ -1,17 +1,19 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Flame, Zap, Shield, Lock } from 'lucide-react';
-import Link from 'next/link';
+import { useState } from "react";
+import { Flame, Zap, Shield, Lock } from "lucide-react";
+import Link from "next/link";
 
 export default function ImpulsoPage() {
-  const [activeTab, setActiveTab] = useState<'diagnostico' | 'retos' | 'insights' | 'mensajes'>('diagnostico');
+  const [activeTab, setActiveTab] = useState<"diagnostico" | "retos" | "insights" | "mensajes">(
+    "diagnostico"
+  );
 
   const tabs = [
-    { id: 'diagnostico', label: 'Diagnóstico' },
-    { id: 'retos', label: 'Retos' },
-    { id: 'insights', label: 'Insights' },
-    { id: 'mensajes', label: 'Mensajes' },
+    { id: "diagnostico", label: "Diagnóstico" },
+    { id: "retos", label: "Retos" },
+    { id: "insights", label: "Insights" },
+    { id: "mensajes", label: "Mensajes" },
   ] as const;
 
   return (
@@ -24,14 +26,17 @@ export default function ImpulsoPage() {
         </div>
 
         {/* Diagnostico Section */}
-        {activeTab === 'diagnostico' && (
+        {activeTab === "diagnostico" && (
           <>
             {/* Profile Card */}
             <div className="card-surface p-8 space-y-6">
               <div className="text-center space-y-4">
                 <div className="text-5xl">🚀</div>
                 <h2 className="text-3xl font-bold text-white">Emprendedor</h2>
-                <p className="text-zinc-400 max-w-2xl">Tu perfil muestra energía alta y capacidad de acción. Tu desafío es mantener la consistencia a largo plazo.</p>
+                <p className="text-zinc-400 max-w-2xl">
+                  Tu perfil muestra energía alta y capacidad de acción. Tu desafío es mantener la
+                  consistencia a largo plazo.
+                </p>
               </div>
             </div>
 
@@ -77,12 +82,12 @@ export default function ImpulsoPage() {
         )}
 
         {/* Retos Section */}
-        {activeTab === 'retos' && (
+        {activeTab === "retos" && (
           <div className="space-y-4">
             {[
-              { title: 'Morning Momentum', progress: 15, status: 'active', days: '15/21' },
-              { title: 'Deep Work Blocks', progress: 21, status: 'completed', days: '21/21' },
-              { title: 'Evening Reflection', progress: 8, status: 'active', days: '8/21' },
+              { title: "Morning Momentum", progress: 15, status: "active", days: "15/21" },
+              { title: "Deep Work Blocks", progress: 21, status: "completed", days: "21/21" },
+              { title: "Evening Reflection", progress: 8, status: "active", days: "8/21" },
             ].map((reto, i) => (
               <div key={i} className="card-surface p-6 space-y-4">
                 <div className="flex items-start justify-between">
@@ -90,12 +95,14 @@ export default function ImpulsoPage() {
                     <h3 className="text-lg font-bold text-white">{reto.title}</h3>
                     <p className="text-sm text-zinc-400 mt-1">{reto.days} días</p>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                    reto.status === 'completed' 
-                      ? 'bg-emerald-500/10 text-emerald-500'
-                      : 'bg-amber-500/10 text-amber-500'
-                  }`}>
-                    {reto.status === 'completed' ? '✓ Completado' : 'En progreso'}
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      reto.status === "completed"
+                        ? "bg-emerald-500/10 text-emerald-500"
+                        : "bg-amber-500/10 text-amber-500"
+                    }`}
+                  >
+                    {reto.status === "completed" ? "✓ Completado" : "En progreso"}
                   </span>
                 </div>
                 <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
@@ -113,22 +120,41 @@ export default function ImpulsoPage() {
         )}
 
         {/* Insights Section */}
-        {activeTab === 'insights' && (
+        {activeTab === "insights" && (
           <div className="space-y-4">
             {[
-              { type: 'info', icon: Zap, title: 'Patrones detectados', message: 'Avanzas más por la noche y en sesiones de 45 minutos' },
-              { type: 'warning', icon: Shield, title: 'Potencial bloqueo', message: 'Has evitado tareas de escritura 3 veces esta semana' },
-              { type: 'info', icon: Zap, title: 'Recomendación', message: 'Comienza con microtareas de 5 minutos para vencer la resistencia inicial' },
+              {
+                type: "info",
+                icon: Zap,
+                title: "Patrones detectados",
+                message: "Avanzas más por la noche y en sesiones de 45 minutos",
+              },
+              {
+                type: "warning",
+                icon: Shield,
+                title: "Potencial bloqueo",
+                message: "Has evitado tareas de escritura 3 veces esta semana",
+              },
+              {
+                type: "info",
+                icon: Zap,
+                title: "Recomendación",
+                message: "Comienza con microtareas de 5 minutos para vencer la resistencia inicial",
+              },
             ].map((insight, i) => {
               const Icon = insight.icon;
               return (
                 <div
                   key={i}
                   className={`card-surface p-6 flex items-start gap-4 ${
-                    insight.type === 'warning' ? 'border-l-4 border-l-amber-500' : 'border-l-4 border-l-indigo-500'
+                    insight.type === "warning"
+                      ? "border-l-4 border-l-amber-500"
+                      : "border-l-4 border-l-indigo-500"
                   }`}
                 >
-                  <Icon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${insight.type === 'warning' ? 'text-amber-500' : 'text-indigo-400'}`} />
+                  <Icon
+                    className={`w-5 h-5 flex-shrink-0 mt-0.5 ${insight.type === "warning" ? "text-amber-500" : "text-indigo-400"}`}
+                  />
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-white">{insight.title}</p>
                     <p className="text-sm text-zinc-400 mt-1">{insight.message}</p>
@@ -140,12 +166,27 @@ export default function ImpulsoPage() {
         )}
 
         {/* Mensajes Section */}
-        {activeTab === 'mensajes' && (
+        {activeTab === "mensajes" && (
           <div className="space-y-4">
             {[
-              { day: 7, title: 'Tu primera semana', preview: 'Hiciste un cambio...', locked: false },
-              { day: 14, title: 'Punto de quiebre', preview: 'Aquí es donde muchos...', locked: true },
-              { day: 21, title: 'Tu nuevo hábito', preview: 'Felicitaciones, ahora...', locked: true },
+              {
+                day: 7,
+                title: "Tu primera semana",
+                preview: "Hiciste un cambio...",
+                locked: false,
+              },
+              {
+                day: 14,
+                title: "Punto de quiebre",
+                preview: "Aquí es donde muchos...",
+                locked: true,
+              },
+              {
+                day: 21,
+                title: "Tu nuevo hábito",
+                preview: "Felicitaciones, ahora...",
+                locked: true,
+              },
             ].map((mensaje, i) => (
               <div key={i} className="card-surface p-6 space-y-3 relative">
                 {mensaje.locked && (
@@ -157,8 +198,16 @@ export default function ImpulsoPage() {
                   <div>
                     <p className="text-sm text-zinc-500 font-semibold">Día {mensaje.day}</p>
                     <h3 className="text-lg font-bold text-white mt-1">{mensaje.title}</h3>
-                    {!mensaje.locked && <p className="text-sm text-zinc-400 mt-2 italic">"{mensaje.preview}"</p>}
-                    {mensaje.locked && <p className="text-sm text-zinc-500 mt-2">Se desbloquea el día {mensaje.day}</p>}
+                    {!mensaje.locked && (
+                      <p className="text-sm text-zinc-400 mt-2 italic">
+                        &quot;{mensaje.preview}&quot;
+                      </p>
+                    )}
+                    {mensaje.locked && (
+                      <p className="text-sm text-zinc-500 mt-2">
+                        Se desbloquea el día {mensaje.day}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -174,8 +223,8 @@ export default function ImpulsoPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-3 font-semibold transition-colors border-b-2 -mb-px ${
                 activeTab === tab.id
-                  ? 'text-indigo-400 border-b-indigo-400'
-                  : 'text-zinc-400 border-b-transparent hover:text-white'
+                  ? "text-indigo-400 border-b-indigo-400"
+                  : "text-zinc-400 border-b-transparent hover:text-white"
               }`}
             >
               {tab.label}

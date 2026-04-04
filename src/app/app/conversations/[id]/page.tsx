@@ -171,34 +171,43 @@ export default function ConversationDetailPage({
               </div>
             </div>
           ) : (
-            messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`max-w-[85%] sm:max-w-lg rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
-                    message.role === 'user'
-                      ? 'bg-linear-to-br from-violet-600 to-fuchsia-600 text-white'
-                      : 'bg-zinc-800 text-zinc-100'
-                  }`}
-                >
-                  {message.content}
+            messages.map((message) =>
+              message.role === 'assistant' ? (
+                <div key={message.id} className="flex justify-start">
+                  <div className="flex items-start gap-3 max-w-[85%] sm:max-w-lg">
+                    <div className="w-8 h-8 rounded-full bg-violet-500/20 border border-violet-500/30 flex items-center justify-center shrink-0 mt-1">
+                      <span className="text-sm">🔥</span>
+                    </div>
+                    <div className="bg-zinc-800 text-zinc-100 rounded-2xl rounded-tl-sm px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap">
+                      {message.content}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))
+              ) : (
+                <div key={message.id} className="flex justify-end">
+                  <div className="max-w-[85%] sm:max-w-lg bg-linear-to-br from-violet-600 to-fuchsia-600 text-white rounded-2xl rounded-tr-sm px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap">
+                    {message.content}
+                  </div>
+                </div>
+              )
+            )
           )}
 
           {sending && (
             <div className="flex justify-start">
-              <div className="bg-zinc-800 rounded-2xl px-4 py-3 flex gap-1 items-center">
-                {[0, 1, 2].map((i) => (
-                  <span
-                    key={i}
-                    className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce"
-                    style={{ animationDelay: `${i * 120}ms` }}
-                  />
-                ))}
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-full bg-violet-500/20 border border-violet-500/30 flex items-center justify-center shrink-0 mt-1">
+                  <span className="text-sm">🔥</span>
+                </div>
+                <div className="bg-zinc-800 rounded-2xl rounded-tl-sm px-4 py-3 flex gap-1.5 items-center h-10">
+                  {[0, 1, 2].map((i) => (
+                    <span
+                      key={i}
+                      className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce"
+                      style={{ animationDelay: `${i * 120}ms` }}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           )}

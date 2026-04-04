@@ -229,11 +229,30 @@ export default function ImpulsoPage() {
             </>
           ) : (
             <>
-              {/* Streak */}
-              <div className="card-surface p-5 text-center space-y-1.5">
-                <div className="flex items-center justify-center gap-1.5 mb-1">
-                  <Flame className="w-4 h-4 text-amber-400" />
-                  <p className="text-2xl font-bold text-white">{streak?.currentDays ?? 0}</p>
+              {/* Streak ring */}
+              <div className="card-surface p-5 flex flex-col items-center space-y-2">
+                <div className="relative w-14 h-14">
+                  <svg className="w-14 h-14 -rotate-90" viewBox="0 0 56 56">
+                    <circle cx="28" cy="28" r="23" fill="none" stroke="#27272a" strokeWidth="4" />
+                    <circle
+                      cx="28" cy="28" r="23" fill="none"
+                      stroke="url(#impulsoStreakGrad)"
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                      strokeDasharray={`${2 * Math.PI * 23}`}
+                      strokeDashoffset={`${2 * Math.PI * 23 * (1 - Math.min((streak?.currentDays ?? 0), 21) / 21)}`}
+                      className="transition-all duration-700"
+                    />
+                    <defs>
+                      <linearGradient id="impulsoStreakGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#f59e0b" />
+                        <stop offset="100%" stopColor="#f97316" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-sm font-bold text-white">{streak?.currentDays ?? 0}</span>
+                  </div>
                 </div>
                 <p className="text-xs text-zinc-400">días seguidos</p>
                 {streak?.bestDays ? (

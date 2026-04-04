@@ -287,7 +287,8 @@ describe("POST /api/chat", () => {
           stage: "opening",
           starterQuestion: "¿Qué llevas semanas evitando hacer?",
         }),
-      })
+      }),
+      expect.any(Array)
     );
   });
 
@@ -393,7 +394,8 @@ describe("POST /api/chat", () => {
           hasActiveGoal: false,
           conversionTrigger: true,
         }),
-      })
+      }),
+      expect.any(Array)
     );
   });
 

@@ -181,11 +181,16 @@ npm run build        # Build de producción
 npm run start        # Servidor de producción
 npm run lint         # ESLint
 npm run test         # Jest
+npm run test:telegram # Prueba envio Telegram
+npm run backup:daily # Copia de seguridad DB
+npm run backup:restore:latest # Restaurar ultimo backup
 
 npx prisma migrate deploy   # Aplicar migraciones (producción)
 npx prisma generate         # Regenerar cliente Prisma
 npx prisma studio           # Explorador de BD visual
 ```
+
+Ver `docs/daily-backup.md` para configuracion diaria con cron y retencion.
 
 ---
 

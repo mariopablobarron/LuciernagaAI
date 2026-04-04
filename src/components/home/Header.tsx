@@ -8,6 +8,7 @@ import { useState } from "react";
 const NAV = [
   { label: "Chat", href: "/app" },
   { label: "Impulso", href: "/impulso" },
+  { label: "Test gratuito", href: "/test", highlight: true },
   { label: "Mi progreso", href: "/dashboard" },
 ];
 
@@ -32,6 +33,17 @@ export default function Header() {
           <nav className="hidden md:flex items-center gap-1 flex-1">
             {NAV.map((link) => {
               const active = pathname === link.href || pathname.startsWith(link.href + "/");
+              if (link.highlight) {
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border border-cyan-500/40 bg-cyan-500/8 text-cyan-300 hover:bg-cyan-500/15 hover:border-cyan-500/60 transition-all"
+                  >
+                    {link.label}
+                  </Link>
+                );
+              }
               return (
                 <Link
                   key={link.href}

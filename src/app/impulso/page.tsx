@@ -309,11 +309,57 @@ export default function ImpulsoPage() {
                 </div>
               </>
             ) : error || !profile ? (
-              <div className="card-surface p-8 text-center space-y-3">
-                <p className="text-zinc-400 text-sm">No se pudo cargar tu perfil.</p>
-                <Link href="/app" className="text-violet-400 text-sm hover:text-fuchsia-300 transition-colors">
-                  Ir al chat para comenzar →
-                </Link>
+              <div className="space-y-6">
+                <div className="relative rounded-2xl border border-violet-500/20 bg-violet-500/5 p-10 text-center overflow-hidden">
+                  <div className="w-16 h-16 rounded-2xl bg-violet-500/15 border border-violet-500/20 flex items-center justify-center mx-auto mb-5">
+                    <span className="text-3xl">⚡</span>
+                  </div>
+                  <h2 className="text-2xl font-bold text-white mb-2">
+                    Aún no tienes un perfil activo
+                  </h2>
+                  <p className="text-zinc-400 text-base leading-relaxed max-w-md mx-auto mb-8">
+                    Haz el diagnóstico de 12 preguntas para descubrir tu patrón de bloqueo
+                    y recibir un programa personalizado de 21 días.
+                  </p>
+                  <Link
+                    href="/impulso/diagnostico"
+                    className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-bold text-white bg-linear-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-fuchsia-500/20 text-base"
+                  >
+                    <Brain className="w-4 h-4" />
+                    Hacer diagnóstico ahora
+                  </Link>
+                  <p className="text-xs text-zinc-600 mt-4">5 minutos · Resultados inmediatos · Sin registro</p>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  {[
+                    { num: "01", icon: Brain, title: "Diagnóstico", desc: "12 preguntas sobre claridad, energía y disciplina.", color: "text-violet-400", bg: "bg-violet-500/10" },
+                    { num: "02", icon: Zap, title: "Tu perfil", desc: "BLOQUEADO, ANSIOSO, DESMOTIVADO, PERDIDO o POTENCIAL_ALTO.", color: "text-amber-400", bg: "bg-amber-500/10" },
+                    { num: "03", icon: Target, title: "Retos 21 días", desc: "Check-in diario con progresión personalizada.", color: "text-cyan-400", bg: "bg-cyan-500/10" },
+                  ].map((step) => {
+                    const Icon = step.icon;
+                    return (
+                      <div key={step.num} className="card-surface p-6 space-y-3">
+                        <div className={`w-10 h-10 rounded-xl ${step.bg} flex items-center justify-center`}>
+                          <Icon className={`w-5 h-5 ${step.color}`} />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-zinc-600 mb-1">{step.num}</p>
+                          <h3 className="font-bold text-white text-sm mb-1">{step.title}</h3>
+                          <p className="text-xs text-zinc-400 leading-relaxed">{step.desc}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="card-surface p-6 flex items-center justify-between gap-6">
+                  <div>
+                    <p className="font-semibold text-white text-sm mb-1">¿Prefieres empezar con el chat?</p>
+                    <p className="text-xs text-zinc-400">El coach también puede ayudarte sin diagnóstico previo.</p>
+                  </div>
+                  <Link href="/app" className="shrink-0 px-5 py-2.5 rounded-xl border border-zinc-700 text-sm font-semibold text-zinc-300 hover:text-white hover:border-zinc-500 transition-all">
+                    Ir al chat →
+                  </Link>
+                </div>
               </div>
             ) : (
               <>

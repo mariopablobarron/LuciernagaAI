@@ -6,51 +6,48 @@ import { ArrowRight } from "lucide-react";
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
-      {/* HERO - 2 Column Layout */}
+
+      {/* HERO */}
       <section className="relative min-h-[calc(100vh-80px)] grid md:grid-cols-2 gap-12 items-center px-4 py-24 max-w-6xl mx-auto">
-        {/* Left: Text */}
+        {/* Left */}
         <div className="space-y-8 order-2 md:order-1">
           <div className="space-y-2">
-            <p className="text-sm font-semibold uppercase tracking-widest text-indigo-400">
+            <p className="text-sm font-semibold uppercase tracking-widest text-violet-400">
               ⚡ Transformación Real
             </p>
             <h1 className="text-5xl md:text-6xl font-bold leading-tight">
               Cambia tu vida{" "}
-              <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
                 un hábito a la vez
               </span>
             </h1>
           </div>
           <p className="text-lg text-zinc-400 leading-relaxed max-w-lg">
-            Luciernaga te guía a través de la transformación real. No es teoría. No es perfección.
-            Es acción pequeña, consistente, que genera cambios duraderos.
+            Luciérnaga te guía a través de la transformación real. No es teoría. No es
+            perfección. Es acción pequeña, consistente, que genera cambios duraderos.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <Link
               href="/explore"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-400 transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-linear-to-r from-violet-500 to-fuchsia-500 text-white font-semibold rounded-xl hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-fuchsia-500/25"
             >
               Empieza gratis <ArrowRight className="w-4 h-4" />
             </Link>
             <button
               onClick={() => {
-                const el = document.getElementById("how-it-works");
-                el?.scrollIntoView({ behavior: "smooth" });
+                document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" });
               }}
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-zinc-700 text-white font-semibold rounded-lg hover:bg-zinc-900/50 transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-zinc-700 text-white font-semibold rounded-xl hover:bg-zinc-900/50 hover:border-zinc-600 transition-colors"
             >
-              Ver demo
+              Ver cómo funciona
             </button>
           </div>
         </div>
 
-        {/* Right: Chat UI Mock */}
+        {/* Right: Chat mock */}
         <div className="hidden md:block order-1 md:order-2">
           <div className="card-surface p-6 space-y-4 max-h-96 overflow-hidden relative">
-            {/* Glow effect */}
-            <div className="absolute inset-0 -z-10 bg-gradient-to-br from-indigo-500/20 via-transparent to-purple-500/20 blur-2xl" />
-
-            {/* Mock chat messages */}
+            <div className="absolute inset-0 -z-10 bg-linear-to-br from-violet-500/15 via-transparent to-fuchsia-500/15 blur-2xl" />
             <div className="space-y-3">
               {[
                 { role: "user", text: "Estoy bloqueado con mi proyecto" },
@@ -63,13 +60,13 @@ export default function LandingPage() {
                   className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-xs px-4 py-2 rounded-lg ${
+                    className={`max-w-xs px-4 py-2 rounded-xl text-sm ${
                       msg.role === "user"
-                        ? "bg-indigo-500/20 border border-indigo-500/30 text-white"
+                        ? "bg-violet-500/20 border border-violet-500/30 text-white"
                         : "bg-zinc-800/50 border border-zinc-700 text-zinc-300"
                     }`}
                   >
-                    <p className="text-sm">{msg.text}</p>
+                    {msg.text}
                   </div>
                 </div>
               ))}
@@ -78,11 +75,14 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* HOW IT WORKS - 3 Steps */}
-      <section id="how-it-works" className="py-20 px-4 bg-zinc-900/30 border-y border-zinc-800">
+      {/* HOW IT WORKS */}
+      <section
+        id="how-it-works"
+        className="py-20 px-4 bg-zinc-900/30 border-y border-zinc-800"
+      >
         <div className="max-w-4xl mx-auto space-y-12">
           <div className="text-center space-y-4">
-            <p className="text-sm font-semibold text-indigo-400 uppercase tracking-wider">
+            <p className="text-sm font-semibold text-violet-400 uppercase tracking-wider">
               Cómo funciona
             </p>
             <h2 className="text-4xl md:text-5xl font-bold">Tu transformación en 3 pasos</h2>
@@ -106,7 +106,9 @@ export default function LandingPage() {
               },
             ].map((step) => (
               <div key={step.num} className="card-surface p-8 text-center space-y-4">
-                <div className="text-5xl font-bold text-indigo-400">{step.num}</div>
+                <div className="text-5xl font-bold bg-linear-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+                  {step.num}
+                </div>
                 <h3 className="text-xl font-bold">{step.title}</h3>
                 <p className="text-zinc-400 text-sm leading-relaxed">{step.desc}</p>
               </div>
@@ -118,37 +120,31 @@ export default function LandingPage() {
       {/* TESTIMONIALS */}
       <section className="py-20 px-4 max-w-5xl mx-auto">
         <div className="text-center mb-12 space-y-4">
-          <p className="text-sm font-semibold text-indigo-400 uppercase tracking-wider">
+          <p className="text-sm font-semibold text-violet-400 uppercase tracking-wider">
             Historias reales
           </p>
           <h2 className="text-4xl font-bold">Personas que ya empezaron</h2>
         </div>
         <div className="grid md:grid-cols-3 gap-6">
           {[
-            {
-              quote: "Por fin algo que no me dice qué sentir sino qué hacer.",
-              name: "Valentina",
-              age: "29",
-            },
+            { quote: "Por fin algo que no me dice qué sentir sino qué hacer.", name: "Valentina", age: "29" },
             { quote: "Tres semanas y ya completé mi primer reto.", name: "Miguel", age: "34" },
             { quote: "El check-in diario me cambió la rutina.", name: "Priya", age: "31" },
-          ].map((testimonial, i) => (
+          ].map((t, i) => (
             <div key={i} className="card-surface p-6 space-y-4">
-              <div className="flex gap-1">
-                {[...Array(5)].map((_, j) => (
-                  <span key={j} className="text-amber-400">
-                    ★
-                  </span>
+              <div className="flex gap-0.5">
+                {Array.from({ length: 5 }).map((_, j) => (
+                  <span key={j} className="text-amber-400">★</span>
                 ))}
               </div>
-              <p className="text-zinc-300 italic text-sm">&quot;{testimonial.quote}&quot;</p>
+              <p className="text-zinc-300 italic text-sm">&ldquo;{t.quote}&rdquo;</p>
               <div className="flex items-center gap-3 pt-4 border-t border-zinc-800">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center font-bold">
-                  {testimonial.name[0]}
+                <div className="w-10 h-10 rounded-full bg-linear-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center font-bold text-sm">
+                  {t.name[0]}
                 </div>
                 <div>
-                  <p className="font-semibold text-white text-sm">{testimonial.name}</p>
-                  <p className="text-xs text-zinc-500">{testimonial.age} años</p>
+                  <p className="font-semibold text-white text-sm">{t.name}</p>
+                  <p className="text-xs text-zinc-500">{t.age} años</p>
                 </div>
               </div>
             </div>
@@ -160,7 +156,7 @@ export default function LandingPage() {
       <section className="py-20 px-4 bg-zinc-900/30 border-y border-zinc-800">
         <div className="max-w-4xl mx-auto space-y-12">
           <div className="text-center space-y-4">
-            <p className="text-sm font-semibold text-indigo-400 uppercase tracking-wider">Planes</p>
+            <p className="text-sm font-semibold text-violet-400 uppercase tracking-wider">Planes</p>
             <h2 className="text-4xl font-bold">Elige tu camino</h2>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
@@ -169,12 +165,7 @@ export default function LandingPage() {
                 title: "Gratuito",
                 description: "Perfecto para empezar",
                 price: "Gratis",
-                features: [
-                  "Chat ilimitado",
-                  "Detección de estado",
-                  "Primer reto gratis",
-                  "Acceso exploración",
-                ],
+                features: ["Chat ilimitado", "Detección de estado", "Primer reto gratis", "Acceso exploración"],
                 cta: "Empezar ahora",
                 href: "/explore",
                 featured: false,
@@ -200,7 +191,7 @@ export default function LandingPage() {
                 key={i}
                 className={`rounded-xl border p-8 space-y-6 ${
                   plan.featured
-                    ? "ring-2 ring-indigo-500 bg-indigo-500/5"
+                    ? "ring-1 ring-violet-500/60 bg-violet-500/5 border-violet-500/30"
                     : "border-zinc-800 bg-zinc-900/50 hover:border-zinc-700"
                 }`}
               >
@@ -208,23 +199,21 @@ export default function LandingPage() {
                   <h3 className="text-2xl font-bold">{plan.title}</h3>
                   <p className="text-sm text-zinc-400 mt-1">{plan.description}</p>
                 </div>
-                <div>
-                  <p className="text-3xl font-bold">{plan.price}</p>
-                </div>
+                <p className="text-3xl font-bold">{plan.price}</p>
                 <ul className="space-y-3">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-center gap-2 text-sm text-zinc-300">
-                      <span className="text-indigo-400 font-bold">✓</span>
-                      {feature}
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm text-zinc-300">
+                      <span className="text-violet-400 font-bold">✓</span>
+                      {f}
                     </li>
                   ))}
                 </ul>
                 <Link
                   href={plan.href}
-                  className={`w-full py-2 px-4 rounded-lg font-semibold text-center transition-colors block ${
+                  className={`w-full py-2.5 px-4 rounded-xl font-semibold text-center transition-all block text-sm ${
                     plan.featured
-                      ? "bg-indigo-500 text-white hover:bg-indigo-400"
-                      : "border border-zinc-700 text-white hover:bg-zinc-900"
+                      ? "bg-linear-to-r from-violet-500 to-fuchsia-500 text-white hover:from-violet-400 hover:to-fuchsia-400"
+                      : "border border-zinc-700 text-white hover:bg-zinc-900 hover:border-zinc-600"
                   }`}
                 >
                   {plan.cta}
@@ -237,11 +226,9 @@ export default function LandingPage() {
 
       {/* FINAL CTA */}
       <section className="relative min-h-96 flex flex-col items-center justify-center px-4 py-20 overflow-hidden">
-        {/* Radial glow */}
-        <div className="absolute inset-0 -z-10 opacity-30">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-transparent to-purple-500/20 blur-3xl" />
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute inset-0 bg-linear-to-br from-violet-500/10 via-transparent to-fuchsia-500/10 blur-3xl" />
         </div>
-
         <div className="max-w-3xl text-center space-y-6">
           <h2 className="text-5xl md:text-6xl font-bold">¿Listo para tu primer paso?</h2>
           <p className="text-lg text-zinc-400">
@@ -249,15 +236,16 @@ export default function LandingPage() {
           </p>
           <Link
             href="/explore"
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-indigo-500 to-indigo-400 text-white font-bold rounded-lg hover:from-indigo-400 hover:to-indigo-300 transition-all hover:shadow-lg hover:shadow-indigo-500/50"
+            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-linear-to-r from-violet-500 to-fuchsia-500 text-white font-bold rounded-xl hover:from-violet-400 hover:to-fuchsia-400 transition-all hover:shadow-lg hover:shadow-fuchsia-500/40"
           >
-            Abrir Luciernaga AI <ArrowRight className="w-5 h-5" />
+            Abrir Luciérnaga AI <ArrowRight className="w-5 h-5" />
           </Link>
-          <p className="text-xs text-zinc-500 pt-4">
-            Luciernaga AI no sustituye terapia ni intervención psicológica profesional.
+          <p className="text-xs text-zinc-600 pt-4">
+            Luciérnaga AI no sustituye terapia ni intervención psicológica profesional.
           </p>
         </div>
       </section>
+
     </div>
   );
 }

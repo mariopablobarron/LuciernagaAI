@@ -6,7 +6,7 @@ import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-syst
 
 export default function SettingsPage() {
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${GRADIENTS.background} py-8 px-4`}>
+    <div className={`bg-linear-to-br ${GRADIENTS.background} py-8 px-4`}>
       <div className={`${LAYOUTS.sectionInner} max-w-3xl space-y-8`}>
         {/* Header */}
         <div className="flex items-center gap-4">

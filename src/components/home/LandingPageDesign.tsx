@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { ArrowRight, Sparkles, Zap, Target, CheckCircle2 } from 'lucide-react';
 import Header from '@/components/home/Header';
+import Footer from '@/components/home/Footer';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -324,72 +325,7 @@ export default function LandingPageDesign() {
         </div>
       </section>
 
-      {/* ── FOOTER ───────────────────────────────────────────────────────── */}
-      <footer className="border-t border-zinc-800 bg-zinc-900/40 py-12 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 mb-10">
-            {/* Brand */}
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xl">🔥</span>
-                <span className="text-lg font-bold bg-linear-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                  Luciérnaga AI
-                </span>
-              </div>
-              <p className="text-sm text-zinc-400 leading-relaxed">
-                Mentoría conversacional con IA para sacarte del bucle.
-              </p>
-            </div>
-
-            {/* Product */}
-            <div>
-              <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">Producto</h4>
-              <ul className="space-y-2 text-sm text-zinc-400">
-                <li>
-                  <Link href="/unirse" className="hover:text-cyan-400 transition-colors focus-visible:outline-none focus-visible:text-cyan-400">
-                    Empieza gratis
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/app" className="hover:text-cyan-400 transition-colors focus-visible:outline-none focus-visible:text-cyan-400">
-                    Tu espacio
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/impulso" className="hover:text-cyan-400 transition-colors focus-visible:outline-none focus-visible:text-cyan-400">
-                    Programa Impulso
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Legal */}
-            <div>
-              <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">Legal</h4>
-              <ul className="space-y-2 text-sm text-zinc-400">
-                <li>
-                  <Link href="/api/legal" className="hover:text-cyan-400 transition-colors focus-visible:outline-none focus-visible:text-cyan-400">
-                    Privacidad
-                  </Link>
-                </li>
-                <li>
-                  <a
-                    href="mailto:hola@luciernaga.ai"
-                    className="hover:text-cyan-400 transition-colors focus-visible:outline-none focus-visible:text-cyan-400"
-                  >
-                    Contacto
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-zinc-800 pt-8 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-zinc-500">
-            <p>© 2025 Luciérnaga AI · Hecho con intención.</p>
-            <p>Deja de darle vueltas. Empieza a actuar.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

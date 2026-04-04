@@ -192,7 +192,7 @@ export default function ImpulsoPage() {
   const programProgress = Math.min(Math.round((programDays / programTotal) * 100), 100);
 
   return (
-    <div className="min-h-screen bg-zinc-950">
+    <div className="bg-zinc-950">
       {/* Background glows */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/3 w-125 h-125 bg-violet-500/10 rounded-full blur-3xl" />

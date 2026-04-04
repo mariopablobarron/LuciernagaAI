@@ -6,7 +6,7 @@ import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-syst
 
 export default function ProfilePage() {
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${GRADIENTS.background} py-8 px-4`}>
+    <div className={`bg-linear-to-br ${GRADIENTS.background} py-8 px-4`}>
       <div className={`${LAYOUTS.sectionInner} max-w-2xl space-y-8`}>
         {/* Header */}
         <div className="flex items-center gap-4">
@@ -20,7 +20,7 @@ export default function ProfilePage() {
         <div className={`${COMPONENTS.card} p-8 space-y-6`}>
           <div className="flex items-start justify-between">
             <div className="flex gap-4">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-2xl font-bold text-white">
+              <div className="w-20 h-20 rounded-full bg-linear-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-2xl font-bold text-white">
                 JD
               </div>
               <div className="space-y-2">

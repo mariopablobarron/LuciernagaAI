@@ -162,7 +162,7 @@ export default function DashboardPage() {
   });
 
   return (
-    <div className="min-h-screen bg-zinc-950">
+    <div className="bg-zinc-950">
       {/* Background glow */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-violet-500/8 rounded-full blur-3xl" />

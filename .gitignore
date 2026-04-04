@@ -54,3 +54,4 @@ rasa-demo/
 .openhands/
 .testing-agent/
 .windsurf/
+.env.sentry-build-plugin

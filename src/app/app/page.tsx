@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import Chat, { type ChatMessage } from "@/components/Chat";
+import AssessmentFlow from "@/components/AssessmentFlow";
 import HomeHero from "@/components/home/HomeHero";
 import HomeOnboarding from "@/components/home/HomeOnboarding";
 import HomeWorkspace, { type WorkspaceTab } from "@/components/home/HomeWorkspace";
@@ -1771,6 +1772,8 @@ export default function HomePage() {
             activeTab={workspaceTab}
             onTabChange={setWorkspaceTab}
             chat={
+              <>
+                <AssessmentFlow userId={sessionProfile?.id} />
               <Chat
                 title={safeConversation.title}
                 messages={safeConversation.messages}
@@ -1796,6 +1799,7 @@ export default function HomePage() {
                 onUseStarterExample={handleUseStarterExample}
                 draftKey={`chat-draft:${safeConversation.id}`}
               />
+              </>
             }
             onNewConversation={handleNewConversation}
             conversationTitle={safeConversation.title}

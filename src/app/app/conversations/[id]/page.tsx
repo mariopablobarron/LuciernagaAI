@@ -140,9 +140,36 @@ export default function ConversationDetailPage({
               ))}
             </>
           ) : messages.length === 0 ? (
-            <p className="text-zinc-500 text-sm text-center py-12">
-              Sin mensajes. Escribe algo para comenzar.
-            </p>
+            <div className="flex flex-col items-center gap-6 py-12">
+              {/* Bienvenida del coach */}
+              <div className="flex justify-start w-full">
+                <div className="flex items-start gap-3 max-w-[85%] sm:max-w-lg">
+                  <div className="w-8 h-8 rounded-full bg-violet-500/20 border border-violet-500/30 flex items-center justify-center shrink-0 mt-1">
+                    <span className="text-sm">🔥</span>
+                  </div>
+                  <div className="bg-zinc-800 text-zinc-100 rounded-2xl rounded-tl-sm px-4 py-3 text-sm leading-relaxed">
+                    Hola. Estoy aquí. ¿Qué está pasando ahora mismo que te tiene aquí?
+                  </div>
+                </div>
+              </div>
+              {/* Sugerencias rápidas */}
+              <div className="flex flex-wrap gap-2 justify-center">
+                {[
+                  "No sé por dónde empezar",
+                  "Me siento bloqueado",
+                  "Necesito claridad sobre algo",
+                  "Tengo que tomar una decisión",
+                ].map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    onClick={() => setInput(suggestion)}
+                    className="px-3 py-1.5 rounded-full text-xs border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 hover:bg-zinc-800/50 transition-all"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            </div>
           ) : (
             messages.map((message) => (
               <div

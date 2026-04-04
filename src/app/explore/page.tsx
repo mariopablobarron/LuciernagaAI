@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ExploreCanvas from "@/components/explore/ExploreCanvas";
+import OnboardingFlow, { type OnboardingData } from "@/components/explore/OnboardingFlow";
 import { Toaster } from "@/components/ui/sonner";
 
 type ActionNode = {
@@ -18,6 +19,9 @@ type UserState = {
   emotionalState: "blocked" | "anxious" | "doubt" | "clarity";
   completedActions: number;
   totalActions: number;
+  name?: string;
+  situation?: string;
+  goal?: string;
 };
 
 const AVAILABLE_ACTIONS: ActionNode[] = [
@@ -60,11 +64,13 @@ const AVAILABLE_ACTIONS: ActionNode[] = [
 ];
 
 export default function ExplorePage() {
+  const [onboardingComplete, setOnboardingComplete] = useState(false);
+  const [onboardingData, setOnboardingData] = useState<OnboardingData | null>(null);
   const [actions, setActions] = useState<ActionNode[]>(AVAILABLE_ACTIONS);
   const [userState, setUserState] = useState<UserState>({
     emotionalState: "doubt",
     completedActions: 0,
-    totalActions: 4, // Keep 4 as the total even if we add more actions
+    totalActions: 4,
   });
   const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -75,6 +81,19 @@ export default function ExplorePage() {
       setLoading(false);
     }, 500);
   }, []);
+
+  const handleOnboardingComplete = (data: OnboardingData) => {
+    setOnboardingData(data);
+    setOnboardingComplete(true);
+
+    // Personalize user state with onboarding data
+    setUserState((prev) => ({
+      ...prev,
+      name: data.name,
+      situation: data.situation,
+      goal: data.goal,
+    }));
+  };
 
   const handleNodeClick = (nodeId: string) => {
     setActiveNodeId(nodeId);
@@ -98,11 +117,11 @@ export default function ExplorePage() {
 
   const handleReset = () => {
     setActions(AVAILABLE_ACTIONS);
-    setUserState({
-      emotionalState: "doubt",
+    setUserState((prev) => ({
+      ...prev,
       completedActions: 0,
       totalActions: AVAILABLE_ACTIONS.length,
-    });
+    }));
     setActiveNodeId(null);
   };
 
@@ -118,16 +137,26 @@ export default function ExplorePage() {
   }
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-gradient-to-br from-background via-background to-muted/20">
-      <ExploreCanvas
-        actions={actions}
-        userState={userState}
-        activeNodeId={activeNodeId}
-        onNodeClick={handleNodeClick}
-        onActionComplete={handleActionComplete}
-        onReset={handleReset}
-      />
+    <>
+      {!onboardingComplete ? (
+        <div className="animate-in fade-in duration-300">
+          <OnboardingFlow onComplete={handleOnboardingComplete} />
+        </div>
+      ) : (
+        <div className="animate-in fade-in duration-500">
+          <div className="relative h-screen w-full overflow-hidden bg-gradient-to-br from-background via-background to-muted/20">
+            <ExploreCanvas
+              actions={actions}
+              userState={userState}
+              activeNodeId={activeNodeId}
+              onNodeClick={handleNodeClick}
+              onActionComplete={handleActionComplete}
+              onReset={handleReset}
+            />
+          </div>
+        </div>
+      )}
       <Toaster />
-    </div>
+    </>
   );
 }

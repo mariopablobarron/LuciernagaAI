@@ -242,8 +242,13 @@ export default function ExploreCanvas({
         />
       )}
 
-      {/* HUD Superior - Microcopy emocional */}
+      {/* HUD Superior - Microcopy emocional y nombre */}
       <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20 text-center space-y-1.5">
+        {userState.name && (
+          <p className="text-xs font-semibold text-foreground">
+            {userState.name}, es hora de actuar
+          </p>
+        )}
         <p className="text-xs font-medium text-foreground">
           {activeNodeId ? "Perfecto. Escribo con honestidad." : "No tiene que ser perfecto"}
         </p>

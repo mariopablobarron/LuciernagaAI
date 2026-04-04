@@ -49,18 +49,18 @@ export default function ImpulsoPage() {
                 <p className="text-xs text-zinc-500">Mejor: 21 días</p>
               </div>
 
-              <div className="card-surface p-8 text-center space-y-3">
+              <div className={`${COMPONENTS.card} text-center space-y-3`}>
                 <p className="text-4xl font-bold text-white">42%</p>
                 <p className="text-sm text-zinc-400">Progreso del programa</p>
                 <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
-                  <div className="h-full w-[42%] bg-gradient-to-r from-indigo-500 to-indigo-400" />
+                  <div className="h-full w-[42%] bg-gradient-to-r from-violet-500 to-cyan-400" />
                 </div>
               </div>
 
-              <div className="card-surface p-8 text-center space-y-3">
+              <div className={`${COMPONENTS.card} text-center space-y-3`}>
                 <p className="text-4xl font-bold text-white">9/21</p>
                 <p className="text-sm text-zinc-400">Días completados</p>
-                <p className="text-xs text-amber-500 font-semibold">Estás en track ✓</p>
+                <p className="text-xs text-cyan-400 font-semibold">Estás en track ✓</p>
               </div>
             </div>
 
@@ -68,11 +68,11 @@ export default function ImpulsoPage() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/impulso/checkin"
-                className="flex-1 py-3 px-4 rounded-lg bg-amber-500 text-white font-semibold hover:bg-amber-400 transition-colors text-center"
+                className={`${COMPONENTS.buttonPrimary} flex-1 text-center`}
               >
                 Hacer check-in de hoy
               </Link>
-              <button className="flex-1 py-3 px-4 rounded-lg border border-zinc-700 text-white font-semibold hover:bg-zinc-900/50 transition-colors">
+              <button className={`${COMPONENTS.buttonSecondary} flex-1`}>
                 Ver diagnóstico completo
               </button>
             </div>
@@ -87,29 +87,29 @@ export default function ImpulsoPage() {
               { title: 'Deep Work Blocks', progress: 21, status: 'completed', days: '21/21' },
               { title: 'Evening Reflection', progress: 8, status: 'active', days: '8/21' },
             ].map((reto, i) => (
-              <div key={i} className="card-surface p-6 space-y-4">
+              <div key={i} className={`${COMPONENTS.card} space-y-4`}>
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="text-lg font-bold text-white">{reto.title}</h3>
                     <p className="text-sm text-zinc-400 mt-1">{reto.days} días</p>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                    reto.status === 'completed' 
-                      ? 'bg-emerald-500/10 text-emerald-500'
-                      : 'bg-amber-500/10 text-amber-500'
+                    reto.status === 'completed'
+                      ? 'bg-emerald-500/10 text-emerald-400'
+                      : 'bg-cyan-500/10 text-cyan-400'
                   }`}>
                     {reto.status === 'completed' ? '✓ Completado' : 'En progreso'}
                   </span>
                 </div>
                 <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-indigo-500 to-indigo-400 transition-all"
+                    className="h-full bg-gradient-to-r from-violet-500 to-cyan-400 transition-all"
                     style={{ width: `${reto.progress}%` }}
                   />
                 </div>
               </div>
             ))}
-            <button className="w-full py-3 px-4 rounded-lg border border-indigo-500 text-indigo-400 font-semibold hover:bg-indigo-500/10 transition-colors">
+            <button className={`${COMPONENTS.buttonSecondary} w-full`}>
               + Asignar nuevo reto
             </button>
           </div>
@@ -127,11 +127,11 @@ export default function ImpulsoPage() {
               return (
                 <div
                   key={i}
-                  className={`card-surface p-6 flex items-start gap-4 ${
-                    insight.type === 'warning' ? 'border-l-4 border-l-amber-500' : 'border-l-4 border-l-indigo-500'
+                  className={`${COMPONENTS.card} p-6 flex items-start gap-4 ${
+                    insight.type === 'warning' ? 'border-l-4 border-l-cyan-500' : 'border-l-4 border-l-violet-500'
                   }`}
                 >
-                  <Icon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${insight.type === 'warning' ? 'text-amber-500' : 'text-indigo-400'}`} />
+                  <Icon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${insight.type === 'warning' ? 'text-cyan-400' : 'text-violet-400'}`} />
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-white">{insight.title}</p>
                     <p className="text-sm text-zinc-400 mt-1">{insight.message}</p>
@@ -150,7 +150,7 @@ export default function ImpulsoPage() {
               { day: 14, title: 'Punto de quiebre', preview: 'Aquí es donde muchos...', locked: true },
               { day: 21, title: 'Tu nuevo hábito', preview: 'Felicitaciones, ahora...', locked: true },
             ].map((mensaje, i) => (
-              <div key={i} className="card-surface p-6 space-y-3 relative">
+              <div key={i} className={`${COMPONENTS.card} space-y-3 relative`}>
                 {mensaje.locked && (
                   <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/40 rounded-xl flex items-center justify-center">
                     <Lock className="w-8 h-8 text-white opacity-50" />
@@ -177,7 +177,7 @@ export default function ImpulsoPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-3 font-semibold transition-colors border-b-2 -mb-px ${
                 activeTab === tab.id
-                  ? 'text-indigo-400 border-b-indigo-400'
+                  ? 'text-cyan-400 border-b-cyan-400'
                   : 'text-zinc-400 border-b-transparent hover:text-white'
               }`}
             >

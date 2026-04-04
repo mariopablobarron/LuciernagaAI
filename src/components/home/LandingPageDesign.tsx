@@ -68,11 +68,11 @@ export default function LandingPageDesign() {
           <div className="flex items-center">
             <div className="flex -space-x-3">
               {[
-                { initial: 'V', bg: 'bg-indigo-500' },
-                { initial: 'M', bg: 'bg-purple-500' },
-                { initial: 'P', bg: 'bg-pink-500' },
-                { initial: 'A', bg: 'bg-blue-500' },
-                { initial: 'L', bg: 'bg-cyan-500' },
+                { initial: 'V', bg: 'bg-violet-500' },
+                { initial: 'M', bg: 'bg-fuchsia-500' },
+                { initial: 'P', bg: 'bg-violet-600' },
+                { initial: 'A', bg: 'bg-cyan-500' },
+                { initial: 'L', bg: 'bg-cyan-400' },
               ].map((avatar, i) => (
                 <div
                   key={i}
@@ -96,10 +96,10 @@ export default function LandingPageDesign() {
         <div className="max-w-6xl mx-auto">
           {/* Section label */}
           <div className="text-center mb-12">
-            <p className="text-sm font-semibold text-indigo-400 tracking-widest uppercase mb-3">
+            <p className="text-sm font-semibold text-cyan-400 tracking-widest uppercase mb-3">
               Cómo funciona
             </p>
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
+            <h2 className={`${TYPOGRAPHY.h2} text-white mb-4`}>
               Diseñado para sacarte del bucle
             </h2>
             <p className="text-zinc-400 max-w-xl mx-auto">
@@ -108,7 +108,7 @@ export default function LandingPageDesign() {
           </div>
 
           {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className={LAYOUTS.gridThreeCol}>
             {[
               {
                 icon: '○',
@@ -128,15 +128,15 @@ export default function LandingPageDesign() {
             ].map((feature, i) => (
               <div
                 key={i}
-                className="group p-8 rounded-xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900 hover:border-zinc-700 transition-all hover:shadow-lg hover:shadow-indigo-500/10"
+                className={`group p-8 ${COMPONENTS.card} ${COMPONENTS.cardHover}`}
               >
                 {/* Icon */}
-                <div className="text-4xl font-light text-indigo-400 mb-4 group-hover:text-indigo-300 transition-colors">
+                <div className="text-4xl font-light text-violet-400 mb-4 group-hover:text-cyan-300 transition-colors">
                   {feature.icon}
                 </div>
 
                 {/* Title */}
-                <h3 className="text-xl font-bold text-white mb-3">
+                <h3 className={`${TYPOGRAPHY.h3} text-white mb-3`}>
                   {feature.title}
                 </h3>
 
@@ -146,7 +146,7 @@ export default function LandingPageDesign() {
                 </p>
 
                 {/* Hover indicator */}
-                <div className="mt-6 h-0.5 w-0 bg-gradient-to-r from-indigo-400 to-transparent group-hover:w-full transition-all duration-500" />
+                <div className="mt-6 h-0.5 w-0 bg-gradient-to-r from-violet-400 to-cyan-400 group-hover:w-full transition-all duration-500" />
               </div>
             ))}
           </div>
@@ -154,26 +154,26 @@ export default function LandingPageDesign() {
       </section>
 
       {/* ─── FINAL CTA SECTION ─── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 py-20 overflow-hidden">
+      <section className={`relative min-h-screen flex flex-col items-center justify-center px-4 py-20 overflow-hidden bg-gradient-to-br ${GRADIENTS.background}`}>
         {/* Radial glow background */}
         <div className="absolute inset-0 -z-10 opacity-30">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-transparent to-purple-500/20 blur-3xl" />
+          <div className="absolute inset-0 bg-gradient-to-br from-violet-500/20 via-transparent to-cyan-500/20 blur-3xl" />
         </div>
 
         {/* Content */}
         <div className="max-w-3xl text-center">
-          <h2 className="text-5xl sm:text-6xl font-bold text-white mb-6">
+          <h2 className={`${TYPOGRAPHY.h1} text-white mb-6`}>
             ¿Listo para tu primer paso?
           </h2>
 
-          <p className="text-lg sm:text-xl text-zinc-400 mb-12 leading-relaxed">
+          <p className={`${TYPOGRAPHY.body} text-zinc-400 mb-12 leading-relaxed`}>
             Empieza en menos de 60 segundos. Sin registro obligatorio.
           </p>
 
           {/* CTA Button */}
           <Link
             href="/explore"
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-indigo-500 to-indigo-400 text-white font-bold rounded-lg hover:from-indigo-400 hover:to-indigo-300 transition-all hover:shadow-lg hover:shadow-indigo-500/50"
+            className={`${COMPONENTS.buttonPrimary} inline-flex items-center justify-center gap-2`}
           >
             Abrir Luciernaga AI <ArrowRight className="w-5 h-5" />
           </Link>
@@ -193,7 +193,7 @@ export default function LandingPageDesign() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-2xl">🔥</span>
-                <span className="font-bold text-lg text-white">Luciernaga</span>
+                <span className={`${TYPOGRAPHY.h3} text-white`}>Luciernaga</span>
               </div>
               <p className="text-sm text-zinc-400">
                 Mentoría conversacional con IA para sacarte del bucle.
@@ -205,12 +205,12 @@ export default function LandingPageDesign() {
               <h4 className="font-semibold text-white mb-4">Producto</h4>
               <ul className="space-y-2 text-sm text-zinc-400">
                 <li>
-                  <Link href="/explore" className="hover:text-indigo-400 transition-colors">
+                  <Link href="/explore" className="hover:text-cyan-400 transition-colors">
                     Empieza ahora
                   </Link>
                 </li>
                 <li>
-                  <Link href="/dashboard" className="hover:text-indigo-400 transition-colors">
+                  <Link href="/dashboard" className="hover:text-cyan-400 transition-colors">
                     Tu progreso
                   </Link>
                 </li>
@@ -222,12 +222,12 @@ export default function LandingPageDesign() {
               <h4 className="font-semibold text-white mb-4">Legal</h4>
               <ul className="space-y-2 text-sm text-zinc-400">
                 <li>
-                  <Link href="/api/legal" className="hover:text-indigo-400 transition-colors">
+                  <Link href="/api/legal" className="hover:text-cyan-400 transition-colors">
                     Privacidad
                   </Link>
                 </li>
                 <li>
-                  <a href="mailto:hola@luciernaga.ai" className="hover:text-indigo-400 transition-colors">
+                  <a href="mailto:hola@luciernaga.ai" className="hover:text-cyan-400 transition-colors">
                     Contacto
                   </a>
                 </li>

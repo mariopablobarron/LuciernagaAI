@@ -358,7 +358,14 @@ export default function HomePage() {
     setSessionProfile(null);
     setCaptureEmailRecommended(false);
     setCaptureEmailPrompt(null);
-    setError("Sesión inválida o expirada. Recarga la página para continuar.");
+    // Auto-recover: re-bootstrap silently. If it fails, show the error.
+    bootstrapBrowserSession()
+      .then(() => {
+        window.location.reload();
+      })
+      .catch(() => {
+        setError("Sesión inválida o expirada. Recarga la página para continuar.");
+      });
   };
 
   const refreshSessionProfile = async (): Promise<BrowserSessionUser | null> => {

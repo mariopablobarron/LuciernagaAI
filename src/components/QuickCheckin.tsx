@@ -23,11 +23,12 @@ export default function QuickCheckin({ onComplete }: Props) {
     setSelected(value);
     setLoading(true);
     try {
+      const label = MOODS.find((m) => m.value === value)?.label ?? "Regular";
       await fetch("/api/checkin", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ energyLevel: value }),
+        body: JSON.stringify({ response: label, mood: label.toLowerCase(), energyLevel: value }),
       });
       setSent(true);
       onComplete?.();

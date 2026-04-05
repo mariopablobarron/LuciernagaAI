@@ -1,5 +1,5 @@
 /**
- * DESIGN SYSTEM - Luciernaga AI
+ * DESIGN SYSTEM - Tres Mil Millones de Latidos
  * 
  * Sistema global de colores, espaciados, tipografía y componentes
  * Aplicable a TODAS las páginas para coherencia visual

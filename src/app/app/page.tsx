@@ -1743,7 +1743,7 @@ export default function HomePage() {
   return (
     <>
       <AppLayout
-        title="Luciernaga AI"
+        title="Tres Mil Millones de Latidos"
         subtitle="Mentoría conversacional con foco en acción, continuidad emocional y un contexto persistente que acompaña la conversación."
         summary={
           <>

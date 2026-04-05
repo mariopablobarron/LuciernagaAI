@@ -13,7 +13,7 @@ import { trackSafe } from "@/services/events";
 import {
   appendCaptureEmailPrompt,
   appendConversionPrompt,
-  finalizeLuciernagaResponse,
+  finalizeTres Mil Millones de LatidosResponse,
   appendSoftPaywallPrompt,
   buildActionRequiredMessage,
   buildCoachPrompt,
@@ -967,7 +967,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     transformation: { phase: transformationPhase, summary: transformationSummary },
     legal: {
       limitsNote:
-        "Luciernaga AI orienta y empuja accion, pero no sustituye terapia ni soporte de emergencia.",
+        "Tres Mil Millones de Latidos orienta y empuja accion, pero no sustituye terapia ni soporte de emergencia.",
       critical: false,
     },
     onboarding: onboardingContext,
@@ -1029,7 +1029,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     let assistantResponse = completionMicroFeedback
       ? `${completionMicroFeedback}\n\n${aiResult.response}`
       : aiResult.response;
-    assistantResponse = finalizeLuciernagaResponse(assistantResponse, {
+    assistantResponse = finalizeTres Mil Millones de LatidosResponse(assistantResponse, {
       state,
       mentor: mentorMode,
       goal: buildGoalCoachContext(activeGoal, message, {
@@ -1155,7 +1155,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
       let finalText = completionMicroFeedback
         ? `${completionMicroFeedback}\n\n${rawText}`
         : rawText;
-      finalText = finalizeLuciernagaResponse(finalText, {
+      finalText = finalizeTres Mil Millones de LatidosResponse(finalText, {
         state,
         mentor: mentorMode,
         goal: buildGoalCoachContext(activeGoal, message, {

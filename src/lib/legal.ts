@@ -8,7 +8,7 @@ export type CrisisSupportResource = {
 };
 
 export const PRODUCT_DISCLAIMERS = [
-  "Luciernaga AI no sustituye terapia, diagnostico, atencion medica ni intervencion psicologica de emergencia.",
+  "Tres Mil Millones de Latidos no sustituye terapia, diagnostico, atencion medica ni intervencion psicologica de emergencia.",
   "Usa la plataforma de forma responsable. Si hay riesgo alto o crisis, prioriza ayuda humana inmediata.",
 ] as const;
 

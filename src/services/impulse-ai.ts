@@ -47,7 +47,7 @@ function buildImpulsePrompt(
 
   const estimatedMinutes = estimateMinutes(userProfile.code);
 
-  return `Eres Luciernaga AI en Modo Impulso.
+  return `Eres Tres Mil Millones de Latidos en Modo Impulso.
 
 Objetivo:
 - No entretener.

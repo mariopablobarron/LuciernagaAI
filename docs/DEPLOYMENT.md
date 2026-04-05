@@ -1,4 +1,4 @@
-# Luciernaga AI - Deployment Guide
+# Tres Mil Millones de Latidos - Deployment Guide
 
 ## 🚀 Despliegue a Producción
 
@@ -92,7 +92,7 @@ docker run -d \
 
 2. **Importar proyecto**
    - Clic en "New Project"
-   - Seleccionar repositorio `LuciernagaAI`
+   - Seleccionar repositorio `Tres Mil Millones de LatidosAI`
    - Vercel detectará Next.js automáticamente
 
 3. **Configurar variables**

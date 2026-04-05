@@ -1,4 +1,4 @@
-# LuciernagaAI - Architecture Documentation
+# Tres Mil Millones de LatidosAI - Architecture Documentation
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@
 
 ## Executive Summary
 
-**Luciernaga AI** is a behavior transformation platform built on Next.js 16 that uses AI coaching to help users overcome avoidance and build sustainable habits.
+**Tres Mil Millones de Latidos** is a behavior transformation platform built on Next.js 16 that uses AI coaching to help users overcome avoidance and build sustainable habits.
 
 ### Core Value Proposition
 - **Interactive exploration**: Users identify what they're avoiding via circular canvas UI

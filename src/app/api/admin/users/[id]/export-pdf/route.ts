@@ -75,7 +75,7 @@ export async function GET(
 </style>
 </head>
 <body>
-<h1>Expediente clínico — Luciernaga AI</h1>
+<h1>Expediente clínico — Tres Mil Millones de Latidos</h1>
 <div class="meta">
   <p>Usuario: ${user.name ?? "-"} &lt;${user.email}&gt;</p>
   <p>ID: ${user.id} · Registro: ${fmt(user.createdAt)}</p>
@@ -101,7 +101,7 @@ ${assessments.map((a) => `
 <h2>Historial de conversaciones (${messages.length} mensajes)</h2>
 ${messages.map((m) => `
 <div class="message">
-  <p class="role">${m.role === "user" ? "Usuario" : "Luciernaga AI"} · ${fmt(m.createdAt)}</p>
+  <p class="role">${m.role === "user" ? "Usuario" : "Tres Mil Millones de Latidos"} · ${fmt(m.createdAt)}</p>
   <div class="${m.role === "user" ? "user-msg" : "ai-msg"}">
     <p>${m.content.replace(/\n/g, "<br/>")}</p>
   </div>

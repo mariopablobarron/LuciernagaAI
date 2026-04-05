@@ -2,11 +2,11 @@ import {
   buildActionRequiredMessage,
   buildCoachPrompt,
   buildFallbackResponse,
-  finalizeLuciernagaResponse,
+  finalizeTres Mil Millones de LatidosResponse,
 } from "@/services/coach";
 
 describe("coach prompt identity", () => {
-  it("integra la identidad central de Luciernaga AI", () => {
+  it("integra la identidad central de Tres Mil Millones de Latidos", () => {
     const prompt = buildCoachPrompt("duda");
 
     expect(prompt).toContain("Eres Luciérnaga AI.");
@@ -19,7 +19,7 @@ describe("coach prompt identity", () => {
   });
 
   it("fuerza cierre con acción y pregunta cuando la respuesta queda vacía", () => {
-    const response = finalizeLuciernagaResponse("Entiendo lo que te pasa.", {
+    const response = finalizeTres Mil Millones de LatidosResponse("Entiendo lo que te pasa.", {
       state: "bloqueo",
       onboarding: {
         active: true,
@@ -35,7 +35,7 @@ describe("coach prompt identity", () => {
   });
 
   it("vuelve más firme el seguimiento cuando hay acción pendiente y confrontación", () => {
-    const response = finalizeLuciernagaResponse("Te escucho.", {
+    const response = finalizeTres Mil Millones de LatidosResponse("Te escucho.", {
       state: "claridad",
       mentor: {
         mode: "confrontation",

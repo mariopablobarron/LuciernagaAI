@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
       : "  · Ninguno";
 
     const report = [
-      `📊 *Resumen semanal — Luciernaga AI*`,
+      `📊 *Resumen semanal — Tres Mil Millones de Latidos*`,
       `_Período: últimos 7 días_`,
       ``,
       `👥 Usuarios activos: *${activeUsers}*`,

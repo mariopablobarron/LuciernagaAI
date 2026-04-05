@@ -4,7 +4,7 @@ import { CRISIS_SUPPORT_RESOURCES, PRODUCT_DISCLAIMERS, RESPONSIBLE_USE_NOTES } 
 export async function GET() {
   return NextResponse.json({
     success: true,
-    product: "Luciernaga AI",
+    product: "Tres Mil Millones de Latidos",
     disclaimers: PRODUCT_DISCLAIMERS,
     responsibleUse: RESPONSIBLE_USE_NOTES,
     crisisResources: CRISIS_SUPPORT_RESOURCES,

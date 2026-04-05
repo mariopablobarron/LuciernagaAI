@@ -8,7 +8,7 @@ const steps = [
     icon: MessageCircle,
     title: "Conversa con honestidad",
     description:
-      "Sin filtros. Sin juicio. Cuéntale a Luciernaga qué te pasa, qué evitas, qué te frena.",
+      "Sin filtros. Sin juicio. Cuéntale a Tres Mil Millones de Latidos qué te pasa, qué evitas, qué te frena.",
     color: "emotion-blocked",
   },
   {

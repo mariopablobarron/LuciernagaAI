@@ -1,8 +1,8 @@
-# Manual SaaS Luciernaga AI
+# Manual SaaS Tres Mil Millones de Latidos
 
 ## Control del documento
 
-- Producto: Luciernaga AI
+- Producto: Tres Mil Millones de Latidos
 - Tipo: Manual maestro SaaS, version operativa
 - Objetivo: Documentar negocio, producto, arquitectura, operacion y calidad para un entorno productivo
 - Alcance: Aplicacion web de mentoria con IA, backend API, persistencia, panel admin y despliegue
@@ -172,9 +172,9 @@ Aprobaciones:
 
 ## 2) Resumen ejecutivo (2 paginas)
 
-### 2.1 Que es Luciernaga AI
+### 2.1 Que es Tres Mil Millones de Latidos
 
-Luciernaga AI es un SaaS de mentoria conversacional con IA que detecta estado emocional del usuario, orienta a accion concreta y registra progreso en objetivos y check-ins.
+Tres Mil Millones de Latidos es un SaaS de mentoria conversacional con IA que detecta estado emocional del usuario, orienta a accion concreta y registra progreso en objetivos y check-ins.
 
 ### 2.2 Valor diferencial
 

@@ -1,4 +1,4 @@
-# Luciernaga AI - UI Implementation Guide
+# Tres Mil Millones de Latidos - UI Implementation Guide
 
 Complete specifications and component templates for building all pages in the design system.
 
@@ -29,7 +29,7 @@ Complete specifications and component templates for building all pages in the de
 
 ### Header (src/components/home/Header.tsx)
 - Sticky top with transparent → zinc-950/80 on scroll
-- Logo left: "Luciernaga" wordmark white
+- Logo left: "Tres Mil Millones de Latidos" wordmark white
 - Nav: Inicio | Cómo funciona | Impulso | Contacto
 - CTA right: "Abrir app →" indigo button
 - Mobile menu with hamburger
@@ -82,7 +82,7 @@ export default function LandingPage() {
             </span>
           </h1>
           <p className="text-lg text-zinc-400 leading-relaxed">
-            Luciernaga te guía a través de la transformación real. No es teoría.
+            Tres Mil Millones de Latidos te guía a través de la transformación real. No es teoría.
             No es perfección. Es acción pequeña, consistente, que genera cambios duraderos.
           </p>
           <div className="flex flex-wrap gap-4 pt-4">
@@ -223,7 +223,7 @@ export default function AppPage() {
 
   return (
     <AppLayout
-      title="Luciernaga AI"
+      title="Tres Mil Millones de Latidos"
       sidebar={<Sidebar onSelectConversation={setActiveConversationId} />}
       main={<Chat conversationId={activeConversationId} />}
       rightPanel={<InsightsPanel />}

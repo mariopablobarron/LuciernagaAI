@@ -2,7 +2,7 @@
 
 ## Estructura
 
-Esta experiencia transforma la home de Luciernaga AI en una interfaz de exploración moderna e inmersiva, centrada en el usuario y sus acciones.
+Esta experiencia transforma la home de Tres Mil Millones de Latidos en una interfaz de exploración moderna e inmersiva, centrada en el usuario y sus acciones.
 
 ### Páginas
 

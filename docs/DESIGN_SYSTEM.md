@@ -1,4 +1,4 @@
-# Design System Global - Luciernaga AI
+# Design System Global - Tres Mil Millones de Latidos
 
 ## 📋 Tabla de Contenidos
 
@@ -15,7 +15,7 @@
 
 ## Visión General
 
-Este Design System garantiza **consistencia visual en TODAS las páginas** de Luciernaga AI:
+Este Design System garantiza **consistencia visual en TODAS las páginas** de Tres Mil Millones de Latidos:
 
 - ✅ **Colores fluorescentes modernos**: Negro → Morado → Violeta → Fucsia → Cyan
 - ✅ **Responsive**: Mobile, Tablet, Desktop

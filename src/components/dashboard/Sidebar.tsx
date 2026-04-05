@@ -17,7 +17,7 @@ export default function DashboardSidebar() {
   return (
     <aside className="flex h-full w-56 flex-col border-r border-border bg-card px-3 py-6">
       <p className="mb-6 px-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-        Luciernaga AI
+        Tres Mil Millones de Latidos
       </p>
       <nav className="flex flex-col gap-1">
         {navItems.map(({ href, label, icon: Icon }) => {

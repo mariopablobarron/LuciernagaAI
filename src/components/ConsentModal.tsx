@@ -33,7 +33,7 @@ export default function ConsentModal({ onAccept }: Props) {
         {/* Header */}
         <div>
           <p className="text-xs text-cyan-400 font-semibold uppercase tracking-widest mb-1">
-            Luciernaga AI
+            Tres Mil Millones de Latidos
           </p>
           <h2 className="text-xl font-bold text-white">Consentimiento informado</h2>
         </div>
@@ -41,7 +41,7 @@ export default function ConsentModal({ onAccept }: Props) {
         {/* Body */}
         <div className="space-y-3 text-sm text-zinc-400 max-h-64 overflow-y-auto pr-1">
           <p>
-            Luciernaga AI es una herramienta de mentoría conversacional basada en inteligencia
+            Tres Mil Millones de Latidos es una herramienta de mentoría conversacional basada en inteligencia
             artificial. <strong className="text-white">No es un servicio de salud mental, no
             sustituye la psicoterapia ni la intervención psicológica profesional.</strong>
           </p>
@@ -73,7 +73,7 @@ export default function ConsentModal({ onAccept }: Props) {
             className="mt-0.5 h-4 w-4 rounded border-zinc-700 bg-zinc-900 accent-cyan-500"
           />
           <span className="text-sm text-zinc-300">
-            He leído y acepto el uso de Luciernaga AI tal como se describe arriba.
+            He leído y acepto el uso de Tres Mil Millones de Latidos tal como se describe arriba.
           </span>
         </label>
 

@@ -190,7 +190,7 @@ describe("POST /api/chat", () => {
       resources: [],
       shouldEscalate: false,
       legalFlag: false,
-      disclaimer: "Luciernaga AI no sustituye terapia.",
+      disclaimer: "Tres Mil Millones de Latidos no sustituye terapia.",
       continueChat: true,
     });
     (getUserCrisisStatus as jest.Mock).mockResolvedValue({
@@ -429,7 +429,7 @@ describe("POST /api/chat", () => {
       resources: ["Llama al 112 o 911"],
       shouldEscalate: true,
       legalFlag: true,
-      disclaimer: "Luciernaga AI no sustituye terapia.",
+      disclaimer: "Tres Mil Millones de Latidos no sustituye terapia.",
       continueChat: false,
     });
     (registerCrisisEvent as jest.Mock).mockResolvedValue(undefined);
@@ -496,7 +496,7 @@ describe("POST /api/chat", () => {
       resources: ["Llama al 112 o 911"],
       shouldEscalate: true,
       legalFlag: true,
-      disclaimer: "Luciernaga AI no sustituye terapia.",
+      disclaimer: "Tres Mil Millones de Latidos no sustituye terapia.",
       continueChat: false,
     });
     (registerCrisisEvent as jest.Mock).mockResolvedValue(undefined);

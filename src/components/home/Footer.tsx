@@ -73,6 +73,34 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Admin links — only visible to those who know */}
+        <div className="border-t border-border/10 pt-6 mb-6">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/40 mb-3">
+            Acceso interno
+          </p>
+          <div className="flex flex-wrap gap-x-5 gap-y-1.5">
+            {[
+              { href: "/admin", label: "Dashboard" },
+              { href: "/admin/users", label: "Usuarios" },
+              { href: "/admin-clinical", label: "Panel clínico" },
+              { href: "/admin/crisis", label: "Crisis" },
+              { href: "/admin/analytics", label: "Analytics" },
+              { href: "/admin/audit", label: "Auditoría" },
+              { href: "/admin/llm-usage", label: "LLM Usage" },
+              { href: "/admin/settings", label: "Configuración" },
+              { href: "/admin/login", label: "Login admin" },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="text-[11px] text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
         {/* Bottom */}
         <div className="border-t border-border/30 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-muted-foreground">

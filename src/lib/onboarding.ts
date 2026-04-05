@@ -1,7 +1,7 @@
 export const ONBOARDING_HEADLINE = "Convierte claridad en acción";
 
 export const ONBOARDING_SUBTITLE =
-  "Empieza por lo que llevas tiempo evitando y Luciernaga lo convierte en una primera acción concreta.";
+  "Empieza por lo que llevas tiempo evitando y Tres Mil Millones de Latidos lo convierte en una primera acción concreta.";
 
 export const ONBOARDING_STARTER_QUESTION = "¿Qué llevas semanas evitando hacer?";
 

@@ -449,7 +449,7 @@ export function buildFallbackResponse(): string {
   return "Vamos a hacerlo simple. Dime qué estás evitando ahora mismo y lo convertimos en un paso concreto hoy.";
 }
 
-function buildLuciernagaActionLine(context: ResponseFinalizationContext): string {
+function buildTres Mil Millones de LatidosActionLine(context: ResponseFinalizationContext): string {
   const activeAction = context.goal?.activeAction;
   const unfinishedActionsCount = context.goal?.unfinishedActionsCount ?? 0;
   const confront = context.mentor?.confront ?? false;
@@ -483,7 +483,7 @@ function buildLuciernagaActionLine(context: ResponseFinalizationContext): string
   return "Convierte esto en un paso concreto antes de cerrar el día.";
 }
 
-function buildLuciernagaQuestion(context: ResponseFinalizationContext): string {
+function buildTres Mil Millones de LatidosQuestion(context: ResponseFinalizationContext): string {
   const activeAction = context.goal?.activeAction;
   const confront = context.mentor?.confront ?? false;
 
@@ -518,18 +518,18 @@ function buildLuciernagaQuestion(context: ResponseFinalizationContext): string {
   return "¿Qué pequeño paso puedes dar hoy?";
 }
 
-export function finalizeLuciernagaResponse(
+export function finalizeTres Mil Millones de LatidosResponse(
   response: string,
   context: ResponseFinalizationContext
 ): string {
   let next = response.trim();
 
   if (!ACTION_CUE_PATTERN.test(next)) {
-    next = `${next}\n\n${buildLuciernagaActionLine(context)}`;
+    next = `${next}\n\n${buildTres Mil Millones de LatidosActionLine(context)}`;
   }
 
   if (!QUESTION_PATTERN.test(next)) {
-    next = `${next}\n\n${buildLuciernagaQuestion(context)}`;
+    next = `${next}\n\n${buildTres Mil Millones de LatidosQuestion(context)}`;
   }
 
   return next;

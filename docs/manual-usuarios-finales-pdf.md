@@ -1,7 +1,7 @@
 ---
 title: "Guia de Usuario Final"
-subtitle: "Luciernaga AI"
-author: "Equipo Luciernaga AI"
+subtitle: "Tres Mil Millones de Latidos"
+author: "Equipo Tres Mil Millones de Latidos"
 date: "30 de marzo de 2026"
 lang: "es"
 toc: true
@@ -13,7 +13,7 @@ fontsize: 11pt
 
 # Portada
 
-**Producto:** Luciernaga AI  
+**Producto:** Tres Mil Millones de Latidos  
 **Documento:** Guia de Usuario Final  
 **Version:** v1.0  
 **Fecha:** 30 de marzo de 2026
@@ -27,9 +27,9 @@ Te ayudara a empezar rapido, usar bien el chat y resolver problemas comunes.
 
 \newpage
 
-# 1. Que es Luciernaga AI
+# 1. Que es Tres Mil Millones de Latidos
 
-Luciernaga AI es una plataforma de mentoria conversacional que te ayuda a:
+Tres Mil Millones de Latidos es una plataforma de mentoria conversacional que te ayuda a:
 
 - ordenar ideas cuando te sientes bloqueado/a
 - tomar decisiones con pasos concretos
@@ -38,7 +38,7 @@ Luciernaga AI es una plataforma de mentoria conversacional que te ayuda a:
 
 # 2. Antes de empezar
 
-Para usar Luciernaga AI solo necesitas:
+Para usar Tres Mil Millones de Latidos solo necesitas:
 
 - un navegador web actualizado
 - conexion a internet
@@ -122,13 +122,13 @@ Si el sistema detecta una situacion de alto riesgo emocional, puede activar un m
 
 Importante:
 
-- Luciernaga AI no reemplaza atencion medica ni psicologica profesional.
+- Tres Mil Millones de Latidos no reemplaza atencion medica ni psicologica profesional.
 - Si hay riesgo inmediato para tu seguridad, busca ayuda de emergencia de tu pais.
 - Contacta a una persona de confianza en cuanto sea posible.
 
 # 8. Privacidad y uso responsable
 
-Luciernaga AI utiliza tus interacciones para mejorar continuidad y seguimiento dentro de la plataforma.
+Tres Mil Millones de Latidos utiliza tus interacciones para mejorar continuidad y seguimiento dentro de la plataforma.
 
 Recomendaciones de privacidad:
 
@@ -138,7 +138,7 @@ Recomendaciones de privacidad:
 
 # 9. Limites del servicio
 
-Luciernaga AI puede equivocarse o dar sugerencias que no apliquen a tu contexto exacto.
+Tres Mil Millones de Latidos puede equivocarse o dar sugerencias que no apliquen a tu contexto exacto.
 
 Ten en cuenta:
 

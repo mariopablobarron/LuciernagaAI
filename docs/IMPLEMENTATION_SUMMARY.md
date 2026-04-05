@@ -254,5 +254,5 @@ Puedes:
 ---
 
 **Creado:** 2026-04-04  
-**Sistema:** Luciernaga AI  
+**Sistema:** Tres Mil Millones de Latidos  
 **Versión:** 1.0

@@ -288,7 +288,8 @@ describe("POST /api/chat", () => {
           starterQuestion: "¿Qué llevas semanas evitando hacer?",
         }),
       }),
-      expect.any(Array)
+      expect.any(Array),
+      expect.any(Object)
     );
   });
 
@@ -395,7 +396,8 @@ describe("POST /api/chat", () => {
           conversionTrigger: true,
         }),
       }),
-      expect.any(Array)
+      expect.any(Array),
+      expect.any(Object)
     );
   });
 

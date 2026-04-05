@@ -2,7 +2,7 @@
 export type UserState = "neutral" | "duda" | "bloqueo" | "ansiedad" | "claridad";
 
 // Estado sistémico/conductual — derivado de métricas de engagement
-export type SystemState = "CRISIS" | "BLOQUEADO" | "EVASIVO" | "ESTABLE" | "ACTIVO";
+export type SystemState = "CRISIS" | "BLOQUEADO" | "EVASIVO" | "ESTABLE" | "ACTIVO" | "TRANSITIONAL_VOID";
 
 export type EventType =
   | "MESSAGE_SENT"
@@ -17,14 +17,16 @@ export type EventType =
   | "AVOIDANCE_DETECTED"
   | "USER_ONBOARDED"
   | "CHECKIN_SUBMITTED"
-  | "PROFILE_COMPLETED";
+  | "PROFILE_COMPLETED"
+  | "TRANSITIONAL_VOID_DETECTED";
 
 export type DecisionType =
   | "ESCALAR_CRISIS"
   | "DESTRABAR_BLOQUEO"
   | "REDUCIR_EVASION"
   | "ACELERAR_ACCION"
-  | "MANTENER_RUMBO";
+  | "MANTENER_RUMBO"
+  | "SOSTENER_VACIO";
 
 export interface Insight {
   retentionDay3: number;
@@ -33,6 +35,10 @@ export interface Insight {
   avoidanceRate: number;
   actionCompletionRate: number;
   crisisCount: number;
+  // TRANSITIONAL_VOID detection — derived from message text analysis
+  confusionScore?: number;   // 0–1: proportion of uncertainty/confusion signals
+  identityShift?: boolean;   // true if identity-dissolution keywords detected
+  directionClarity?: number; // 0–1: inverse of confusion, proxy for directional clarity
 }
 
 export interface Decision {

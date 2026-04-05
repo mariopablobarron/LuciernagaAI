@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
     const [userStateRecord, userRecord, activeGoal, streakRecord] = await Promise.all([
       prisma.userState.findUnique({
         where: { userId: identity.userId },
-        select: { state: true, primaryEmotion: true, progressTrend: true },
+        select: { state: true, systemState: true, primaryEmotion: true, progressTrend: true },
       }),
       prisma.user.findUnique({
         where: { id: identity.userId },
@@ -48,6 +48,7 @@ export async function GET(req: NextRequest) {
     ]);
 
     const state: UserState = (userStateRecord?.state as UserState) ?? "neutral";
+    const systemState = userStateRecord?.systemState ?? "ESTABLE";
     const primaryEmotion = userStateRecord?.primaryEmotion ?? "calma";
     const progressTrend = userStateRecord?.progressTrend ?? "igual";
     const consentGiven = userRecord?.consentGiven ?? false;
@@ -60,6 +61,7 @@ export async function GET(req: NextRequest) {
     const res = NextResponse.json({
       success: true,
       state,
+      systemState,
       primaryEmotion,
       progressTrend,
       consentGiven,

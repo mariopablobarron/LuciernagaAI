@@ -7,7 +7,14 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import type { UserState as DomainUserState } from "@/domain/types";
 
-export type ExploreActionType = "name_block" | "next_step" | "close_pending" | "order_thoughts";
+export type ExploreActionType =
+  | "name_block"
+  | "next_step"
+  | "close_pending"
+  | "order_thoughts"
+  | "identify_what_ended"
+  | "detect_escape"
+  | "allow_uncertainty";
 
 type ActionNode = {
   id: string;
@@ -29,6 +36,7 @@ type CanvasUserState = {
 type UserStateResponse = {
   success: boolean;
   state: DomainUserState;
+  systemState: string;
   progress: number;
   pendingActions: { id: string; description: string }[];
 };
@@ -82,6 +90,12 @@ const HINT_TEXT: Record<ExploreActionType, string> = {
     "💡 Hay algo que lleva tiempo dándote vueltas. Escribe qué es eso que necesitas cerrar o soltar.",
   order_thoughts:
     "💡 ¿Cuál es ese pensamiento que se repite? Cuéntame qué patrón mental estás notando.",
+  identify_what_ended:
+    "💡 No tienes que tener respuestas. Solo escribe: ¿qué parte de tu vida anterior ya no encaja con quien eres ahora?",
+  detect_escape:
+    "💡 Observa sin juzgar: ¿qué estás intentando decidir o resolver demasiado rápido? ¿Qué decisión sientes que 'deberías' tomar ya?",
+  allow_uncertainty:
+    "💡 Escribe una cosa que no necesitas decidir hoy. Solo una. Deja que exista sin resolverse.",
 };
 
 const STATE_PRIORITY: Record<DomainUserState, ExploreActionType> = {
@@ -100,12 +114,47 @@ const STATE_TO_EMOTIONAL: Record<DomainUserState, CanvasUserState["emotionalStat
   neutral: "doubt",
 };
 
+const TRANSITIONAL_VOID_CATALOG: Omit<ActionNode, "completed" | "order">[] = [
+  {
+    id: "tv-identify-what-ended",
+    type: "identify_what_ended",
+    title: "Entender qué ha terminado",
+    description: "Qué parte de ti ya no encaja",
+    icon: "🌅",
+    color: "doubt",
+  },
+  {
+    id: "tv-detect-escape",
+    type: "detect_escape",
+    title: "Detectar impulsos de escape",
+    description: "Qué estás intentando resolver demasiado rápido",
+    icon: "🔍",
+    color: "anxious",
+  },
+  {
+    id: "tv-allow-uncertainty",
+    type: "allow_uncertainty",
+    title: "No decidir todavía",
+    description: "Permítete estar en el vacío sin resolverlo",
+    icon: "🌿",
+    color: "clarity",
+  },
+];
+
 function buildActions(
   domainState: DomainUserState,
-  completedIds: Set<string> = new Set()
+  completedIds: Set<string> = new Set(),
+  isTransitionalVoid = false
 ): ActionNode[] {
-  const primaryType = STATE_PRIORITY[domainState];
+  if (isTransitionalVoid) {
+    return TRANSITIONAL_VOID_CATALOG.map((node, i) => ({
+      ...node,
+      completed: completedIds.has(node.id),
+      order: i,
+    }));
+  }
 
+  const primaryType = STATE_PRIORITY[domainState];
   return ACTION_CATALOG.map((node, i) => ({
     ...node,
     completed: completedIds.has(node.id),
@@ -119,6 +168,7 @@ export default function ExplorePage() {
   const router = useRouter();
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [domainState, setDomainState] = useState<DomainUserState>("neutral");
+  const [isTransitionalVoid, setIsTransitionalVoid] = useState(false);
   const [actions, setActions] = useState<ActionNode[]>([]);
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
   const [userState, setUserState] = useState<CanvasUserState>({
@@ -139,14 +189,15 @@ export default function ExplorePage() {
 
         const data: UserStateResponse = res.ok
           ? ((await res.json()) as UserStateResponse)
-          : { success: false, state: "neutral", progress: 0, pendingActions: [] };
+          : { success: false, state: "neutral", systemState: "ESTABLE", progress: 0, pendingActions: [] };
 
         if (cancelled) return;
 
         const state: DomainUserState = data.state ?? "neutral";
-        applyDomainState(state, new Set());
+        const tvoid = data.systemState === "TRANSITIONAL_VOID";
+        applyDomainState(state, new Set(), tvoid);
       } catch {
-        if (!cancelled) applyDomainState("neutral", new Set());
+        if (!cancelled) applyDomainState("neutral", new Set(), false);
       } finally {
         if (!cancelled) setLoadState("ready");
       }
@@ -158,13 +209,15 @@ export default function ExplorePage() {
     };
   }, []);
 
-  function applyDomainState(state: DomainUserState, completed: Set<string>) {
+  function applyDomainState(state: DomainUserState, completed: Set<string>, tvoid: boolean) {
+    const catalog = tvoid ? TRANSITIONAL_VOID_CATALOG : ACTION_CATALOG;
     setDomainState(state);
-    setActions(buildActions(state, completed));
+    setIsTransitionalVoid(tvoid);
+    setActions(buildActions(state, completed, tvoid));
     setUserState({
       emotionalState: STATE_TO_EMOTIONAL[state] ?? "doubt",
       completedActions: completed.size,
-      totalActions: ACTION_CATALOG.length,
+      totalActions: catalog.length,
     });
   }
 
@@ -185,17 +238,27 @@ export default function ExplorePage() {
     setUserState((prev) => ({ ...prev, completedActions: nextCompleted.size }));
 
     try {
-      const res = await fetch("/api/actions/trigger", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: node.type, content }),
-      });
+      if (isTransitionalVoid) {
+        // Low-pressure actions → save as UserAction, no state transition
+        await fetch("/api/actions", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: node.type.toUpperCase() }),
+        });
+      } else {
+        const res = await fetch("/api/actions/trigger", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: node.type, content }),
+        });
 
-      if (res.ok) {
-        const data = (await res.json()) as TriggerResponse;
-        if (data.success && data.updatedState !== domainState) {
-          applyDomainState(data.updatedState, nextCompleted);
+        if (res.ok) {
+          const data = (await res.json()) as TriggerResponse;
+          if (data.success && data.updatedState !== domainState) {
+            applyDomainState(data.updatedState, nextCompleted, false);
+          }
         }
       }
     } catch {
@@ -208,7 +271,7 @@ export default function ExplorePage() {
   const handleReset = () => {
     const empty = new Set<string>();
     setCompletedIds(empty);
-    applyDomainState(domainState, empty);
+    applyDomainState(domainState, empty, isTransitionalVoid);
     setCurrentIndex(0);
   };
 
@@ -292,12 +355,25 @@ export default function ExplorePage() {
 
         {/* Header */}
         <div className="text-center space-y-4 max-w-2xl mb-16">
-          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
-            Una cosa a la vez
-          </h1>
-          <p className="text-lg bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent font-medium">
-            Elige lo que necesitas trabajar ahora
-          </p>
+          {isTransitionalVoid ? (
+            <>
+              <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400 bg-clip-text text-transparent">
+                Estás en transición
+              </h1>
+              <p className="text-lg text-violet-300/80 font-medium max-w-md mx-auto">
+                No necesitas decidir nada hoy. Solo observar.
+              </p>
+            </>
+          ) : (
+            <>
+              <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
+                Una cosa a la vez
+              </h1>
+              <p className="text-lg bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent font-medium">
+                Elige lo que necesitas trabajar ahora
+              </p>
+            </>
+          )}
         </div>
 
         {/* Progress Bar */}

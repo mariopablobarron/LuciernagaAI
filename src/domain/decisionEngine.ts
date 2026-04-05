@@ -53,6 +53,19 @@ export function generateDecision(state: SystemState, insight: Insight): Decision
     };
   }
 
+  if (state === "TRANSITIONAL_VOID") {
+    return {
+      type: "SOSTENER_VACIO",
+      reason: "El usuario está en una transición de identidad sin dirección clara.",
+      confidence: "high",
+      recommendedActions: [
+        "IDENTIFY_WHAT_ENDED: Identifica qué parte de tu vida ya no encaja",
+        "DETECT_ESCAPE: Detecta qué estás intentando resolver demasiado rápido",
+        "ALLOW_UNCERTAINTY: Permítete no decidir hoy",
+      ],
+    };
+  }
+
   return {
     type: "MANTENER_RUMBO",
     reason: "El sistema está estable sin señales críticas activas.",

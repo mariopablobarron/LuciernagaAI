@@ -66,6 +66,7 @@ model User {
   invitations          Invitation[]
   invitesEarned        Int                  @default(0)
   passwordResetTokens  PasswordResetToken[]
+  userActions          UserAction[]
 }
 
 model Message {
@@ -117,6 +118,7 @@ model UserState {
   id               String    @id @default(cuid())
   userId           String    @unique
   state            String    // "neutral" | "duda" | "bloqueo" | "ansiedad" | "claridad"
+  systemState      String    @default("ESTABLE") // SystemState — last computed behavioral state
   transformationPhase String @default("bloqueo")
   mood             String?
   primaryEmotion   String    @default("calma")
@@ -131,6 +133,7 @@ model UserState {
   updatedAt        DateTime  @updatedAt
 
   @@index([state, updatedAt])
+  @@index([systemState, updatedAt])
   @@index([transformationPhase, updatedAt])
   @@index([primaryEmotion, dominantPattern, updatedAt])
   @@index([crisisActive, crisisActiveUntil])
@@ -564,6 +567,19 @@ model PasswordResetToken {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+/// Low-pressure guidance actions for TRANSITIONAL_VOID state.
+model UserAction {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // e.g. "IDENTIFY_WHAT_ENDED" | "DETECT_ESCAPE" | "ALLOW_UNCERTAINTY"
+  status    String   @default("PENDING") // "PENDING" | "DONE"
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, status])
 }
 
 /// Result of the public diagnostic quiz (anonymous users included).

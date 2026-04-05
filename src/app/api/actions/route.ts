@@ -5,6 +5,7 @@ import {
   InvalidSessionTokenError,
   resolveIdentity,
 } from "@/lib/auth";
+import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { trackSafe } from "@/services/events";
 import { updateGoalAction, type GoalWithProgress } from "@/services/goals";
@@ -32,10 +33,82 @@ function serializeGoal(goal: GoalWithProgress | null) {
   };
 }
 
+type PostActionBody = {
+  type?: string;
+};
+
 type PatchActionBody = {
   actionId?: string;
   completed?: boolean;
 };
+
+export async function POST(req: NextRequest) {
+  let identity: Awaited<ReturnType<typeof resolveIdentity>>;
+
+  try {
+    identity = await resolveIdentity(req);
+  } catch (e: unknown) {
+    if (e instanceof InvalidSessionTokenError) {
+      const res = NextResponse.json(
+        { success: false, error: "Token inválido o expirado" },
+        { status: 401 }
+      );
+      clearSessionCookie(res);
+      return res;
+    }
+    logError("ACTIONS", e, { route: "/api/actions", method: "POST" });
+    return NextResponse.json({ success: false, error: "Error interno" }, { status: 500 });
+  }
+
+  try {
+    const body = (await req.json()) as PostActionBody;
+    const type = body.type?.trim() ?? "";
+
+    if (!type) {
+      return NextResponse.json(
+        { success: false, error: "El campo 'type' es requerido" },
+        { status: 400 }
+      );
+    }
+
+    const prisma = getPrismaClient();
+    const userAction = await prisma.userAction.create({
+      data: {
+        userId: identity.userId,
+        type,
+        status: "PENDING",
+      },
+    });
+
+    logInfo("ACTIONS", "user_action_created", {
+      userId: identity.userId,
+      type,
+      id: userAction.id,
+    });
+
+    void trackSafe({
+      userId: identity.userId,
+      type: "ACTION_CREATED",
+      metadata: { actionId: userAction.id, actionText: type, source: "transitional_void" },
+    });
+
+    const res = NextResponse.json({ success: true, action: userAction });
+    if (identity.shouldSetCookie) {
+      attachSessionCookie(res, identity.sessionToken);
+    }
+    return res;
+  } catch (error: unknown) {
+    logError("ACTIONS", error, {
+      route: "/api/actions",
+      method: "POST",
+      userId: identity.userId,
+    });
+    return NextResponse.json(
+      { success: false, error: "No se pudo guardar la acción" },
+      { status: 500 }
+    );
+  }
+}
 
 export async function PATCH(req: NextRequest) {
   try {

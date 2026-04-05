@@ -7,12 +7,9 @@ export const dynamic = "force-dynamic";
 function isAuthorized(req: NextRequest): boolean {
   const secret = process.env.CRON_SECRET?.trim();
   if (!secret) {
-    // No secret configured — only allow in non-production
     return process.env.NODE_ENV !== "production";
   }
-
-  const authHeader = req.headers.get("authorization");
-  return authHeader === `Bearer ${secret}`;
+  return req.nextUrl.searchParams.get("secret") === secret;
 }
 
 export async function POST(req: NextRequest) {

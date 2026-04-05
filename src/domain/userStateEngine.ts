@@ -10,9 +10,16 @@ export function buildUserState(insight: Insight): SystemState {
   const checkinDrop = clampRate(insight.checkinDrop);
   const avoidanceRate = clampRate(insight.avoidanceRate);
   const actionCompletionRate = clampRate(insight.actionCompletionRate);
+  const confusionScore = clampRate(insight.confusionScore ?? 0);
+  const directionClarity = clampRate(insight.directionClarity ?? 1);
+  const identityShift = insight.identityShift ?? false;
 
   if (insight.crisisCount > 0) {
     return "CRISIS" as const;
+  }
+
+  if (confusionScore > 0.7 && identityShift && directionClarity < 0.4) {
+    return "TRANSITIONAL_VOID" as const;
   }
 
   if (retentionDay3 < 0.35 || checkinDrop > 0.7) {

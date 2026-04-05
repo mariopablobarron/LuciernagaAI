@@ -131,6 +131,9 @@ function buildChatInsight(params: {
   avoidanceRate?: number;
   actionCompletionRate?: number;
   crisisCount?: number;
+  confusionScore?: number;
+  identityShift?: boolean;
+  directionClarity?: number;
 }): DomainInsight {
   return {
     retentionDay3: params.retentionDay3 ?? 0.5,
@@ -139,7 +142,47 @@ function buildChatInsight(params: {
     avoidanceRate: params.avoidanceRate ?? 0,
     actionCompletionRate: params.actionCompletionRate ?? 0.4,
     crisisCount: params.crisisCount ?? 0,
+    confusionScore: params.confusionScore,
+    identityShift: params.identityShift,
+    directionClarity: params.directionClarity,
   };
+}
+
+/**
+ * Detects TRANSITIONAL_VOID signals from raw message text.
+ * Returns normalised scores consumed by buildUserState.
+ */
+function detectTransitionalVoidSignals(message: string): {
+  confusionScore: number;
+  identityShift: boolean;
+  directionClarity: number;
+} {
+  const normalized = message
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  const confusionPhrases = [
+    "no se", "no entiendo", "confundido", "confundida",
+    "no tengo claro", "no se hacia donde", "no se que hacer",
+    "no se que quiero", "no se quien soy", "no se quien",
+    "perdido", "perdida", "sin rumbo", "no se adonde",
+  ];
+  const identityPhrases = [
+    "ya no soy", "no me reconozco", "todo ha cambiado",
+    "ya no encaja", "no encajo", "quien soy",
+    "cambie", "me perdi", "transicion", "nueva etapa",
+    "ya no me", "no se quien era", "siento que ya no",
+    "no me siento yo", "me siento diferente", "vacio",
+    "ya no tengo identidad",
+  ];
+
+  const confusionMatches = confusionPhrases.filter((p) => normalized.includes(p)).length;
+  const confusionScore = Math.min(1, confusionMatches / 3);
+  const identityShift = identityPhrases.some((p) => normalized.includes(p));
+  const directionClarity = Math.max(0, 1 - confusionScore - (identityShift ? 0.3 : 0));
+
+  return { confusionScore, identityShift, directionClarity };
 }
 
 function serializeGoal(goal: Awaited<ReturnType<typeof getActiveGoalForUser>>) {
@@ -191,6 +234,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
 
   // ── 1. Quick synchronous analysis ──────────────────────────────────────
   const state = detectUserState(message);
+  const tvSignals = detectTransitionalVoidSignals(message);
   const detectedIntent = detectIntent(message);
   const riskLevel = detectRiskLevel(message);
   let emotionalProfile = analyzeEmotionalProfile(message, []);
@@ -233,7 +277,10 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
   let actionCompletedThisTurn = false;
   let conversationMessageCount = 0;
   let conversionTrigger = state === "claridad";
-  let domainInsight = buildChatInsight({ crisisCount: mapRiskLevelToCrisisCount(riskLevel) });
+  let domainInsight = buildChatInsight({
+    crisisCount: mapRiskLevelToCrisisCount(riskLevel),
+    ...tvSignals,
+  });
   let domainState: SystemState = buildUserState(domainInsight);
   let domainDecision: DomainDecision = generateDomainDecision(domainState, domainInsight);
   let transformationPhase: ReturnType<typeof inferTransformationPhase> = "bloqueo";
@@ -652,6 +699,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
         avoidanceRate,
         actionCompletionRate,
         crisisCount: mapRiskLevelToCrisisCount(riskLevel),
+        ...tvSignals,
       });
       domainState = buildUserState(domainInsight);
       domainDecision = generateDomainDecision(domainState, domainInsight);
@@ -782,6 +830,72 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
         alerts: crisisPayload.resources,
         legalFlag: crisisPayload.legalFlag,
         legalDisclaimer: crisisPayload.disclaimer,
+      },
+    };
+  }
+
+  // ── 5.5. TRANSITIONAL_VOID response ────────────────────────────────────
+  if (domainState === "TRANSITIONAL_VOID" && !crisisMode) {
+    const tvResponse =
+      `No estás perdido.\n\nEstás en una transición.\n\n` +
+      `El problema no es que no sepas qué hacer.\n` +
+      `Es que estás intentando decidir demasiado pronto.\n\n` +
+      `Vamos a hacer algo simple.\n\n` +
+      `Escribe:\n→ qué parte de tu vida ya no encaja contigo`;
+
+    void trackSafe({
+      userId,
+      type: "TRANSITIONAL_VOID_DETECTED",
+      metadata: { conversationId, state },
+    });
+
+    // n8n webhook — fire and forget
+    const n8nWebhook = process.env.N8N_TRANSITIONAL_VOID_WEBHOOK;
+    if (n8nWebhook) {
+      void fetch(n8nWebhook, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, state: "TRANSITIONAL_VOID" }),
+      }).catch(() => {});
+    }
+
+    if (persistenceAvailable) {
+      try {
+        const { getPrismaClient } = await import("@/db/prisma");
+        const prisma = getPrismaClient();
+        await Promise.all([
+          saveConversationMessage({
+            conversationId,
+            userId,
+            role: "assistant",
+            content: tvResponse,
+          }),
+          prisma.userState.upsert({
+            where: { userId },
+            update: { systemState: "TRANSITIONAL_VOID" },
+            create: { userId, state, systemState: "TRANSITIONAL_VOID" },
+          }),
+        ]);
+      } catch {
+        // non-critical
+      }
+    }
+
+    return {
+      data: {
+        success: true,
+        type: "transitional_void",
+        response: tvResponse,
+        state,
+        systemState: "TRANSITIONAL_VOID",
+        decision: domainDecision,
+        conversationId,
+        goal: serializeGoal(activeGoal),
+        emotionalProfile,
+        persistenceAvailable,
+        fallback: false,
+        searchUsed: false,
+        flow: serializeFlow(flowContext),
       },
     };
   }

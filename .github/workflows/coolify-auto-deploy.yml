@@ -14,18 +14,13 @@ jobs:
   trigger-coolify:
     runs-on: ubuntu-latest
     steps:
-      - name: Validate webhook secret
-        run: |
-          if [ -z "${{ secrets.COOLIFY_DEPLOY_WEBHOOK_URL }}" ]; then
-            echo "Missing GitHub secret: COOLIFY_DEPLOY_WEBHOOK_URL"
-            exit 1
-          fi
-
       - name: Trigger Coolify deployment webhook
         run: |
+          if [ -z "${{ secrets.COOLIFY_DEPLOY_WEBHOOK_URL }}" ]; then
+            echo "COOLIFY_DEPLOY_WEBHOOK_URL not set — deploy manually from Coolify."
+            exit 0
+          fi
           curl --fail --silent --show-error \
             --request GET \
             "${{ secrets.COOLIFY_DEPLOY_WEBHOOK_URL }}"
-
-      - name: Done
-        run: echo "Coolify deploy webhook triggered."
+          echo "Coolify deploy webhook triggered."

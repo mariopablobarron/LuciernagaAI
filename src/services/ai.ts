@@ -1,4 +1,5 @@
 import { logError, logInfo } from "@/lib/logger";
+import { logLlmCall } from "@/lib/llm-logger";
 import { getErrorMessage, withTimeout } from "@/lib/utils";
 import {
   buildCoachPrompt,
@@ -13,6 +14,11 @@ import {
 
 interface OpenRouterResponse {
   choices?: Array<{ message?: { content?: string } }>;
+  usage?: {
+    prompt_tokens?: number;
+    completion_tokens?: number;
+    total_tokens?: number;
+  };
 }
 
 interface OpenRouterStreamChunk {
@@ -85,6 +91,7 @@ async function requestOpenRouter(
   emotionalProfile: EmotionalProfile,
   coachContext: CoachContext,
   history: ConversationTurn[] = [],
+  opts: { userId?: string; source?: string } = {},
 ): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY?.trim();
   if (!apiKey) {
@@ -107,6 +114,8 @@ async function requestOpenRouter(
     hasActiveGoal: coachContext.access?.hasActiveGoal ?? false,
     conversionTrigger: coachContext.access?.conversionTrigger ?? false,
   });
+
+  const startTime = Date.now();
 
   const safeCoachContext = sanitizeCoachContext(coachContext);
 
@@ -157,6 +166,18 @@ async function requestOpenRouter(
   if (!reply) {
     throw new OpenRouterProviderError("OpenRouter returned empty response");
   }
+
+  logLlmCall({
+    userId: opts.userId,
+    model: OPENROUTER_MODEL,
+    source: opts.source ?? "chat",
+    prompt: message,
+    response: reply,
+    promptTokens: data.usage?.prompt_tokens ?? 0,
+    completionTokens: data.usage?.completion_tokens ?? 0,
+    totalTokens: data.usage?.total_tokens ?? 0,
+    latencyMs: Date.now() - startTime,
+  });
 
   logInfo("AI", "openrouter_request_succeeded", {
     model: OPENROUTER_MODEL,

@@ -2,7 +2,7 @@ import {
   buildActionRequiredMessage,
   buildCoachPrompt,
   buildFallbackResponse,
-  finalizeTres Mil Millones de LatidosResponse,
+  finalizeResponse,
 } from "@/services/coach";
 
 describe("coach prompt identity", () => {
@@ -19,7 +19,7 @@ describe("coach prompt identity", () => {
   });
 
   it("fuerza cierre con acción y pregunta cuando la respuesta queda vacía", () => {
-    const response = finalizeTres Mil Millones de LatidosResponse("Entiendo lo que te pasa.", {
+    const response = finalizeResponse("Entiendo lo que te pasa.", {
       state: "bloqueo",
       onboarding: {
         active: true,
@@ -35,7 +35,7 @@ describe("coach prompt identity", () => {
   });
 
   it("vuelve más firme el seguimiento cuando hay acción pendiente y confrontación", () => {
-    const response = finalizeTres Mil Millones de LatidosResponse("Te escucho.", {
+    const response = finalizeResponse("Te escucho.", {
       state: "claridad",
       mentor: {
         mode: "confrontation",

@@ -13,7 +13,7 @@ import { trackSafe } from "@/services/events";
 import {
   appendCaptureEmailPrompt,
   appendConversionPrompt,
-  finalizeTres Mil Millones de LatidosResponse,
+  finalizeResponse,
   appendSoftPaywallPrompt,
   buildActionRequiredMessage,
   buildCoachPrompt,
@@ -1029,7 +1029,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     let assistantResponse = completionMicroFeedback
       ? `${completionMicroFeedback}\n\n${aiResult.response}`
       : aiResult.response;
-    assistantResponse = finalizeTres Mil Millones de LatidosResponse(assistantResponse, {
+    assistantResponse = finalizeResponse(assistantResponse, {
       state,
       mentor: mentorMode,
       goal: buildGoalCoachContext(activeGoal, message, {
@@ -1155,7 +1155,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
       let finalText = completionMicroFeedback
         ? `${completionMicroFeedback}\n\n${rawText}`
         : rawText;
-      finalText = finalizeTres Mil Millones de LatidosResponse(finalText, {
+      finalText = finalizeResponse(finalText, {
         state,
         mentor: mentorMode,
         goal: buildGoalCoachContext(activeGoal, message, {

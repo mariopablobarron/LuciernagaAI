@@ -449,7 +449,7 @@ export function buildFallbackResponse(): string {
   return "Vamos a hacerlo simple. Dime qué estás evitando ahora mismo y lo convertimos en un paso concreto hoy.";
 }
 
-function buildTres Mil Millones de LatidosActionLine(context: ResponseFinalizationContext): string {
+function buildActionLine(context: ResponseFinalizationContext): string {
   const activeAction = context.goal?.activeAction;
   const unfinishedActionsCount = context.goal?.unfinishedActionsCount ?? 0;
   const confront = context.mentor?.confront ?? false;
@@ -483,7 +483,7 @@ function buildTres Mil Millones de LatidosActionLine(context: ResponseFinalizati
   return "Convierte esto en un paso concreto antes de cerrar el día.";
 }
 
-function buildTres Mil Millones de LatidosQuestion(context: ResponseFinalizationContext): string {
+function buildQuestion(context: ResponseFinalizationContext): string {
   const activeAction = context.goal?.activeAction;
   const confront = context.mentor?.confront ?? false;
 
@@ -518,18 +518,18 @@ function buildTres Mil Millones de LatidosQuestion(context: ResponseFinalization
   return "¿Qué pequeño paso puedes dar hoy?";
 }
 
-export function finalizeTres Mil Millones de LatidosResponse(
+export function finalizeResponse(
   response: string,
   context: ResponseFinalizationContext
 ): string {
   let next = response.trim();
 
   if (!ACTION_CUE_PATTERN.test(next)) {
-    next = `${next}\n\n${buildTres Mil Millones de LatidosActionLine(context)}`;
+    next = `${next}\n\n${buildActionLine(context)}`;
   }
 
   if (!QUESTION_PATTERN.test(next)) {
-    next = `${next}\n\n${buildTres Mil Millones de LatidosQuestion(context)}`;
+    next = `${next}\n\n${buildQuestion(context)}`;
   }
 
   return next;

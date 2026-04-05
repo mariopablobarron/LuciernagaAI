@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ArrowRight, Sparkles, Zap, Target, CheckCircle2 } from 'lucide-react';
 import Header from '@/components/home/Header';
 import Footer from '@/components/home/Footer';
+import HeartbeatParticles from '@/components/effects/HeartbeatParticles';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -123,6 +124,7 @@ const FEATURES = [
 export default function LandingPageDesign() {
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
+      <HeartbeatParticles />
       {/* Navigation */}
       <Header />
 
@@ -146,20 +148,21 @@ export default function LandingPageDesign() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-400" />
                 </span>
-                <span className="text-xs font-medium text-violet-300">Mentoría conversacional con IA</span>
+                <span className="text-xs font-medium text-violet-300">Tres mil millones de latidos</span>
               </div>
 
               {/* Headline */}
               <div className="space-y-4">
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight">
-                  Deja de darle vueltas.{' '}
+                  Haz que cuenten{' '}
                   <span className="bg-linear-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
-                    Empieza a actuar.
+                    tus próximos latidos.
                   </span>
                 </h1>
                 <p className="text-lg text-zinc-300 leading-relaxed max-w-lg">
-                  Luciérnaga AI convierte tu bloqueo en claridad y tu claridad en acción concreta.
-                  Sin rodeos, sin juicios, con un siguiente paso real.
+                  El corazón humano late tres mil millones de veces en una vida.
+                  Luciérnaga existe para que los que te quedan tengan dirección real.
+                  No teoría. No perfección. Acción concreta, latido a latido.
                 </p>
               </div>
 
@@ -169,7 +172,7 @@ export default function LandingPageDesign() {
                   href="/unirse"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-linear-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-fuchsia-500/25 hover:shadow-fuchsia-500/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
                 >
-                  Empieza ahora <ArrowRight className="w-4 h-4" />
+                  Empieza a latir diferente <ArrowRight className="w-4 h-4" />
                 </Link>
                 <button
                   onClick={() =>
@@ -201,7 +204,7 @@ export default function LandingPageDesign() {
                 </div>
                 <div>
                   <p className="text-sm text-zinc-300 font-medium">
-                    Más de <span className="text-white font-bold">200 personas</span> ya avanzaron
+                    <span className="text-white font-bold">+200 personas</span> latiendo diferente
                   </p>
                   <div className="flex gap-0.5 mt-0.5">
                     {Array.from({ length: 5 }).map((_, i) => (
@@ -213,7 +216,7 @@ export default function LandingPageDesign() {
               <div className="flex items-center gap-2 pt-1">
                 <span className="text-base">🇪🇸</span>
                 <p className="text-xs text-zinc-500">
-                  El único coach IA conversacional en español enfocado en acción real
+                  Mentoría con IA en español. Cada latido, una elección real.
                 </p>
               </div>
             </div>
@@ -235,10 +238,10 @@ export default function LandingPageDesign() {
               Cómo funciona
             </p>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Diseñado para sacarte del bucle
+              Cada latido, un paso hacia adelante
             </h2>
             <p className="text-zinc-300 text-lg max-w-xl mx-auto leading-relaxed">
-              Una mentoría que entiende dónde estás bloqueado y te acompaña hacia la acción.
+              Una mentoría que entiende dónde estás y te acompaña hacia la acción latido a latido.
             </p>
           </div>
 
@@ -272,7 +275,7 @@ export default function LandingPageDesign() {
               El proceso
             </p>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Tu transformación en 3 pasos
+              Tu cambio en 3 latidos
             </h2>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -280,17 +283,17 @@ export default function LandingPageDesign() {
               {
                 num: '01',
                 title: 'Describes cómo te sientes',
-                desc: 'Elige tu estado emocional actual. No hay respuesta correcta ni incorrecta.',
+                desc: 'Sin filtros, sin juicio. Cuéntale a Luciérnaga qué te pasa, qué evitas, qué te frena.',
               },
               {
                 num: '02',
-                title: 'La IA detecta tu patrón',
-                desc: 'Bloqueado, ansioso, con duda o con claridad — la conversación se adapta a ti.',
+                title: 'Obtienes claridad',
+                desc: 'Bloqueado, ansioso, con duda o con claridad — la conversación se adapta a donde estás.',
               },
               {
                 num: '03',
-                title: 'Recibes un próximo paso',
-                desc: 'Específico, accionable, que puedes ejecutar hoy en 10 minutos.',
+                title: 'Actúas en menos de 5 min',
+                desc: 'Un siguiente paso concreto, accionable, que genera momentum real desde hoy.',
               },
             ].map((step) => (
               <div key={step.num} className="text-center space-y-3">
@@ -312,21 +315,25 @@ export default function LandingPageDesign() {
         </div>
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold">
-            ¿Listo para tu primer paso?
+            Algunos latidos ya pasaron.
+            <br />
+            <span className="bg-linear-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
+              Los que vienen aún son tuyos.
+            </span>
           </h2>
           <p className="text-lg text-zinc-300 leading-relaxed">
-            Empieza en menos de 60 segundos. Sin registro obligatorio.
+            Tres mil millones de latidos en una vida. ¿Cuántos ya pasaron sin sentirlos?
           </p>
           <div className="pt-2">
             <Link
               href="/unirse"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-white bg-linear-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-fuchsia-500/25 hover:shadow-fuchsia-500/40 text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
             >
-              Abrir Luciérnaga AI <ArrowRight className="w-5 h-5" />
+              Empieza a latir diferente <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
           <p className="text-xs text-zinc-500">
-            Luciérnaga AI no sustituye terapia ni intervención psicológica profesional.
+            No sustituye terapia ni intervención psicológica profesional.
           </p>
         </div>
       </section>

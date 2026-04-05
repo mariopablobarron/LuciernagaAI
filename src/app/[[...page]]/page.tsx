@@ -3,9 +3,9 @@ import { notFound } from "next/navigation";
 import LandingPageDesign from "@/components/home/LandingPageDesign";
 
 export const metadata: Metadata = {
-  title: "Luciérnaga AI — Mentoría con IA para salir del bloqueo y avanzar",
+  title: "Luciérnaga — Tres mil millones de latidos. Haz que cuenten los tuyos.",
   description:
-    "Luciérnaga detecta si estás bloqueado, ansioso o perdido y te da un próximo paso concreto. Conversaciones orientadas a acción, no a charla. Gratis.",
+    "El corazón late tres mil millones de veces en una vida. Luciérnaga existe para que los tuyos tengan dirección real. Mentoría con IA, latido a latido.",
   keywords: [
     "mentor IA",
     "coach inteligencia artificial",
@@ -14,19 +14,20 @@ export const metadata: Metadata = {
     "productividad personal",
     "herramienta bienestar",
     "ansiedad productividad",
+    "tresmilmillonesdelatidos",
   ],
   openGraph: {
-    title: "Luciérnaga AI — Salir del bloqueo con IA",
+    title: "Luciérnaga — Haz que cuenten tus próximos latidos",
     description:
-      "Detecta tu estado mental y recibe un próximo paso concreto. Sin registro. En 2 minutos.",
+      "Mentoría con IA para jóvenes que saben que algo tiene que cambiar. Latido a latido.",
     type: "website",
     locale: "es_ES",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Luciérnaga AI — Salir del bloqueo con IA",
+    title: "Luciérnaga — Haz que cuenten tus próximos latidos",
     description:
-      "Detecta tu estado mental y recibe un próximo paso concreto. Sin registro. En 2 minutos.",
+      "Mentoría con IA para jóvenes que saben que algo tiene que cambiar. Latido a latido.",
   },
   robots: { index: true, follow: true },
 };

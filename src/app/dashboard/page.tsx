@@ -44,7 +44,7 @@ const STATE_CONFIG: Record<
     gradient: "from-cyan-900/40 to-teal-900/20",
     border: "border-cyan-500/40",
     badge: "bg-cyan-500/15 text-cyan-300 border-cyan-500/30",
-    desc: "Estás en modo ejecución. Aprovecha el impulso.",
+    desc: "Latido en dirección. Aprovecha este impulso ahora.",
   },
   bloqueo: {
     label: "Bloqueo",
@@ -52,7 +52,7 @@ const STATE_CONFIG: Record<
     gradient: "from-red-900/30 to-rose-900/10",
     border: "border-red-500/30",
     badge: "bg-red-500/15 text-red-300 border-red-500/30",
-    desc: "Algo te detiene. Nombrarlo es el primer paso.",
+    desc: "Latido pausado. Nombrarlo desbloquea el ritmo.",
   },
   ansiedad: {
     label: "Ansiedad",
@@ -60,7 +60,7 @@ const STATE_CONFIG: Record<
     gradient: "from-amber-900/30 to-orange-900/10",
     border: "border-amber-500/30",
     badge: "bg-amber-500/15 text-amber-300 border-amber-500/30",
-    desc: "Tu mente va rápido. Elige una sola cosa.",
+    desc: "Demasiados latidos a la vez. Elige uno solo.",
   },
   duda: {
     label: "Duda",
@@ -68,7 +68,7 @@ const STATE_CONFIG: Record<
     gradient: "from-violet-900/30 to-purple-900/10",
     border: "border-violet-500/30",
     badge: "bg-violet-500/15 text-violet-300 border-violet-500/30",
-    desc: "Sin dirección clara. El chat puede ayudarte a ordenarlo.",
+    desc: "El latido busca ritmo. El chat puede orientarlo.",
   },
   neutral: {
     label: "Neutral",
@@ -76,7 +76,7 @@ const STATE_CONFIG: Record<
     gradient: "from-zinc-800/40 to-zinc-900/20",
     border: "border-zinc-600/30",
     badge: "bg-zinc-700/40 text-zinc-300 border-zinc-600/30",
-    desc: "Estás en calma. Buen momento para planificar.",
+    desc: "Latido en calma. Buen momento para elegir dirección.",
   },
 };
 

@@ -40,10 +40,10 @@ export default function TestimonialsSection() {
         {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
-            Quiénes ya transformaron
+            Latidos que ya cambiaron de ritmo
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Jóvenes de 18 a 35 años que decidieron cambiar y lo lograron.
+            Jóvenes de 18 a 35 años que dejaron de dejar pasar los latidos.
           </p>
         </div>
 
@@ -82,11 +82,11 @@ export default function TestimonialsSection() {
         <div className="grid grid-cols-3 gap-4 md:gap-8 text-center p-8 rounded-3xl border border-border/50 bg-card/30">
           <div>
             <div className="text-3xl md:text-4xl font-bold text-emotion-clarity mb-2">+200</div>
-            <p className="text-sm text-muted-foreground">Personas transformando</p>
+            <p className="text-sm text-muted-foreground">Latiendo diferente</p>
           </div>
           <div>
             <div className="text-3xl md:text-4xl font-bold text-emotion-clarity mb-2">92%</div>
-            <p className="text-sm text-muted-foreground">Completaron su primer hábito</p>
+            <p className="text-sm text-muted-foreground">Completaron su primer latido de cambio</p>
           </div>
           <div>
             <div className="text-3xl md:text-4xl font-bold text-emotion-clarity mb-2">4.8/5</div>

@@ -11,15 +11,15 @@ export default function Footer() {
           {/* Brand */}
           <div className="space-y-4">
             <Link href="/" className="flex items-center gap-2.5 group transition-opacity hover:opacity-80">
-              <div className="text-2xl">🔥</div>
+              <div className="text-2xl">💓</div>
               <span className="font-black text-foreground tracking-tight">Luciérnaga</span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Mentoría con IA para personas que quieren transformar su vida con acción real, no promesas vacías.
+              Cada latido es una elección. Luciérnaga existe para que los tuyos tengan dirección real.
             </p>
             <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium">
               <Heart className="w-3 h-3 text-cyan-500" />
-              Hecho con propósito en Latinoamérica
+              Hecho con el corazón en Latinoamérica
             </div>
           </div>
 
@@ -76,10 +76,17 @@ export default function Footer() {
         {/* Bottom */}
         <div className="border-t border-border/30 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Luciérnaga AI. Todos los derechos reservados.
+            © {new Date().getFullYear()}{" "}
+            <a
+              href="https://tresmilmillonesdelatidos.es"
+              className="hover:text-foreground transition-colors"
+            >
+              tresmilmillonesdelatidos.es
+            </a>{" "}
+            — Todos los derechos reservados.
           </p>
           <p className="text-xs text-muted-foreground">
-            Luciérnaga AI no sustituye terapia ni intervención psicológica profesional.
+            No sustituye terapia ni intervención psicológica profesional.
           </p>
         </div>
       </div>

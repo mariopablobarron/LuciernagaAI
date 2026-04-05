@@ -280,7 +280,7 @@ export default function ExplorePage() {
       <div className="flex h-screen items-center justify-center bg-zinc-950">
         <div className="space-y-3 text-center">
           <div className="inline-block animate-spin rounded-full border-2 border-zinc-800 border-t-indigo-400 h-8 w-8" />
-          <p className="text-sm text-zinc-400">Preparando tu espacio</p>
+          <p className="text-sm text-zinc-400">Buscando tu ritmo...</p>
         </div>
       </div>
     );
@@ -367,10 +367,10 @@ export default function ExplorePage() {
           ) : (
             <>
               <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
-                Una cosa a la vez
+                Un latido a la vez
               </h1>
               <p className="text-lg bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent font-medium">
-                Elige lo que necesitas trabajar ahora
+                ¿Dónde pones tu próximo latido?
               </p>
             </>
           )}
@@ -409,7 +409,7 @@ export default function ExplorePage() {
             {/* Completion badge */}
             {currentAction.completed && (
               <div className="text-center mb-8 py-4 bg-emerald-500/20 border border-emerald-500/30 rounded-lg">
-                <p className="text-emerald-400 font-semibold">✓ Completado</p>
+                <p className="text-emerald-400 font-semibold">💓 Latido registrado</p>
               </div>
             )}
 
@@ -452,7 +452,7 @@ export default function ExplorePage() {
                 disabled={submitting}
                 className="w-full py-3 px-6 rounded-lg bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-bold hover:from-violet-400 hover:to-fuchsia-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-fuchsia-500/30 hover:shadow-fuchsia-500/50"
               >
-                {submitting ? "Guardando..." : "Completar"}
+                {submitting ? "Registrando latido..." : "Marcar este latido ✓"}
               </button>
             )}
           </div>
@@ -504,7 +504,7 @@ export default function ExplorePage() {
               href={`/app?context=explore&completed=${completedCount}`}
               className="w-full block py-4 px-6 rounded-xl bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-violet-500 text-white font-bold text-center hover:from-cyan-400 hover:via-fuchsia-400 hover:to-violet-400 transition-all shadow-lg shadow-fuchsia-500/40 hover:shadow-fuchsia-500/60"
             >
-              {allCompleted ? "🎉 Todo listo · Ir al chat" : "Continuar en el chat →"}
+              {allCompleted ? "💓 Latidos completos · Ir al chat" : "Llevar estos latidos al chat →"}
             </Link>
             <button
               onClick={handleReset}

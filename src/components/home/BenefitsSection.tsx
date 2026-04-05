@@ -54,10 +54,10 @@ export default function BenefitsSection() {
         {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
-            Lo que ganas
+            Lo que cambia en tus latidos
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            No son promesas vacías. Son cambios reales que experimentan quienes se comprometen.
+            No son promesas vacías. Son latidos reales que experimentan quienes se comprometen.
           </p>
         </div>
 
@@ -91,15 +91,15 @@ export default function BenefitsSection() {
 
         {/* Bottom section */}
         <div className="mt-20 p-8 md:p-12 rounded-3xl border border-border/50 bg-gradient-to-r from-emotion-clarity/5 via-emotion-doubt/5 to-emotion-blocked/5 text-center">
-          <h3 className="text-2xl md:text-3xl font-bold mb-4">¿Listo para transformar?</h3>
+          <h3 className="text-2xl md:text-3xl font-bold mb-4">Algunos latidos ya pasaron.<br />Los que vienen aún son tuyos.</h3>
           <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
-            Tienes 18 a 35 años. Sabes que algo tiene que cambiar. Estás en el lugar correcto.
+            Tienes 18 a 35 años. Sabes que algo tiene que cambiar. Y cada día que pasa es un latido que no vuelve.
           </p>
           <Link
             href="/unirse"
             className="inline-flex items-center gap-2 px-8 py-3 rounded-lg bg-gradient-to-r from-emotion-clarity to-emotion-doubt text-white font-semibold hover:opacity-90 transition-opacity"
           >
-            Comienza tu transformación
+            Empieza a latir diferente
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"

@@ -140,8 +140,8 @@ function UnirseContent() {
             </div>
           )}
           <div className="text-center space-y-3">
-            <div className="text-5xl mb-2">🌟</div>
-            <h1 className="text-3xl md:text-4xl font-bold">Acceso a Luciérnaga</h1>
+            <div className="text-5xl mb-2">💓</div>
+            <h1 className="text-3xl md:text-4xl font-bold">Tres preguntas.<br />Un latido de honestidad.</h1>
             <p className="text-zinc-400 text-lg leading-relaxed">
               No hay formulario de registro. Hay tres preguntas que nadie más se atreve a hacerte.
               Respóndelas y el acceso es tuyo.
@@ -176,7 +176,7 @@ function UnirseContent() {
               Empezar las misiones <ArrowRight className="h-4 w-4" />
             </button>
           </form>
-          <p className="text-center text-xs text-zinc-600">Sin tarjeta. Sin spam. Solo transformación.</p>
+          <p className="text-center text-xs text-zinc-600">Sin tarjeta. Sin spam. Solo latidos que cuentan.</p>
         </div>
       )}
 
@@ -230,10 +230,10 @@ function UnirseContent() {
       {step === "done" && (
         <div className="w-full max-w-lg space-y-8 text-center animate-in fade-in zoom-in-95 duration-500">
           <div className="space-y-4">
-            <div className="text-6xl animate-bounce">🌟</div>
-            <h1 className="text-3xl md:text-4xl font-bold">Acceso desbloqueado</h1>
+            <div className="text-6xl animate-bounce">💓</div>
+            <h1 className="text-3xl md:text-4xl font-bold">Primer latido. Hecho.</h1>
             <p className="text-zinc-400 text-lg">
-              Has completado las tres misiones. Ya eres parte de Luciérnaga.
+              Has completado las tres misiones. Tu ritmo ya empezó.
             </p>
           </div>
 
@@ -256,14 +256,14 @@ function UnirseContent() {
               Entrar a Luciérnaga <ArrowRight className="h-4 w-4" />
             </button>
             <p className="text-xs text-zinc-600">
-              Tus respuestas guiarán tu primera sesión.
+              Tus respuestas dan ritmo a tu primera sesión.
             </p>
           </div>
 
           <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4 flex items-center gap-3">
             <Lock className="h-4 w-4 shrink-0 text-zinc-600" />
             <p className="text-xs text-zinc-500">
-              Cuando lleves 7 días activo/a, ganarás una invitación para traer a alguien que lo necesite.
+              7 días latiendo y ganarás una invitación para traer a alguien que también lo necesita.
             </p>
           </div>
         </div>

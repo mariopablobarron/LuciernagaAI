@@ -5,11 +5,11 @@ import CheckoutButton from '@/components/CheckoutButton';
 import PortalButton from '@/components/billing/PortalButton';
 
 export const metadata: Metadata = {
-  title: 'Precios — Luciérnaga AI',
-  description: 'Plan gratuito para empezar. Pro con conversaciones ilimitadas, Modo Impulso y retos personalizados por 9€/mes.',
+  title: 'Precios — tresmilmillonesdelatidos.es',
+  description: 'Invierte en los latidos que importan. Plan gratuito para empezar. Pro con conversaciones ilimitadas, Modo Impulso y retos personalizados por 9€/mes.',
   openGraph: {
-    title: 'Precios — Luciérnaga AI',
-    description: 'Empieza gratis. Actualiza cuando necesites más.',
+    title: 'Precios — tresmilmillonesdelatidos.es',
+    description: 'Empieza gratis. Amplía cuando tu ritmo lo pida.',
     type: 'website',
     locale: 'es_ES',
   },
@@ -38,10 +38,10 @@ export default function PreciosPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-16 space-y-12">
       <div className="text-center space-y-4">
-        <p className="text-xs font-semibold uppercase tracking-widest text-violet-400">Precios</p>
-        <h1 className="text-4xl font-bold">Simple y transparente</h1>
+        <p className="text-xs font-semibold uppercase tracking-widest text-violet-400">💓 tresmilmillonesdelatidos.es</p>
+        <h1 className="text-4xl font-bold">Invierte en los latidos que importan</h1>
         <p className="text-zinc-400 text-lg max-w-xl mx-auto">
-          Empieza gratis. Actualiza cuando necesites más.
+          Empieza gratis. Amplía cuando tu ritmo lo pida.
         </p>
       </div>
 
@@ -119,6 +119,10 @@ export default function PreciosPage() {
       <div className="space-y-4 pt-4">
         <h2 className="text-xl font-bold text-center mb-6">Preguntas frecuentes</h2>
         {[
+          {
+            q: '¿Qué significa tresmilmillonesdelatidos.es?',
+            a: 'El corazón humano late aproximadamente tres mil millones de veces en una vida. Luciérnaga existe para que los tuyos tengan dirección. Cada conversación, cada acción, cada decisión — es un latido que puedes desperdiciar o hacer contar.',
+          },
           {
             q: '¿Necesito tarjeta para el plan gratuito?',
             a: 'No. El plan gratuito no requiere ningún dato de pago.',

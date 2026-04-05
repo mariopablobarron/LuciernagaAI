@@ -25,8 +25,8 @@ const steps = [
   },
   {
     icon: TrendingUp,
-    title: "Observa tu transformación",
-    description: "Semana tras semana, ves cómo cambias. Tus hábitos, tu claridad, tu capacidad.",
+    title: "Tus latidos hablan",
+    description: "Semana tras semana ves cómo cambias. Latido a latido, tus hábitos, tu claridad, tu capacidad.",
     color: "emotion-clarity",
   },
 ];
@@ -88,13 +88,13 @@ export default function HowItWorks() {
         {/* Bottom CTA */}
         <div className="mt-16 text-center">
           <p className="text-muted-foreground mb-6">
-            ¿Listo para cambiar? Empieza en menos de un minuto.
+            Tres mil millones de latidos. ¿Cuántos ya pasaron sin que los sintieras?
           </p>
           <Link
             href="/unirse"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-emotion-clarity to-emotion-doubt text-white font-semibold hover:opacity-90 transition-opacity"
           >
-            Comenzar ahora
+            Empieza a latir diferente
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"

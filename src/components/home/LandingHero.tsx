@@ -24,18 +24,19 @@ export default function LandingHero() {
               <div className="inline-block">
                 <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emotion-clarity/20 border border-emotion-clarity/40 text-xs font-semibold text-emotion-clarity">
                   <Zap className="w-3 h-3" />
-                  Transformación Real
+                  Tres mil millones de latidos
                 </span>
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
-                <span className="block">Cambia tu vida</span>
+                <span className="block">Haz que cuenten</span>
                 <span className="bg-linear-to-r from-emotion-clarity via-emotion-doubt to-emotion-blocked bg-clip-text text-transparent">
-                  un hábito a la vez
+                  tus próximos latidos
                 </span>
               </h1>
               <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">
-                Luciérnaga te guía en la transformación real. No es teoría. No es
-                perfección. Es acción concreta, diaria, que genera cambios que duran.
+                El corazón humano late tres mil millones de veces en una vida.
+                Luciérnaga existe para que los que te quedan tengan dirección real.
+                No teoría. No perfección. Acción concreta, latido a latido.
               </p>
             </div>
 
@@ -44,7 +45,7 @@ export default function LandingHero() {
               {[
                 { icon: Brain, text: "Entiende qué te frena" },
                 { icon: Target, text: "Acciona sobre lo real" },
-                { icon: Zap, text: "Observa tu transformación" },
+                { icon: Zap, text: "Vive latidos que importan" },
               ].map((item, idx) => (
                 <div key={idx} className="flex items-center gap-3">
                   <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-emotion-clarity/20 text-emotion-clarity">
@@ -63,19 +64,19 @@ export default function LandingHero() {
                 className="bg-linear-to-r from-emotion-clarity to-emotion-doubt hover:opacity-90 text-white font-semibold group"
               >
                 <Link href="/unirse">
-                  Empieza tu transformación
+                  Empieza a latir diferente
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link href="/app">Acceder a tu cuenta</Link>
+                <Link href="/app">Ya tengo cuenta</Link>
               </Button>
             </div>
 
             {/* Social Proof */}
             <div className="pt-8 border-t border-border/50">
               <p className="text-xs text-muted-foreground mb-3">
-                Jóvenes que ya transformaron sus vidas
+                Personas haciendo contar sus latidos
               </p>
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2">
@@ -89,7 +90,7 @@ export default function LandingHero() {
                   ))}
                 </div>
                 <span className="text-sm text-muted-foreground">
-                  +200 personas en transformación
+                  +200 latiendo diferente
                 </span>
               </div>
             </div>
@@ -115,19 +116,19 @@ export default function LandingHero() {
                 {/* Inner gradient circle */}
                 <div className="absolute inset-16 rounded-full bg-linear-to-br from-emotion-clarity/20 via-emotion-doubt/20 to-emotion-blocked/20 backdrop-blur-sm border border-border/50 shadow-2xl flex items-center justify-center">
                   <div className="text-center space-y-2">
-                    <div className="text-5xl">🚀</div>
-                    <p className="text-sm font-semibold text-foreground">Tu transformación</p>
-                    <p className="text-xs text-muted-foreground">empieza ahora</p>
+                    <div className="text-5xl">💓</div>
+                    <p className="text-sm font-semibold text-foreground">Cada latido</p>
+                    <p className="text-xs text-muted-foreground">es una elección</p>
                   </div>
                 </div>
 
                 {/* Floating elements */}
-                <div className="absolute -top-4 -right-4 text-2xl animate-bounce">🔥</div>
+                <div className="absolute -top-4 -right-4 text-2xl animate-bounce">💫</div>
                 <div
                   className="absolute -bottom-4 -left-4 text-2xl animate-bounce"
                   style={{ animationDelay: "0.5s" }}
                 >
-                  ⚡
+                  🌱
                 </div>
                 <div className="absolute top-1/2 -right-12 text-2xl animate-pulse">✨</div>
               </div>

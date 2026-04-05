@@ -55,8 +55,9 @@ export default function SignupPage() {
     <div className={`min-h-screen bg-linear-to-br ${GRADIENTS.background} flex items-center justify-center px-4 py-12`}>
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-2">
-          <h1 className={`${TYPOGRAPHY.h1} text-white`}>Empieza tu viaje</h1>
-          <p className="text-zinc-400">Crea tu cuenta en Luciérnaga</p>
+          <div className="text-3xl mb-1">💓</div>
+          <h1 className={`${TYPOGRAPHY.h1} text-white`}>Primer latido.</h1>
+          <p className="text-zinc-400">El primero de muchos que van a contar.</p>
         </div>
 
         <form onSubmit={handleSubmit} className={`${COMPONENTS.card} p-8 space-y-6`}>

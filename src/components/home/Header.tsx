@@ -22,7 +22,7 @@ export default function Header() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <span className="text-xl leading-none">🔥</span>
+            <span className="text-xl leading-none">💓</span>
             <span className="text-base font-bold bg-linear-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
               Luciérnaga
             </span>
@@ -71,7 +71,7 @@ export default function Header() {
               href="/unirse"
               className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-linear-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-sm shadow-fuchsia-500/20"
             >
-              Empezar gratis
+              Empieza a latir
             </Link>
           </div>
 
@@ -128,7 +128,7 @@ export default function Header() {
                 onClick={() => setOpen(false)}
                 className="py-2.5 rounded-xl text-center text-sm font-semibold text-white bg-linear-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 transition-all"
               >
-                Empezar gratis
+                Empieza a latir
               </Link>
             </div>
           </nav>

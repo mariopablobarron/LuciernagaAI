@@ -10,6 +10,7 @@ const customJestConfig = {
   testEnvironment: "node",
   globalTeardown: "<rootDir>/jest.teardown.ts",
   openHandlesTimeout: 0,
+  forceExit: true,
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
   },

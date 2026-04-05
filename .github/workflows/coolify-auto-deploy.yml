@@ -16,11 +16,11 @@ jobs:
     steps:
       - name: Trigger Coolify deployment webhook
         run: |
-          if [ -z "${{ secrets.COOLIFY_DEPLOY_WEBHOOK_URL }}" ]; then
-            echo "COOLIFY_DEPLOY_WEBHOOK_URL not set — deploy manually from Coolify."
+          if [ -z "$COOLIFY_WEBHOOK" ]; then
+            echo "No webhook configured - deploy manually from Coolify."
             exit 0
           fi
-          curl --fail --silent --show-error \
-            --request GET \
-            "${{ secrets.COOLIFY_DEPLOY_WEBHOOK_URL }}"
-          echo "Coolify deploy webhook triggered."
+          curl --fail --silent --show-error --request GET "$COOLIFY_WEBHOOK"
+          echo "Coolify deploy triggered."
+        env:
+          COOLIFY_WEBHOOK: ${{ secrets.COOLIFY_DEPLOY_WEBHOOK_URL }}

@@ -67,6 +67,7 @@ model User {
   invitesEarned        Int                  @default(0)
   passwordResetTokens  PasswordResetToken[]
   userActions          UserAction[]
+  interventions        Intervention[]       @relation("UserInterventions")
 }
 
 model Message {
@@ -590,4 +591,49 @@ model QuizResult {
   createdAt DateTime @default(now())
 
   @@index([userId, createdAt])
+}
+
+// ─── LLM Usage Tracking ───────────────────────────────────────────────────────
+
+/// One record per LLM call — tokens, latency, prompt/response, source context.
+model LlmLog {
+  id               String   @id @default(cuid())
+  userId           String?
+  model            String
+  source           String   @default("chat") // "chat" | "impulse" | "checkin" | "cron" | etc.
+  prompt           String   @db.Text
+  response         String   @db.Text
+  promptTokens     Int      @default(0)
+  completionTokens Int      @default(0)
+  totalTokens      Int      @default(0)
+  costUsd          Float    @default(0)
+  latencyMs        Int
+  createdAt        DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([userId, createdAt])
+  @@index([model, createdAt])
+  @@index([source, createdAt])
+}
+
+// ─── Clinical Dashboard ───────────────────────────────────────────────────────
+
+/// Intervention sent by a clinician/admin to a specific user.
+model Intervention {
+  id        String    @id @default(cuid())
+  userId    String
+  adminId   String    // ADMIN_USERNAME who sent it
+  type      String    // "message" | "recommendation" | "resource" | "assessment"
+  content   String    @db.Text
+  status    String    @default("sent") // "sent" | "read" | "resolved"
+  metadata  Json?
+  sentAt    DateTime  @default(now())
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user      User      @relation("UserInterventions", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, sentAt])
+  @@index([adminId, sentAt])
 }

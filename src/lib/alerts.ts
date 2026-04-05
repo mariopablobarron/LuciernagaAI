@@ -252,19 +252,23 @@ export async function sendAdminUserAlert(params: {
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
   if (!adminChatId || !botToken) return;
 
-  const emoji = params.state === "ansiedad" || params.state === "riesgo" ? "🚨" : "⚠️";
+  const isCritical = params.state === "riesgo" || params.state === "ansiedad";
+  const emoji = isCritical ? "🚨" : "⚠️";
+  const via = params.userId.startsWith("tg_") ? "Telegram" : "App web";
+
   const text =
-    `${emoji} Usuario en riesgo:\n` +
-    `ID: ${params.userId}\n` +
-    (params.state ? `Estado: ${params.state}\n` : "") +
-    (params.reason ? `Motivo: ${params.reason}\n` : "") +
-    `Último mensaje: ${truncateText(params.lastMessage)}`;
+    `${emoji} *Usuario requiere atención*\n\n` +
+    `👤 ID: \`${params.userId}\`\n` +
+    (params.state ? `🧠 Estado: *${params.state}*\n` : "") +
+    (params.reason ? `📌 Motivo: ${params.reason}\n` : "") +
+    `💬 _${truncateText(params.lastMessage)}_\n` +
+    `_Vía: ${via}_`;
 
   try {
     await fetchWithTimeout(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: adminChatId, text }),
+      body: JSON.stringify({ chat_id: adminChatId, text, parse_mode: "Markdown" }),
     });
   } catch (error) {
     logError("ALERTS", error, { area: "sendAdminUserAlert" });

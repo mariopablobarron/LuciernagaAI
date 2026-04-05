@@ -212,33 +212,63 @@ export type AdminAlertInput =
   | PaymentAlert
   | CancellationAlert;
 
+// Human-readable labels for explore action types
+const ACTION_LABELS: Record<string, string> = {
+  name_block:     "Nombrar el bloqueo",
+  next_step:      "Definir siguiente paso",
+  close_pending:  "Cerrar pendiente",
+  order_thoughts: "Ordenar pensamientos",
+};
+
+function userVia(userId: string): string {
+  return userId.startsWith("tg_") ? "_Vía: Telegram_" : "_Vía: App web_";
+}
+
 /** Builds a Markdown-formatted admin notification string. */
 export function buildAdminAlert(input: AdminAlertInput): string {
   switch (input.tipo) {
     case "new_user":
-      return `👤 *Nuevo usuario*\n\nID: \`${input.userId}\``;
+      return (
+        `👤 *Nuevo usuario*\n\n` +
+        `ID: \`${input.userId}\`\n` +
+        userVia(input.userId)
+      );
 
     case "email_captured":
-      return `📧 *Usuario identificado*\n\nID: \`${input.userId}\`\nEmail: ${input.email}`;
-
-    case "state_change":
       return (
-        `🧠 *Luciernaga Alerta*\n\n` +
-        `👤 Usuario: \`${input.userId}\`\n` +
-        `🎯 Acción: ${input.actionType}\n` +
-        `💡 Estado: ${input.previousState} → *${input.newState}*`
+        `📧 *Usuario identificado*\n\n` +
+        `ID: \`${input.userId}\`\n` +
+        `Email: ${input.email}\n` +
+        userVia(input.userId)
       );
+
+    case "state_change": {
+      const actionLabel = ACTION_LABELS[input.actionType] ?? input.actionType;
+      return (
+        `🧠 *Cambio de estado emocional*\n\n` +
+        `👤 Usuario: \`${input.userId}\`\n` +
+        `🎯 Acción: ${actionLabel}\n` +
+        `💡 Estado: ${input.previousState} → *${input.newState}*\n` +
+        userVia(input.userId)
+      );
+    }
 
     case "crisis":
       return (
         `🚨 *Crisis detectada*\n\n` +
         `👤 Usuario: \`${input.userId}\`\n` +
         `⚡ Nivel: *${input.crisisLevel}*` +
-        (input.lastMessage ? `\n💬 _${input.lastMessage.slice(0, 120)}_` : "")
+        (input.lastMessage ? `\n💬 _${input.lastMessage.slice(0, 120)}_` : "") +
+        `\n` + userVia(input.userId)
       );
 
     case "streak_milestone":
-      return `🔥 *Racha destacada*\n\nID: \`${input.userId}\`\nRacha: *${input.streakDays} días*`;
+      return (
+        `🔥 *Racha destacada*\n\n` +
+        `ID: \`${input.userId}\`\n` +
+        `Racha: *${input.streakDays} días*\n` +
+        `_Vía: Check-in diario_`
+      );
 
     case "payment": {
       const isTrialing = input.status === "trialing";
@@ -248,7 +278,8 @@ export function buildAdminAlert(input: AdminAlertInput): string {
         `${emoji} *${statusLabel}*\n\n` +
         `📧 Email: \`${input.email}\`\n` +
         `📦 Plan: *${input.plan}* — ${input.amount}\n` +
-        `👤 ID: \`${input.userId}\``
+        `👤 ID: \`${input.userId}\`\n` +
+        `_Vía: Stripe webhook_`
       );
     }
 
@@ -257,7 +288,8 @@ export function buildAdminAlert(input: AdminAlertInput): string {
         `❌ *Suscripción cancelada*\n\n` +
         `📧 Email: \`${input.email}\`\n` +
         `👤 ID: \`${input.userId}\`\n` +
-        `🔑 Sub: \`${input.subscriptionId}\``
+        `🔑 Sub: \`${input.subscriptionId}\`\n` +
+        `_Vía: Stripe webhook_`
       );
   }
 }

@@ -117,17 +117,7 @@ export function buildQuizLeadEmail(params: {
   return { to, subject, html, text };
 }
 
-const SENDGRID_URL = "https://api.sendgrid.com/v3/mail/send";
-
-function getEmailConfig(): { apiKey: string; from: string } | null {
-  const provider = process.env.EMAIL_PROVIDER?.toLowerCase();
-  const apiKey = process.env.EMAIL_API_KEY?.trim();
-  const from =
-    process.env.EMAIL_FROM?.trim() ?? `Luciérnaga <noreply@luciernaga.ai>`;
-
-  if (provider !== "sendgrid" || !apiKey) return null;
-  return { apiKey, from };
-}
+const RESEND_URL = "https://api.resend.com/emails";
 
 export type UserEmail = {
   to: string;
@@ -137,28 +127,28 @@ export type UserEmail = {
 };
 
 export async function sendUserEmail(email: UserEmail): Promise<boolean> {
-  const config = getEmailConfig();
-  if (!config) return false;
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  const from = process.env.EMAIL_FROM?.trim() ?? "TresMilMillonesdeLatidos <info@tresmilmillonesdelatidos.es>";
+
+  if (!apiKey) return false;
 
   try {
-    const res = await fetch(SENDGRID_URL, {
+    const res = await fetch(RESEND_URL, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${config.apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        personalizations: [{ to: [{ email: email.to }] }],
-        from: { email: config.from },
+        from,
+        to: [email.to],
         subject: email.subject,
-        content: [
-          { type: "text/plain", value: email.text },
-          { type: "text/html", value: email.html },
-        ],
+        html: email.html,
+        text: email.text,
       }),
     });
 
-    return res.ok || res.status === 202;
+    return res.ok;
   } catch {
     return false;
   }

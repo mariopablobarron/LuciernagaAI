@@ -204,6 +204,7 @@ export async function generateAIResponse(
   emotionalProfile: EmotionalProfile = DEFAULT_EMOTIONAL_PROFILE,
   coachContext: CoachContext = {},
   history: ConversationTurn[] = [],
+  opts: { userId?: string; source?: string } = {},
 ): Promise<{
   response: string;
   fallback: boolean;
@@ -213,7 +214,7 @@ export async function generateAIResponse(
   const typedState = normalizeState(userState);
 
   try {
-    const response = await requestOpenRouter(message, typedState, emotionalProfile, coachContext, history);
+    const response = await requestOpenRouter(message, typedState, emotionalProfile, coachContext, history, opts);
     logInfo("AI", "ai_response_generated", {
       state: typedState,
       primaryEmotion: emotionalProfile.primaryEmotion,

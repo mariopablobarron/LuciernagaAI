@@ -95,6 +95,16 @@ export function AdminShell({
               >
                 Usuarios
               </Link>
+              <Link
+                href="/admin-clinical"
+                className={`rounded-full border px-3 py-2 text-xs font-semibold transition ${
+                  pathname.startsWith("/admin-clinical")
+                    ? "border-primary/30 bg-primary text-primary-foreground"
+                    : "border-border bg-background/70 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                }`}
+              >
+                Panel clínico
+              </Link>
             </div>
 
             {showSectionNav ? (

@@ -2,67 +2,113 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, RefreshCw, Search, ShieldAlert, UserRound } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowDown,
+  ArrowRight,
+  ArrowUp,
+  ChevronLeft,
+  ChevronRight,
+  Flame,
+  MessageCircle,
+  RefreshCw,
+  Search,
+  ShieldAlert,
+  Target,
+  TrendingUp,
+  Users,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 
-type AdminUsersResponse = {
-  items: Array<{
-    id: string;
-    email: string;
-    name: string | null;
-    role: string;
-    createdAt: string;
-    updatedAt: string;
-    lastSeen: string;
-    state: string;
-    riskLevel: string;
-    crisisActive: boolean;
-    plan: string;
-    subscriptionStatus: string;
-    profileTitle: string | null;
-    streakDays: number;
-    engagementScore: number;
-    counts: {
-      conversations: number;
-      messages: number;
-      goals: number;
-      checkins7d: number;
-      crisisEvents7d: number;
-      avoidanceEvents7d: number;
-      messages7d: number;
-    };
-  }>;
-  pagination: {
-    page: number;
-    pageSize: number;
-    total: number;
-    totalPages: number;
-  };
-  filters: {
-    q: string;
-    state: string;
-    riskOnly: boolean;
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+type UserItem = {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string;
+  createdAt: string;
+  updatedAt: string;
+  lastSeen: string;
+  state: string;
+  riskLevel: string;
+  crisisActive: boolean;
+  plan: string;
+  subscriptionStatus: string;
+  profileTitle: string | null;
+  streakDays: number;
+  engagementScore: number;
+  counts: {
+    conversations: number;
+    messages: number;
+    goals: number;
+    checkins7d: number;
+    crisisEvents7d: number;
+    avoidanceEvents7d: number;
+    messages7d: number;
   };
 };
 
-function formatDate(value: string): string {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-  return date.toLocaleString();
+type AdminUsersResponse = {
+  items: UserItem[];
+  pagination: { page: number; pageSize: number; total: number; totalPages: number };
+  filters: { q: string; state: string; riskOnly: boolean };
+};
+
+type SortKey = "name" | "lastSeen" | "engagementScore" | "streakDays" | "state" | "messages7d";
+type SortDir = "asc" | "desc";
+
+// ─── Config ──────────────────────────────────────────────────────────────────
+
+const STATE_CONFIG: Record<string, { label: string; dot: string; bg: string }> = {
+  claridad: { label: "Claridad", dot: "bg-cyan-400", bg: "bg-cyan-500/10 text-cyan-300 border-cyan-500/30" },
+  bloqueo: { label: "Bloqueo", dot: "bg-red-400", bg: "bg-red-500/10 text-red-300 border-red-500/30" },
+  ansiedad: { label: "Ansiedad", dot: "bg-amber-400", bg: "bg-amber-500/10 text-amber-300 border-amber-500/30" },
+  duda: { label: "Duda", dot: "bg-violet-400", bg: "bg-violet-500/10 text-violet-300 border-violet-500/30" },
+  neutral: { label: "Neutral", dot: "bg-zinc-500", bg: "bg-zinc-700/30 text-zinc-400 border-zinc-600/30" },
+};
+
+const RISK_CONFIG: Record<string, { label: string; color: string }> = {
+  critical: { label: "Critico", color: "text-red-400" },
+  high: { label: "Alto", color: "text-orange-400" },
+  medium: { label: "Medio", color: "text-amber-400" },
+  low: { label: "Bajo", color: "text-zinc-500" },
+};
+
+const PLAN_CONFIG: Record<string, { label: string; style: string }> = {
+  pro: { label: "Pro", style: "bg-violet-500/15 text-violet-300 border-violet-500/30" },
+  free: { label: "Free", style: "bg-zinc-700/30 text-zinc-400 border-zinc-600/30" },
+};
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function timeAgo(value: string): string {
+  const now = Date.now();
+  const then = new Date(value).getTime();
+  if (Number.isNaN(then)) return "—";
+  const diffMs = now - then;
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return "Ahora";
+  if (mins < 60) return `${mins}m`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days}d`;
+  return `${Math.floor(days / 30)}mo`;
 }
 
-function riskVariant(level: string): "secondary" | "warning" | "danger" {
-  if (level === "critical") return "danger";
-  if (level === "high") return "warning";
-  return "secondary";
+function engagementColor(score: number): string {
+  if (score >= 65) return "bg-emerald-500";
+  if (score >= 35) return "bg-amber-400";
+  return "bg-red-400";
 }
+
+function Skeleton({ className }: { className?: string }) {
+  return <div className={`animate-pulse rounded-xl bg-zinc-800/60 ${className ?? ""}`} />;
+}
+
+// ─── Main ────────────────────────────────────────────────────────────────────
 
 export default function AdminUsersPage() {
   const router = useRouter();
@@ -73,52 +119,36 @@ export default function AdminUsersPage() {
 
   const [query, setQuery] = useState("");
   const [stateFilter, setStateFilter] = useState("all");
+  const [planFilter, setPlanFilter] = useState("all");
   const [riskOnly, setRiskOnly] = useState(false);
   const [page, setPage] = useState(1);
-
-  const stateOptions = useMemo(
-    () => ["all", "neutral", "duda", "bloqueo", "ansiedad", "claridad"],
-    []
-  );
+  const [sortKey, setSortKey] = useState<SortKey>("lastSeen");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
 
   async function fetchUsers() {
     setLoading(true);
     setError(null);
-
     const params = new URLSearchParams();
     params.set("page", String(page));
-    params.set("pageSize", "20");
-    if (query.trim()) {
-      params.set("q", query.trim());
-    }
-    if (stateFilter !== "all") {
-      params.set("state", stateFilter);
-    }
-    if (riskOnly) {
-      params.set("risk", "1");
-    }
+    params.set("pageSize", "25");
+    if (query.trim()) params.set("q", query.trim());
+    if (stateFilter !== "all") params.set("state", stateFilter);
+    if (riskOnly) params.set("risk", "1");
 
     try {
-      const response = await fetch(`/api/admin/users?${params.toString()}`, {
+      const res = await fetch(`/api/admin/users?${params.toString()}`, {
         cache: "no-store",
         credentials: "include",
       });
-
-      if (response.status === 401) {
+      if (res.status === 401) {
         router.replace("/admin/login?next=/admin/users");
         return;
       }
-
-      const payload = (await response.json().catch(() => null)) as AdminUsersResponse | null;
-      if (!response.ok || !payload) {
-        throw new Error("No se pudo cargar el listado de usuarios.");
-      }
-
+      const payload = (await res.json().catch(() => null)) as AdminUsersResponse | null;
+      if (!res.ok || !payload) throw new Error("No se pudo cargar el listado.");
       setData(payload);
-    } catch (fetchError: unknown) {
-      const message =
-        fetchError instanceof Error ? fetchError.message : "Error cargando listado de usuarios.";
-      setError(message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Error cargando usuarios.");
     } finally {
       setLoading(false);
     }
@@ -142,267 +172,373 @@ export default function AdminUsersPage() {
     void fetchUsers();
   }
 
-  const users = data?.items || [];
+  function handleSort(key: SortKey) {
+    if (sortKey === key) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir("desc");
+    }
+  }
+
+  // Sort + filter client-side for plan filter
+  const users = useMemo(() => {
+    let items = data?.items ?? [];
+    if (planFilter !== "all") {
+      items = items.filter((u) => u.plan === planFilter);
+    }
+    const dir = sortDir === "asc" ? 1 : -1;
+    return [...items].sort((a, b) => {
+      switch (sortKey) {
+        case "name":
+          return dir * (a.name ?? a.email).localeCompare(b.name ?? b.email);
+        case "lastSeen":
+          return dir * (new Date(a.lastSeen).getTime() - new Date(b.lastSeen).getTime());
+        case "engagementScore":
+          return dir * (a.engagementScore - b.engagementScore);
+        case "streakDays":
+          return dir * (a.streakDays - b.streakDays);
+        case "messages7d":
+          return dir * (a.counts.messages7d - b.counts.messages7d);
+        case "state":
+          return dir * a.state.localeCompare(b.state);
+        default:
+          return 0;
+      }
+    });
+  }, [data?.items, planFilter, sortKey, sortDir]);
+
+  // KPIs
+  const allItems = data?.items ?? [];
+  const totalUsers = data?.pagination.total ?? 0;
+  const withRisk = allItems.filter((u) => u.riskLevel === "high" || u.riskLevel === "critical").length;
+  const withCrisis = allItems.filter((u) => u.crisisActive).length;
+  const avgEngagement = allItems.length > 0
+    ? Math.round(allItems.reduce((s, u) => s + u.engagementScore, 0) / allItems.length)
+    : 0;
+  const proUsers = allItems.filter((u) => u.plan === "pro").length;
+  const activeToday = allItems.filter((u) => {
+    const diff = Date.now() - new Date(u.lastSeen).getTime();
+    return diff < 24 * 60 * 60 * 1000;
+  }).length;
+
+  function SortIcon({ col }: { col: SortKey }) {
+    if (sortKey !== col) return null;
+    return sortDir === "asc"
+      ? <ArrowUp className="inline h-3 w-3 ml-0.5" />
+      : <ArrowDown className="inline h-3 w-3 ml-0.5" />;
+  }
 
   return (
     <AdminShell
-      title="Usuarios y Fichas"
-      subtitle="Vista operativa completa de usuarios: estado emocional, actividad, riesgo y contexto para soporte de producto y retencion."
+      title="Usuarios"
+      subtitle="Vista operativa completa: estado emocional, actividad, riesgo y contexto por usuario."
       onLogout={handleLogout}
       showSectionNav={false}
     >
-      <Card className="border-border/80 bg-card/95 shadow-sm">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-xl">Explorador de usuarios</CardTitle>
-          <CardDescription>
-            Filtra por estado, riesgo o búsqueda textual para abrir la ficha completa de cada
-            usuario.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.3fr_0.7fr_0.55fr_auto_auto]">
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Buscar por email o nombre"
-                className="pl-9"
-              />
-            </div>
-
-            <select
-              value={stateFilter}
-              onChange={(event) => setStateFilter(event.target.value)}
-              className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-            >
-              {stateOptions.map((state) => (
-                <option key={state} value={state}>
-                  {state === "all" ? "Todos los estados" : state}
-                </option>
-              ))}
-            </select>
-
-            <label className="flex items-center gap-2 rounded-md border border-input px-3 text-sm">
-              <input
-                type="checkbox"
-                checked={riskOnly}
-                onChange={(event) => setRiskOnly(event.target.checked)}
-              />
-              Solo riesgo
-            </label>
-
-            <Button type="button" variant="outline" onClick={applyFilters}>
-              Aplicar
-            </Button>
-
-            <Button type="button" variant="secondary" onClick={() => void fetchUsers()}>
-              <RefreshCw className="size-4" />
-              Refrescar
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
-            <Card className="border-border/80 bg-muted/40">
-              <CardContent className="p-4">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">Usuarios</p>
-                <p className="mt-2 text-2xl font-semibold text-foreground">
-                  {data?.pagination.total ?? 0}
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="border-border/80 bg-muted/40">
-              <CardContent className="p-4">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">Con riesgo</p>
-                <p className="mt-2 text-2xl font-semibold text-[color-mix(in_oklab,var(--signal-warning)_60%,var(--foreground))]">
-                  {
-                    users.filter(
-                      (user) => user.riskLevel === "high" || user.riskLevel === "critical"
-                    ).length
-                  }
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="border-border/80 bg-muted/40">
-              <CardContent className="p-4">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                  Crisis activa
-                </p>
-                <p className="mt-2 text-2xl font-semibold text-[color-mix(in_oklab,var(--signal-danger)_60%,var(--foreground))]">
-                  {users.filter((user) => user.crisisActive).length}
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="border-border/80 bg-muted/40">
-              <CardContent className="p-4">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                  Mensajes (página)
-                </p>
-                <p className="mt-2 text-2xl font-semibold text-foreground">
-                  {users.reduce((acc, user) => acc + user.counts.messages, 0)}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </CardContent>
-      </Card>
-
-      {error ? (
-        <Card className="border-signal-danger/30 bg-signal-danger/12">
-          <CardContent className="p-4 text-foreground">{error}</CardContent>
-        </Card>
-      ) : null}
-
-      {loading ? (
-        <Card className="border-border/80 bg-card/95">
-          <CardContent className="p-5 text-muted-foreground">Cargando usuarios...</CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-3">
-          {users.length === 0 ? (
-            <Card className="border-border/80 bg-card/95">
-              <CardContent className="p-5 text-muted-foreground">
-                No hay usuarios para el filtro actual.
-              </CardContent>
-            </Card>
-          ) : (
-            users.map((user) => (
-              <Card key={user.id} className="border-border/80 bg-card/95 shadow-sm">
-                <CardContent className="space-y-4 p-4">
-                  <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-                    <div>
-                      <p className="text-base font-semibold text-foreground">
-                        {user.name || user.email}
-                      </p>
-                      <p className="text-sm text-muted-foreground">{user.email}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">ID {user.id}</p>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge variant="secondary" className="rounded-full px-3 py-1">
-                        Rol {user.role}
-                      </Badge>
-                      <Badge
-                        variant={riskVariant(user.riskLevel)}
-                        className="rounded-full px-3 py-1"
-                      >
-                        Riesgo {user.riskLevel}
-                      </Badge>
-                      {user.crisisActive ? (
-                        <Badge variant="danger" className="rounded-full px-3 py-1">
-                          <ShieldAlert className="mr-1 size-3.5" />
-                          Crisis activa
-                        </Badge>
-                      ) : null}
-                      <Badge variant="secondary" className="rounded-full px-3 py-1">
-                        Plan {user.plan}
-                      </Badge>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2 text-sm md:grid-cols-6">
-                    <div className="rounded-xl border border-border bg-muted/35 px-3 py-2">
-                      <p className="text-xs text-muted-foreground">Estado</p>
-                      <p className="font-semibold text-foreground capitalize">{user.state}</p>
-                    </div>
-                    <div className="rounded-xl border border-border bg-muted/35 px-3 py-2">
-                      <p className="text-xs text-muted-foreground">Perfil</p>
-                      <p className="font-semibold text-foreground">
-                        {user.profileTitle || "Sin perfil"}
-                      </p>
-                    </div>
-                    <div className="rounded-xl border border-border bg-muted/35 px-3 py-2">
-                      <p className="text-xs text-muted-foreground">Conversaciones</p>
-                      <p className="font-semibold text-foreground">{user.counts.conversations}</p>
-                    </div>
-                    <div className="rounded-xl border border-border bg-muted/35 px-3 py-2">
-                      <p className="text-xs text-muted-foreground">Msgs 7d</p>
-                      <p className="font-semibold text-foreground">{user.counts.messages7d}</p>
-                    </div>
-                    <div className="rounded-xl border border-border bg-muted/35 px-3 py-2">
-                      <p className="text-xs text-muted-foreground">Check-ins 7d</p>
-                      <p className="font-semibold text-foreground">{user.counts.checkins7d}</p>
-                    </div>
-                    <div className="rounded-xl border border-border bg-muted/35 px-3 py-2">
-                      <p className="text-xs text-muted-foreground">Racha</p>
-                      <p className="font-semibold text-foreground">{user.streakDays} dias</p>
-                    </div>
-                  </div>
-
-                  <div className="mt-1 flex items-center gap-2 text-sm">
-                    <span className="text-xs text-muted-foreground">Engagement</span>
-                    <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted/60">
-                      <div
-                        className={`h-full rounded-full transition-all ${
-                          user.engagementScore >= 65
-                            ? "bg-emerald-500"
-                            : user.engagementScore >= 35
-                              ? "bg-amber-400"
-                              : "bg-rose-400"
-                        }`}
-                        style={{ width: `${user.engagementScore}%` }}
-                      />
-                    </div>
-                    <span className="w-8 text-right font-semibold tabular-nums text-foreground">
-                      {user.engagementScore}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
-                    <div className="flex flex-wrap gap-3">
-                      <span>Ultima actividad {formatDate(user.lastSeen)}</span>
-                      <span>Alta {formatDate(user.createdAt)}</span>
-                    </div>
-                    <Button asChild size="sm" variant="outline">
-                      <Link href={`/admin/users/${user.id}`}>
-                        Ver ficha
-                        <ArrowRight className="size-4" />
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-
-          <Card className="border-border/80 bg-card/95">
-            <CardContent className="flex flex-wrap items-center justify-between gap-3 p-4">
-              <p className="text-sm text-muted-foreground">
-                Página {data?.pagination.page ?? 1} de{" "}
-                {Math.max(data?.pagination.totalPages ?? 1, 1)}
-              </p>
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={(data?.pagination.page ?? 1) <= 1}
-                  onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-                >
-                  Anterior
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={(data?.pagination.page ?? 1) >= (data?.pagination.totalPages ?? 1)}
-                  onClick={() =>
-                    setPage((prev) => Math.min(data?.pagination.totalPages ?? prev, prev + 1))
-                  }
-                >
-                  Siguiente
-                </Button>
+      {/* ── KPI Cards ───────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+        {loading ? (
+          Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-20" />)
+        ) : (
+          <>
+            <div className="card-surface rounded-xl border border-zinc-800 p-4">
+              <div className="flex items-center gap-2 text-xs text-zinc-500">
+                <Users className="h-3.5 w-3.5" />
+                <span className="font-semibold uppercase tracking-wide">Total</span>
               </div>
-            </CardContent>
-          </Card>
+              <p className="mt-2 text-2xl font-bold text-white">{totalUsers}</p>
+            </div>
+            <div className="card-surface rounded-xl border border-zinc-800 p-4">
+              <div className="flex items-center gap-2 text-xs text-zinc-500">
+                <TrendingUp className="h-3.5 w-3.5" />
+                <span className="font-semibold uppercase tracking-wide">Activos 24h</span>
+              </div>
+              <p className="mt-2 text-2xl font-bold text-emerald-400">{activeToday}</p>
+            </div>
+            <div className="card-surface rounded-xl border border-zinc-800 p-4">
+              <div className="flex items-center gap-2 text-xs text-zinc-500">
+                <Target className="h-3.5 w-3.5" />
+                <span className="font-semibold uppercase tracking-wide">Engagement</span>
+              </div>
+              <p className={`mt-2 text-2xl font-bold ${avgEngagement >= 50 ? "text-emerald-400" : "text-amber-400"}`}>
+                {avgEngagement}%
+              </p>
+            </div>
+            <div className="card-surface rounded-xl border border-zinc-800 p-4">
+              <div className="flex items-center gap-2 text-xs text-amber-500/70">
+                <AlertTriangle className="h-3.5 w-3.5" />
+                <span className="font-semibold uppercase tracking-wide">Riesgo</span>
+              </div>
+              <p className="mt-2 text-2xl font-bold text-amber-400">{withRisk}</p>
+            </div>
+            <div className="card-surface rounded-xl border border-zinc-800 p-4">
+              <div className="flex items-center gap-2 text-xs text-red-500/70">
+                <ShieldAlert className="h-3.5 w-3.5" />
+                <span className="font-semibold uppercase tracking-wide">Crisis</span>
+              </div>
+              <p className="mt-2 text-2xl font-bold text-red-400">{withCrisis}</p>
+            </div>
+            <div className="card-surface rounded-xl border border-zinc-800 p-4">
+              <div className="flex items-center gap-2 text-xs text-violet-500/70">
+                <Flame className="h-3.5 w-3.5" />
+                <span className="font-semibold uppercase tracking-wide">Pro</span>
+              </div>
+              <p className="mt-2 text-2xl font-bold text-violet-400">{proUsers}</p>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* ── Filters ─────────────────────────────────────────────── */}
+      <div className="card-surface rounded-xl border border-zinc-800 p-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+          {/* Search */}
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-600" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && applyFilters()}
+              placeholder="Buscar por email o nombre..."
+              className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 py-2.5 pl-10 pr-4 text-sm text-zinc-200 placeholder-zinc-600 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500/50"
+            />
+          </div>
+
+          {/* State filter */}
+          <select
+            value={stateFilter}
+            onChange={(e) => setStateFilter(e.target.value)}
+            className="rounded-xl border border-zinc-700 bg-zinc-900/80 px-3 py-2.5 text-sm text-zinc-300 focus:border-violet-500 focus:outline-none"
+          >
+            <option value="all">Todos los estados</option>
+            <option value="claridad">Claridad</option>
+            <option value="bloqueo">Bloqueo</option>
+            <option value="ansiedad">Ansiedad</option>
+            <option value="duda">Duda</option>
+            <option value="neutral">Neutral</option>
+          </select>
+
+          {/* Plan filter */}
+          <select
+            value={planFilter}
+            onChange={(e) => setPlanFilter(e.target.value)}
+            className="rounded-xl border border-zinc-700 bg-zinc-900/80 px-3 py-2.5 text-sm text-zinc-300 focus:border-violet-500 focus:outline-none"
+          >
+            <option value="all">Todos los planes</option>
+            <option value="pro">Pro</option>
+            <option value="free">Free</option>
+          </select>
+
+          {/* Risk toggle */}
+          <button
+            onClick={() => { setRiskOnly(!riskOnly); setTimeout(applyFilters, 0); }}
+            className={`rounded-xl border px-3 py-2.5 text-sm font-semibold transition-all ${
+              riskOnly
+                ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
+                : "border-zinc-700 text-zinc-500 hover:text-zinc-300"
+            }`}
+          >
+            <ShieldAlert className="mr-1.5 inline h-3.5 w-3.5" />
+            Solo riesgo
+          </button>
+
+          {/* Actions */}
+          <button
+            onClick={applyFilters}
+            className="rounded-xl bg-linear-to-r from-violet-500 to-fuchsia-500 px-4 py-2.5 text-sm font-semibold text-white hover:from-violet-400 hover:to-fuchsia-400 transition-all"
+          >
+            Buscar
+          </button>
+          <button
+            onClick={() => void fetchUsers()}
+            className="rounded-xl border border-zinc-700 p-2.5 text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors"
+            title="Refrescar"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* ── Error ───────────────────────────────────────────────── */}
+      {error && (
+        <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          {error}
         </div>
       )}
 
-      <Card className="border-dashed border-border bg-muted/30">
-        <CardContent className="flex items-start gap-3 p-4 text-sm text-muted-foreground">
-          <UserRound className="mt-0.5 size-4 shrink-0" />
-          Esta vista está diseñada para operación SaaS: soporte, retención, riesgo y lectura rápida
-          de contexto por usuario sin salir del admin.
-        </CardContent>
-      </Card>
+      {/* ── User Table ──────────────────────────────────────────── */}
+      {loading ? (
+        <div className="space-y-2">
+          {Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-16" />)}
+        </div>
+      ) : users.length === 0 ? (
+        <div className="card-surface rounded-xl border border-zinc-800 p-8 text-center">
+          <Users className="mx-auto h-8 w-8 text-zinc-600" />
+          <p className="mt-3 text-sm text-zinc-400">No hay usuarios para el filtro actual.</p>
+        </div>
+      ) : (
+        <div className="card-surface overflow-hidden rounded-xl border border-zinc-800">
+          {/* Table header */}
+          <div className="hidden lg:grid lg:grid-cols-[1.5fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr_0.4fr_auto] gap-3 border-b border-zinc-800 px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+            <button onClick={() => handleSort("name")} className="text-left hover:text-zinc-300 transition-colors">
+              Usuario <SortIcon col="name" />
+            </button>
+            <button onClick={() => handleSort("state")} className="text-left hover:text-zinc-300 transition-colors">
+              Estado <SortIcon col="state" />
+            </button>
+            <span>Plan / Riesgo</span>
+            <button onClick={() => handleSort("engagementScore")} className="text-left hover:text-zinc-300 transition-colors">
+              Engagement <SortIcon col="engagementScore" />
+            </button>
+            <button onClick={() => handleSort("messages7d")} className="text-left hover:text-zinc-300 transition-colors">
+              Msgs 7d <SortIcon col="messages7d" />
+            </button>
+            <button onClick={() => handleSort("streakDays")} className="text-left hover:text-zinc-300 transition-colors">
+              Racha <SortIcon col="streakDays" />
+            </button>
+            <button onClick={() => handleSort("lastSeen")} className="text-left hover:text-zinc-300 transition-colors">
+              Visto <SortIcon col="lastSeen" />
+            </button>
+            <span />
+          </div>
+
+          {/* Rows */}
+          <div className="divide-y divide-zinc-800/50">
+            {users.map((user) => {
+              const stateCfg = STATE_CONFIG[user.state] ?? STATE_CONFIG.neutral;
+              const riskCfg = RISK_CONFIG[user.riskLevel] ?? RISK_CONFIG.low;
+              const planCfg = PLAN_CONFIG[user.plan] ?? PLAN_CONFIG.free;
+
+              return (
+                <Link
+                  key={user.id}
+                  href={`/admin/users/${user.id}`}
+                  className="group block transition-colors hover:bg-zinc-800/30"
+                >
+                  {/* Desktop row */}
+                  <div className="hidden lg:grid lg:grid-cols-[1.5fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr_0.4fr_auto] items-center gap-3 px-4 py-3">
+                    {/* User */}
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-white group-hover:text-violet-300 transition-colors">
+                        {user.name || user.email.split("@")[0]}
+                      </p>
+                      <p className="truncate text-xs text-zinc-600">{user.email}</p>
+                    </div>
+
+                    {/* State */}
+                    <div>
+                      <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${stateCfg.bg}`}>
+                        <span className={`inline-block h-1.5 w-1.5 rounded-full ${stateCfg.dot}`} />
+                        {stateCfg.label}
+                      </span>
+                    </div>
+
+                    {/* Plan + Risk */}
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold ${planCfg.style}`}>
+                        {planCfg.label}
+                      </span>
+                      {(user.riskLevel === "high" || user.riskLevel === "critical") && (
+                        <span className={`text-[10px] font-semibold ${riskCfg.color}`}>
+                          {riskCfg.label}
+                        </span>
+                      )}
+                      {user.crisisActive && (
+                        <ShieldAlert className="h-3.5 w-3.5 text-red-400" />
+                      )}
+                    </div>
+
+                    {/* Engagement */}
+                    <div className="flex items-center gap-2">
+                      <div className="h-1.5 w-12 overflow-hidden rounded-full bg-zinc-800">
+                        <div
+                          className={`h-full rounded-full ${engagementColor(user.engagementScore)}`}
+                          style={{ width: `${user.engagementScore}%` }}
+                        />
+                      </div>
+                      <span className="text-xs font-semibold text-zinc-300 tabular-nums">
+                        {user.engagementScore}
+                      </span>
+                    </div>
+
+                    {/* Messages 7d */}
+                    <div className="flex items-center gap-1.5 text-xs text-zinc-400">
+                      <MessageCircle className="h-3 w-3" />
+                      <span className="font-semibold tabular-nums">{user.counts.messages7d}</span>
+                    </div>
+
+                    {/* Streak */}
+                    <div className="flex items-center gap-1.5 text-xs">
+                      <Flame className={`h-3 w-3 ${user.streakDays > 0 ? "text-amber-400" : "text-zinc-700"}`} />
+                      <span className={`font-semibold tabular-nums ${user.streakDays > 0 ? "text-amber-300" : "text-zinc-600"}`}>
+                        {user.streakDays}d
+                      </span>
+                    </div>
+
+                    {/* Last seen */}
+                    <span className="text-xs text-zinc-600 tabular-nums">{timeAgo(user.lastSeen)}</span>
+
+                    {/* Arrow */}
+                    <ArrowRight className="h-4 w-4 text-zinc-700 group-hover:text-violet-400 transition-colors" />
+                  </div>
+
+                  {/* Mobile card */}
+                  <div className="lg:hidden space-y-3 px-4 py-4">
+                    <div className="flex items-start justify-between">
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-medium text-white">{user.name || user.email.split("@")[0]}</p>
+                        <p className="truncate text-xs text-zinc-600">{user.email}</p>
+                      </div>
+                      <div className="flex items-center gap-1.5 ml-3">
+                        <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${stateCfg.bg}`}>
+                          <span className={`inline-block h-1.5 w-1.5 rounded-full ${stateCfg.dot}`} />
+                          {stateCfg.label}
+                        </span>
+                        {user.crisisActive && <ShieldAlert className="h-3.5 w-3.5 text-red-400" />}
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-3 text-xs text-zinc-500">
+                      <span className={`${planCfg.style} rounded-full border px-2 py-0.5 text-[10px] font-semibold`}>{planCfg.label}</span>
+                      <span>Eng: <strong className="text-zinc-300">{user.engagementScore}</strong></span>
+                      <span>Msgs: <strong className="text-zinc-300">{user.counts.messages7d}</strong></span>
+                      <span>Racha: <strong className={user.streakDays > 0 ? "text-amber-300" : "text-zinc-500"}>{user.streakDays}d</strong></span>
+                      <span>Visto: {timeAgo(user.lastSeen)}</span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── Pagination ──────────────────────────────────────────── */}
+      {!loading && data && data.pagination.totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-zinc-600">
+            Página {data.pagination.page} de {data.pagination.totalPages} · {data.pagination.total} usuarios
+          </p>
+          <div className="flex gap-2">
+            <button
+              disabled={data.pagination.page <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              className="inline-flex items-center gap-1 rounded-xl border border-zinc-700 px-3 py-2 text-xs text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+              Anterior
+            </button>
+            <button
+              disabled={data.pagination.page >= data.pagination.totalPages}
+              onClick={() => setPage((p) => Math.min(data.pagination.totalPages, p + 1))}
+              className="inline-flex items-center gap-1 rounded-xl border border-zinc-700 px-3 py-2 text-xs text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              Siguiente
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
     </AdminShell>
   );
 }

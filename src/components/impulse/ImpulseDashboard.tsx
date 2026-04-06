@@ -460,7 +460,7 @@ export default function ImpulseDashboard() {
               <CardHeader>
                 <CardTitle>Test inicial de impulso</CardTitle>
                 <CardDescription>
-                  12 preguntas, escala 1-5. Esto define cómo debe empujarte Luciérnaga.
+                  12 preguntas, escala 1-5. Esto define cómo debe empujarte Tres Mil Millones de Latidos.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-5">

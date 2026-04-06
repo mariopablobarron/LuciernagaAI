@@ -52,7 +52,7 @@ export default function OGImage() {
               letterSpacing: "-0.5px",
             }}
           >
-            Luciérnaga AI
+            Tres Mil Millones de Latidos
           </span>
         </div>
 

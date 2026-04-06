@@ -253,7 +253,7 @@ function UnirseContent() {
               onClick={() => router.push("/app")}
               className={`${COMPONENTS.buttonPrimary} w-full flex items-center justify-center gap-2 py-3 text-base`}
             >
-              Entrar a Luciérnaga <ArrowRight className="h-4 w-4" />
+              Entrar a Tres Mil Millones de Latidos <ArrowRight className="h-4 w-4" />
             </button>
             <p className="text-xs text-zinc-600">
               Tus respuestas dan ritmo a tu primera sesión.

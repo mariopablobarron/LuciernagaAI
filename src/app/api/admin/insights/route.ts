@@ -523,6 +523,7 @@ export async function GET(req: NextRequest) {
       EVASIVO: 0,
       ESTABLE: 0,
       ACTIVO: 0,
+      TRANSITIONAL_VOID: 0,
     };
     const decisionTypeCounts: Record<DecisionType, number> = {
       ESCALAR_CRISIS: 0,
@@ -530,6 +531,7 @@ export async function GET(req: NextRequest) {
       REDUCIR_EVASION: 0,
       ACELERAR_ACCION: 0,
       MANTENER_RUMBO: 0,
+      SOSTENER_VACIO: 0,
     };
     let decisionSamples = 0;
 

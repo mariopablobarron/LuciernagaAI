@@ -21,7 +21,7 @@ export default function InvitePage() {
       .then((r) => r.json())
       .then((data: { valid: boolean; inviterName?: string }) => {
         if (data.valid) {
-          setInviterName(data.inviterName ?? "alguien de Luciérnaga");
+          setInviterName(data.inviterName ?? "alguien de Tres Mil Millones de Latidos");
           setStatus("valid");
           // Store invite code for use during waitlist/app join
           localStorage.setItem("luc_invite_code", code);
@@ -65,7 +65,7 @@ export default function InvitePage() {
           <div className="space-y-3">
             <div className="text-6xl">💛</div>
             <h1 className="text-3xl md:text-4xl font-bold leading-tight">
-              {inviterName} te ha invitado a Luciérnaga
+              {inviterName} te ha invitado a Tres Mil Millones de Latidos
             </h1>
             <p className="text-zinc-400 text-lg leading-relaxed">
               Esta invitación es tuya. No es publicidad — es alguien que cree que puedes
@@ -75,7 +75,7 @@ export default function InvitePage() {
 
           {/* What is it */}
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 text-left space-y-4">
-            <p className="text-sm font-semibold text-zinc-300">¿Qué es Luciérnaga?</p>
+            <p className="text-sm font-semibold text-zinc-300">¿Qué es Tres Mil Millones de Latidos?</p>
             <div className="space-y-3">
               {[
                 "Una IA que te hace las preguntas que nadie más se atreve a hacerte",
@@ -104,7 +104,7 @@ export default function InvitePage() {
               onClick={() => router.push("/")}
               className="text-sm text-zinc-600 hover:text-zinc-400 transition-colors"
             >
-              Ver más sobre Luciérnaga primero
+              Ver más sobre Tres Mil Millones de Latidos primero
             </button>
           </div>
 

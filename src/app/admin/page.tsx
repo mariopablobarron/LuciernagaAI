@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { AdminMetricCard } from "@/features/admin/components/AdminMetricCard";
 import { AdminPanel } from "@/features/admin/components/AdminPanel";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 import type { AdminInsightsResponse } from "@/features/admin/types";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { SAAS_CONFIG } from "@/lib/saas";
 
 type AdminInsightsPartial = Partial<AdminInsightsResponse> | null;
@@ -168,9 +168,9 @@ export default function AdminPage() {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-background p-6">
-        <Card className="mx-auto max-w-2xl border-signal-danger/30 bg-signal-danger/12">
-          <CardContent className="p-6 text-foreground">{error}</CardContent>
+      <main className="min-h-screen bg-zinc-950 p-6">
+        <Card className="mx-auto max-w-2xl border-red-500/30 bg-red-500/10">
+          <CardContent className="p-6 text-white">{error}</CardContent>
         </Card>
       </main>
     );
@@ -178,9 +178,9 @@ export default function AdminPage() {
 
   if (!data) {
     return (
-      <main className="min-h-screen bg-background p-6">
-        <Card className="mx-auto max-w-2xl border-border/80 bg-card/95">
-          <CardContent className="p-6 text-muted-foreground">Cargando dashboard...</CardContent>
+      <main className="min-h-screen bg-zinc-950 p-6">
+        <Card className="mx-auto max-w-2xl border-zinc-800/80 bg-zinc-900/95">
+          <CardContent className="p-6 text-zinc-500">Cargando dashboard...</CardContent>
         </Card>
       </main>
     );
@@ -193,7 +193,7 @@ export default function AdminPage() {
       onLogout={handleLogout}
     >
       {degraded ? (
-        <div className="rounded-2xl border border-signal-warning/30 bg-signal-warning/12 px-4 py-3 text-sm text-foreground">
+        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-white">
           {degraded}
         </div>
       ) : null}
@@ -231,13 +231,13 @@ export default function AdminPage() {
           />
         </div>
 
-        <div className="rounded-2xl border border-emotion-doubt/30 bg-emotion-doubt/10 p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <div className="rounded-2xl border border-violet-500/30 bg-violet-500/10 p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
             Decision automatica
           </p>
-          <p className="mt-2 text-xl font-semibold text-foreground">{data.decision.decision}</p>
-          <p className="mt-2 text-sm text-muted-foreground">{data.decision.reason}</p>
-          <p className="mt-3 text-sm font-medium text-foreground">
+          <p className="mt-2 text-xl font-semibold text-white">{data.decision.decision}</p>
+          <p className="mt-2 text-sm text-zinc-500">{data.decision.reason}</p>
+          <p className="mt-3 text-sm font-medium text-white">
             Accion sugerida: {data.decision.action}
           </p>
         </div>
@@ -250,9 +250,9 @@ export default function AdminPage() {
         description="Para cada semana de alta: % de usuarios que volvieron al día 1, 3, 7, 14 y 30. Fuente: mensajes reales del usuario."
       >
         {!retention ? (
-          <p className="text-sm text-muted-foreground">Cargando retención...</p>
+          <p className="text-sm text-zinc-500">Cargando retención...</p>
         ) : retention.cohorts.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Sin datos todavía. Esperando primeros usuarios.</p>
+          <p className="text-sm text-zinc-500">Sin datos todavía. Esperando primeros usuarios.</p>
         ) : (
           <>
             {/* Overall row */}
@@ -261,46 +261,46 @@ export default function AdminPage() {
                 const rate = retention.overall[m];
                 const pct = rate !== null ? Math.round(rate * 100) : null;
                 const color =
-                  pct === null ? "text-muted-foreground" :
+                  pct === null ? "text-zinc-500" :
                   pct >= 50 ? "text-emerald-400" :
                   pct >= 25 ? "text-amber-400" : "text-rose-400";
                 return (
-                  <div key={m} className="rounded-xl border border-border bg-muted/40 p-3 text-center">
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">D{m}</p>
+                  <div key={m} className="rounded-xl border border-zinc-800 bg-zinc-800/40 p-3 text-center">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">D{m}</p>
                     <p className={`mt-1 text-lg font-bold ${color}`}>
                       {pct !== null ? `${pct}%` : "—"}
                     </p>
                   </div>
                 );
               })}
-              <div className="rounded-xl border border-border bg-muted/40 p-3 text-center">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Total</p>
-                <p className="mt-1 text-lg font-bold text-foreground">{retention.totalUsers}</p>
+              <div className="rounded-xl border border-zinc-800 bg-zinc-800/40 p-3 text-center">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Total</p>
+                <p className="mt-1 text-lg font-bold text-white">{retention.totalUsers}</p>
               </div>
             </div>
 
             {/* Cohort table */}
-            <div className="overflow-x-auto rounded-xl border border-border">
+            <div className="overflow-x-auto rounded-xl border border-zinc-800">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border bg-muted/30">
-                    <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Semana</th>
-                    <th className="px-3 py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Altas</th>
+                  <tr className="border-b border-zinc-800 bg-zinc-800/30">
+                    <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Semana</th>
+                    <th className="px-3 py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Altas</th>
                     {([1, 3, 7, 14, 30] as RetentionMilestone[]).map((m) => (
-                      <th key={m} className="px-3 py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">D{m}</th>
+                      <th key={m} className="px-3 py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-zinc-500">D{m}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {retention.cohorts.map((cohort, i) => (
-                    <tr key={cohort.week} className={`border-b border-border ${i % 2 === 0 ? "bg-background" : "bg-muted/20"}`}>
-                      <td className="px-3 py-2 font-mono text-xs text-muted-foreground">{cohort.week}</td>
-                      <td className="px-3 py-2 text-center font-semibold text-foreground">{cohort.totalUsers}</td>
+                    <tr key={cohort.week} className={`border-b border-zinc-800 ${i % 2 === 0 ? "bg-zinc-950" : "bg-zinc-800/20"}`}>
+                      <td className="px-3 py-2 font-mono text-xs text-zinc-500">{cohort.week}</td>
+                      <td className="px-3 py-2 text-center font-semibold text-white">{cohort.totalUsers}</td>
                       {([1, 3, 7, 14, 30] as RetentionMilestone[]).map((m) => {
                         const cell = cohort.retention[m];
                         const pct = cell.rate !== null ? Math.round(cell.rate * 100) : null;
                         const color =
-                          pct === null ? "text-muted-foreground" :
+                          pct === null ? "text-zinc-500" :
                           pct >= 50 ? "text-emerald-400" :
                           pct >= 25 ? "text-amber-400" : "text-rose-400";
                         const bg =
@@ -313,7 +313,7 @@ export default function AdminPage() {
                               {pct !== null ? `${pct}%` : "—"}
                             </span>
                             {cell.count > 0 && (
-                              <span className="ml-1 text-[10px] text-muted-foreground">({cell.count})</span>
+                              <span className="ml-1 text-[10px] text-zinc-500">({cell.count})</span>
                             )}
                           </td>
                         );
@@ -323,7 +323,7 @@ export default function AdminPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="text-xs text-zinc-500 mt-2">
               — = aún no ha pasado suficiente tiempo para medir ese milestone en esta cohorte.
             </p>
           </>
@@ -374,26 +374,26 @@ export default function AdminPage() {
           title="Billing readiness"
           description="Extraccion de patron de Open SaaS: dejar billing desacoplado y listo, sin forzar Stripe antes de tiempo."
         >
-          <div className="rounded-2xl border border-border bg-muted/40 p-4">
-            <p className="text-sm font-semibold text-foreground">
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-800/40 p-4">
+            <p className="text-sm font-semibold text-white">
               Proveedor previsto: {SAAS_CONFIG.billing.provider}
             </p>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="mt-2 text-sm text-zinc-500">
               Estado actual: {SAAS_CONFIG.billing.enabled ? "activo" : "no integrado"}.
             </p>
           </div>
 
           <div className="space-y-3">
             {SAAS_CONFIG.billing.plans.map((plan) => (
-              <div key={plan.id} className="rounded-2xl border border-border bg-background p-4">
+              <div key={plan.id} className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="font-semibold text-foreground">{plan.name}</p>
+                  <p className="font-semibold text-white">{plan.name}</p>
                   <Badge variant="secondary" className="rounded-full px-2.5 py-1">
                     {plan.status}
                   </Badge>
                 </div>
-                <p className="mt-2 text-sm text-muted-foreground">{plan.description}</p>
-                <p className="mt-2 text-sm font-medium text-foreground">{plan.priceLabel}</p>
+                <p className="mt-2 text-sm text-zinc-500">{plan.description}</p>
+                <p className="mt-2 text-sm font-medium text-white">{plan.priceLabel}</p>
               </div>
             ))}
           </div>
@@ -414,35 +414,35 @@ export default function AdminPage() {
 
           <div className="space-y-3">
             {data.crisis.latestEvents.length === 0 ? (
-              <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+              <div className="rounded-2xl border border-zinc-800 bg-zinc-800/40 p-4 text-sm text-zinc-500">
                 Sin eventos high/critical en las ultimas 24h.
               </div>
             ) : (
               data.crisis.latestEvents.map((event, idx) => (
                 <div
                   key={`${event.userId}-${event.createdAt}-${idx}`}
-                  className={`rounded-2xl border-l-4 bg-card p-4 shadow-sm ${
+                  className={`rounded-2xl border-l-4 bg-zinc-900 p-4 shadow-sm ${
                     event.level === "critical"
-                      ? "border-signal-danger bg-signal-danger/10"
-                      : "border-signal-warning bg-signal-warning/10"
+                      ? "border-red-500 bg-red-500/10"
+                      : "border-amber-500 bg-amber-500/10"
                   }`}
                 >
                   <div className="flex flex-wrap items-center gap-2 text-xs">
-                    <span className="rounded bg-muted px-2 py-1 font-mono text-foreground">
+                    <span className="rounded bg-zinc-800 px-2 py-1 font-mono text-white">
                       {event.userId}
                     </span>
                     <span
                       className={`rounded px-2 py-1 font-semibold uppercase ${
                         event.level === "critical"
-                          ? "bg-signal-danger/15 text-foreground"
-                          : "bg-signal-warning/15 text-foreground"
+                          ? "bg-red-500/15 text-white"
+                          : "bg-amber-500/15 text-white"
                       }`}
                     >
                       {event.level}
                     </span>
-                    <span className="text-muted-foreground">{formatDateTime(event.createdAt)}</span>
+                    <span className="text-zinc-500">{formatDateTime(event.createdAt)}</span>
                   </div>
-                  <p className="mt-2 text-sm text-foreground">{event.message}</p>
+                  <p className="mt-2 text-sm text-white">{event.message}</p>
                 </div>
               ))
             )}
@@ -456,17 +456,17 @@ export default function AdminPage() {
         >
           <div className="space-y-3">
             {data.alerts.length === 0 ? (
-              <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+              <div className="rounded-2xl border border-zinc-800 bg-zinc-800/40 p-4 text-sm text-zinc-500">
                 Sin alertas criticas.
               </div>
             ) : (
               data.alerts.map((alert, idx) => (
                 <div
                   key={idx}
-                  className="rounded-2xl border-l-4 border-signal-danger bg-signal-danger/10 p-4 shadow-sm"
+                  className="rounded-2xl border-l-4 border-red-500 bg-red-500/10 p-4 shadow-sm"
                 >
-                  <h3 className="font-semibold text-foreground">{alert.title}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">{alert.message}</p>
+                  <h3 className="font-semibold text-white">{alert.title}</h3>
+                  <p className="mt-1 text-sm text-zinc-500">{alert.message}</p>
                 </div>
               ))
             )}
@@ -492,30 +492,30 @@ export default function AdminPage() {
 
         <div className="space-y-3">
           {data.avoidance.topActions.length === 0 ? (
-            <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-800/40 p-4 text-sm text-zinc-500">
               Sin acciones evitadas en los ultimos 7 dias.
             </div>
           ) : (
             data.avoidance.topActions.map((item) => (
               <div
                 key={item.actionId}
-                className="rounded-2xl border-l-4 border-signal-warning bg-card p-4 shadow-sm"
+                className="rounded-2xl border-l-4 border-signal-warning bg-zinc-900 p-4 shadow-sm"
               >
                 <div className="flex flex-wrap items-center gap-2 text-xs">
-                  <span className="rounded bg-muted px-2 py-1 font-semibold text-foreground">
+                  <span className="rounded bg-zinc-800 px-2 py-1 font-semibold text-white">
                     {item.total} eventos
                   </span>
-                  <span className="rounded bg-signal-warning/15 px-2 py-1 font-semibold text-foreground">
+                  <span className="rounded bg-amber-500/15 px-2 py-1 font-semibold text-white">
                     {item.postpone} postpone
                   </span>
-                  <span className="rounded bg-signal-danger/15 px-2 py-1 font-semibold text-foreground">
+                  <span className="rounded bg-red-500/15 px-2 py-1 font-semibold text-white">
                     {item.refuse} refuse
                   </span>
                   {item.goalTitle ? (
-                    <span className="text-muted-foreground">Objetivo: {item.goalTitle}</span>
+                    <span className="text-zinc-500">Objetivo: {item.goalTitle}</span>
                   ) : null}
                 </div>
-                <p className="mt-2 text-sm font-semibold text-foreground">{item.description}</p>
+                <p className="mt-2 text-sm font-semibold text-white">{item.description}</p>
               </div>
             ))
           )}
@@ -531,11 +531,11 @@ export default function AdminPage() {
           {data.insights.map((insight, idx) => (
             <div
               key={idx}
-              className="rounded-2xl border-l-4 border-emotion-doubt bg-card p-4 shadow-sm"
+              className="rounded-2xl border-l-4 border-violet-500 bg-zinc-900 p-4 shadow-sm"
             >
-              <h3 className="font-semibold text-foreground">{insight.title}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{insight.content}</p>
-              <p className="mt-2 text-sm font-medium text-[color-mix(in_oklab,var(--emotion-doubt)_78%,var(--foreground))]">
+              <h3 className="font-semibold text-white">{insight.title}</h3>
+              <p className="mt-1 text-sm text-zinc-500">{insight.content}</p>
+              <p className="mt-2 text-sm font-medium text-violet-400">
                 {insight.action}
               </p>
             </div>
@@ -550,21 +550,21 @@ export default function AdminPage() {
               {data.decisionHistory.map((item) => (
                 <div
                   key={item.id}
-                  className="rounded-2xl border border-border bg-card p-4 shadow-sm"
+                  className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4 shadow-sm"
                 >
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                    <span className="rounded bg-muted px-2 py-1 font-semibold text-foreground">
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500">
+                    <span className="rounded bg-zinc-800 px-2 py-1 font-semibold text-white">
                       {item.metric}
                     </span>
                     <span>{formatDateTime(item.createdAt)}</span>
                     <span>valor {item.value.toFixed(2)}</span>
                   </div>
-                  <p className="mt-2 text-sm font-semibold text-foreground">{item.decision}</p>
+                  <p className="mt-2 text-sm font-semibold text-white">{item.decision}</p>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-800/40 p-4 text-sm text-zinc-500">
               Sin decisiones historicas registradas todavia.
             </div>
           )}
@@ -576,38 +576,38 @@ export default function AdminPage() {
               {data.insightHistory.map((item) => (
                 <div
                   key={item.id}
-                  className="rounded-2xl border border-border bg-card p-4 shadow-sm"
+                  className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4 shadow-sm"
                 >
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                    <span className="rounded bg-muted px-2 py-1 font-semibold text-foreground">
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500">
+                    <span className="rounded bg-zinc-800 px-2 py-1 font-semibold text-white">
                       {item.type}
                     </span>
                     <span>{formatDateTime(item.createdAt)}</span>
                     <span
                       className={`rounded px-2 py-1 font-semibold ${
                         item.priority === "high"
-                          ? "bg-signal-danger/15 text-foreground"
+                          ? "bg-red-500/15 text-white"
                           : item.priority === "medium"
-                            ? "bg-signal-warning/15 text-foreground"
-                            : "bg-signal-success/15 text-foreground"
+                            ? "bg-amber-500/15 text-white"
+                            : "bg-emerald-500/15 text-white"
                       }`}
                     >
                       {item.priority}
                     </span>
-                    <span className="rounded bg-muted px-2 py-1 font-semibold text-foreground">
+                    <span className="rounded bg-zinc-800 px-2 py-1 font-semibold text-white">
                       confianza {item.confidence}
                     </span>
                   </div>
-                  <p className="mt-2 text-sm font-semibold text-foreground">{item.title}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{item.content}</p>
-                  <p className="mt-2 text-sm font-medium text-[color-mix(in_oklab,var(--emotion-doubt)_78%,var(--foreground))]">
+                  <p className="mt-2 text-sm font-semibold text-white">{item.title}</p>
+                  <p className="mt-1 text-sm text-zinc-500">{item.content}</p>
+                  <p className="mt-2 text-sm font-medium text-violet-400">
                     {item.action}
                   </p>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-800/40 p-4 text-sm text-zinc-500">
               Sin insights historicos registrados todavia.
             </div>
           )}

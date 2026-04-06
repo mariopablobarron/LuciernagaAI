@@ -3,7 +3,7 @@ import ContactForm from "@/components/contact/ContactForm";
 import { TYPOGRAPHY, GRADIENTS, LAYOUTS } from "@/styles/design-system";
 
 export const metadata: Metadata = {
-  title: "Contacto — Luciérnaga AI",
+  title: "Contacto — Tres Mil Millones de Latidos",
   description: "¿Tienes dudas o quieres saber más? Escríbenos y te respondemos en menos de 24 horas.",
   robots: { index: false, follow: false },
 };

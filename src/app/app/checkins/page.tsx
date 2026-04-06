@@ -122,7 +122,7 @@ export default function CheckinsPage() {
           <Calendar className="w-10 h-10 text-violet-400 mx-auto" />
           <h2 className="text-lg font-semibold text-white">Registra cómo estás hoy</h2>
           <p className="text-zinc-400 text-sm">
-            El check-in diario ayuda a Luciérnaga a entender tu estado y acompañarte mejor.
+            El check-in diario ayuda a Tres Mil Millones de Latidos a entender tu estado y acompañarte mejor.
           </p>
           <Link
             href="/impulso/checkin"

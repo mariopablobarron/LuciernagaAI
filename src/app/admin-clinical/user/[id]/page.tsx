@@ -38,13 +38,13 @@ function formatDate(iso: string) {
 function ProfileBar({ label, value }: { label: string; value: number }) {
   return (
     <div className="space-y-1">
-      <div className="flex justify-between text-xs text-muted-foreground">
+      <div className="flex justify-between text-xs text-zinc-500">
         <span>{label}</span>
         <span>{value}</span>
       </div>
-      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+      <div className="h-1.5 rounded-full bg-zinc-800 overflow-hidden">
         <div
-          className="h-full rounded-full bg-primary transition-all"
+          className="h-full rounded-full bg-violet-500 transition-all"
           style={{ width: `${Math.min(100, (value / 10) * 100)}%` }}
         />
       </div>
@@ -127,13 +127,13 @@ export default function ClinicalUserDetailPage({ params }: { params: Promise<Par
       <div className="flex items-center gap-2">
         <Link
           href="/admin-clinical"
-          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition"
+          className="flex items-center gap-1 text-sm text-zinc-500 hover:text-white transition"
         >
           <ArrowLeft className="size-4" /> Panel clínico
         </Link>
       </div>
 
-      {loading && <div className="text-sm text-muted-foreground p-4">Cargando...</div>}
+      {loading && <div className="text-sm text-zinc-500 p-4">Cargando...</div>}
       {error && (
         <div className="flex items-center gap-2 text-sm text-destructive p-4">
           <AlertTriangle className="size-4" /> {error}
@@ -163,14 +163,14 @@ export default function ClinicalUserDetailPage({ params }: { params: Promise<Par
                       </Badge>
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground font-mono mt-1">{detail.user.id}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-xs text-zinc-500 font-mono mt-1">{detail.user.id}</p>
+                  <p className="text-xs text-zinc-500 mt-1">
                     Registrado {formatDate(detail.user.createdAt)} · Vía {detail.user.source ?? "web"}
                   </p>
                 </div>
-                <div className="text-right text-xs text-muted-foreground">
+                <div className="text-right text-xs text-zinc-500">
                   <div>Última actividad</div>
-                  <div className="font-medium text-foreground">{formatDate(detail.user.lastSeen)}</div>
+                  <div className="font-medium text-white">{formatDate(detail.user.lastSeen)}</div>
                 </div>
               </CardContent>
             </Card>
@@ -192,7 +192,7 @@ export default function ClinicalUserDetailPage({ params }: { params: Promise<Par
                     ["Mood", detail.state.mood],
                   ].map(([label, value]) => value && (
                     <div key={label}>
-                      <div className="text-xs text-muted-foreground">{label}</div>
+                      <div className="text-xs text-zinc-500">{label}</div>
                       <div className="font-medium capitalize">{value}</div>
                     </div>
                   ))}
@@ -212,8 +212,8 @@ export default function ClinicalUserDetailPage({ params }: { params: Promise<Par
                   <ProfileBar label="Energía" value={detail.emotionalProfile.energiaScore} />
                   <ProfileBar label="Disciplina" value={detail.emotionalProfile.disciplinaScore} />
                   <ProfileBar label="Social" value={detail.emotionalProfile.socialScore} />
-                  <div className="pt-1 text-xs text-muted-foreground">
-                    Total: <span className="font-semibold text-foreground">{detail.emotionalProfile.totalScore}</span>
+                  <div className="pt-1 text-xs text-zinc-500">
+                    Total: <span className="font-semibold text-white">{detail.emotionalProfile.totalScore}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -235,8 +235,8 @@ export default function ClinicalUserDetailPage({ params }: { params: Promise<Par
                       {g.actions.length > 0 && (
                         <ul className="mt-2 space-y-1">
                           {g.actions.map((a) => (
-                            <li key={a.id} className="flex items-start gap-2 text-xs text-muted-foreground">
-                              <span className={a.completed ? "text-green-500" : "text-muted-foreground"}>
+                            <li key={a.id} className="flex items-start gap-2 text-xs text-zinc-500">
+                              <span className={a.completed ? "text-green-500" : "text-zinc-500"}>
                                 {a.completed ? "✓" : "·"}
                               </span>
                               <span className={a.completed ? "line-through" : ""}>{a.description}</span>
@@ -255,7 +255,7 @@ export default function ClinicalUserDetailPage({ params }: { params: Promise<Par
               <Card>
                 <CardHeader className="pb-0">
                   <button
-                    className="flex w-full items-center justify-between py-2 text-sm font-semibold text-foreground"
+                    className="flex w-full items-center justify-between py-2 text-sm font-semibold text-white"
                     onClick={() => setShowCrisis((v) => !v)}
                   >
                     <span>Eventos de crisis ({detail.crisisEvents.length})</span>
@@ -268,9 +268,9 @@ export default function ClinicalUserDetailPage({ params }: { params: Promise<Par
                       <div key={c.id} className="rounded-lg border border-destructive/20 bg-destructive/5 p-3 text-xs">
                         <div className="flex items-center gap-2 mb-1">
                           <Badge variant="danger">{c.level}</Badge>
-                          <span className="text-muted-foreground">{formatDate(c.createdAt)}</span>
+                          <span className="text-zinc-500">{formatDate(c.createdAt)}</span>
                         </div>
-                        <p className="text-foreground">{c.message}</p>
+                        <p className="text-white">{c.message}</p>
                       </div>
                     ))}
                   </CardContent>
@@ -282,7 +282,7 @@ export default function ClinicalUserDetailPage({ params }: { params: Promise<Par
             <Card>
               <CardHeader className="pb-0">
                 <button
-                  className="flex w-full items-center justify-between py-2 text-sm font-semibold text-foreground"
+                  className="flex w-full items-center justify-between py-2 text-sm font-semibold text-white"
                   onClick={() => setShowMessages((v) => !v)}
                 >
                   <span>Historial de mensajes ({detail.messages.length})</span>
@@ -299,8 +299,8 @@ export default function ClinicalUserDetailPage({ params }: { params: Promise<Par
                       <div
                         className={`max-w-[80%] rounded-xl px-3 py-2 text-xs ${
                           m.role === "user"
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted text-foreground"
+                            ? "bg-violet-500 text-white"
+                            : "bg-zinc-800 text-white"
                         }`}
                       >
                         <p>{m.content}</p>
@@ -329,8 +329,8 @@ export default function ClinicalUserDetailPage({ params }: { params: Promise<Par
                       onClick={() => setIType(t.value)}
                       className={`rounded-lg border px-2 py-1.5 text-xs font-semibold transition ${
                         iType === t.value
-                          ? "border-primary/30 bg-primary text-primary-foreground"
-                          : "border-border bg-background/70 text-muted-foreground hover:bg-accent"
+                          ? "border-violet-500/30 bg-violet-500 text-white"
+                          : "border-zinc-800 bg-zinc-950/70 text-zinc-500 hover:bg-zinc-800"
                       }`}
                     >
                       {t.label}
@@ -346,7 +346,7 @@ export default function ClinicalUserDetailPage({ params }: { params: Promise<Par
                   className="resize-none text-sm"
                 />
 
-                <label className="flex cursor-pointer items-center gap-2 text-xs text-muted-foreground">
+                <label className="flex cursor-pointer items-center gap-2 text-xs text-zinc-500">
                   <input
                     type="checkbox"
                     checked={iNotify}
@@ -386,13 +386,13 @@ export default function ClinicalUserDetailPage({ params }: { params: Promise<Par
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {detail.interventions.map((i) => (
-                    <div key={i.id} className="rounded-lg border border-border bg-muted/30 p-3 text-xs">
+                    <div key={i.id} className="rounded-lg border border-zinc-800 bg-zinc-800/30 p-3 text-xs">
                       <div className="flex items-center justify-between gap-2 mb-1">
                         <Badge variant="secondary">{i.type}</Badge>
-                        <span className="text-muted-foreground">{formatDate(i.sentAt)}</span>
+                        <span className="text-zinc-500">{formatDate(i.sentAt)}</span>
                       </div>
-                      <p className="text-foreground">{i.content}</p>
-                      <p className="mt-1 text-muted-foreground">
+                      <p className="text-white">{i.content}</p>
+                      <p className="mt-1 text-zinc-500">
                         Estado: <span className="font-medium">{i.status}</span>
                       </p>
                     </div>

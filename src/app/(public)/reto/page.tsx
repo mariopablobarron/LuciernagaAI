@@ -20,7 +20,7 @@ const STEPS = [
   {
     icon: "🔥",
     title: "30 días de acción diaria",
-    desc: "Cada día cuenta. Tu racha se actualiza cada vez que abres Luciérnaga y actúas.",
+    desc: "Cada día cuenta. Tu racha se actualiza cada vez que abres Tres Mil Millones de Latidos y actúas.",
   },
   {
     icon: "🌟",

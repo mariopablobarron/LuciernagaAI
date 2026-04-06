@@ -1,4 +1,4 @@
-# Auditoría del Sistema — Luciérnaga AI
+# Auditoría del Sistema — Tres Mil Millones de Latidos
 
 > Generada el 2026-03-31. Revisión manual requerida antes de actuar sobre hallazgos de seguridad.
 

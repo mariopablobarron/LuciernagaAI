@@ -66,7 +66,7 @@ export default function GoalsPage() {
             <Target className="w-12 h-12 text-zinc-600 mx-auto" />
             <p className="text-zinc-400 text-lg">No tienes un objetivo activo.</p>
             <p className="text-zinc-600 text-sm">
-              Cuéntale a Luciérnaga lo que quieres lograr y te ayudará a definirlo.
+              Cuéntale a Tres Mil Millones de Latidos lo que quieres lograr y te ayudará a definirlo.
             </p>
             <Link
               href="/app"

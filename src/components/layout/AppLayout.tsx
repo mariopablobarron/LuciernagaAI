@@ -24,15 +24,15 @@ export default function AppLayout({
   const mainContent = main ?? children;
 
   return (
-    <div className="min-h-screen bg-background px-3 py-4 text-foreground sm:px-4 lg:px-6">
+    <div className="px-3 py-4 text-zinc-100 sm:px-4 lg:px-6">
       <div className="mx-auto w-full max-w-screen-2xl space-y-4">
         {title || subtitle || summary ? (
-          <header className="rounded-3xl border border-border/80 bg-card/95 p-5 shadow-sm">
+          <header className="card-surface rounded-2xl border border-zinc-800 p-5">
             {title ? (
-              <h1 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h1>
+              <h1 className="text-2xl font-bold tracking-tight text-white">{title}</h1>
             ) : null}
             {subtitle ? (
-              <p className="mt-2 max-w-5xl text-sm text-muted-foreground">{subtitle}</p>
+              <p className="mt-2 max-w-5xl text-sm text-zinc-500">{subtitle}</p>
             ) : null}
             {summary ? (
               <div className="mt-4 flex flex-wrap items-center gap-2">{summary}</div>

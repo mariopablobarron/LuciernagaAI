@@ -1,4 +1,4 @@
-# Manual de administración — Luciérnaga AI
+# Manual de administración — Tres Mil Millones de Latidos
 
 **Versión:** 1.1  
 **Fecha:** abril 2026  

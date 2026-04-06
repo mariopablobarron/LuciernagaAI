@@ -445,7 +445,7 @@ export default function TestPage() {
             <div className="text-3xl">📬</div>
             <h2 className="text-2xl font-bold">¿Te enviamos el diagnóstico?</h2>
             <p className="text-zinc-400 text-sm leading-relaxed">
-              Recibe tu resultado completo por email y Luciérnaga te ayudará a hacer seguimiento de tu estado.
+              Recibe tu resultado completo por email y Tres Mil Millones de Latidos te ayudará a hacer seguimiento de tu estado.
             </p>
           </div>
 
@@ -575,7 +575,7 @@ export default function TestPage() {
             <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-4">
               <div className="space-y-2">
                 <p className="text-sm font-semibold text-white">
-                  Luciérnaga detecta tu estado en cada sesión
+                  Tres Mil Millones de Latidos detecta tu estado en cada sesión
                 </p>
                 <ul className="space-y-1.5">
                   {[

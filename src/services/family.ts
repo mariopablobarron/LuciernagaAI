@@ -53,7 +53,7 @@ export async function notifyTrustedContactOnCrisis(userId: string): Promise<void
   // Telegram notification (if contact has a telegramId stored as phone field with @ prefix)
   if (contact.phone?.startsWith("@") || /^\d{6,}$/.test(contact.phone ?? "")) {
     const msg =
-      `⚠️ *Alerta de Luciérnaga*\n\n` +
+      `⚠️ *Alerta de Tres Mil Millones de Latidos*\n\n` +
       `${userName} puede necesitar apoyo ahora. Se ha detectado una señal de crisis.\n\n` +
       `Accede a tu portal: ${url}`;
     sendTelegramNotification(contact.phone!.replace("@", ""), msg);

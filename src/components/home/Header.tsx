@@ -7,6 +7,8 @@ import { useState } from "react";
 
 const NAV = [
   { label: "Chat", href: "/app" },
+  { label: "Itinerarios", href: "/journey" },
+  { label: "Dashboard", href: "/dashboard" },
   { label: "Precios", href: "/precios" },
   { label: "Test gratuito", href: "/test", highlight: true },
 ];
@@ -21,10 +23,10 @@ export default function Header() {
         <div className="flex h-16 items-center justify-between gap-6">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 shrink-0">
+          <Link href="/" className="flex items-center gap-2 shrink-0">
             <span className="text-xl leading-none">💓</span>
-            <span className="text-base font-bold bg-linear-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
-              Luciérnaga
+            <span className="text-sm font-bold bg-linear-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
+              Tres Mil Millones<span className="hidden lg:inline"> de Latidos</span>
             </span>
           </Link>
 
@@ -81,7 +83,7 @@ export default function Header() {
               href="/unirse"
               className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-violet-600 hover:bg-violet-500 transition-all"
             >
-              Empezar gratis
+              Empieza a latir
             </Link>
             <button
               onClick={() => setOpen((v) => !v)}

@@ -1,4 +1,4 @@
-# 🎓 Luciérnaga AI — Manual de Presentación para Tesis
+# 🎓 Tres Mil Millones de Latidos — Manual de Presentación para Tesis
 
 **Fecha de entrega:** 4 de abril de 2026  
 **Versión manual:** v0.15  
@@ -8,7 +8,7 @@
 
 ## 📌 Resumen Ejecutivo del Proyecto
 
-**Luciérnaga AI** es un SaaS de mentoría conversacional con IA que detecta estado emocional del usuario, orienta a acción concreta y registra progreso en objetivos y check-ins.
+**Tres Mil Millones de Latidos** es un SaaS de mentoría conversacional con IA que detecta estado emocional del usuario, orienta a acción concreta y registra progreso en objetivos y check-ins.
 
 ### Logros principales
 

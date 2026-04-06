@@ -342,7 +342,7 @@ export default function AdminConversationPage() {
                         {/* Role label — only on first in a run */}
                         {(!prev || prev.role !== msg.role) && (
                           <span className="text-[11px] font-semibold text-zinc-600 px-1">
-                            {isUser ? "Usuario" : "Luciérnaga"}
+                            {isUser ? "Usuario" : "Tres Mil Millones de Latidos"}
                           </span>
                         )}
                         <div

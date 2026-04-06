@@ -1,4 +1,4 @@
-# Luciérnaga AI — Plataforma de Mentoría Conversacional
+# Tres Mil Millones de Latidos — Plataforma de Mentoría Conversacional
 
 **Stack:** Next.js 15 (App Router) · TypeScript · Prisma · PostgreSQL · OpenRouter
 **Deploy:** Docker + Coolify · Auto-deploy desde `main`

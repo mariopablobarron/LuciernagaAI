@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
 
     await sendUserEmail({
       to: email,
-      subject: "Recupera tu contraseña de Luciérnaga",
+      subject: "Recupera tu contraseña de Tres Mil Millones de Latidos",
       text: `Hola${user.name ? ` ${user.name}` : ""},\n\nPide restablecer tu contraseña. Haz clic en el enlace (válido 1 hora):\n\n${resetUrl}\n\nSi no pediste esto, ignora este mensaje.`,
       html: `
         <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">

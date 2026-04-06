@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "¿Qué te frena ahora? — Test gratuito de bloqueo mental | Luciérnaga",
+  title: "¿Qué te frena ahora? — Test gratuito de bloqueo mental | Tres Mil Millones de Latidos",
   description:
     "5 preguntas. Descubre si estás bloqueado, ansioso o en niebla de dirección. Resultado inmediato con una acción concreta para hoy. Sin registro.",
   openGraph: {

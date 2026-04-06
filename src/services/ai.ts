@@ -247,7 +247,7 @@ export async function generateAIResponse(
 
 // --- Modo Impulso ---
 
-const IMPULSE_SYSTEM_PROMPT = `Eres Luciérnaga en Modo Impulso.
+const IMPULSE_SYSTEM_PROMPT = `Eres Tres Mil Millones de Latidos en Modo Impulso.
 No es una conversación libre. Es entrenamiento.
 
 Reglas absolutas:

@@ -1,5 +1,5 @@
 /**
- * Telegram onboarding sequences for Luciérnaga AI.
+ * Telegram onboarding sequences for Tres Mil Millones de Latidos.
  *
  * - sendWelcomeSequence: fires the day-1 message immediately and queues day 3 & 7.
  * - scheduleFollowUp: persists a FutureMessage so the cron job delivers it on the right day.
@@ -13,7 +13,7 @@ import { sendTelegramNotification } from "@/services/telegram";
 
 // ─── Message copy ─────────────────────────────────────────────────────────────
 
-const WELCOME_DAY1 = `🌟 *¡Bienvenido/a a Luciérnaga!*
+const WELCOME_DAY1 = `🌟 *¡Bienvenido/a a Tres Mil Millones de Latidos!*
 
 Soy tu mentor personal. Estoy aquí para ayudarte a pasar de darle vueltas… a actuar.
 

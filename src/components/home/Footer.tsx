@@ -12,10 +12,10 @@ export default function Footer() {
           <div className="space-y-4">
             <Link href="/" className="flex items-center gap-2.5 group transition-opacity hover:opacity-80">
               <div className="text-2xl">💓</div>
-              <span className="font-black text-foreground tracking-tight">Luciérnaga</span>
+              <span className="font-black text-foreground tracking-tight">Tres Mil Millones de Latidos</span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Cada latido es una elección. Luciérnaga existe para que los tuyos tengan dirección real.
+              Cada latido es una elección. Tres Mil Millones de Latidos existe para que los tuyos tengan dirección real.
             </p>
             <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium">
               <Heart className="w-3 h-3 text-cyan-500" />
@@ -40,6 +40,11 @@ export default function Footer() {
               <li>
                 <Link href="/reto" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   El reto 30 días
+                </Link>
+              </li>
+              <li>
+                <Link href="/test" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Test gratuito
                 </Link>
               </li>
               <li>

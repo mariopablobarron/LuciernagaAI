@@ -12,7 +12,7 @@ export default function PrivacyPage() {
           <section className="space-y-4">
             <h2 className={`${TYPOGRAPHY.h2} text-white`}>Tu privacidad es nuestra prioridad</h2>
             <p className="text-zinc-300 leading-relaxed">
-              En Luciérnaga AI tu privacidad importa. Esta política explica qué datos recopilamos,
+              En Tres Mil Millones de Latidos tu privacidad importa. Esta política explica qué datos recopilamos,
               para qué los usamos y cómo los protegemos. Si tienes dudas, escríbenos a{' '}
               <a href="mailto:privacy@luciernaga.ai" className="text-cyan-400 hover:underline">
                 privacy@luciernaga.ai
@@ -25,7 +25,7 @@ export default function PrivacyPage() {
             <h2 className={`${TYPOGRAPHY.h2} text-white`}>Datos que recopilamos</h2>
             <ul className="space-y-2 text-zinc-300">
               <li>✓ Dirección de email (para identificar tu cuenta)</li>
-              <li>✓ Mensajes y conversaciones dentro de Luciérnaga AI</li>
+              <li>✓ Mensajes y conversaciones dentro de Tres Mil Millones de Latidos</li>
               <li>✓ Patrones de uso anonimizados (frecuencia, no contenido)</li>
               <li>✗ No recopilamos datos de ubicación, pagos ni información sensible adicional</li>
             </ul>

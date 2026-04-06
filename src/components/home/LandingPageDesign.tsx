@@ -161,7 +161,7 @@ export default function LandingPageDesign() {
                 </h1>
                 <p className="text-lg text-zinc-300 leading-relaxed max-w-lg">
                   El corazón humano late tres mil millones de veces en una vida.
-                  Luciérnaga existe para que los que te quedan tengan dirección real.
+                  Tres Mil Millones de Latidos existe para que los que te quedan tengan dirección real.
                   No teoría. No perfección. Acción concreta, latido a latido.
                 </p>
               </div>
@@ -283,7 +283,7 @@ export default function LandingPageDesign() {
               {
                 num: '01',
                 title: 'Describes cómo te sientes',
-                desc: 'Sin filtros, sin juicio. Cuéntale a Luciérnaga qué te pasa, qué evitas, qué te frena.',
+                desc: 'Sin filtros, sin juicio. Cuéntale a Tres Mil Millones de Latidos qué te pasa, qué evitas, qué te frena.',
               },
               {
                 num: '02',

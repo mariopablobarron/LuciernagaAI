@@ -121,7 +121,7 @@ export default function PreciosPage() {
         {[
           {
             q: '¿Qué significa tresmilmillonesdelatidos.es?',
-            a: 'El corazón humano late aproximadamente tres mil millones de veces en una vida. Luciérnaga existe para que los tuyos tengan dirección. Cada conversación, cada acción, cada decisión — es un latido que puedes desperdiciar o hacer contar.',
+            a: 'El corazón humano late aproximadamente tres mil millones de veces en una vida. Tres Mil Millones de Latidos existe para que los tuyos tengan dirección. Cada conversación, cada acción, cada decisión — es un latido que puedes desperdiciar o hacer contar.',
           },
           {
             q: '¿Necesito tarjeta para el plan gratuito?',
@@ -136,8 +136,8 @@ export default function PreciosPage() {
             a: 'Al día 8 se carga el primer mes (9€). Recibirás un email de Stripe antes del cargo.',
           },
           {
-            q: '¿Luciérnaga reemplaza a un psicólogo?',
-            a: 'No. Luciérnaga es una herramienta de mentoría conversacional. No sustituye terapia profesional.',
+            q: '¿Tres Mil Millones de Latidos reemplaza a un psicólogo?',
+            a: 'No. Tres Mil Millones de Latidos es una herramienta de mentoría conversacional. No sustituye terapia profesional.',
           },
         ].map(({ q, a }) => (
           <div key={q} className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">

@@ -7,10 +7,10 @@ export type SaasPlan = {
 };
 
 export const SAAS_CONFIG = {
-  name: "Luciérnaga AI",
+  name: "Tres Mil Millones de Latidos",
   description:
     "Plataforma de mentoría conversacional con IA. Claridad emocional, acción real y seguimiento continuo para transformar tu vida en 30 días.",
-  marketingTitle: "Luciérnaga AI — Mentoría con IA para transformar tu vida",
+  marketingTitle: "Tres Mil Millones de Latidos — Mentoría con IA para transformar tu vida",
   auth: {
     mode: "session-cookie",
     selfServeAuthReady: false,

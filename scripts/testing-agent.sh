@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# Luciérnaga Testing Agent
+# Tres Mil Millones de Latidos Testing Agent
 # =============================================================================
 # Monitoriza cambios, ejecuta tests relevantes, verifica salud del sistema,
 # notifica errores por Telegram y se instala como git hook automático.
@@ -321,7 +321,7 @@ generate_report() {
   mkdir -p "$LOG_DIR"
   {
     echo "======================================================================"
-    echo "  Luciérnaga Testing Agent — Reporte"
+    echo "  Tres Mil Millones de Latidos Testing Agent — Reporte"
     echo "  Generado: $(timestamp)"
     echo "======================================================================"
     echo "TESTS:  $test_result"
@@ -848,7 +848,7 @@ cmd_report() {
 # ---------------------------------------------------------------------------
 cmd_help() {
   echo ""
-  echo -e "${BOLD}  Luciérnaga Testing Agent${RESET}"
+  echo -e "${BOLD}  Tres Mil Millones de Latidos Testing Agent${RESET}"
   echo ""
   echo "  Uso: ./scripts/testing-agent.sh <comando>"
   echo ""

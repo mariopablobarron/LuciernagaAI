@@ -3,9 +3,9 @@ import { notFound } from "next/navigation";
 import LandingPageDesign from "@/components/home/LandingPageDesign";
 
 export const metadata: Metadata = {
-  title: "Luciérnaga — Tres mil millones de latidos. Haz que cuenten los tuyos.",
+  title: "Tres Mil Millones de Latidos — Tres mil millones de latidos. Haz que cuenten los tuyos.",
   description:
-    "El corazón late tres mil millones de veces en una vida. Luciérnaga existe para que los tuyos tengan dirección real. Mentoría con IA, latido a latido.",
+    "El corazón late tres mil millones de veces en una vida. Tres Mil Millones de Latidos existe para que los tuyos tengan dirección real. Mentoría con IA, latido a latido.",
   keywords: [
     "mentor IA",
     "coach inteligencia artificial",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     "tresmilmillonesdelatidos",
   ],
   openGraph: {
-    title: "Luciérnaga — Haz que cuenten tus próximos latidos",
+    title: "Tres Mil Millones de Latidos — Haz que cuenten tus próximos latidos",
     description:
       "Mentoría con IA para jóvenes que saben que algo tiene que cambiar. Latido a latido.",
     type: "website",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Luciérnaga — Haz que cuenten tus próximos latidos",
+    title: "Tres Mil Millones de Latidos — Haz que cuenten tus próximos latidos",
     description:
       "Mentoría con IA para jóvenes que saben que algo tiene que cambiar. Latido a latido.",
   },

@@ -113,7 +113,7 @@ export default function SettingsPage() {
                 <p className="text-sm font-semibold text-white">Cómo conectar</p>
                 <ol className="space-y-2">
                   {[
-                    { step: '1', text: 'Abre el bot de Luciérnaga en Telegram' },
+                    { step: '1', text: 'Abre el bot de Tres Mil Millones de Latidos en Telegram' },
                     { step: '2', text: 'Pulsa Iniciar o escribe /start' },
                     { step: '3', text: 'Envía el comando /vincular' },
                     { step: '4', text: 'Haz clic en el enlace que te mande el bot' },

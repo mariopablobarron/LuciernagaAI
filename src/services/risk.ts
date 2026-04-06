@@ -76,6 +76,9 @@ const MEDIUM_PATTERNS: RegExp[] = [
   /\b(me siento hundid[oa]|estoy muy mal|me sobrepasa)\b/,
   /\b(ansiedad muy fuerte|ataque de ansiedad|panico)\b/,
   /\b(no veo salida|estoy desbordad[oa]|me siento roto)\b/,
+  /\b(no puedo vivir sin (el|ella|ti)|sin (el|ella|ti) no soy nada)\b/,
+  /\b(dependo completamente de|necesito que (me quiera|este conmigo|no me deje))\b/,
+  /\b(si me deja me muero|sin (el|ella) no tengo sentido)\b/,
 ];
 
 const RISK_ORDER: RiskLevel[] = ["low", "medium", "high", "critical"];

@@ -330,28 +330,28 @@ export default function AdminUserDetailPage() {
       </div>
 
       {error ? (
-        <Card className="border-signal-danger/30 bg-signal-danger/12">
-          <CardContent className="p-4 text-foreground">{error}</CardContent>
+        <Card className="border-red-500/30 bg-red-500/10">
+          <CardContent className="p-4 text-white">{error}</CardContent>
         </Card>
       ) : null}
 
       {loading || !data ? (
-        <Card className="border-border/80 bg-card/95">
-          <CardContent className="p-5 text-muted-foreground">
+        <Card className="border-zinc-800 bg-zinc-900/50">
+          <CardContent className="p-5 text-zinc-500">
             Cargando ficha de usuario...
           </CardContent>
         </Card>
       ) : (
         <>
-          <Card className="border-border/80 bg-card/95 shadow-sm">
+          <Card className="border-zinc-800 bg-zinc-900/50 shadow-sm">
             <CardContent className="space-y-4 p-5">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                 <div>
-                  <p className="text-xl font-semibold text-foreground">
+                  <p className="text-xl font-semibold text-white">
                     {data.user.name || data.user.email}
                   </p>
-                  <p className="text-sm text-muted-foreground">{data.user.email}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">ID {data.user.id}</p>
+                  <p className="text-sm text-zinc-500">{data.user.email}</p>
+                  <p className="mt-1 text-xs text-zinc-500">ID {data.user.id}</p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
@@ -374,26 +374,26 @@ export default function AdminUserDetailPage() {
               </div>
 
               <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-                <div className="rounded-xl border border-border bg-muted/35 px-3 py-2">
-                  <p className="text-xs text-muted-foreground">Conversaciones</p>
-                  <p className="font-semibold text-foreground">{data.user.counts.conversations}</p>
+                <div className="rounded-xl border border-zinc-800 bg-zinc-800/35 px-3 py-2">
+                  <p className="text-xs text-zinc-500">Conversaciones</p>
+                  <p className="font-semibold text-white">{data.user.counts.conversations}</p>
                 </div>
-                <div className="rounded-xl border border-border bg-muted/35 px-3 py-2">
-                  <p className="text-xs text-muted-foreground">Mensajes</p>
-                  <p className="font-semibold text-foreground">{data.user.counts.messages}</p>
+                <div className="rounded-xl border border-zinc-800 bg-zinc-800/35 px-3 py-2">
+                  <p className="text-xs text-zinc-500">Mensajes</p>
+                  <p className="font-semibold text-white">{data.user.counts.messages}</p>
                 </div>
-                <div className="rounded-xl border border-border bg-muted/35 px-3 py-2">
-                  <p className="text-xs text-muted-foreground">Check-ins 7d</p>
-                  <p className="font-semibold text-foreground">{data.activity7d.checkins}</p>
+                <div className="rounded-xl border border-zinc-800 bg-zinc-800/35 px-3 py-2">
+                  <p className="text-xs text-zinc-500">Check-ins 7d</p>
+                  <p className="font-semibold text-white">{data.activity7d.checkins}</p>
                 </div>
-                <div className="rounded-xl border border-border bg-muted/35 px-3 py-2">
-                  <p className="text-xs text-muted-foreground">Crisis 7d</p>
+                <div className="rounded-xl border border-zinc-800 bg-zinc-800/35 px-3 py-2">
+                  <p className="text-xs text-zinc-500">Crisis 7d</p>
                   <p className="font-semibold text-[color:color-mix(in_oklab,var(--signal-danger)_60%,var(--foreground))]">
                     {data.activity7d.crisisEvents}
                   </p>
                 </div>
-                <div className="rounded-xl border border-border bg-muted/35 px-3 py-2">
-                  <p className="text-xs text-muted-foreground">Evasión 7d</p>
+                <div className="rounded-xl border border-zinc-800 bg-zinc-800/35 px-3 py-2">
+                  <p className="text-xs text-zinc-500">Evasión 7d</p>
                   <p className="font-semibold text-[color:color-mix(in_oklab,var(--signal-warning)_60%,var(--foreground))]">
                     {data.activity7d.avoidanceEvents}
                   </p>
@@ -401,11 +401,11 @@ export default function AdminUserDetailPage() {
               </div>
 
               <div className="grid grid-cols-1 gap-3 text-sm md:grid-cols-3">
-                <p className="text-muted-foreground">
+                <p className="text-zinc-500">
                   Última actividad: {formatDate(data.user.lastSeen)}
                 </p>
-                <p className="text-muted-foreground">Creado: {formatDate(data.user.createdAt)}</p>
-                <p className="text-muted-foreground">
+                <p className="text-zinc-500">Creado: {formatDate(data.user.createdAt)}</p>
+                <p className="text-zinc-500">
                   Actualizado: {formatDate(data.user.updatedAt)}
                 </p>
               </div>
@@ -413,14 +413,14 @@ export default function AdminUserDetailPage() {
           </Card>
 
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-            <Card className="border-border/80 bg-card/95">
+            <Card className="border-zinc-800 bg-zinc-900/50">
               <CardHeader className="pb-3">
                 <CardTitle>Estado emocional-operativo</CardTitle>
                 <CardDescription>Lectura activa para soporte y retención.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
                 {!data.state ? (
-                  <p className="text-muted-foreground">Sin estado registrado.</p>
+                  <p className="text-zinc-500">Sin estado registrado.</p>
                 ) : (
                   <>
                     <div className="flex flex-wrap gap-2">
@@ -428,18 +428,18 @@ export default function AdminUserDetailPage() {
                       <Badge variant="secondary">Fase {data.state.transformationPhase}</Badge>
                       <Badge variant="secondary">Riesgo {data.state.riskLevel}</Badge>
                     </div>
-                    <p className="text-muted-foreground">
+                    <p className="text-zinc-500">
                       Emoción primaria: {data.state.primaryEmotion}
                     </p>
-                    <p className="text-muted-foreground">
+                    <p className="text-zinc-500">
                       Patrón dominante: {data.state.dominantPattern}
                     </p>
-                    <p className="text-muted-foreground">Área foco: {data.state.focusArea}</p>
-                    <p className="text-muted-foreground">
+                    <p className="text-zinc-500">Área foco: {data.state.focusArea}</p>
+                    <p className="text-zinc-500">
                       Nivel de energía: {data.state.energyLevel}
                     </p>
-                    <p className="text-muted-foreground">Tendencia: {data.state.progressTrend}</p>
-                    <p className="text-muted-foreground">
+                    <p className="text-zinc-500">Tendencia: {data.state.progressTrend}</p>
+                    <p className="text-zinc-500">
                       Actualizado: {formatDate(data.state.updatedAt)}
                     </p>
                   </>
@@ -447,7 +447,7 @@ export default function AdminUserDetailPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-border/80 bg-card/95">
+            <Card className="border-zinc-800 bg-zinc-900/50">
               <CardHeader className="pb-3">
                 <CardTitle>Perfil Impulso y Racha</CardTitle>
                 <CardDescription>Diagnóstico y constancia.</CardDescription>
@@ -460,45 +460,45 @@ export default function AdminUserDetailPage() {
                       <Badge variant="secondary">Tipo {data.profile.type}</Badge>
                       <Badge variant="secondary">Código {data.profile.code}</Badge>
                     </div>
-                    <p className="text-muted-foreground">{data.profile.description}</p>
-                    <p className="text-muted-foreground">
+                    <p className="text-zinc-500">{data.profile.description}</p>
+                    <p className="text-zinc-500">
                       Foco operativo: {data.profile.operationalFocus}
                     </p>
                     <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
-                      <div className="rounded-lg border border-border px-2 py-2">
+                      <div className="rounded-lg border border-zinc-800 px-2 py-2">
                         Claridad {data.profile.scores.claridad}
                       </div>
-                      <div className="rounded-lg border border-border px-2 py-2">
+                      <div className="rounded-lg border border-zinc-800 px-2 py-2">
                         Autoestima {data.profile.scores.autoestima}
                       </div>
-                      <div className="rounded-lg border border-border px-2 py-2">
+                      <div className="rounded-lg border border-zinc-800 px-2 py-2">
                         Energía {data.profile.scores.energia}
                       </div>
-                      <div className="rounded-lg border border-border px-2 py-2">
+                      <div className="rounded-lg border border-zinc-800 px-2 py-2">
                         Disciplina {data.profile.scores.disciplina}
                       </div>
-                      <div className="rounded-lg border border-border px-2 py-2">
+                      <div className="rounded-lg border border-zinc-800 px-2 py-2">
                         Social {data.profile.scores.social}
                       </div>
-                      <div className="rounded-lg border border-border px-2 py-2">
+                      <div className="rounded-lg border border-zinc-800 px-2 py-2">
                         Total {data.profile.scores.total}
                       </div>
                     </div>
                   </>
                 ) : (
-                  <p className="text-muted-foreground">Sin perfil diagnóstico asignado.</p>
+                  <p className="text-zinc-500">Sin perfil diagnóstico asignado.</p>
                 )}
 
-                <div className="rounded-xl border border-border bg-muted/35 px-3 py-3">
-                  <p className="text-sm font-medium text-foreground">Racha</p>
-                  <p className="mt-1 text-muted-foreground">
+                <div className="rounded-xl border border-zinc-800 bg-zinc-800/35 px-3 py-3">
+                  <p className="text-sm font-medium text-white">Racha</p>
+                  <p className="mt-1 text-zinc-500">
                     Actual {data.streak?.currentDays || 0} días · Mejor {data.streak?.bestDays || 0}{" "}
                     días
                   </p>
-                  <p className="text-muted-foreground">
+                  <p className="text-zinc-500">
                     Estado {data.streak?.status || "inactive"}
                   </p>
-                  <p className="text-muted-foreground">
+                  <p className="text-zinc-500">
                     Último check-in {formatDate(data.streak?.lastCheckInDate || null)}
                   </p>
                 </div>
@@ -507,7 +507,7 @@ export default function AdminUserDetailPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-            <Card className="border-border/80 bg-card/95">
+            <Card className="border-zinc-800 bg-zinc-900/50">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <Target className="size-4" />
@@ -516,7 +516,7 @@ export default function AdminUserDetailPage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {data.activeGoals.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">Sin objetivos activos.</p>
+                  <p className="text-sm text-zinc-500">Sin objetivos activos.</p>
                 ) : (
                   data.activeGoals.map((goal) => {
                     const progress =
@@ -525,15 +525,15 @@ export default function AdminUserDetailPage() {
                         : 0;
 
                     return (
-                      <div key={goal.id} className="rounded-xl border border-border p-3">
-                        <p className="text-sm font-semibold text-foreground">{goal.title}</p>
-                        <p className="mt-1 text-xs text-muted-foreground">
+                      <div key={goal.id} className="rounded-xl border border-zinc-800 p-3">
+                        <p className="text-sm font-semibold text-white">{goal.title}</p>
+                        <p className="mt-1 text-xs text-zinc-500">
                           {goal.completedActions}/{goal.totalActions} acciones
                         </p>
                         <Progress className="mt-2 h-2" value={progress} />
                         <div className="mt-2 space-y-1">
                           {goal.actions.slice(0, 5).map((action) => (
-                            <p key={action.id} className="text-xs text-muted-foreground">
+                            <p key={action.id} className="text-xs text-zinc-500">
                               {action.completed ? "[x]" : "[ ]"} {action.description}
                             </p>
                           ))}
@@ -545,7 +545,7 @@ export default function AdminUserDetailPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-border/80 bg-card/95">
+            <Card className="border-zinc-800 bg-zinc-900/50">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <MessageSquareText className="size-4" />
@@ -554,13 +554,13 @@ export default function AdminUserDetailPage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {data.conversations.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">Sin conversaciones registradas.</p>
+                  <p className="text-sm text-zinc-500">Sin conversaciones registradas.</p>
                 ) : (
                   data.conversations.map((conversation) => (
-                    <div key={conversation.id} className="rounded-xl border border-border p-3 flex items-start justify-between gap-3">
+                    <div key={conversation.id} className="rounded-xl border border-zinc-800 p-3 flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-foreground truncate">{conversation.title}</p>
-                        <p className="mt-1 text-xs text-muted-foreground">
+                        <p className="text-sm font-semibold text-white truncate">{conversation.title}</p>
+                        <p className="mt-1 text-xs text-zinc-500">
                           {conversation.messageCount} mensajes · {formatDate(conversation.updatedAt)}
                         </p>
                       </div>
@@ -578,55 +578,55 @@ export default function AdminUserDetailPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-            <Card className="border-border/80 bg-card/95">
+            <Card className="border-zinc-800 bg-zinc-900/50">
               <CardHeader className="pb-3">
                 <CardTitle>Eventos de crisis</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {data.crisisEvents.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">Sin eventos de crisis.</p>
+                  <p className="text-sm text-zinc-500">Sin eventos de crisis.</p>
                 ) : (
                   data.crisisEvents.map((event) => (
                     <div
                       key={event.id}
-                      className="rounded-xl border border-signal-danger/30 bg-signal-danger/12 p-3"
+                      className="rounded-xl border border-red-500/30 bg-red-500/10 p-3"
                     >
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge variant="danger">{event.level}</Badge>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-xs text-zinc-500">
                           {formatDate(event.createdAt)}
                         </span>
                       </div>
-                      <p className="mt-2 text-sm text-foreground">{event.message}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">Respuesta: {event.response}</p>
+                      <p className="mt-2 text-sm text-white">{event.message}</p>
+                      <p className="mt-1 text-xs text-zinc-500">Respuesta: {event.response}</p>
                     </div>
                   ))
                 )}
               </CardContent>
             </Card>
 
-            <Card className="border-border/80 bg-card/95">
+            <Card className="border-zinc-800 bg-zinc-900/50">
               <CardHeader className="pb-3">
                 <CardTitle>Eventos de evasión</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {data.avoidanceEvents.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">Sin eventos de evasión.</p>
+                  <p className="text-sm text-zinc-500">Sin eventos de evasión.</p>
                 ) : (
                   data.avoidanceEvents.map((event) => (
                     <div
                       key={event.id}
-                      className="rounded-xl border border-signal-warning/30 bg-signal-warning/12 p-3"
+                      className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3"
                     >
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge variant="warning">{event.type}</Badge>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-xs text-zinc-500">
                           {formatDate(event.createdAt)}
                         </span>
                       </div>
-                      <p className="mt-2 text-sm text-foreground">{event.action.description}</p>
+                      <p className="mt-2 text-sm text-white">{event.action.description}</p>
                       {event.action.goalTitle ? (
-                        <p className="mt-1 text-xs text-muted-foreground">
+                        <p className="mt-1 text-xs text-zinc-500">
                           Objetivo: {event.action.goalTitle}
                         </p>
                       ) : null}
@@ -638,7 +638,7 @@ export default function AdminUserDetailPage() {
           </div>
 
           {/* ── EMOTIONAL TIMELINE ────────────────────────────────────── */}
-          <Card className="border-border/80 bg-card/95">
+          <Card className="border-zinc-800 bg-zinc-900/50">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2">
                 <Brain className="size-4" />
@@ -648,7 +648,7 @@ export default function AdminUserDetailPage() {
             </CardHeader>
             <CardContent>
               {timeline.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Sin datos de check-in en los últimos 30 días.</p>
+                <p className="text-sm text-zinc-500">Sin datos de check-in en los últimos 30 días.</p>
               ) : (
                 <div className="flex flex-wrap gap-1.5">
                   {timeline.map((entry) => {
@@ -664,7 +664,7 @@ export default function AdminUserDetailPage() {
                   })}
                 </div>
               )}
-              <div className="mt-3 flex flex-wrap gap-3 text-xs text-muted-foreground">
+              <div className="mt-3 flex flex-wrap gap-3 text-xs text-zinc-500">
                 {Object.entries(STATE_COLORS).filter(([k]) => k !== "unknown").map(([state, cls]) => (
                   <span key={state} className="flex items-center gap-1">
                     <span className={`inline-block h-3 w-3 rounded-sm ${cls}`} />
@@ -676,7 +676,7 @@ export default function AdminUserDetailPage() {
           </Card>
 
           {/* ── CLINICAL NOTES ────────────────────────────────────────── */}
-          <Card className="border-border/80 bg-card/95">
+          <Card className="border-zinc-800 bg-zinc-900/50">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2">
                 <NotebookPen className="size-4" />
@@ -706,21 +706,21 @@ export default function AdminUserDetailPage() {
                 </Button>
               </div>
               {notes.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Sin notas registradas.</p>
+                <p className="text-sm text-zinc-500">Sin notas registradas.</p>
               ) : (
                 <div className="space-y-2">
                   {notes.map((note) => (
-                    <div key={note.id} className="group rounded-xl border border-border bg-muted/30 p-3">
+                    <div key={note.id} className="group rounded-xl border border-zinc-800 bg-zinc-800/30 p-3">
                       <div className="flex items-start justify-between gap-2">
-                        <p className="text-sm text-foreground whitespace-pre-wrap">{note.content}</p>
+                        <p className="text-sm text-white whitespace-pre-wrap">{note.content}</p>
                         <button
                           onClick={() => void handleDeleteNote(note.id)}
-                          className="shrink-0 text-muted-foreground opacity-0 group-hover:opacity-100 transition hover:text-red-400"
+                          className="shrink-0 text-zinc-500 opacity-0 group-hover:opacity-100 transition hover:text-red-400"
                         >
                           <Trash2 className="size-3.5" />
                         </button>
                       </div>
-                      <p className="mt-1 text-xs text-muted-foreground">{new Date(note.createdAt).toLocaleString()}</p>
+                      <p className="mt-1 text-xs text-zinc-500">{new Date(note.createdAt).toLocaleString()}</p>
                     </div>
                   ))}
                 </div>
@@ -729,7 +729,7 @@ export default function AdminUserDetailPage() {
           </Card>
 
           {/* ── ASSESSMENTS ───────────────────────────────────────────── */}
-          <Card className="border-border/80 bg-card/95">
+          <Card className="border-zinc-800 bg-zinc-900/50">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2">
                 <ClipboardList className="size-4" />
@@ -757,13 +757,13 @@ export default function AdminUserDetailPage() {
                 </Button>
               </div>
               {assessments.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Sin evaluaciones asignadas.</p>
+                <p className="text-sm text-zinc-500">Sin evaluaciones asignadas.</p>
               ) : (
                 <div className="space-y-2">
                   {assessments.map((a) => (
-                    <div key={a.id} className="rounded-xl border border-border p-3">
+                    <div key={a.id} className="rounded-xl border border-zinc-800 p-3">
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-sm font-medium text-foreground">{a.title}</p>
+                        <p className="text-sm font-medium text-white">{a.title}</p>
                         <Badge variant={a.status === "completed" ? "secondary" : "warning"}>
                           {a.status === "completed" ? "Completada" : "Pendiente"}
                         </Badge>
@@ -773,9 +773,9 @@ export default function AdminUserDetailPage() {
                           Puntuación {a.response.totalScore} · {SEVERITY_LABELS[a.response.severity] ?? a.response.severity}
                         </p>
                       ) : (
-                        <p className="mt-1 text-xs text-muted-foreground">Esperando respuesta del usuario</p>
+                        <p className="mt-1 text-xs text-zinc-500">Esperando respuesta del usuario</p>
                       )}
-                      <p className="mt-1 text-xs text-muted-foreground">{new Date(a.createdAt).toLocaleString()}</p>
+                      <p className="mt-1 text-xs text-zinc-500">{new Date(a.createdAt).toLocaleString()}</p>
                     </div>
                   ))}
                 </div>
@@ -783,7 +783,7 @@ export default function AdminUserDetailPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-border/80 bg-card/95">
+          <Card className="border-zinc-800 bg-zinc-900/50">
             <CardHeader className="pb-3">
               <CardTitle>Mensajes recientes</CardTitle>
               <CardDescription>
@@ -792,16 +792,16 @@ export default function AdminUserDetailPage() {
             </CardHeader>
             <CardContent className="space-y-2">
               {data.messages.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Sin mensajes recientes.</p>
+                <p className="text-sm text-zinc-500">Sin mensajes recientes.</p>
               ) : (
                 data.messages.map((message) => (
-                  <div key={message.id} className="rounded-xl border border-border p-3">
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                  <div key={message.id} className="rounded-xl border border-zinc-800 p-3">
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500">
                       <Badge variant="secondary">{message.role}</Badge>
                       <span>{formatDate(message.createdAt)}</span>
                       <span>Conversación {message.conversationId}</span>
                     </div>
-                    <p className="mt-2 text-sm text-foreground">{message.content}</p>
+                    <p className="mt-2 text-sm text-white">{message.content}</p>
                   </div>
                 ))
               )}

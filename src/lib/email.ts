@@ -54,11 +54,11 @@ export function buildQuizLeadEmail(params: {
   const subject = `${content.emoji} Tu diagnóstico: ${content.label}`;
 
   const text =
-    `Tu resultado del test de Luciérnaga\n\n` +
+    `Tu resultado del test de Tres Mil Millones de Latidos\n\n` +
     `Estado detectado: ${content.label}\n\n` +
     `${content.headline}\n\n` +
     `Tu acción para ahora:\n${content.action}\n\n` +
-    `Luciérnaga te ayuda a hacer seguimiento de tu estado y avanzar con conversaciones orientadas a acción.\n\n` +
+    `Tres Mil Millones de Latidos te ayuda a hacer seguimiento de tu estado y avanzar con conversaciones orientadas a acción.\n\n` +
     `Empieza gratis → ${appUrl}`;
 
   const html = `<!DOCTYPE html>
@@ -70,7 +70,7 @@ export function buildQuizLeadEmail(params: {
       <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)">
         <tr>
           <td style="background:#1a1a1a;padding:24px 32px">
-            <span style="color:#818cf8;font-size:20px;font-weight:700;letter-spacing:-0.5px">Luciérnaga</span>
+            <span style="color:#818cf8;font-size:20px;font-weight:700;letter-spacing:-0.5px">Tres Mil Millones de Latidos</span>
           </td>
         </tr>
         <tr>
@@ -92,7 +92,7 @@ export function buildQuizLeadEmail(params: {
               </p>
             </div>
             <p style="margin:0 0 24px;font-size:14px;color:#555;line-height:1.6">
-              Luciérnaga detecta tu estado en cada conversación y te orienta a la acción concreta.
+              Tres Mil Millones de Latidos detecta tu estado en cada conversación y te orienta a la acción concreta.
               Sin consejos genéricos. Sin rodeos.
             </p>
             <a href="${appUrl}" style="display:inline-block;background:#6366f1;color:#fff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;font-weight:600">
@@ -103,7 +103,7 @@ export function buildQuizLeadEmail(params: {
         <tr>
           <td style="padding:20px 32px;border-top:1px solid #eee">
             <p style="margin:0;font-size:12px;color:#999;line-height:1.5">
-              Luciérnaga acompaña — no sustituye ayuda profesional.<br>
+              Tres Mil Millones de Latidos acompaña — no sustituye ayuda profesional.<br>
               Para darte de baja, responde &quot;baja&quot; a este correo.
             </p>
           </td>
@@ -160,7 +160,7 @@ export function buildReminderEmail(params: {
 }): Pick<UserEmail, "subject" | "html" | "text"> {
   const { pendingAction, appUrl } = params;
 
-  const subject = "Tienes una acción pendiente en Luciérnaga";
+  const subject = "Tienes una acción pendiente en Tres Mil Millones de Latidos";
 
   const text =
     `Han pasado 24 horas desde tu última sesión.\n\n` +
@@ -177,7 +177,7 @@ export function buildReminderEmail(params: {
       <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)">
         <tr>
           <td style="background:#1a1a1a;padding:24px 32px">
-            <span style="color:#f5c518;font-size:20px;font-weight:700;letter-spacing:-0.5px">Luciérnaga</span>
+            <span style="color:#f5c518;font-size:20px;font-weight:700;letter-spacing:-0.5px">Tres Mil Millones de Latidos</span>
           </td>
         </tr>
         <tr>
@@ -203,7 +203,7 @@ export function buildReminderEmail(params: {
         <tr>
           <td style="padding:20px 32px;border-top:1px solid #eee">
             <p style="margin:0;font-size:12px;color:#999;line-height:1.5">
-              Luciérnaga acompaña — no obliga. Si no es el momento, está bien.<br>
+              Tres Mil Millones de Latidos acompaña — no obliga. Si no es el momento, está bien.<br>
               Para dejar de recibir estos emails, responde "baja" a este correo.
             </p>
           </td>
@@ -236,7 +236,7 @@ function familyLayout(title: string, body: string, cta?: { href: string; label: 
     <tr><td align="center">
       <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)">
         <tr><td style="background:#1a1a1a;padding:20px 32px">
-          <span style="color:#f5c518;font-size:18px;font-weight:700">Luciérnaga</span>
+          <span style="color:#f5c518;font-size:18px;font-weight:700">Tres Mil Millones de Latidos</span>
           <span style="color:#888;font-size:12px;margin-left:8px">— red de apoyo</span>
         </td></tr>
         <tr><td style="padding:32px">
@@ -261,12 +261,12 @@ export function buildFamilyInviteEmail(params: {
   portalUrl: string;
 }): Pick<UserEmail, "subject" | "html" | "text"> {
   const { userName, contactName, relation, portalUrl } = params;
-  const subject = `${escapeHtml(userName)} te ha añadido como contacto de confianza en Luciérnaga`;
+  const subject = `${escapeHtml(userName)} te ha añadido como contacto de confianza en Tres Mil Millones de Latidos`;
   const body = `
     <p style="color:#444;font-size:15px;line-height:1.6">Hola ${escapeHtml(contactName)},</p>
     <p style="color:#444;font-size:15px;line-height:1.6">
       <strong>${escapeHtml(userName)}</strong> te ha designado como su <em>${escapeHtml(relation)}</em> de confianza
-      en Luciérnaga, la app que le ayuda a mantener claridad, avanzar en sus objetivos y gestionar su bienestar emocional.
+      en Tres Mil Millones de Latidos, la app que le ayuda a mantener claridad, avanzar en sus objetivos y gestionar su bienestar emocional.
     </p>
     <p style="color:#444;font-size:15px;line-height:1.6">
       Con tu portal podrás ver su progreso (solo lo que él/ella elija compartir), enviarle mensajes de apoyo
@@ -275,7 +275,7 @@ export function buildFamilyInviteEmail(params: {
     <p style="color:#444;font-size:15px;line-height:1.6">
       <strong>Guarda este enlace — es tu acceso permanente:</strong>
     </p>`;
-  const text = `Hola ${contactName},\n\n${userName} te ha añadido como contacto de confianza en Luciérnaga.\n\nTu portal de acceso:\n${portalUrl}`;
+  const text = `Hola ${contactName},\n\n${userName} te ha añadido como contacto de confianza en Tres Mil Millones de Latidos.\n\nTu portal de acceso:\n${portalUrl}`;
   return { subject, html: familyLayout(subject, body, { href: portalUrl, label: "Abrir mi portal" }), text };
 }
 
@@ -292,7 +292,7 @@ export function buildFamilyCrisisEmail(params: {
     <p style="color:#444;font-size:15px;line-height:1.6">Hola ${escapeHtml(contactName)},</p>
     <div style="background:#fff3f3;border-left:3px solid #e53e3e;border-radius:4px;padding:14px 16px;margin:16px 0">
       <p style="margin:0;font-size:15px;color:#c53030;font-weight:600">
-        Luciérnaga ha detectado una señal de crisis en la sesión de <strong>${escapeHtml(userName)}</strong>.
+        Tres Mil Millones de Latidos ha detectado una señal de crisis en la sesión de <strong>${escapeHtml(userName)}</strong>.
       </p>
     </div>
     <p style="color:#444;font-size:15px;line-height:1.6">
@@ -300,7 +300,7 @@ export function buildFamilyCrisisEmail(params: {
       Un "Hola, estoy aquí" puede marcar la diferencia.
     </p>
     <p style="color:#555;font-size:13px">Si crees que hay riesgo real, contacta servicios de emergencia: <strong>112</strong> (España) / <strong>911</strong></p>`;
-  const text = `Hola ${contactName},\n\nLuciérnaga ha detectado una señal de crisis en la sesión de ${userName}.\n\nPuede que agradezca una llamada.\nEmergencias: 112\n\nTu portal: ${portalUrl}`;
+  const text = `Hola ${contactName},\n\nTres Mil Millones de Latidos ha detectado una señal de crisis en la sesión de ${userName}.\n\nPuede que agradezca una llamada.\nEmergencias: 112\n\nTu portal: ${portalUrl}`;
   return { subject, html: familyLayout(subject, body, { href: portalUrl, label: "Ver portal" }), text };
 }
 
@@ -312,7 +312,7 @@ export function buildFamilyInactivityEmail(params: {
   portalUrl: string;
 }): Pick<UserEmail, "subject" | "html" | "text"> {
   const { userName, contactName, daysSilent, portalUrl } = params;
-  const subject = `${escapeHtml(userName)} lleva ${daysSilent} días sin actividad en Luciérnaga`;
+  const subject = `${escapeHtml(userName)} lleva ${daysSilent} días sin actividad en Tres Mil Millones de Latidos`;
   const body = `
     <p style="color:#444;font-size:15px;line-height:1.6">Hola ${escapeHtml(contactName)},</p>
     <p style="color:#444;font-size:15px;line-height:1.6">
@@ -338,7 +338,7 @@ export function buildFamilyWinEmail(params: {
   const body = `
     <p style="color:#444;font-size:15px;line-height:1.6">Hola ${escapeHtml(contactName)},</p>
     <p style="color:#444;font-size:15px;line-height:1.6">
-      <strong>${escapeHtml(userName)}</strong> acaba de registrar una victoria en Luciérnaga y quiso compartirla contigo:
+      <strong>${escapeHtml(userName)}</strong> acaba de registrar una victoria en Tres Mil Millones de Latidos y quiso compartirla contigo:
     </p>
     <div style="background:#f0faf0;border-left:3px solid #38a169;border-radius:4px;padding:14px 16px;margin:16px 0">
       <p style="margin:0;font-size:16px;color:#276749;line-height:1.5">"${escapeHtml(winNote)}"</p>

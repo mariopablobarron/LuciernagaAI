@@ -47,6 +47,7 @@ import { runFlow, loadDialogueState, saveDialogueState } from "@/services/flows"
 import { detectIntent } from "@/services/intent";
 import { getMentorMode, shouldAskForEmail } from "@/services/mentor-protocol";
 import { getConversationalOnboarding } from "@/services/onboarding";
+import { buildJourneyPromptBlock } from "@/services/journey-coach-bridge";
 import { analyzeEmotionalProfile, updateEmotionalProfile } from "@/services/emotional-model";
 import {
   buildSearchQuery,
@@ -937,9 +938,10 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     pendingActions: activeGoal?.actions.filter((a) => !a.completed).map((a) => a.description) ?? [],
   });
 
-  const [impulseProfile, impulseLogs] = await Promise.all([
+  const [impulseProfile, impulseLogs, journeyPromptBlock] = await Promise.all([
     getUserImpulseProfile(userId).catch(() => null),
     listRecentImpulseLogs(userId, 5).catch(() => []),
+    buildJourneyPromptBlock(userId).catch(() => null),
   ]);
 
   const activeAction = getFirstPendingAction(activeGoal);
@@ -971,6 +973,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
       critical: false,
     },
     onboarding: onboardingContext,
+    journeyPrompt: journeyPromptBlock,
     access: {
       userPlan: session.userPlan,
       remainingMessages: remainingMessagesAfterTurn,

@@ -9,7 +9,7 @@ describe("coach prompt identity", () => {
   it("integra la identidad central de Tres Mil Millones de Latidos", () => {
     const prompt = buildCoachPrompt("duda");
 
-    expect(prompt).toContain("Eres Luciérnaga AI.");
+    expect(prompt).toContain("Eres Tres Mil Millones de Latidos.");
     expect(prompt).toContain("No eres un chatbot.");
     expect(prompt).toContain("Claridad sobre consuelo");
     expect(prompt).toContain("Acción sobre reflexión vacía");

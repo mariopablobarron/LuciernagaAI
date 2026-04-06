@@ -298,7 +298,7 @@ export default function DashboardPage() {
                   <CheckCircle2 className="w-8 h-8 text-emerald-500/50" />
                   <p className="text-zinc-400 text-sm">Sin acciones pendientes.</p>
                   <p className="text-xs text-zinc-600">
-                    Conversa con Luciérnaga para definir tu próxima acción.
+                    Conversa con Tres Mil Millones de Latidos para definir tu próxima acción.
                   </p>
                 </div>
               ) : (
@@ -333,7 +333,7 @@ export default function DashboardPage() {
                 <div className="flex flex-col items-center py-6 space-y-2 text-center">
                   <Sparkles className="w-7 h-7 text-amber-500/30" />
                   <p className="text-zinc-500 text-sm">Aún no has registrado logros.</p>
-                  <p className="text-xs text-zinc-600">Cuéntale a Luciérnaga cuando completes algo.</p>
+                  <p className="text-xs text-zinc-600">Cuéntale a Tres Mil Millones de Latidos cuando completes algo.</p>
                 </div>
               ) : (
                 <div className="space-y-2">

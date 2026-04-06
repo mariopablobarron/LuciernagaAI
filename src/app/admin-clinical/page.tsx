@@ -111,15 +111,15 @@ export default function AdminClinicalPage() {
                 onClick={() => { setStateFilter(opt.value); setPage(1); }}
                 className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                   stateFilter === opt.value
-                    ? "border-primary/30 bg-primary text-primary-foreground"
-                    : "border-border bg-background/70 text-muted-foreground hover:bg-accent"
+                    ? "border-violet-500/30 bg-violet-500 text-white"
+                    : "border-zinc-800 bg-zinc-950/70 text-zinc-500 hover:bg-zinc-800"
                 }`}
               >
                 {opt.label}
               </button>
             ))}
           </div>
-          <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-500">
             <input
               type="checkbox"
               checked={riskOnly}
@@ -148,16 +148,16 @@ export default function AdminClinicalPage() {
             </div>
           )}
           {loading && !data && (
-            <div className="p-6 text-sm text-muted-foreground">Cargando...</div>
+            <div className="p-6 text-sm text-zinc-500">Cargando...</div>
           )}
           {data && data.items.length === 0 && (
-            <div className="p-6 text-sm text-muted-foreground">Sin resultados.</div>
+            <div className="p-6 text-sm text-zinc-500">Sin resultados.</div>
           )}
           {data && data.items.length > 0 && (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <tr className="border-b text-xs font-semibold uppercase tracking-wider text-zinc-500">
                     <th className="px-4 py-3 text-left">Usuario</th>
                     <th className="px-4 py-3 text-left">Estado</th>
                     <th className="px-4 py-3 text-left">Riesgo</th>
@@ -170,13 +170,13 @@ export default function AdminClinicalPage() {
                 </thead>
                 <tbody className="divide-y divide-border">
                   {data.items.map((u) => (
-                    <tr key={u.id} className="group hover:bg-muted/30 transition-colors">
+                    <tr key={u.id} className="group hover:bg-zinc-800/30 transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           {u.crisisActive && <ShieldAlert className="size-4 text-destructive" />}
                           <div>
-                            <div className="font-medium text-foreground">{u.name ?? u.email}</div>
-                            <div className="text-xs text-muted-foreground font-mono">{u.id}</div>
+                            <div className="font-medium text-white">{u.name ?? u.email}</div>
+                            <div className="text-xs text-zinc-500 font-mono">{u.id}</div>
                           </div>
                         </div>
                       </td>
@@ -191,26 +191,26 @@ export default function AdminClinicalPage() {
                         </Badge>
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <span className={u.crisisEvents7d > 0 ? "font-bold text-destructive" : "text-muted-foreground"}>
+                        <span className={u.crisisEvents7d > 0 ? "font-bold text-destructive" : "text-zinc-500"}>
                           {u.crisisEvents7d}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-center text-muted-foreground">
+                      <td className="px-4 py-3 text-center text-zinc-500">
                         {u.streakDays}d
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <span className="inline-flex items-center gap-1 text-muted-foreground">
+                        <span className="inline-flex items-center gap-1 text-zinc-500">
                           <User className="size-3" />
                           {u.interventions}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-xs text-muted-foreground">
+                      <td className="px-4 py-3 text-xs text-zinc-500">
                         {formatRelative(u.lastSeen)}
                       </td>
                       <td className="px-4 py-3">
                         <Link
                           href={`/admin-clinical/user/${u.id}`}
-                          className="rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground opacity-0 transition group-hover:opacity-100"
+                          className="rounded-full bg-violet-500 px-3 py-1.5 text-xs font-semibold text-white opacity-0 transition group-hover:opacity-100"
                         >
                           Ver
                         </Link>
@@ -224,7 +224,7 @@ export default function AdminClinicalPage() {
           {/* Pagination */}
           {data && data.pagination.totalPages > 1 && (
             <div className="flex items-center justify-between border-t p-4 text-sm">
-              <span className="text-muted-foreground">
+              <span className="text-zinc-500">
                 Página {data.pagination.page} de {data.pagination.totalPages}
               </span>
               <div className="flex gap-2">

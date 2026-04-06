@@ -245,7 +245,7 @@ async function callAdminAI(question: string): Promise<string> {
   ]);
 
   const systemPrompt = [
-    "Eres el asistente de administración de Luciérnaga AI, una plataforma de coaching emocional e inteligencia artificial.",
+    "Eres el asistente de administración de Tres Mil Millones de Latidos, una plataforma de coaching emocional e inteligencia artificial.",
     "",
     "Contexto actual del sistema:",
     `- Usuarios totales: ${totalUsers}`,

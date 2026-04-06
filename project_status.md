@@ -1,4 +1,4 @@
-# Luciérnaga — Estado del Proyecto
+# Tres Mil Millones de Latidos — Estado del Proyecto
 
 Última actualización: 2026-03-30
 
@@ -94,7 +94,7 @@
 # Email (recordatorios web)
 EMAIL_PROVIDER=sendgrid
 EMAIL_API_KEY=SG.xxx
-EMAIL_FROM=Luciérnaga <noreply@tudominio.com>
+EMAIL_FROM=Tres Mil Millones de Latidos <noreply@tudominio.com>
 
 # Cron
 CRON_SECRET=<openssl rand -hex 32>

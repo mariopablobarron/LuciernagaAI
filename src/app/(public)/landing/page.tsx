@@ -23,7 +23,7 @@ export default function LandingPage() {
             </h1>
           </div>
           <p className="text-lg text-zinc-400 leading-relaxed max-w-lg">
-            Luciérnaga te guía a través de la transformación real. No es teoría. No es
+            Tres Mil Millones de Latidos te guía a través de la transformación real. No es teoría. No es
             perfección. Es acción pequeña, consistente, que genera cambios duraderos.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
@@ -238,10 +238,10 @@ export default function LandingPage() {
             href="/unirse"
             className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-linear-to-r from-violet-500 to-fuchsia-500 text-white font-bold rounded-xl hover:from-violet-400 hover:to-fuchsia-400 transition-all hover:shadow-lg hover:shadow-fuchsia-500/40"
           >
-            Abrir Luciérnaga AI <ArrowRight className="w-5 h-5" />
+            Abrir Tres Mil Millones de Latidos <ArrowRight className="w-5 h-5" />
           </Link>
           <p className="text-xs text-zinc-600 pt-4">
-            Luciérnaga AI no sustituye terapia ni intervención psicológica profesional.
+            Tres Mil Millones de Latidos no sustituye terapia ni intervención psicológica profesional.
           </p>
         </div>
       </section>

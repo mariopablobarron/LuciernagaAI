@@ -14,6 +14,6 @@ export async function GET(
 
   return NextResponse.json({
     valid: true,
-    inviterName: invite.user.name ?? "alguien de Luciérnaga",
+    inviterName: invite.user.name ?? "alguien de Tres Mil Millones de Latidos",
   });
 }

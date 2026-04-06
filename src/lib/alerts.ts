@@ -112,7 +112,7 @@ async function sendEmail(alert: Alert): Promise<void> {
     <p>${escapeHtml(alert.message)}</p>
     ${alert.metric ? `<p><strong>${alert.metric}:</strong> ${alert.value}</p>` : ""}
     <hr>
-    <p>Luciérnaga Decision Engine</p>
+    <p>Tres Mil Millones de Latidos Decision Engine</p>
   `;
 
   if (emailProvider === "sendgrid") {

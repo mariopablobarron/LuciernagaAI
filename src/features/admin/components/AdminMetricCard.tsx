@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 
 type AdminMetricCardProps = {
   label: string;
@@ -10,12 +9,12 @@ type AdminMetricCardProps = {
 };
 
 const accentStyles = {
-  slate: "text-foreground",
-  emerald: "text-[color:color-mix(in_oklab,var(--signal-success)_55%,var(--foreground))]",
-  sky: "text-[color:color-mix(in_oklab,var(--emotion-doubt)_78%,var(--foreground))]",
-  amber: "text-[color:color-mix(in_oklab,var(--signal-warning)_60%,var(--foreground))]",
-  rose: "text-[color:color-mix(in_oklab,var(--signal-danger)_60%,var(--foreground))]",
-  violet: "text-[color:color-mix(in_oklab,var(--emotion-doubt)_60%,var(--foreground))]",
+  slate: "text-white",
+  emerald: "text-emerald-400",
+  sky: "text-cyan-400",
+  amber: "text-amber-400",
+  rose: "text-red-400",
+  violet: "text-violet-400",
 } as const;
 
 export function AdminMetricCard({
@@ -26,17 +25,15 @@ export function AdminMetricCard({
   icon,
 }: AdminMetricCardProps) {
   return (
-    <Card className="border-border/80 bg-card/95 shadow-sm">
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-sm text-muted-foreground">{label}</p>
-            <p className={`mt-2 text-2xl font-semibold ${accentStyles[accent]}`}>{value}</p>
-          </div>
-          {icon ? <div className="text-muted-foreground">{icon}</div> : null}
+    <div className="card-surface rounded-xl border border-zinc-800 p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{label}</p>
+          <p className={`mt-2 text-2xl font-bold ${accentStyles[accent]}`}>{value}</p>
         </div>
-        {hint ? <p className="mt-3 text-xs leading-5 text-muted-foreground">{hint}</p> : null}
-      </CardContent>
-    </Card>
+        {icon ? <div className="text-zinc-600">{icon}</div> : null}
+      </div>
+      {hint ? <p className="mt-3 text-xs leading-5 text-zinc-500">{hint}</p> : null}
+    </div>
   );
 }

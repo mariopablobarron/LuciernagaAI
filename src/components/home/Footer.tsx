@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Heart } from "lucide-react";
 
 export default function Footer() {
@@ -10,10 +9,10 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           {/* Brand */}
           <div className="space-y-4">
-            <Link href="/" className="flex items-center gap-2.5 group transition-opacity hover:opacity-80">
+            <a href="/" className="flex items-center gap-2.5 group transition-opacity hover:opacity-80">
               <div className="text-2xl">💓</div>
               <span className="font-black text-foreground tracking-tight">Tres Mil Millones de Latidos</span>
-            </Link>
+            </a>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Cada latido es una elección. Tres Mil Millones de Latidos existe para que los tuyos tengan dirección real.
             </p>
@@ -28,29 +27,29 @@ export default function Footer() {
             <h4 className="font-semibold text-foreground">Producto</h4>
             <ul className="space-y-2.5">
               <li>
-                <Link href="/precios" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <a href="/precios" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Precios
-                </Link>
+                </a>
               </li>
               <li>
-                <Link href="/unirse" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <a href="/unirse" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Unirse al reto
-                </Link>
+                </a>
               </li>
               <li>
-                <Link href="/reto" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <a href="/reto" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   El reto 30 días
-                </Link>
+                </a>
               </li>
               <li>
-                <Link href="/test" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <a href="/test" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Test gratuito
-                </Link>
+                </a>
               </li>
               <li>
-                <Link href="/app" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <a href="/app" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Acceder
-                </Link>
+                </a>
               </li>
             </ul>
           </div>
@@ -60,19 +59,19 @@ export default function Footer() {
             <h4 className="font-semibold text-foreground">Información</h4>
             <ul className="space-y-2.5">
               <li>
-                <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <a href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Política de privacidad
-                </Link>
+                </a>
               </li>
               <li>
-                <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <a href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Términos de servicio
-                </Link>
+                </a>
               </li>
               <li>
-                <Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <a href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Contacto
-                </Link>
+                </a>
               </li>
             </ul>
           </div>
@@ -95,13 +94,13 @@ export default function Footer() {
               { href: "/admin/settings", label: "Configuración" },
               { href: "/admin/login", label: "Login admin" },
             ].map((item) => (
-              <Link
+              <a
                 key={item.href}
                 href={item.href}
                 className="text-[11px] text-muted-foreground/40 hover:text-muted-foreground transition-colors"
               >
                 {item.label}
-              </Link>
+              </a>
             ))}
           </div>
         </div>

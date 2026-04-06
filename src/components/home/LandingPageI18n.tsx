@@ -128,12 +128,12 @@ export default function LandingPageI18n() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3">
-                <Link
+                <a
                   href="/unirse"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-linear-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-fuchsia-500/25"
                 >
                   {t('hero.cta')} <ArrowRight className="w-4 h-4" />
-                </Link>
+                </a>
                 <button
                   onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-zinc-300 border border-zinc-700 hover:border-zinc-500 hover:text-white transition-all"
@@ -235,12 +235,12 @@ export default function LandingPageI18n() {
           </h2>
           <p className="text-lg text-zinc-300 leading-relaxed">{t('finalCta.subtitle')}</p>
           <div className="pt-2">
-            <Link
+            <a
               href="/unirse"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-white bg-linear-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-fuchsia-500/25 text-lg"
             >
               {t('finalCta.cta')} <ArrowRight className="w-5 h-5" />
-            </Link>
+            </a>
           </div>
           <p className="text-xs text-zinc-500">{t('finalCta.disclaimer')}</p>
         </div>

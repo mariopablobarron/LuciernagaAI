@@ -35,6 +35,7 @@ import {
 } from "@/lib/session-client";
 import { DEFAULT_ONBOARDING_EXAMPLE } from "@/lib/onboarding";
 import { DEFAULT_EMOTIONAL_PROFILE, type EmotionalProfile } from "@/types/emotional-profile";
+import GoalContextBar from "@/components/GoalContextBar";
 
 type Conversation = {
   id: string;
@@ -1945,6 +1946,15 @@ export default function HomePage() {
                     }
                   />
                 </div>
+                <GoalContextBar
+                  goal={activeGoal}
+                  actionLock={
+                    effectiveActionLock
+                      ? { message: effectiveActionLock.message, actionTitle: effectiveActionLock.action.title }
+                      : null
+                  }
+                  onToggleAction={handleToggleAction}
+                />
                 <Chat
                   title={safeConversation.title}
                   messages={safeConversation.messages}

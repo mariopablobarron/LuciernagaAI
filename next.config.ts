@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
-import createNextIntlPlugin from "next-intl/plugin";
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const createNextIntlPlugin = require("next-intl/plugin");
 
 const isDev = process.env.NODE_ENV === "development";
 

@@ -27,6 +27,7 @@
     "test:telegram": "node scripts/test-telegram-send.mjs",
     "docs:commands:update": "node scripts/auto-update-commands-doc.mjs",
     "docs:commands:check": "node scripts/auto-update-commands-doc.mjs --check",
+    "migrate:deploy": "prisma migrate deploy",
     "backup:daily": "bash scripts/db-backup-daily.sh",
     "backup:restore:latest": "gunzip -c ./backups/db/latest.sql.gz | psql \"$DATABASE_URL\""
   },

@@ -1,13 +1,31 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
+const isDev = process.env.NODE_ENV === "development";
+
+const cspDirectives = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self'",
+  `connect-src 'self' https://openrouter.ai https://*.sentry.io${isDev ? " ws://localhost:3000 ws://127.0.0.1:3000" : ""}`,
+  "frame-ancestors 'none'",
+  "form-action 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  ...(!isDev ? ["upgrade-insecure-requests"] : []),
+];
+
+const contentSecurityPolicy = cspDirectives.join("; ");
+
 const nextConfig: NextConfig = {
   // ============================================
   // PRODUCTION OPTIMIZATIONS
   // ============================================
-  
+
   // Disable React strict mode in production (performance)
-  reactStrictMode: process.env.NODE_ENV === "development",
+  reactStrictMode: isDev,
 
   // Optimize images
   images: {
@@ -37,11 +55,16 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/api/:path*",
+        // Global security headers
+        source: "/:path*",
         headers: [
           {
-            key: "Cache-Control",
-            value: "no-store, no-cache, must-revalidate, proxy-revalidate",
+            key: "X-DNS-Prefetch-Control",
+            value: "on",
+          },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
           },
           {
             key: "X-Content-Type-Options",
@@ -55,14 +78,39 @@ const nextConfig: NextConfig = {
             key: "X-XSS-Protection",
             value: "1; mode=block",
           },
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=(), browsing-topics=()",
+          },
+          {
+            key: "Content-Security-Policy",
+            value: contentSecurityPolicy,
+          },
         ],
       },
       {
-        source: "/:path*",
+        // API-specific: no caching
+        source: "/api/:path*",
         headers: [
           {
-            key: "X-DNS-Prefetch-Control",
-            value: "on",
+            key: "Cache-Control",
+            value: "no-store, no-cache, must-revalidate, proxy-revalidate",
+          },
+          {
+            key: "Access-Control-Allow-Origin",
+            value: process.env.APP_BASE_URL || "http://localhost:3000",
+          },
+          {
+            key: "Access-Control-Allow-Methods",
+            value: "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+          },
+          {
+            key: "Access-Control-Allow-Headers",
+            value: "Content-Type, Authorization, X-Session-Token, X-Response-Mode",
           },
         ],
       },

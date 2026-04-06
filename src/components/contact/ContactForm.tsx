@@ -43,8 +43,7 @@ export default function ContactForm() {
       } else {
         setSubmitStatus("error");
       }
-    } catch (error) {
-      console.error("Error sending message:", error);
+    } catch {
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);

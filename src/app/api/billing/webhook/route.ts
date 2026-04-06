@@ -3,52 +3,75 @@ import { stripe } from '@/lib/stripe';
 import { getPrismaClient } from '@/db/prisma';
 import { notifyAdmin, buildAdminAlert } from '@/services/telegram';
 import { logError, logInfo, logWarn } from '@/lib/logger';
+import { STRIPE_PLANS } from '@/lib/stripe';
 import Stripe from 'stripe';
 
 export const dynamic = 'force-dynamic';
 
-async function upgradeToPro(params: {
-  stripeCustomerId: string;
-  stripeSubscriptionId: string;
-  stripePriceId: string | null;
-  status: string;
-  currentPeriodStart: Date;
-  currentPeriodEnd: Date;
-  cancelAtPeriodEnd: boolean;
-}) {
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+/**
+ * Finds user by stripeCustomerId OR email (fallback for race conditions where
+ * checkout.session.completed hasn't linked the customer yet).
+ */
+async function findUser(stripeCustomerId: string, email?: string | null) {
   const prisma = getPrismaClient();
 
-  // Find user by stripeCustomerId
-  const user = await prisma.user.findFirst({
-    where: { stripeCustomerId: params.stripeCustomerId },
+  let user = await prisma.user.findFirst({
+    where: { stripeCustomerId },
     select: { id: true, email: true },
   });
 
+  if (!user && email) {
+    user = await prisma.user.findFirst({
+      where: { email },
+      select: { id: true, email: true },
+    });
+    // Save the stripeCustomerId so future lookups are fast
+    if (user) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { stripeCustomerId },
+      });
+    }
+  }
+
+  return user;
+}
+
+async function upgradeToPro(sub: Stripe.Subscription, email?: string | null) {
+  const prisma = getPrismaClient();
+  const firstItem = sub.items.data[0];
+
+  const user = await findUser(sub.customer as string, email);
   if (!user) {
-    logWarn('BILLING', 'webhook_user_not_found', { customerId: params.stripeCustomerId });
+    logWarn('BILLING', 'webhook_user_not_found', {
+      customerId: sub.customer,
+      email,
+    });
     return null;
   }
 
   await prisma.subscription.upsert({
-    where: { stripeSubscriptionId: params.stripeSubscriptionId },
+    where: { stripeSubscriptionId: sub.id },
     create: {
       userId: user.id,
       plan: 'pro',
-      status: params.status,
-      stripeSubscriptionId: params.stripeSubscriptionId,
-      stripeCustomerId: params.stripeCustomerId,
-      stripePriceId: params.stripePriceId,
-      currentPeriodStart: params.currentPeriodStart,
-      currentPeriodEnd: params.currentPeriodEnd,
-      cancelAtPeriodEnd: params.cancelAtPeriodEnd,
+      status: sub.status,
+      stripeSubscriptionId: sub.id,
+      stripeCustomerId: sub.customer as string,
+      stripePriceId: firstItem?.price?.id ?? null,
+      currentPeriodStart: new Date((firstItem?.current_period_start ?? sub.billing_cycle_anchor) * 1000),
+      currentPeriodEnd: new Date((firstItem?.current_period_end ?? sub.billing_cycle_anchor) * 1000),
+      cancelAtPeriodEnd: sub.cancel_at_period_end,
     },
     update: {
       plan: 'pro',
-      status: params.status,
-      stripePriceId: params.stripePriceId,
-      currentPeriodStart: params.currentPeriodStart,
-      currentPeriodEnd: params.currentPeriodEnd,
-      cancelAtPeriodEnd: params.cancelAtPeriodEnd,
+      status: sub.status,
+      stripePriceId: firstItem?.price?.id ?? null,
+      currentPeriodStart: new Date((firstItem?.current_period_start ?? sub.billing_cycle_anchor) * 1000),
+      currentPeriodEnd: new Date((firstItem?.current_period_end ?? sub.billing_cycle_anchor) * 1000),
+      cancelAtPeriodEnd: sub.cancel_at_period_end,
       cancelledAt: null,
     },
   });
@@ -76,13 +99,13 @@ async function cancelSubscription(stripeSubscriptionId: string) {
     },
   });
 
-  const user = await prisma.user.findUnique({
+  return prisma.user.findUnique({
     where: { id: subscription.userId },
     select: { id: true, email: true },
   });
-
-  return user;
 }
+
+// ─── Handler ──────────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
   const sig = req.headers.get('stripe-signature');
@@ -97,7 +120,11 @@ export async function POST(req: NextRequest) {
     const rawBody = await req.text();
     event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
   } catch (err) {
-    logError('BILLING', err, { area: 'webhook_signature' });
+    logError('BILLING', err, {
+      area: 'webhook_signature',
+      sigHeader: sig.substring(0, 30) + '…',  // partial, safe to log
+      secretPrefix: webhookSecret.substring(0, 7),
+    });
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
@@ -106,10 +133,11 @@ export async function POST(req: NextRequest) {
   try {
     switch (event.type) {
 
+      // ── Checkout completed: link customer → user, then activate subscription ──
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
-        // Subscription will be activated via customer.subscription.updated
-        // but we can store the customerId on the user here if we have their email
+
+        // Save stripeCustomerId on the user immediately
         if (session.customer && session.customer_email) {
           const prisma = getPrismaClient();
           await prisma.user.updateMany({
@@ -117,46 +145,75 @@ export async function POST(req: NextRequest) {
             data: { stripeCustomerId: session.customer as string },
           });
         }
-        logInfo('BILLING', 'checkout_completed', {
-          email: session.customer_email,
-          customerId: session.customer,
-        });
-        break;
-      }
 
-      case 'customer.subscription.created':
-      case 'customer.subscription.updated': {
-        const sub = event.data.object as Stripe.Subscription;
-        const firstItem = sub.items.data[0];
-        const user = await upgradeToPro({
-          stripeCustomerId: sub.customer as string,
-          stripeSubscriptionId: sub.id,
-          stripePriceId: firstItem?.price?.id ?? null,
-          status: sub.status,
-          currentPeriodStart: new Date((firstItem?.current_period_start ?? sub.billing_cycle_anchor) * 1000),
-          currentPeriodEnd: new Date((firstItem?.current_period_end ?? sub.billing_cycle_anchor) * 1000),
-          cancelAtPeriodEnd: sub.cancel_at_period_end,
-        });
-
-        if (user && event.type === 'customer.subscription.created') {
-          notifyAdmin(
-            buildAdminAlert({ tipo: 'new_user', userId: user.id }) +
-            `\n💳 *Nueva suscripción Pro*\nEmail: \`${user.email}\``
-          );
+        // If there's a subscription attached, activate it now.
+        // This handles the race where customer.subscription.created fired first
+        // but couldn't find the user yet because stripeCustomerId wasn't saved.
+        if (session.subscription) {
+          const sub = await stripe.subscriptions.retrieve(session.subscription as string);
+          const user = await upgradeToPro(sub, session.customer_email);
+          if (user) {
+            const planKey = (sub.metadata?.plan ?? 'pro_monthly') as keyof typeof STRIPE_PLANS;
+            const planInfo = STRIPE_PLANS[planKey] ?? STRIPE_PLANS.pro_monthly;
+            notifyAdmin(buildAdminAlert({
+              tipo: 'payment',
+              userId: user.id,
+              email: user.email,
+              plan: planKey === 'pro_annual' ? 'Anual' : 'Mensual',
+              status: sub.status,
+              amount: planInfo.label,
+            }));
+            logInfo('BILLING', 'subscription_activated', {
+              userId: user.id,
+              subscriptionId: sub.id,
+              status: sub.status,
+            });
+          }
         }
         break;
       }
 
+      // ── Subscription updates (renewals, plan changes, trial → active) ─────────
+      case 'customer.subscription.created':
+      case 'customer.subscription.updated': {
+        const sub = event.data.object as Stripe.Subscription;
+
+        // Fetch customer email for the fallback lookup
+        let email: string | null = null;
+        try {
+          const customer = await stripe.customers.retrieve(sub.customer as string);
+          if (!customer.deleted) email = customer.email;
+        } catch { /* non-critical */ }
+
+        const user = await upgradeToPro(sub, email);
+
+        if (user && event.type === 'customer.subscription.created') {
+          logInfo('BILLING', 'subscription_created', {
+            userId: user.id,
+            subscriptionId: sub.id,
+            status: sub.status,
+          });
+        }
+        break;
+      }
+
+      // ── Cancellation ──────────────────────────────────────────────────────────
       case 'customer.subscription.deleted': {
         const sub = event.data.object as Stripe.Subscription;
         const user = await cancelSubscription(sub.id);
         if (user) {
           logInfo('BILLING', 'subscription_cancelled', { userId: user.id, subscriptionId: sub.id });
-          notifyAdmin(`❌ *Suscripción cancelada*\nUsuario: \`${user.id}\`\nEmail: \`${user.email}\``);
+          notifyAdmin(buildAdminAlert({
+            tipo: 'cancellation',
+            userId: user.id,
+            email: user.email,
+            subscriptionId: sub.id,
+          }));
         }
         break;
       }
 
+      // ── Payment events ────────────────────────────────────────────────────────
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice;
         logWarn('BILLING', 'payment_failed', {

@@ -13,8 +13,8 @@ export function PrivacySettings() {
     try {
       // El navegador manejará la descarga automáticamente gracias al header Content-Disposition
       window.location.href = `/api/user/export?format=${format}`;
-    } catch (error) {
-      console.error("Error al exportar datos", error);
+    } catch {
+      // Export error handled by browser
     } finally {
       // Pequeño timeout para restablecer el botón
       setTimeout(() => setIsExporting(null), 1500);
@@ -34,8 +34,8 @@ export function PrivacySettings() {
       } else {
         alert("Hubo un problema al eliminar tu cuenta. Por favor contacta a soporte.");
       }
-    } catch (error) {
-      console.error("Error eliminando cuenta:", error);
+    } catch {
+      // Delete error handled by alert above
     } finally {
       setIsDeleting(false);
     }

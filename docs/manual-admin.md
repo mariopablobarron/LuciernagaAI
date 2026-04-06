@@ -302,8 +302,8 @@ _Período: últimos 7 días_
 | Crisis (Telegram) | [src/app/api/telegram/webhook/route.ts](../src/app/api/telegram/webhook/route.ts) |
 | Usuario en riesgo | [src/lib/alerts.ts](../src/lib/alerts.ts) — `sendAdminUserAlert` |
 | Racha destacada | [src/app/api/checkin/route.ts](../src/app/api/checkin/route.ts) |
-| Pago confirmado | [src/app/api/stripe/webhook/route.ts](../src/app/api/stripe/webhook/route.ts) |
-| Cancelación | [src/app/api/stripe/webhook/route.ts](../src/app/api/stripe/webhook/route.ts) |
+| Pago confirmado | [src/app/api/billing/webhook/route.ts](../src/app/api/billing/webhook/route.ts) |
+| Cancelación | [src/app/api/billing/webhook/route.ts](../src/app/api/billing/webhook/route.ts) |
 | Test diagnóstico | [src/app/api/quiz/result/route.ts](../src/app/api/quiz/result/route.ts) |
 | Contacto | [src/app/api/contact/route.ts](../src/app/api/contact/route.ts) |
 | Resumen semanal | [src/app/api/cron/weekly-summary/route.ts](../src/app/api/cron/weekly-summary/route.ts) |

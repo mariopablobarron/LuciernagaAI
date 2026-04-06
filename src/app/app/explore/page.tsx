@@ -37,6 +37,9 @@ type UserStateResponse = {
   success: boolean;
   state: DomainUserState;
   systemState: string;
+  primaryEmotion: string;
+  progressTrend: string;
+  streakDays: number;
   progress: number;
   pendingActions: { id: string; description: string }[];
 };
@@ -156,13 +159,14 @@ function buildActions(
   }
 
   // Real user actions go first — personalized from their goals
+  const stateColor = STATE_TO_EMOTIONAL[domainState] ?? "doubt";
   const userActions: ActionNode[] = pendingActions.map((pa, i) => ({
     id: `pending-${pa.id}`,
     type: "close_pending" as ExploreActionType,
     title: pa.description,
-    description: "Acción pendiente de tu plan",
+    description: "De tu plan personal",
     icon: "⚡",
-    color: "clarity" as const,
+    color: stateColor,
     completed: completedIds.has(`pending-${pa.id}`),
     order: i,
   }));
@@ -194,6 +198,12 @@ export default function ExplorePage() {
   });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [profileContext, setProfileContext] = useState<{
+    primaryEmotion: string;
+    progressTrend: string;
+    streakDays: number;
+    progress: number;
+  }>({ primaryEmotion: "calma", progressTrend: "igual", streakDays: 0, progress: 0 });
 
   useEffect(() => {
     let cancelled = false;
@@ -203,14 +213,25 @@ export default function ExplorePage() {
         const res = await fetch("/api/user/state", { credentials: "include" });
         if (cancelled) return;
 
+        const defaults: UserStateResponse = {
+          success: false, state: "neutral", systemState: "ESTABLE",
+          primaryEmotion: "calma", progressTrend: "igual", streakDays: 0,
+          progress: 0, pendingActions: [],
+        };
         const data: UserStateResponse = res.ok
           ? ((await res.json()) as UserStateResponse)
-          : { success: false, state: "neutral", systemState: "ESTABLE", progress: 0, pendingActions: [] };
+          : defaults;
 
         if (cancelled) return;
 
         const state: DomainUserState = data.state ?? "neutral";
         const tvoid = data.systemState === "TRANSITIONAL_VOID";
+        setProfileContext({
+          primaryEmotion: data.primaryEmotion ?? "calma",
+          progressTrend: data.progressTrend ?? "igual",
+          streakDays: data.streakDays ?? 0,
+          progress: data.progress ?? 0,
+        });
         applyDomainState(state, new Set(), tvoid, data.pendingActions ?? []);
       } catch {
         if (!cancelled) applyDomainState("neutral", new Set(), false, []);
@@ -404,6 +425,28 @@ export default function ExplorePage() {
             </>
           )}
         </div>
+
+        {/* User context banner */}
+        {profileContext.streakDays > 0 || profileContext.progress > 0 ? (
+          <div className="w-full max-w-md mb-8 flex items-center justify-center gap-6 py-3 px-5 rounded-xl border border-zinc-800/60 bg-zinc-900/40 backdrop-blur-sm">
+            {profileContext.streakDays > 0 && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-amber-400 text-sm">🔥</span>
+                <span className="text-xs font-medium text-zinc-300">{profileContext.streakDays}d racha</span>
+              </div>
+            )}
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-zinc-500">Estado:</span>
+              <span className="text-xs font-medium text-violet-300">{profileContext.primaryEmotion}</span>
+            </div>
+            {profileContext.progressTrend !== "igual" && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs">{profileContext.progressTrend === "subiendo" ? "📈" : "📉"}</span>
+                <span className="text-xs font-medium text-zinc-300 capitalize">{profileContext.progressTrend}</span>
+              </div>
+            )}
+          </div>
+        ) : null}
 
         {/* Progress Bar */}
         <div className="w-full max-w-md mb-12">

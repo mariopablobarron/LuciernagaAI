@@ -104,9 +104,16 @@ export async function GET(req: NextRequest) {
   const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   try {
-    // Users active in the last 7 days with an email
+    // Users active in the last 7 days who haven't opted out of weekly emails
     const users = await prisma.user.findMany({
-      where: { lastSeen: { gte: since }, isActive: true },
+      where: {
+        lastSeen: { gte: since },
+        isActive: true,
+        OR: [
+          { preferences: null }, // No preferences = default (opted in)
+          { preferences: { weeklyEmailEnabled: true } },
+        ],
+      },
       select: { id: true, email: true, name: true },
     });
 

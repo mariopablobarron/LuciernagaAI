@@ -1,9 +1,27 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Bell, CheckCircle2, ExternalLink, Globe, Lock, Eye, EyeOff, Send } from 'lucide-react';
+import {
+  ArrowLeft,
+  Bell,
+  CheckCircle2,
+  Clock,
+  Download,
+  ExternalLink,
+  Eye,
+  EyeOff,
+  Globe,
+  Lock,
+  MessageSquare,
+  Send,
+  Sparkles,
+  Trash2,
+  AlertTriangle,
+} from 'lucide-react';
 import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 type TelegramStatus = {
   linked: boolean;
@@ -11,23 +29,120 @@ type TelegramStatus = {
   botUsername: string;
 };
 
+type Preferences = {
+  aiTone: string;
+  reminderTime: string | null;
+  reminderEnabled: boolean;
+  weeklyEmailEnabled: boolean;
+  notifyInsights: boolean;
+  notifyGoals: boolean;
+  notifyUpdates: boolean;
+  timezone: string;
+};
+
 type PasswordForm = { current: string; next: string; confirm: string };
+
+const AI_TONES = [
+  { value: 'directo', label: 'Directo', desc: 'Va al grano, sin rodeos' },
+  { value: 'socratico', label: 'Socrático', desc: 'Te guía con preguntas' },
+  { value: 'calido', label: 'Cálido', desc: 'Empático y cercano' },
+] as const;
+
+const TIMEZONES = [
+  { value: 'Europe/Madrid', label: 'Madrid (GMT+1)' },
+  { value: 'Europe/London', label: 'Londres (GMT+0)' },
+  { value: 'America/Mexico_City', label: 'Ciudad de México (GMT-6)' },
+  { value: 'America/Bogota', label: 'Bogotá (GMT-5)' },
+  { value: 'America/Lima', label: 'Lima (GMT-5)' },
+  { value: 'America/Santiago', label: 'Santiago (GMT-4)' },
+  { value: 'America/Argentina/Buenos_Aires', label: 'Buenos Aires (GMT-3)' },
+  { value: 'America/New_York', label: 'Nueva York (GMT-5)' },
+  { value: 'America/Los_Angeles', label: 'Los Ángeles (GMT-8)' },
+] as const;
+
+// ─── Toggle Component ─────────────────────────────────────────────────────────
+
+function Toggle({ checked, onChange, disabled }: { checked: boolean; onChange: (v: boolean) => void; disabled?: boolean }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      disabled={disabled}
+      onClick={() => onChange(!checked)}
+      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 disabled:opacity-50 ${
+        checked ? 'bg-violet-600' : 'bg-zinc-700'
+      }`}
+    >
+      <span
+        className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-lg transition-transform ${
+          checked ? 'translate-x-5' : 'translate-x-0'
+        }`}
+      />
+    </button>
+  );
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
   const [telegram, setTelegram] = useState<TelegramStatus | null>(null);
+  const [prefs, setPrefs] = useState<Preferences | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState<string | null>(null);
   const [showPwForm, setShowPwForm] = useState(false);
   const [pwForm, setPwForm] = useState<PasswordForm>({ current: '', next: '', confirm: '' });
   const [showPw, setShowPw] = useState(false);
   const [pwLoading, setPwLoading] = useState(false);
   const [pwMsg, setPwMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isExporting, setIsExporting] = useState<string | null>(null);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
+  // Load data
   useEffect(() => {
     fetch('/api/user/telegram-status', { credentials: 'include' })
       .then((r) => r.json())
       .then((d: TelegramStatus) => setTelegram(d))
       .catch(() => {});
+
+    fetch('/api/user/preferences', { credentials: 'include' })
+      .then((r) => r.json())
+      .then((d: { preferences: Preferences }) => setPrefs(d.preferences))
+      .catch(() => {});
   }, []);
 
+  // Save preferences
+  const savePrefs = useCallback(async (patch: Partial<Preferences>) => {
+    setSaving(true);
+    setSaveMsg(null);
+    try {
+      const res = await fetch('/api/user/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(patch),
+      });
+      const data = (await res.json()) as { preferences: Preferences };
+      if (res.ok) {
+        setPrefs(data.preferences);
+        setSaveMsg('Guardado');
+        setTimeout(() => setSaveMsg(null), 2000);
+      }
+    } catch {
+      setSaveMsg('Error al guardar');
+    } finally {
+      setSaving(false);
+    }
+  }, []);
+
+  // Update a single preference
+  const updatePref = useCallback(<K extends keyof Preferences>(key: K, value: Preferences[K]) => {
+    setPrefs((p) => p ? { ...p, [key]: value } : p);
+    savePrefs({ [key]: value });
+  }, [savePrefs]);
+
+  // Password change
   async function handleChangePassword(e: React.SyntheticEvent) {
     e.preventDefault();
     setPwMsg(null);
@@ -67,19 +182,167 @@ export default function SettingsPage() {
     }
   }
 
-  const botUrl = telegram?.botUsername
-    ? `https://t.me/${telegram.botUsername}`
-    : 'https://t.me/';
+  // Export data
+  function handleExport(format: string) {
+    setIsExporting(format);
+    window.location.href = `/api/user/export?format=${format}`;
+    setTimeout(() => setIsExporting(null), 2000);
+  }
+
+  // Delete account
+  async function handleDelete() {
+    setIsDeleting(true);
+    try {
+      const res = await fetch('/api/user/account', { method: 'DELETE', credentials: 'include' });
+      if (res.ok) window.location.href = '/';
+      else alert('Error al eliminar la cuenta.');
+    } catch {
+      alert('Error al eliminar la cuenta.');
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
+  const botUrl = telegram?.botUsername ? `https://t.me/${telegram.botUsername}` : 'https://t.me/';
 
   return (
     <div className={`bg-linear-to-br ${GRADIENTS.background} py-8 px-4`}>
       <div className={`${LAYOUTS.sectionInner} max-w-3xl space-y-8`}>
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <Link href="/app" className="p-2 -ml-2 rounded-lg text-zinc-400 hover:text-cyan-400 hover:bg-white/5 transition-colors">
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-          <h1 className={`${TYPOGRAPHY.h1} text-white`}>Configuración</h1>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Link href="/app" className="p-2 -ml-2 rounded-lg text-zinc-400 hover:text-cyan-400 hover:bg-white/5 transition-colors">
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
+            <h1 className={`${TYPOGRAPHY.h1} text-white`}>Configuración</h1>
+          </div>
+          {saveMsg && (
+            <span className="flex items-center gap-1.5 text-xs text-emerald-400 animate-in fade-in">
+              <CheckCircle2 className="w-3.5 h-3.5" /> {saveMsg}
+            </span>
+          )}
+        </div>
+
+        {/* ── AI Coach ──────────────────────────────────────────────── */}
+        <div className={`${COMPONENTS.card} p-6 space-y-5`}>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-violet-500/15 flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-violet-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-white">Coach IA</h2>
+              <p className="text-xs text-zinc-500">Personaliza cómo te habla tu mentor</p>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-zinc-300">Tono de conversación</p>
+            <div className="grid grid-cols-3 gap-2">
+              {AI_TONES.map((tone) => (
+                <button
+                  key={tone.value}
+                  onClick={() => updatePref('aiTone', tone.value)}
+                  disabled={saving}
+                  className={`p-3 rounded-xl border text-left transition-all ${
+                    prefs?.aiTone === tone.value
+                      ? 'border-violet-500/60 bg-violet-500/10'
+                      : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700'
+                  }`}
+                >
+                  <p className="text-sm font-semibold text-white">{tone.label}</p>
+                  <p className="text-[11px] text-zinc-500 mt-0.5">{tone.desc}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Notifications ──────────────────────────────────────────── */}
+        <div className={`${COMPONENTS.card} p-6 space-y-5`}>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-cyan-500/15 flex items-center justify-center">
+              <Bell className="w-4 h-4 text-cyan-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-white">Notificaciones</h2>
+              <p className="text-xs text-zinc-500">Controla qué te enviamos y cuándo</p>
+            </div>
+          </div>
+
+          {prefs ? (
+            <div className="space-y-1 divide-y divide-zinc-800/60">
+              {/* Reminder */}
+              <div className="flex items-center justify-between py-3">
+                <div>
+                  <p className="text-sm font-semibold text-white">Recordatorios diarios</p>
+                  <p className="text-xs text-zinc-500">Check-in y acciones pendientes</p>
+                </div>
+                <Toggle checked={prefs.reminderEnabled} onChange={(v) => updatePref('reminderEnabled', v)} disabled={saving} />
+              </div>
+
+              {/* Reminder Time */}
+              {prefs.reminderEnabled && (
+                <div className="flex items-center justify-between py-3">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-zinc-500" />
+                    <div>
+                      <p className="text-sm font-semibold text-white">Hora del recordatorio</p>
+                      <p className="text-xs text-zinc-500">Recibirás el recordatorio a esta hora</p>
+                    </div>
+                  </div>
+                  <input
+                    type="time"
+                    value={prefs.reminderTime ?? '09:00'}
+                    onChange={(e) => updatePref('reminderTime', e.target.value)}
+                    disabled={saving}
+                    className="bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:ring-1 focus:ring-violet-500"
+                  />
+                </div>
+              )}
+
+              {/* Weekly email */}
+              <div className="flex items-center justify-between py-3">
+                <div>
+                  <p className="text-sm font-semibold text-white">Resumen semanal por email</p>
+                  <p className="text-xs text-zinc-500">Tu progreso de la semana cada domingo</p>
+                </div>
+                <Toggle checked={prefs.weeklyEmailEnabled} onChange={(v) => updatePref('weeklyEmailEnabled', v)} disabled={saving} />
+              </div>
+
+              {/* Insights */}
+              <div className="flex items-center justify-between py-3">
+                <div>
+                  <p className="text-sm font-semibold text-white">Nuevos insights</p>
+                  <p className="text-xs text-zinc-500">Cuando tengas nuevas recomendaciones</p>
+                </div>
+                <Toggle checked={prefs.notifyInsights} onChange={(v) => updatePref('notifyInsights', v)} disabled={saving} />
+              </div>
+
+              {/* Goals */}
+              <div className="flex items-center justify-between py-3">
+                <div>
+                  <p className="text-sm font-semibold text-white">Objetivos completados</p>
+                  <p className="text-xs text-zinc-500">Celebraciones cuando termines un objetivo</p>
+                </div>
+                <Toggle checked={prefs.notifyGoals} onChange={(v) => updatePref('notifyGoals', v)} disabled={saving} />
+              </div>
+
+              {/* Updates */}
+              <div className="flex items-center justify-between py-3">
+                <div>
+                  <p className="text-sm font-semibold text-white">Actualizaciones del producto</p>
+                  <p className="text-xs text-zinc-500">Nuevas funciones y mejoras</p>
+                </div>
+                <Toggle checked={prefs.notifyUpdates} onChange={(v) => updatePref('notifyUpdates', v)} disabled={saving} />
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="h-14 rounded-xl bg-zinc-800/50 animate-pulse" />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* ── Telegram ──────────────────────────────────────────────── */}
@@ -94,7 +357,6 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Status */}
           {telegram === null ? (
             <div className="h-14 rounded-xl bg-zinc-800/50 animate-pulse" />
           ) : telegram.linked ? (
@@ -102,9 +364,7 @@ export default function SettingsPage() {
               <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
               <div>
                 <p className="text-sm font-semibold text-emerald-300">Cuenta conectada</p>
-                <p className="text-xs text-zinc-500 mt-0.5">
-                  Ya recibes mensajes y recordatorios en Telegram.
-                </p>
+                <p className="text-xs text-zinc-500 mt-0.5">Ya recibes mensajes y recordatorios en Telegram.</p>
               </div>
             </div>
           ) : (
@@ -113,21 +373,20 @@ export default function SettingsPage() {
                 <p className="text-sm font-semibold text-white">Cómo conectar</p>
                 <ol className="space-y-2">
                   {[
-                    { step: '1', text: 'Abre el bot de Tres Mil Millones de Latidos en Telegram' },
-                    { step: '2', text: 'Pulsa Iniciar o escribe /start' },
-                    { step: '3', text: 'Envía el comando /vincular' },
-                    { step: '4', text: 'Haz clic en el enlace que te mande el bot' },
-                  ].map((item) => (
-                    <li key={item.step} className="flex items-start gap-3 text-sm text-zinc-300">
+                    'Abre el bot en Telegram',
+                    'Pulsa Iniciar o escribe /start',
+                    'Envía el comando /vincular',
+                    'Haz clic en el enlace que te mande el bot',
+                  ].map((text, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-zinc-300">
                       <span className="shrink-0 w-5 h-5 rounded-full bg-violet-500/20 text-violet-400 text-xs font-bold flex items-center justify-center mt-0.5">
-                        {item.step}
+                        {i + 1}
                       </span>
-                      {item.text}
+                      {text}
                     </li>
                   ))}
                 </ol>
               </div>
-
               <a
                 href={botUrl}
                 target="_blank"
@@ -138,74 +397,46 @@ export default function SettingsPage() {
                 Abrir bot en Telegram
                 <ExternalLink className="w-3.5 h-3.5 opacity-70" />
               </a>
-
-              {telegram.botUsername && (
-                <p className="text-center text-xs text-zinc-600">
-                  @{telegram.botUsername}
-                </p>
-              )}
             </div>
           )}
         </div>
 
-        {/* ── Notifications ──────────────────────────────────────────── */}
-        <div className={`${COMPONENTS.card} p-6 space-y-4`}>
-          <div className="flex items-center gap-3 mb-4">
-            <Bell className="w-5 h-5 text-cyan-400" />
-            <h2 className="text-lg font-semibold text-white">Notificaciones</h2>
+        {/* ── Timezone ──────────────────────────────────────────────── */}
+        <div className={`${COMPONENTS.card} p-6 space-y-5`}>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-violet-500/15 flex items-center justify-center">
+              <Globe className="w-4 h-4 text-violet-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-white">Región</h2>
+              <p className="text-xs text-zinc-500">Afecta a la hora de los recordatorios</p>
+            </div>
           </div>
 
-          <div className="space-y-4 border-t border-zinc-800 pt-4">
-            {[
-              { label: 'Recordatorios de check-in', desc: 'Notificaciones diarias para check-ins' },
-              { label: 'Nuevos insights', desc: 'Cuando tengas nuevas recomendaciones' },
-              { label: 'Objetivos completados', desc: 'Celebraciones cuando termines un objetivo' },
-              { label: 'Actualizaciones importantes', desc: 'Cambios y nuevas funciones' },
-            ].map((item) => (
-              <div key={item.label} className="flex items-center justify-between py-3">
-                <div>
-                  <p className="font-semibold text-white">{item.label}</p>
-                  <p className="text-xs text-zinc-500">{item.desc}</p>
-                </div>
-                <input type="checkbox" defaultChecked className="rounded border-zinc-700 bg-zinc-900 accent-cyan-500" />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Privacy ────────────────────────────────────────────────── */}
-        <div className={`${COMPONENTS.card} p-6 space-y-4`}>
-          <div className="flex items-center gap-3 mb-4">
-            <Eye className="w-5 h-5 text-violet-400" />
-            <h2 className="text-lg font-semibold text-white">Privacidad</h2>
-          </div>
-
-          <div className="space-y-4 border-t border-zinc-800 pt-4">
-            {[
-              { label: 'Perfil visible', desc: 'Otros usuarios pueden ver tu perfil público' },
-              { label: 'Compartir estadísticas', desc: 'Permitir que se usen tus datos anónimos para mejorar el producto' },
-            ].map((item) => (
-              <div key={item.label} className="flex items-center justify-between py-3">
-                <div>
-                  <p className="font-semibold text-white">{item.label}</p>
-                  <p className="text-xs text-zinc-500">{item.desc}</p>
-                </div>
-                <input type="checkbox" defaultChecked className="rounded border-zinc-700 bg-zinc-900 accent-cyan-500" />
-              </div>
-            ))}
-          </div>
+          {prefs && (
+            <select
+              value={prefs.timezone}
+              onChange={(e) => updatePref('timezone', e.target.value)}
+              disabled={saving}
+              className={`${COMPONENTS.inputField} w-full`}
+            >
+              {TIMEZONES.map((tz) => (
+                <option key={tz.value} value={tz.value}>{tz.label}</option>
+              ))}
+            </select>
+          )}
         </div>
 
         {/* ── Security ───────────────────────────────────────────────── */}
         <div className={`${COMPONENTS.card} p-6 space-y-4`}>
-          <div className="flex items-center gap-3 mb-4">
-            <Lock className="w-5 h-5 text-cyan-400" />
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-cyan-500/15 flex items-center justify-center">
+              <Lock className="w-4 h-4 text-cyan-400" />
+            </div>
             <h2 className="text-lg font-semibold text-white">Seguridad</h2>
           </div>
 
           <div className="space-y-3 border-t border-zinc-800 pt-4">
-
-            {/* Change password */}
             {!showPwForm ? (
               <button
                 onClick={() => { setShowPwForm(true); setPwMsg(null); }}
@@ -216,13 +447,11 @@ export default function SettingsPage() {
             ) : (
               <form onSubmit={handleChangePassword} className="space-y-4 rounded-xl border border-zinc-700/50 p-4">
                 <p className="text-sm font-semibold text-white">Cambiar contraseña</p>
-
                 {pwMsg && (
                   <div className={`rounded-lg px-3 py-2 text-sm ${pwMsg.type === 'success' ? 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : 'border border-red-500/30 bg-red-500/10 text-red-300'}`}>
                     {pwMsg.text}
                   </div>
                 )}
-
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-zinc-400">Contraseña actual</label>
                   <div className="relative">
@@ -237,7 +466,6 @@ export default function SettingsPage() {
                     </button>
                   </div>
                 </div>
-
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-zinc-400">Nueva contraseña</label>
                   <input
@@ -246,16 +474,14 @@ export default function SettingsPage() {
                     placeholder="Mínimo 8 caracteres" className={`${COMPONENTS.inputField} py-2 text-sm`}
                   />
                 </div>
-
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-zinc-400">Confirmar nueva contraseña</label>
+                  <label className="text-xs font-semibold text-zinc-400">Confirmar nueva</label>
                   <input
                     type={showPw ? 'text' : 'password'} value={pwForm.confirm} required
                     onChange={(e) => setPwForm({ ...pwForm, confirm: e.target.value })}
                     placeholder="••••••••" className={`${COMPONENTS.inputField} py-2 text-sm`}
                   />
                 </div>
-
                 <div className="flex gap-2">
                   <button type="submit" disabled={pwLoading}
                     className={`${COMPONENTS.buttonPrimary} flex-1 py-2 text-sm disabled:opacity-60`}>
@@ -268,50 +494,77 @@ export default function SettingsPage() {
                 </div>
               </form>
             )}
+          </div>
+        </div>
 
-            <button className={`${COMPONENTS.buttonSecondary} w-full`}>
-              Activar autenticación de dos factores
+        {/* ── Data Export ─────────────────────────────────────────────── */}
+        <div className={`${COMPONENTS.card} p-6 space-y-5`}>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-violet-500/15 flex items-center justify-center">
+              <Download className="w-4 h-4 text-violet-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-white">Tus datos</h2>
+              <p className="text-xs text-zinc-500">Derecho a portabilidad (Art. 20 RGPD)</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={() => handleExport('csv')}
+              disabled={isExporting !== null}
+              className={`${COMPONENTS.buttonSecondary} flex-1 flex items-center justify-center gap-2`}
+            >
+              {isExporting === 'csv' ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <MessageSquare className="w-4 h-4" />}
+              Historial de Chat (CSV)
             </button>
-            <button className={`${COMPONENTS.buttonSecondary} w-full`}>
-              Ver sesiones activas
+            <button
+              onClick={() => handleExport('json')}
+              disabled={isExporting !== null}
+              className={`${COMPONENTS.buttonSecondary} flex-1 flex items-center justify-center gap-2`}
+            >
+              {isExporting === 'json' ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Download className="w-4 h-4" />}
+              Datos completos (JSON)
             </button>
           </div>
         </div>
 
-        {/* ── Preferences ────────────────────────────────────────────── */}
-        <div className={`${COMPONENTS.card} p-6 space-y-4`}>
-          <div className="flex items-center gap-3 mb-4">
-            <Globe className="w-5 h-5 text-violet-400" />
-            <h2 className="text-lg font-semibold text-white">Preferencias</h2>
-          </div>
-
-          <div className="space-y-4 border-t border-zinc-800 pt-4">
-            <div>
-              <p className="font-semibold text-white mb-3">Idioma</p>
-              <select className={`${COMPONENTS.inputField} w-full`}>
-                <option>Español</option>
-                <option>English</option>
-                <option>Português</option>
-              </select>
-            </div>
-            <div>
-              <p className="font-semibold text-white mb-3">Zona horaria</p>
-              <select className={`${COMPONENTS.inputField} w-full`}>
-                <option>America/Argentina/Buenos_Aires</option>
-                <option>America/Mexico_City</option>
-                <option>Europe/Madrid</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Danger zone ────────────────────────────────────────────── */}
+        {/* ── Danger Zone ────────────────────────────────────────────── */}
         <div className={`${COMPONENTS.card} p-6 space-y-3 border-l-4 border-l-red-500`}>
           <h2 className="text-lg font-semibold text-red-400">Zona de peligro</h2>
           <p className="text-sm text-zinc-400">Estas acciones no se pueden deshacer.</p>
-          <button className="w-full py-2 px-4 rounded-lg border border-red-500/50 text-red-400 hover:bg-red-500/10 transition-colors font-semibold">
-            Eliminar mi cuenta y todos mis datos
-          </button>
+
+          {!showConfirmDelete ? (
+            <button
+              onClick={() => setShowConfirmDelete(true)}
+              className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-lg border border-red-500/50 text-red-400 hover:bg-red-500/10 transition-colors font-semibold"
+            >
+              <Trash2 className="w-4 h-4" />
+              Eliminar mi cuenta y todos mis datos
+            </button>
+          ) : (
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3 text-red-500">
+                <AlertTriangle className="w-5 h-5 shrink-0" />
+                <span className="text-sm font-medium">¿Seguro? Perderás todo tu avance.</span>
+              </div>
+              <div className="flex gap-2 w-full sm:w-auto">
+                <button
+                  onClick={() => setShowConfirmDelete(false)}
+                  className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="flex-1 bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
+                >
+                  {isDeleting ? 'Borrando…' : 'Sí, borrar'}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -93,7 +93,27 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // API-specific: no caching
+        // Static assets with hash — cache aggressively (1 year)
+        source: "/_next/static/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        // HTML pages — always revalidate with server
+        source: "/((?!api|_next/static).*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-cache, must-revalidate",
+          },
+        ],
+      },
+      {
+        // API-specific: never cache
         source: "/api/:path*",
         headers: [
           {

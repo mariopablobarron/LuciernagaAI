@@ -65,42 +65,21 @@ export function proxy(request: NextRequest) {
   }
 
   // ── i18n locale routing ─────────────────────────────────────────────
-  // Skip i18n for app routes, api, static files
-  const skipI18n =
-    pathname.startsWith("/app") ||
-    pathname.startsWith("/api") ||
-    pathname.startsWith("/impulso") ||
-    pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/journey") ||
-    pathname.startsWith("/editor") ||
-    pathname.startsWith("/profile") ||
-    pathname.startsWith("/settings") ||
-    pathname.startsWith("/billing") ||
-    pathname.startsWith("/family") ||
-    pathname.startsWith("/monitoring") ||
-    pathname.startsWith("/org") ||
-    pathname.startsWith("/_next") ||
-    pathname.includes(".");
-
-  if (skipI18n) return NextResponse.next();
-
-  // Pages that have i18n versions under [locale]/
-  const i18nPages = ["/"];
-
-  // Check if this is a locale-prefixed URL for a page that doesn't have i18n
-  const localeMatch = pathname.match(/^\/(es|en)(\/.*)?$/);
-  if (localeMatch) {
-    const subpath = localeMatch[2] || "/";
-    if (!i18nPages.includes(subpath)) {
-      // Redirect /en/unirse → /unirse (strip locale prefix)
-      const url = request.nextUrl.clone();
-      url.pathname = subpath;
-      return NextResponse.redirect(url);
-    }
+  // Only apply i18n to: /, /en, /es (the landing page)
+  // Everything else passes through to Next.js normally
+  if (pathname === "/" || pathname === "/en" || pathname === "/es") {
+    return intlMiddleware(request);
   }
 
-  // Apply i18n middleware only to root and locale-prefixed root
-  return intlMiddleware(request);
+  // Redirect /en/anything or /es/anything → /anything (strip locale prefix)
+  const localeMatch = pathname.match(/^\/(es|en)(\/.*)/);
+  if (localeMatch) {
+    const url = request.nextUrl.clone();
+    url.pathname = localeMatch[2];
+    return NextResponse.redirect(url);
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {

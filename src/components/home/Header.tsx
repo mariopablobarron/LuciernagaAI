@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import ClinicalDisclaimer from "@/components/ClinicalDisclaimer";
 
 const NAV = [
   { label: "Chat", href: "/app" },
@@ -63,6 +64,7 @@ export default function Header() {
 
           {/* CTAs */}
           <div className="hidden md:flex items-center gap-2 shrink-0">
+            <ClinicalDisclaimer />
             <Link
               href="/login"
               className="px-4 py-2 rounded-lg text-sm font-medium text-zinc-300 hover:text-white transition-colors"
@@ -79,6 +81,7 @@ export default function Header() {
 
           {/* Mobile: CTA visible + toggle */}
           <div className="md:hidden flex items-center gap-2">
+            <ClinicalDisclaimer />
             <Link
               href="/unirse"
               className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-violet-600 hover:bg-violet-500 transition-all"

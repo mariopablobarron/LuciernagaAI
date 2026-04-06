@@ -73,6 +73,7 @@ model User {
   userState            UserState?
   dailyCheckins        DailyCheckin[]
   llmLogs              LlmLog[]
+  feedbacks            Feedback[]
 }
 
 model Message {
@@ -757,4 +758,18 @@ model UserExercise {
   @@index([userId, status])
   @@index([exerciseId, status])
   @@index([userId, completedAt])
+}
+
+/// User feedback, suggestions, and bug reports.
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   @default("suggestion") // "suggestion" | "bug" | "other"
+  message   String   @db.Text
+  page      String?  // URL path where feedback was submitted
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([type, createdAt])
 }

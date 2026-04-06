@@ -19,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 import { Textarea } from "@/components/ui/textarea";
+import { VoiceRecorder } from "@/components/ui/voice-recorder";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -603,6 +604,10 @@ export default function Chat({
             rows={1}
             className="min-h-11 max-h-36 flex-1 resize-none overflow-hidden rounded-xl border-zinc-800 bg-zinc-900 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-indigo-500/50"
             style={{ fieldSizing: "content" } as React.CSSProperties}
+          />
+          <VoiceRecorder
+            onTranscript={(text) => handleInputChange(input ? `${input} ${text}` : text)}
+            disabled={loading}
           />
           <Button
             onClick={() => void onSend()}

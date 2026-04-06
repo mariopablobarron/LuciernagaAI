@@ -16,6 +16,7 @@ import {
   Target,
 } from "lucide-react";
 import type { UserState } from "@/domain/types";
+import Milestones from "@/components/Milestones";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -263,6 +264,9 @@ export default function DashboardPage() {
                 </div>
                 <p className="text-xs text-zinc-600">{stateData?.primaryEmotion ?? "—"}</p>
               </div>
+
+              {/* Milestones */}
+              <Milestones streakDays={stateData?.streakDays ?? 0} messageCount={0} />
             </>
           )}
         </div>

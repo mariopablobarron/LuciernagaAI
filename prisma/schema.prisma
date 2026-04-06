@@ -75,6 +75,8 @@ model User {
   llmLogs              LlmLog[]
   feedbacks            Feedback[]
   events               Event[]
+  organizationId       String?
+  organization         Organization?    @relation(fields: [organizationId], references: [id])
 }
 
 model Message {
@@ -777,4 +779,44 @@ model Feedback {
 
   @@index([userId, createdAt])
   @@index([type, createdAt])
+}
+
+// ─── B2B: Organizations (Multitenant) ─────────────────────────────────────────
+
+/// An organization (company, clinic, school) that groups users.
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique // URL-friendly identifier
+  type        String   @default("company") // "company" | "clinic" | "school"
+  plan        String   @default("team") // "team" | "enterprise"
+  maxUsers    Int      @default(50)
+  isActive    Boolean  @default(true)
+  contactName String?
+  contactEmail String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       User[]
+  orgAdmins   OrgAdmin[]
+
+  @@index([slug])
+  @@index([type, isActive])
+}
+
+/// Admin users for an organization (HR managers, therapists).
+/// Separate from User — they don't chat, they view aggregate data.
+model OrgAdmin {
+  id             String       @id @default(cuid())
+  organizationId String
+  email          String
+  name           String
+  role           String       @default("hr") // "hr" | "therapist" | "admin"
+  passwordHash   String
+  lastLoginAt    DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, email])
+  @@index([email])
 }

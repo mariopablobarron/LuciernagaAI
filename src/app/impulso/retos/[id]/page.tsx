@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle, Target, Clock } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Target, Clock, MessageCircle } from 'lucide-react';
 import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
 
 export default async function RetoDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -74,6 +74,15 @@ export default async function RetoDetailPage({ params }: { params: Promise<{ id:
             Ver historial
           </button>
         </div>
+
+        {/* Bridge to chat */}
+        <Link
+          href="/app?context=reto"
+          className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl border border-violet-500/30 bg-violet-500/5 text-violet-300 hover:bg-violet-500/10 hover:border-violet-500/50 transition-all text-sm font-medium"
+        >
+          <MessageCircle className="w-4 h-4" />
+          Comentar este reto con tu mentor
+        </Link>
       </div>
     </div>
   );

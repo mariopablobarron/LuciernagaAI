@@ -1,3 +1,4 @@
+import { interceptActionLock, interceptCrisis, interceptTransitionalVoid } from "./phases/intercept";
 import { generateDecision as generateDomainDecision } from "@/domain/decisionEngine";
 import type {
   Decision as DomainDecision,
@@ -714,193 +715,36 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
   const conversionType = conversionTrigger ? "progress" : undefined;
   const softPaywallPrompt = softPaywallActive && (conversionTrigger || Boolean(activeGoal));
 
-  // ── 4. Action lock response ─────────────────────────────────────────────
-  if (actionLockPayload && actionLockAssistantMessage) {
-    if (captureEmailRecommended) {
-      actionLockAssistantMessage = appendCaptureEmailPrompt(
-        actionLockAssistantMessage,
-        captureEmailRecommended
-      );
-    }
-    actionLockPayload = {
-      ...actionLockPayload,
-      captureEmail: captureEmailRecommended,
-      captureEmailMessage: captureEmailRecommended ? captureEmailMessage : null,
-      message: actionLockAssistantMessage,
-      response: actionLockAssistantMessage,
-    };
+  // ── 4-5. Intercept: action lock / crisis / transitional void ─────────────
+  const interceptInput = {
+    userId,
+    message,
+    state,
+    conversationId,
+    persistenceAvailable,
+    flowContext,
+    emotionalProfile,
+    crisisMode,
+    crisisSource,
+    crisisActiveUntil,
+    riskLevel,
+    actionLockPayload,
+    actionLockAssistantMessage,
+    captureEmailRecommended,
+    captureEmailMessage,
+    domainState,
+    domainDecision,
+    activeGoal,
+  };
 
-    if (persistenceAvailable) {
-      try {
-        await saveConversationMessage({
-          conversationId,
-          userId,
-          role: "assistant",
-          content: actionLockAssistantMessage,
-        });
-        logInfo("DB", "message_saved", {
-          userId,
-          conversationId,
-          role: "assistant",
-          actionLock: true,
-        });
-      } catch (dbError: unknown) {
-        persistenceAvailable = false;
-        logError("DB", dbError, { route: "/api/chat", userId, stage: "action_lock_persistence" });
-        actionLockPayload = { ...actionLockPayload, persistenceAvailable };
-      }
-    }
+  const lockResult = await interceptActionLock(interceptInput);
+  if (lockResult.intercepted) return { data: lockResult.data };
 
-    return { data: actionLockPayload };
-  }
+  const crisisResult = await interceptCrisis(interceptInput);
+  if (crisisResult.intercepted) return { data: crisisResult.data };
 
-  // ── 5. Crisis response ─────────────────────────────────────────────────
-  if (crisisMode) {
-    const containmentLevel: RiskLevel = isCrisisLevel(riskLevel) ? riskLevel : "high";
-    const crisisPayload = getCrisisResponse(containmentLevel);
-
-    await registerCrisisEvent({
-      userId,
-      level: containmentLevel,
-      message,
-      response: crisisPayload.response,
-    });
-    await sendCrisisEscalationAlert({ userId, level: containmentLevel, message });
-
-    if (persistenceAvailable) {
-      try {
-        await saveConversationMessage({
-          conversationId,
-          userId,
-          role: "assistant",
-          content: crisisPayload.response,
-        });
-        logInfo("DB", "message_saved", {
-          userId,
-          conversationId,
-          role: "assistant",
-          crisisMode: true,
-        });
-      } catch (dbError: unknown) {
-        persistenceAvailable = false;
-        logError("DB", dbError, {
-          route: "/api/chat",
-          userId,
-          stage: "crisis_response_persistence",
-        });
-      }
-    }
-
-    logInfo("RISK", "crisis_mode_activated", {
-      userId,
-      conversationId,
-      riskLevel,
-      containmentLevel,
-      crisisSource,
-      crisisActiveUntil,
-    });
-
-    return {
-      data: {
-        success: true,
-        type: "crisis",
-        response: crisisPayload.response,
-        state,
-        systemState: "CRISIS",
-        decision: generateDomainDecision(
-          "CRISIS",
-          buildChatInsight({
-            crisisCount: 1,
-            checkinDrop: 1,
-            retentionDay3: 0.1,
-            retentionDay7: 0.1,
-          })
-        ),
-        conversationId,
-        goal: null,
-        emotionalProfile,
-        fallback: true,
-        persistenceAvailable,
-        crisis: true,
-        continueChat: crisisPayload.continueChat,
-        riskLevel: containmentLevel,
-        detectedRiskLevel: riskLevel,
-        crisisActive: true,
-        crisisActiveUntil,
-        searchUsed: false,
-        flow: serializeFlow(flowContext),
-        alerts: crisisPayload.resources,
-        legalFlag: crisisPayload.legalFlag,
-        legalDisclaimer: crisisPayload.disclaimer,
-      },
-    };
-  }
-
-  // ── 5.5. TRANSITIONAL_VOID response ────────────────────────────────────
-  if (domainState === "TRANSITIONAL_VOID" && !crisisMode) {
-    const tvResponse =
-      `No estás perdido.\n\nEstás en una transición.\n\n` +
-      `El problema no es que no sepas qué hacer.\n` +
-      `Es que estás intentando decidir demasiado pronto.\n\n` +
-      `Vamos a hacer algo simple.\n\n` +
-      `Escribe:\n→ qué parte de tu vida ya no encaja contigo`;
-
-    void trackSafe({
-      userId,
-      type: "TRANSITIONAL_VOID_DETECTED",
-      metadata: { conversationId, state },
-    });
-
-    // n8n webhook — fire and forget
-    const n8nWebhook = process.env.N8N_TRANSITIONAL_VOID_WEBHOOK;
-    if (n8nWebhook) {
-      void fetch(n8nWebhook, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, state: "TRANSITIONAL_VOID" }),
-      }).catch(() => {});
-    }
-
-    if (persistenceAvailable) {
-      try {
-        const { getPrismaClient } = await import("@/db/prisma");
-        const prisma = getPrismaClient();
-        await Promise.all([
-          saveConversationMessage({
-            conversationId,
-            userId,
-            role: "assistant",
-            content: tvResponse,
-          }),
-          prisma.userState.upsert({
-            where: { userId },
-            update: { systemState: "TRANSITIONAL_VOID" },
-            create: { userId, state, systemState: "TRANSITIONAL_VOID" },
-          }),
-        ]);
-      } catch {
-        // non-critical
-      }
-    }
-
-    return {
-      data: {
-        success: true,
-        type: "transitional_void",
-        response: tvResponse,
-        state,
-        systemState: "TRANSITIONAL_VOID",
-        decision: domainDecision,
-        conversationId,
-        goal: serializeGoal(activeGoal),
-        emotionalProfile,
-        persistenceAvailable,
-        fallback: false,
-        searchUsed: false,
-        flow: serializeFlow(flowContext),
-      },
-    };
-  }
+  const tvResult = await interceptTransitionalVoid(interceptInput);
+  if (tvResult.intercepted) return { data: tvResult.data };
 
   // ── 6. AI key guard ────────────────────────────────────────────────────
   if (!process.env.OPENROUTER_API_KEY?.trim()) {

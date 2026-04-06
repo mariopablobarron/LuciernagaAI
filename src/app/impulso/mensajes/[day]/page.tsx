@@ -4,8 +4,9 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar } from 'lucide-react';
 import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
 
-export default function MessageDetailPage({ params }: { params: { day: string } }) {
-  const day = parseInt(params.day);
+export default async function MessageDetailPage({ params }: { params: Promise<{ day: string }> }) {
+  const { day: dayStr } = await params;
+  const day = parseInt(dayStr);
 
   return (
     <div className={`min-h-screen bg-gradient-to-br ${GRADIENTS.background} py-8 px-4`}>

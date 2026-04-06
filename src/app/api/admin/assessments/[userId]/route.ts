@@ -104,5 +104,3 @@ export async function POST(
   return NextResponse.json({ assessment }, { status: 201 });
 }
 
-// Export getSeverity so the user-facing respond route can use it
-export { getSeverity };

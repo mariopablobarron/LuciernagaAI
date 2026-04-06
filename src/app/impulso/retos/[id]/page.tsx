@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { ArrowLeft, CheckCircle, Target, Clock } from 'lucide-react';
 import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
 
-export default function RetoDetailPage({ params }: { params: { id: string } }) {
+export default async function RetoDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  await params;
   return (
     <div className={`min-h-screen bg-gradient-to-br ${GRADIENTS.background} py-8 px-4`}>
       <div className={`${LAYOUTS.sectionInner} max-w-3xl space-y-8`}>

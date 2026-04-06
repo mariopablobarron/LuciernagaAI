@@ -74,6 +74,7 @@ model User {
   dailyCheckins        DailyCheckin[]
   llmLogs              LlmLog[]
   feedbacks            Feedback[]
+  events               Event[]
 }
 
 model Message {
@@ -171,6 +172,7 @@ model DecisionLog {
 model Event {
   id        String   @id @default(cuid())
   userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   type      String
   metadata  Json?
   createdAt DateTime @default(now())

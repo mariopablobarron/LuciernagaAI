@@ -15,7 +15,7 @@ export default function CheckoutButton({ plan = 'pro_monthly', email, children, 
   async function handleCheckout() {
     setLoading(true);
     try {
-      const res = await fetch('/api/stripe/checkout', {
+      const res = await fetch('/api/billing/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ plan, email }),

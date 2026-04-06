@@ -1,63 +1,67 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { getPrismaClient } from "@/db/prisma";
+import { NextRequest, NextResponse } from "next/server";
 import { resolveIdentity } from "@/lib/auth";
+import { getPrismaClient } from "@/db/prisma";
+import { logError } from "@/lib/logger";
 
-// PATCH /api/conversations/[id]  — rename or set rating / journalMode
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const identity = await resolveIdentity(req);
-  const { id } = await params;
-  const body = (await req.json().catch(() => null)) as {
-    title?: string;
-    rating?: number;
-    journalMode?: boolean;
-  } | null;
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const identity = await resolveIdentity(req);
+    const resolvedParams = await params;
+    const conversationId = resolvedParams.id;
+    const body = await req.json();
 
-  if (!body) return NextResponse.json({ error: "Body requerido" }, { status: 400 });
+    const prisma = getPrismaClient();
 
-  const prisma = getPrismaClient();
+    // Validar propiedad de la conversación
+    const conversation = await prisma.conversation.findFirst({
+      where: { id: conversationId, userId: identity.userId },
+    });
 
-  const conv = await prisma.conversation.findFirst({
-    where: { id, userId: identity.userId },
-    select: { id: true },
-  });
-  if (!conv) return NextResponse.json({ error: "No encontrada" }, { status: 404 });
+    if (!conversation) {
+      return NextResponse.json({ error: "Conversación no encontrada" }, { status: 404 });
+    }
 
-  const data: Record<string, unknown> = {};
-  if (typeof body.title === "string" && body.title.trim())
-    data.title = body.title.trim().slice(0, 80);
-  if (body.rating === 1 || body.rating === -1) data.rating = body.rating;
-  if (typeof body.journalMode === "boolean") data.journalMode = body.journalMode;
+    // Construir objeto de actualización dinámico
+    const updateData: { title?: string; journalMode?: boolean; rating?: number } = {};
+    if (typeof body.title === "string") updateData.title = body.title;
+    if (typeof body.journalMode === "boolean") updateData.journalMode = body.journalMode;
+    if (typeof body.rating === "number") updateData.rating = body.rating;
 
-  if (Object.keys(data).length === 0)
-    return NextResponse.json({ error: "Nada que actualizar" }, { status: 400 });
+    const updated = await prisma.conversation.update({
+      where: { id: conversationId },
+      data: updateData,
+    });
 
-  const updated = await prisma.conversation.update({
-    where: { id },
-    data,
-    select: { id: true, title: true, rating: true, journalMode: true },
-  });
-
-  return NextResponse.json({ conversation: updated });
+    return NextResponse.json({ success: true, conversation: updated });
+  } catch (error: unknown) {
+    logError("CONVERSATION", error, { area: "patch_conversation" });
+    return NextResponse.json({ error: "Fallo al actualizar la conversación" }, { status: 500 });
+  }
 }
 
-// DELETE /api/conversations/[id]
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const identity = await resolveIdentity(req);
-  const { id } = await params;
-  const prisma = getPrismaClient();
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const identity = await resolveIdentity(req);
+    const resolvedParams = await params;
+    const conversationId = resolvedParams.id;
 
-  const conv = await prisma.conversation.findFirst({
-    where: { id, userId: identity.userId },
-    select: { id: true },
-  });
-  if (!conv) return NextResponse.json({ error: "No encontrada" }, { status: 404 });
+    const prisma = getPrismaClient();
 
-  await prisma.conversation.delete({ where: { id } });
-  return NextResponse.json({ ok: true });
+    const conversation = await prisma.conversation.findFirst({
+      where: { id: conversationId, userId: identity.userId },
+    });
+
+    if (!conversation) {
+      return NextResponse.json({ error: "Conversación no encontrada" }, { status: 404 });
+    }
+
+    await prisma.conversation.delete({
+      where: { id: conversationId },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error: unknown) {
+    logError("CONVERSATION", error, { area: "delete_conversation" });
+    return NextResponse.json({ error: "Fallo al eliminar la conversación" }, { status: 500 });
+  }
 }

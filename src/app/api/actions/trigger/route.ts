@@ -176,11 +176,14 @@ export async function POST(
     });
 
     // 5. Notify n8n — fire-and-forget ────────────────────────────────────────
-    void fetch("https://n8n.72.61.195.108.sslip.io/webhook/luciernaga-action", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type, userId: identity.userId, state: updatedState }),
-    }).catch(() => {});
+    const n8nUrl = process.env.N8N_ACTION_WEBHOOK;
+    if (n8nUrl) {
+      void fetch(n8nUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, userId: identity.userId, state: updatedState }),
+      }).catch(() => {});
+    }
 
     // 6. Telegram admin alerts (all fire-and-forget via notifyAdmin) ──────────
     if (updatedState === "bloqueo" || updatedState === "claridad") {

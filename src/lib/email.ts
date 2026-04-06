@@ -130,7 +130,10 @@ export async function sendUserEmail(email: UserEmail): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY?.trim();
   const from = process.env.EMAIL_FROM?.trim() ?? "TresMilMillonesdeLatidos <info@tresmilmillonesdelatidos.es>";
 
-  if (!apiKey) return false;
+  if (!apiKey) {
+    console.error("[EMAIL] RESEND_API_KEY not configured — email not sent");
+    return false;
+  }
 
   try {
     const res = await fetch(RESEND_URL, {
@@ -148,8 +151,14 @@ export async function sendUserEmail(email: UserEmail): Promise<boolean> {
       }),
     });
 
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      console.error(`[EMAIL] Resend API error ${res.status}: ${body}`);
+    }
+
     return res.ok;
-  } catch {
+  } catch (err) {
+    console.error("[EMAIL] Failed to send:", err);
     return false;
   }
 }

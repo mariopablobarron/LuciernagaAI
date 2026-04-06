@@ -1,4 +1,5 @@
 import { analyzeMessage, isCrisisLevel, isCrisisInterventionMessage, mapRiskLevelToCrisisCount, detectTransitionalVoidSignals } from "./phases/analyze";
+import { buildContext } from "./phases/context";
 import { interceptActionLock, interceptCrisis, interceptTransitionalVoid } from "./phases/intercept";
 import { generateDecision as generateDomainDecision } from "@/domain/decisionEngine";
 import type {
@@ -28,8 +29,8 @@ import {
   resolveConversationForUser,
   saveConversationMessage,
 } from "@/services/conversation";
-import { listRecentImpulseLogs, upsertDailyImpulseLog } from "@/services/impulse-challenges";
-import { getUserImpulseProfile } from "@/services/impulse-diagnostic";
+import { upsertDailyImpulseLog } from "@/services/impulse-challenges";
+// getUserImpulseProfile + listRecentImpulseLogs now in phases/context.ts
 import {
   buildGoalCoachContext,
   countPendingActions,
@@ -48,18 +49,12 @@ import {
 // flows + intent now in phases/analyze.ts
 import { getMentorMode, shouldAskForEmail } from "@/services/mentor-protocol";
 import { getConversationalOnboarding } from "@/services/onboarding";
-import { buildJourneyPromptBlock } from "@/services/journey-coach-bridge";
+// buildJourneyPromptBlock now in phases/context.ts
 import { analyzeEmotionalProfile, updateEmotionalProfile } from "@/services/emotional-model";
-import {
-  buildSearchQuery,
-  classifyExternalInfoNeed,
-  needsExternalInfo,
-  searchWeb,
-} from "@/services/search";
+// search now in phases/context.ts
 // risk detection now in phases/analyze.ts, crisis handling in phases/intercept.ts
 import {
   activateUserCrisis,
-  buildConversationContext,
   clearUserCrisis,
   getUserCrisisStatus,
   shouldBypassActionLock,
@@ -175,8 +170,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
   let persistenceAvailable = true;
   let conversationHistory: Array<{ role: "user" | "assistant"; content: string }> = [];
   let activeGoal: Awaited<ReturnType<typeof getActiveGoalForUser>> | null = null;
-  let searchResults: Awaited<ReturnType<typeof searchWeb>> = [];
-  let searchQuery: string | null = null;
+  // searchResults and searchQuery now come from Phase 4 (Context)
   let conversationId = input.conversationId?.trim() || `tmp_${Date.now()}`;
   let goalAvoidanceCount = 0;
   let goalAvoidanceStreak = 0;
@@ -660,83 +654,30 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     throw new Error("MISSING_OPENROUTER_API_KEY");
   }
 
-  logInfo("AI", "openrouter_call_requested", {
+  // ── 7-8. Build context (Phase 4: Context) ─────────────────────────────
+  const ctx = await buildContext({
     userId,
+    message,
     conversationId,
     state,
-    primaryEmotion: emotionalProfile.primaryEmotion,
-    dominantPattern: emotionalProfile.dominantPattern,
-    energyLevel: emotionalProfile.energyLevel,
-    messageLength: message.length,
-    mentorMode: mentorMode.mode,
+    emotionalProfile,
+    activeGoal,
+    flowContext,
+    mentorMode,
     transformationPhase,
-  });
-
-  // ── 7. Web search ──────────────────────────────────────────────────────
-  const externalInfo = classifyExternalInfoNeed(message);
-  if (needsExternalInfo(message) && externalInfo.shouldUse) {
-    searchQuery = buildSearchQuery(message);
-    if (searchQuery) {
-      searchResults = await searchWeb(searchQuery, 3).catch((searchError: unknown) => {
-        logError("SEARCH", searchError, { route: "/api/chat", userId, query: searchQuery });
-        return [];
-      });
-    }
-  }
-
-  // ── 8. Build coach context ─────────────────────────────────────────────
-  const conversationContext = buildConversationContext({
-    state,
-    lastGoal: activeGoal?.title ?? null,
-    pendingActions: activeGoal?.actions.filter((a) => !a.completed).map((a) => a.description) ?? [],
-  });
-
-  const [impulseProfile, impulseLogs, journeyPromptBlock] = await Promise.all([
-    getUserImpulseProfile(userId).catch(() => null),
-    listRecentImpulseLogs(userId, 5).catch(() => []),
-    buildJourneyPromptBlock(userId).catch(() => null),
-  ]);
-
-  const activeAction = getFirstPendingAction(activeGoal);
-  const defaultAction = activeGoal
-    ? "Cierra hoy una sola accion visible de tu objetivo activo."
-    : "Define una sola accion concreta para hoy y ejecútala.";
-
-  const coachContext = {
-    goal: buildGoalCoachContext(activeGoal, message, {
-      avoidanceCount: goalAvoidanceCount,
-      avoidanceDetected: avoidanceDetectedThisTurn,
-    }),
-    continuity: {
-      ...conversationContext,
-      hesitationDetected: goalAvoidanceCount > 0 || avoidanceDetectedThisTurn,
-      trend: emotionalProfile.progressTrend,
-    },
-    flow: {
-      currentIntent: flowContext.currentIntent,
-      currentStep: flowContext.currentStep,
-      activeFlow: flowContext.activeFlow,
-      instruction: flowContext.instruction,
-    },
-    mentor: mentorMode,
-    transformation: { phase: transformationPhase, summary: transformationSummary },
-    legal: {
-      limitsNote:
-        "Tres Mil Millones de Latidos orienta y empuja accion, pero no sustituye terapia ni soporte de emergencia.",
-      critical: false,
-    },
-    onboarding: onboardingContext,
-    journeyPrompt: journeyPromptBlock,
-    access: {
+    transformationSummary,
+    onboardingContext,
+    goalAvoidanceCount,
+    avoidanceDetectedThisTurn,
+    conversionTrigger,
+    session: {
       userPlan: session.userPlan,
       remainingMessages: remainingMessagesAfterTurn,
       hasActiveGoal: Boolean(activeGoal),
-      conversionTrigger,
     },
-    web: searchQuery
-      ? { query: searchQuery, usage: "practical_decision" as const, results: searchResults }
-      : null,
-  };
+  });
+
+  const { coachContext, searchResults, impulseProfile, impulseLogs, activeAction, defaultAction } = ctx;
 
   // ── 9. Impulse mode (non-streaming JSON) ──────────────────────────────
   if (impulseProfile) {

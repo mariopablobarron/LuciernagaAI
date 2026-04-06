@@ -10,6 +10,7 @@ const NAV = [
   { label: "Chat", href: "/app" },
   { label: "Itinerarios", href: "/journey" },
   { label: "Dashboard", href: "/dashboard" },
+  { label: "Guía", href: "/guia" },
   { label: "Precios", href: "/precios" },
   { label: "Test gratuito", href: "/test", highlight: true },
 ];

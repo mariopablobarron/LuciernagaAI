@@ -49,7 +49,7 @@ export default function FeedbackWidget() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-4 right-4 z-40 p-2.5 rounded-full bg-zinc-800/80 border border-zinc-700/50 text-zinc-500 hover:text-violet-400 hover:border-violet-500/40 hover:bg-zinc-800 transition-all backdrop-blur-sm"
+          className="fixed bottom-24 right-4 z-40 p-2.5 rounded-full bg-zinc-800/80 border border-zinc-700/50 text-zinc-500 hover:text-violet-400 hover:border-violet-500/40 hover:bg-zinc-800 transition-all backdrop-blur-sm"
           title="Enviar feedback"
         >
           <MessageSquarePlus className="w-4 h-4" />
@@ -58,7 +58,7 @@ export default function FeedbackWidget() {
 
       {/* Panel */}
       {open && (
-        <div className="fixed bottom-4 right-4 z-50 w-80 rounded-xl border border-zinc-700/60 bg-zinc-900/95 backdrop-blur-md shadow-2xl shadow-black/40 animate-in slide-in-from-bottom-2 fade-in duration-200">
+        <div className="fixed bottom-24 right-4 z-50 w-80 rounded-xl border border-zinc-700/60 bg-zinc-900/95 backdrop-blur-md shadow-2xl shadow-black/40 animate-in slide-in-from-bottom-2 fade-in duration-200">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800/60">
             <p className="text-sm font-semibold text-zinc-200">Feedback</p>

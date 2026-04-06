@@ -14,7 +14,7 @@ type TokenVerificationResult =
   | { kind: "expired"; payload: SessionPayload }
   | { kind: "invalid" };
 
-export type IdentitySource = "session" | "generated" | "refreshed" | "linked" | "static";
+export type IdentitySource = "session" | "generated" | "refreshed" | "linked";
 
 export type ResolvedIdentity = {
   userId: string;
@@ -40,10 +40,6 @@ const SESSION_COOKIE_NAME = "mw_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 24;
 const SESSION_TTL_MS = SESSION_TTL_SECONDS * 1000;
 const USER_ID_PATTERN = /^[a-zA-Z0-9._:-]{3,64}$/;
-const MVP_STATIC_IDENTITY_ENABLED =
-  process.env.MVP_STATIC_IDENTITY === "true" &&
-  process.env.NODE_ENV !== "production";
-const MVP_STATIC_USER_ID = "demo-user";
 
 function getSessionSecret(): string {
   const authSecret = process.env.AUTH_TOKEN_SECRET?.trim();
@@ -233,21 +229,6 @@ export async function resolveIdentity(
   req: NextRequest,
   options: ResolveIdentityOptions = {}
 ): Promise<ResolvedIdentity> {
-  if (MVP_STATIC_IDENTITY_ENABLED) {
-    // ⚠️ MVP MODE: identidad fija para validar persistencia sin login
-    // Reemplazar por auth real en producción
-    logInfo("CHAT", "resolve_identity_mvp_static", {
-      userId: MVP_STATIC_USER_ID,
-    });
-    await ensureUserAccount(MVP_STATIC_USER_ID);
-    return {
-      userId: MVP_STATIC_USER_ID,
-      source: "static",
-      sessionToken: "",
-      shouldSetCookie: false,
-    };
-  }
-
   const requestTokenInfo = getTokenFromRequest(req);
   const requestToken = requestTokenInfo.token;
   logInfo("CHAT", "resolve_identity_started", {

@@ -1,6 +1,6 @@
 import { logError, logInfo } from "@/lib/logger";
 import { logLlmCall } from "@/lib/llm-logger";
-import { getErrorMessage, withTimeout } from "@/lib/utils";
+import { getErrorMessage, fetchWithTimeout } from "@/lib/utils";
 import {
   buildCoachPrompt,
   buildFallbackResponse,
@@ -121,8 +121,9 @@ async function requestOpenRouter(
 
   let response: Response;
   try {
-    response = await withTimeout(
-      fetch(OPENROUTER_URL, {
+    response = await fetchWithTimeout(
+      OPENROUTER_URL,
+      {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiKey}`,
@@ -143,7 +144,7 @@ async function requestOpenRouter(
           temperature: 0.7,
           max_tokens: 500,
         }),
-      }),
+      },
       REQUEST_TIMEOUT_MS
     );
   } catch (error: unknown) {
@@ -299,8 +300,9 @@ export async function generateImpulseResponse(input: ImpulseResponseInput): Prom
   }
 
   try {
-    const res = await withTimeout(
-      fetch(OPENROUTER_URL, {
+    const res = await fetchWithTimeout(
+      OPENROUTER_URL,
+      {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiKey}`,
@@ -317,7 +319,7 @@ export async function generateImpulseResponse(input: ImpulseResponseInput): Prom
           temperature: 0.5,
           max_tokens: 220,
         }),
-      }),
+      },
       REQUEST_TIMEOUT_MS
     );
 
@@ -360,8 +362,9 @@ export async function* streamOpenRouterTokens(
 
   let res: Response;
   try {
-    res = await withTimeout(
-      fetch(OPENROUTER_URL, {
+    res = await fetchWithTimeout(
+      OPENROUTER_URL,
+      {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiKey}`,
@@ -380,7 +383,7 @@ export async function* streamOpenRouterTokens(
           max_tokens: 500,
           stream: true,
         }),
-      }),
+      },
       REQUEST_TIMEOUT_MS
     );
   } catch (error: unknown) {

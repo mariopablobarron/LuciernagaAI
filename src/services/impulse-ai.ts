@@ -1,5 +1,5 @@
 import { logError, logInfo } from "@/lib/logger";
-import { getErrorMessage, withTimeout } from "@/lib/utils";
+import { getErrorMessage, fetchWithTimeout } from "@/lib/utils";
 import { buildFallbackResponse } from "@/services/coach";
 import type { DailyImpulseLogSnapshot, ImpulseProfileSnapshot } from "@/types/impulse";
 
@@ -143,8 +143,9 @@ export async function generateImpulseResponse(
       lastLogs: lastLogs.length,
     });
 
-    const response = await withTimeout(
-      fetch(OPENROUTER_URL, {
+    const response = await fetchWithTimeout(
+      OPENROUTER_URL,
+      {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiKey}`,
@@ -155,19 +156,13 @@ export async function generateImpulseResponse(
         body: JSON.stringify({
           model: OPENROUTER_MODEL,
           messages: [
-            {
-              role: "system",
-              content: systemPrompt,
-            },
-            {
-              role: "user",
-              content: input,
-            },
+            { role: "system", content: systemPrompt },
+            { role: "user", content: input },
           ],
           temperature: 0.5,
           max_tokens: 220,
         }),
-      }),
+      },
       REQUEST_TIMEOUT_MS
     );
 

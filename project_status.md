@@ -92,8 +92,7 @@
 
 ```env
 # Email (recordatorios web)
-EMAIL_PROVIDER=sendgrid
-EMAIL_API_KEY=SG.xxx
+RESEND_API_KEY=re_123456789...
 EMAIL_FROM=Tres Mil Millones de Latidos <noreply@tudominio.com>
 
 # Cron

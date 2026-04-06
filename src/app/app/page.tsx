@@ -959,9 +959,7 @@ export default function HomePage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title }),
     });
-    setConversations((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, title } : c)),
-    );
+    setConversations((prev) => prev.map((c) => (c.id === id ? { ...c, title } : c)));
   };
 
   const handleDeleteConversation = async (id: string) => {
@@ -998,7 +996,7 @@ export default function HomePage() {
     if (!id) return;
     const current = safeConversation.journalMode;
     setConversations((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, journalMode: !current } : c)),
+      prev.map((c) => (c.id === id ? { ...c, journalMode: !current } : c))
     );
     void fetch(`/api/conversations/${id}`, {
       method: "PATCH",
@@ -1283,7 +1281,35 @@ export default function HomePage() {
 
     // Journal mode: skip AI, just record the message locally
     if (resolvedConversation.journalMode) {
-      setLoading(false);
+      try {
+        const res = await fetch("/api/journal", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: trimmed,
+            conversationId: resolvedConversation.isDraft ? undefined : currentConversationId,
+          }),
+        });
+
+        const payload = await res.json().catch(() => ({}));
+        // Si era una conversación nueva (draft) y el backend la creó en BD, actualizamos la UI
+        if (res.ok && payload.conversationId && payload.conversationId !== currentConversationId) {
+          const newId = payload.conversationId;
+          setConversations((prev) =>
+            prev.map((c) =>
+              c.id === currentConversationId
+                ? { ...c, id: newId, isDraft: false, hasLoadedMessages: true }
+                : c
+            )
+          );
+          setActiveConversationId(newId);
+        }
+      } catch (err) {
+        console.error("[CHAT_UI] Error guardando mensaje de diario:", err);
+      } finally {
+        setLoading(false);
+      }
       return;
     }
 
@@ -1895,42 +1921,40 @@ export default function HomePage() {
                   <RetoDiario
                     userId={sessionProfile?.id}
                     onFailed={(retoTitle) =>
-                      void handleSend(
-                        `Hoy no pude hacer el reto: ${retoTitle}. ¿Qué hago?`
-                      )
+                      void handleSend(`Hoy no pude hacer el reto: ${retoTitle}. ¿Qué hago?`)
                     }
                   />
                 </div>
-              <Chat
-                title={safeConversation.title}
-                messages={safeConversation.messages}
-                input={input}
-                loading={loading || sessionLoading}
-                streamingMessageId={streamingMessageId}
-                error={error}
-                responseSignals={{
-                  searchUsed: safeConversation.searchUsed,
-                  fallback: safeConversation.fallback,
-                  flow: safeConversation.flow,
-                }}
-                actionLock={
-                  effectiveActionLock
-                    ? {
-                        message: effectiveActionLock.message,
-                        actionTitle: effectiveActionLock.action.title,
-                      }
-                    : null
-                }
-                onInputChange={setInput}
-                onSend={handleSend}
-                onUseStarterExample={handleUseStarterExample}
-                draftKey={`chat-draft:${safeConversation.id}`}
-                conversationId={safeConversation.isDraft ? undefined : safeConversation.id}
-                onRateSession={handleRateSession}
-                journalMode={safeConversation.journalMode}
-                onToggleJournal={safeConversation.isDraft ? undefined : handleToggleJournal}
-                proactivePrompt={safeConversation.messages.length === 0 ? proactivePrompt : null}
-              />
+                <Chat
+                  title={safeConversation.title}
+                  messages={safeConversation.messages}
+                  input={input}
+                  loading={loading || sessionLoading}
+                  streamingMessageId={streamingMessageId}
+                  error={error}
+                  responseSignals={{
+                    searchUsed: safeConversation.searchUsed,
+                    fallback: safeConversation.fallback,
+                    flow: safeConversation.flow,
+                  }}
+                  actionLock={
+                    effectiveActionLock
+                      ? {
+                          message: effectiveActionLock.message,
+                          actionTitle: effectiveActionLock.action.title,
+                        }
+                      : null
+                  }
+                  onInputChange={setInput}
+                  onSend={handleSend}
+                  onUseStarterExample={handleUseStarterExample}
+                  draftKey={`chat-draft:${safeConversation.id}`}
+                  conversationId={safeConversation.isDraft ? undefined : safeConversation.id}
+                  onRateSession={handleRateSession}
+                  journalMode={safeConversation.journalMode}
+                  onToggleJournal={safeConversation.isDraft ? undefined : handleToggleJournal}
+                  proactivePrompt={safeConversation.messages.length === 0 ? proactivePrompt : null}
+                />
               </>
             }
             onNewConversation={handleNewConversation}

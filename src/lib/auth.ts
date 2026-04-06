@@ -296,8 +296,7 @@ export async function resolveIdentity(
     );
   }
 
-  // En modo normal, si no hay sesión válida exigimos autenticación explícita.
-  // MVP MODE (opt-in) queda arriba para entornos de demo.
+  // Si no hay sesión válida y no es un bootstrap anónimo, exigimos autenticación.
   throw new InvalidSessionTokenError();
 }
 

@@ -1,3 +1,4 @@
+import { analyzeMessage, isCrisisLevel, isCrisisInterventionMessage, mapRiskLevelToCrisisCount, detectTransitionalVoidSignals } from "./phases/analyze";
 import { interceptActionLock, interceptCrisis, interceptTransitionalVoid } from "./phases/intercept";
 import { generateDecision as generateDomainDecision } from "@/domain/decisionEngine";
 import type {
@@ -6,7 +7,7 @@ import type {
   SystemState,
 } from "@/domain/types";
 import { buildUserState } from "@/domain/userStateEngine";
-import { sendAvoidanceEscalationAlert, sendCrisisEscalationAlert } from "@/lib/alerts";
+import { sendAvoidanceEscalationAlert } from "@/lib/alerts";
 import { logError, logInfo } from "@/lib/logger";
 import { generateAIResponse, streamOpenRouterTokens } from "@/services/ai";
 import { generateImpulseResponse } from "@/services/impulse-ai";
@@ -44,8 +45,7 @@ import {
   getAvoidanceStreakForUser,
   registerAvoidanceEvent,
 } from "@/services/goals";
-import { runFlow, hydrateDialogueState, persistDialogueState } from "@/services/flows";
-import { detectIntent } from "@/services/intent";
+// flows + intent now in phases/analyze.ts
 import { getMentorMode, shouldAskForEmail } from "@/services/mentor-protocol";
 import { getConversationalOnboarding } from "@/services/onboarding";
 import { buildJourneyPromptBlock } from "@/services/journey-coach-bridge";
@@ -56,17 +56,11 @@ import {
   needsExternalInfo,
   searchWeb,
 } from "@/services/search";
-import {
-  detectRiskLevel,
-  getCrisisResponse,
-  registerCrisisEvent,
-  type RiskLevel,
-} from "@/services/risk";
+// risk detection now in phases/analyze.ts, crisis handling in phases/intercept.ts
 import {
   activateUserCrisis,
   buildConversationContext,
   clearUserCrisis,
-  detectUserState,
   getUserCrisisStatus,
   shouldBypassActionLock,
   updateUserTransformationPhase,
@@ -97,34 +91,7 @@ export type ProcessMessageResult =
   | { stream: ReadableStream; meta: Record<string, unknown> }
   | { data: Record<string, unknown> };
 
-// ─── helpers ───────────────────────────────────────────────────────────────
-
-function isCrisisLevel(level: RiskLevel): level is "high" | "critical" {
-  return level === "high" || level === "critical";
-}
-
-function isCrisisInterventionMessage(message: string): boolean {
-  const normalized = message
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-  const signals = [
-    "ya hable con",
-    "ya pedi ayuda",
-    "ya contacte",
-    "ya llame al 112",
-    "ya llame al 911",
-    "estoy con mi familia",
-    "estoy acompanado",
-    "estoy acompañado",
-    "ya estoy seguro",
-  ];
-  return signals.some((s) => normalized.includes(s));
-}
-
-function mapRiskLevelToCrisisCount(level: RiskLevel): number {
-  return level === "high" || level === "critical" ? 1 : 0;
-}
+// ─── helpers (remaining — analyze/intercept helpers moved to phases/) ──────
 
 function buildChatInsight(params: {
   retentionDay3?: number;
@@ -148,43 +115,6 @@ function buildChatInsight(params: {
     identityShift: params.identityShift,
     directionClarity: params.directionClarity,
   };
-}
-
-/**
- * Detects TRANSITIONAL_VOID signals from raw message text.
- * Returns normalised scores consumed by buildUserState.
- */
-function detectTransitionalVoidSignals(message: string): {
-  confusionScore: number;
-  identityShift: boolean;
-  directionClarity: number;
-} {
-  const normalized = message
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-
-  const confusionPhrases = [
-    "no se", "no entiendo", "confundido", "confundida",
-    "no tengo claro", "no se hacia donde", "no se que hacer",
-    "no se que quiero", "no se quien soy", "no se quien",
-    "perdido", "perdida", "sin rumbo", "no se adonde",
-  ];
-  const identityPhrases = [
-    "ya no soy", "no me reconozco", "todo ha cambiado",
-    "ya no encaja", "no encajo", "quien soy",
-    "cambie", "me perdi", "transicion", "nueva etapa",
-    "ya no me", "no se quien era", "siento que ya no",
-    "no me siento yo", "me siento diferente", "vacio",
-    "ya no tengo identidad",
-  ];
-
-  const confusionMatches = confusionPhrases.filter((p) => normalized.includes(p)).length;
-  const confusionScore = Math.min(1, confusionMatches / 3);
-  const identityShift = identityPhrases.some((p) => normalized.includes(p));
-  const directionClarity = Math.max(0, 1 - confusionScore - (identityShift ? 0.3 : 0));
-
-  return { confusionScore, identityShift, directionClarity };
 }
 
 function serializeGoal(goal: Awaited<ReturnType<typeof getActiveGoalForUser>>) {
@@ -234,34 +164,12 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
   const softPaywallActive =
     !session.hasPlan && remainingMessagesAfterTurn !== null && remainingMessagesAfterTurn <= 2;
 
-  // ── 1. Quick synchronous analysis ──────────────────────────────────────
-  const state = detectUserState(message);
-  const tvSignals = detectTransitionalVoidSignals(message);
-  const detectedIntent = detectIntent(message);
-  const riskLevel = detectRiskLevel(message);
-  // emotionalProfile is computed after DB enrichment (line ~395) to avoid double work
+  // ── 1. Quick synchronous analysis (Phase 1: Analyze) ────────────────────
+  const analysis = await analyzeMessage(userId, message);
+  const { state, tvSignals, detectedIntent, riskLevel, flowContext } = analysis;
+  let { crisisMode, crisisActiveUntil, crisisSource } = analysis;
+  // emotionalProfile is computed after DB enrichment to avoid double work
   let emotionalProfile!: ReturnType<typeof analyzeEmotionalProfile>;
-  const dialogueState = await hydrateDialogueState(userId);
-  const flowContext = runFlow({ ...dialogueState, currentIntent: detectedIntent }, message);
-  void persistDialogueState(userId, {
-    currentIntent: flowContext.currentIntent,
-    currentStep: flowContext.currentStep,
-    activeFlow: flowContext.activeFlow,
-  });
-
-  let crisisMode = isCrisisLevel(riskLevel);
-  let crisisActiveUntil: string | null = null;
-  let crisisSource: "detected" | "active_state" | "none" = crisisMode ? "detected" : "none";
-
-  logInfo("STATE", "state_detected", {
-    userId,
-    state,
-    intent: detectedIntent,
-    activeFlow: flowContext.activeFlow,
-    flowStep: flowContext.currentStep,
-    messageLength: message.length,
-  });
-  logInfo("RISK", "risk_level_detected", { userId, riskLevel, crisisMode });
 
   // ── 2. Mutable state for DB phase ──────────────────────────────────────
   let persistenceAvailable = true;

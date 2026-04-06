@@ -1,0 +1,116 @@
+{
+  "nav": {
+    "chat": "Chat",
+    "journeys": "Journeys",
+    "dashboard": "Dashboard",
+    "pricing": "Pricing",
+    "freeTest": "Free test",
+    "login": "Log in",
+    "cta": "Start beating",
+    "brand": "Three Billion",
+    "brandFull": "Heartbeats"
+  },
+  "hero": {
+    "badge": "Three billion heartbeats",
+    "title": "Make your next",
+    "titleHighlight": "heartbeats count.",
+    "subtitle": "The human heart beats three billion times in a lifetime. Three Billion Heartbeats exists so the ones you have left carry real direction. No theory. No perfection. Concrete action, heartbeat by heartbeat.",
+    "cta": "Start beating differently",
+    "ctaSecondary": "See how it works",
+    "socialProof": "+200 people",
+    "socialProofText": "beating differently",
+    "langNote": "AI mentoring in English. Every heartbeat, a real choice."
+  },
+  "features": {
+    "sectionLabel": "How it works",
+    "title": "Every heartbeat, a step forward",
+    "subtitle": "A mentorship that understands where you are and walks with you toward action, heartbeat by heartbeat.",
+    "noJudgment": {
+      "title": "No judgment",
+      "description": "Only questions that move you forward. No unsolicited advice, no evaluations, no pressure."
+    },
+    "realState": {
+      "title": "Real state",
+      "description": "Detects if you're blocked, anxious, or clear and adapts the conversation to where you really are."
+    },
+    "concreteAction": {
+      "title": "Concrete action",
+      "description": "Every conversation ends with a real next step you can execute today in under 10 minutes."
+    }
+  },
+  "howItWorks": {
+    "sectionLabel": "The process",
+    "title": "Your change in 3 heartbeats",
+    "step1": {
+      "title": "Describe how you feel",
+      "description": "No filters, no judgment. Tell Three Billion Heartbeats what's happening, what you're avoiding, what's holding you back."
+    },
+    "step2": {
+      "title": "Get clarity",
+      "description": "Blocked, anxious, doubtful, or clear — the conversation adapts to where you are."
+    },
+    "step3": {
+      "title": "Act in under 5 min",
+      "description": "A concrete, actionable next step that generates real momentum starting today."
+    }
+  },
+  "finalCta": {
+    "title1": "Some heartbeats have already passed.",
+    "title2": "The ones ahead are still yours.",
+    "subtitle": "Three billion heartbeats in a lifetime. How many passed without you feeling them?",
+    "cta": "Start beating differently",
+    "disclaimer": "Does not replace therapy or professional psychological intervention."
+  },
+  "chatMockup": {
+    "msg1User": "I've been stuck on my project for weeks",
+    "msg2Ai": "What's the smallest thing you could do in the next 10 minutes?",
+    "msg3User": "I guess open the file and write a paragraph",
+    "msg4Ai": "That's exactly what you need. Do it now. Then tell me about it.",
+    "placeholder": "Write what's on your mind…"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "privacy": "Privacy",
+    "terms": "Terms"
+  },
+  "settings": {
+    "title": "Settings",
+    "coach": "AI Coach",
+    "coachDesc": "Customize how your mentor talks to you",
+    "tone": "Conversation tone",
+    "toneDirect": "Direct",
+    "toneDirectDesc": "Gets to the point, no fluff",
+    "toneSocratic": "Socratic",
+    "toneSocraticDesc": "Guides you with questions",
+    "toneWarm": "Warm",
+    "toneWarmDesc": "Empathetic and close",
+    "notifications": "Notifications",
+    "notificationsDesc": "Control what we send you and when",
+    "dailyReminders": "Daily reminders",
+    "dailyRemindersDesc": "Check-in and pending actions",
+    "reminderTime": "Reminder time",
+    "reminderTimeDesc": "You'll receive the reminder at this time",
+    "weeklyEmail": "Weekly email summary",
+    "weeklyEmailDesc": "Your weekly progress every Sunday",
+    "insights": "New insights",
+    "insightsDesc": "When you have new recommendations",
+    "goals": "Completed goals",
+    "goalsDesc": "Celebrations when you finish a goal",
+    "updates": "Product updates",
+    "updatesDesc": "New features and improvements",
+    "telegram": "Telegram",
+    "telegramDesc": "Receive reminders and chat outside the app",
+    "region": "Region",
+    "regionDesc": "Affects reminder times",
+    "security": "Security",
+    "changePassword": "Change password",
+    "data": "Your data",
+    "dataDesc": "Right to portability (GDPR Art. 20)",
+    "exportCsv": "Chat History (CSV)",
+    "exportJson": "Full Data (JSON)",
+    "dangerZone": "Danger zone",
+    "dangerDesc": "These actions cannot be undone.",
+    "deleteAccount": "Delete my account and all my data",
+    "saved": "Saved"
+  }
+}

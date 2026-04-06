@@ -1,0 +1,116 @@
+{
+  "nav": {
+    "chat": "Chat",
+    "journeys": "Itinerarios",
+    "dashboard": "Dashboard",
+    "pricing": "Precios",
+    "freeTest": "Test gratuito",
+    "login": "Entrar",
+    "cta": "Empieza a latir",
+    "brand": "Tres Mil Millones",
+    "brandFull": "de Latidos"
+  },
+  "hero": {
+    "badge": "Tres mil millones de latidos",
+    "title": "Haz que cuenten",
+    "titleHighlight": "tus próximos latidos.",
+    "subtitle": "El corazón humano late tres mil millones de veces en una vida. Tres Mil Millones de Latidos existe para que los que te quedan tengan dirección real. No teoría. No perfección. Acción concreta, latido a latido.",
+    "cta": "Empieza a latir diferente",
+    "ctaSecondary": "Ver cómo funciona",
+    "socialProof": "+200 personas",
+    "socialProofText": "latiendo diferente",
+    "langNote": "Mentoría con IA en español. Cada latido, una elección real."
+  },
+  "features": {
+    "sectionLabel": "Cómo funciona",
+    "title": "Cada latido, un paso hacia adelante",
+    "subtitle": "Una mentoría que entiende dónde estás y te acompaña hacia la acción latido a latido.",
+    "noJudgment": {
+      "title": "Sin juicios",
+      "description": "Solo preguntas que te hacen avanzar. Sin consejos no pedidos, sin evaluaciones, sin presión."
+    },
+    "realState": {
+      "title": "Estado real",
+      "description": "Detecta si estás bloqueado, ansioso o con claridad y adapta la conversación a donde realmente estás."
+    },
+    "concreteAction": {
+      "title": "Acción concreta",
+      "description": "Cada conversación termina con un siguiente paso real que puedes ejecutar hoy en menos de 10 minutos."
+    }
+  },
+  "howItWorks": {
+    "sectionLabel": "El proceso",
+    "title": "Tu cambio en 3 latidos",
+    "step1": {
+      "title": "Describes cómo te sientes",
+      "description": "Sin filtros, sin juicio. Cuéntale a Tres Mil Millones de Latidos qué te pasa, qué evitas, qué te frena."
+    },
+    "step2": {
+      "title": "Obtienes claridad",
+      "description": "Bloqueado, ansioso, con duda o con claridad — la conversación se adapta a donde estás."
+    },
+    "step3": {
+      "title": "Actúas en menos de 5 min",
+      "description": "Un siguiente paso concreto, accionable, que genera momentum real desde hoy."
+    }
+  },
+  "finalCta": {
+    "title1": "Algunos latidos ya pasaron.",
+    "title2": "Los que vienen aún son tuyos.",
+    "subtitle": "Tres mil millones de latidos en una vida. ¿Cuántos ya pasaron sin sentirlos?",
+    "cta": "Empieza a latir diferente",
+    "disclaimer": "No sustituye terapia ni intervención psicológica profesional."
+  },
+  "chatMockup": {
+    "msg1User": "Llevo semanas sin avanzar con el proyecto",
+    "msg2Ai": "¿Qué es lo más pequeño que podrías hacer en los próximos 10 minutos?",
+    "msg3User": "Supongo que abrir el archivo y escribir un párrafo",
+    "msg4Ai": "Eso es exactamente lo que necesitas. Hazlo ahora. Luego me cuentas.",
+    "placeholder": "Escribe lo que te pasa…"
+  },
+  "footer": {
+    "rights": "Todos los derechos reservados.",
+    "privacy": "Privacidad",
+    "terms": "Términos"
+  },
+  "settings": {
+    "title": "Configuración",
+    "coach": "Coach IA",
+    "coachDesc": "Personaliza cómo te habla tu mentor",
+    "tone": "Tono de conversación",
+    "toneDirect": "Directo",
+    "toneDirectDesc": "Va al grano, sin rodeos",
+    "toneSocratic": "Socrático",
+    "toneSocraticDesc": "Te guía con preguntas",
+    "toneWarm": "Cálido",
+    "toneWarmDesc": "Empático y cercano",
+    "notifications": "Notificaciones",
+    "notificationsDesc": "Controla qué te enviamos y cuándo",
+    "dailyReminders": "Recordatorios diarios",
+    "dailyRemindersDesc": "Check-in y acciones pendientes",
+    "reminderTime": "Hora del recordatorio",
+    "reminderTimeDesc": "Recibirás el recordatorio a esta hora",
+    "weeklyEmail": "Resumen semanal por email",
+    "weeklyEmailDesc": "Tu progreso de la semana cada domingo",
+    "insights": "Nuevos insights",
+    "insightsDesc": "Cuando tengas nuevas recomendaciones",
+    "goals": "Objetivos completados",
+    "goalsDesc": "Celebraciones cuando termines un objetivo",
+    "updates": "Actualizaciones del producto",
+    "updatesDesc": "Nuevas funciones y mejoras",
+    "telegram": "Telegram",
+    "telegramDesc": "Recibe recordatorios y chatea fuera de la app",
+    "region": "Región",
+    "regionDesc": "Afecta a la hora de los recordatorios",
+    "security": "Seguridad",
+    "changePassword": "Cambiar contraseña",
+    "data": "Tus datos",
+    "dataDesc": "Derecho a portabilidad (Art. 20 RGPD)",
+    "exportCsv": "Historial de Chat (CSV)",
+    "exportJson": "Datos completos (JSON)",
+    "dangerZone": "Zona de peligro",
+    "dangerDesc": "Estas acciones no se pueden deshacer.",
+    "deleteAccount": "Eliminar mi cuenta y todos mis datos",
+    "saved": "Guardado"
+  }
+}

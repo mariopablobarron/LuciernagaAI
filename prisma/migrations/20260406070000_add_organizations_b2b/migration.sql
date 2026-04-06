@@ -43,3 +43,18 @@ CREATE INDEX "OrgAdmin_email_idx" ON "OrgAdmin"("email");
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE "OrgAdmin" ADD CONSTRAINT "OrgAdmin_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- Seed: Demo organization + admins
+INSERT INTO "Organization" ("id", "name", "slug", "type", "plan", "maxUsers", "contactName", "contactEmail", "createdAt", "updatedAt")
+VALUES ('org_demo', 'Demo Corp', 'demo-corp', 'company', 'team', 50, 'Admin Demo', 'admin@demo-corp.com', NOW(), NOW())
+ON CONFLICT ("slug") DO NOTHING;
+
+-- HR admin (password: demo1234 → HMAC-SHA256 with salt "org-admin-salt")
+INSERT INTO "OrgAdmin" ("id", "organizationId", "email", "name", "role", "passwordHash", "createdAt", "updatedAt")
+VALUES ('oadm_hr_demo', 'org_demo', 'hr@demo-corp.com', 'María García (HR)', 'hr', '11d94a2e41072a4bfdba2df955238cd117225b912029f9c4207eaccbaf7be4d9', NOW(), NOW())
+ON CONFLICT ("organizationId", "email") DO NOTHING;
+
+-- Therapist admin (same password)
+INSERT INTO "OrgAdmin" ("id", "organizationId", "email", "name", "role", "passwordHash", "createdAt", "updatedAt")
+VALUES ('oadm_th_demo', 'org_demo', 'psico@demo-corp.com', 'Dr. López (Terapeuta)', 'therapist', '11d94a2e41072a4bfdba2df955238cd117225b912029f9c4207eaccbaf7be4d9', NOW(), NOW())
+ON CONFLICT ("organizationId", "email") DO NOTHING;

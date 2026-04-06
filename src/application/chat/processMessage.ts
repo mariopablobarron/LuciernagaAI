@@ -43,7 +43,7 @@ import {
   getAvoidanceStreakForUser,
   registerAvoidanceEvent,
 } from "@/services/goals";
-import { runFlow, loadDialogueState, saveDialogueState } from "@/services/flows";
+import { runFlow, hydrateDialogueState, persistDialogueState } from "@/services/flows";
 import { detectIntent } from "@/services/intent";
 import { getMentorMode, shouldAskForEmail } from "@/services/mentor-protocol";
 import { getConversationalOnboarding } from "@/services/onboarding";
@@ -238,10 +238,11 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
   const tvSignals = detectTransitionalVoidSignals(message);
   const detectedIntent = detectIntent(message);
   const riskLevel = detectRiskLevel(message);
-  let emotionalProfile = analyzeEmotionalProfile(message, []);
-  const dialogueState = loadDialogueState(userId);
+  // emotionalProfile is computed after DB enrichment (line ~395) to avoid double work
+  let emotionalProfile!: ReturnType<typeof analyzeEmotionalProfile>;
+  const dialogueState = await hydrateDialogueState(userId);
   const flowContext = runFlow({ ...dialogueState, currentIntent: detectedIntent }, message);
-  saveDialogueState(userId, {
+  void persistDialogueState(userId, {
     currentIntent: flowContext.currentIntent,
     currentStep: flowContext.currentStep,
     activeFlow: flowContext.activeFlow,

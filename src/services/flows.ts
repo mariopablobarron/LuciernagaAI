@@ -49,13 +49,14 @@ const FLOW_DEFINITIONS: Record<FlowDefinition["name"], FlowDefinition> = {
   },
 };
 
-const DIALOGUE_STATE_STORE = new Map<string, DialogueState>();
-
 const DEFAULT_DIALOGUE_STATE: DialogueState = {
   currentIntent: "clarification",
   currentStep: 0,
   activeFlow: null,
 };
+
+// In-memory cache — hydrated from DB on first load, written back on save
+const DIALOGUE_STATE_CACHE = new Map<string, DialogueState>();
 
 function getFlowNameByIntent(intent: Intent): FlowDefinition["name"] | null {
   if (intent === "problem" || intent === "doubt" || intent === "goal_creation") {
@@ -76,11 +77,60 @@ function getStepInstruction(flowName: FlowDefinition["name"], step: number): str
 }
 
 export function loadDialogueState(userId: string): DialogueState {
-  return DIALOGUE_STATE_STORE.get(userId) ?? { ...DEFAULT_DIALOGUE_STATE };
+  return DIALOGUE_STATE_CACHE.get(userId) ?? { ...DEFAULT_DIALOGUE_STATE };
 }
 
 export function saveDialogueState(userId: string, state: DialogueState): void {
-  DIALOGUE_STATE_STORE.set(userId, state);
+  DIALOGUE_STATE_CACHE.set(userId, state);
+}
+
+/** Hydrate cache from DB — call once at the start of each request */
+export async function hydrateDialogueState(userId: string): Promise<DialogueState> {
+  const cached = DIALOGUE_STATE_CACHE.get(userId);
+  if (cached) return cached;
+
+  try {
+    const { getPrismaClient } = await import("@/db/prisma");
+    const prisma = getPrismaClient();
+    const record = await prisma.userState.findUnique({
+      where: { userId },
+      select: { dialogueIntent: true, dialogueStep: true, dialogueFlow: true },
+    });
+
+    if (record) {
+      const state: DialogueState = {
+        currentIntent: record.dialogueIntent as DialogueState["currentIntent"],
+        currentStep: record.dialogueStep,
+        activeFlow: record.dialogueFlow as DialogueState["activeFlow"],
+      };
+      DIALOGUE_STATE_CACHE.set(userId, state);
+      return state;
+    }
+  } catch {
+    // Fall through to default
+  }
+
+  return { ...DEFAULT_DIALOGUE_STATE };
+}
+
+/** Persist dialogue state to DB — fire-and-forget after saving to cache */
+export async function persistDialogueState(userId: string, state: DialogueState): Promise<void> {
+  DIALOGUE_STATE_CACHE.set(userId, state);
+
+  try {
+    const { getPrismaClient } = await import("@/db/prisma");
+    const prisma = getPrismaClient();
+    await prisma.userState.updateMany({
+      where: { userId },
+      data: {
+        dialogueIntent: state.currentIntent,
+        dialogueStep: state.currentStep,
+        dialogueFlow: state.activeFlow ?? null,
+      },
+    });
+  } catch {
+    // Silently fail — cache still valid for this request lifecycle
+  }
 }
 
 export function runFlow(state: DialogueState, message: string): FlowContext {

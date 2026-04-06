@@ -138,6 +138,9 @@ model UserState {
   crisisActive     Boolean   @default(false)
   crisisActivatedAt DateTime?
   crisisActiveUntil DateTime?
+  dialogueIntent   String    @default("clarification")
+  dialogueStep     Int       @default(0)
+  dialogueFlow     String?   // active flow name or null
   updatedAt        DateTime  @updatedAt
   user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 

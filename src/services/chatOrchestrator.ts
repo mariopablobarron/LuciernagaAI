@@ -3,7 +3,7 @@ import {
   attachSessionCookie,
   clearSessionCookie,
   InvalidSessionTokenError,
-  resolveIdentity,
+  bootstrapSessionIdentity,
 } from "@/lib/auth";
 import { logError } from "@/lib/logger";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -48,10 +48,10 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
     return buildErrorResponse("Body inválido en la solicitud", 400, "neutral", "INVALID_BODY");
   }
 
-  // ── 2. Auth ─────────────────────────────────────────────────────────────
-  let identity: Awaited<ReturnType<typeof resolveIdentity>>;
+  // ── 2. Auth (allows anonymous bootstrap for new users) ──────────────────
+  let identity: Awaited<ReturnType<typeof bootstrapSessionIdentity>>;
   try {
-    identity = await resolveIdentity(req);
+    identity = await bootstrapSessionIdentity(req);
   } catch (e: unknown) {
     if (e instanceof InvalidSessionTokenError) {
       const res = buildErrorResponse(

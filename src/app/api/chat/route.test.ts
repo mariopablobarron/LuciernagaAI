@@ -6,9 +6,12 @@ jest.mock("@/lib/auth", () => {
     }
   }
 
+  const resolveIdentityMock = jest.fn();
   return {
     InvalidSessionTokenError: MockInvalidSessionTokenError,
-    resolveIdentity: jest.fn(),
+    resolveIdentity: resolveIdentityMock,
+    // bootstrapSessionIdentity delegates to resolveIdentity in the real code
+    bootstrapSessionIdentity: jest.fn((...args: unknown[]) => resolveIdentityMock(...args)),
     attachSessionCookie: jest.fn(),
     clearSessionCookie: jest.fn(),
   };
@@ -86,7 +89,7 @@ jest.mock("@/services/risk", () => ({
 
 import { NextRequest } from "next/server";
 import { POST } from "./route";
-import { InvalidSessionTokenError, resolveIdentity, clearSessionCookie } from "@/lib/auth";
+import { InvalidSessionTokenError, resolveIdentity, bootstrapSessionIdentity, clearSessionCookie } from "@/lib/auth";
 import { sendAvoidanceEscalationAlert, sendCrisisEscalationAlert } from "@/lib/alerts";
 import { checkRateLimit } from "@/lib/rate-limit";
 import {

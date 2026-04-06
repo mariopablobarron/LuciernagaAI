@@ -144,7 +144,8 @@ const TRANSITIONAL_VOID_CATALOG: Omit<ActionNode, "completed" | "order">[] = [
 function buildActions(
   domainState: DomainUserState,
   completedIds: Set<string> = new Set(),
-  isTransitionalVoid = false
+  isTransitionalVoid = false,
+  pendingActions: { id: string; description: string }[] = []
 ): ActionNode[] {
   if (isTransitionalVoid) {
     return TRANSITIONAL_VOID_CATALOG.map((node, i) => ({
@@ -154,12 +155,27 @@ function buildActions(
     }));
   }
 
+  // Real user actions go first — personalized from their goals
+  const userActions: ActionNode[] = pendingActions.map((pa, i) => ({
+    id: `pending-${pa.id}`,
+    type: "close_pending" as ExploreActionType,
+    title: pa.description,
+    description: "Acción pendiente de tu plan",
+    icon: "⚡",
+    color: "clarity" as const,
+    completed: completedIds.has(`pending-${pa.id}`),
+    order: i,
+  }));
+
+  // Then the catalog, prioritized by state
   const primaryType = STATE_PRIORITY[domainState];
-  return ACTION_CATALOG.map((node, i) => ({
+  const catalogActions = ACTION_CATALOG.map((node, i) => ({
     ...node,
     completed: completedIds.has(node.id),
-    order: node.type === primaryType ? 0 : i + 1,
+    order: userActions.length + (node.type === primaryType ? 0 : i + 1),
   })).sort((a, b) => a.order - b.order);
+
+  return [...userActions, ...catalogActions];
 }
 
 type LoadState = "loading" | "ready";
@@ -195,9 +211,9 @@ export default function ExplorePage() {
 
         const state: DomainUserState = data.state ?? "neutral";
         const tvoid = data.systemState === "TRANSITIONAL_VOID";
-        applyDomainState(state, new Set(), tvoid);
+        applyDomainState(state, new Set(), tvoid, data.pendingActions ?? []);
       } catch {
-        if (!cancelled) applyDomainState("neutral", new Set(), false);
+        if (!cancelled) applyDomainState("neutral", new Set(), false, []);
       } finally {
         if (!cancelled) setLoadState("ready");
       }
@@ -209,15 +225,20 @@ export default function ExplorePage() {
     };
   }, []);
 
-  function applyDomainState(state: DomainUserState, completed: Set<string>, tvoid: boolean) {
-    const catalog = tvoid ? TRANSITIONAL_VOID_CATALOG : ACTION_CATALOG;
+  function applyDomainState(
+    state: DomainUserState,
+    completed: Set<string>,
+    tvoid: boolean,
+    pending: { id: string; description: string }[] = []
+  ) {
     setDomainState(state);
     setIsTransitionalVoid(tvoid);
-    setActions(buildActions(state, completed, tvoid));
+    const built = buildActions(state, completed, tvoid, pending);
+    setActions(built);
     setUserState({
       emotionalState: STATE_TO_EMOTIONAL[state] ?? "doubt",
       completedActions: completed.size,
-      totalActions: catalog.length,
+      totalActions: built.length,
     });
   }
 
@@ -370,7 +391,15 @@ export default function ExplorePage() {
                 Un latido a la vez
               </h1>
               <p className="text-lg bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent font-medium">
-                ¿Dónde pones tu próximo latido?
+                {domainState === "bloqueo"
+                  ? "Algo te frena. Vamos a nombrarlo."
+                  : domainState === "ansiedad"
+                    ? "Tu mente va rápido. Vamos a ordenarla."
+                    : domainState === "duda"
+                      ? "Hay opciones. Vamos a elegir una."
+                      : domainState === "claridad"
+                        ? "Estás claro. Define tu siguiente paso."
+                        : "¿Dónde pones tu próximo latido?"}
               </p>
             </>
           )}

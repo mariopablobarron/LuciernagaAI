@@ -29,7 +29,8 @@
     "docs:commands:check": "node scripts/auto-update-commands-doc.mjs --check",
     "migrate:deploy": "prisma migrate deploy",
     "backup:daily": "bash scripts/db-backup-daily.sh",
-    "backup:restore:latest": "gunzip -c ./backups/db/latest.sql.gz | psql \"$DATABASE_URL\""
+    "backup:restore:latest": "gunzip -c ./backups/db/latest.sql.gz | psql \"$DATABASE_URL\"",
+    "translate": "node scripts/translate.mjs"
   },
   "dependencies": {
     "@blocknote/mantine": "^0.47.3",
@@ -52,6 +53,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^1.7.0",
     "next": "16.2.1",
+    "next-intl": "^4.9.0",
     "next-themes": "^0.4.6",
     "pg": "^8.20.0",
     "prisma": "^7.6.0",

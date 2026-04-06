@@ -17,10 +17,10 @@ export default function Footer() {
             <p className="text-sm text-muted-foreground leading-relaxed">
               Cada latido es una elección. Tres Mil Millones de Latidos existe para que los tuyos tengan dirección real.
             </p>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium">
+            <a href="https://startidea.es" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-muted-foreground font-medium hover:text-cyan-400 transition-colors">
               <Heart className="w-3 h-3 text-cyan-500" />
-              Hecho con el corazón en Latinoamérica
-            </div>
+              Comprometidos con el bienestar emocional a través de la tecnología
+            </a>
           </div>
 
           {/* Product */}

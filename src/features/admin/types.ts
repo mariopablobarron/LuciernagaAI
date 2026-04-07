@@ -14,6 +14,40 @@ export interface AlertItem {
   message: string;
 }
 
+export interface DomainDecision {
+  state: string;
+  type: string;
+  reason: string;
+  confidence: string;
+  recommendedActions: string[];
+}
+
+export interface TodayDecision {
+  id: string;
+  priority: Priority;
+  title: string;
+  description: string;
+  action: string;
+}
+
+export interface DecisionMetricsData {
+  samples: number;
+  stateDistribution: Record<string, number>;
+  stateRatios: Record<string, number>;
+  decisionTypeCounts: Record<string, number>;
+}
+
+export interface EventMetrics {
+  totalEventsLast7d: number;
+  messagesPerUserLast7d: number;
+  actionsCompletedLast7d: number;
+  actionsCreatedLast7d: number;
+  actionsPerConversation: number;
+  actionCompletionRate: number;
+  avoidanceRate: number;
+  eventsByType: Record<string, number>;
+}
+
 export interface AdminInsightsResponse {
   metrics: {
     retentionDay3: number;
@@ -37,6 +71,12 @@ export interface AdminInsightsResponse {
     activeNewUsers: number;
     activeReturningUsers: number;
     inactiveUsers: number;
+    behaviorBased?: {
+      blockedUsersCount: number;
+      activeUsersCount: number;
+      avoidanceUsersCount: number;
+      crisisUsersCount: number;
+    };
   };
   decision: {
     decision: string;
@@ -44,6 +84,10 @@ export interface AdminInsightsResponse {
     priority: Priority;
     action: string;
   };
+  domainDecision?: DomainDecision;
+  decisionsToday?: TodayDecision[];
+  decisionMetrics?: DecisionMetricsData;
+  events?: EventMetrics;
   alerts: AlertItem[];
   insights: Insight[];
   crisis: {

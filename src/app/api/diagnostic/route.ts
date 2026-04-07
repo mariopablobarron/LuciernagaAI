@@ -8,8 +8,11 @@ import {
 } from "@/services/impulse-diagnostic";
 import { getUserStreak } from "@/services/streak";
 import type { DiagnosticAnswerMap } from "@/types/impulse";
+import { getClientIp, withRateLimit } from "@/lib/rate-limit";
 
-export async function GET(req: NextRequest) {
+const MAX_BODY_SIZE = 50 * 1024; // 50 KB
+
+export const GET = withRateLimit(async function GET(req: NextRequest) {
   try {
     const identity = await bootstrapSessionIdentity(req);
     const [profile, streak] = await Promise.all([
@@ -36,10 +39,15 @@ export async function GET(req: NextRequest) {
       { status: 500 }
     );
   }
-}
+}, { limit: 60, keyFn: (req) => `rl:/api/diagnostic:${getClientIp(req)}` });
 
-export async function POST(req: NextRequest) {
+export const POST = withRateLimit(async function POST(req: NextRequest) {
   try {
+    const contentLength = parseInt(req.headers.get("content-length") ?? "0", 10);
+    if (contentLength > MAX_BODY_SIZE) {
+      return NextResponse.json({ error: "Payload too large" }, { status: 413 });
+    }
+
     const identity = await bootstrapSessionIdentity(req);
     const body = (await req.json()) as { answers?: DiagnosticAnswerMap };
     if (!body.answers) {
@@ -73,4 +81,4 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
-}
+}, { limit: 60, keyFn: (req) => `rl:/api/diagnostic:${getClientIp(req)}` });

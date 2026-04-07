@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -98,6 +98,15 @@ export default function SettingsPage() {
   const [isExporting, setIsExporting] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const saveMsgTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const exportTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (saveMsgTimerRef.current) clearTimeout(saveMsgTimerRef.current);
+      if (exportTimerRef.current) clearTimeout(exportTimerRef.current);
+    };
+  }, []);
 
   // Load data
   useEffect(() => {
@@ -127,7 +136,8 @@ export default function SettingsPage() {
       if (res.ok) {
         setPrefs(data.preferences);
         setSaveMsg('Guardado');
-        setTimeout(() => setSaveMsg(null), 2000);
+        if (saveMsgTimerRef.current) clearTimeout(saveMsgTimerRef.current);
+        saveMsgTimerRef.current = setTimeout(() => setSaveMsg(null), 2000);
       }
     } catch {
       setSaveMsg('Error al guardar');
@@ -186,7 +196,8 @@ export default function SettingsPage() {
   function handleExport(format: string) {
     setIsExporting(format);
     window.location.href = `/api/user/export?format=${format}`;
-    setTimeout(() => setIsExporting(null), 2000);
+    if (exportTimerRef.current) clearTimeout(exportTimerRef.current);
+    exportTimerRef.current = setTimeout(() => setIsExporting(null), 2000);
   }
 
   // Delete account

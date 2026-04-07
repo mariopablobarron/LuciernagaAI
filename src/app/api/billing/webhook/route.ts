@@ -4,6 +4,7 @@ import { getPrismaClient } from '@/db/prisma';
 import { notifyAdmin, buildAdminAlert } from '@/services/telegram';
 import { logError, logInfo, logWarn } from '@/lib/logger';
 import { STRIPE_PLANS } from '@/lib/stripe';
+import { invalidateUserCache } from '@/services/user';
 import Stripe from 'stripe';
 
 export const dynamic = 'force-dynamic';
@@ -76,6 +77,9 @@ async function upgradeToPro(sub: Stripe.Subscription, email?: string | null) {
     },
   });
 
+  // Bust cached access state so the user sees their new plan immediately
+  invalidateUserCache(user.id);
+
   return user;
 }
 
@@ -98,6 +102,9 @@ async function cancelSubscription(stripeSubscriptionId: string) {
       cancelAtPeriodEnd: false,
     },
   });
+
+  // Bust cached access state so downgrade takes effect immediately
+  invalidateUserCache(subscription.userId);
 
   return prisma.user.findUnique({
     where: { id: subscription.userId },

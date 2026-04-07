@@ -403,7 +403,9 @@ export default function HomePage() {
       .then((data: { prompt?: string }) => {
         if (data.prompt) setProactivePrompt(data.prompt);
       })
-      .catch(() => {});
+      .catch((err: unknown) => {
+        console.error("[app] proactive prompt load failed:", err);
+      });
   };
 
   const ensureOnboardingConsent = async (): Promise<boolean> => {

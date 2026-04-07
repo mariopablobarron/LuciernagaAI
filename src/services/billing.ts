@@ -8,6 +8,7 @@ import { stripe } from "@/lib/stripe";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { STRIPE_TRIAL_DAYS } from "@/lib/plans";
+import { invalidateUserCache } from "@/services/user";
 
 const APP_BASE_URL = () =>
   process.env.APP_BASE_URL?.trim() || "http://localhost:3000";
@@ -166,6 +167,9 @@ export async function syncSubscription(
     where: { id: resolvedUserId },
     data: { stripeCustomerId: stripeSub.customer as string },
   }).catch(() => null);
+
+  // Bust cached user access state so the change takes effect immediately
+  invalidateUserCache(resolvedUserId);
 
   logInfo("BILLING", "subscription_synced", {
     userId: resolvedUserId,

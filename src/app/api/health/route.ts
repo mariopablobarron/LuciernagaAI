@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
+import { cache } from "@/lib/cache";
 
 export const dynamic = "force-dynamic";
 
@@ -57,25 +58,36 @@ function getMemoryMb() {
   };
 }
 
+const HEALTH_CACHE_TTL_MS = 10 * 1000; // 10 seconds
+
 export async function GET(): Promise<NextResponse<HealthResponse>> {
-  const [dbStatus, envCheck] = await Promise.all([checkDatabase(), Promise.resolve(checkEnv())]);
+  const body = await cache.get<HealthResponse>(
+    "health:check",
+    HEALTH_CACHE_TTL_MS,
+    async () => {
+      const [dbStatus, envCheck] = await Promise.all([
+        checkDatabase(),
+        Promise.resolve(checkEnv()),
+      ]);
 
-  const overallStatus: CheckStatus =
-    dbStatus === "down" ? "down" : envCheck.status === "degraded" ? "degraded" : "ok";
+      const overallStatus: CheckStatus =
+        dbStatus === "down" ? "down" : envCheck.status === "degraded" ? "degraded" : "ok";
 
-  const body: HealthResponse = {
-    status: overallStatus,
-    uptime: Math.floor(process.uptime()),
-    timestamp: new Date().toISOString(),
-    checks: {
-      database: dbStatus,
-      env: envCheck.status,
-      missingVars: envCheck.missing,
+      return {
+        status: overallStatus,
+        uptime: Math.floor(process.uptime()),
+        timestamp: new Date().toISOString(),
+        checks: {
+          database: dbStatus,
+          env: envCheck.status,
+          missingVars: envCheck.missing,
+        },
+        memory: getMemoryMb(),
+      };
     },
-    memory: getMemoryMb(),
-  };
+  );
 
   return NextResponse.json(body, {
-    status: overallStatus === "down" ? 503 : 200,
+    status: body.status === "down" ? 503 : 200,
   });
 }

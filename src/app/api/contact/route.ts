@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { logError, logInfo } from "@/lib/logger";
 import { notifyAdmin } from "@/services/telegram";
+import { withRateLimit } from "@/lib/rate-limit";
 
-export async function POST(request: NextRequest) {
+const MAX_BODY_SIZE = 10 * 1024; // 10 KB
+
+export const POST = withRateLimit(async function POST(request: NextRequest) {
   try {
+    const contentLength = parseInt(request.headers.get("content-length") ?? "0", 10);
+    if (contentLength > MAX_BODY_SIZE) {
+      return NextResponse.json({ error: "Payload too large" }, { status: 413 });
+    }
+
     const body = await request.json();
     const { name, email, message } = body as { name?: string; email?: string; message?: string };
 
@@ -31,4 +39,4 @@ export async function POST(request: NextRequest) {
     logError("CONTACT", error, { route: "/api/contact" });
     return NextResponse.json({ error: "Error al procesar la solicitud" }, { status: 500 });
   }
-}
+}, { limit: 10 });

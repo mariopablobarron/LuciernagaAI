@@ -182,7 +182,9 @@ export async function POST(
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type, userId: identity.userId, state: updatedState }),
-      }).catch(() => {});
+      }).catch((err) =>
+        logError("EXPLORE", err instanceof Error ? err : new Error(String(err)), { context: "n8n_webhook", userId: identity.userId }),
+      );
     }
 
     // 6. Telegram admin alerts (all fire-and-forget via notifyAdmin) ──────────

@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { resolveFamilyPortal, notifyUserOfPing } from "@/services/family";
+import { logError } from "@/lib/logger";
 
 // POST /api/family/[token]/ping — send "are you ok?" ping to user
 export async function POST(
@@ -39,7 +40,9 @@ export async function POST(
     select: { id: true, createdAt: true },
   });
 
-  void notifyUserOfPing(contact.user.id, contact.name);
+  void notifyUserOfPing(contact.user.id, contact.name).catch((err) =>
+    logError("FAMILY", err instanceof Error ? err : new Error(String(err)), { context: "notifyUserOfPing", userId: contact.user.id }),
+  );
 
   return NextResponse.json({ ok: true, pingId: ping.id }, { status: 201 });
 }

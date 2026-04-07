@@ -102,6 +102,13 @@ export default function Sidebar({
   type InviteItem = { code: string; url: string; used: boolean; usedByEmail: string | null };
   const [invites, setInvites] = useState<InviteItem[]>([]);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     fetch("/api/user/invites", { credentials: "include" })
@@ -115,7 +122,8 @@ export default function Sidebar({
   function copyInvite(code: string, url: string) {
     void navigator.clipboard.writeText(url).then(() => {
       setCopiedCode(code);
-      setTimeout(() => setCopiedCode(null), 2000);
+      if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+      copiedTimerRef.current = setTimeout(() => setCopiedCode(null), 2000);
     });
   }
 

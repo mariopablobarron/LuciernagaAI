@@ -5,6 +5,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LogOut, ShieldCheck, Sparkles } from "lucide-react";
 import { SAAS_ADMIN_NAV, SAAS_CONFIG } from "@/lib/saas";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type AdminShellProps = {
   title: string;
@@ -17,6 +23,7 @@ type AdminShellProps = {
 const NAV_LINKS = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/users", label: "Usuarios", matchPrefix: true },
+  { href: "/admin/research", label: "Investigación", matchPrefix: true },
   { href: "/admin-clinical", label: "Panel clínico", matchPrefix: true },
 ];
 
@@ -109,17 +116,28 @@ export function AdminShell({
 
           {/* Section nav */}
           {showSectionNav && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {SAAS_ADMIN_NAV.map((item) => (
-                <a
-                  key={item.id}
-                  href={`#${item.id}`}
-                  className="rounded-full border border-zinc-800 px-3 py-2 text-xs font-semibold text-zinc-500 transition-all hover:border-zinc-700 hover:text-zinc-300"
-                >
-                  {item.label}
-                </a>
-              ))}
-            </div>
+            <TooltipProvider delayDuration={250}>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {SAAS_ADMIN_NAV.map((item) => (
+                  <Tooltip key={item.id}>
+                    <TooltipTrigger asChild>
+                      <a
+                        href={`#${item.id}`}
+                        className="rounded-full border border-zinc-800 px-3 py-2 text-xs font-semibold text-zinc-500 transition-all hover:border-zinc-700 hover:text-zinc-300"
+                      >
+                        {item.label}
+                      </a>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="bottom"
+                      className="max-w-xs border-zinc-700 bg-zinc-800 text-xs text-zinc-200"
+                    >
+                      {item.description}
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
+              </div>
+            </TooltipProvider>
           )}
         </div>
 

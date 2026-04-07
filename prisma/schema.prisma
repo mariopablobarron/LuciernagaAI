@@ -111,6 +111,7 @@ model DailyLog {
   @@index([userId, createdAt])
   @@index([userId, logDate])
   @@index([emotionalState, createdAt])
+  @@index([userId, emotionalState, createdAt])
 }
 
 model Insight {
@@ -174,6 +175,18 @@ model DecisionLog {
   @@index([metric, createdAt])
 }
 
+model AdminSnapshot {
+  id        String   @id @default(cuid())
+  type      String   // "reset" | "manual" | "scheduled"
+  label     String?  // Optional label (e.g. "Pre-reset 2026-04-07")
+  data      Json     // Full snapshot of decisions + insights at time of archive
+  summary   String?  // Human-readable summary of what was archived
+  recordCount Int    @default(0) // Total records archived
+  createdAt DateTime @default(now())
+
+  @@index([type, createdAt])
+}
+
 model Event {
   id        String   @id @default(cuid())
   userId    String
@@ -210,6 +223,7 @@ model Goal {
   actions   Action[]
 
   @@index([userId, status, createdAt])
+  @@index([status])
 }
 
 model Action {
@@ -636,6 +650,8 @@ model LlmLog {
   @@index([userId, createdAt])
   @@index([model, createdAt])
   @@index([source, createdAt])
+  @@index([model])
+  @@index([source])
 }
 
 // ─── Clinical Dashboard ───────────────────────────────────────────────────────

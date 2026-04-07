@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { resolveAdminAuth } from "@/lib/admin-auth";
+import { logError } from "@/lib/logger";
 
 // PHQ-9 and GAD-7 question templates
 const ASSESSMENT_TEMPLATES = {
@@ -54,19 +55,24 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ userId: string }> },
 ) {
-  const auth = resolveAdminAuth(req);
-  if (!auth.authenticated) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  try {
+    const auth = resolveAdminAuth(req);
+    if (!auth.authenticated) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { userId } = await params;
-  const prisma = getPrismaClient();
+    const { userId } = await params;
+    const prisma = getPrismaClient();
 
-  const assessments = await prisma.assessment.findMany({
-    where: { userId },
-    orderBy: { createdAt: "desc" },
-    include: { response: true },
-  });
+    const assessments = await prisma.assessment.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      include: { response: true },
+    });
 
-  return NextResponse.json({ assessments });
+    return NextResponse.json({ assessments });
+  } catch (err) {
+    logError("ADMIN", err instanceof Error ? err : new Error(String(err)), { route: "/api/admin/assessments/[userId]", method: "GET" });
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
 
 // POST /api/admin/assessments/[userId] — assign PHQ-9 or GAD-7 to a user
@@ -74,33 +80,38 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ userId: string }> },
 ) {
-  const auth = resolveAdminAuth(req);
-  if (!auth.authenticated) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  try {
+    const auth = resolveAdminAuth(req);
+    if (!auth.authenticated) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { userId } = await params;
-  const body = (await req.json().catch(() => null)) as { type?: string } | null;
+    const { userId } = await params;
+    const body = (await req.json().catch(() => null)) as { type?: string } | null;
 
-  const type = body?.type as AssessmentType | undefined;
-  if (!type || !(type in ASSESSMENT_TEMPLATES)) {
-    return NextResponse.json({ error: "type debe ser 'phq9' o 'gad7'" }, { status: 400 });
+    const type = body?.type as AssessmentType | undefined;
+    if (!type || !(type in ASSESSMENT_TEMPLATES)) {
+      return NextResponse.json({ error: "type debe ser 'phq9' o 'gad7'" }, { status: 400 });
+    }
+
+    const prisma = getPrismaClient();
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+    if (!user) return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
+
+    const template = ASSESSMENT_TEMPLATES[type];
+    const assessment = await prisma.assessment.create({
+      data: {
+        userId,
+        type,
+        title: template.title,
+        questions: template.questions,
+        status: "pending",
+      },
+      select: { id: true, type: true, title: true, status: true, createdAt: true },
+    });
+
+    return NextResponse.json({ assessment }, { status: 201 });
+  } catch (err) {
+    logError("ADMIN", err instanceof Error ? err : new Error(String(err)), { route: "/api/admin/assessments/[userId]", method: "POST" });
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  const prisma = getPrismaClient();
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
-  if (!user) return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
-
-  const template = ASSESSMENT_TEMPLATES[type];
-  const assessment = await prisma.assessment.create({
-    data: {
-      userId,
-      type,
-      title: template.title,
-      questions: template.questions,
-      status: "pending",
-    },
-    select: { id: true, type: true, title: true, status: true, createdAt: true },
-  });
-
-  return NextResponse.json({ assessment }, { status: 201 });
 }
 

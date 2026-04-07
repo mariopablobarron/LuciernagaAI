@@ -90,7 +90,9 @@ export async function POST(req: NextRequest) {
       userId: identity.userId,
       type: "ACTION_CREATED",
       metadata: { actionId: userAction.id, actionText: type, source: "transitional_void" },
-    });
+    }).catch((err) =>
+      logError("ACTIONS", err instanceof Error ? err : new Error(String(err)), { context: "trackSafe/ACTION_CREATED", userId: identity.userId }),
+    );
 
     const res = NextResponse.json({ success: true, action: userAction });
     if (identity.shouldSetCookie) {

@@ -31,35 +31,45 @@ export async function POST(req: NextRequest) {
 
     const prisma = getPrismaClient();
 
-    const existing = await prisma.user.findUnique({ where: { email }, select: { id: true, passwordHash: true } });
-    if (existing) {
-      if (existing.passwordHash) {
-        return NextResponse.json({ success: false, error: "EMAIL_TAKEN" }, { status: 409 });
-      }
-      // Anonymous user upgrading to full account
-      const hash = await hashPassword(password);
-      await prisma.user.update({
-        where: { id: existing.id },
-        data: { passwordHash: hash, name: name || undefined },
-      });
-      const user = await getUserSessionProfile(existing.id);
-      const token = issueSessionToken(existing.id);
-      const res = NextResponse.json({ success: true, user });
-      attachSessionCookie(res, token);
-      return res;
-    }
-
+    // Hash password before the transaction to minimise time spent holding the lock
     const hash = await hashPassword(password);
-    const newUser = await prisma.user.create({
-      data: { email, name: name || null, passwordHash: hash },
+
+    // Use a serializable transaction to prevent the race between findUnique and create/update.
+    // Two concurrent signups with the same email could both pass the check and then both try to
+    // create, violating the unique constraint.
+    const result = await prisma.$transaction(async (tx) => {
+      const existing = await tx.user.findUnique({ where: { email }, select: { id: true, passwordHash: true } });
+
+      if (existing) {
+        if (existing.passwordHash) {
+          return { status: "EMAIL_TAKEN" as const };
+        }
+        // Anonymous user upgrading to full account
+        await tx.user.update({
+          where: { id: existing.id },
+          data: { passwordHash: hash, name: name || undefined },
+        });
+        return { status: "UPGRADED" as const, userId: existing.id };
+      }
+
+      const newUser = await tx.user.create({
+        data: { email, name: name || null, passwordHash: hash },
+      });
+      return { status: "CREATED" as const, userId: newUser.id };
     });
 
-    const user = await getUserSessionProfile(newUser.id);
-    const token = issueSessionToken(newUser.id);
+    if (result.status === "EMAIL_TAKEN") {
+      return NextResponse.json({ success: false, error: "EMAIL_TAKEN" }, { status: 409 });
+    }
+
+    const user = await getUserSessionProfile(result.userId);
+    const token = issueSessionToken(result.userId);
     const res = NextResponse.json({ success: true, user });
     attachSessionCookie(res, token);
 
-    logInfo("AUTH", "signup_completed", { userId: newUser.id, email });
+    if (result.status === "CREATED") {
+      logInfo("AUTH", "signup_completed", { userId: result.userId, email });
+    }
     return res;
   } catch (err) {
     logError("AUTH", err, { route: "/api/auth/signup" });

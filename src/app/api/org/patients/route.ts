@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
+import { withRateLimit } from "@/lib/rate-limit";
+import { verifyOrgToken } from "@/lib/org-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +13,7 @@ export const dynamic = "force-dynamic";
  * Only available for orgAdmins with role "therapist".
  * Shows clinical summary per patient (not chat content).
  */
-export async function GET(req: NextRequest) {
+export const GET = withRateLimit(async function GET(req: NextRequest) {
   const orgId = req.nextUrl.searchParams.get("orgId");
   const token = req.nextUrl.searchParams.get("token");
 
@@ -19,12 +21,18 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Missing params" }, { status: 400 });
   }
 
+  // Verify signed token and extract admin ID
+  const verified = verifyOrgToken(token);
+  if (!verified) {
+    return NextResponse.json({ error: "Invalid or expired token" }, { status: 401 });
+  }
+
   const prisma = getPrismaClient();
 
   try {
-    // Verify therapist access
+    // Verify therapist access using the admin ID from the signed token
     const admin = await prisma.orgAdmin.findFirst({
-      where: { organizationId: orgId, id: token, role: "therapist" },
+      where: { organizationId: orgId, id: verified.adminId, role: "therapist" },
       select: { id: true, name: true },
     });
 
@@ -114,4 +122,4 @@ export async function GET(req: NextRequest) {
     logError("ORG", error, { action: "patients_fetch", orgId });
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
-}
+}, { limit: 30 });

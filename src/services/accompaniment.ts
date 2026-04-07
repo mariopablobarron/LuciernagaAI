@@ -302,6 +302,7 @@ export async function buildAccompanimentList(): Promise<
         actions: {
           where: { completed: false },
           select: { id: true },
+          take: 10,
         },
       },
     }),

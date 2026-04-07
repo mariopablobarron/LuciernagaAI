@@ -10,7 +10,12 @@ function createPrismaClient(): PrismaClient {
     throw new Error("[DB] DATABASE_URL environment variable is not set");
   }
 
-  const adapter = new PrismaPg({ connectionString });
+  const poolMax = parseInt(process.env.DATABASE_POOL_MAX ?? "20", 10);
+  const adapter = new PrismaPg({
+    connectionString,
+    min: 5,
+    max: Number.isFinite(poolMax) && poolMax > 0 ? poolMax : 20,
+  });
   return new PrismaClient({
     adapter,
     log: ["error", "warn"],

@@ -7,8 +7,9 @@ import {
 } from "@/lib/auth";
 import { logError, logInfo } from "@/lib/logger";
 import { ensureUserSession, listMessagesForConversation } from "@/services/conversation";
+import { getClientIp, withRateLimit } from "@/lib/rate-limit";
 
-export async function GET(req: NextRequest) {
+export const GET = withRateLimit(async function GET(req: NextRequest) {
   try {
     const identity = await resolveIdentity(req);
     const userId = identity.userId;
@@ -87,4 +88,4 @@ export async function GET(req: NextRequest) {
       { status: 500 }
     );
   }
-}
+}, { limit: 60, keyFn: (req) => `rl:/api/messages:${getClientIp(req)}` });

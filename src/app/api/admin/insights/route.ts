@@ -9,6 +9,7 @@ import type {
 } from "@/domain/types";
 import { buildUserState } from "@/domain/userStateEngine";
 import { dispatchAutomatedAlerts } from "@/lib/alerts";
+import { cache } from "@/lib/cache";
 import { logError, logInfo } from "@/lib/logger";
 import { generateDecision, type DecisionMetrics } from "@/services/decision";
 import { generateInsights, getInsightConfidence } from "@/services/insights";
@@ -21,6 +22,8 @@ import {
   getActionsPerConversation,
   getUserSegments,
 } from "@/lib/metrics";
+
+const INSIGHTS_CACHE_TTL_MS = 30 * 1000; // 30 seconds
 
 export const dynamic = "force-dynamic";
 
@@ -230,6 +233,73 @@ export async function GET(req: NextRequest) {
       return unauthorized;
     }
 
+    const responseData = await cache.get(
+      "admin:insights",
+      INSIGHTS_CACHE_TTL_MS,
+      () => fetchInsightsData(),
+    );
+
+    return NextResponse.json(responseData);
+  } catch (error: unknown) {
+    logError("DECISION", error, { route: "/api/admin/insights" });
+    return NextResponse.json(
+      {
+        metrics: {
+          retentionDay3: 0,
+          retentionDay7: 0,
+          dropOffPoint: "day_1",
+          checkinDrop: 0,
+          dominantState: "neutral",
+        },
+        activity: {
+          usersCreatedLast7d: 0,
+          activeUsersLast7d: 0,
+          messagesLast7d: 0,
+          checkinsLast7d: 0,
+        },
+        segments: {
+          totalUsers: 0,
+          newUsers: 0,
+          returningUsers: 0,
+          activeNewUsers: 0,
+          activeReturningUsers: 0,
+          inactiveUsers: 0,
+        },
+        decision: {
+          decision: "Error en motor de decisiones",
+          reason: "No se pudieron calcular métricas",
+          priority: "high",
+          action: "Revisar logs y conectividad de base de datos",
+        },
+        alerts: [],
+        insights: [],
+        crisis: {
+          last24h: {
+            total: 0,
+            high: 0,
+            critical: 0,
+          },
+          latestEvents: [],
+        },
+        avoidance: {
+          last7d: {
+            total: 0,
+            postpone: 0,
+            refuse: 0,
+            uniqueUsers: 0,
+          },
+          topActions: [],
+        },
+        decisionHistory: [],
+        insightHistory: [],
+      },
+      { status: 500 }
+    );
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function fetchInsightsData(): Promise<Record<string, any>> {
     const prisma = getPrismaClient();
 
     const now = new Date();
@@ -608,7 +678,7 @@ export async function GET(req: NextRequest) {
       ACTIVO: decisionSamples > 0 ? stateDistribution.ACTIVO / decisionSamples : 0,
     };
 
-    return NextResponse.json({
+    return {
       metrics: {
         retentionDay3,
         retentionDay7,
@@ -703,61 +773,5 @@ export async function GET(req: NextRequest) {
         confidence: item.confidence,
         createdAt: item.createdAt.toISOString(),
       })),
-    });
-  } catch (error: unknown) {
-    logError("DECISION", error, { route: "/api/admin/insights" });
-    return NextResponse.json(
-      {
-        metrics: {
-          retentionDay3: 0,
-          retentionDay7: 0,
-          dropOffPoint: "day_1",
-          checkinDrop: 0,
-          dominantState: "neutral",
-        },
-        activity: {
-          usersCreatedLast7d: 0,
-          activeUsersLast7d: 0,
-          messagesLast7d: 0,
-          checkinsLast7d: 0,
-        },
-        segments: {
-          totalUsers: 0,
-          newUsers: 0,
-          returningUsers: 0,
-          activeNewUsers: 0,
-          activeReturningUsers: 0,
-          inactiveUsers: 0,
-        },
-        decision: {
-          decision: "Error en motor de decisiones",
-          reason: "No se pudieron calcular métricas",
-          priority: "high",
-          action: "Revisar logs y conectividad de base de datos",
-        },
-        alerts: [],
-        insights: [],
-        crisis: {
-          last24h: {
-            total: 0,
-            high: 0,
-            critical: 0,
-          },
-          latestEvents: [],
-        },
-        avoidance: {
-          last7d: {
-            total: 0,
-            postpone: 0,
-            refuse: 0,
-            uniqueUsers: 0,
-          },
-          topActions: [],
-        },
-        decisionHistory: [],
-        insightHistory: [],
-      },
-      { status: 500 }
-    );
-  }
+    };
 }

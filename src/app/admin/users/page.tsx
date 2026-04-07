@@ -125,7 +125,7 @@ export default function AdminUsersPage() {
   const [sortKey, setSortKey] = useState<SortKey>("lastSeen");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
-  async function fetchUsers() {
+  async function fetchUsers(signal?: AbortSignal) {
     setLoading(true);
     setError(null);
     const params = new URLSearchParams();
@@ -139,23 +139,29 @@ export default function AdminUsersPage() {
       const res = await fetch(`/api/admin/users?${params.toString()}`, {
         cache: "no-store",
         credentials: "include",
+        signal,
       });
+      if (signal?.aborted) return;
       if (res.status === 401) {
         router.replace("/admin/login?next=/admin/users");
         return;
       }
       const payload = (await res.json().catch(() => null)) as AdminUsersResponse | null;
+      if (signal?.aborted) return;
       if (!res.ok || !payload) throw new Error("No se pudo cargar el listado.");
       setData(payload);
     } catch (e: unknown) {
+      if (e instanceof DOMException && e.name === "AbortError") return;
       setError(e instanceof Error ? e.message : "Error cargando usuarios.");
     } finally {
-      setLoading(false);
+      if (!signal?.aborted) setLoading(false);
     }
   }
 
   useEffect(() => {
-    void fetchUsers();
+    const controller = new AbortController();
+    void fetchUsers(controller.signal);
+    return () => controller.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 

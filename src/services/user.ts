@@ -1,9 +1,61 @@
 import type { Prisma } from "@prisma/client";
 import { getPrismaClient } from "@/db/prisma";
 import { PLANS } from "@/lib/plans";
+import { cache } from "@/lib/cache";
 
 const SYNTHETIC_EMAIL_DOMAIN = "session.luciernaga.local";
 const ACTIVE_SUBSCRIPTION_STATUSES = new Set(["active", "trialing"]);
+
+// ── Cache TTLs ───────────────────────────────────────────────────────────────
+const USER_CACHE_TTL_MS = 2 * 60 * 1000; // 2 minutes
+
+/** Prefix for all per-user cache keys — used for targeted invalidation. */
+const USER_CACHE_PREFIX = "user:";
+
+/**
+ * Invalidate all cached data for a given user (session profile + access state).
+ * Call this after subscription changes, profile updates, etc.
+ */
+export function invalidateUserCache(userId: string): void {
+  cache.invalidate(`${USER_CACHE_PREFIX}${userId}:access`);
+  cache.invalidate(`${USER_CACHE_PREFIX}${userId}:profile`);
+}
+
+// ---------------------------------------------------------------------------
+// Debounced lastSeen: avoids a DB write on every single request.
+// Updates at most once per LAST_SEEN_DEBOUNCE_MS per user.
+// ---------------------------------------------------------------------------
+const LAST_SEEN_DEBOUNCE_MS = 5 * 60 * 1000; // 5 minutes
+const lastSeenCache = new Map<string, number>();
+
+/**
+ * Updates `lastSeen` for a user, but at most once every 5 minutes.
+ * Fire-and-forget — callers should not await this.
+ */
+export function touchLastSeen(userId: string): void {
+  const now = Date.now();
+  const lastTouch = lastSeenCache.get(userId);
+  if (lastTouch && now - lastTouch < LAST_SEEN_DEBOUNCE_MS) return;
+
+  lastSeenCache.set(userId, now);
+
+  // Evict old entries periodically to avoid memory leak
+  if (lastSeenCache.size > 10_000) {
+    const cutoff = now - LAST_SEEN_DEBOUNCE_MS;
+    for (const [uid, ts] of lastSeenCache) {
+      if (ts < cutoff) lastSeenCache.delete(uid);
+    }
+  }
+
+  const prisma = getPrismaClient();
+  void prisma.user.update({
+    where: { id: userId },
+    data: { lastSeen: new Date(now) },
+  }).catch(() => {
+    // User might not exist yet (bootstrap race) — ignore silently
+    lastSeenCache.delete(userId);
+  });
+}
 export const FREE_PLAN_MESSAGE_LIMIT = PLANS.free.limits.messagesPerConversation;
 export type CanonicalUserPlan = "free" | "pro";
 
@@ -365,7 +417,7 @@ export async function linkIdentityToEmail(params: {
   const normalizedEmail = normalizeEmail(params.email);
   const nextName = params.name?.trim() || null;
 
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     const now = new Date();
     const currentUser =
       (await tx.user.findUnique({
@@ -439,6 +491,12 @@ export async function linkIdentityToEmail(params: {
 
     return { userId: existingUser.id };
   });
+
+  // Invalidate both the old and new user cache entries after merge
+  invalidateUserCache(params.currentUserId);
+  invalidateUserCache(result.userId);
+
+  return result;
 }
 
 export async function linkTelegramIdentity(params: {
@@ -447,7 +505,7 @@ export async function linkTelegramIdentity(params: {
 }): Promise<{ userId: string }> {
   const prisma = getPrismaClient();
 
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     const now = new Date();
     const currentUser = await tx.user.findUnique({ where: { id: params.currentUserId } });
     if (!currentUser) {
@@ -509,54 +567,91 @@ export async function linkTelegramIdentity(params: {
 
     return { userId: currentUser.id };
   });
+
+  // Invalidate both user caches after identity merge
+  invalidateUserCache(params.currentUserId);
+  invalidateUserCache(params.telegramUserId);
+
+  return result;
 }
 
 export async function getUserAccessState(userId: string): Promise<UserAccessState> {
-  const prisma = getPrismaClient();
-  await ensureUserAccount(userId);
+  touchLastSeen(userId);
 
-  const [latestSubscription, messagesUsedToday] = await Promise.all([
-    prisma.subscription.findFirst({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-      select: {
-        status: true,
-        plan: true,
-      },
-    }),
-    prisma.message.count({
-      where: {
-        userId,
-        role: "user",
-        createdAt: {
-          gte: getStartOfDay(),
-        },
-      },
-    }),
-  ]);
+  return cache.get<UserAccessState>(
+    `${USER_CACHE_PREFIX}${userId}:access`,
+    USER_CACHE_TTL_MS,
+    async () => {
+      const prisma = getPrismaClient();
 
-  const subscriptionStatus = latestSubscription?.status ?? "free";
-  const hasPlan = ACTIVE_SUBSCRIPTION_STATUSES.has(subscriptionStatus);
-  const plan = normalizePlan(latestSubscription?.plan, hasPlan);
+      const [latestSubscription, messagesUsedToday] = await Promise.all([
+        prisma.subscription.findFirst({
+          where: { userId },
+          orderBy: { createdAt: "desc" },
+          select: {
+            status: true,
+            plan: true,
+          },
+        }),
+        prisma.message.count({
+          where: {
+            userId,
+            role: "user",
+            createdAt: {
+              gte: getStartOfDay(),
+            },
+          },
+        }),
+      ]);
 
-  return buildAccessState({
-    plan,
-    hasPlan,
-    subscriptionStatus,
-    messagesUsedToday,
-  });
+      const subscriptionStatus = latestSubscription?.status ?? "free";
+      const hasPlan = ACTIVE_SUBSCRIPTION_STATUSES.has(subscriptionStatus);
+      const plan = normalizePlan(latestSubscription?.plan, hasPlan);
+
+      return buildAccessState({
+        plan,
+        hasPlan,
+        subscriptionStatus,
+        messagesUsedToday,
+      });
+    },
+  );
 }
 
 export async function getUserSessionProfile(userId: string): Promise<UserSessionProfile> {
-  const user = await ensureUserAccount(userId);
-  const accessState = await getUserAccessState(userId);
+  touchLastSeen(userId);
 
-  return {
-    id: user.id,
-    email: user.email,
-    name: user.name,
-    role: user.role,
-    isAnonymous: isSyntheticEmail(user.email),
-    ...accessState,
-  };
+  return cache.get<UserSessionProfile>(
+    `${USER_CACHE_PREFIX}${userId}:profile`,
+    USER_CACHE_TTL_MS,
+    async () => {
+      const prisma = getPrismaClient();
+
+      // Read-only fetch — user must already exist (created at bootstrap/signup).
+      const user = await prisma.user.findUnique({ where: { id: userId } });
+      if (!user) {
+        // Defensive fallback: should only happen if data was wiped or race at bootstrap.
+        const created = await ensureUserAccount(userId);
+        const accessState = await getUserAccessState(userId);
+        return {
+          id: created.id,
+          email: created.email,
+          name: created.name,
+          role: created.role,
+          isAnonymous: isSyntheticEmail(created.email),
+          ...accessState,
+        };
+      }
+
+      const accessState = await getUserAccessState(userId);
+      return {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        isAnonymous: isSyntheticEmail(user.email),
+        ...accessState,
+      };
+    },
+  );
 }

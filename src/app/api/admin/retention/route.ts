@@ -70,6 +70,7 @@ export async function GET(req: NextRequest) {
       },
       select: { userId: true, createdAt: true },
       orderBy: { createdAt: "asc" },
+      take: 100000,
     });
 
     // Build map: userId -> sorted list of message timestamps (ms)

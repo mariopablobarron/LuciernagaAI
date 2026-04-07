@@ -64,7 +64,9 @@ async function buildBootstrapResponse(req: NextRequest): Promise<NextResponse> {
       }).catch(() => null);
 
       const resolvedId = user?.telegramId ?? telegramId;
-      void sendWelcomeSequence(identity.userId, resolvedId);
+      void sendWelcomeSequence(identity.userId, resolvedId).catch((err) =>
+        logError("CHAT", err instanceof Error ? err : new Error(String(err)), { context: "sendWelcomeSequence", userId: identity.userId }),
+      );
     }
   }
 

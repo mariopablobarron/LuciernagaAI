@@ -1,7 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
+import { Prisma } from "@prisma/client";
 import { resolveIdentity } from "@/lib/auth";
 import { sendFamilyInviteEmail } from "@/services/family";
+import { logError } from "@/lib/logger";
 
 const VALID_RELATIONS = ["madre", "padre", "pareja", "amigo/a", "hermano/a", "terapeuta", "otro"] as const;
 
@@ -56,35 +58,42 @@ export async function POST(req: NextRequest) {
 
   const prisma = getPrismaClient();
 
-  // Only one trusted contact per user
-  const existing = await prisma.trustedContact.findUnique({ where: { userId: identity.userId } });
-  if (existing) {
-    return NextResponse.json({ error: "Ya tienes un contacto de confianza. Actualízalo con PATCH." }, { status: 409 });
+  // Only one trusted contact per user (enforced by @unique on userId).
+  // Instead of check-then-create (which races), we attempt the create directly
+  // and catch the unique constraint violation (P2002).
+  try {
+    const contact = await prisma.trustedContact.create({
+      data: {
+        userId: identity.userId,
+        name: body.name.trim().slice(0, 80),
+        email: body.email.trim().toLowerCase().slice(0, 200),
+        phone: body.phone?.trim().slice(0, 30) ?? null,
+        relation: VALID_RELATIONS.includes(body.relation as typeof VALID_RELATIONS[number])
+          ? body.relation
+          : null,
+        shareProgress: body.shareProgress ?? false,
+        shareWins: body.shareWins ?? false,
+        shareStreak: body.shareStreak ?? false,
+        notifyOnCrisis: body.notifyOnCrisis ?? true,
+        notifyOnInactivity: body.notifyOnInactivity ?? true,
+        inactivityDays: Math.min(Math.max(body.inactivityDays ?? 3, 1), 30),
+      },
+      select: { id: true, name: true, email: true, relation: true, createdAt: true },
+    });
+
+    // Send invite email in background
+    void sendFamilyInviteEmail(contact.id).catch((err) =>
+      logError("FAMILY", err instanceof Error ? err : new Error(String(err)), { context: "sendFamilyInviteEmail", contactId: contact.id }),
+    );
+
+    return NextResponse.json({ contact }, { status: 201 });
+  } catch (err) {
+    // P2002 = unique constraint violation — another request already created the contact
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
+      return NextResponse.json({ error: "Ya tienes un contacto de confianza. Actualízalo con PATCH." }, { status: 409 });
+    }
+    throw err;
   }
-
-  const contact = await prisma.trustedContact.create({
-    data: {
-      userId: identity.userId,
-      name: body.name.trim().slice(0, 80),
-      email: body.email.trim().toLowerCase().slice(0, 200),
-      phone: body.phone?.trim().slice(0, 30) ?? null,
-      relation: VALID_RELATIONS.includes(body.relation as typeof VALID_RELATIONS[number])
-        ? body.relation
-        : null,
-      shareProgress: body.shareProgress ?? false,
-      shareWins: body.shareWins ?? false,
-      shareStreak: body.shareStreak ?? false,
-      notifyOnCrisis: body.notifyOnCrisis ?? true,
-      notifyOnInactivity: body.notifyOnInactivity ?? true,
-      inactivityDays: Math.min(Math.max(body.inactivityDays ?? 3, 1), 30),
-    },
-    select: { id: true, name: true, email: true, relation: true, createdAt: true },
-  });
-
-  // Send invite email in background
-  void sendFamilyInviteEmail(contact.id);
-
-  return NextResponse.json({ contact }, { status: 201 });
 }
 
 // PATCH /api/user/trusted-contact — update settings
@@ -132,7 +141,9 @@ export async function PATCH(req: NextRequest) {
     select: { id: true, name: true, email: true, relation: true, shareProgress: true, shareWins: true, shareStreak: true, notifyOnCrisis: true, notifyOnInactivity: true, inactivityDays: true },
   });
 
-  if (body.resendInvite) void sendFamilyInviteEmail(contact.id);
+  if (body.resendInvite) void sendFamilyInviteEmail(contact.id).catch((err) =>
+    logError("FAMILY", err instanceof Error ? err : new Error(String(err)), { context: "resendFamilyInviteEmail", contactId: contact.id }),
+  );
 
   return NextResponse.json({ contact });
 }

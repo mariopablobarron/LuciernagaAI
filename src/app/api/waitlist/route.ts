@@ -3,8 +3,15 @@ import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { useInviteCode } from "@/services/invites";
 
+const MAX_BODY_SIZE = 10 * 1024; // 10 KB
+
 export async function POST(req: NextRequest) {
   try {
+    const contentLength = parseInt(req.headers.get("content-length") ?? "0", 10);
+    if (contentLength > MAX_BODY_SIZE) {
+      return NextResponse.json({ error: "Payload too large" }, { status: 413 });
+    }
+
     const body = (await req.json()) as {
       email?: string;
       mission1?: string;

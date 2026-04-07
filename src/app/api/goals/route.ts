@@ -11,6 +11,7 @@ import {
   getActiveGoalForUser,
   type GoalWithProgress,
 } from "@/services/goals";
+import { getClientIp, withRateLimit } from "@/lib/rate-limit";
 
 function serializeGoal(goal: GoalWithProgress | null) {
   if (!goal) {
@@ -35,7 +36,7 @@ function serializeGoal(goal: GoalWithProgress | null) {
   };
 }
 
-export async function GET(req: NextRequest) {
+export const GET = withRateLimit(async function GET(req: NextRequest) {
   try {
     const identity = await resolveIdentity(req);
     const goal = await getActiveGoalForUser(identity.userId);
@@ -69,9 +70,9 @@ export async function GET(req: NextRequest) {
       { status: 500 }
     );
   }
-}
+}, { limit: 60, keyFn: (req) => `rl:/api/goals:${getClientIp(req)}` });
 
-export async function POST(req: NextRequest) {
+export const POST = withRateLimit(async function POST(req: NextRequest) {
   try {
     const identity = await resolveIdentity(req);
     const body = (await req.json()) as { title?: string; actions?: string[] };
@@ -138,4 +139,4 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
-}
+}, { limit: 60, keyFn: (req) => `rl:/api/goals:${getClientIp(req)}` });

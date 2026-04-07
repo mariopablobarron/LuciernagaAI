@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
+import { withRateLimit } from "@/lib/rate-limit";
+import { verifyOrgToken } from "@/lib/org-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +29,7 @@ type AggregateStats = {
  * No PII (names, emails, individual data) is ever returned.
  * Only shows data when group size >= MIN_GROUP_SIZE (5).
  */
-export async function GET(req: NextRequest) {
+export const GET = withRateLimit(async function GET(req: NextRequest) {
   const orgId = req.nextUrl.searchParams.get("orgId");
   const token = req.nextUrl.searchParams.get("token");
 
@@ -35,12 +37,18 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Missing orgId or token" }, { status: 400 });
   }
 
+  // Verify signed token and extract admin ID
+  const verified = verifyOrgToken(token);
+  if (!verified) {
+    return NextResponse.json({ error: "Invalid or expired token" }, { status: 401 });
+  }
+
   const prisma = getPrismaClient();
 
   try {
-    // Verify org admin access
+    // Verify org admin access using the admin ID from the signed token
     const admin = await prisma.orgAdmin.findFirst({
-      where: { organizationId: orgId, id: token },
+      where: { organizationId: orgId, id: verified.adminId },
       select: { id: true, role: true, organizationId: true },
     });
 
@@ -161,4 +169,4 @@ export async function GET(req: NextRequest) {
     logError("ORG", error, { action: "dashboard_fetch", orgId });
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
-}
+}, { limit: 30 });

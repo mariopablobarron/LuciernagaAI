@@ -1,7 +1,7 @@
 import { createHmac, randomUUID, timingSafeEqual } from "crypto";
 import type { NextRequest, NextResponse } from "next/server";
 import { logError, logInfo } from "@/lib/logger";
-import { ensureUserAccount, linkIdentityToEmail } from "@/services/user";
+import { ensureUserAccount, linkIdentityToEmail, touchLastSeen } from "@/services/user";
 
 type SessionPayload = {
   uid: string;
@@ -197,7 +197,13 @@ async function finalizeIdentity(
   identity: ResolvedIdentity,
   options: ResolveIdentityOptions
 ): Promise<ResolvedIdentity> {
-  await ensureUserAccount(identity.userId);
+  // On bootstrap (new user), we need the full upsert.
+  // On existing sessions, just debounce lastSeen — no DB write per request.
+  if (identity.source === "generated") {
+    await ensureUserAccount(identity.userId);
+  } else {
+    touchLastSeen(identity.userId);
+  }
 
   const requestedEmail = options.email?.trim();
   if (!requestedEmail) {

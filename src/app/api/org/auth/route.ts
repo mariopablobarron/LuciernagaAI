@@ -2,6 +2,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { logInfo } from "@/lib/logger";
 import { createHmac, timingSafeEqual } from "crypto";
+import { withRateLimit } from "@/lib/rate-limit";
+import { issueOrgToken } from "@/lib/org-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +20,7 @@ function safeCompare(a: string, b: string): boolean {
 }
 
 // POST /api/org/auth — login for org admins
-export async function POST(req: NextRequest) {
+export const POST = withRateLimit(async function POST(req: NextRequest) {
   const body = (await req.json().catch(() => null)) as {
     email?: string;
     password?: string;
@@ -58,8 +60,8 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({
     ok: true,
-    token: admin.id, // Used as bearer for dashboard/patients endpoints
+    token: issueOrgToken(admin.id), // Signed HMAC token — not the raw admin ID
     admin: { name: admin.name, role: admin.role },
     organization: { id: org.id, name: org.name },
   });
-}
+}, { limit: 10 });

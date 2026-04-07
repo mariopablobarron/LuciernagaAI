@@ -216,6 +216,7 @@ describe("POST /api/chat", () => {
       subscriptionStatus: "free",
       hasPlan: false,
       isAnonymous: true,
+      emailVerified: false,
       messagesUsedToday: 0,
       messagesRemainingToday: 10,
       messageLimitPerDay: 10,

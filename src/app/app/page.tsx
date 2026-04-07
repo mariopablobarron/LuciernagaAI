@@ -10,6 +10,7 @@ import AssessmentFlow from "@/components/AssessmentFlow";
 import QuickCheckin from "@/components/QuickCheckin";
 import RetoDiario from "@/components/RetoDiario";
 import HomeHero from "@/components/home/HomeHero";
+import DailyQuote from "@/components/DailyQuote";
 import HomeOnboarding from "@/components/home/HomeOnboarding";
 import HomeWorkspace, { type WorkspaceTab } from "@/components/home/HomeWorkspace";
 import InsightsPanel from "@/components/InsightsPanel";
@@ -1878,6 +1879,7 @@ export default function HomePage() {
         }
         prelude={
           <>
+            <DailyQuote />
             {sessionProfile && !sessionProfile.isAnonymous && !sessionProfile.emailVerified && (
               <EmailVerificationBanner
                 emailVerified={sessionProfile.emailVerified}

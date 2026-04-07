@@ -75,8 +75,17 @@ model User {
   llmLogs              LlmLog[]
   feedbacks            Feedback[]
   events               Event[]
+  emailVerified        Boolean          @default(false)
+  emailVerifyToken     String?
+  emailVerifyExpires   DateTime?
   organizationId       String?
   organization         Organization?    @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([isActive, createdAt])
+  @@index([lastSeen])
+  @@index([createdAt])
+  @@index([organizationId, isActive, lastSeen])
 }
 
 model Message {

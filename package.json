@@ -24,6 +24,7 @@
     "agent:ci": "bash scripts/testing-agent.sh ci",
     "agent:audit": "bash scripts/testing-agent.sh audit",
     "agent:hooks": "bash scripts/testing-agent.sh hooks",
+    "test:email": "node scripts/test-email.mjs",
     "test:telegram": "node scripts/test-telegram-send.mjs",
     "docs:commands:update": "node scripts/auto-update-commands-doc.mjs",
     "docs:commands:check": "node scripts/auto-update-commands-doc.mjs --check",

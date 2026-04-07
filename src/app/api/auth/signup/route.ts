@@ -1,9 +1,11 @@
+import { randomBytes } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { attachSessionCookie, issueSessionToken } from "@/lib/auth";
 import { getPrismaClient } from "@/db/prisma";
 import { hashPassword } from "@/lib/password";
 import { logError, logInfo } from "@/lib/logger";
 import { getUserSessionProfile, normalizeEmail } from "@/services/user";
+import { sendUserEmail, buildVerificationEmail, buildWelcomeEmail } from "@/lib/email";
 
 type SignupBody = {
   email?: string;
@@ -45,17 +47,33 @@ export async function POST(req: NextRequest) {
           return { status: "EMAIL_TAKEN" as const };
         }
         // Anonymous user upgrading to full account
+        const verifyToken = randomBytes(32).toString("hex");
+        const verifyExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
         await tx.user.update({
           where: { id: existing.id },
-          data: { passwordHash: hash, name: name || undefined },
+          data: {
+            passwordHash: hash,
+            name: name || undefined,
+            emailVerifyToken: verifyToken,
+            emailVerifyExpires: verifyExpires,
+          },
         });
-        return { status: "UPGRADED" as const, userId: existing.id };
+        return { status: "UPGRADED" as const, userId: existing.id, verifyToken };
       }
 
+      const verifyToken = randomBytes(32).toString("hex");
+      const verifyExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
+
       const newUser = await tx.user.create({
-        data: { email, name: name || null, passwordHash: hash },
+        data: {
+          email,
+          name: name || null,
+          passwordHash: hash,
+          emailVerifyToken: verifyToken,
+          emailVerifyExpires: verifyExpires,
+        },
       });
-      return { status: "CREATED" as const, userId: newUser.id };
+      return { status: "CREATED" as const, userId: newUser.id, verifyToken };
     });
 
     if (result.status === "EMAIL_TAKEN") {
@@ -69,6 +87,19 @@ export async function POST(req: NextRequest) {
 
     if (result.status === "CREATED") {
       logInfo("AUTH", "signup_completed", { userId: result.userId, email });
+    }
+
+    // Send verification + welcome emails for new and upgraded users
+    if ("verifyToken" in result) {
+      const baseUrl = process.env.APP_BASE_URL ?? "http://localhost:3000";
+      const verifyUrl = `${baseUrl}/api/auth/verify-email?token=${result.verifyToken}`;
+      sendUserEmail(buildVerificationEmail({ to: email, verifyUrl, name: name || undefined })).catch(
+        (e) => logError("AUTH", e, { action: "send_verification_email", email }),
+      );
+      const welcomeEmail = buildWelcomeEmail({ name: name || null, appUrl: baseUrl });
+      sendUserEmail({ to: email, ...welcomeEmail }).catch(
+        (e) => logError("AUTH", e, { action: "send_welcome_email", email }),
+      );
     }
     return res;
   } catch (err) {

@@ -222,9 +222,12 @@ export function ShareStoryCard({ data, onClose }: ShareStoryCardProps) {
 
   const template = TEMPLATES[activeIndex];
 
+  const [downloadError, setDownloadError] = useState(false);
+
   const handleDownload = useCallback(async () => {
     if (!cardRef.current) return;
     setDownloading(true);
+    setDownloadError(false);
     try {
       const dataUrl = await toPng(cardRef.current, {
         width: 1080,
@@ -237,7 +240,7 @@ export function ShareStoryCard({ data, onClose }: ShareStoryCardProps) {
       link.href = dataUrl;
       link.click();
     } catch {
-      // Silent fail
+      setDownloadError(true);
     } finally {
       setDownloading(false);
     }
@@ -352,6 +355,11 @@ export function ShareStoryCard({ data, onClose }: ShareStoryCardProps) {
           </button>
         </div>
 
+        {downloadError && (
+          <p className="text-center text-xs text-red-400">
+            No se pudo generar la imagen. Prueba con una captura de pantalla.
+          </p>
+        )}
         <p className="text-center text-[10px] text-zinc-600">
           La imagen se genera en formato Story (1080x1920). Perfecta para Instagram, WhatsApp o LinkedIn.
         </p>

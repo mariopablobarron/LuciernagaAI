@@ -4,6 +4,7 @@ import { attachSessionCookie, issueSessionToken } from "@/lib/auth";
 import { getPrismaClient } from "@/db/prisma";
 import { hashPassword } from "@/lib/password";
 import { logError, logInfo } from "@/lib/logger";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { getUserSessionProfile, normalizeEmail } from "@/services/user";
 import { sendUserEmail, buildVerificationEmail, buildWelcomeEmail } from "@/lib/email";
 import { issueWebLinkToken } from "@/lib/telegram-link";
@@ -36,6 +37,15 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+    const rl = checkRateLimit(`signup:${ip}`, 5, 60_000 * 60); // 5 signups/hour per IP
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { success: false, error: "TOO_MANY_ATTEMPTS" },
+        { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } },
+      );
+    }
+
     const body = (await req.json()) as SignupBody;
     const email = normalizeEmail(body.email?.trim() ?? "");
     const password = body.password?.trim() ?? "";

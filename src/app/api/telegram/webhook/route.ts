@@ -1,6 +1,6 @@
 import { after } from "next/server";
 import { NextRequest, NextResponse } from "next/server";
-import { logError, logInfo } from "@/lib/logger";
+import { logError, logInfo, logWarn } from "@/lib/logger";
 import { generateAIResponse } from "@/services/ai";
 import { saveConversationMessage } from "@/services/conversation";
 import { analyzeEmotionalProfile, getEmotionalProfile } from "@/services/emotional-model";
@@ -358,13 +358,17 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ ok: true });
   }
 
-  // Verify Telegram webhook secret if configured
+  // Verify Telegram webhook secret
   const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
   if (webhookSecret) {
     const incomingSecret = req.headers.get("x-telegram-bot-api-secret-token");
     if (incomingSecret !== webhookSecret) {
       return NextResponse.json({ ok: false }, { status: 401 });
     }
+  } else if (process.env.NODE_ENV === "production") {
+    logWarn("TELEGRAM", "webhook_secret_not_configured", {
+      warning: "TELEGRAM_WEBHOOK_SECRET not set — webhook accepts all requests",
+    });
   }
 
   let chatId: number | undefined;

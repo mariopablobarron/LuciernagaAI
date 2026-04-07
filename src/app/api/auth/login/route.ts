@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
       const prisma = getPrismaClient();
       const dbUser = await prisma.user.findUnique({
         where: { email: normalizedEmail },
-        select: { id: true, passwordHash: true },
+        select: { id: true, passwordHash: true, emailVerified: true },
       });
 
       if (!dbUser?.passwordHash) {
@@ -80,9 +80,14 @@ export async function POST(req: NextRequest) {
 
       const token = issueSessionToken(dbUser.id);
       const user = await getUserSessionProfile(dbUser.id);
-      const response = NextResponse.json({ success: true, authenticated: true, user });
+      const response = NextResponse.json({
+        success: true,
+        authenticated: true,
+        user,
+        emailVerified: dbUser.emailVerified ?? false,
+      });
       attachSessionCookie(response, token);
-      logInfo("AUTH", "password_login", { userId: dbUser.id });
+      logInfo("AUTH", "password_login", { userId: dbUser.id, emailVerified: dbUser.emailVerified });
       return response;
     }
 

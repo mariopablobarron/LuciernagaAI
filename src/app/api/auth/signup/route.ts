@@ -7,6 +7,8 @@ import { logError, logInfo } from "@/lib/logger";
 import { getUserSessionProfile, normalizeEmail } from "@/services/user";
 import { sendUserEmail, buildVerificationEmail, buildWelcomeEmail } from "@/lib/email";
 import { issueWebLinkToken } from "@/lib/telegram-link";
+import { sendAlert } from "@/lib/alerts";
+import { validateOrigin } from "@/lib/csrf";
 
 type UtmParams = {
   utm_source?: string;
@@ -29,6 +31,10 @@ function isValidEmail(e: string) {
 }
 
 export async function POST(req: NextRequest) {
+  if (!validateOrigin(req)) {
+    return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
+  }
+
   try {
     const body = (await req.json()) as SignupBody;
     const email = normalizeEmail(body.email?.trim() ?? "");
@@ -114,6 +120,11 @@ export async function POST(req: NextRequest) {
 
     if (result.status === "CREATED") {
       logInfo("AUTH", "signup_completed", { userId: result.userId, email });
+      sendAlert({
+        type: "info",
+        title: "Nuevo usuario registrado",
+        message: `${name || "Sin nombre"} (${email})${phone ? ` — Tel: ${phone}` : ""}`,
+      }).catch(() => {});
     }
 
     // Send verification + welcome emails for new and upgraded users

@@ -97,43 +97,39 @@ async function sendTelegram(alert: Alert): Promise<void> {
 }
 
 async function sendEmail(alert: Alert): Promise<void> {
-  const emailProvider = process.env.EMAIL_PROVIDER; // sendgrid, mailgun, etc.
-  const apiKey = process.env.EMAIL_API_KEY;
   const toEmail = process.env.ALERT_EMAIL;
+  if (!toEmail) return;
 
-  if (!emailProvider || !apiKey || !toEmail) {
-    logWarn("ALERTS", "Email credentials missing, skipping alert");
-    return;
-  }
+  // Use Resend (same as transactional emails)
+  const { sendUserEmail } = await import("@/lib/email");
 
-  const subject = `${alert.type.toUpperCase()} - ${alert.title}`;
-  const htmlContent = `
-    <h2>${escapeHtml(alert.title)}</h2>
-    <p>${escapeHtml(alert.message)}</p>
-    ${alert.metric ? `<p><strong>${alert.metric}:</strong> ${alert.value}</p>` : ""}
-    <hr>
-    <p>Tres Mil Millones de Latidos Decision Engine</p>
-  `;
+  const emoji = alert.type === "critical" ? "🚨" : alert.type === "warning" ? "⚠️" : "ℹ️";
+  const subject = `${emoji} ${alert.type.toUpperCase()} — ${alert.title}`;
 
-  if (emailProvider === "sendgrid") {
-    try {
-      await fetchWithTimeout("https://api.sendgrid.com/v3/mail/send", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          personalizations: [{ to: [{ email: toEmail }] }],
-          from: { email: "noreply@luciernaga.ai" },
-          subject,
-          content: [{ type: "text/html", value: htmlContent }],
-        }),
-      });
-    } catch (error) {
-      logError("ALERTS", error, { area: "sendEmail_sendgrid" });
-    }
-  }
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:40px;background:#0a0a0a;font-family:system-ui,sans-serif;color:#d4d4d8">
+  <div style="max-width:560px;margin:0 auto;background:#18181b;border-radius:12px;border:1px solid #27272a;overflow:hidden">
+    <div style="background:${alert.type === "critical" ? "#dc2626" : alert.type === "warning" ? "#d97706" : "#7c3aed"};padding:20px 32px">
+      <span style="color:#fff;font-size:16px;font-weight:700">${emoji} ${escapeHtml(alert.title)}</span>
+    </div>
+    <div style="padding:24px 32px">
+      <p style="margin:0 0 16px;color:#e4e4e7;font-size:15px;line-height:1.6">${escapeHtml(alert.message)}</p>
+      ${alert.metric ? `<p style="margin:0;color:#71717a;font-size:13px"><strong>${escapeHtml(alert.metric)}:</strong> ${alert.value}</p>` : ""}
+    </div>
+    <div style="padding:12px 32px;border-top:1px solid #27272a">
+      <p style="margin:0;font-size:11px;color:#52525b">Tres Mil Millones de Latidos — Sistema de alertas</p>
+    </div>
+  </div>
+</body>
+</html>`;
+
+  const text = `${alert.title}\n\n${alert.message}${alert.metric ? `\n\n${alert.metric}: ${alert.value}` : ""}`;
+
+  await sendUserEmail({ to: toEmail, subject, html, text }).catch((err) =>
+    logError("ALERTS", err, { area: "sendEmail_resend" })
+  );
 }
 
 export async function sendAlert(alert: Alert): Promise<void> {

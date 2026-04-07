@@ -1,23 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { logInfo } from "@/lib/logger";
-import { createHmac, timingSafeEqual } from "crypto";
+import { verifyPassword } from "@/lib/password";
 import { withRateLimit } from "@/lib/rate-limit";
 import { issueOrgToken } from "@/lib/org-auth";
 
 export const dynamic = "force-dynamic";
-
-function hashPassword(password: string): string {
-  return createHmac("sha256", "org-admin-salt").update(password).digest("hex");
-}
-
-function safeCompare(a: string, b: string): boolean {
-  try {
-    return timingSafeEqual(Buffer.from(a), Buffer.from(b));
-  } catch {
-    return false;
-  }
-}
 
 // POST /api/org/auth — login for org admins
 export const POST = withRateLimit(async function POST(req: NextRequest) {
@@ -47,7 +35,7 @@ export const POST = withRateLimit(async function POST(req: NextRequest) {
     select: { id: true, name: true, role: true, passwordHash: true },
   });
 
-  if (!admin || !safeCompare(hashPassword(body.password), admin.passwordHash)) {
+  if (!admin || !(await verifyPassword(body.password, admin.passwordHash))) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 

@@ -117,6 +117,13 @@ export default function OrgLoginPage() {
             {loading ? "Accediendo..." : "Entrar"}
           </button>
         </form>
+
+        <p className="text-center text-xs text-zinc-600">
+          ¿No tienes cuenta?{" "}
+          <a href="/org/registro" className="text-violet-400 hover:text-violet-300">
+            Registra tu organizacion
+          </a>
+        </p>
       </div>
     </div>
   );

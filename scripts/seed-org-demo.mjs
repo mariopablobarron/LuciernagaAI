@@ -6,7 +6,8 @@
  * Requires DATABASE_URL in .env
  */
 
-import { createHmac } from "crypto";
+import { randomBytes, scrypt } from "crypto";
+import { promisify } from "util";
 import { config } from "dotenv";
 config();
 
@@ -16,14 +17,19 @@ if (!DATABASE_URL) {
   process.exit(1);
 }
 
-function hashPassword(password) {
-  return createHmac("sha256", "org-admin-salt").update(password).digest("hex");
+const scryptAsync = promisify(scrypt);
+async function hashPassword(password) {
+  const salt = randomBytes(16).toString("hex");
+  const derived = await scryptAsync(password, salt, 64);
+  return `${salt}:${derived.toString("hex")}`;
 }
 
 async function seed() {
-  // Dynamic import of Prisma
+  const { PrismaPg } = await import("@prisma/adapter-pg");
   const { PrismaClient } = await import("@prisma/client");
-  const prisma = new PrismaClient();
+
+  const adapter = new PrismaPg({ connectionString: DATABASE_URL });
+  const prisma = new PrismaClient({ adapter });
 
   try {
     // 1. Create organization
@@ -45,13 +51,13 @@ async function seed() {
     // 2. Create HR admin
     const hr = await prisma.orgAdmin.upsert({
       where: { organizationId_email: { organizationId: org.id, email: "hr@demo-corp.com" } },
-      update: {},
+      update: { passwordHash: await hashPassword("demo1234") },
       create: {
         organizationId: org.id,
         email: "hr@demo-corp.com",
         name: "María García (HR)",
         role: "hr",
-        passwordHash: hashPassword("demo1234"),
+        passwordHash: await hashPassword("demo1234"),
       },
     });
     console.log(`HR Admin: ${hr.email} (password: demo1234)`);
@@ -59,13 +65,13 @@ async function seed() {
     // 3. Create therapist admin
     const therapist = await prisma.orgAdmin.upsert({
       where: { organizationId_email: { organizationId: org.id, email: "psico@demo-corp.com" } },
-      update: {},
+      update: { passwordHash: await hashPassword("demo1234") },
       create: {
         organizationId: org.id,
         email: "psico@demo-corp.com",
         name: "Dr. López (Terapeuta)",
         role: "therapist",
-        passwordHash: hashPassword("demo1234"),
+        passwordHash: await hashPassword("demo1234"),
       },
     });
     console.log(`Therapist: ${therapist.email} (password: demo1234)`);

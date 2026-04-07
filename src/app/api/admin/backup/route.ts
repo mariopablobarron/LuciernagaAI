@@ -1,12 +1,14 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { logError, logInfo } from "@/lib/logger";
 import { notifyAdmin } from "@/services/telegram";
+import pg from "pg";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 120;
 
 // GET /api/admin/backup?secret=CRON_SECRET
-// Triggers a pg_dump via the DATABASE_URL and returns the compressed SQL.
-// Called by Coolify scheduled task or cron-job.org.
+// Pure-JS PostgreSQL backup — no pg_dump binary needed.
+// Returns a gzipped SQL file with CREATE TABLE + COPY data for all tables.
 export async function GET(req: NextRequest) {
   const secret = req.nextUrl.searchParams.get("secret");
   if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
@@ -18,63 +20,110 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "DATABASE_URL not set" }, { status: 500 });
   }
 
+  const client = new pg.Client({ connectionString: dbUrl });
+
   try {
-    // Parse DATABASE_URL to extract connection params
-    const url = new URL(dbUrl);
-    const host = url.hostname;
-    const port = url.port || "5432";
-    const user = url.username;
-    const password = url.password;
-    const database = url.pathname.slice(1); // remove leading /
+    await client.connect();
 
-    // Use pg_dump via child_process — available if PostgreSQL client is installed,
-    // otherwise fall back to a Prisma-based export
-    const { execSync } = await import("child_process");
+    // Get all user tables (exclude Prisma migration table)
+    const { rows: tables } = await client.query<{ tablename: string }>(
+      `SELECT tablename FROM pg_tables
+       WHERE schemaname = 'public' AND tablename != '_prisma_migrations'
+       ORDER BY tablename`
+    );
 
-    const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-    const filename = `backup_${database}_${timestamp}.sql.gz`;
+    const parts: string[] = [
+      `-- Backup: ${new Date().toISOString()}`,
+      `-- Tables: ${tables.length}`,
+      `SET statement_timeout = 0;`,
+      `SET client_encoding = 'UTF8';`,
+      ``,
+    ];
 
-    // Try pg_dump first
-    let backupBuffer: Buffer;
-    try {
-      const env = { ...process.env, PGPASSWORD: password };
-      backupBuffer = execSync(
-        `pg_dump --no-owner --no-privileges -h ${host} -p ${port} -U ${user} ${database} | gzip`,
-        { env, maxBuffer: 100 * 1024 * 1024, timeout: 120_000 }
+    let totalRows = 0;
+
+    for (const { tablename } of tables) {
+      // Get CREATE TABLE DDL
+      const { rows: cols } = await client.query<{
+        column_name: string;
+        data_type: string;
+        udt_name: string;
+        is_nullable: string;
+        column_default: string | null;
+        character_maximum_length: number | null;
+      }>(
+        `SELECT column_name, data_type, udt_name, is_nullable, column_default, character_maximum_length
+         FROM information_schema.columns
+         WHERE table_schema = 'public' AND table_name = $1
+         ORDER BY ordinal_position`,
+        [tablename]
       );
-    } catch {
-      // pg_dump not available — do a lightweight JSON export via Prisma
-      const { getPrismaClient } = await import("@/db/prisma");
-      const prisma = getPrismaClient();
 
-      const [users, conversations, messages] = await Promise.all([
-        prisma.user.count(),
-        prisma.conversation.count(),
-        prisma.message.count(),
-      ]);
-
-      logInfo("BACKUP", "pg_dump_unavailable_fallback", { users, conversations, messages });
-
-      return NextResponse.json({
-        ok: false,
-        error: "pg_dump not available in container",
-        hint: "Run backup from PostgreSQL container: docker exec $(docker ps -qf name=postgres) pg_dump -U postgres DB_NAME | gzip > backup.sql.gz",
-        stats: { users, conversations, messages },
+      const colDefs = cols.map((c) => {
+        let type = c.data_type === "USER-DEFINED" ? `"${c.udt_name}"` : c.data_type;
+        if (c.character_maximum_length) type += `(${c.character_maximum_length})`;
+        const nullable = c.is_nullable === "NO" ? " NOT NULL" : "";
+        const def = c.column_default ? ` DEFAULT ${c.column_default}` : "";
+        return `  "${c.column_name}" ${type}${nullable}${def}`;
       });
+
+      parts.push(`-- Table: ${tablename}`);
+      parts.push(`CREATE TABLE IF NOT EXISTS "${tablename}" (`);
+      parts.push(colDefs.join(",\n"));
+      parts.push(`);`);
+      parts.push(``);
+
+      // Export data as INSERT statements (safe for restore)
+      const { rows: data } = await client.query(`SELECT * FROM "${tablename}"`);
+
+      if (data.length > 0) {
+        const columnNames = Object.keys(data[0]).map((c) => `"${c}"`).join(", ");
+
+        for (const row of data) {
+          const values = Object.values(row)
+            .map((v) => {
+              if (v === null) return "NULL";
+              if (v instanceof Date) return `'${v.toISOString()}'`;
+              if (typeof v === "boolean") return v ? "true" : "false";
+              if (typeof v === "number") return String(v);
+              if (typeof v === "object") return `'${JSON.stringify(v).replace(/'/g, "''")}'`;
+              return `'${String(v).replace(/'/g, "''")}'`;
+            })
+            .join(", ");
+
+          parts.push(`INSERT INTO "${tablename}" (${columnNames}) VALUES (${values}) ON CONFLICT DO NOTHING;`);
+        }
+        totalRows += data.length;
+        parts.push(``);
+      }
     }
 
-    logInfo("BACKUP", "backup_created", { filename, sizeKb: Math.round(backupBuffer.length / 1024) });
-    notifyAdmin(`✅ Backup completado: ${filename} (${Math.round(backupBuffer.length / 1024)} KB)`);
+    await client.end();
 
-    return new Response(new Uint8Array(backupBuffer), {
+    const sql = parts.join("\n");
+    const { gzipSync } = await import("zlib");
+    const compressed = gzipSync(Buffer.from(sql, "utf-8"));
+
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    const filename = `backup_${timestamp}.sql.gz`;
+    const sizeKb = Math.round(compressed.length / 1024);
+
+    logInfo("BACKUP", "backup_created", { filename, sizeKb, tables: tables.length, rows: totalRows });
+    notifyAdmin(`✅ Backup completado: ${filename} (${sizeKb} KB, ${tables.length} tablas, ${totalRows} filas)`);
+
+    return new Response(new Uint8Array(compressed), {
       headers: {
         "Content-Type": "application/gzip",
         "Content-Disposition": `attachment; filename="${filename}"`,
       },
     });
   } catch (error) {
+    await client.end().catch(() => {});
     logError("BACKUP", error, { action: "backup_failed" });
     notifyAdmin(`❌ Backup falló: ${error instanceof Error ? error.message : "Unknown error"}`);
-    return NextResponse.json({ error: "Backup failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Backup failed", detail: error instanceof Error ? error.message : "Unknown" },
+      { status: 500 }
+    );
   }
 }

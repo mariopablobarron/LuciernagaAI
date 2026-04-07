@@ -1,5 +1,6 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 
 export default function Error({
@@ -10,10 +11,8 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log error to server
-    console.error("[ERROR-BOUNDARY] 💥 Uncaught Error:", error.message);
-    console.error("[ERROR-BOUNDARY] Stack:", error.stack);
-    console.error("[ERROR-BOUNDARY] Digest:", error.digest);
+    Sentry.captureException(error);
+    console.error("[ERROR-BOUNDARY] Uncaught Error:", error.message);
   }, [error]);
 
   return (

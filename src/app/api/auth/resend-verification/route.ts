@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: "NOT_AUTHENTICATED" }, { status: 401 });
   }
 
-  const rl = checkRateLimit(`resend-verify:${userId}`, 3, 60_000 * 15); // 3 per 15min
+  const rl = checkRateLimit(`resend-verify:${userId}`, 3, 60_000 * 60); // 3 per hour
   if (!rl.allowed) {
     return NextResponse.json(
       { success: false, error: "TOO_MANY_ATTEMPTS" },

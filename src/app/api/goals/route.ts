@@ -11,6 +11,7 @@ import {
   getActiveGoalForUser,
   type GoalWithProgress,
 } from "@/services/goals";
+import { getUserSessionProfile, isSyntheticEmail } from "@/services/user";
 import { getClientIp, withRateLimit } from "@/lib/rate-limit";
 
 function serializeGoal(goal: GoalWithProgress | null) {
@@ -75,6 +76,16 @@ export const GET = withRateLimit(async function GET(req: NextRequest) {
 export const POST = withRateLimit(async function POST(req: NextRequest) {
   try {
     const identity = await resolveIdentity(req);
+
+    // Email verification gate
+    const profile = await getUserSessionProfile(identity.userId);
+    if (!profile.emailVerified && !isSyntheticEmail(profile.email)) {
+      return NextResponse.json(
+        { success: false, error: "EMAIL_NOT_VERIFIED", message: "Verifica tu email para poder crear objetivos." },
+        { status: 403 }
+      );
+    }
+
     const body = (await req.json()) as { title?: string; actions?: string[] };
     const title = body.title?.trim() ?? "";
 

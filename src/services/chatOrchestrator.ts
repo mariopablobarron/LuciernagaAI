@@ -8,7 +8,7 @@ import {
 import { logError } from "@/lib/logger";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getErrorMessage } from "@/lib/utils";
-import { getUserSessionProfile } from "@/services/user";
+import { getUserSessionProfile, isSyntheticEmail } from "@/services/user";
 import { processMessage } from "@/application/chat/processMessage";
 import type { UserState } from "@/domain/types";
 import { FREE_LIMIT_MESSAGE } from "@/lib/plans";
@@ -77,8 +77,20 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
     );
   }
 
-  // ── 3. Plan limit ────────────────────────────────────────────────────────
+  // ── 3. Email verification gate ────────────────────────────────────────────
   const accessState = await getUserSessionProfile(identity.userId);
+  if (!accessState.emailVerified && !isSyntheticEmail(accessState.email)) {
+    const res = buildErrorResponse(
+      "Verifica tu email para poder chatear.",
+      403,
+      "neutral",
+      "EMAIL_NOT_VERIFIED"
+    );
+    if (identity.shouldSetCookie) attachSessionCookie(res, identity.sessionToken);
+    return res;
+  }
+
+  // ── 4. Plan limit ────────────────────────────────────────────────────────
   if (
     !accessState.hasPlan &&
     accessState.messageLimitPerDay !== null &&
@@ -103,7 +115,7 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
     return res;
   }
 
-  // ── 4. Rate limit ────────────────────────────────────────────────────────
+  // ── 5. Rate limit ────────────────────────────────────────────────────────
   const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
   const rateLimits = [
     checkRateLimit(`chat:burst:${identity.userId}`, 5, 60_000),
@@ -138,7 +150,7 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
     return res;
   }
 
-  // ── 5. Process ───────────────────────────────────────────────────────────
+  // ── 6. Process ───────────────────────────────────────────────────────────
   const jsonMode =
     process.env.NODE_ENV === "test" ||
     req.headers.get("x-response-mode") === "json" ||
@@ -160,7 +172,7 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
     jsonMode,
   });
 
-  // ── 6. Return ──────────────────────────────────────────────────────────
+  // ── 7. Return ──────────────────────────────────────────────────────────
   if ("stream" in result) {
     const isProduction = process.env.NODE_ENV === "production";
     const headers: Record<string, string> = {

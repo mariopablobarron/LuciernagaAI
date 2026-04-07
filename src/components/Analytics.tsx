@@ -1,11 +1,20 @@
 "use client";
 
 import Script from "next/script";
+import { useEffect, useState } from "react";
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 export default function Analytics() {
-  if (!GA_MEASUREMENT_ID) {
+  const [consent, setConsent] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const stored = typeof window !== "undefined" ? localStorage.getItem("cookie_consent") : null;
+    // Load GA only if user explicitly accepted cookies
+    setConsent(stored === "true");
+  }, []);
+
+  if (!GA_MEASUREMENT_ID || consent !== true) {
     return null;
   }
 

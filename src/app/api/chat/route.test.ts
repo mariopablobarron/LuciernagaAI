@@ -75,6 +75,7 @@ jest.mock("@/services/state", () => ({
 
 jest.mock("@/services/user", () => ({
   getUserSessionProfile: jest.fn(),
+  isSyntheticEmail: jest.fn((email: string) => email?.endsWith("@session.luciernaga.local")),
 }));
 
 jest.mock("@/services/ai", () => ({

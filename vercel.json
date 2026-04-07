@@ -1,0 +1,40 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/reminders?secret=${CRON_SECRET}",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/action-reminders?secret=${CRON_SECRET}",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/telegram-checkin?secret=${CRON_SECRET}&period=morning",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/telegram-checkin?secret=${CRON_SECRET}&period=evening",
+      "schedule": "0 21 * * *"
+    },
+    {
+      "path": "/api/cron/proactive-review?secret=${CRON_SECRET}",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/inactivity-check?secret=${CRON_SECRET}",
+      "schedule": "0 10 * * *"
+    },
+    {
+      "path": "/api/cron/weekly-summary?secret=${CRON_SECRET}",
+      "schedule": "0 9 * * 1"
+    },
+    {
+      "path": "/api/cron/weekly-inactive-reminder?secret=${CRON_SECRET}",
+      "schedule": "0 10 * * 1"
+    },
+    {
+      "path": "/api/cron/user-weekly-review?secret=${CRON_SECRET}",
+      "schedule": "0 20 * * 0"
+    }
+  ]
+}

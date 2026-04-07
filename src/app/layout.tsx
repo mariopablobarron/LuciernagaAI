@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import Analytics from "@/components/Analytics";
 import MetaPixel from "@/components/MetaPixel";
 import UtmCapture from "@/components/UtmCapture";
+import CookieConsent from "@/components/CookieConsent";
 import { SAAS_CONFIG } from "@/lib/saas";
 import { validateEnv } from "@/lib/env";
 import "./globals.css";
@@ -74,6 +75,7 @@ export default function RootLayout({
         <UtmCapture />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
+          <CookieConsent />
         </ThemeProvider>
       </body>
     </html>

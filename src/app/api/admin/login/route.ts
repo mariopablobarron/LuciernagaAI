@@ -7,7 +7,7 @@ import {
   validateAdminCredentials,
 } from "@/lib/admin-auth";
 import { logError, logInfo } from "@/lib/logger";
-import { checkRateLimit } from "@/lib/rate-limit";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 type AdminLoginBody = {
   username?: string;
@@ -22,18 +22,19 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-    const rl = checkRateLimit(`admin-login:${ip}`, 5, 60_000 * 15); // 5 intentos / 15 min
+    const ip = getClientIp(req);
+    const body = (await req.json()) as AdminLoginBody;
+    const username = body.username?.trim() ?? "";
+
+    // Rate-limit by username (per-account lockout) instead of only by IP
+    const rl = checkRateLimit(`login-fail:admin:${username}`, 5, 60_000 * 15);
     if (!rl.allowed) {
-      logInfo("AUTH", "admin_login_rate_limited", { ip });
+      logInfo("AUTH", "admin_login_rate_limited", { username });
       return NextResponse.json(
-        { ok: false, error: "TOO_MANY_ATTEMPTS" },
+        { ok: false, error: "ACCOUNT_LOCKED", message: "Demasiados intentos. Espera 15 minutos." },
         { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
       );
     }
-
-    const body = (await req.json()) as AdminLoginBody;
-    const username = body.username?.trim() ?? "";
     const password = body.password ?? "";
     const nextPath = normalizeAdminNextPath(body.next);
 

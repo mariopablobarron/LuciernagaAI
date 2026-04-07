@@ -14,6 +14,8 @@ import {
   IdentityLinkConflictError,
   normalizeEmail,
 } from "@/services/user";
+import { checkRateLimit } from "@/lib/rate-limit";
+import { validateOrigin } from "@/lib/csrf";
 
 type LoginBody = {
   email?: string;
@@ -26,6 +28,10 @@ function isValidEmail(email: string): boolean {
 }
 
 export async function POST(req: NextRequest) {
+  if (!validateOrigin(req)) {
+    return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
+  }
+
   try {
     const body = (await req.json()) as LoginBody;
     const rawEmail = body.email?.trim() ?? "";
@@ -42,6 +48,15 @@ export async function POST(req: NextRequest) {
 
     // Password login path — bypasses session token flow
     if (password) {
+      // Account lockout: check BEFORE attempting password verification
+      const rl = checkRateLimit(`login-fail:${normalizedEmail}`, 5, 60_000 * 15);
+      if (!rl.allowed) {
+        return NextResponse.json(
+          { error: "ACCOUNT_LOCKED", message: "Demasiados intentos. Espera 15 minutos." },
+          { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+        );
+      }
+
       const prisma = getPrismaClient();
       const dbUser = await prisma.user.findUnique({
         where: { email: normalizedEmail },

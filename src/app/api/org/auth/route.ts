@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { logInfo } from "@/lib/logger";
 import { verifyPassword } from "@/lib/password";
-import { withRateLimit } from "@/lib/rate-limit";
+import { checkRateLimit, withRateLimit } from "@/lib/rate-limit";
 import { issueOrgToken } from "@/lib/org-auth";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +17,15 @@ export const POST = withRateLimit(async function POST(req: NextRequest) {
 
   if (!body?.email || !body?.password || !body?.orgSlug) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+  }
+
+  // Per-email account lockout: 5 attempts per 15 minutes
+  const rl = checkRateLimit(`login-fail:org:${body.email}`, 5, 60_000 * 15);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: "ACCOUNT_LOCKED", message: "Demasiados intentos. Espera 15 minutos." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    );
   }
 
   const prisma = getPrismaClient();

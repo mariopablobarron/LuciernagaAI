@@ -3,8 +3,13 @@ import { resolveIdentity } from "@/lib/auth";
 import { getPrismaClient } from "@/db/prisma";
 import { hashPassword, verifyPassword } from "@/lib/password";
 import { logError } from "@/lib/logger";
+import { validateOrigin } from "@/lib/csrf";
 
 export async function POST(req: NextRequest) {
+  if (!validateOrigin(req)) {
+    return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
+  }
+
   try {
     const identity = await resolveIdentity(req);
     const body = (await req.json()) as { current?: string; next?: string };

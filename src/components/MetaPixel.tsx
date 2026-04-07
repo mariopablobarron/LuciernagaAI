@@ -1,15 +1,24 @@
 "use client";
 
 import Script from "next/script";
+import { useEffect, useState } from "react";
 
 const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 
 /**
  * Loads the Meta (Facebook) Pixel script and fires an initial PageView.
- * Renders nothing when NEXT_PUBLIC_META_PIXEL_ID is not set.
+ * Renders nothing when NEXT_PUBLIC_META_PIXEL_ID is not set or when the
+ * user has not accepted cookies.
  */
 export default function MetaPixel() {
-  if (!PIXEL_ID) return null;
+  const [consent, setConsent] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const stored = typeof window !== "undefined" ? localStorage.getItem("cookie_consent") : null;
+    setConsent(stored === "true");
+  }, []);
+
+  if (!PIXEL_ID || consent !== true) return null;
 
   return (
     <>

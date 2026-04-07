@@ -190,11 +190,14 @@ export type UserEmail = {
 export async function sendUserEmail(email: UserEmail): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY?.trim();
   const from = process.env.EMAIL_FROM?.trim() ?? "TresMilMillonesdeLatidos <info@tresmilmillonesdelatidos.es>";
+  const baseUrl = process.env.APP_BASE_URL?.trim() ?? "https://tresmilmillonesdelatidos.es";
 
   if (!apiKey) {
     console.error("[EMAIL] RESEND_API_KEY not configured — email not sent");
     return false;
   }
+
+  const unsubscribeUrl = `${baseUrl}/api/email/unsubscribe?email=${encodeURIComponent(email.to)}`;
 
   try {
     const res = await fetch(RESEND_URL, {
@@ -209,6 +212,10 @@ export async function sendUserEmail(email: UserEmail): Promise<boolean> {
         subject: email.subject,
         html: email.html,
         text: email.text,
+        headers: {
+          "List-Unsubscribe": `<${unsubscribeUrl}>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
       }),
     });
 

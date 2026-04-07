@@ -7,6 +7,8 @@ import {
   Bell,
   CheckCircle2,
   Clock,
+  CreditCard,
+  Crown,
   Download,
   ExternalLink,
   Eye,
@@ -20,6 +22,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
+import type { BrowserSessionUser } from '@/lib/session-client';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -86,6 +89,8 @@ function Toggle({ checked, onChange, disabled }: { checked: boolean; onChange: (
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
+  const [user, setUser] = useState<BrowserSessionUser | null>(null);
+  const [portalLoading, setPortalLoading] = useState(false);
   const [telegram, setTelegram] = useState<TelegramStatus | null>(null);
   const [prefs, setPrefs] = useState<Preferences | null>(null);
   const [saving, setSaving] = useState(false);
@@ -110,6 +115,11 @@ export default function SettingsPage() {
 
   // Load data
   useEffect(() => {
+    fetch('/api/auth/token', { credentials: 'include' })
+      .then((r) => r.json())
+      .then((d: { user?: BrowserSessionUser }) => { if (d.user) setUser(d.user); })
+      .catch(() => {});
+
     fetch('/api/user/telegram-status', { credentials: 'include' })
       .then((r) => r.json())
       .then((d: TelegramStatus) => setTelegram(d))
@@ -214,6 +224,26 @@ export default function SettingsPage() {
     }
   }
 
+  // Open Stripe portal
+  async function handleManageSubscription() {
+    setPortalLoading(true);
+    try {
+      const res = await fetch('/api/billing/portal', { method: 'POST', credentials: 'include' });
+      const data = (await res.json()) as { url?: string; error?: string };
+      if (res.ok && data.url) {
+        window.location.href = data.url;
+      } else {
+        alert('No se pudo abrir el portal de suscripcion.');
+      }
+    } catch {
+      alert('Error al conectar con el portal de pagos.');
+    } finally {
+      setPortalLoading(false);
+    }
+  }
+
+  const isPro = user?.plan === 'pro' || user?.plan === 'pro_monthly' || user?.plan === 'pro_annual';
+
   const botUrl = telegram?.botUsername ? `https://t.me/${telegram.botUsername}` : 'https://t.me/';
 
   return (
@@ -266,6 +296,66 @@ export default function SettingsPage() {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* ── Subscription ──────────────────────────────────────────── */}
+        <div className={`${COMPONENTS.card} p-6 space-y-5`}>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-violet-500/15 flex items-center justify-center">
+              <CreditCard className="w-4 h-4 text-violet-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-white">Suscripcion</h2>
+              <p className="text-xs text-zinc-500">Tu plan actual y facturacion</p>
+            </div>
+          </div>
+
+          {user ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <Crown className={`w-5 h-5 ${isPro ? 'text-violet-400' : 'text-zinc-500'}`} />
+                  <div>
+                    <p className="text-sm font-semibold text-white">
+                      {user.planLabel ?? (isPro ? 'Pro' : 'Plan gratuito')}
+                    </p>
+                    <p className="text-xs text-zinc-500">
+                      {isPro ? 'Acceso completo a todas las funciones' : 'Funciones basicas incluidas'}
+                    </p>
+                  </div>
+                </div>
+                {isPro && (
+                  <span className="text-xs font-semibold text-violet-400 bg-violet-500/10 border border-violet-500/30 rounded-full px-2.5 py-0.5">
+                    Activo
+                  </span>
+                )}
+              </div>
+
+              {isPro ? (
+                <button
+                  onClick={handleManageSubscription}
+                  disabled={portalLoading}
+                  className={`${COMPONENTS.buttonSecondary} w-full flex items-center justify-center gap-2`}
+                >
+                  <CreditCard className="w-4 h-4" />
+                  {portalLoading ? 'Abriendo portal...' : 'Gestionar suscripcion'}
+                </button>
+              ) : (
+                <Link
+                  href="/precios"
+                  className={`${COMPONENTS.buttonPrimary} w-full flex items-center justify-center gap-2`}
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Mejorar a Pro
+                </Link>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="h-14 rounded-xl bg-zinc-800/50 animate-pulse" />
+              <div className="h-10 rounded-xl bg-zinc-800/50 animate-pulse" />
+            </div>
+          )}
         </div>
 
         {/* ── Notifications ──────────────────────────────────────────── */}

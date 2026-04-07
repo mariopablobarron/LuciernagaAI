@@ -3,6 +3,7 @@ import { getPrismaClient } from "@/db/prisma";
 import { sendUserEmail } from "@/lib/email";
 import { sendTelegramNotification } from "@/services/telegram";
 import { logError, logInfo } from "@/lib/logger";
+import { getNotificationConfig } from "@/lib/notification-config";
 
 export const dynamic = "force-dynamic";
 
@@ -99,6 +100,11 @@ export async function GET(req: NextRequest) {
   const secret = req.nextUrl.searchParams.get("secret");
   if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const notifConfig = await getNotificationConfig();
+  if (!notifConfig.cronWeeklyReview) {
+    return NextResponse.json({ ok: true, skipped: true, reason: "disabled_in_config" });
   }
 
   const prisma = getPrismaClient();

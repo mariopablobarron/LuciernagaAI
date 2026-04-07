@@ -25,6 +25,7 @@ import {
 import { AdminShell } from "@/features/admin/components/AdminShell";
 import { AdminPanel } from "@/features/admin/components/AdminPanel";
 import { AdminMetricCard } from "@/features/admin/components/AdminMetricCard";
+import NotificationSettings from "@/components/admin/NotificationSettings";
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -1078,6 +1079,7 @@ export default function AdminSettingsPage() {
           </div>
         )}
       </AdminPanel>
+      <NotificationSettings />
     </AdminShell>
   );
 }

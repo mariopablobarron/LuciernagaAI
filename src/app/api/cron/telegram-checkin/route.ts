@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { sendTelegramMessageAsync } from "@/services/telegram";
 import { logError, logInfo } from "@/lib/logger";
+import { getNotificationConfig } from "@/lib/notification-config";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,11 @@ export async function GET(req: NextRequest) {
   const secret = req.nextUrl.searchParams.get("secret");
   if (secret !== process.env.CRON_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const notifConfig = await getNotificationConfig();
+  if (!notifConfig.cronDailyCheckin) {
+    return NextResponse.json({ ok: true, skipped: true, reason: "disabled_in_config" });
   }
 
   const period = req.nextUrl.searchParams.get("period") ?? "morning";

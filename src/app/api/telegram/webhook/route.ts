@@ -640,9 +640,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       }).catch(() => undefined);
     }
 
-    // ---- Forward conversation to admin ----
+    // ---- Forward conversation to admin (if enabled) ----
+    const { getNotificationConfig } = await import("@/lib/notification-config");
+    const notifConfig = await getNotificationConfig();
     const adminChatId = process.env.ADMIN_TELEGRAM_ID?.trim();
-    if (adminChatId && chatId.toString() !== adminChatId) {
+    if (adminChatId && chatId.toString() !== adminChatId && notifConfig.telegramUserMessages) {
       const userName = message.from?.first_name ?? userId;
       const preview = text.length > 200 ? text.slice(0, 200) + "…" : text;
       const aiPreview = aiResult.response.length > 300 ? aiResult.response.slice(0, 300) + "…" : aiResult.response;

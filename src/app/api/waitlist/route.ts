@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { useInviteCode } from "@/services/invites";
+import { buildWaitlistWelcomeEmail, sendUserEmail } from "@/lib/email";
 
 const MAX_BODY_SIZE = 10 * 1024; // 10 KB
 
@@ -18,9 +19,10 @@ export async function POST(req: NextRequest) {
       mission2?: string;
       mission3?: string;
       inviteCode?: string;
+      utm?: Record<string, string>;
     };
 
-    const { email, mission1, mission2, mission3, inviteCode } = body;
+    const { email, mission1, mission2, mission3, inviteCode, utm } = body;
 
     if (!email || !mission1 || !mission2 || !mission3) {
       return NextResponse.json({ error: "Faltan campos obligatorios" }, { status: 400 });
@@ -41,7 +43,12 @@ export async function POST(req: NextRequest) {
       update: { mission1, mission2, mission3 },
     });
 
-    logInfo("WAITLIST", "entry_created", { id: entry.id, email: emailLower });
+    logInfo("WAITLIST", "entry_created", { id: entry.id, email: emailLower, ...(utm && { utm }) });
+
+    const appUrl = process.env.APP_BASE_URL ?? "http://localhost:3000";
+    sendUserEmail(buildWaitlistWelcomeEmail({ to: emailLower, appUrl })).catch(
+      (e) => logError("WAITLIST", e, { action: "send_waitlist_welcome_email", email: emailLower }),
+    );
 
     return NextResponse.json({ ok: true, id: entry.id });
   } catch (error) {

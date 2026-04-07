@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
+import { trackMetaEvent } from '@/lib/meta-pixel';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
@@ -17,6 +18,7 @@ function SuccessContent() {
       router.replace('/app');
       return;
     }
+    trackMetaEvent('Subscribe', { content_name: 'pro' });
     // Auto-redirect after 5s
     const timer = setInterval(() => {
       setCountdown((n) => {

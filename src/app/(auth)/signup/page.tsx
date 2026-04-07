@@ -5,6 +5,9 @@ import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, Mail, ArrowRight, MessageCircle } from 'lucide-react';
 import { TYPOGRAPHY, COMPONENTS, GRADIENTS } from '@/styles/design-system';
+import { trackEvent } from '@/lib/analytics';
+import { trackMetaEvent } from '@/lib/meta-pixel';
+import { getUtmParams } from '@/lib/utm';
 
 const ERROR_MESSAGES: Record<string, string> = {
   EMAIL_INVALID: 'El email no es válido.',
@@ -49,11 +52,12 @@ function SignupForm() {
     }
     setLoading(true);
     try {
+      const utm = getUtmParams();
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ name, email, phone: phone || undefined, password }),
+        body: JSON.stringify({ name, email, phone: phone || undefined, password, utm }),
       });
       const data = (await res.json()) as { success: boolean; error?: string; telegramLink?: string };
       if (!res.ok || !data.success) {
@@ -61,6 +65,8 @@ function SignupForm() {
         return;
       }
       if (data.telegramLink) setTelegramLink(data.telegramLink);
+      trackEvent('signup_completed');
+      trackMetaEvent('CompleteRegistration', { content_name: 'signup' });
       setSignedUp(true);
     } catch {
       setError(ERROR_MESSAGES.SIGNUP_FAILED);

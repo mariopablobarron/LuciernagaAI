@@ -4,6 +4,9 @@ import { Suspense, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ArrowRight, CheckCircle, Lock, Sparkles } from "lucide-react";
 import { COMPONENTS } from "@/styles/design-system";
+import { trackEvent } from "@/lib/analytics";
+import { trackMetaEvent } from "@/lib/meta-pixel";
+import { getUtmParams } from "@/lib/utm";
 
 const MISSIONS = [
   {
@@ -75,6 +78,7 @@ function UnirseContent() {
   async function submitWaitlist(finalAnswers: string[]) {
     setLoading(true);
     try {
+      const utm = getUtmParams();
       const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -84,6 +88,7 @@ function UnirseContent() {
           mission2: finalAnswers[1],
           mission3: finalAnswers[2],
           inviteCode,
+          utm,
         }),
       });
 
@@ -91,6 +96,8 @@ function UnirseContent() {
         const data = await res.json().catch(() => ({})) as { error?: string };
         throw new Error(data.error ?? `Error ${res.status}`);
       }
+      trackEvent("waitlist_submitted");
+      trackMetaEvent("Lead", { content_name: "waitlist" });
       const lEmail = email.toLowerCase().trim();
       localStorage.setItem("luc_waitlist_email", lEmail);
       localStorage.setItem(

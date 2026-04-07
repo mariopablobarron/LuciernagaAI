@@ -1,31 +1,23 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "¿Qué te frena ahora? — Test gratuito de bloqueo mental | Tres Mil Millones de Latidos",
+  title: "Test gratuito de estado emocional — Tres Mil Millones de Latidos",
   description:
-    "5 preguntas. Descubre si estás bloqueado, ansioso o en niebla de dirección. Resultado inmediato con una acción concreta para hoy. Sin registro.",
+    "Descubre tu estado emocional en 5 preguntas. Bloqueo, ansiedad, duda o claridad: identifica dónde estás y recibe tu primer paso de acción.",
   openGraph: {
-    title: "¿Qué te frena ahora mismo?",
+    title: "Test gratuito de estado emocional — Tres Mil Millones de Latidos",
     description:
-      "Diagnóstico gratuito de estado mental. 5 preguntas, resultado inmediato y una acción para hoy.",
+      "Descubre tu estado emocional en 5 preguntas. Bloqueo, ansiedad, duda o claridad: identifica dónde estás y recibe tu primer paso de acción.",
     type: "website",
     locale: "es_ES",
+    siteName: "Tres Mil Millones de Latidos",
   },
   twitter: {
     card: "summary_large_image",
-    title: "¿Qué te frena ahora mismo?",
+    title: "Test gratuito de estado emocional — Tres Mil Millones de Latidos",
     description:
-      "Diagnóstico gratuito de estado mental. 5 preguntas, resultado inmediato y una acción para hoy.",
+      "Descubre tu estado emocional en 5 preguntas. Bloqueo, ansiedad, duda o claridad: identifica dónde estás y recibe tu primer paso de acción.",
   },
-  keywords: [
-    "bloqueo mental",
-    "ansiedad productividad",
-    "test emocional",
-    "diagnóstico bloqueo",
-    "como superar bloqueo",
-    "herramienta claridad mental",
-    "coach IA gratis",
-  ],
   robots: {
     index: true,
     follow: true,

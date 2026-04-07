@@ -8,11 +8,11 @@ const isDev = process.env.NODE_ENV === "development";
 
 const cspDirectives = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self'",
-  `connect-src 'self' https://openrouter.ai https://*.sentry.io${isDev ? " ws://localhost:3000 ws://127.0.0.1:3000" : ""}`,
+  `connect-src 'self' https://openrouter.ai https://*.sentry.io https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://www.facebook.com${isDev ? " ws://localhost:3000 ws://127.0.0.1:3000" : ""}`,
   "frame-ancestors 'none'",
   "form-action 'self'",
   "base-uri 'self'",

@@ -1,20 +1,22 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Empieza gratis — Tres Mil Millones de Latidos",
+  title: "Únete a Tres Mil Millones de Latidos — Empieza tu transformación",
   description:
-    "Crea tu cuenta en Tres Mil Millones de Latidos en menos de 60 segundos. Sin tarjeta. Detecta tu estado mental y recibe un plan de acción personalizado hoy.",
+    "Responde 3 preguntas sobre lo que quieres cambiar y accede a la plataforma de mentoría con IA que te guía a la acción real.",
   openGraph: {
-    title: "Empieza gratis — Tres Mil Millones de Latidos",
+    title: "Únete a Tres Mil Millones de Latidos — Empieza tu transformación",
     description:
-      "Crea tu cuenta en menos de 60 segundos. Sin tarjeta. Primer paso concreto hoy.",
+      "Responde 3 preguntas sobre lo que quieres cambiar y accede a la plataforma de mentoría con IA que te guía a la acción real.",
     type: "website",
     locale: "es_ES",
+    siteName: "Tres Mil Millones de Latidos",
   },
   twitter: {
-    card: "summary",
-    title: "Empieza gratis — Tres Mil Millones de Latidos",
-    description: "Crea tu cuenta en menos de 60 segundos. Sin tarjeta.",
+    card: "summary_large_image",
+    title: "Únete a Tres Mil Millones de Latidos — Empieza tu transformación",
+    description:
+      "Responde 3 preguntas sobre lo que quieres cambiar y accede a la plataforma de mentoría con IA que te guía a la acción real.",
   },
   robots: { index: true, follow: true },
 };

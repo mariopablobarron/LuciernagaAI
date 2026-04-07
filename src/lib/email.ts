@@ -295,6 +295,92 @@ function escapeHtml(value: string): string {
     .replace(/"/g, "&quot;");
 }
 
+// ─── Waitlist welcome email ──────────────────────────────────────────────────
+
+export function buildWaitlistWelcomeEmail(params: {
+  to: string;
+  name?: string;
+  appUrl: string;
+}): UserEmail {
+  const { to, name, appUrl } = params;
+  const greeting = name ? `Hola ${escapeHtml(name)}` : "Hola";
+  const signupUrl = `${appUrl}/signup`;
+
+  const subject =
+    "Tu transformación empieza aquí — Tres Mil Millones de Latidos";
+
+  const text = [
+    `${name ? `Hola ${name}` : "Hola"},`,
+    ``,
+    `Ya diste el primer paso. Respondiste tres preguntas que la mayoría evita. Eso dice algo de ti.`,
+    ``,
+    `Tres Mil Millones de Latidos no es otra app de productividad. Es un espacio para ordenar lo que sientes, nombrar lo que te frena y avanzar con acción concreta.`,
+    ``,
+    `El siguiente paso: crea tu cuenta y empieza tu primera conversación.`,
+    ``,
+    `${signupUrl}`,
+    ``,
+    `Sin rodeos. Sin consejos genéricos. Solo tú y la claridad que necesitas.`,
+    ``,
+    `— Tres Mil Millones de Latidos`,
+    ``,
+    `Este servicio acompaña — no sustituye ayuda profesional.`,
+  ].join("\n");
+
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0a0a0a;font-family:system-ui,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 0">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#18181b;border-radius:12px;overflow:hidden;border:1px solid #27272a">
+        <tr>
+          <td style="background:linear-gradient(135deg,#7c3aed 0%,#d946ef 100%);padding:28px 32px">
+            <span style="color:#fff;font-size:20px;font-weight:700;letter-spacing:-0.5px">Tres Mil Millones de Latidos</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:32px;color:#d4d4d8">
+            <p style="margin:0 0 20px;font-size:18px;color:#fff;font-weight:600">${greeting},</p>
+            <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#a1a1aa">
+              Ya diste el primer paso. Respondiste tres preguntas que la mayoría evita.
+              Eso dice algo de ti.
+            </p>
+            <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#a1a1aa">
+              Tres Mil Millones de Latidos no es otra app de productividad. Es un espacio para
+              ordenar lo que sientes, nombrar lo que te frena y avanzar con acción concreta.
+            </p>
+            <div style="background:#27272a;border-left:3px solid #d946ef;border-radius:4px;padding:16px 20px;margin:24px 0">
+              <p style="margin:0;font-size:15px;color:#e4e4e7;line-height:1.6;font-weight:500">
+                El siguiente paso: crea tu cuenta y empieza tu primera conversación.
+              </p>
+            </div>
+            <div style="text-align:center;margin:28px 0">
+              <a href="${signupUrl}" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#7c3aed,#d946ef);color:#fff;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px">
+                Crear mi cuenta
+              </a>
+            </div>
+            <p style="margin:0;font-size:14px;line-height:1.6;color:#71717a">
+              Sin rodeos. Sin consejos genéricos. Solo tú y la claridad que necesitas.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:16px 32px;border-top:1px solid #27272a">
+            <p style="margin:0;font-size:11px;color:#52525b;text-align:center">
+              Tres Mil Millones de Latidos acompaña — no sustituye ayuda profesional.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  return { to, subject, html, text };
+}
+
 // ─── Welcome email ──────────────────────────────────────────────────────────
 
 export function buildWelcomeEmail(params: {

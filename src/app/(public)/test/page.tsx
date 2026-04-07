@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { ArrowRight, CheckCircle2, Link2 } from "lucide-react";
 import { COMPONENTS } from "@/styles/design-system";
+import { trackEvent } from "@/lib/analytics";
+import { trackMetaEvent } from "@/lib/meta-pixel";
 
 type EmotionalState = "bloqueo" | "ansiedad" | "duda" | "claridad" | "neutral";
 
@@ -265,6 +267,7 @@ export default function TestPage() {
       } else {
         const state = calculateState(newAnswers);
         setResult(state);
+        trackEvent("quiz_completed", { result: state });
         setScreen("email");
         fetch("/api/quiz/result", {
           method: "POST",
@@ -302,6 +305,9 @@ export default function TestPage() {
           body: JSON.stringify({ email: email.trim() }),
         });
         setEmailStatus(res.ok ? "sent" : "error");
+        if (res.ok) {
+          trackMetaEvent("Lead", { content_name: "quiz_email" });
+        }
         if (res.ok && result) {
           fetch("/api/quiz/email", {
             method: "POST",

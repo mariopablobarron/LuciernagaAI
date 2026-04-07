@@ -8,11 +8,20 @@ import { getUserSessionProfile, normalizeEmail } from "@/services/user";
 import { sendUserEmail, buildVerificationEmail, buildWelcomeEmail } from "@/lib/email";
 import { issueWebLinkToken } from "@/lib/telegram-link";
 
+type UtmParams = {
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_content?: string;
+  utm_term?: string;
+};
+
 type SignupBody = {
   email?: string;
   password?: string;
   name?: string;
   phone?: string;
+  utm?: UtmParams;
 };
 
 function isValidEmail(e: string) {
@@ -26,6 +35,9 @@ export async function POST(req: NextRequest) {
     const password = body.password?.trim() ?? "";
     const name = body.name?.trim() ?? "";
     const phone = body.phone?.trim() || null;
+    const utmSource = body.utm && Object.keys(body.utm).length > 0
+      ? JSON.stringify(body.utm)
+      : null;
 
     if (!email || !isValidEmail(email)) {
       return NextResponse.json({ success: false, error: "EMAIL_INVALID" }, { status: 400 });
@@ -76,6 +88,7 @@ export async function POST(req: NextRequest) {
           passwordHash: hash,
           emailVerifyToken: verifyToken,
           emailVerifyExpires: verifyExpires,
+          source: utmSource,
         },
       });
       return { status: "CREATED" as const, userId: newUser.id, verifyToken };

@@ -640,6 +640,20 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       }).catch(() => undefined);
     }
 
+    // ---- Forward conversation to admin ----
+    const adminChatId = process.env.ADMIN_TELEGRAM_ID?.trim();
+    if (adminChatId && chatId.toString() !== adminChatId) {
+      const userName = message.from?.first_name ?? userId;
+      const preview = text.length > 200 ? text.slice(0, 200) + "…" : text;
+      const aiPreview = aiResult.response.length > 300 ? aiResult.response.slice(0, 300) + "…" : aiResult.response;
+      const fwd = [
+        `💬 *${userName}* (${userId})`,
+        `👤 ${preview}`,
+        `🤖 ${aiPreview}`,
+      ].join("\n\n");
+      sendTelegramMessage(Number(adminChatId), fwd).catch(() => {});
+    }
+
     // ---- Send reply ----
     await sendTelegramMessage(chatId, aiResult.response);
   } catch (error: unknown) {

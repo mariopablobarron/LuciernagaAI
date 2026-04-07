@@ -2,62 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { resolveAdminAuth, clearAdminSessionCookie } from "@/lib/admin-auth";
 import { withRateLimit } from "@/lib/rate-limit";
 import { logError, logInfo } from "@/lib/logger";
+import { getNotificationConfig, type NotificationConfig } from "@/lib/notification-config";
 import fs from "fs/promises";
 import path from "path";
 
 export const dynamic = "force-dynamic";
 
 const CONFIG_PATH = path.join(process.cwd(), "notification-config.json");
-
-export type NotificationConfig = {
-  // Email alerts to ALERT_EMAIL
-  emailNewUser: boolean;
-  emailCrisis: boolean;
-  emailRetentionDrop: boolean;
-  emailWeeklySummary: boolean;
-  emailAvoidanceEscalation: boolean;
-  // Telegram alerts to ADMIN_TELEGRAM_ID
-  telegramNewUser: boolean;
-  telegramCrisis: boolean;
-  telegramUserMessages: boolean;
-  telegramWeeklySummary: boolean;
-  telegramAvoidanceEscalation: boolean;
-  // Cron jobs
-  cronDailyCheckin: boolean;
-  cronWeeklyReview: boolean;
-  cronWeeklyInactiveReminder: boolean;
-  cronActionReminders: boolean;
-  cronInactivityCheck: boolean;
-  cronProactiveReview: boolean;
-};
-
-const DEFAULTS: NotificationConfig = {
-  emailNewUser: true,
-  emailCrisis: true,
-  emailRetentionDrop: true,
-  emailWeeklySummary: true,
-  emailAvoidanceEscalation: true,
-  telegramNewUser: true,
-  telegramCrisis: true,
-  telegramUserMessages: true,
-  telegramWeeklySummary: true,
-  telegramAvoidanceEscalation: true,
-  cronDailyCheckin: true,
-  cronWeeklyReview: true,
-  cronWeeklyInactiveReminder: true,
-  cronActionReminders: true,
-  cronInactivityCheck: true,
-  cronProactiveReview: true,
-};
-
-export async function loadNotificationConfig(): Promise<NotificationConfig> {
-  try {
-    const raw = await fs.readFile(CONFIG_PATH, "utf-8");
-    return { ...DEFAULTS, ...JSON.parse(raw) };
-  } catch {
-    return { ...DEFAULTS };
-  }
-}
 
 async function saveNotificationConfig(config: NotificationConfig): Promise<void> {
   await fs.writeFile(CONFIG_PATH, JSON.stringify(config, null, 2), "utf-8");
@@ -71,7 +22,7 @@ export const GET = withRateLimit(async function GET(req: NextRequest) {
     return res;
   }
 
-  const config = await loadNotificationConfig();
+  const config = await getNotificationConfig();
   return NextResponse.json(config);
 }, { limit: 30 });
 
@@ -85,7 +36,7 @@ export const PUT = withRateLimit(async function PUT(req: NextRequest) {
 
   try {
     const body = (await req.json()) as Partial<NotificationConfig>;
-    const current = await loadNotificationConfig();
+    const current = await getNotificationConfig();
     const updated = { ...current, ...body };
     await saveNotificationConfig(updated);
     logInfo("ADMIN", "notification_config_updated", { changes: Object.keys(body) });

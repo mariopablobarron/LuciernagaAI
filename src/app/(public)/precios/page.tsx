@@ -109,6 +109,40 @@ export default function PreciosPage() {
         </div>
       </div>
 
+      {/* Transparency note */}
+      <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-8 space-y-4">
+        <div className="flex items-start gap-3">
+          <span className="text-2xl">🧪</span>
+          <div className="space-y-3">
+            <h3 className="text-lg font-bold text-white">Esto es un producto en construccion</h3>
+            <p className="text-sm text-zinc-300 leading-relaxed">
+              Tres Mil Millones de Latidos es un MVP — un producto minimo viable que funciona,
+              pero que todavia esta aprendiendo. No es una herramienta terminada.
+              Es una herramienta honesta.
+            </p>
+            <p className="text-sm text-zinc-300 leading-relaxed">
+              Cada conversacion que tienes, cada accion que completas o evitas, cada check-in
+              que registras, nos ayuda a entender mejor como acompanar a personas reales
+              con problemas reales. Esos datos se usan exclusivamente para mejorar
+              la plataforma — nunca se venden ni se comparten con terceros.
+            </p>
+            <p className="text-sm text-zinc-300 leading-relaxed">
+              Si decides usarla, estaras contribuyendo a que esta herramienta sea mejor
+              para los que vengan despues. Eso no es poco.
+            </p>
+            <div className="pt-2 border-t border-amber-500/10">
+              <p className="text-xs text-zinc-500 leading-relaxed">
+                Al usar Tres Mil Millones de Latidos aceptas que es una version en desarrollo.
+                Puede haber errores, cambios o interrupciones del servicio.
+                Tus datos emocionales y conversacionales se procesan para mejorar el producto
+                de forma anonimizada. Puedes eliminar toda tu informacion en cualquier momento
+                desde Ajustes o escribiendo /borrar_datos en Telegram.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Portal link for existing subscribers */}
       <div className="text-center">
         <p className="text-sm text-zinc-500 mb-2">¿Ya eres Pro?</p>

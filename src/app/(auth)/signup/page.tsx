@@ -201,15 +201,24 @@ function SignupForm() {
             />
           </div>
 
-          <label className="flex items-start gap-3 cursor-pointer">
-            <input type="checkbox" required className="rounded border-zinc-700 bg-zinc-900 mt-0.5" />
-            <span className="text-sm text-zinc-400">
-              Acepto los{' '}
-              <Link href="/terms" className="text-cyan-400 hover:text-cyan-300">Términos</Link>
-              {' '}y la{' '}
-              <Link href="/privacy" className="text-cyan-400 hover:text-cyan-300">Privacidad</Link>
-            </span>
-          </label>
+          <div className="rounded-lg border border-amber-500/15 bg-amber-500/5 px-4 py-3">
+            <p className="text-xs text-zinc-400 leading-relaxed mb-3">
+              Tres Mil Millones de Latidos es un producto en desarrollo activo.
+              Al registrarte, aceptas que tus datos conversacionales y emocionales
+              se usen de forma anonimizada para mejorar la plataforma.
+              Puedes eliminar toda tu informacion en cualquier momento.
+            </p>
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input type="checkbox" required className="rounded border-zinc-700 bg-zinc-900 mt-0.5" />
+              <span className="text-sm text-zinc-400">
+                Acepto los{' '}
+                <Link href="/terms" className="text-cyan-400 hover:text-cyan-300">Términos</Link>
+                {' '}y la{' '}
+                <Link href="/privacy" className="text-cyan-400 hover:text-cyan-300">Privacidad</Link>
+                {' '}y entiendo que es un producto en fase de pruebas
+              </span>
+            </label>
+          </div>
 
           <button
             type="submit" disabled={loading}

@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Stethoscope, LogOut, AlertTriangle, CheckCircle2, Clock,
-  Flame, Target, TrendingUp, TrendingDown, Minus, ChevronDown, ChevronUp,
+  Flame, Target, TrendingUp, TrendingDown, Minus, ChevronDown, ChevronUp, BookOpen,
 } from "lucide-react";
 
 type Patient = {
@@ -179,9 +180,14 @@ export default function OrgPatientsPage() {
             <p className="text-xs text-zinc-500">{therapistName} · {patients.length} pacientes</p>
           </div>
         </div>
-        <button onClick={handleLogout} className="p-2 text-zinc-500 hover:text-white transition-colors">
-          <LogOut className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-2">
+          <Link href="/org/guia" className="p-2 text-zinc-500 hover:text-violet-400 transition-colors" title="Guía">
+            <BookOpen className="w-4 h-4" />
+          </Link>
+          <button onClick={handleLogout} className="p-2 text-zinc-500 hover:text-white transition-colors">
+            <LogOut className="w-4 h-4" />
+          </button>
+        </div>
       </header>
 
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">

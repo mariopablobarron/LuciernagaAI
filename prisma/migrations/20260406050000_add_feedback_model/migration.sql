@@ -1,9 +1,3 @@
--- Clean orphaned LlmLog records before adding FK
-DELETE FROM "LlmLog" WHERE "userId" NOT IN (SELECT "id" FROM "User");
-
--- AddForeignKey (was skipped in previous migration due to orphaned data)
-ALTER TABLE "LlmLog" ADD CONSTRAINT "LlmLog_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
 -- CreateTable
 CREATE TABLE "Feedback" (
     "id" TEXT NOT NULL,

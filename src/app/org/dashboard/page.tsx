@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   BarChart3, Users, Flame, MessageCircle, AlertTriangle,
-  Target, TrendingUp, LogOut, ShieldCheck,
+  Target, TrendingUp, LogOut, ShieldCheck, BookOpen,
 } from "lucide-react";
 
 type Stats = {
@@ -84,6 +84,9 @@ export default function OrgDashboardPage() {
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
             <span className="text-[10px] text-emerald-300 font-medium">Datos anonimizados</span>
           </div>
+          <Link href="/org/guia" className="p-2 text-zinc-500 hover:text-violet-400 transition-colors" title="Guía">
+            <BookOpen className="w-4 h-4" />
+          </Link>
           <button onClick={handleLogout} className="p-2 text-zinc-500 hover:text-white transition-colors">
             <LogOut className="w-4 h-4" />
           </button>

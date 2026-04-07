@@ -54,6 +54,7 @@ export async function GET(req: NextRequest) {
         streak: { select: { currentDays: true } },
         preferences: { select: { reminderEnabled: true } },
       },
+      take: 500,
     });
 
     // Filter: only users with reminders enabled (default true if no preferences)

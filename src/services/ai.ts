@@ -119,49 +119,69 @@ async function requestOpenRouter(
 
   const safeCoachContext = sanitizeCoachContext(coachContext);
 
-  let response: Response;
-  try {
-    response = await fetchWithTimeout(
-      OPENROUTER_URL,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": process.env.APP_BASE_URL ?? "http://localhost:3000",
-          "X-Title": "mentor-web",
+  const RETRY_DELAYS = [1_000, 3_000]; // backoff: 1s, 3s
+  const MAX_ATTEMPTS = 3;
+
+  let response: Response | undefined;
+
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    try {
+      response = await fetchWithTimeout(
+        OPENROUTER_URL,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+            "HTTP-Referer": process.env.APP_BASE_URL ?? "http://localhost:3000",
+            "X-Title": "mentor-web",
+          },
+          body: JSON.stringify({
+            model: OPENROUTER_MODEL,
+            messages: [
+              {
+                role: "system",
+                content: buildCoachPrompt(userState, emotionalProfile, safeCoachContext),
+              },
+              ...history,
+              { role: "user", content: message },
+            ],
+            temperature: 0.7,
+            max_tokens: 500,
+          }),
         },
-        body: JSON.stringify({
-          model: OPENROUTER_MODEL,
-          messages: [
-            {
-              role: "system",
-              content: buildCoachPrompt(userState, emotionalProfile, safeCoachContext),
-            },
-            ...history,
-            { role: "user", content: message },
-          ],
-          temperature: 0.7,
-          max_tokens: 500,
-        }),
-      },
-      REQUEST_TIMEOUT_MS
-    );
-  } catch (error: unknown) {
-    throw new OpenRouterProviderError(
-      `OpenRouter request failed: ${getErrorMessage(error)}`
-    );
+        REQUEST_TIMEOUT_MS
+      );
+    } catch (error: unknown) {
+      if (attempt < MAX_ATTEMPTS) {
+        await new Promise((r) => setTimeout(r, RETRY_DELAYS[attempt - 1]));
+        continue;
+      }
+      throw new OpenRouterProviderError(
+        `OpenRouter request failed: ${getErrorMessage(error)}`
+      );
+    }
+
+    if (!response.ok) {
+      const status = response.status;
+      const errorText = await response.text().catch(() => "");
+      // Retry on 429 (rate limit) or 5xx (server error), not on other 4xx
+      if ((status === 429 || status >= 500) && attempt < MAX_ATTEMPTS) {
+        logInfo("AI", "openrouter_retry", { attempt, status, delayMs: RETRY_DELAYS[attempt - 1] });
+        await new Promise((r) => setTimeout(r, RETRY_DELAYS[attempt - 1]));
+        continue;
+      }
+      throw new OpenRouterProviderError(
+        `OpenRouter HTTP ${status}: ${errorText.slice(0, 200)}`,
+        status
+      );
+    }
+
+    // Success — break out of retry loop
+    break;
   }
 
-  if (!response.ok) {
-    const errorText = await response.text().catch(() => "");
-    throw new OpenRouterProviderError(
-      `OpenRouter HTTP ${response.status}: ${errorText.slice(0, 200)}`,
-      response.status
-    );
-  }
-
-  const data = (await response.json()) as OpenRouterResponse;
+  const data = (await response!.json()) as OpenRouterResponse;
   const reply = extractReply(data);
 
   if (!reply) {

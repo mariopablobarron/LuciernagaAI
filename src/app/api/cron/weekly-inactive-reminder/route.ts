@@ -113,6 +113,7 @@ export async function GET(req: NextRequest) {
         const ok = await sendUserEmail({ to: user.email, ...email });
         if (ok) sent++;
         else errors++;
+        await new Promise((r) => setTimeout(r, 200)); // throttle: 5 emails/sec max
       } catch (err) {
         logError("CRON", err, { userId: user.id, action: "weekly_inactive_reminder" });
         errors++;

@@ -186,6 +186,34 @@ export function sendTelegramNotification(
   ).catch(() => {});
 }
 
+/**
+ * Sends a Telegram message and awaits the result.
+ * Returns true if the message was delivered, false otherwise.
+ */
+export async function sendTelegramMessageAsync(
+  chatId: string | number,
+  text: string,
+  parseMode: string = "Markdown"
+): Promise<boolean> {
+  const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
+  if (!token || !chatId) return false;
+
+  try {
+    const res = await fetchWithTimeout(
+      `${TELEGRAM_NOTIFY_BASE}/bot${token}/sendMessage`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, text, parse_mode: parseMode }),
+      },
+      5_000
+    );
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 /** Shortcut: send a message to the admin chat. */
 export function notifyAdmin(text: string, parseMode: TelegramParseMode = "Markdown"): void {
   const adminChatId = process.env.ADMIN_TELEGRAM_ID?.trim();

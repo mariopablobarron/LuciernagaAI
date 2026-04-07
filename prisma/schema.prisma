@@ -846,3 +846,23 @@ model OrgAdmin {
   @@unique([organizationId, email])
   @@index([email])
 }
+
+// ─── Marketing Dashboard ──────────────────────────────────────────────────────
+
+model BroadcastLog {
+  id             String    @id @default(cuid())
+  channel        String    // "telegram" | "email"
+  segment        String    // audience segment key
+  message        String
+  subject        String?   // only for email
+  recipientCount Int
+  successCount   Int       @default(0)
+  failureCount   Int       @default(0)
+  status         String    @default("pending") // "pending" | "sending" | "completed" | "failed"
+  sentBy         String
+  createdAt      DateTime  @default(now())
+  completedAt    DateTime?
+
+  @@index([channel, createdAt])
+  @@index([status, createdAt])
+}

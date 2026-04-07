@@ -24,6 +24,7 @@ const NAV_LINKS = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/users", label: "Usuarios", matchPrefix: true },
   { href: "/admin/research", label: "Investigación", matchPrefix: true },
+  { href: "/admin/marketing", label: "Marketing", matchPrefix: true },
   { href: "/admin-clinical", label: "Panel clínico", matchPrefix: true },
   { href: "/admin/guia", label: "Guía" },
 ];

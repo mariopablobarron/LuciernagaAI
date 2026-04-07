@@ -1,152 +1,136 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Check } from 'lucide-react';
-import CheckoutButton from '@/components/CheckoutButton';
-import PortalButton from '@/components/billing/PortalButton';
+import { Check, Gift, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Precios — tresmilmillonesdelatidos.es',
-  description: 'Invierte en los latidos que importan. Plan gratuito para empezar. Pro con conversaciones ilimitadas, Modo Impulso y retos personalizados por 9€/mes.',
+  description: 'Acceso completo gratuito durante la fase MVP. Registrate y accede a todas las funcionalidades Pro sin coste.',
   openGraph: {
     title: 'Precios — tresmilmillonesdelatidos.es',
-    description: 'Empieza gratis. Amplía cuando tu ritmo lo pida.',
+    description: 'Fase MVP: acceso Pro gratuito para los primeros usuarios.',
     type: 'website',
     locale: 'es_ES',
   },
   robots: { index: true, follow: true },
 };
 
-const FREE_FEATURES = [
-  '10 conversaciones al mes',
-  'Hasta 20 mensajes por conversación',
-  'Test de diagnóstico gratuito',
-  'Acceso al coach IA',
+const PRO_FEATURES = [
+  'Conversaciones ilimitadas con el coach IA',
+  'Mensajes ilimitados',
+  'Modo Impulso completo — 21 dias de transformacion',
+  'Diagnosticos avanzados y retos personalizados',
+  'Insights semanales de comportamiento',
+  'Check-in diario con racha',
+  'Mapa de patrones de evitacion',
+  'Historial de conversaciones completo',
+  'Bot de Telegram integrado',
+  'Portal para personas de confianza',
 ];
 
-const PRO_FEATURES = [
-  'Conversaciones ilimitadas',
-  'Mensajes ilimitados',
-  'Modo Impulso completo — 21 días',
-  'Historial de conversaciones',
-  'Diagnósticos avanzados',
-  'Retos personalizados',
-  'Insights semanales',
-  'Soporte prioritario',
+const FUTURE_PRICE = [
+  { plan: 'Free', price: '0 euros/mes', features: 'Acceso basico: 10 conversaciones/mes, 20 mensajes/conversacion' },
+  { plan: 'Pro', price: '9 euros/mes', features: 'Todo ilimitado + Modo Impulso + retos + insights' },
+  { plan: 'Pro anual', price: '79 euros/ano', features: 'Mismo que Pro, ahorrando 2 meses' },
 ];
 
 export default function PreciosPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-16 space-y-12">
+      {/* Header */}
       <div className="text-center space-y-4">
-        <p className="text-xs font-semibold uppercase tracking-widest text-violet-400">💓 tresmilmillonesdelatidos.es</p>
-        <h1 className="text-4xl font-bold">Invierte en los latidos que importan</h1>
+        <p className="text-xs font-semibold uppercase tracking-widest text-violet-400">tresmilmillonesdelatidos.es</p>
+        <h1 className="text-3xl sm:text-4xl font-bold">Acceso completo. Gratuito. Ahora.</h1>
         <p className="text-zinc-400 text-lg max-w-xl mx-auto">
-          Empieza gratis. Amplía cuando tu ritmo lo pida.
+          Estamos en fase MVP. Los primeros usuarios acceden a todo el plan Pro
+          sin coste durante 6 meses.
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Free */}
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-8 space-y-6">
-          <div>
-            <p className="text-sm font-medium text-zinc-400 mb-1">Gratis</p>
-            <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-bold">0€</span>
-              <span className="text-zinc-500">/mes</span>
-            </div>
-          </div>
-          <ul className="space-y-3">
-            {FREE_FEATURES.map((f) => (
-              <li key={f} className="flex items-center gap-3 text-sm text-zinc-300">
-                <Check className="w-4 h-4 text-zinc-500 shrink-0" />
-                {f}
-              </li>
-            ))}
-          </ul>
-          <Link
-            href="/app"
-            className="block text-center py-3 rounded-xl border border-zinc-700 text-sm font-semibold text-zinc-300 hover:text-white hover:border-zinc-500 transition-all"
-          >
-            Empezar gratis
-          </Link>
+      {/* MVP offer card */}
+      <div className="rounded-2xl border-2 border-violet-500/60 bg-violet-500/5 p-8 sm:p-10 space-y-6 relative">
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+          <span className="bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-xs font-bold px-4 py-1.5 rounded-full">
+            FASE MVP — ACCESO ABIERTO
+          </span>
         </div>
 
-        {/* Pro */}
-        <div className="rounded-2xl border-2 border-violet-500/60 bg-violet-500/5 p-8 space-y-6 relative">
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-            <span className="bg-violet-600 text-white text-xs font-bold px-3 py-1 rounded-full">
-              MÁS POPULAR
-            </span>
+        <div className="text-center space-y-2 pt-4">
+          <div className="flex items-center justify-center gap-3">
+            <Gift className="w-6 h-6 text-violet-400" />
+            <p className="text-sm font-medium text-violet-400">Plan Pro completo</p>
           </div>
-          <div>
-            <p className="text-sm font-medium text-violet-400 mb-1">Pro</p>
-            <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-bold">9€</span>
-              <span className="text-zinc-500">/mes</span>
-            </div>
-            <p className="text-xs text-zinc-500 mt-1">o 79€/año — ahorras 2 meses</p>
+          <div className="flex items-baseline justify-center gap-2">
+            <span className="text-5xl font-black text-white">0 euros</span>
+            <span className="text-zinc-500">/6 meses</span>
           </div>
-          <ul className="space-y-3">
-            {PRO_FEATURES.map((f) => (
-              <li key={f} className="flex items-center gap-3 text-sm text-zinc-300">
-                <Check className="w-4 h-4 text-violet-400 shrink-0" />
-                {f}
-              </li>
-            ))}
-          </ul>
-          <div className="space-y-2">
-            <CheckoutButton plan="pro_monthly">Empezar 7 días gratis</CheckoutButton>
-            <CheckoutButton
-              plan="pro_annual"
-              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold text-zinc-300 border border-zinc-700 hover:border-zinc-500 hover:text-white transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              Plan anual — 79€/año
-            </CheckoutButton>
-          </div>
-          <p className="text-xs text-zinc-600 text-center">
-            7 días de prueba gratis · Sin cargo hasta el día 8 · Cancelas cuando quieras
+          <p className="text-sm text-zinc-400">Sin tarjeta. Sin compromiso. Solo tu registro.</p>
+        </div>
+
+        <ul className="grid sm:grid-cols-2 gap-3 pt-2">
+          {PRO_FEATURES.map((f) => (
+            <li key={f} className="flex items-start gap-3 text-sm text-zinc-300">
+              <Check className="w-4 h-4 text-violet-400 shrink-0 mt-0.5" />
+              {f}
+            </li>
+          ))}
+        </ul>
+
+        <div className="pt-4">
+          <Link
+            href="/signup"
+            className="flex items-center justify-center gap-2 w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 transition-all text-base"
+          >
+            Crear cuenta gratuita <ArrowRight className="w-5 h-5" />
+          </Link>
+          <p className="text-xs text-zinc-600 text-center mt-3">
+            Al registrarte accedes automaticamente al plan Pro completo.
+            No se te pedira tarjeta de credito.
           </p>
         </div>
       </div>
 
-      {/* Transparency note */}
+      {/* Why free — honesty block */}
       <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-8 space-y-4">
         <div className="flex items-start gap-3">
           <span className="text-2xl">🧪</span>
           <div className="space-y-3">
-            <h3 className="text-lg font-bold text-white">Esto es un producto en construccion</h3>
+            <h3 className="text-lg font-bold text-white">Por que es gratis (y hasta cuando)</h3>
             <p className="text-sm text-zinc-300 leading-relaxed">
-              Tres Mil Millones de Latidos es un MVP — un producto minimo viable que funciona,
-              pero que todavia esta aprendiendo. No es una herramienta terminada.
-              Es una herramienta honesta.
+              Tres Mil Millones de Latidos esta en fase de producto minimo viable.
+              Funciona, pero todavia esta aprendiendo. Y para aprender necesita
+              personas reales usandolo de verdad — no betas cerradas ni demos
+              que nadie toca.
             </p>
             <p className="text-sm text-zinc-300 leading-relaxed">
-              Cada conversacion que tienes, cada accion que completas o evitas, cada check-in
-              que registras, nos ayuda a entender mejor como acompanar a personas reales
-              con problemas reales. Esos datos se usan exclusivamente para mejorar
-              la plataforma — nunca se venden ni se comparten con terceros.
+              Durante estos 6 meses (hasta octubre 2026), todo el plan Pro esta abierto
+              sin coste. A cambio, tus interacciones nos ayudan a mejorar el producto.
+              No vendemos tus datos. No los compartimos. Los usamos, anonimizados,
+              para que la herramienta sea mejor para ti y para los que vengan despues.
             </p>
             <p className="text-sm text-zinc-300 leading-relaxed">
-              Si decides usarla, estaras contribuyendo a que esta herramienta sea mejor
-              para los que vengan despues. Eso no es poco.
+              Cuando termine la fase MVP, podras seguir con el plan gratuito
+              o elegir Pro a su precio regular. Sin sorpresas.
             </p>
-            <div className="pt-2 border-t border-amber-500/10">
-              <p className="text-xs text-zinc-500 leading-relaxed">
-                Al usar Tres Mil Millones de Latidos aceptas que es una version en desarrollo.
-                Puede haber errores, cambios o interrupciones del servicio.
-                Tus datos emocionales y conversacionales se procesan para mejorar el producto
-                de forma anonimizada. Puedes eliminar toda tu informacion en cualquier momento
-                desde Ajustes o escribiendo /borrar_datos en Telegram.
-              </p>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Portal link for existing subscribers */}
-      <div className="text-center">
-        <p className="text-sm text-zinc-500 mb-2">¿Ya eres Pro?</p>
-        <PortalButton />
+      {/* Future pricing reference */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold text-center">Precios tras la fase MVP</h2>
+        <p className="text-sm text-zinc-500 text-center max-w-md mx-auto">
+          Estos seran los precios cuando termine el periodo de acceso abierto.
+          Los usuarios MVP tendran condiciones especiales.
+        </p>
+        <div className="grid sm:grid-cols-3 gap-4 pt-2">
+          {FUTURE_PRICE.map((p) => (
+            <div key={p.plan} className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 space-y-2">
+              <p className="text-sm font-semibold text-white">{p.plan}</p>
+              <p className="text-lg font-bold text-violet-400">{p.price}</p>
+              <p className="text-xs text-zinc-500">{p.features}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* FAQ */}
@@ -154,24 +138,24 @@ export default function PreciosPage() {
         <h2 className="text-xl font-bold text-center mb-6">Preguntas frecuentes</h2>
         {[
           {
-            q: '¿Qué significa tresmilmillonesdelatidos.es?',
-            a: 'El corazón humano late aproximadamente tres mil millones de veces en una vida. Tres Mil Millones de Latidos existe para que los tuyos tengan dirección. Cada conversación, cada acción, cada decisión — es un latido que puedes desperdiciar o hacer contar.',
+            q: 'Es realmente gratis?',
+            a: 'Si. Durante la fase MVP (hasta octubre 2026) no se cobra nada. No necesitas tarjeta de credito. Solo registrarte con tu email.',
           },
           {
-            q: '¿Necesito tarjeta para el plan gratuito?',
-            a: 'No. El plan gratuito no requiere ningún dato de pago.',
+            q: 'Que pasa con mis datos?',
+            a: 'Tus conversaciones y datos emocionales se procesan de forma anonimizada para mejorar el producto. Nunca se venden ni comparten con terceros. Puedes borrar todo en cualquier momento desde Ajustes.',
           },
           {
-            q: '¿Puedo cancelar cuando quiera?',
-            a: 'Sí. Cancelas en cualquier momento sin permanencia ni penalización. Si cancelas durante el periodo de prueba, no se te cobra nada.',
+            q: 'Que pasa cuando termine el MVP?',
+            a: 'Podras seguir usando el plan gratuito (con limites) o elegir Pro a su precio regular. Los usuarios que participaron en el MVP tendran condiciones especiales como agradecimiento.',
           },
           {
-            q: '¿Qué pasa cuando termina el periodo de prueba?',
-            a: 'Al día 8 se carga el primer mes (9€). Recibirás un email de Stripe antes del cargo.',
+            q: 'Tres Mil Millones de Latidos reemplaza a un psicologo?',
+            a: 'No. Es una herramienta de mentoria conversacional con IA. Ayuda a ordenar ideas y pasar a la accion, pero no sustituye terapia profesional. En caso de crisis, conecta con el 024.',
           },
           {
-            q: '¿Tres Mil Millones de Latidos reemplaza a un psicólogo?',
-            a: 'No. Tres Mil Millones de Latidos es una herramienta de mentoría conversacional. No sustituye terapia profesional.',
+            q: 'Puedo usarlo desde el movil?',
+            a: 'Si. La web esta optimizada para movil y puedes anadirla a tu pantalla de inicio. Tambien puedes usar el bot de Telegram para conversar directamente desde ahi.',
           },
         ].map(({ q, a }) => (
           <div key={q} className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
@@ -179,6 +163,16 @@ export default function PreciosPage() {
             <p className="text-sm text-zinc-400">{a}</p>
           </div>
         ))}
+      </div>
+
+      {/* CTA bottom */}
+      <div className="text-center pt-4">
+        <Link
+          href="/signup"
+          className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 transition-all text-lg"
+        >
+          Empezar ahora — es gratis <ArrowRight className="w-5 h-5" />
+        </Link>
       </div>
     </div>
   );

@@ -606,7 +606,17 @@ export async function getUserAccessState(userId: string): Promise<UserAccessStat
       ]);
 
       const subscriptionStatus = latestSubscription?.status ?? "free";
-      const hasPlan = ACTIVE_SUBSCRIPTION_STATUSES.has(subscriptionStatus);
+      let hasPlan = ACTIVE_SUBSCRIPTION_STATUSES.has(subscriptionStatus);
+
+      // MVP mode: grant Pro to all users until the configured date
+      const mvpUntil = process.env.MVP_PRO_UNTIL?.trim(); // e.g. "2026-10-08"
+      if (mvpUntil && !hasPlan) {
+        const mvpEnd = new Date(mvpUntil);
+        if (!isNaN(mvpEnd.getTime()) && new Date() < mvpEnd) {
+          hasPlan = true;
+        }
+      }
+
       const plan = normalizePlan(latestSubscription?.plan, hasPlan);
 
       return buildAccessState({

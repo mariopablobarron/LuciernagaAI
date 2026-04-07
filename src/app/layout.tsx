@@ -39,16 +39,23 @@ function getMetadataBase(): URL {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
 };
 
 export const metadata: Metadata = {
   metadataBase: getMetadataBase(),
   title: SAAS_CONFIG.marketingTitle,
   description: SAAS_CONFIG.description,
+  manifest: "/manifest.json",
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
     apple: "/favicon.ico",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Latidos",
   },
   openGraph: {
     images: [{ url: "/opengraph-image", width: 1200, height: 630 }],

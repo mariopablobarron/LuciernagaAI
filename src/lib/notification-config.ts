@@ -54,7 +54,7 @@ export async function getNotificationConfig(): Promise<NotificationConfig> {
     cached = { ...DEFAULTS };
   }
   cachedAt = Date.now();
-  return cached;
+  return cached!;
 }
 
 export function isEnabled(config: NotificationConfig, key: keyof NotificationConfig): boolean {

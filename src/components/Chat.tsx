@@ -585,7 +585,7 @@ export default function Chat({
               bottomRef.current?.scrollIntoView({ behavior: "smooth" });
               setAtBottom(true);
             }}
-            className="absolute bottom-4 right-4 flex h-8 w-8 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-zinc-400 shadow-lg transition hover:bg-zinc-800 hover:text-white"
+            className="absolute bottom-4 right-4 flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-zinc-400 shadow-lg transition hover:bg-zinc-800 hover:text-white"
           >
             <ArrowDown className="h-4 w-4" />
           </button>
@@ -593,7 +593,7 @@ export default function Chat({
       </div>
 
       {/* ── Input area ──────────────────────────────────────────────────── */}
-      <div className="shrink-0 border-t border-zinc-800/60 bg-zinc-950 px-3 py-3">
+      <div className="shrink-0 border-t border-zinc-800/60 bg-zinc-950 px-3 py-3" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
         <div className="relative flex items-end gap-2">
           <Textarea
             value={input}

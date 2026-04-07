@@ -766,6 +766,38 @@ export default function HomePage() {
           pendingWaitlistMessageRef.current = null;
           setTimeout(() => void handleSend(msg), 400);
         }
+        // ── Auto-greet new users with no messages ────────────────────────────
+        if (!cancelled && !pendingWaitlistMessageRef.current) {
+          const activeConv = conversations.find((c) => c.id === activeConversationId);
+          if (activeConv && activeConv.messages.length === 0) {
+            const isFirstTime = !localStorage.getItem("luc_auto_greeted");
+            if (isFirstTime) localStorage.setItem("luc_auto_greeted", "1");
+
+            const greetContent = isFirstTime
+              ? "Hola. Soy tu mentor en Tres Mil Millones de Latidos.\n\n" +
+                "No voy a darte consejos genéricos. Voy a ayudarte a ver lo que ya sabes pero no estás haciendo.\n\n" +
+                "**¿Qué llevas semanas evitando?** Cuéntame en una frase — sin filtros."
+              : "**¿Qué necesitas resolver hoy?**\n\nUna frase. Sin rodeos.";
+
+            setConversations((prev) =>
+              prev.map((c) =>
+                c.id === activeConv.id
+                  ? {
+                      ...c,
+                      messages: [
+                        {
+                          id: "auto-greet",
+                          role: "assistant" as const,
+                          content: greetContent,
+                        },
+                      ],
+                      messageCount: 1,
+                    }
+                  : c
+              )
+            );
+          }
+        }
         if (!cancelled) {
           fetch("/api/user/state")
             .then((r) => r.json())
@@ -2043,7 +2075,7 @@ export default function HomePage() {
         }
         rightPanel={
           <InsightsPanel
-            mode={workspaceTab}
+            mode={workspaceTab === "espejo" ? "chat" : workspaceTab}
             state={safeConversation.state}
             emotionalProfile={emotionalProfile}
             insight={safeConversation.insight}

@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Brain, ClipboardList, MessageSquareText, NotebookPen, ShieldAlert, Target, Trash2 } from "lucide-react";
+import { ArrowLeft, Brain, Check, ChevronDown, ClipboardList, Mail, MessageSquareText, NotebookPen, Pencil, Power, RefreshCw, ShieldAlert, Target, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import { AdminPanel } from "@/features/admin/components/AdminPanel";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 
 // ─── Psychologist panel types ──────────────────────────────────────────────────
@@ -189,6 +190,181 @@ export default function AdminUserDetailPage() {
   const [timeline, setTimeline] = useState<TimelineEntry[]>([]);
   const [crisisMarkers, setCrisisMarkers] = useState<CrisisMarker[]>([]);
   const userId = useRef<string | null>(null);
+
+  // ── Admin action state ──────────────────────────────────────────────────────
+  const [openSection, setOpenSection] = useState<string | null>(null);
+  const [actionFeedback, setActionFeedback] = useState<{ section: string; type: "success" | "error"; message: string } | null>(null);
+
+  // Edit user info
+  const [editName, setEditName] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+  const [editRole, setEditRole] = useState("user");
+  const [savingUser, setSavingUser] = useState(false);
+
+  // Change plan
+  const [newPlan, setNewPlan] = useState("free");
+  const [planReason, setPlanReason] = useState("");
+  const [savingPlan, setSavingPlan] = useState(false);
+
+  // Reset password
+  const [newPassword, setNewPassword] = useState("");
+  const [savingPassword, setSavingPassword] = useState(false);
+
+  // Send email
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailBody, setEmailBody] = useState("");
+  const [sendingEmail, setSendingEmail] = useState(false);
+
+  // Deactivate / reactivate
+  const [togglingActive, setTogglingActive] = useState(false);
+
+  // Track whether user is active (defaults true, updated from data)
+  const [isUserActive, setIsUserActive] = useState(true);
+
+  function toggleSection(id: string) {
+    setOpenSection((prev) => (prev === id ? null : id));
+    setActionFeedback(null);
+  }
+
+  function showFeedback(section: string, type: "success" | "error", message: string) {
+    setActionFeedback({ section, type, message });
+    setTimeout(() => setActionFeedback(null), 5000);
+  }
+
+  // Sync edit fields when data loads
+  useEffect(() => {
+    if (data) {
+      setEditName(data.user.name || "");
+      setEditEmail(data.user.email);
+      setEditRole(data.user.role);
+      setNewPlan(data.subscription?.plan || "free");
+    }
+  }, [data]);
+
+  async function handleSaveUserInfo() {
+    if (!params?.id) return;
+    setSavingUser(true);
+    try {
+      const res = await fetch(`/api/admin/users/${params.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ name: editName, email: editEmail, role: editRole }),
+      });
+      if (!res.ok) throw new Error("Error al guardar cambios.");
+      setData((prev) => prev ? {
+        ...prev,
+        user: { ...prev.user, name: editName, email: editEmail, role: editRole },
+      } : prev);
+      showFeedback("edit-user", "success", "Datos del usuario actualizados correctamente.");
+    } catch {
+      showFeedback("edit-user", "error", "No se pudieron guardar los cambios.");
+    } finally {
+      setSavingUser(false);
+    }
+  }
+
+  async function handleChangePlan() {
+    if (!params?.id) return;
+    if (!window.confirm(`Cambiar plan a "${newPlan}"? Esta accion puede afectar la facturacion del usuario.`)) return;
+    setSavingPlan(true);
+    try {
+      const res = await fetch(`/api/admin/users/${params.id}/change-plan`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ plan: newPlan, reason: planReason }),
+      });
+      if (!res.ok) throw new Error("Error al cambiar plan.");
+      setData((prev) => prev ? {
+        ...prev,
+        subscription: prev.subscription
+          ? { ...prev.subscription, plan: newPlan }
+          : { plan: newPlan, status: "active", createdAt: new Date().toISOString() },
+      } : prev);
+      setPlanReason("");
+      showFeedback("change-plan", "success", `Plan cambiado a "${newPlan}" correctamente.`);
+    } catch {
+      showFeedback("change-plan", "error", "No se pudo cambiar el plan.");
+    } finally {
+      setSavingPlan(false);
+    }
+  }
+
+  async function handleResetPassword() {
+    if (!params?.id || !newPassword.trim()) return;
+    if (!window.confirm("Resetear la contrasena de este usuario? Se cerraran sus sesiones activas.")) return;
+    setSavingPassword(true);
+    try {
+      const res = await fetch(`/api/admin/users/${params.id}/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ newPassword }),
+      });
+      if (!res.ok) throw new Error("Error al resetear contrasena.");
+      setNewPassword("");
+      showFeedback("reset-password", "success", "Contrasena reseteada correctamente.");
+    } catch {
+      showFeedback("reset-password", "error", "No se pudo resetear la contrasena.");
+    } finally {
+      setSavingPassword(false);
+    }
+  }
+
+  async function handleSendEmail() {
+    if (!params?.id || !emailSubject.trim() || !emailBody.trim()) return;
+    setSendingEmail(true);
+    try {
+      const res = await fetch(`/api/admin/users/${params.id}/send-email`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ subject: emailSubject, body: emailBody }),
+      });
+      if (!res.ok) throw new Error("Error al enviar email.");
+      setEmailSubject("");
+      setEmailBody("");
+      showFeedback("send-email", "success", "Email enviado correctamente.");
+    } catch {
+      showFeedback("send-email", "error", "No se pudo enviar el email.");
+    } finally {
+      setSendingEmail(false);
+    }
+  }
+
+  async function handleToggleActive() {
+    if (!params?.id) return;
+    const activating = !isUserActive;
+    const msg = activating
+      ? "Reactivar este usuario?"
+      : "Desactivar este usuario? Perdera acceso a la plataforma.";
+    if (!window.confirm(msg)) return;
+    setTogglingActive(true);
+    try {
+      if (activating) {
+        const res = await fetch(`/api/admin/users/${params.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ isActive: true }),
+        });
+        if (!res.ok) throw new Error("Error al reactivar usuario.");
+      } else {
+        const res = await fetch(`/api/admin/users/${params.id}`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error("Error al desactivar usuario.");
+      }
+      setIsUserActive(activating);
+      showFeedback("toggle-active", "success", activating ? "Usuario reactivado." : "Usuario desactivado.");
+    } catch {
+      showFeedback("toggle-active", "error", activating ? "No se pudo reactivar el usuario." : "No se pudo desactivar el usuario.");
+    } finally {
+      setTogglingActive(false);
+    }
+  }
 
   useEffect(() => {
     async function fetchDetail() {
@@ -411,6 +587,266 @@ export default function AdminUserDetailPage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* ── ADMIN ACTIONS ────────────────────────────────────────── */}
+          <AdminPanel title="Acciones de administrador" description="Gestionar datos, plan, acceso y comunicaciones del usuario.">
+            {/* ── 1. Edit User Info ── */}
+            <div className="rounded-xl border border-zinc-800 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => toggleSection("edit-user")}
+                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-semibold text-zinc-200 hover:bg-zinc-800/40 transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <Pencil className="size-4 text-violet-400" />
+                  Editar datos del usuario
+                </span>
+                <ChevronDown className={`size-4 text-zinc-500 transition-transform ${openSection === "edit-user" ? "rotate-180" : ""}`} />
+              </button>
+              {openSection === "edit-user" && (
+                <div className="space-y-3 border-t border-zinc-800 px-4 py-4">
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-zinc-500">Nombre</label>
+                    <input
+                      type="text"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      className="h-9 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 text-sm text-white placeholder:text-zinc-600 focus:border-violet-500 focus:outline-none"
+                      placeholder="Nombre del usuario"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-zinc-500">Email</label>
+                    <input
+                      type="email"
+                      value={editEmail}
+                      onChange={(e) => setEditEmail(e.target.value)}
+                      className="h-9 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 text-sm text-white placeholder:text-zinc-600 focus:border-violet-500 focus:outline-none"
+                      placeholder="correo@ejemplo.com"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-zinc-500">Rol</label>
+                    <select
+                      value={editRole}
+                      onChange={(e) => setEditRole(e.target.value)}
+                      className="h-9 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 text-sm text-white focus:border-violet-500 focus:outline-none"
+                    >
+                      <option value="user">user</option>
+                      <option value="admin">admin</option>
+                    </select>
+                  </div>
+                  {actionFeedback?.section === "edit-user" && (
+                    <p className={`text-xs font-medium ${actionFeedback.type === "success" ? "text-emerald-400" : "text-red-400"}`}>
+                      {actionFeedback.message}
+                    </p>
+                  )}
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    loading={savingUser}
+                    loadingText="Guardando..."
+                    onClick={() => void handleSaveUserInfo()}
+                  >
+                    <Check className="size-4" />
+                    Guardar cambios
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* ── 2. Change Plan ── */}
+            <div className="rounded-xl border border-zinc-800 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => toggleSection("change-plan")}
+                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-semibold text-zinc-200 hover:bg-zinc-800/40 transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <RefreshCw className="size-4 text-violet-400" />
+                  Cambiar plan
+                </span>
+                <ChevronDown className={`size-4 text-zinc-500 transition-transform ${openSection === "change-plan" ? "rotate-180" : ""}`} />
+              </button>
+              {openSection === "change-plan" && (
+                <div className="space-y-3 border-t border-zinc-800 px-4 py-4">
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-zinc-500">Plan</label>
+                    <select
+                      value={newPlan}
+                      onChange={(e) => setNewPlan(e.target.value)}
+                      className="h-9 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 text-sm text-white focus:border-violet-500 focus:outline-none"
+                    >
+                      <option value="free">Free</option>
+                      <option value="pro">Pro</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-zinc-500">Motivo (opcional)</label>
+                    <textarea
+                      value={planReason}
+                      onChange={(e) => setPlanReason(e.target.value)}
+                      rows={2}
+                      className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:border-violet-500 focus:outline-none resize-none"
+                      placeholder="Motivo del cambio de plan..."
+                    />
+                  </div>
+                  {actionFeedback?.section === "change-plan" && (
+                    <p className={`text-xs font-medium ${actionFeedback.type === "success" ? "text-emerald-400" : "text-red-400"}`}>
+                      {actionFeedback.message}
+                    </p>
+                  )}
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    loading={savingPlan}
+                    loadingText="Cambiando..."
+                    onClick={() => void handleChangePlan()}
+                  >
+                    Cambiar plan
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* ── 3. Reset Password ── */}
+            <div className="rounded-xl border border-zinc-800 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => toggleSection("reset-password")}
+                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-semibold text-zinc-200 hover:bg-zinc-800/40 transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <ShieldAlert className="size-4 text-amber-400" />
+                  Resetear contrasena
+                </span>
+                <ChevronDown className={`size-4 text-zinc-500 transition-transform ${openSection === "reset-password" ? "rotate-180" : ""}`} />
+              </button>
+              {openSection === "reset-password" && (
+                <div className="space-y-3 border-t border-zinc-800 px-4 py-4">
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-zinc-500">Nueva contrasena</label>
+                    <input
+                      type="password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="h-9 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 text-sm text-white placeholder:text-zinc-600 focus:border-violet-500 focus:outline-none"
+                      placeholder="Nueva contrasena"
+                    />
+                  </div>
+                  {actionFeedback?.section === "reset-password" && (
+                    <p className={`text-xs font-medium ${actionFeedback.type === "success" ? "text-emerald-400" : "text-red-400"}`}>
+                      {actionFeedback.message}
+                    </p>
+                  )}
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    loading={savingPassword}
+                    loadingText="Reseteando..."
+                    disabled={!newPassword.trim()}
+                    onClick={() => void handleResetPassword()}
+                  >
+                    Resetear contrasena
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* ── 4. Send Email ── */}
+            <div className="rounded-xl border border-zinc-800 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => toggleSection("send-email")}
+                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-semibold text-zinc-200 hover:bg-zinc-800/40 transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <Mail className="size-4 text-violet-400" />
+                  Enviar email
+                </span>
+                <ChevronDown className={`size-4 text-zinc-500 transition-transform ${openSection === "send-email" ? "rotate-180" : ""}`} />
+              </button>
+              {openSection === "send-email" && (
+                <div className="space-y-3 border-t border-zinc-800 px-4 py-4">
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-zinc-500">Asunto</label>
+                    <input
+                      type="text"
+                      value={emailSubject}
+                      onChange={(e) => setEmailSubject(e.target.value)}
+                      className="h-9 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 text-sm text-white placeholder:text-zinc-600 focus:border-violet-500 focus:outline-none"
+                      placeholder="Asunto del email"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-zinc-500">Cuerpo</label>
+                    <textarea
+                      value={emailBody}
+                      onChange={(e) => setEmailBody(e.target.value)}
+                      rows={4}
+                      className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:border-violet-500 focus:outline-none resize-none"
+                      placeholder="Contenido del email..."
+                    />
+                  </div>
+                  {actionFeedback?.section === "send-email" && (
+                    <p className={`text-xs font-medium ${actionFeedback.type === "success" ? "text-emerald-400" : "text-red-400"}`}>
+                      {actionFeedback.message}
+                    </p>
+                  )}
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    loading={sendingEmail}
+                    loadingText="Enviando..."
+                    disabled={!emailSubject.trim() || !emailBody.trim()}
+                    onClick={() => void handleSendEmail()}
+                  >
+                    <Mail className="size-4" />
+                    Enviar email
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* ── 5. Deactivate / Reactivate ── */}
+            <div className="rounded-xl border border-zinc-800 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => toggleSection("toggle-active")}
+                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-semibold text-zinc-200 hover:bg-zinc-800/40 transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <Power className={`size-4 ${isUserActive ? "text-red-400" : "text-emerald-400"}`} />
+                  {isUserActive ? "Desactivar usuario" : "Reactivar usuario"}
+                </span>
+                <ChevronDown className={`size-4 text-zinc-500 transition-transform ${openSection === "toggle-active" ? "rotate-180" : ""}`} />
+              </button>
+              {openSection === "toggle-active" && (
+                <div className="space-y-3 border-t border-zinc-800 px-4 py-4">
+                  <p className="text-xs text-zinc-500">
+                    {isUserActive
+                      ? "Al desactivar el usuario, perdera acceso inmediato a la plataforma. Esta accion es reversible."
+                      : "Al reactivar el usuario, recuperara acceso a la plataforma con su plan actual."}
+                  </p>
+                  {actionFeedback?.section === "toggle-active" && (
+                    <p className={`text-xs font-medium ${actionFeedback.type === "success" ? "text-emerald-400" : "text-red-400"}`}>
+                      {actionFeedback.message}
+                    </p>
+                  )}
+                  <Button
+                    variant={isUserActive ? "danger" : "primary"}
+                    size="sm"
+                    loading={togglingActive}
+                    loadingText={isUserActive ? "Desactivando..." : "Reactivando..."}
+                    onClick={() => void handleToggleActive()}
+                  >
+                    <Power className="size-4" />
+                    {isUserActive ? "Desactivar usuario" : "Reactivar usuario"}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </AdminPanel>
 
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
             <Card className="border-zinc-800 bg-zinc-900/50">

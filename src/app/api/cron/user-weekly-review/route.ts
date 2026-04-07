@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { sendUserEmail } from "@/lib/email";
+import { sendTelegramNotification } from "@/services/telegram";
 import { logError, logInfo } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
@@ -114,40 +115,93 @@ export async function GET(req: NextRequest) {
           { preferences: { weeklyEmailEnabled: true } },
         ],
       },
-      select: { id: true, email: true, name: true },
+      select: { id: true, email: true, name: true, telegramId: true },
     });
 
     let sent = 0;
     let errors = 0;
 
+    let sentTelegram = 0;
+
     for (const user of users) {
       try {
-        const [messagesCount, checkinsCount, streak, userState] = await Promise.all([
+        const [messagesCount, checkinsCount, streak, userState, avoidanceCount] = await Promise.all([
           prisma.message.count({ where: { userId: user.id, createdAt: { gte: since }, role: "user" } }),
           prisma.dailyLog.count({ where: { userId: user.id, createdAt: { gte: since } } }),
           prisma.streak.findUnique({ where: { userId: user.id }, select: { currentDays: true } }),
           prisma.userState.findUnique({ where: { userId: user.id }, select: { primaryEmotion: true } }),
+          prisma.avoidanceEvent.count({ where: { userId: user.id, createdAt: { gte: since } } }),
         ]);
+
+        const streakDays = streak?.currentDays ?? 0;
+        const dominantEmotion = userState?.primaryEmotion ?? "calma";
 
         const email = buildWeeklyReviewEmail({
           name: user.name,
           messagesCount,
           checkinsCount,
-          streakDays: streak?.currentDays ?? 0,
-          dominantEmotion: userState?.primaryEmotion ?? "calma",
+          streakDays,
+          dominantEmotion,
         });
 
         const ok = await sendUserEmail({ to: user.email, ...email });
         if (ok) sent++;
         else errors++;
+
+        // Send via Telegram too
+        if (user.telegramId) {
+          // Find most avoided action for personalized insight
+          const topAvoided = avoidanceCount > 0
+            ? await prisma.avoidanceEvent.findFirst({
+                where: { userId: user.id, createdAt: { gte: since } },
+                select: { action: { select: { description: true } } },
+                orderBy: { createdAt: "desc" },
+              })
+            : null;
+
+          const greeting = user.name ? `${user.name}, ` : "";
+          const tgLines = [
+            `📊 *Tu semana en Tres Mil Millones de Latidos*`,
+            ``,
+            `${greeting}aqui va tu resumen:`,
+            ``,
+            `💬 ${messagesCount} mensajes`,
+            `📝 ${checkinsCount} check-ins`,
+            `🔥 ${streakDays} dias de racha`,
+            `🧠 Estado: ${dominantEmotion}`,
+          ];
+
+          if (avoidanceCount > 0) {
+            tgLines.push(`⚠️ ${avoidanceCount} evitaciones`);
+            if (topAvoided?.action?.description) {
+              tgLines.push(`📌 Lo que mas evitas: _${topAvoided.action.description}_`);
+            }
+          }
+
+          tgLines.push(``);
+
+          // Personalized closing insight
+          if (streakDays >= 7 && avoidanceCount === 0) {
+            tgLines.push(`Semana impecable. Ni un paso atras.`);
+          } else if (avoidanceCount > 3) {
+            tgLines.push(`Esta semana evitaste varias cosas. ¿Y si empiezas por la mas pequena?`);
+          } else if (checkinsCount === 0) {
+            tgLines.push(`No hiciste check-in esta semana. Un minuto al dia marca la diferencia.`);
+          } else {
+            tgLines.push(`Cada latido cuenta. Sigue asi.`);
+          }
+
+          sendTelegramNotification(user.telegramId, tgLines.join("\n"));
+          sentTelegram++;
+        }
       } catch (err) {
         logError("CRON", err, { userId: user.id, action: "user_weekly_review" });
         errors++;
       }
     }
 
-    logInfo("CRON", "user_weekly_review_done", { candidates: users.length, sent, errors });
-    return NextResponse.json({ ok: true, candidates: users.length, sent, errors });
+    logInfo("CRON", "user_weekly_review_done", { candidates: users.length, sent, sentTelegram, errors });
+    return NextResponse.json({ ok: true, candidates: users.length, sent, sentTelegram, errors });
   } catch (error) {
     logError("CRON", error, { action: "user_weekly_review_failed" });
     return NextResponse.json({ error: "Internal error" }, { status: 500 });

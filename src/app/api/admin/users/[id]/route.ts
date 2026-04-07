@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { clearAdminSessionCookie, resolveAdminAuth } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
-import { logError } from "@/lib/logger";
+import { logError, logInfo } from "@/lib/logger";
+import { withRateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,8 @@ function shortText(value: string, maxLength = 180): string {
   }
   return `${normalized.slice(0, maxLength - 3)}...`;
 }
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -339,3 +342,192 @@ export async function GET(req: NextRequest, { params }: Params) {
     );
   }
 }
+
+/* ------------------------------------------------------------------ */
+/*  PATCH /api/admin/users/[id] — Edit user                           */
+/* ------------------------------------------------------------------ */
+
+export const PATCH = withRateLimit(
+  async function PATCH(req: NextRequest, ctx: unknown) {
+    try {
+      const adminAuth = resolveAdminAuth(req);
+      if (!adminAuth.authenticated) {
+        const unauthorized = NextResponse.json(
+          { error: "UNAUTHORIZED_ADMIN", message: "Admin authentication required." },
+          { status: 401 },
+        );
+        if (adminAuth.source === "invalid") clearAdminSessionCookie(unauthorized);
+        return unauthorized;
+      }
+
+      const { id } = await (ctx as Params).params;
+      if (!id) {
+        return NextResponse.json(
+          { error: "INVALID_USER_ID", message: "User id is required." },
+          { status: 400 },
+        );
+      }
+
+      const body = (await req.json()) as {
+        name?: string;
+        email?: string;
+        role?: string;
+        isActive?: boolean;
+      };
+
+      const { name, email, role, isActive } = body;
+
+      // At least one field must be provided
+      if (name === undefined && email === undefined && role === undefined && isActive === undefined) {
+        return NextResponse.json(
+          { error: "NO_FIELDS", message: "At least one field (name, email, role, isActive) is required." },
+          { status: 400 },
+        );
+      }
+
+      // Validate email format if provided
+      if (email !== undefined && !EMAIL_REGEX.test(email)) {
+        return NextResponse.json(
+          { error: "INVALID_EMAIL", message: "Invalid email format." },
+          { status: 400 },
+        );
+      }
+
+      // Validate role if provided
+      if (role !== undefined && !["user", "admin"].includes(role)) {
+        return NextResponse.json(
+          { error: "INVALID_ROLE", message: "Role must be 'user' or 'admin'." },
+          { status: 400 },
+        );
+      }
+
+      const prisma = getPrismaClient();
+
+      // Check email uniqueness if changing email
+      if (email !== undefined) {
+        const existing = await prisma.user.findUnique({ where: { email } });
+        if (existing && existing.id !== id) {
+          return NextResponse.json(
+            { error: "EMAIL_TAKEN", message: "That email is already in use by another user." },
+            { status: 409 },
+          );
+        }
+      }
+
+      // Build update data — only include provided fields
+      const data: Record<string, unknown> = {};
+      const fields: string[] = [];
+      if (name !== undefined) { data.name = name; fields.push("name"); }
+      if (email !== undefined) { data.email = email; fields.push("email"); }
+      if (role !== undefined) { data.role = role; fields.push("role"); }
+      if (isActive !== undefined) { data.isActive = isActive; fields.push("isActive"); }
+
+      const updated = await prisma.user.update({
+        where: { id },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          isActive: true,
+          updatedAt: true,
+        },
+        data,
+      });
+
+      logInfo("ADMIN", "user_updated", { userId: id, fields });
+
+      return NextResponse.json({ user: updated });
+    } catch (error: unknown) {
+      logError("ADMIN", error, { route: "PATCH /api/admin/users/[id]" });
+      return NextResponse.json(
+        { error: "USER_UPDATE_FAILED", message: "No se pudo actualizar el usuario." },
+        { status: 500 },
+      );
+    }
+  },
+  { limit: 30 },
+);
+
+/* ------------------------------------------------------------------ */
+/*  DELETE /api/admin/users/[id] — Soft-delete (or hard with ?hard=true) */
+/* ------------------------------------------------------------------ */
+
+export const DELETE = withRateLimit(
+  async function DELETE(req: NextRequest, ctx: unknown) {
+    try {
+      const adminAuth = resolveAdminAuth(req);
+      if (!adminAuth.authenticated) {
+        const unauthorized = NextResponse.json(
+          { error: "UNAUTHORIZED_ADMIN", message: "Admin authentication required." },
+          { status: 401 },
+        );
+        if (adminAuth.source === "invalid") clearAdminSessionCookie(unauthorized);
+        return unauthorized;
+      }
+
+      const { id } = await (ctx as Params).params;
+      if (!id) {
+        return NextResponse.json(
+          { error: "INVALID_USER_ID", message: "User id is required." },
+          { status: 400 },
+        );
+      }
+
+      const prisma = getPrismaClient();
+      const url = new URL(req.url);
+      const hard = url.searchParams.get("hard") === "true";
+
+      if (hard) {
+        // Hard delete requires confirmation header
+        const confirmHeader = req.headers.get("X-Confirm-Delete");
+        if (confirmHeader !== "true") {
+          return NextResponse.json(
+            {
+              error: "CONFIRMATION_REQUIRED",
+              message: "Hard delete requires the header X-Confirm-Delete: true.",
+            },
+            { status: 400 },
+          );
+        }
+
+        // Verify user exists before deleting
+        const user = await prisma.user.findUnique({ where: { id }, select: { id: true } });
+        if (!user) {
+          return NextResponse.json(
+            { error: "USER_NOT_FOUND", message: "No existe ese usuario." },
+            { status: 404 },
+          );
+        }
+
+        await prisma.user.delete({ where: { id } });
+
+        logInfo("ADMIN", "user_hard_deleted", { userId: id });
+
+        return NextResponse.json({ success: true, action: "hard_deleted", userId: id });
+      }
+
+      // Soft delete — set isActive: false
+      const user = await prisma.user.findUnique({ where: { id }, select: { id: true } });
+      if (!user) {
+        return NextResponse.json(
+          { error: "USER_NOT_FOUND", message: "No existe ese usuario." },
+          { status: 404 },
+        );
+      }
+
+      await prisma.user.update({ where: { id }, data: { isActive: false } });
+
+      logInfo("ADMIN", "user_deactivated", { userId: id });
+
+      return NextResponse.json({ success: true, action: "deactivated", userId: id });
+    } catch (error: unknown) {
+      logError("ADMIN", error, { route: "DELETE /api/admin/users/[id]" });
+      return NextResponse.json(
+        { error: "USER_DELETE_FAILED", message: "No se pudo eliminar/desactivar el usuario." },
+        { status: 500 },
+      );
+    }
+  },
+  { limit: 10 },
+);

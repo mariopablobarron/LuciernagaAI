@@ -9,9 +9,13 @@ import {
   Compass,
   MessageSquareText,
   Plus,
+  Eye,
   Target,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import type { BrowserSessionUser } from "@/lib/session-client";
+
+const AvoidanceMap = dynamic(() => import("@/components/AvoidanceMap"), { ssr: false });
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,7 +26,7 @@ import UpgradeBanner from "@/components/shared/UpgradeBanner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 
-export type WorkspaceTab = "chat" | "plan" | "checkin";
+export type WorkspaceTab = "chat" | "plan" | "checkin" | "espejo";
 
 type WorkspaceGoal = {
   id: string;
@@ -174,7 +178,7 @@ export default function HomeWorkspace({
               </p>
             </div>
 
-            <TabsList className="grid w-full grid-cols-3 lg:w-105">
+            <TabsList className="grid w-full grid-cols-4 lg:w-140">
               <TabsTrigger value="chat" className="gap-2">
                 <MessageSquareText className="size-4" />
                 Chat
@@ -186,6 +190,10 @@ export default function HomeWorkspace({
               <TabsTrigger value="checkin" className="gap-2">
                 <ClipboardCheck className="size-4" />
                 Check-in
+              </TabsTrigger>
+              <TabsTrigger value="espejo" className="gap-2">
+                <Eye className="size-4" />
+                Espejo
               </TabsTrigger>
             </TabsList>
           </div>
@@ -640,6 +648,20 @@ export default function HomeWorkspace({
             </Card>
           </div>
         </div>
+      </TabsContent>
+
+      <TabsContent value="espejo" className="flex-1">
+        <Card className="border-border/80 bg-card/95 shadow-sm">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl">Mapa de evitación</CardTitle>
+            <CardDescription>
+              Esto es lo que llevas posponiendo y por qué. Mirarlo de frente es el primer paso.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <AvoidanceMap />
+          </CardContent>
+        </Card>
       </TabsContent>
     </Tabs>
   );

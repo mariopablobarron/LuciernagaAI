@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, Check, Copy, Gift, LogOut, Pencil, Plus, Search, ShieldCheck, Trash2, X } from "lucide-react";
+import { ArrowRight, Check, Copy, Gift, LogOut, Pencil, Plus, Search, Share2, ShieldCheck, Trash2, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import FamilySettings from "@/components/FamilySettings";
 import SidebarRetoWidget from "@/components/SidebarRetoWidget";
+import { ShareStoryCard } from "@/components/ShareStoryCard";
 
 export type SidebarConversation = {
   id: string;
@@ -97,6 +98,7 @@ export default function Sidebar({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showShareStory, setShowShareStory] = useState(false);
   const editInputRef = useRef<HTMLInputElement>(null);
 
   type InviteItem = { code: string; url: string; used: boolean; usedByEmail: string | null };
@@ -457,6 +459,12 @@ export default function Sidebar({
                     🔥 {progress.streakDays} días racha
                   </Badge>
                 ) : null}
+                <button
+                  onClick={() => setShowShareStory(true)}
+                  className="inline-flex items-center gap-1 rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-[11px] font-semibold text-violet-300 hover:bg-violet-500/20 transition-colors"
+                >
+                  <Share2 className="w-3 h-3" /> Compartir
+                </button>
               </div>
             ) : null}
           </div>
@@ -635,6 +643,22 @@ export default function Sidebar({
           </Button>
         )}
       </div>
+
+      {/* Share Story Modal */}
+      {showShareStory && (
+        <ShareStoryCard
+          data={{
+            name: profile.name,
+            streakDays: progress.streakDays ?? 0,
+            completedActions: progress.completedActions,
+            totalActions: progress.totalActions,
+            goalTitle: activeGoal?.title ?? null,
+            state: progress.emotionalState ?? progress.dominantState ?? "neutral",
+            plan: profile.plan ?? "Free",
+          }}
+          onClose={() => setShowShareStory(false)}
+        />
+      )}
     </aside>
   );
 }

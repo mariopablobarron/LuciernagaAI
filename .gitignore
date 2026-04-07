@@ -47,6 +47,7 @@ next-env.d.ts
 Just_HEAR_ME/
 rasa-demo/
 **/.venv/
+clauditor/
 
 # AI tool configs (local only)
 .claude/

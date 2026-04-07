@@ -7,6 +7,7 @@ jest.mock("@/services/user", () => ({
     lastSeen: new Date("2026-03-30T00:00:00.000Z"),
   }),
   linkIdentityToEmail: jest.fn(),
+  touchLastSeen: jest.fn(),
 }));
 
 import { NextRequest } from "next/server";

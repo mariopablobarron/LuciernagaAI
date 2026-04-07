@@ -7,6 +7,7 @@ jest.mock("@/services/user", () => ({
     lastSeen: new Date("2026-03-30T00:00:00.000Z"),
   }),
   linkIdentityToEmail: jest.fn(),
+  touchLastSeen: jest.fn(),
   getUserSessionProfile: jest.fn().mockResolvedValue({
     id: "usr_mock",
     email: "anon@session.luciernaga.local",

@@ -1,4 +1,5 @@
 import { GET } from "./route";
+import { cache } from "@/lib/cache";
 
 jest.mock("@/db/prisma", () => ({
   getPrismaClient: jest.fn(() => ({
@@ -8,6 +9,10 @@ jest.mock("@/db/prisma", () => ({
 
 describe("GET /api/health", () => {
   const originalOpenRouterKey = process.env.OPENROUTER_API_KEY;
+
+  beforeEach(() => {
+    cache.invalidate("health:check");
+  });
 
   afterEach(() => {
     process.env.OPENROUTER_API_KEY = originalOpenRouterKey;

@@ -142,7 +142,13 @@ const nextConfig: NextConfig = {
 
   // Redirects (example)
   async redirects() {
-    return [];
+    return [
+      {
+        source: "/registro",
+        destination: "/signup",
+        permanent: true,
+      },
+    ];
   },
 
   // Rewrites (example)

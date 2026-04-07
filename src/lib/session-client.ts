@@ -8,6 +8,7 @@ export type BrowserSessionUser = {
   subscriptionStatus: string;
   hasPlan: boolean;
   isAnonymous: boolean;
+  emailVerified: boolean;
   messagesUsedToday: number;
   messagesRemainingToday: number | null;
   messageLimitPerDay: number | null;

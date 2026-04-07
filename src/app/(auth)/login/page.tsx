@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Eye, EyeOff } from 'lucide-react';
+import { Suspense, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { TYPOGRAPHY, COMPONENTS, GRADIENTS } from '@/styles/design-system';
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -13,7 +13,17 @@ const ERROR_MESSAGES: Record<string, string> = {
 };
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const justVerified = searchParams.get('verified') === '1';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -52,6 +62,13 @@ export default function LoginPage() {
           <h1 className={`${TYPOGRAPHY.h1} text-white`}>Tu corazón ya sabía el camino.</h1>
           <p className="text-zinc-400">Vuelve a latir.</p>
         </div>
+
+        {justVerified && (
+          <div className="flex items-center gap-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
+            <CheckCircle2 className="w-5 h-5 shrink-0" />
+            <span>Email verificado correctamente. Ya puedes iniciar sesion.</span>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className={`${COMPONENTS.card} p-8 space-y-6`}>
           {error && (

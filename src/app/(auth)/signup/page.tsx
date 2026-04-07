@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Mail, ArrowRight, MessageCircle } from 'lucide-react';
 import { TYPOGRAPHY, COMPONENTS, GRADIENTS } from '@/styles/design-system';
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -14,11 +14,21 @@ const ERROR_MESSAGES: Record<string, string> = {
 };
 
 export default function SignupPage() {
+  return (
+    <Suspense>
+      <SignupForm />
+    </Suspense>
+  );
+}
+
+function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [telegramLink, setTelegramLink] = useState('');
 
   useEffect(() => {
     const prefill = searchParams.get('email');
@@ -28,6 +38,7 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [signedUp, setSignedUp] = useState(false);
 
   async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
@@ -42,19 +53,65 @@ export default function SignupPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, phone: phone || undefined, password }),
       });
-      const data = (await res.json()) as { success: boolean; error?: string };
+      const data = (await res.json()) as { success: boolean; error?: string; telegramLink?: string };
       if (!res.ok || !data.success) {
         setError(ERROR_MESSAGES[data.error ?? ''] ?? ERROR_MESSAGES.SIGNUP_FAILED);
         return;
       }
-      router.push('/app');
+      if (data.telegramLink) setTelegramLink(data.telegramLink);
+      setSignedUp(true);
     } catch {
       setError(ERROR_MESSAGES.SIGNUP_FAILED);
     } finally {
       setLoading(false);
     }
+  }
+
+  if (signedUp) {
+    return (
+      <div className={`min-h-screen bg-linear-to-br ${GRADIENTS.background} flex items-center justify-center px-4 py-12`}>
+        <div className="w-full max-w-md space-y-8 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-violet-500/10 border border-violet-500/30 flex items-center justify-center mx-auto">
+            <Mail className="w-8 h-8 text-violet-400" />
+          </div>
+          <div className="space-y-2">
+            <h1 className={`${TYPOGRAPHY.h1} text-white`}>Cuenta creada</h1>
+            <p className="text-zinc-400">
+              Hemos enviado un enlace de verificación a <strong className="text-white">{email}</strong>.
+            </p>
+          </div>
+
+          {telegramLink && (
+            <a
+              href={telegramLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block rounded-2xl border border-cyan-500/30 bg-cyan-500/10 p-6 space-y-3 hover:bg-cyan-500/15 transition-colors"
+            >
+              <div className="flex items-center justify-center gap-3">
+                <MessageCircle className="w-6 h-6 text-cyan-400" />
+                <span className="text-lg font-bold text-white">Llévame contigo en Telegram</span>
+              </div>
+              <p className="text-sm text-zinc-400">
+                Haz clic para conectar tu cuenta. Te acompañaré desde ahí — sin abrir la web.
+              </p>
+            </a>
+          )}
+
+          <div className={`${COMPONENTS.card} p-6 space-y-4`}>
+            <p className="text-sm text-zinc-500">No encuentras el email? Revisa la carpeta de spam.</p>
+            <button
+              onClick={() => router.push('/app')}
+              className={`${COMPONENTS.buttonPrimary} w-full py-3 text-base inline-flex items-center justify-center gap-2`}
+            >
+              Continuar a la app <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -89,6 +146,18 @@ export default function SignupPage() {
               id="email" type="email" value={email} required autoComplete="email"
               onChange={(e) => setEmail(e.target.value)}
               placeholder="tu@email.com"
+              className={COMPONENTS.inputField}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="phone" className="block text-sm font-semibold text-white">
+              Teléfono <span className="text-zinc-500 font-normal">(opcional)</span>
+            </label>
+            <input
+              id="phone" type="tel" value={phone} autoComplete="tel"
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+34 612 345 678"
               className={COMPONENTS.inputField}
             />
           </div>

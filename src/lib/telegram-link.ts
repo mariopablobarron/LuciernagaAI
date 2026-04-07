@@ -47,6 +47,48 @@ export function issueTelegramLinkToken(telegramUserId: string): string {
   return `${encoded}.${signature}`;
 }
 
+// ─── Web → Telegram link (user signs up on web, clicks deep link to connect bot) ──
+
+type WebLinkPayload = {
+  typ: "web_link";
+  userId: string;
+  iat: number;
+  exp: number;
+};
+
+export function issueWebLinkToken(userId: string): string {
+  const now = Math.floor(Date.now() / 1000);
+  const payload: WebLinkPayload = {
+    typ: "web_link",
+    userId,
+    iat: now,
+    exp: now + TOKEN_TTL_SECONDS,
+  };
+  const encoded = Buffer.from(JSON.stringify(payload), "utf8").toString("base64url");
+  const signature = sign(encoded);
+  return `${encoded}.${signature}`;
+}
+
+export function verifyWebLinkToken(token: string): WebLinkPayload {
+  const [encoded, signature] = token.split(".");
+  if (!encoded || !signature) throw new Error("INVALID_LINK_TOKEN");
+
+  const expectedSignature = sign(encoded);
+  if (!safeEqual(expectedSignature, signature)) throw new Error("INVALID_LINK_TOKEN");
+
+  const payload = JSON.parse(
+    Buffer.from(encoded, "base64url").toString("utf8")
+  ) as WebLinkPayload;
+  if (payload.typ !== "web_link" || !payload.userId) throw new Error("INVALID_LINK_TOKEN");
+
+  const now = Math.floor(Date.now() / 1000);
+  if (payload.exp <= now) throw new Error("EXPIRED_LINK_TOKEN");
+
+  return payload;
+}
+
+// ─── Telegram → Web link (user types /vincular in bot) ──
+
 export function verifyTelegramLinkToken(token: string): TelegramLinkPayload {
   const [encoded, signature] = token.split(".");
   if (!encoded || !signature) {

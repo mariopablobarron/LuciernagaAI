@@ -6,11 +6,13 @@ import { hashPassword } from "@/lib/password";
 import { logError, logInfo } from "@/lib/logger";
 import { getUserSessionProfile, normalizeEmail } from "@/services/user";
 import { sendUserEmail, buildVerificationEmail, buildWelcomeEmail } from "@/lib/email";
+import { issueWebLinkToken } from "@/lib/telegram-link";
 
 type SignupBody = {
   email?: string;
   password?: string;
   name?: string;
+  phone?: string;
 };
 
 function isValidEmail(e: string) {
@@ -23,6 +25,7 @@ export async function POST(req: NextRequest) {
     const email = normalizeEmail(body.email?.trim() ?? "");
     const password = body.password?.trim() ?? "";
     const name = body.name?.trim() ?? "";
+    const phone = body.phone?.trim() || null;
 
     if (!email || !isValidEmail(email)) {
       return NextResponse.json({ success: false, error: "EMAIL_INVALID" }, { status: 400 });
@@ -54,6 +57,7 @@ export async function POST(req: NextRequest) {
           data: {
             passwordHash: hash,
             name: name || undefined,
+            phone,
             emailVerifyToken: verifyToken,
             emailVerifyExpires: verifyExpires,
           },
@@ -68,6 +72,7 @@ export async function POST(req: NextRequest) {
         data: {
           email,
           name: name || null,
+          phone,
           passwordHash: hash,
           emailVerifyToken: verifyToken,
           emailVerifyExpires: verifyExpires,
@@ -82,7 +87,16 @@ export async function POST(req: NextRequest) {
 
     const user = await getUserSessionProfile(result.userId);
     const token = issueSessionToken(result.userId);
-    const res = NextResponse.json({ success: true, user });
+
+    // Build Telegram deep link for account linking
+    const botUsername = process.env.TELEGRAM_BOT_USERNAME?.trim();
+    let telegramLink: string | undefined;
+    if (botUsername) {
+      const linkToken = issueWebLinkToken(result.userId);
+      telegramLink = `https://t.me/${botUsername}?start=link_${linkToken}`;
+    }
+
+    const res = NextResponse.json({ success: true, user, telegramLink });
     attachSessionCookie(res, token);
 
     if (result.status === "CREATED") {

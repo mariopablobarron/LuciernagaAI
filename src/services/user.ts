@@ -87,6 +87,7 @@ export type UserSessionProfile = {
   subscriptionStatus: string;
   hasPlan: boolean;
   isAnonymous: boolean;
+  emailVerified: boolean;
   messagesUsedToday: number;
   messagesRemainingToday: number | null;
   messageLimitPerDay: number | null;
@@ -639,6 +640,7 @@ export async function getUserSessionProfile(userId: string): Promise<UserSession
           name: created.name,
           role: created.role,
           isAnonymous: isSyntheticEmail(created.email),
+          emailVerified: false,
           ...accessState,
         };
       }
@@ -650,6 +652,7 @@ export async function getUserSessionProfile(userId: string): Promise<UserSession
         name: user.name,
         role: user.role,
         isAnonymous: isSyntheticEmail(user.email),
+        emailVerified: user.emailVerified ?? false,
         ...accessState,
       };
     },

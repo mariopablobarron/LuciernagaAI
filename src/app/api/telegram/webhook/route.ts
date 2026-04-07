@@ -16,8 +16,9 @@ import {
   logTelegramCrisis,
   touchTelegramUser,
 } from "@/services/telegram";
-import { issueTelegramLinkToken } from "@/lib/telegram-link";
+import { issueTelegramLinkToken, verifyWebLinkToken } from "@/lib/telegram-link";
 import { sendAdminUserAlert } from "@/lib/alerts";
+import { sendWelcomeSequence } from "@/services/telegramOnboarding";
 import { DEFAULT_EMOTIONAL_PROFILE } from "@/types/emotional-profile";
 import { getPrismaClient } from "@/db/prisma";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -403,8 +404,37 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // ---- Look up user ----
     let user = await findTelegramUser(chatId);
 
-    // ---- Handle /start ----
-    if (text === "/start") {
+    // ---- Handle /start (with optional deep link param) ----
+    if (text === "/start" || text.startsWith("/start ")) {
+      const startParam = text.split(" ")[1]?.trim();
+
+      // Deep link from web signup: /start link_TOKEN
+      if (startParam?.startsWith("link_")) {
+        const rawToken = startParam.slice(5); // remove "link_" prefix
+        try {
+          const payload = verifyWebLinkToken(rawToken);
+          const prisma = getPrismaClient();
+          // Link Telegram chatId to the web user
+          await prisma.user.update({
+            where: { id: payload.userId },
+            data: { telegramId: String(chatId), consentGiven: true, consentAt: new Date() },
+          });
+          await sendTelegramMessage(chatId, "✅ ¡Cuenta vinculada! Ahora recibirás todo por aquí.");
+          sendWelcomeSequence(payload.userId, String(chatId));
+          logInfo("TELEGRAM", "web_link_success", { chatId, webUserId: payload.userId });
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : "";
+          if (msg.includes("EXPIRED")) {
+            await sendTelegramMessage(chatId, "⏰ Este enlace ha caducado. Genera uno nuevo desde la app.");
+          } else {
+            await sendTelegramMessage(chatId, "❌ Enlace no válido. Inténtalo de nuevo desde la web.");
+          }
+          logError("TELEGRAM", err, { area: "web_link", chatId });
+        }
+        return NextResponse.json({ ok: true });
+      }
+
+      // Normal /start
       if (!user || !user.consentGiven) {
         await sendTelegramMessage(chatId, CONSENT_MESSAGE);
       } else {

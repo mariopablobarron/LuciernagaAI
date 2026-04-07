@@ -75,6 +75,7 @@ model User {
   llmLogs              LlmLog[]
   feedbacks            Feedback[]
   events               Event[]
+  phone                String?
   emailVerified        Boolean          @default(false)
   emailVerifyToken     String?
   emailVerifyExpires   DateTime?

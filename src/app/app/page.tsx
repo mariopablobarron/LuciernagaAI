@@ -36,6 +36,7 @@ import {
 import { DEFAULT_ONBOARDING_EXAMPLE } from "@/lib/onboarding";
 import { DEFAULT_EMOTIONAL_PROFILE, type EmotionalProfile } from "@/types/emotional-profile";
 import GoalContextBar from "@/components/GoalContextBar";
+import { EmailVerificationBanner } from "@/components/EmailVerificationBanner";
 
 type Conversation = {
   id: string;
@@ -1845,6 +1846,13 @@ export default function HomePage() {
         }
         prelude={
           <>
+            {sessionProfile && !sessionProfile.isAnonymous && !sessionProfile.emailVerified && (
+              <EmailVerificationBanner
+                emailVerified={sessionProfile.emailVerified}
+                isAnonymous={sessionProfile.isAnonymous}
+                email={sessionProfile.email}
+              />
+            )}
             {onboardingStep === 0 ? (
               <HomeHero
                 onUseChat={() => setWorkspaceTab("chat")}

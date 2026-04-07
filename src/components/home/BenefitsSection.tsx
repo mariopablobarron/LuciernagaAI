@@ -96,10 +96,10 @@ export default function BenefitsSection() {
             Tienes 18 a 35 años. Sabes que algo tiene que cambiar. Y cada día que pasa es un latido que no vuelve.
           </p>
           <Link
-            href="/unirse"
+            href="/signup"
             className="inline-flex items-center gap-2 px-8 py-3 rounded-lg bg-gradient-to-r from-emotion-clarity to-emotion-doubt text-white font-semibold hover:opacity-90 transition-opacity"
           >
-            Empieza a latir diferente
+            Crear cuenta gratis
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"

@@ -110,7 +110,7 @@ export default function RetoPage() {
 
           <div className="flex flex-col items-center gap-3 pt-2 sm:flex-row sm:justify-center">
             <Link
-              href="/unirse"
+              href="/signup"
               className={`${COMPONENTS.buttonPrimary} flex items-center gap-2 px-8 py-3 text-base`}
             >
               Acepta el reto <ArrowRight className="h-4 w-4" />
@@ -239,7 +239,7 @@ export default function RetoPage() {
             aplazando empieza hoy.
           </p>
           <Link
-            href="/unirse"
+            href="/signup"
             className={`${COMPONENTS.buttonPrimary} inline-flex items-center gap-2 px-8 py-3 text-base`}
           >
             Acepta el reto ahora <ArrowRight className="h-4 w-4" />

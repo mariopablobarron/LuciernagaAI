@@ -73,10 +73,10 @@ export default function Header() {
               Entrar
             </Link>
             <Link
-              href="/unirse"
+              href="/signup"
               className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-linear-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-sm shadow-fuchsia-500/20"
             >
-              Empieza a latir
+              Crear cuenta
             </Link>
           </div>
 
@@ -84,10 +84,10 @@ export default function Header() {
           <div className="md:hidden flex items-center gap-2">
             <ClinicalDisclaimer />
             <Link
-              href="/unirse"
+              href="/signup"
               className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-violet-600 hover:bg-violet-500 transition-all"
             >
-              Empieza a latir
+              Crear cuenta
             </Link>
             <button
               onClick={() => setOpen((v) => !v)}
@@ -130,11 +130,11 @@ export default function Header() {
                 Entrar
               </Link>
               <Link
-                href="/unirse"
+                href="/signup"
                 onClick={() => setOpen(false)}
                 className="py-2.5 rounded-xl text-center text-sm font-semibold text-white bg-linear-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 transition-all"
               >
-                Empieza a latir
+                Crear cuenta
               </Link>
             </div>
           </nav>

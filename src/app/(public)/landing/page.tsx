@@ -28,19 +28,17 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <Link
-              href="/unirse"
+              href="/signup"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-linear-to-r from-violet-500 to-fuchsia-500 text-white font-semibold rounded-xl hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-fuchsia-500/25"
             >
-              Empieza gratis <ArrowRight className="w-4 h-4" />
+              Crear cuenta gratis <ArrowRight className="w-4 h-4" />
             </Link>
-            <button
-              onClick={() => {
-                document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" });
-              }}
+            <Link
+              href="/unirse"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-zinc-700 text-white font-semibold rounded-xl hover:bg-zinc-900/50 hover:border-zinc-600 transition-colors"
             >
-              Ver cómo funciona
-            </button>
+              Probar sin cuenta
+            </Link>
           </div>
         </div>
 
@@ -166,8 +164,8 @@ export default function LandingPage() {
                 description: "Perfecto para empezar",
                 price: "Gratis",
                 features: ["Chat ilimitado", "Detección de estado", "Primer reto gratis", "Acceso exploración"],
-                cta: "Empezar ahora",
-                href: "/unirse",
+                cta: "Crear cuenta gratis",
+                href: "/signup",
                 featured: false,
               },
               {
@@ -232,13 +230,13 @@ export default function LandingPage() {
         <div className="max-w-3xl text-center space-y-6">
           <h2 className="text-5xl md:text-6xl font-bold">¿Listo para tu primer paso?</h2>
           <p className="text-lg text-zinc-400">
-            Empieza en menos de 60 segundos. Sin registro obligatorio.
+            Crea tu cuenta en menos de 60 segundos. Gratis.
           </p>
           <Link
-            href="/unirse"
+            href="/signup"
             className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-linear-to-r from-violet-500 to-fuchsia-500 text-white font-bold rounded-xl hover:from-violet-400 hover:to-fuchsia-400 transition-all hover:shadow-lg hover:shadow-fuchsia-500/40"
           >
-            Abrir Tres Mil Millones de Latidos <ArrowRight className="w-5 h-5" />
+            Crear cuenta gratis <ArrowRight className="w-5 h-5" />
           </Link>
           <p className="text-xs text-zinc-600 pt-4">
             Tres Mil Millones de Latidos no sustituye terapia ni intervención psicológica profesional.

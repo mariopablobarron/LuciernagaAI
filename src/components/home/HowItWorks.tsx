@@ -91,10 +91,10 @@ export default function HowItWorks() {
             Tres mil millones de latidos. ¿Cuántos ya pasaron sin que los sintieras?
           </p>
           <Link
-            href="/unirse"
+            href="/signup"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-emotion-clarity to-emotion-doubt text-white font-semibold hover:opacity-90 transition-opacity"
           >
-            Empieza a latir diferente
+            Crear cuenta gratis
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"

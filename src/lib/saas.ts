@@ -13,7 +13,7 @@ export const SAAS_CONFIG = {
   marketingTitle: "Tres Mil Millones de Latidos — Mentoría con IA para transformar tu vida",
   auth: {
     mode: "session-cookie",
-    selfServeAuthReady: false,
+    selfServeAuthReady: true,
     notes: [
       "Sesion de usuario firmada via cookie HMAC.",
       "Admin separado con cookie y credenciales dedicadas.",

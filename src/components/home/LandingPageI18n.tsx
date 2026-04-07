@@ -129,7 +129,7 @@ export default function LandingPageI18n() {
 
               <div className="flex flex-col sm:flex-row gap-3">
                 <a
-                  href="/unirse"
+                  href="/signup"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-linear-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-fuchsia-500/25"
                 >
                   {t('hero.cta')} <ArrowRight className="w-4 h-4" />
@@ -236,7 +236,7 @@ export default function LandingPageI18n() {
           <p className="text-lg text-zinc-300 leading-relaxed">{t('finalCta.subtitle')}</p>
           <div className="pt-2">
             <a
-              href="/unirse"
+              href="/signup"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-white bg-linear-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-fuchsia-500/25 text-lg"
             >
               {t('finalCta.cta')} <ArrowRight className="w-5 h-5" />

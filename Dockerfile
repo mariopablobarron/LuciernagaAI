@@ -33,13 +33,17 @@ FROM node:20-slim
 
 WORKDIR /app
 
-# Install dumb-init for correct signal handling
+# Install system tools + git (needed for Claude Code)
 RUN apt-get update && apt-get install -y --no-install-recommends \
   dumb-init \
   curl \
   openssl \
   postgresql-client \
+  git \
   && rm -rf /var/lib/apt/lists/*
+
+# Install Claude Code CLI
+RUN npm install -g @anthropic-ai/claude-code || echo '[WARN] Claude Code install skipped'
 
 # Copy package files
 COPY package*.json ./
@@ -59,6 +63,18 @@ COPY scripts/seed-superadmin.mjs ./scripts/seed-superadmin.mjs
 # Copy built app from builder
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
+
+# Copy full source for Claude Code (read/edit files inside container)
+COPY src ./src
+COPY docs ./docs
+COPY .git ./.git
+COPY CLAUDE.md AGENTS.md ./
+COPY tsconfig.json next-env.d.ts postcss.config.mjs eslint.config.mjs ./
+
+# Configure git for Claude Code commits
+RUN git config --global user.name "Claude Code" && \
+    git config --global user.email "claude@tresmilmillonesdelatidos.es" && \
+    git config --global --add safe.directory /app
 
 # Production env
 ENV NODE_ENV=production

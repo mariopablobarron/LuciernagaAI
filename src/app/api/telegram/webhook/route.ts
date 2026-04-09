@@ -236,28 +236,58 @@ async function callAdminAI(question: string): Promise<string> {
   const prisma = getPrismaClient();
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
-  const [totalUsers, activeToday, messagesTotal, activeStreaks, waitlist] = await Promise.all([
+  const [totalUsers, activeToday, active7d, messagesTotal, messages7d, activeStreaks, waitlist, crisisEvents, proUsers, goalsActive] = await Promise.all([
     prisma.user.count(),
     prisma.user.count({ where: { lastSeen: { gte: startOfDay } } }),
-    prisma.message.count({ where: { createdAt: { gte: startOfDay } } }),
+    prisma.user.count({ where: { lastSeen: { gte: sevenDaysAgo } } }),
+    prisma.message.count({ where: { createdAt: { gte: startOfDay }, role: "user" } }),
+    prisma.message.count({ where: { createdAt: { gte: sevenDaysAgo }, role: "user" } }),
     prisma.streak.count({ where: { status: "active" } }),
     prisma.waitlistEntry.count({ where: { status: "approved" } }),
+    prisma.crisisEvent.count({ where: { createdAt: { gte: sevenDaysAgo }, level: { in: ["high", "critical"] } } }),
+    prisma.subscription.count({ where: { plan: "pro", status: "active" } }),
+    prisma.goal.count({ where: { status: "active" } }),
   ]);
 
   const systemPrompt = [
-    "Eres el asistente de administración de Tres Mil Millones de Latidos, una plataforma de coaching emocional e inteligencia artificial.",
+    "Eres el co-piloto técnico y estratégico de Tres Mil Millones de Latidos.",
+    "Eres experto en el código, la arquitectura y la visión del producto.",
     "",
-    "Contexto actual del sistema:",
-    `- Usuarios totales: ${totalUsers}`,
-    `- Activos hoy: ${activeToday}`,
-    `- Mensajes hoy: ${messagesTotal}`,
+    "PRODUCTO: Plataforma de mentoría conversacional con IA para jóvenes 18-35.",
+    "STACK: Next.js 16, Prisma + PostgreSQL, Resend (email), Stripe (pagos), Telegram bot, Coolify (deploy).",
+    "DOMINIO: https://tresmilmillonesdelatidos.es",
+    "",
+    "MÉTRICAS ACTUALES:",
+    `- Usuarios totales: ${totalUsers} (activos hoy: ${activeToday}, 7d: ${active7d})`,
+    `- Mensajes hoy: ${messagesTotal} (7d: ${messages7d})`,
     `- Rachas activas: ${activeStreaks}`,
+    `- Objetivos activos: ${goalsActive}`,
+    `- Usuarios Pro: ${proUsers}`,
+    `- Crisis 7d: ${crisisEvents}`,
     `- Waitlist aprobados: ${waitlist}`,
     "",
-    "Puedes responder preguntas sobre métricas, estrategia, código, features, bugs, o cualquier cosa relacionada con el producto.",
-    "Sé directo, conciso y práctico. Responde en español. Usa emojis con moderación.",
-    "Máximo 400 palabras.",
+    "ARQUITECTURA CLAVE:",
+    "- Chat: processMessage.ts → analyze → enrich → buildCoachPrompt → generateAIResponse → persist",
+    "- Mentor: 4 modos (containment/supportive/directive/confrontation) en mentor-protocol.ts",
+    "- Identity: luciernaga-identity.ts — principios: interpelar > instruir, porqué siempre, gafas nuevas, local → global",
+    "- Flows: decision flow (5 pasos con fase gafas nuevas) + avoidance flow en flows.ts",
+    "- Admin: RBAC con 7 roles (superadmin/admin/clinical/marketing/support/content/ops)",
+    "- Crons: 8 endpoints + backup, todos con alertas automáticas si fallan",
+    "- Email: 11 plantillas Resend, unsubscribe RFC 8058",
+    "- Billing: Stripe checkout + webhooks + portal, Free (10 conv/mes) / Pro (9€/mes ilimitado)",
+    "",
+    "FILOSOFÍA DEL MENTOR (marco pedagógico):",
+    "- Interpelar antes de instruir: preguntar para que descubra, no decir qué hacer",
+    "- Siempre explicar el porqué: sin porqué, la acción es obediencia",
+    "- Gafas nuevas: ayudar a ver lo que han normalizado",
+    "- De lo local a lo global: empezar por lo concreto, descubrir el patrón",
+    "- El cambio viene de dentro: no se impone, se interpela",
+    "",
+    "Responde en español, directo y práctico. Si te preguntan sobre código, da paths de archivos concretos.",
+    "Si te piden cambios, describe qué archivos tocar y cómo — luego el admin lo ejecuta en Claude Code.",
+    "Máximo 500 palabras.",
   ].join("\n");
 
   try {
@@ -269,15 +299,15 @@ async function callAdminAI(question: string): Promise<string> {
         "HTTP-Referer": process.env.APP_BASE_URL ?? "https://tresmilmillonesdelatidos.es",
       },
       body: JSON.stringify({
-        model: "anthropic/claude-sonnet-4-5",
+        model: "anthropic/claude-sonnet-4-6",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: question },
         ],
-        max_tokens: 600,
-        temperature: 0.4,
+        max_tokens: 800,
+        temperature: 0.3,
       }),
-      signal: AbortSignal.timeout(25_000),
+      signal: AbortSignal.timeout(30_000),
     });
 
     if (!res.ok) {
@@ -505,7 +535,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             "/estado — distribución emocional",
             "/tareas — tareas pendientes antiguas",
             "",
-            "💬 Cualquier mensaje libre → respuesta IA directa en segundos.",
+            "💬 *Mensaje libre* → co-piloto IA con contexto completo del producto, métricas, código y arquitectura.",
+            "",
+            "Ejemplos:",
+            "• ¿Cuántos usuarios activos hay esta semana?",
+            "• ¿Cómo funciona el flujo de decisión del mentor?",
+            "• Quiero añadir notificaciones push, ¿qué archivos toco?",
+            "• ¿Qué métricas debería mejorar ahora?",
           ].join("\n");
         } else {
           reply = "Comando no reconocido.";

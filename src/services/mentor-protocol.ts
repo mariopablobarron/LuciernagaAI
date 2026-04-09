@@ -46,7 +46,7 @@ export function getMentorMode(context: MentorProtocolContext): MentorMode {
   }
 
   if (
-    context.avoidanceCount >= 2 ||
+    (context.avoidanceStreak ?? 0) >= 2 || context.avoidanceCount >= 4 ||
     context.repeatedPattern ||
     (context.pendingActionsCount > 0 && context.avoidanceDetected)
   ) {
@@ -95,7 +95,7 @@ export function getMentorMode(context: MentorProtocolContext): MentorMode {
     mode: "supportive",
     validate: true,
     confront: false,
-    pushAction: context.conversationMessageCount > 1,
+    pushAction: context.conversationMessageCount > 3,
     stopConversation: false,
     reason: "Todavia estamos construyendo claridad util antes de exigir ejecucion dura.",
   };

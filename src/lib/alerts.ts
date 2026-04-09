@@ -246,7 +246,13 @@ export async function sendAdminUserAlert(params: {
 }): Promise<void> {
   const adminChatId = process.env.ADMIN_TELEGRAM_ID;
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
-  if (!adminChatId || !botToken) return;
+  if (!adminChatId || !botToken) {
+    logError("ALERTS", new Error("ADMIN_TELEGRAM_ID or TELEGRAM_BOT_TOKEN not configured for admin alerts"), {
+      area: "sendAdminUserAlert",
+      userId: params.userId,
+    });
+    return;
+  }
 
   const isCritical = params.state === "riesgo" || params.state === "ansiedad";
   const emoji = isCritical ? "🚨" : "⚠️";

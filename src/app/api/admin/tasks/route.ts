@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { resolveAdminAuth } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
 
@@ -8,10 +8,8 @@ export const dynamic = "force-dynamic";
 // GET /api/admin/tasks?status=pending
 export async function GET(req: NextRequest) {
   try {
-    const auth = await resolveAdminAuth(req);
-    if (!auth.authenticated) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const auth = requireAdminPermission(req, "tasks");
+    if (auth instanceof NextResponse) return auth;
 
     const status = req.nextUrl.searchParams.get("status") ?? "pending";
     const prisma = getPrismaClient();
@@ -31,10 +29,8 @@ export async function GET(req: NextRequest) {
 // PATCH /api/admin/tasks — bulk update: { ids: string[], status: "done"|"skipped", result?: string }
 export async function PATCH(req: NextRequest) {
   try {
-    const auth = await resolveAdminAuth(req);
-    if (!auth.authenticated) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const auth = requireAdminPermission(req, "tasks");
+    if (auth instanceof NextResponse) return auth;
 
     const body = (await req.json()) as {
       ids: string[];

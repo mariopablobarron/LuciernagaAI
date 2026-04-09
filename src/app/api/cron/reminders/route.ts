@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runReminderJob } from "@/services/reminders";
 import { logError, logInfo } from "@/lib/logger";
+import { sendAutomatedAlert } from "@/lib/alerts";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, stats });
   } catch (error: unknown) {
     logError("CRON", error, { route: "/api/cron/reminders" });
+    sendAutomatedAlert({ type: "critical", title: "Cron falló: reminders", message: error instanceof Error ? error.message : "Error desconocido" }).catch(() => {});
     return NextResponse.json({ error: "JOB_FAILED" }, { status: 500 });
   }
 }

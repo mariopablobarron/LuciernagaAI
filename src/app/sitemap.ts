@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = process.env.APP_BASE_URL?.trim() || "https://luciernaga.ai";
+const BASE_URL = process.env.APP_BASE_URL?.trim() || "https://tresmilmillonesdelatidos.es";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -35,6 +35,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.7,
+    },
+    {
+      url: `${BASE_URL}/guia`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${BASE_URL}/landing`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
     },
     {
       url: `${BASE_URL}/contact`,

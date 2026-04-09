@@ -62,8 +62,8 @@ export default function TermsPage() {
             <h2 className={`${TYPOGRAPHY.h2} text-white`}>6. Contacto</h2>
             <p className="text-zinc-300 leading-relaxed">
               Para consultas sobre estos términos escríbenos a{' '}
-              <a href="mailto:hola@luciernaga.ai" className="text-cyan-400 hover:underline">
-                hola@luciernaga.ai
+              <a href="mailto:hola@tresmilmillonesdelatidos.es" className="text-cyan-400 hover:underline">
+                hola@tresmilmillonesdelatidos.es
               </a>
               .
             </p>

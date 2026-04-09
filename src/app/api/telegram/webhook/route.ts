@@ -72,7 +72,7 @@ Este asistente utiliza inteligencia artificial para acompañarte en decisiones p
 🔹 Puedes dejar de usarlo en cualquier momento
 🔹 No sustituye ayuda profesional
 
-Consulta la política: ${process.env.APP_BASE_URL ?? "https://luciernaga.ai"}/privacidad
+Consulta la política: ${process.env.APP_BASE_URL ?? "https://tresmilmillonesdelatidos.es"}/privacidad
 
 Escribe ACEPTO para continuar.`;
 
@@ -85,7 +85,7 @@ Tus mensajes se almacenan de forma segura para mantener la continuidad de la con
 🔹 Para borrar tus datos escribe: /borrar_datos
 🔹 Para desactivar recordatorios escribe: /salir
 
-Más información: ${process.env.APP_BASE_URL ?? "https://luciernaga.ai"}/privacidad`;
+Más información: ${process.env.APP_BASE_URL ?? "https://tresmilmillonesdelatidos.es"}/privacidad`;
 
 const WELCOME_MESSAGE = "Gracias. Ya puedes comenzar. ¿Qué te preocupa ahora mismo?";
 
@@ -266,7 +266,7 @@ async function callAdminAI(question: string): Promise<string> {
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": process.env.APP_BASE_URL ?? "https://luciernaga.ai",
+        "HTTP-Referer": process.env.APP_BASE_URL ?? "https://tresmilmillonesdelatidos.es",
       },
       body: JSON.stringify({
         model: "anthropic/claude-sonnet-4-5",

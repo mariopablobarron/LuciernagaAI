@@ -37,6 +37,7 @@ model User {
   lastSeen        DateTime         @default(now())
   passwordHash    String?
   telegramId       String?          @unique
+  googleId         String?          @unique
   stripeCustomerId String?          @unique
   consentGiven     Boolean          @default(false)
   consentAt       DateTime?
@@ -485,6 +486,34 @@ model UserPreferences {
   user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+// ─── System Admin Users (RBAC) ────────────────────────────────────────────────
+
+enum SystemRole {
+  superadmin
+  admin
+  clinical
+  marketing
+  support
+  content
+  ops
+}
+
+/// Internal team member with role-based access to the admin panel.
+model AdminUser {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  name         String
+  role         SystemRole @default(admin)
+  passwordHash String
+  isActive     Boolean    @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([role, isActive])
+  @@index([email])
+}
+
 // ─── Admin task queue (Telegram → Claude Code) ────────────────────────────────
 
 /// Instructions sent by the admin via Telegram, queued for local execution.
@@ -824,6 +853,7 @@ model Organization {
   updatedAt   DateTime @updatedAt
   users       User[]
   orgAdmins   OrgAdmin[]
+  orgInvites  OrgInvite[]
 
   @@index([slug])
   @@index([type, isActive])
@@ -845,6 +875,24 @@ model OrgAdmin {
 
   @@unique([organizationId, email])
   @@index([email])
+}
+
+/// Invitation link for users to join a specific organization.
+model OrgInvite {
+  id             String       @id @default(cuid())
+  organizationId String
+  code           String       @unique @default(cuid())
+  email          String?      // if set, only this email can use the invite
+  role           String?      // optional: pre-assign a label like "empleado" | "paciente"
+  maxUses        Int          @default(1)
+  usedCount      Int          @default(0)
+  expiresAt      DateTime?
+  createdBy      String       // admin who created it
+  createdAt      DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, createdAt])
+  @@index([code])
 }
 
 // ─── Marketing Dashboard ──────────────────────────────────────────────────────

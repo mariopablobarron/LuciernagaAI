@@ -1,5 +1,6 @@
 import Header from "@/components/home/Header";
 import Footer from "@/components/home/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 
 export default function PublicLayout({
   children,
@@ -11,6 +12,7 @@ export default function PublicLayout({
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />
+      <ScrollToTop />
     </div>
   );
 }

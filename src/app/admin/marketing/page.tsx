@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { AdminMetricCard } from "@/features/admin/components/AdminMetricCard";
 import { AdminPanel } from "@/features/admin/components/AdminPanel";
 import { AdminShell } from "@/features/admin/components/AdminShell";
@@ -201,7 +202,7 @@ export default function MarketingPage() {
         if (m) setMetrics(m);
         if (h) setHistory(h);
       })
-      .catch(() => {})
+      .catch(() => { toast.error("Error al cargar métricas de marketing"); })
       .finally(() => setMetricsLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);

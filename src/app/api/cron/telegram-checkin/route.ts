@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { sendTelegramMessageAsync } from "@/services/telegram";
 import { logError, logInfo } from "@/lib/logger";
+import { sendAutomatedAlert } from "@/lib/alerts";
 import { getNotificationConfig } from "@/lib/notification-config";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +16,7 @@ export const dynamic = "force-dynamic";
  */
 export async function GET(req: NextRequest) {
   const secret = req.nextUrl.searchParams.get("secret");
-  if (secret !== process.env.CRON_SECRET) {
+  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -133,6 +134,7 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     logError("CRON", error, { action: `telegram_checkin_${period}` });
+    sendAutomatedAlert({ type: "critical", title: `Cron falló: telegram-checkin (${period})`, message: error instanceof Error ? error.message : "Error desconocido" }).catch(() => {});
     return NextResponse.json({ error: "CRON_FAILED" }, { status: 500 });
   }
 }

@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
-import { resolveAdminAuth } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { logError } from "@/lib/logger";
 
 // PHQ-9 and GAD-7 question templates
@@ -56,8 +56,8 @@ export async function GET(
   { params }: { params: Promise<{ userId: string }> },
 ) {
   try {
-    const auth = resolveAdminAuth(req);
-    if (!auth.authenticated) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const auth = requireAdminPermission(req, "assessments");
+    if (auth instanceof NextResponse) return auth;
 
     const { userId } = await params;
     const prisma = getPrismaClient();
@@ -81,8 +81,8 @@ export async function POST(
   { params }: { params: Promise<{ userId: string }> },
 ) {
   try {
-    const auth = resolveAdminAuth(req);
-    if (!auth.authenticated) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const auth = requireAdminPermission(req, "assessments");
+    if (auth instanceof NextResponse) return auth;
 
     const { userId } = await params;
     const body = (await req.json().catch(() => null)) as { type?: string } | null;

@@ -26,8 +26,6 @@ const CRITICAL_VARS = [
   "DATABASE_URL",
   "AUTH_TOKEN_SECRET",
   "OPENROUTER_API_KEY",
-  "ADMIN_USERNAME",
-  "ADMIN_PASSWORD",
 ] as const;
 
 async function checkDatabase(): Promise<CheckStatus> {

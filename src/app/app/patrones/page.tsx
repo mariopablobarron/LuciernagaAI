@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import Link from "next/link";
 import {
   AlertTriangle, ArrowLeft, TrendingDown, TrendingUp, Minus,
@@ -99,7 +100,7 @@ export default function PatronesPage() {
     fetch("/api/user/avoidance-patterns", { credentials: "include" })
       .then((r) => r.json())
       .then((d: ApiData) => setData(d))
-      .catch(() => {})
+      .catch(() => { toast.error("No se pudieron cargar los patrones"); })
       .finally(() => setLoading(false));
   }, []);
 

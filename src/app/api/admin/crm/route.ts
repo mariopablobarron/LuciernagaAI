@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { resolveAdminAuth } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
 
@@ -12,10 +12,8 @@ export const dynamic = "force-dynamic";
  * and segmentation for marketing purposes.
  */
 export async function GET(req: NextRequest) {
-  const auth = resolveAdminAuth(req);
-  if (!auth.authenticated) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const auth = requireAdminPermission(req, "crm");
+  if (auth instanceof NextResponse) return auth;
 
   const prisma = getPrismaClient();
   const page = Math.max(1, Number(req.nextUrl.searchParams.get("page") ?? 1));

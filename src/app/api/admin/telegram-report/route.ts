@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { resolveAdminAuth } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { notifyAdmin } from "@/services/telegram";
 import { logError, logInfo } from "@/lib/logger";
@@ -55,10 +55,8 @@ function buildDailyReport(data: {
 }
 
 export async function GET(req: NextRequest) {
-  const auth = resolveAdminAuth(req);
-  if (!auth.authenticated) {
-    return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
-  }
+  const auth = requireAdminPermission(req, "analytics");
+  if (auth instanceof NextResponse) return auth;
 
   try {
     const prisma = getPrismaClient();

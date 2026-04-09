@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { clearAdminSessionCookie, resolveAdminAuth } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 
 export const dynamic = "force-dynamic";
@@ -7,15 +7,8 @@ export const dynamic = "force-dynamic";
 type Params = { params: Promise<{ id: string }> };
 
 export async function GET(req: NextRequest, { params }: Params) {
-  const adminAuth = resolveAdminAuth(req);
-  if (!adminAuth.authenticated) {
-    const res = NextResponse.json(
-      { error: "UNAUTHORIZED_ADMIN" },
-      { status: 401 }
-    );
-    if (adminAuth.source === "invalid") clearAdminSessionCookie(res);
-    return res;
-  }
+  const adminAuth = requireAdminPermission(req, "conversations:read");
+  if (adminAuth instanceof NextResponse) return adminAuth;
 
   const { id } = await params;
   if (!id) {

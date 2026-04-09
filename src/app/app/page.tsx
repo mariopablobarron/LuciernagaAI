@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MessageCircle, Plus, Sparkles } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
+import { trackMetaEvent } from "@/lib/meta-pixel";
 import AppLayout from "@/components/layout/AppLayout";
 import { FloatingButton } from "@/components/effects/FloatingButton";
 import Chat, { type ChatMessage } from "@/components/Chat";
@@ -28,6 +30,10 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { PRODUCT_DISCLAIMERS } from "@/lib/legal";
+import { useSfx } from "@/lib/useSfx";
+import { confettiBurst, confettiHeartbeat } from "@/lib/confetti";
+import { toast } from "sonner";
+import SfxToggle from "@/components/SfxToggle";
 import {
   bootstrapBrowserSession,
   captureBrowserEmail,
@@ -312,6 +318,7 @@ function mergeConversations(
 }
 
 export default function HomePage() {
+  const sfx = useSfx();
   const starterPrefilledConversationsRef = useRef<Set<string>>(new Set());
   const pendingWaitlistMessageRef = useRef<string | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -963,6 +970,7 @@ export default function HomePage() {
     setWorkspaceTab("chat");
     setInput("");
     setError(null);
+    sfx.play("open");
   };
 
   const handleUseStarterExample = (value: string) => {
@@ -1138,6 +1146,10 @@ export default function HomePage() {
         throw new Error(payload.error || "No se pudo actualizar la acción.");
       }
 
+      sfx.play("success");
+      confettiBurst();
+      trackEvent("action_completed", { actionId });
+      toast.success("Acción completada");
       const nextGoal = payload.goal || null;
       setActiveGoal(nextGoal);
       setActionLock((previous) => {
@@ -1162,6 +1174,7 @@ export default function HomePage() {
       const message =
         toggleError instanceof Error ? toggleError.message : "No se pudo actualizar la acción.";
       setError(message);
+      toast.error(message);
     } finally {
       setGoalLoading(false);
     }
@@ -1243,6 +1256,11 @@ export default function HomePage() {
         setActiveConversationId(seededConversation.id);
       }
 
+      sfx.play("heartbeat");
+      confettiHeartbeat();
+      trackEvent("checkin_submitted");
+      trackMetaEvent("Lead", { content_name: "checkin" });
+      toast.success("Check-in guardado", { description: "Tu estado se ha actualizado" });
       setCheckinStatus({
         message: "Check-in guardado y estado actualizado.",
         checkinsToday: payload.checkinsToday ?? 1,
@@ -1254,6 +1272,7 @@ export default function HomePage() {
       const message =
         submitError instanceof Error ? submitError.message : "No se pudo guardar el check-in.";
       setError(message);
+      toast.error(message);
     } finally {
       setCheckinLoading(false);
     }
@@ -1733,6 +1752,7 @@ export default function HomePage() {
       });
       setEmotionalProfile(nextEmotionalProfile);
       setActionLock(nextActionLock);
+      sfx.play("message");
 
       if (resolvedConversationId !== currentConversationId) {
         setActiveConversationId(resolvedConversationId);
@@ -1765,10 +1785,6 @@ export default function HomePage() {
         }
         await refreshSessionProfile().catch(() => null);
       } catch {
-        console.error("[CHAT_UI] refresh_failed_after_send", {
-          conversationId: resolvedConversationId,
-          persistenceAvailable,
-        });
         // La UI ya tiene estado local optimista; ignoramos refresco fallido.
       }
     } catch (requestError: unknown) {
@@ -1875,6 +1891,7 @@ export default function HomePage() {
               Estado:{" "}
               <span className="ml-1 font-semibold capitalize">{safeConversation.state}</span>
             </Badge>
+            <SfxToggle enabled={sfx.enabled} onToggle={sfx.toggle} />
           </>
         }
         prelude={
@@ -1979,9 +1996,9 @@ export default function HomePage() {
             activeTab={workspaceTab}
             onTabChange={setWorkspaceTab}
             chat={
-              <>
-                <AssessmentFlow userId={sessionProfile?.id} />
+              <div className="flex min-h-96 max-h-[calc(100vh-14rem)] flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
                 <div className="shrink-0">
+                  <AssessmentFlow userId={sessionProfile?.id} />
                   <QuickCheckin userId={sessionProfile?.id} />
                   <RetoDiario
                     userId={sessionProfile?.id}
@@ -1989,16 +2006,16 @@ export default function HomePage() {
                       void handleSend(`Hoy no pude hacer el reto: ${retoTitle}. ¿Qué hago?`)
                     }
                   />
+                  <GoalContextBar
+                    goal={activeGoal}
+                    actionLock={
+                      effectiveActionLock
+                        ? { message: effectiveActionLock.message, actionTitle: effectiveActionLock.action.title }
+                        : null
+                    }
+                    onToggleAction={handleToggleAction}
+                  />
                 </div>
-                <GoalContextBar
-                  goal={activeGoal}
-                  actionLock={
-                    effectiveActionLock
-                      ? { message: effectiveActionLock.message, actionTitle: effectiveActionLock.action.title }
-                      : null
-                  }
-                  onToggleAction={handleToggleAction}
-                />
                 <Chat
                   title={safeConversation.title}
                   messages={safeConversation.messages}
@@ -2029,7 +2046,7 @@ export default function HomePage() {
                   onToggleJournal={safeConversation.isDraft ? undefined : handleToggleJournal}
                   proactivePrompt={safeConversation.messages.length === 0 ? proactivePrompt : null}
                 />
-              </>
+              </div>
             }
             onNewConversation={handleNewConversation}
             conversationTitle={safeConversation.title}
@@ -2103,13 +2120,15 @@ export default function HomePage() {
         }
       />
 
-      <FloatingButton
-        icon={<MessageCircle className="w-6 h-6" />}
-        label="Nueva conversación"
-        position="bottom-right"
-        onClick={handleNewConversation}
-        color="cyan"
-      />
+      {workspaceTab !== "chat" && (
+        <FloatingButton
+          icon={<MessageCircle className="w-6 h-6" />}
+          label="Nueva conversación"
+          position="bottom-right"
+          onClick={handleNewConversation}
+          color="cyan"
+        />
+      )}
 
       <Dialog open={upgradeDialogOpen} onOpenChange={setUpgradeDialogOpen}>
         <DialogContent>

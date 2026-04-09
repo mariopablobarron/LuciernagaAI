@@ -2,100 +2,40 @@ import type { UserState } from "@/domain/types";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { DEFAULT_EMOTIONAL_PROFILE } from "@/types/emotional-profile";
+import type { PrimaryEmotion } from "@/types/emotional-profile";
+import { analyzeEmotionalProfile } from "@/services/emotional-model";
+import { normalizeText, countMatches } from "@/services/text-analysis";
 import type { TransformationPhase } from "@/services/transformation";
 
 const DEFAULT_CRISIS_ACTIVE_HOURS = 6;
 
-const STATE_KEYWORDS: Record<UserState, string[]> = {
-  neutral: ["bien", "normal", "ok", "estable", "sereno", "tranquilo"],
-  duda: [
-    "no se",
-    "no sé",
-    "duda",
-    "dudas",
-    "confund",
-    "desorientado",
-    "sin rumbo",
-    "no tengo claro",
-    "por donde empiezo",
-  ],
-  bloqueo: [
-    "bloqueo",
-    "bloqueado",
-    "paralisis",
-    "parálisis",
-    "estancado",
-    "atrapado",
-    "no puedo avanzar",
-    "no arranco",
-    "evitando",
-  ],
-  ansiedad: [
-    "ansiedad",
-    "ansioso",
-    "panico",
-    "pánico",
-    "miedo",
-    "nervioso",
-    "estres",
-    "estrés",
-    "desbordado",
-    "agobio",
-  ],
-  claridad: [
-    "claro",
-    "claridad",
-    "ya se",
-    "ya sé",
-    "entiendo",
-    "decidido",
-    "decidida",
-    "tengo claro",
-    "plan definido",
-    "avance",
-    "progreso",
-  ],
+/**
+ * Map the richer PrimaryEmotion (from emotional-model) to the simpler
+ * UserState used by the UI. Single source of truth for keyword analysis
+ * lives in emotional-model.ts — this function only translates.
+ */
+const EMOTION_TO_STATE: Record<PrimaryEmotion, UserState> = {
+  ansiedad: "ansiedad",
+  apatía: "bloqueo",
+  confusión: "duda",
+  frustración: "bloqueo",
+  calma: "claridad",
 };
 
-function normalizeText(message: string): string {
-  return message
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function countMatches(message: string, keywords: string[]): number {
-  return keywords.reduce((total, keyword) => {
-    return total + (message.includes(normalizeText(keyword)) ? 1 : 0);
-  }, 0);
-}
+const CLARITY_KEYWORDS = [
+  "claro", "claridad", "ya se", "ya sé", "decidido", "decidida",
+  "tengo claro", "plan definido", "avance", "progreso",
+];
 
 export function detectUserState(message: string): UserState {
-  const normalized = normalizeText(message);
-
-  const scores: Record<UserState, number> = {
-    neutral: countMatches(normalized, STATE_KEYWORDS.neutral),
-    duda: countMatches(normalized, STATE_KEYWORDS.duda),
-    bloqueo: countMatches(normalized, STATE_KEYWORDS.bloqueo),
-    ansiedad: countMatches(normalized, STATE_KEYWORDS.ansiedad),
-    claridad: countMatches(normalized, STATE_KEYWORDS.claridad),
-  };
-
-  const orderedStates: UserState[] = ["bloqueo", "ansiedad", "duda", "claridad", "neutral"];
-  let winner: UserState = "neutral";
-  let maxScore = -1;
-
-  for (const state of orderedStates) {
-    const score = scores[state];
-    if (score > maxScore) {
-      winner = state;
-      maxScore = score;
-    }
+  const profile = analyzeEmotionalProfile(message, []);
+  // "calma" is the emotional-model fallback when no keywords match.
+  // In the simpler UI model that means "neutral", not "claridad".
+  // Reserve "claridad" for messages with explicit clarity signals.
+  if (profile.primaryEmotion === "calma") {
+    return countMatches(normalizeText(message), CLARITY_KEYWORDS) > 0 ? "claridad" : "neutral";
   }
-
-  return maxScore > 0 ? winner : "neutral";
+  return EMOTION_TO_STATE[profile.primaryEmotion] ?? "neutral";
 }
 
 export function shouldBypassActionLock(state: UserState): boolean {
@@ -140,21 +80,14 @@ export function buildConversationContext(userState: {
 }
 
 export function getDominantState(messages: string[]): UserState {
-  if (messages.length === 0) {
-    return "neutral";
-  }
+  if (messages.length === 0) return "neutral";
 
   const counts: Record<UserState, number> = {
-    neutral: 0,
-    duda: 0,
-    bloqueo: 0,
-    ansiedad: 0,
-    claridad: 0,
+    neutral: 0, duda: 0, bloqueo: 0, ansiedad: 0, claridad: 0,
   };
 
   for (const message of messages) {
-    const state = detectUserState(message);
-    counts[state] += 1;
+    counts[detectUserState(message)] += 1;
   }
 
   const ordered: UserState[] = ["bloqueo", "ansiedad", "duda", "claridad", "neutral"];

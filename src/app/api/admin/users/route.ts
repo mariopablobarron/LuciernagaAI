@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { clearAdminSessionCookie, resolveAdminAuth } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
 
@@ -77,19 +77,8 @@ function computeEngagementScore(params: {
 
 export async function GET(req: NextRequest) {
   try {
-    const adminAuth = resolveAdminAuth(req);
-    if (!adminAuth.authenticated) {
-      const unauthorized = NextResponse.json(
-        { error: "UNAUTHORIZED_ADMIN", message: "Admin authentication required." },
-        { status: 401 }
-      );
-
-      if (adminAuth.source === "invalid") {
-        clearAdminSessionCookie(unauthorized);
-      }
-
-      return unauthorized;
-    }
+    const adminAuth = requireAdminPermission(req, "users:read");
+    if (adminAuth instanceof NextResponse) return adminAuth;
 
     const { searchParams } = new URL(req.url);
     const query = searchParams.get("q")?.trim() || "";

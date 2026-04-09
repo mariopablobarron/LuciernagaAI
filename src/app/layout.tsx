@@ -5,6 +5,8 @@ import Analytics from "@/components/Analytics";
 import MetaPixel from "@/components/MetaPixel";
 import UtmCapture from "@/components/UtmCapture";
 import CookieConsent from "@/components/CookieConsent";
+import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
+import { Toaster } from "@/components/ui/sonner";
 import { SAAS_CONFIG } from "@/lib/saas";
 import { validateEnv } from "@/lib/env";
 import "./globals.css";
@@ -50,7 +52,7 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
+    apple: "/icon-192.png",
   },
   appleWebApp: {
     capable: true,
@@ -65,6 +67,60 @@ export const metadata: Metadata = {
   },
 };
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "#organization",
+      name: "Tres Mil Millones de Latidos",
+      url: "https://tresmilmillonesdelatidos.es",
+      description:
+        "Plataforma de mentoría conversacional con inteligencia artificial. Claridad emocional, acción real y seguimiento continuo.",
+      foundingDate: "2025",
+      sameAs: [],
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "#app",
+      name: "Tres Mil Millones de Latidos",
+      url: "https://tresmilmillonesdelatidos.es",
+      applicationCategory: "HealthApplication",
+      operatingSystem: "Web, Telegram",
+      offers: [
+        {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "EUR",
+          name: "Free",
+          description:
+            "10 conversaciones al mes, check-in diario, objetivos y acciones.",
+        },
+        {
+          "@type": "Offer",
+          price: "9",
+          priceCurrency: "EUR",
+          name: "Pro",
+          description:
+            "Conversaciones ilimitadas, Modo Impulso 21 días, retos personalizados y journeys completos.",
+        },
+      ],
+      provider: { "@id": "#organization" },
+      inLanguage: "es",
+      description:
+        "Mentor con IA que detecta tu estado emocional y te guía a la acción concreta. Objetivos, check-ins diarios, retos de 21 días y seguimiento continuo.",
+    },
+    {
+      "@type": "WebSite",
+      "@id": "#website",
+      url: "https://tresmilmillonesdelatidos.es",
+      name: "Tres Mil Millones de Latidos",
+      publisher: { "@id": "#organization" },
+      inLanguage: "es",
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -76,13 +132,21 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">
         <Analytics />
         <MetaPixel />
         <UtmCapture />
+        <ServiceWorkerRegistrar />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
           <CookieConsent />
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

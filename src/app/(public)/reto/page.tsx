@@ -55,7 +55,7 @@ export default function RetoPage() {
     fetch("/api/reto")
       .then((r) => r.json())
       .then((d: RetoStats) => setStats(d))
-      .catch(() => {});
+      .catch(() => { /* Non-critical stats widget */ });
   }, []);
 
   function copyLink() {

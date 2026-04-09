@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import Link from 'next/link';
 import { Calendar, Flame, TrendingUp } from 'lucide-react';
 import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
@@ -48,7 +49,7 @@ export default function CheckinsPage() {
           }
         }
       )
-      .catch(() => {})
+      .catch(() => { if (!cancelled) toast.error('No se pudieron cargar los check-ins'); })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });

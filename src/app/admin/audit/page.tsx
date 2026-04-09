@@ -6,10 +6,10 @@ import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-syst
 
 export default function AdminAuditPage() {
   const auditLogs = [
-    { id: 1, user: 'admin@luciernaga.ai', action: 'Login', timestamp: 'Hace 2 horas', status: 'success' },
+    { id: 1, user: 'admin@tresmilmillonesdelatidos.es', action: 'Login', timestamp: 'Hace 2 horas', status: 'success' },
     { id: 2, user: 'system', action: 'Backup ejecutado', timestamp: 'Hace 4 horas', status: 'success' },
     { id: 3, user: 'user_123', action: 'Cuenta eliminada', timestamp: 'Hace 6 horas', status: 'success' },
-    { id: 4, user: 'admin@luciernaga.ai', action: 'Configuración actualizada', timestamp: 'Ayer', status: 'success' },
+    { id: 4, user: 'admin@tresmilmillonesdelatidos.es', action: 'Configuración actualizada', timestamp: 'Ayer', status: 'success' },
     { id: 5, user: 'user_456', action: 'Intento de acceso rechazado', timestamp: 'Ayer', status: 'warning' },
   ];
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { clearAdminSessionCookie, resolveAdminAuth } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { buildAccompanimentList, sendInterventionMessage } from "@/services/accompaniment";
 import { logError } from "@/lib/logger";
 
@@ -7,15 +7,8 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
-    const adminAuth = resolveAdminAuth(req);
-    if (!adminAuth.authenticated) {
-      const unauthorized = NextResponse.json(
-        { error: "UNAUTHORIZED_ADMIN", message: "Admin authentication required." },
-        { status: 401 }
-      );
-      if (adminAuth.source === "invalid") clearAdminSessionCookie(unauthorized);
-      return unauthorized;
-    }
+    const adminAuth = requireAdminPermission(req, "users:read");
+    if (adminAuth instanceof NextResponse) return adminAuth;
 
     const items = await buildAccompanimentList();
     return NextResponse.json({ items });
@@ -30,15 +23,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const adminAuth = resolveAdminAuth(req);
-    if (!adminAuth.authenticated) {
-      const unauthorized = NextResponse.json(
-        { error: "UNAUTHORIZED_ADMIN", message: "Admin authentication required." },
-        { status: 401 }
-      );
-      if (adminAuth.source === "invalid") clearAdminSessionCookie(unauthorized);
-      return unauthorized;
-    }
+    const adminAuth = requireAdminPermission(req, "interventions");
+    if (adminAuth instanceof NextResponse) return adminAuth;
 
     const body = (await req.json()) as { userId?: string; message?: string };
     const { userId, message } = body;

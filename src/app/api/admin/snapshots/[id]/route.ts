@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { clearAdminSessionCookie, resolveAdminAuth } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
 import { withRateLimit } from "@/lib/rate-limit";
@@ -15,17 +15,8 @@ export const GET = withRateLimit(async function GET(
   ctx?: unknown,
 ) {
   try {
-    const adminAuth = resolveAdminAuth(req);
-    if (!adminAuth.authenticated) {
-      const unauthorized = NextResponse.json(
-        { error: "UNAUTHORIZED_ADMIN", message: "Admin authentication required." },
-        { status: 401 }
-      );
-      if (adminAuth.source === "invalid") {
-        clearAdminSessionCookie(unauthorized);
-      }
-      return unauthorized;
-    }
+    const adminAuth = requireAdminPermission(req, "insights:read");
+    if (adminAuth instanceof NextResponse) return adminAuth;
 
     const { id } = await (ctx as { params: Promise<{ id: string }> }).params;
     const prisma = getPrismaClient();

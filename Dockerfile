@@ -53,6 +53,9 @@ RUN npm ci --omit=dev --prefer-offline --no-audit
 COPY prisma ./prisma
 RUN npx prisma generate
 
+# Copy seed script for initial superadmin creation
+COPY scripts/seed-superadmin.mjs ./scripts/seed-superadmin.mjs
+
 # Copy built app from builder
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
@@ -71,6 +74,6 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
 # Use dumb-init to handle graceful shutdown
 ENTRYPOINT ["/usr/sbin/dumb-init", "--"]
 
-# Apply pending migrations, then start server
+# Apply pending migrations, seed superadmin, then start server
 # Migration failure is non-blocking so the app starts even if DB is temporarily unavailable
-CMD ["sh", "-c", "npx prisma migrate deploy || echo '[WARN] Migration failed, starting anyway...'; exec npm start"]
+CMD ["sh", "-c", "npx prisma migrate deploy || echo '[WARN] Migration failed, starting anyway...'; node scripts/seed-superadmin.mjs || echo '[WARN] Superadmin seed skipped'; exec npm start"]

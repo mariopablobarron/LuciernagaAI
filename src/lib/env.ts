@@ -26,9 +26,13 @@ export type AppConfig = {
 const REQUIRED_VARS: (keyof AppConfig)[] = [
   "DATABASE_URL",
   "AUTH_TOKEN_SECRET",
+  "OPENROUTER_API_KEY",
+];
+
+// Optional — legacy admin env vars (fallback if no AdminUser in DB)
+const OPTIONAL_ADMIN_VARS: (keyof AppConfig)[] = [
   "ADMIN_USERNAME",
   "ADMIN_PASSWORD",
-  "OPENROUTER_API_KEY",
 ];
 
 // Required in production only (warn in dev)
@@ -97,8 +101,8 @@ export function getConfig(): AppConfig {
   return {
     DATABASE_URL: require("DATABASE_URL"),
     AUTH_TOKEN_SECRET: require("AUTH_TOKEN_SECRET"),
-    ADMIN_USERNAME: require("ADMIN_USERNAME"),
-    ADMIN_PASSWORD: require("ADMIN_PASSWORD"),
+    ADMIN_USERNAME: optional("ADMIN_USERNAME"),
+    ADMIN_PASSWORD: optional("ADMIN_PASSWORD"),
     OPENROUTER_API_KEY: require("OPENROUTER_API_KEY"),
     TELEGRAM_BOT_TOKEN: optional("TELEGRAM_BOT_TOKEN"),
     TELEGRAM_BOT_USERNAME: optional("TELEGRAM_BOT_USERNAME"),

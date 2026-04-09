@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import Link from 'next/link';
 import { Search, Plus, MessageSquare, Clock, Trash2 } from 'lucide-react';
 import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
@@ -42,7 +43,7 @@ export default function ConversationsPage() {
       .then((data: { conversations?: Conversation[] } | null) => {
         if (!cancelled && data?.conversations) setConversations(data.conversations);
       })
-      .catch(() => {})
+      .catch(() => { if (!cancelled) toast.error('No se pudieron cargar las conversaciones'); })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });

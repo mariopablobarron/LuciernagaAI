@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { resolveAdminAuth } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
 import type { NextRequest } from "next/server";
@@ -36,10 +36,8 @@ function dayOffset(base: Date, days: number): { from: Date; to: Date } {
 
 export async function GET(req: NextRequest) {
   try {
-    const auth = await resolveAdminAuth(req);
-    if (!auth.authenticated) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const auth = requireAdminPermission(req, "retention");
+    if (auth instanceof NextResponse) return auth;
 
     const prisma = getPrismaClient();
 

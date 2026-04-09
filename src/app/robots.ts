@@ -1,13 +1,13 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = process.env.APP_BASE_URL?.trim() || "https://luciernaga.ai";
+const BASE_URL = process.env.APP_BASE_URL?.trim() || "https://tresmilmillonesdelatidos.es";
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/test", "/unirse", "/precios", "/contact", "/privacy", "/terms"],
+        allow: ["/", "/test", "/unirse", "/precios", "/guia", "/reto", "/landing", "/contact", "/privacy", "/terms"],
         disallow: ["/admin", "/app", "/api", "/dashboard", "/impulso", "/editor", "/family"],
       },
     ],

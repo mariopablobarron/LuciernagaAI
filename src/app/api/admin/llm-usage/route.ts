@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { resolveAdminAuth } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
 
@@ -66,10 +66,8 @@ function buildRecommendations(
 // ── Route handler ─────────────────────────────────────────────────────────────
 
 export async function GET(req: NextRequest) {
-  const auth = resolveAdminAuth(req);
-  if (!auth.authenticated) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const auth = requireAdminPermission(req, "llm-usage");
+  if (auth instanceof NextResponse) return auth;
 
   try {
     const db = getPrismaClient();

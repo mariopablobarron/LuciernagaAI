@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import Link from 'next/link';
 import { Plus, Target, CheckCircle, Clock } from 'lucide-react';
 import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
@@ -34,7 +35,7 @@ export default function GoalsPage() {
       .then((data: { success?: boolean; goal?: ActiveGoal | null } | null) => {
         if (!cancelled) setGoal(data?.goal ?? null);
       })
-      .catch(() => {})
+      .catch(() => { if (!cancelled) toast.error('No se pudo cargar el objetivo'); })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });

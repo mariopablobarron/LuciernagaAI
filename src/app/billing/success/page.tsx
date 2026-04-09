@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
+import { trackEvent } from '@/lib/analytics';
 import { trackMetaEvent } from '@/lib/meta-pixel';
 
 function SuccessContent() {
@@ -18,6 +19,7 @@ function SuccessContent() {
       router.replace('/app');
       return;
     }
+    trackEvent('subscription_started', { plan: 'pro' });
     trackMetaEvent('Subscribe', { content_name: 'pro' });
     // Auto-redirect after 5s
     const timer = setInterval(() => {

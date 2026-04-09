@@ -122,7 +122,7 @@ export async function GET(req: NextRequest) {
     logError("BACKUP", error, { action: "backup_failed" });
     notifyAdmin(`❌ Backup falló: ${error instanceof Error ? error.message : "Unknown error"}`);
     return NextResponse.json(
-      { error: "Backup failed", detail: error instanceof Error ? error.message : "Unknown" },
+      { error: "Backup failed" },
       { status: 500 }
     );
   }

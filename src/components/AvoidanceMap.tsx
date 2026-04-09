@@ -35,7 +35,7 @@ export default function AvoidanceMap() {
     fetch("/api/user/avoidance-map")
       .then((r) => r.json())
       .then((d: AvoidanceData) => setData(d))
-      .catch(() => {})
+      .catch(() => { /* Non-critical widget — silent fail */ })
       .finally(() => setLoading(false));
   }, []);
 

@@ -160,7 +160,7 @@ export default function HomeWorkspace({
     <Tabs
       value={activeTab}
       onValueChange={(value) => onTabChange(value as WorkspaceTab)}
-      className="flex h-full min-h-screen flex-col gap-4"
+      className="flex h-full flex-col gap-4"
     >
       <Card className="border-border/80 bg-card/95 shadow-sm">
         <CardContent className="space-y-4 p-4">
@@ -191,7 +191,7 @@ export default function HomeWorkspace({
                 <ClipboardCheck className="size-4" />
                 Check-in
               </TabsTrigger>
-              <TabsTrigger value="espejo" className="gap-2">
+              <TabsTrigger value="espejo" className="gap-2" title="Mapa de patrones que postergas — mirarlo de frente es el primer paso">
                 <Eye className="size-4" />
                 Espejo
               </TabsTrigger>
@@ -223,7 +223,7 @@ export default function HomeWorkspace({
       </Card>
 
       <TabsContent value="chat" className="flex-1">
-        <div className="flex h-full min-h-136 flex-col gap-4">
+        <div className="flex h-full flex-col gap-4">
           <Card className="border-border/80 bg-card/95 shadow-sm">
             <CardContent className="flex flex-col gap-3 p-4 lg:flex-row lg:items-center lg:justify-between">
               <div className="space-y-3">
@@ -282,7 +282,7 @@ export default function HomeWorkspace({
             </CardContent>
           </Card>
 
-          <div className="min-h-128 flex-1">{chat}</div>
+          <div className="flex flex-1 min-h-0 flex-col">{chat}</div>
         </div>
       </TabsContent>
 

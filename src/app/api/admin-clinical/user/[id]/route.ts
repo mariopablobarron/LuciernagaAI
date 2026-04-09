@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { clearAdminSessionCookie, resolveAdminAuth } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { logError } from "@/lib/logger";
 import { getClinicalUserDetail } from "@/features/admin-clinical/repository";
 
@@ -9,12 +9,8 @@ type Params = { params: Promise<{ id: string }> };
 
 export async function GET(req: NextRequest, { params }: Params) {
   try {
-    const auth = resolveAdminAuth(req);
-    if (!auth.authenticated) {
-      const res = NextResponse.json({ error: "UNAUTHORIZED_ADMIN" }, { status: 401 });
-      if (auth.source === "invalid") clearAdminSessionCookie(res);
-      return res;
-    }
+    const auth = requireAdminPermission(req, "clinical:read");
+    if (auth instanceof NextResponse) return auth;
 
     const { id } = await params;
     const detail = await getClinicalUserDetail(id);

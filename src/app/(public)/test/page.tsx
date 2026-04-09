@@ -281,7 +281,7 @@ export default function TestPage() {
               setPreviousState(ps as EmotionalState);
             }
           })
-          .catch(() => {});
+          .catch(() => { /* Best-effort previous state fetch */ });
       }
     }, 450);
   }
@@ -313,7 +313,7 @@ export default function TestPage() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: email.trim(), state: result }),
-          }).catch(() => {});
+          }).catch(() => { /* Fire-and-forget email delivery */ });
         }
       } catch {
         setEmailStatus("error");

@@ -53,7 +53,7 @@ export default function RetoDiario({ userId, onFailed, onCompleted }: Props) {
           setNoReto(true);
         }
       })
-      .catch(() => {});
+      .catch(() => { /* Non-critical widget */ });
   }, [userId]);
 
   async function generateReto() {

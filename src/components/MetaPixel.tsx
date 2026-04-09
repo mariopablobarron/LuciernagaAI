@@ -14,8 +14,11 @@ export default function MetaPixel() {
   const [consent, setConsent] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const stored = typeof window !== "undefined" ? localStorage.getItem("cookie_consent") : null;
-    setConsent(stored === "true");
+    if (typeof window === "undefined") return;
+    const general = localStorage.getItem("cookie_consent");
+    const meta = localStorage.getItem("meta_consent");
+    // Respect specific meta consent if set, otherwise fall back to general consent
+    setConsent(meta !== null ? meta === "true" : general === "true");
   }, []);
 
   if (!PIXEL_ID || consent !== true) return null;
@@ -35,7 +38,7 @@ export default function MetaPixel() {
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '${PIXEL_ID}');
+            fbq('init', '${PIXEL_ID?.replace(/[^0-9]/g, "")}');
             fbq('track', 'PageView');
           `,
         }}

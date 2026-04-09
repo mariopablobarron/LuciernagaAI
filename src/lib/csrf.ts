@@ -23,9 +23,17 @@ export function validateOrigin(req: NextRequest): boolean {
 
   const incoming = origin || referer;
 
-  // No origin information at all — allow (server-to-server / curl)
+  // No origin information at all (server-to-server, curl, tests).
+  // In production with a configured base URL, require either a CRON_SECRET
+  // or a session cookie to mitigate CSRF from origin-less requests.
+  // In dev/test (no base URL), allow to avoid breaking local tooling.
   if (!incoming) {
-    return true;
+    const baseUrl = process.env.APP_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "";
+    if (!baseUrl) return true; // dev/test — no base URL configured
+    const hasCronSecret = req.nextUrl.searchParams.get("secret") === process.env.CRON_SECRET?.trim();
+    const hasSessionCookie = req.cookies.has("session") || req.cookies.has("auth_token");
+    const isAuthEndpoint = req.nextUrl.pathname.startsWith("/api/auth/");
+    return hasCronSecret || hasSessionCookie || isAuthEndpoint;
   }
 
   const baseUrl =

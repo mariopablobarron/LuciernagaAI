@@ -44,7 +44,7 @@ Reglas:
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": process.env.APP_BASE_URL ?? "https://luciernaga.ai",
+        "HTTP-Referer": process.env.APP_BASE_URL ?? "https://tresmilmillonesdelatidos.es",
       },
       body: JSON.stringify({
         model: "anthropic/claude-sonnet-4-5",

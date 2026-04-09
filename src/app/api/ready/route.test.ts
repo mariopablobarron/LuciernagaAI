@@ -29,6 +29,7 @@ describe("GET /api/ready", () => {
     expect(response.status).toBe(500);
     expect(body.status).toBe("error");
     expect(body.database).toBe("disconnected");
-    expect(body.error).toContain("DB down");
+    // Error details intentionally omitted from response to avoid leaking infrastructure info
+    expect(body.error).toBeUndefined();
   });
 });

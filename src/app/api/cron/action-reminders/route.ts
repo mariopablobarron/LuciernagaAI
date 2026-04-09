@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { sendTelegramNotification } from "@/services/telegram";
 import { logError, logInfo } from "@/lib/logger";
+import { sendAutomatedAlert } from "@/lib/alerts";
 
 // GET /api/cron/action-reminders?secret=CRON_SECRET
 // Run once per hour. Sends at most 1 Telegram reminder per user per day,
@@ -78,6 +79,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: true, processed: due.length, sent, skipped });
   } catch (error) {
     logError("CRON", error, { action: "action_reminders_failed" });
+    sendAutomatedAlert({ type: "critical", title: "Cron falló: action-reminders", message: error instanceof Error ? error.message : "Error desconocido" }).catch(() => {});
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }

@@ -24,27 +24,31 @@ const FLOW_DEFINITIONS: Record<FlowDefinition["name"], FlowDefinition> = {
   decision: {
     name: "decision",
     steps: [
-      { step: 1, instruction: "Aclara el problema central en una frase concreta." },
+      { step: 1, instruction: "Aclara el problema central en una frase concreta. Empieza por lo local: qué pasa hoy, aquí, ahora." },
       {
         step: 2,
-        instruction: "Define opciones reales y limita la conversación a alternativas accionables.",
+        instruction: "Gafas nuevas: antes de buscar opciones, pregunta qué está dando por hecho. ¿Hay algo que da por normal que es parte del problema? ¿Y si no tuviera que ser así?",
       },
       {
         step: 3,
-        instruction: "Fuerza una decisión explícita entre opciones, sin dejar salida ambigua.",
+        instruction: "Define opciones reales y acotadas, pero deja espacio para que la persona proponga la suya. No fuerces binario si necesita explorar. Explica por qué esas opciones y no otras.",
       },
       {
         step: 4,
-        instruction: "Convierte la decisión en una acción específica para hoy con evidencia.",
+        instruction: "Conecta lo local con lo global: ¿este problema se parece a un patrón que se repite? Nombra el patrón si lo ves.",
+      },
+      {
+        step: 5,
+        instruction: "Convierte la decisión en una acción específica para hoy. Explica por qué ese paso concreto genera avance real.",
       },
     ],
   },
   avoidance: {
     name: "avoidance",
     steps: [
-      { step: 1, instruction: "Señala la evitación con claridad, sin rodeos." },
-      { step: 2, instruction: "Confronta la incoherencia entre lo que dice y lo que hace." },
-      { step: 3, instruction: "Exige compromiso explícito hoy con un paso verificable." },
+      { step: 1, instruction: "Señala la evitación con claridad, sin rodeos. Pero antes de confrontar, pregunta: ¿qué hay detrás de esta evitación? ¿Qué protege?" },
+      { step: 2, instruction: "Confronta la incoherencia entre lo que dice y lo que hace. Conecta con el patrón: ¿es la primera vez o ya pasó antes?" },
+      { step: 3, instruction: "Exige compromiso explícito hoy con un paso verificable. Explica por qué este paso rompe el ciclo." },
     ],
   },
 };

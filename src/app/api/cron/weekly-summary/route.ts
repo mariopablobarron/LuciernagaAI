@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { notifyAdmin } from "@/services/telegram";
 import { logError, logInfo } from "@/lib/logger";
+import { sendAutomatedAlert } from "@/lib/alerts";
 
 // GET /api/cron/weekly-summary
 // Triggered by a cron job (e.g. Coolify scheduled task or Vercel cron).
@@ -69,6 +70,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: true, activeUsers, newUsers, totalMessages });
   } catch (error: unknown) {
     logError("CRON", error, { action: "weekly_summary_failed" });
+    sendAutomatedAlert({ type: "critical", title: "Cron falló: weekly-summary", message: error instanceof Error ? error.message : "Error desconocido" }).catch(() => {});
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }

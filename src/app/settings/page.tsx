@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -118,17 +119,17 @@ export default function SettingsPage() {
     fetch('/api/auth/token', { credentials: 'include' })
       .then((r) => r.json())
       .then((d: { user?: BrowserSessionUser }) => { if (d.user) setUser(d.user); })
-      .catch(() => {});
+      .catch(() => { toast.error('No se pudo cargar tu perfil'); });
 
     fetch('/api/user/telegram-status', { credentials: 'include' })
       .then((r) => r.json())
       .then((d: TelegramStatus) => setTelegram(d))
-      .catch(() => {});
+      .catch(() => { /* Telegram status is optional */ });
 
     fetch('/api/user/preferences', { credentials: 'include' })
       .then((r) => r.json())
       .then((d: { preferences: Preferences }) => setPrefs(d.preferences))
-      .catch(() => {});
+      .catch(() => { toast.error('No se pudieron cargar las preferencias'); });
   }, []);
 
   // Save preferences

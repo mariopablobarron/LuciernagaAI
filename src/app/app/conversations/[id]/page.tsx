@@ -1,6 +1,7 @@
 'use client';
 
 import { use, useCallback, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import Link from 'next/link';
 import { ArrowLeft, Send } from 'lucide-react';
 import { COMPONENTS, GRADIENTS, LAYOUTS } from '@/styles/design-system';
@@ -41,7 +42,7 @@ export default function ConversationDetailPage({
       .then((data: { messages?: Message[] } | null) => {
         if (!cancelled && data?.messages) setMessages(data.messages);
       })
-      .catch(() => {})
+      .catch(() => { if (!cancelled) toast.error("No se pudieron cargar los mensajes"); })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });

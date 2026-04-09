@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { clearAdminSessionCookie, resolveAdminAuth } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { logError } from "@/lib/logger";
 import { getClinicalUserList } from "@/features/admin-clinical/repository";
 
@@ -12,12 +12,8 @@ function parsePositiveInt(v: string | null, fallback: number) {
 
 export async function GET(req: NextRequest) {
   try {
-    const auth = resolveAdminAuth(req);
-    if (!auth.authenticated) {
-      const res = NextResponse.json({ error: "UNAUTHORIZED_ADMIN" }, { status: 401 });
-      if (auth.source === "invalid") clearAdminSessionCookie(res);
-      return res;
-    }
+    const auth = requireAdminPermission(req, "clinical:read");
+    if (auth instanceof NextResponse) return auth;
 
     const { searchParams } = new URL(req.url);
     const state = searchParams.get("state")?.trim() || "all";

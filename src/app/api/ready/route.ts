@@ -10,13 +10,9 @@ export async function GET() {
       status: "ok",
       database: "connected",
     });
-  } catch (error: unknown) {
+  } catch {
     return NextResponse.json(
-      {
-        status: "error",
-        database: "disconnected",
-        error: error instanceof Error ? error.message : "Unknown error",
-      },
+      { status: "error", database: "disconnected" },
       { status: 500 }
     );
   }

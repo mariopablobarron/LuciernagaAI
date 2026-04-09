@@ -32,7 +32,7 @@ function ChatMockup() {
             <div className="w-3 h-3 rounded-full bg-zinc-700" />
           </div>
           <div className="flex-1 mx-3 h-5 rounded-full bg-zinc-800/60 flex items-center px-3">
-            <span className="text-[10px] text-zinc-600">luciernaga.ai/app</span>
+            <span className="text-[10px] text-zinc-600">tresmilmillonesdelatidos.es/app</span>
           </div>
         </div>
 

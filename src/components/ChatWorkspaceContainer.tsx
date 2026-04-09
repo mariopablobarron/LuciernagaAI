@@ -80,13 +80,6 @@ export function ChatWorkspaceContainer({
           TOOLS: Dialogs y componentes flotantes
           ═══════════════════════════════════════════ */}
       {tools}
-
-      {/* Leyenda visual para propósito de cada zona */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="text-xs text-zinc-600 p-1 border-t border-zinc-800 bg-black/50 text-center">
-          ← Historial | Centro: Chat Principal | Insights →
-        </div>
-      )}
     </div>
   );
 }

@@ -25,6 +25,7 @@ type SignupBody = {
   name?: string;
   phone?: string;
   utm?: UtmParams;
+  orgInviteCode?: string;
 };
 
 function isValidEmail(e: string) {
@@ -67,6 +68,33 @@ export async function POST(req: NextRequest) {
     // Hash password before the transaction to minimise time spent holding the lock
     const hash = await hashPassword(password);
 
+    // Validate org invite code if present
+    let orgId: string | null = null;
+    const orgInviteCode = body.orgInviteCode?.trim();
+    if (orgInviteCode) {
+      const invite = await prisma.orgInvite.findUnique({
+        where: { code: orgInviteCode },
+        include: { organization: { select: { id: true, isActive: true, maxUsers: true } } },
+      });
+      if (!invite || (invite.expiresAt && invite.expiresAt < new Date())) {
+        return NextResponse.json({ success: false, error: "INVITE_EXPIRED" }, { status: 400 });
+      }
+      if (invite.usedCount >= invite.maxUses) {
+        return NextResponse.json({ success: false, error: "INVITE_USED" }, { status: 400 });
+      }
+      if (!invite.organization.isActive) {
+        return NextResponse.json({ success: false, error: "ORG_INACTIVE" }, { status: 400 });
+      }
+      if (invite.email && invite.email !== email) {
+        return NextResponse.json({ success: false, error: "INVITE_EMAIL_MISMATCH" }, { status: 400 });
+      }
+      const currentUsers = await prisma.user.count({ where: { organizationId: invite.organizationId } });
+      if (currentUsers >= invite.organization.maxUsers) {
+        return NextResponse.json({ success: false, error: "ORG_FULL" }, { status: 400 });
+      }
+      orgId = invite.organizationId;
+    }
+
     // Use a serializable transaction to prevent the race between findUnique and create/update.
     // Two concurrent signups with the same email could both pass the check and then both try to
     // create, violating the unique constraint.
@@ -88,6 +116,7 @@ export async function POST(req: NextRequest) {
             phone,
             emailVerifyToken: verifyToken,
             emailVerifyExpires: verifyExpires,
+            ...(orgId && { organizationId: orgId }),
           },
         });
         return { status: "UPGRADED" as const, userId: existing.id, verifyToken };
@@ -105,10 +134,19 @@ export async function POST(req: NextRequest) {
           emailVerifyToken: verifyToken,
           emailVerifyExpires: verifyExpires,
           source: utmSource,
+          ...(orgId && { organizationId: orgId }),
         },
       });
       return { status: "CREATED" as const, userId: newUser.id, verifyToken };
     });
+
+    // Increment invite usage counter
+    if (orgInviteCode && result.status !== "EMAIL_TAKEN") {
+      await prisma.orgInvite.update({
+        where: { code: orgInviteCode },
+        data: { usedCount: { increment: 1 } },
+      }).catch(() => {}); // non-blocking
+    }
 
     if (result.status === "EMAIL_TAKEN") {
       return NextResponse.json({ success: false, error: "EMAIL_TAKEN" }, { status: 409 });

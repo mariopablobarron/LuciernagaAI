@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { clearAdminSessionCookie, resolveAdminAuth } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { withRateLimit } from "@/lib/rate-limit";
 import { logError } from "@/lib/logger";
@@ -15,15 +15,8 @@ function isValidSegment(segment: string): boolean {
 }
 
 export const POST = withRateLimit(async function POST(req: NextRequest) {
-  const adminAuth = resolveAdminAuth(req);
-  if (!adminAuth.authenticated) {
-    const res = NextResponse.json(
-      { error: "UNAUTHORIZED_ADMIN", message: "Admin authentication required." },
-      { status: 401 },
-    );
-    if (adminAuth.source === "invalid") clearAdminSessionCookie(res);
-    return res;
-  }
+  const adminAuth = requireAdminPermission(req, "marketing:broadcast");
+  if (adminAuth instanceof NextResponse) return adminAuth;
 
   try {
     const body = await req.json() as { message?: string; segment?: string };

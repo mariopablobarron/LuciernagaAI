@@ -412,7 +412,7 @@ export default function Chat({
   const flowActive = responseSignals?.flow?.activeFlow;
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-zinc-950">
+    <div className="flex flex-1 min-h-0 flex-col bg-zinc-950">
       {/* ── Flow indicator ──────────────────────────────────────────────── */}
       {flowActive && (
         <div className="shrink-0 border-b border-zinc-800/60 bg-cyan-950/30 px-4 py-2">

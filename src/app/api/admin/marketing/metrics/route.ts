@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { clearAdminSessionCookie, resolveAdminAuth } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { withRateLimit } from "@/lib/rate-limit";
 import { logError } from "@/lib/logger";
@@ -11,15 +11,8 @@ function dayKey(d: Date): string {
 }
 
 export const GET = withRateLimit(async function GET(req: NextRequest) {
-  const adminAuth = resolveAdminAuth(req);
-  if (!adminAuth.authenticated) {
-    const res = NextResponse.json(
-      { error: "UNAUTHORIZED_ADMIN", message: "Admin authentication required." },
-      { status: 401 },
-    );
-    if (adminAuth.source === "invalid") clearAdminSessionCookie(res);
-    return res;
-  }
+  const adminAuth = requireAdminPermission(req, "marketing:metrics");
+  if (adminAuth instanceof NextResponse) return adminAuth;
 
   try {
     const prisma = getPrismaClient();

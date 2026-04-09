@@ -55,10 +55,21 @@ function getSessionSecret(): string {
     throw new Error("AUTH_TOKEN_SECRET is required in production");
   }
 
-  logInfo("CHAT", "auth_token_secret_fallback_in_use", {
+  const fallback = process.env.SESSION_SECRET?.trim();
+  if (fallback) {
+    logInfo("CHAT", "auth_token_secret_fallback_in_use", {
+      nodeEnv: process.env.NODE_ENV || "development",
+    });
+    return fallback;
+  }
+
+  // In test/dev without any secret configured, use a per-process random value.
+  // This means sessions don't survive restarts, which is fine for dev/test.
+  logInfo("CHAT", "auth_using_ephemeral_secret", {
     nodeEnv: process.env.NODE_ENV || "development",
   });
-  return process.env.SESSION_SECRET?.trim() || "dev-insecure-session-secret";
+  const { randomBytes } = require("crypto") as typeof import("crypto");
+  return randomBytes(32).toString("hex");
 }
 
 function base64UrlEncode(value: string): string {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { clearAdminSessionCookie, resolveAdminAuth } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { withRateLimit } from "@/lib/rate-limit";
@@ -20,19 +20,8 @@ type Params = { params: Promise<{ id: string }> };
 
 export async function GET(req: NextRequest, { params }: Params) {
   try {
-    const adminAuth = resolveAdminAuth(req);
-    if (!adminAuth.authenticated) {
-      const unauthorized = NextResponse.json(
-        { error: "UNAUTHORIZED_ADMIN", message: "Admin authentication required." },
-        { status: 401 }
-      );
-
-      if (adminAuth.source === "invalid") {
-        clearAdminSessionCookie(unauthorized);
-      }
-
-      return unauthorized;
-    }
+    const adminAuth = requireAdminPermission(req, "users:read");
+    if (adminAuth instanceof NextResponse) return adminAuth;
 
     const { id } = await params;
     if (!id) {
@@ -350,15 +339,8 @@ export async function GET(req: NextRequest, { params }: Params) {
 export const PATCH = withRateLimit(
   async function PATCH(req: NextRequest, ctx: unknown) {
     try {
-      const adminAuth = resolveAdminAuth(req);
-      if (!adminAuth.authenticated) {
-        const unauthorized = NextResponse.json(
-          { error: "UNAUTHORIZED_ADMIN", message: "Admin authentication required." },
-          { status: 401 },
-        );
-        if (adminAuth.source === "invalid") clearAdminSessionCookie(unauthorized);
-        return unauthorized;
-      }
+      const adminAuth = requireAdminPermission(req, "users:update");
+      if (adminAuth instanceof NextResponse) return adminAuth;
 
       const { id } = await (ctx as Params).params;
       if (!id) {
@@ -456,15 +438,8 @@ export const PATCH = withRateLimit(
 export const DELETE = withRateLimit(
   async function DELETE(req: NextRequest, ctx: unknown) {
     try {
-      const adminAuth = resolveAdminAuth(req);
-      if (!adminAuth.authenticated) {
-        const unauthorized = NextResponse.json(
-          { error: "UNAUTHORIZED_ADMIN", message: "Admin authentication required." },
-          { status: 401 },
-        );
-        if (adminAuth.source === "invalid") clearAdminSessionCookie(unauthorized);
-        return unauthorized;
-      }
+      const adminAuth = requireAdminPermission(req, "users:delete");
+      if (adminAuth instanceof NextResponse) return adminAuth;
 
       const { id } = await (ctx as Params).params;
       if (!id) {

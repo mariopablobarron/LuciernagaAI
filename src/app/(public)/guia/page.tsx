@@ -6,9 +6,6 @@ import {
   BarChart3, Shield, Mic, Download, Bell, Sparkles, ChevronRight,
   Zap, Heart, CheckCircle2, Map,
 } from 'lucide-react';
-import Header from '@/components/home/Header';
-import Footer from '@/components/home/Footer';
-
 const SECTIONS = [
   {
     id: 'start',
@@ -105,9 +102,7 @@ const SECTIONS = [
 
 export default function GuiaPage() {
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
-      <Header />
-
+    <>
       {/* Hero */}
       <section className="relative overflow-hidden py-16 md:py-24">
         <div className="absolute inset-0 -z-10">
@@ -238,7 +233,6 @@ export default function GuiaPage() {
         </div>
       </div>
 
-      <Footer />
-    </div>
+    </>
   );
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { clearAdminSessionCookie, resolveAdminAuth } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logInfo } from "@/lib/logger";
 import { withRateLimit } from "@/lib/rate-limit";
@@ -11,17 +11,8 @@ export const dynamic = "force-dynamic";
  * Lista los snapshots archivados (para el panel de investigación).
  */
 export const GET = withRateLimit(async function GET(req: NextRequest) {
-  const adminAuth = resolveAdminAuth(req);
-  if (!adminAuth.authenticated) {
-    const unauthorized = NextResponse.json(
-      { error: "UNAUTHORIZED_ADMIN", message: "Admin authentication required." },
-      { status: 401 }
-    );
-    if (adminAuth.source === "invalid") {
-      clearAdminSessionCookie(unauthorized);
-    }
-    return unauthorized;
-  }
+  const adminAuth = requireAdminPermission(req, "insights:read");
+  if (adminAuth instanceof NextResponse) return adminAuth;
 
   const prisma = getPrismaClient();
   const snapshots = await prisma.adminSnapshot.findMany({
@@ -46,17 +37,8 @@ export const GET = withRateLimit(async function GET(req: NextRequest) {
  * Query params: ?target=decisions|insights|all (default: all)
  */
 export const DELETE = withRateLimit(async function DELETE(req: NextRequest) {
-  const adminAuth = resolveAdminAuth(req);
-  if (!adminAuth.authenticated) {
-    const unauthorized = NextResponse.json(
-      { error: "UNAUTHORIZED_ADMIN", message: "Admin authentication required." },
-      { status: 401 }
-    );
-    if (adminAuth.source === "invalid") {
-      clearAdminSessionCookie(unauthorized);
-    }
-    return unauthorized;
-  }
+  const adminAuth = requireAdminPermission(req, "insights:read");
+  if (adminAuth instanceof NextResponse) return adminAuth;
 
   const target = req.nextUrl.searchParams.get("target") ?? "all";
   const prisma = getPrismaClient();

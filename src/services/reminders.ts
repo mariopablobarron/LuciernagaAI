@@ -151,7 +151,7 @@ export async function sendTelegramReminder(user: TelegramReminderUser): Promise<
 }
 
 export async function sendEmailReminder(user: EmailReminderUser): Promise<void> {
-  const appUrl = process.env.APP_BASE_URL ?? "https://luciernaga.ai";
+  const appUrl = process.env.APP_BASE_URL ?? "https://tresmilmillonesdelatidos.es";
   const template = buildReminderEmail({ pendingAction: user.pendingAction, appUrl });
 
   const sent = await sendUserEmail({ to: user.email, ...template });

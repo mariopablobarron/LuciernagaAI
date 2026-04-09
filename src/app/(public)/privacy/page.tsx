@@ -14,8 +14,8 @@ export default function PrivacyPage() {
             <p className="text-zinc-300 leading-relaxed">
               En Tres Mil Millones de Latidos tu privacidad importa. Esta política explica qué datos recopilamos,
               para qué los usamos y cómo los protegemos. Si tienes dudas, escríbenos a{' '}
-              <a href="mailto:privacy@luciernaga.ai" className="text-cyan-400 hover:underline">
-                privacy@luciernaga.ai
+              <a href="mailto:privacidad@tresmilmillonesdelatidos.es" className="text-cyan-400 hover:underline">
+                privacidad@tresmilmillonesdelatidos.es
               </a>
               .
             </p>
@@ -69,8 +69,8 @@ export default function PrivacyPage() {
             <h2 className={`${TYPOGRAPHY.h2} text-white`}>Contacto</h2>
             <p className="text-zinc-300 leading-relaxed">
               Para cualquier pregunta sobre privacidad escríbenos a{' '}
-              <a href="mailto:privacy@luciernaga.ai" className="text-cyan-400 hover:underline">
-                privacy@luciernaga.ai
+              <a href="mailto:privacidad@tresmilmillonesdelatidos.es" className="text-cyan-400 hover:underline">
+                privacidad@tresmilmillonesdelatidos.es
               </a>
               . Respondemos en menos de 48 horas.
             </p>

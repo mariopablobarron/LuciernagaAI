@@ -3,6 +3,7 @@ import { getPrismaClient } from "@/db/prisma";
 import { sendUserEmail } from "@/lib/email";
 import { sendTelegramNotification } from "@/services/telegram";
 import { logError, logInfo } from "@/lib/logger";
+import { sendAutomatedAlert } from "@/lib/alerts";
 import { getNotificationConfig } from "@/lib/notification-config";
 
 export const dynamic = "force-dynamic";
@@ -211,6 +212,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: true, candidates: users.length, sent, sentTelegram, errors });
   } catch (error) {
     logError("CRON", error, { action: "user_weekly_review_failed" });
+    sendAutomatedAlert({ type: "critical", title: "Cron falló: user-weekly-review", message: error instanceof Error ? error.message : "Error desconocido" }).catch(() => {});
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }

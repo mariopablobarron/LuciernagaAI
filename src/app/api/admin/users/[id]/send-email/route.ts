@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { clearAdminSessionCookie, resolveAdminAuth } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { withRateLimit } from "@/lib/rate-limit";
 import { logError, logInfo } from "@/lib/logger";
@@ -12,15 +12,8 @@ type Params = { params: Promise<{ id: string }> };
 export const POST = withRateLimit(
   async function POST(req: NextRequest, ctx: unknown) {
     try {
-      const adminAuth = resolveAdminAuth(req);
-      if (!adminAuth.authenticated) {
-        const unauthorized = NextResponse.json(
-          { error: "UNAUTHORIZED_ADMIN", message: "Admin authentication required." },
-          { status: 401 },
-        );
-        if (adminAuth.source === "invalid") clearAdminSessionCookie(unauthorized);
-        return unauthorized;
-      }
+      const adminAuth = requireAdminPermission(req, "users:send-email");
+      if (adminAuth instanceof NextResponse) return adminAuth;
 
       const { id } = await (ctx as Params).params;
       if (!id) {

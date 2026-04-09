@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "INVALID_STATE" }, { status: 400 });
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://luciernaga.ai/explore";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://tresmilmillonesdelatidos.es/explore";
 
     const email = buildQuizLeadEmail({
       to: body.email,

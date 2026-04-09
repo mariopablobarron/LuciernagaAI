@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   Users, Search, Mail, Phone, MessageCircle, Bot,
   CheckCircle2, XCircle, Flame, ChevronLeft, ChevronRight,
@@ -80,7 +81,7 @@ export default function CrmPage() {
     fetch(`/api/admin/crm?${params}`)
       .then((r) => { if (r.status === 401) { router.push("/admin/login"); return null; } return r.json(); })
       .then((d: CrmData | null) => { if (d) setData(d); })
-      .catch(() => {})
+      .catch(() => { toast.error("Error al cargar CRM"); })
       .finally(() => setLoading(false));
   }
 

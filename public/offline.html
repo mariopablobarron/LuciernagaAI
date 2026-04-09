@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sin conexion — Tres Mil Millones de Latidos</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #09090b;
+      color: #d4d4d8;
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 2rem;
+      text-align: center;
+    }
+    .container { max-width: 400px; }
+    .icon { font-size: 3rem; margin-bottom: 1.5rem; }
+    h1 { font-size: 1.25rem; font-weight: 600; color: #fff; margin-bottom: 0.75rem; }
+    p { font-size: 0.9rem; line-height: 1.6; color: #71717a; margin-bottom: 1.5rem; }
+    button {
+      padding: 0.75rem 2rem;
+      background: linear-gradient(135deg, #7c3aed, #d946ef);
+      color: #fff;
+      border: none;
+      border-radius: 0.75rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .brand { margin-top: 3rem; font-size: 0.7rem; color: #3f3f46; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">📡</div>
+    <h1>Sin conexion</h1>
+    <p>No hay internet ahora mismo. Cuando vuelvas a tener conexion, tu espacio seguira aqui.</p>
+    <button onclick="location.reload()">Reintentar</button>
+    <p class="brand">Tres Mil Millones de Latidos</p>
+  </div>
+</body>
+</html>

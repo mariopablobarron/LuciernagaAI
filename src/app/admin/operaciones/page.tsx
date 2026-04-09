@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   AlertTriangle, CheckCircle2, Database, Download, Info,
   RefreshCw, Shield, ShieldAlert, Activity, Bot,
@@ -84,7 +85,7 @@ export default function OperacionesPage() {
     fetch("/api/admin/operations")
       .then((r) => { if (r.status === 401) { router.push("/admin/login"); return null; } return r.json(); })
       .then((d: OpsData | null) => { if (d) setData(d); })
-      .catch(() => {})
+      .catch(() => { toast.error("Error al cargar operaciones"); })
       .finally(() => setLoading(false));
   }
 

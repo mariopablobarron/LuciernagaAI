@@ -1,408 +1,408 @@
-# Guia de Usuario Final — Tres Mil Millones de Latidos
+# Guía de usuario — Tres Mil Millones de Latidos
 
-**Version:** v2.0
-**Fecha:** 7 de abril de 2026
+**Versión:** v2.1
+**Fecha:** 9 de abril de 2026
 
 ---
 
-## 1. Que es Tres Mil Millones de Latidos
+## 1. ¿Qué es Tres Mil Millones de Latidos y cómo funciona?
 
-Tres Mil Millones de Latidos es una plataforma de mentoria conversacional con IA que te ayuda a:
+Tres Mil Millones de Latidos es una plataforma de mentoría conversacional con inteligencia artificial diseñada para ayudarte a pasar de la parálisis a la acción. Con ella puedes:
 
 - ordenar ideas cuando te sientes bloqueado/a
-- tomar decisiones con pasos concretos
-- mantener seguimiento de tus objetivos
+- tomar decisiones con pasos concretos y realistas
+- mantener seguimiento de tus objetivos y acciones pendientes
 - registrar tu estado emocional y avance diario
-- participar en retos de transformacion personal (Modo Impulso)
-- conectar con personas de confianza para que te acompanen
+- participar en retos de transformación personal de 21 días (Modo Impulso)
+- conectar con personas de confianza para que te acompañen en tu proceso
 
-Esta guia esta pensada para personas usuarias, no para equipos tecnicos.
+Esta guía está pensada para personas usuarias, no para equipos técnicos.
 
 ---
 
-## 2. Antes de empezar
+## 2. ¿Qué necesito para empezar a usar la plataforma?
 
 Para usar Tres Mil Millones de Latidos necesitas:
 
 - un navegador web actualizado (o la app de Telegram)
-- conexion a internet
-- unos minutos al dia para conversar y registrar avances
+- conexión a internet
+- unos minutos al día para conversar y registrar avances
 
-No necesitas conocimientos tecnicos.
+No necesitas conocimientos técnicos ni descargar ninguna aplicación.
 
 ---
 
 ## 3. Registro y primer ingreso
 
-### 3.1 Crear tu cuenta
+### 3.1 ¿Cómo creo mi cuenta?
 
 1. Entra en la web de Tres Mil Millones de Latidos.
-2. Haz clic en "Registrarse" o "Unirse".
-3. Introduce tu email y crea una contrasena.
+2. Haz clic en «Registrarse» o «Unirse».
+3. Introduce tu email y crea una contraseña.
 4. Ya puedes empezar a usar la plataforma.
 
-Tambien puedes empezar de forma anonima y registrar tu email mas adelante.
+También puedes empezar de forma anónima y registrar tu email más adelante para guardar tu progreso.
 
-### 3.2 Iniciar sesion
+### 3.2 ¿Cómo inicio sesión?
 
-1. Haz clic en "Iniciar sesion".
-2. Introduce tu email y contrasena.
-3. Si olvidaste tu contrasena, usa "He olvidado mi contrasena" para recibir un enlace de recuperacion por email.
+1. Haz clic en «Iniciar sesión».
+2. Introduce tu email y contraseña.
+3. Si olvidaste tu contraseña, usa «He olvidado mi contraseña» para recibir un enlace de recuperación por email.
 
-### 3.3 Primer mensaje
+### 3.3 ¿Qué escribo en mi primer mensaje?
 
 Al entrar por primera vez:
 
-1. Inicia una conversacion desde la pantalla principal.
-2. Escribe como te sientes hoy o que necesitas resolver.
+1. Inicia una conversación desde la pantalla principal.
+2. Escribe cómo te sientes hoy o qué necesitas resolver.
 
 Ejemplos de primer mensaje:
 
-- "Me siento bloqueado y no se por donde empezar"
-- "Necesito organizar mi semana"
-- "Estoy con ansiedad y quiero enfocarme"
+- «Me siento bloqueado y no sé por dónde empezar»
+- «Necesito organizar mi semana»
+- «Estoy con ansiedad y quiero enfocarme»
 
 ---
 
-## 4. Navegacion principal
+## 4. ¿Cómo me muevo por la plataforma?
 
 Desde la barra lateral (sidebar) puedes acceder a:
 
 - **Conversaciones:** historial de chats, buscar, renombrar o eliminar conversaciones
-- **Progreso:** acciones completadas, racha de dias consecutivos
+- **Progreso:** acciones completadas, racha de días consecutivos
 - **Objetivo activo:** tu objetivo actual con sus acciones pendientes
 - **Explorar:** contenido y ejercicios para trabajar tu estado emocional
 - **Perfil:** tu nombre, plan actual y ajustes
-- **Invitaciones:** codigos para invitar a otras personas
+- **Invitaciones:** códigos para invitar a otras personas
 
 ---
 
-## 5. Como usar el chat de forma efectiva
+## 5. ¿Cómo usar el chat de mentoría de forma efectiva?
 
-Para obtener mejores respuestas:
+Para obtener mejores respuestas del mentor con IA:
 
-- explica tu situacion en una o dos frases claras
-- menciona contexto real (tiempo, energia, prioridad)
-- pide una accion concreta para hoy
+- explica tu situación en una o dos frases claras
+- menciona contexto real (tiempo disponible, energía, prioridad)
+- pide una acción concreta para hoy
 
-Ejemplos de prompts utiles:
+Ejemplos de mensajes útiles:
 
-- "Ayudame a elegir entre opcion A y B con pros y contras"
-- "Dame un plan de 3 pasos para hoy"
-- "Tengo 30 minutos, que puedo avanzar ahora?"
+- «Ayúdame a elegir entre opción A y B con pros y contras»
+- «Dame un plan de 3 pasos para hoy»
+- «Tengo 30 minutos, ¿qué puedo avanzar ahora?»
 
-Buenas practicas:
+Buenas prácticas:
 
-- usa mensajes cortos y especificos
-- valida que la accion sugerida sea realista
-- vuelve al chat despues de intentar la accion
+- usa mensajes cortos y específicos
+- valida que la acción sugerida sea realista para ti
+- vuelve al chat después de intentar la acción para continuar el proceso
 
 ---
 
-## 6. Objetivos y acciones
+## 6. ¿Cómo funcionan los objetivos y las acciones?
 
-Puedes crear objetivos y dividirlos en acciones pequenas.
+Puedes crear objetivos y dividirlos en acciones pequeñas y alcanzables.
 
-Recomendacion:
+Recomendación:
 
 1. Define 1 objetivo principal por semana.
-2. Divide en 3 a 5 acciones simples.
-3. Marca cada accion como completada cuando avances.
+2. Divídelo en 3 a 5 acciones simples.
+3. Marca cada acción como completada cuando avances.
 
 Ejemplo:
 
-- Objetivo: "Retomar mi rutina"
+- Objetivo: «Retomar mi rutina»
 - Acciones:
   - caminar 20 minutos
-  - escribir 3 prioridades del dia
+  - escribir 3 prioridades del día
   - cerrar una tarea pendiente
 
-El sistema detecta patrones de evitacion si postergas acciones de forma recurrente y te ayuda a identificar el bloqueo.
+El sistema detecta patrones de evitación si postergas acciones de forma recurrente y te ayuda a identificar el bloqueo subyacente.
 
 ---
 
-## 7. Check-in diario
+## 7. ¿Qué es el check-in diario y para qué sirve?
 
-El check-in diario te ayuda a medir progreso y estado emocional.
+El check-in diario te ayuda a medir progreso y estado emocional de forma rápida.
 
 Sugerencia:
 
-- registra al menos 1 check-in por dia
-- responde con honestidad, aunque el avance sea pequeno
-- describe que funciono y que te bloqueo
+- registra al menos 1 check-in por día
+- responde con honestidad, aunque el avance sea pequeño
+- describe qué funcionó y qué te bloqueó
 
 Ejemplo de check-in:
 
-"Hoy avance poco, pero logre definir la primera tarea de manana."
+«Hoy avancé poco, pero logré definir la primera tarea de mañana.»
 
-El sistema lleva la cuenta de tu racha de dias consecutivos. Al alcanzar 3, 7, 14, 21 o 30 dias seguidos recibiras un reconocimiento.
-
----
-
-## 8. Modo Impulso (transformacion en 21 dias)
-
-El Modo Impulso es un programa intensivo disponible en el plan Pro.
-
-### Como funciona
-
-1. **Diagnostico inicial:** Responde un test de 12 preguntas para identificar tu perfil (alto potencial, bloqueado, ansioso, desmotivado).
-2. **Retos personalizados:** Recibe retos de 3 a 7 dias adaptados a tu perfil.
-3. **Check-in diario:** Registra tu avance cada dia dentro del modo Impulso.
-4. **Mensajes programados:** Desbloquea mensajes motivacionales segun tu progreso.
-5. **Insights:** Consulta analisis de tu comportamiento en ventanas de 14 dias.
-
-Accede desde el menu o la seccion Impulso de la app.
+El sistema lleva la cuenta de tu racha de días consecutivos. Al alcanzar 3, 7, 14, 21 o 30 días seguidos recibirás un reconocimiento.
 
 ---
 
-## 9. Journeys (programas guiados)
+## 8. ¿Qué es el Modo Impulso y cómo funciona el programa de 21 días?
 
-Los Journeys son programas paso a paso con ejercicios estructurados.
+El Modo Impulso es un programa intensivo de transformación personal disponible en el plan Pro.
 
-- Elige un journey desde la seccion "Journeys"
+### Cómo funciona paso a paso
+
+1. **Diagnóstico inicial:** Responde un test de 12 preguntas para identificar tu perfil (alto potencial, bloqueado, ansioso, desmotivado).
+2. **Retos personalizados:** Recibe retos de 3 a 7 días adaptados a tu perfil emocional.
+3. **Check-in diario:** Registra tu avance cada día dentro del modo Impulso.
+4. **Mensajes programados:** Desbloquea mensajes motivacionales según tu progreso.
+5. **Insights:** Consulta análisis de tu comportamiento en ventanas de 14 días.
+
+Accede desde el menú o la sección Impulso de la app.
+
+---
+
+## 9. ¿Qué son los Journeys o programas guiados?
+
+Los Journeys son programas paso a paso con ejercicios estructurados para trabajar áreas específicas de tu desarrollo personal.
+
+- Elige un journey desde la sección «Journeys»
 - Completa los ejercicios en orden
-- Tu progreso se guarda automaticamente
+- Tu progreso se guarda automáticamente
 
-Son ideales si prefieres una guia mas estructurada que el chat libre.
-
----
-
-## 10. Test diagnostico
-
-Desde la landing puedes hacer un test rapido para identificar tu estado emocional actual:
-
-- Claridad
-- Bloqueo
-- Ansiedad
-- Duda
-- Neutral
-
-El resultado se guarda en tu perfil y puedes recibir un email con los detalles.
+Son ideales si prefieres una guía más estructurada que el chat libre.
 
 ---
 
-## 11. Planes y suscripcion
+## 10. ¿Cómo funciona el test diagnóstico de estado emocional?
+
+Desde la landing puedes hacer un test rápido y gratuito para identificar tu estado emocional actual:
+
+- **Claridad:** sabes qué hacer y tienes energía para avanzar
+- **Bloqueo:** quieres avanzar pero algo te frena
+- **Ansiedad:** sientes urgencia pero no puedes enfocarte
+- **Duda:** no tienes claro qué camino tomar
+- **Neutral:** sin un estado dominante definido
+
+El resultado se guarda en tu perfil y puedes recibir un email con los detalles y tu primer paso de acción.
+
+---
+
+## 11. ¿Cuánto cuesta Tres Mil Millones de Latidos? Planes y precios
 
 Tres Mil Millones de Latidos ofrece dos planes:
 
-| Caracteristica | Free (0 euros) | Pro (9 euros/mes o 79 euros/ano) |
-|---|---|---|
-| Conversaciones | 10 al mes | Ilimitadas |
-| Mensajes por conversacion | 20 | Ilimitados |
-| Check-in diario | Si | Si |
-| Objetivos y acciones | Si | Si |
-| Modo Impulso | No | Si |
-| Journeys | Basico | Completo |
+| Característica            | Free (0 €)     | Pro (9 €/mes o 79 €/año) |
+| ------------------------- | -------------- | -------------------------------- |
+| Conversaciones            | 10 al mes      | Ilimitadas                       |
+| Mensajes por conversación | 20             | Ilimitados                       |
+| Check-in diario           | Sí             | Sí                               |
+| Objetivos y acciones      | Sí             | Sí                               |
+| Modo Impulso              | No             | Sí                               |
+| Journeys                  | Básico         | Completo                         |
 
-Para cambiar de plan o gestionar tu suscripcion, ve a Ajustes > Suscripcion. El pago se gestiona a traves de Stripe de forma segura.
+Para cambiar de plan o gestionar tu suscripción, ve a Ajustes > Suscripción. El pago se gestiona a través de Stripe de forma segura.
 
 ---
 
-## 12. Telegram
+## 12. ¿Cómo uso Tres Mil Millones de Latidos en Telegram?
 
-Puedes usar Tres Mil Millones de Latidos directamente desde Telegram.
+Puedes usar la plataforma directamente desde Telegram sin necesidad de abrir el navegador.
 
-### Como empezar
+### Cómo empezar en Telegram
 
 1. Busca el bot en Telegram.
-2. Envia `/start`.
-3. Acepta los terminos escribiendo `ACEPTO`.
+2. Envía `/start`.
+3. Acepta los términos escribiendo `ACEPTO`.
 4. Empieza a conversar como en la web.
 
-### Comandos disponibles
+### Comandos disponibles en el bot de Telegram
 
-| Comando | Que hace |
-|---|---|
-| `/start` | Inicia la conversacion |
-| `/estado` | Ver tus acciones pendientes |
-| `/privacidad` | Consultar politica de privacidad |
-| `/vincular` | Conectar tu cuenta de Telegram con la web |
-| `/salir` | Desactivar recordatorios |
-| `/borrar_datos` | Eliminar todos tus datos del sistema |
+| Comando         | Qué hace                                  |
+| --------------- | ----------------------------------------- |
+| `/start`        | Inicia la conversación                    |
+| `/estado`       | Ver tus acciones pendientes               |
+| `/privacidad`   | Consultar política de privacidad          |
+| `/vincular`     | Conectar tu cuenta de Telegram con la web |
+| `/salir`        | Desactivar recordatorios                  |
+| `/borrar_datos` | Eliminar todos tus datos del sistema      |
 
-### Vincular Telegram con tu cuenta web
+### ¿Cómo vinculo mi cuenta de Telegram con la web?
 
 Si ya tienes cuenta web y quieres conectar Telegram:
 
-1. Envia `/vincular` al bot.
-2. Recibiras un enlace para conectar ambas cuentas.
-3. Al vincular, tu historial se sincroniza.
+1. Envía `/vincular` al bot.
+2. Recibirás un enlace para conectar ambas cuentas.
+3. Al vincular, tu historial se sincroniza automáticamente.
 
 ---
 
-## 13. Personas de confianza (portal familia)
+## 13. ¿Qué es el portal de personas de confianza (portal familia)?
 
-Puedes anadir una persona de confianza para que te acompane en tu proceso.
+Puedes añadir una persona de confianza para que te acompañe en tu proceso emocional.
 
-### Que puede ver tu persona de confianza
+### ¿Qué puede ver tu persona de confianza?
 
-- Tu progreso general (no las conversaciones)
+- Tu progreso general (no las conversaciones privadas)
 - Tus logros y racha
-- Alertas si llevas varios dias sin actividad
+- Alertas si llevas varios días sin actividad
 
-### Que puede hacer
+### ¿Qué puede hacer?
 
 - Enviarte mensajes de apoyo
-- Hacer un "ping" si esta preocupada ("estas bien?")
+- Hacer un «ping» si está preocupada («¿estás bien?»)
 
 ### Relaciones disponibles
 
 Madre, padre, pareja, amigo/a o terapeuta.
 
-### Como configurarlo
+### ¿Cómo configuro una persona de confianza?
 
-Desde Ajustes > Personas de confianza, anade el contacto. Recibira un enlace unico para acceder a su portal.
+Desde Ajustes > Personas de confianza, añade el contacto. Recibirá un enlace único para acceder a su portal privado.
 
 ---
 
-## 14. Invitaciones
+## 14. ¿Cómo funcionan las invitaciones?
 
 Puedes ganar invitaciones para compartir la plataforma con otras personas.
 
 Se desbloquean al alcanzar hitos:
 
-- Racha de 7 dias
+- Racha de 7 días
 - Completar un objetivo
-- 30 dias de actividad
+- 30 días de actividad
 
-Desde la barra lateral, ve a la seccion de invitaciones para copiar tu codigo y compartirlo.
+Desde la barra lateral, ve a la sección de invitaciones para copiar tu código y compartirlo.
 
 ---
 
-## 15. Ajustes y preferencias
+## 15. ¿Qué puedo configurar en ajustes y preferencias?
 
 En Ajustes puedes configurar:
 
-- **Tono de la IA:** directo, socratico o calido
+- **Tono de la IA:** directo, socrático o cálido
 - **Recordatorios:** activar/desactivar y elegir hora
 - **Email semanal:** resumen de tu progreso por correo
 - **Zona horaria:** para que los recordatorios lleguen a la hora correcta
-- **Contrasena:** cambiar tu contrasena actual
+- **Contraseña:** cambiar tu contraseña actual
 
 ---
 
-## 16. Cuando te sientes en crisis
+## 16. ¿Qué pasa si me siento en crisis emocional?
 
-Si el sistema detecta una situacion de alto riesgo emocional, puede activar un modo de contencion.
+Si el sistema detecta una situación de alto riesgo emocional, puede activar un modo de contención con recursos de emergencia.
 
 Importante:
 
-- Tres Mil Millones de Latidos no reemplaza atencion medica ni psicologica profesional.
-- Si hay riesgo inmediato para tu seguridad, llama al **024** (linea de atencion a la conducta suicida en Espana).
+- Tres Mil Millones de Latidos **no reemplaza atención médica ni psicológica profesional**.
+- Si hay riesgo inmediato para tu seguridad, llama al **024** (línea de atención a la conducta suicida en España).
 - Contacta a una persona de confianza en cuanto sea posible.
-- Si tienes una persona de confianza configurada, el sistema puede alertarla automaticamente.
+- Si tienes una persona de confianza configurada, el sistema puede alertarla automáticamente.
 
-Para salir del modo crisis, usa la opcion correspondiente en la app o espera a que el sistema detecte que tu estado ha mejorado.
+Para salir del modo crisis, usa la opción correspondiente en la app o espera a que el sistema detecte que tu estado ha mejorado.
 
 ---
 
-## 17. Privacidad y uso responsable
+## 17. Privacidad, seguridad y uso responsable
 
-Tres Mil Millones de Latidos utiliza tus interacciones para mejorar continuidad y seguimiento dentro de la plataforma.
+Tres Mil Millones de Latidos utiliza tus interacciones para mejorar continuidad y seguimiento dentro de la plataforma. No comparte tus datos con terceros para fines publicitarios.
 
 Recomendaciones de privacidad:
 
 - evita compartir datos extremadamente sensibles innecesarios
-- no compartas contrasenas, datos bancarios o documentos oficiales
+- no compartas contraseñas, datos bancarios o documentos oficiales
 - usa el servicio en un dispositivo de confianza
 
-### Tus derechos
+### Tus derechos sobre tus datos
 
 - Puedes exportar tus datos en cualquier momento
-- Puedes solicitar la eliminacion completa de tu cuenta y datos (en Telegram: `/borrar_datos`)
-- Consulta la politica de privacidad completa en `/privacy`
-- Consulta los terminos de servicio en `/terms`
+- Puedes solicitar la eliminación completa de tu cuenta y datos (en Telegram: `/borrar_datos`)
+- Consulta la política de privacidad completa en `/privacy`
+- Consulta los términos de servicio en `/terms`
 
 ---
 
-## 18. Limites del servicio
+## 18. ¿Cuáles son los límites del servicio?
 
 Tres Mil Millones de Latidos puede equivocarse o dar sugerencias que no apliquen a tu contexto exacto.
 
 Ten en cuenta:
 
-- las respuestas son de apoyo, no ordenes
-- siempre aplica criterio personal
-- confirma decisiones importantes con fuentes humanas/profesionales cuando corresponda
+- las respuestas son de apoyo, no órdenes
+- siempre aplica criterio personal antes de actuar
+- confirma decisiones importantes con fuentes humanas o profesionales cuando corresponda
 
 ---
 
-## 19. Problemas comunes y solucion rapida
+## 19. Preguntas frecuentes y solución rápida
 
-### 19.1 "No responde el chat"
+### ¿Por qué no responde el chat?
 
-- verifica tu internet
-- recarga la pagina
-- espera unos segundos y vuelve a intentar
+- Verifica tu conexión a internet
+- Recarga la página
+- Espera unos segundos y vuelve a intentar
 
-### 19.2 "No veo mis mensajes anteriores"
+### ¿Por qué no veo mis mensajes anteriores?
 
-- revisa que estes en la conversacion correcta
-- actualiza la pagina
-- vuelve a entrar al servicio
+- Revisa que estés en la conversación correcta
+- Actualiza la página
+- Vuelve a entrar al servicio
 
-### 19.3 "No puedo avanzar con una accion"
+### ¿Qué hago si no puedo avanzar con una acción?
 
-- pide una version mas pequena de la misma accion
-- solicita 2 alternativas
-- registra un check-in explicando el bloqueo
+- Pide al mentor una versión más pequeña de la misma acción
+- Solicita 2 alternativas
+- Registra un check-in explicando el bloqueo
 
-### 19.4 "No me llegan los recordatorios"
+### ¿Por qué no me llegan los recordatorios?
 
-- verifica que los recordatorios estan activados en Ajustes
-- comprueba la zona horaria configurada
-- si usas Telegram, asegurate de no haber enviado `/salir`
+- Verifica que los recordatorios están activados en Ajustes
+- Comprueba la zona horaria configurada
+- Si usas Telegram, asegúrate de no haber enviado `/salir`
 
-### 19.5 "Quiero cambiar de plan"
+### ¿Cómo cambio de plan Free a Pro?
 
-- ve a Ajustes > Suscripcion
-- desde ahi puedes actualizar, cancelar o gestionar tu plan a traves del portal de pagos
+- Ve a Ajustes > Suscripción
+- Desde ahí puedes actualizar, cancelar o gestionar tu plan a través del portal de pagos
 
 ---
 
-## 20. Buen habito recomendado (5 minutos al dia)
+## 20. Rutina recomendada: 5 minutos al día para avanzar
 
 Rutina sugerida:
 
-1. 1 minuto: escribe como llegas hoy
-2. 2 minutos: define una accion concreta
-3. 1 minuto: ejecuta primer paso
+1. 1 minuto: escribe cómo llegas hoy
+2. 2 minutos: define una acción concreta
+3. 1 minuto: ejecuta el primer paso
 4. 1 minuto: registra check-in
 
-Constancia pequena > esfuerzo perfecto.
+Constancia pequeña > esfuerzo perfecto.
 
 ---
 
-## 21. Soporte
+## 21. ¿Cómo contacto con soporte?
 
 Si necesitas ayuda con el uso de la plataforma, puedes:
 
 - usar el formulario de contacto en la web
-- escribir a traves de tu organizacion si accedes por ese canal
+- escribir a través de tu organización si accedes por ese canal
 
 Incluye en tu mensaje:
 
-- que estabas intentando hacer
-- que paso exactamente
+- qué estabas intentando hacer
+- qué pasó exactamente
 - fecha/hora aproximada del problema
 
 ---
 
-## 22. Resumen rapido
+## 22. Resumen rápido
 
-- Registrate con email y contrasena (o empieza anonimo).
+- Regístrate con email y contraseña (o empieza en modo anónimo).
 - Habla claro y en corto.
-- Define acciones pequenas.
+- Define acciones pequeñas y alcanzables.
 - Registra check-in diario.
-- Prueba el Modo Impulso si quieres un programa estructurado de 21 dias.
-- Conecta Telegram para usar la plataforma desde el movil.
-- Anade una persona de confianza si quieres acompanamiento.
+- Prueba el Modo Impulso si quieres un programa estructurado de 21 días.
+- Conecta Telegram para usar la plataforma desde el móvil.
+- Añade una persona de confianza si quieres acompañamiento.
 - Usa el servicio como apoyo, no como reemplazo profesional.
 - Si hay riesgo inmediato, llama al 024 y prioriza ayuda humana de emergencia.
 
 ---
 
-Documento: Guia de Usuario Final
+Documento: Guía de usuario final
 Producto: Tres Mil Millones de Latidos
-Version: v2.0
-Fecha: 7 de abril de 2026
+Versión: v2.1
+Fecha: 9 de abril de 2026

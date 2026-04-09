@@ -32,7 +32,7 @@ export default function SidebarRetoWidget() {
       .then((d: { ok: boolean; reto?: RetoData }) => {
         if (d.ok && d.reto?.status === "active") setReto(d.reto);
       })
-      .catch(() => {});
+      .catch(() => { /* Non-critical widget */ });
   }, []);
 
   async function checkin(done: boolean) {

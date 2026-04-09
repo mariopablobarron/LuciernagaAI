@@ -6,6 +6,7 @@ import { AdminPanel } from "@/features/admin/components/AdminPanel";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 import { InfoTooltip } from "@/features/admin/components/InfoTooltip";
 import { Archive, ChevronDown, ChevronUp, Download, Database } from "lucide-react";
+import { toast } from "sonner";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -96,7 +97,7 @@ export default function ResearchPage() {
         const json = (await res.json()) as { snapshots: SnapshotSummary[] };
         setSnapshots(json.snapshots);
       })
-      .catch(() => {})
+      .catch(() => { toast.error("Error al cargar research"); })
       .finally(() => setLoading(false));
   }, [router]);
 

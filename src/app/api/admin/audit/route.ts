@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { clearAdminSessionCookie, resolveAdminAuth } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
 import { withRateLimit } from "@/lib/rate-limit";
@@ -27,19 +27,8 @@ function parseDateParam(value: string | null): Date | null {
 
 export const GET = withRateLimit(async function GET(req: NextRequest) {
   try {
-    const adminAuth = resolveAdminAuth(req);
-    if (!adminAuth.authenticated) {
-      const unauthorized = NextResponse.json(
-        { error: "UNAUTHORIZED_ADMIN", message: "Admin authentication required." },
-        { status: 401 }
-      );
-
-      if (adminAuth.source === "invalid") {
-        clearAdminSessionCookie(unauthorized);
-      }
-
-      return unauthorized;
-    }
+    const adminAuth = requireAdminPermission(req, "audit");
+    if (adminAuth instanceof NextResponse) return adminAuth;
 
     const prisma = getPrismaClient();
 

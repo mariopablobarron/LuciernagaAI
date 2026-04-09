@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { clearAdminSessionCookie, resolveAdminAuth } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { logError } from "@/lib/logger";
 import { sendIntervention } from "@/features/admin-clinical/send-intervention";
 import type { InterventionType, SendInterventionInput } from "@/features/admin-clinical/types";
@@ -14,12 +14,8 @@ function isValidType(v: unknown): v is InterventionType {
 
 export async function POST(req: NextRequest) {
   try {
-    const auth = resolveAdminAuth(req);
-    if (!auth.authenticated) {
-      const res = NextResponse.json({ error: "UNAUTHORIZED_ADMIN" }, { status: 401 });
-      if (auth.source === "invalid") clearAdminSessionCookie(res);
-      return res;
-    }
+    const auth = requireAdminPermission(req, "interventions");
+    if (auth instanceof NextResponse) return auth;
 
     const body = (await req.json()) as Partial<SendInterventionInput>;
 

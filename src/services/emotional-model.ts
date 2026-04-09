@@ -1,5 +1,6 @@
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
+import { normalizeText, countMatches, countMessagesWithSignals } from "@/services/text-analysis";
 import {
   DEFAULT_EMOTIONAL_PROFILE,
   DOMINANT_PATTERNS,
@@ -67,6 +68,13 @@ const EMOTION_KEYWORDS: KeywordGroups<PrimaryEmotion> = {
     "me enfada",
     "me molesta",
     "fracaso",
+    "bloqueado",
+    "bloqueo",
+    "estancado",
+    "paralisis",
+    "atrapado",
+    "no puedo avanzar",
+    "no arranco",
   ],
   calma: [
     "calma",
@@ -283,27 +291,6 @@ const WORSENING_KEYWORDS = [
 ];
 
 const SAME_TREND_KEYWORDS = ["sigo igual", "igual que ayer", "igual que siempre", "lo mismo"];
-
-function normalizeText(input: string): string {
-  return input
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function countMatches(message: string, keywords: string[]): number {
-  return keywords.reduce((total, keyword) => {
-    return total + (message.includes(normalizeText(keyword)) ? 1 : 0);
-  }, 0);
-}
-
-function countMessagesWithSignals(messages: string[], keywords: string[]): number {
-  return messages.reduce((total, message) => {
-    return total + (countMatches(message, keywords) > 0 ? 1 : 0);
-  }, 0);
-}
 
 function pickWinner<T extends string>(
   scores: Record<T, number>,

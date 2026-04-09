@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { resolveAdminAuth, clearAdminSessionCookie } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { withRateLimit } from "@/lib/rate-limit";
 import { logError, logInfo } from "@/lib/logger";
 import { getNotificationConfig, type NotificationConfig } from "@/lib/notification-config";
@@ -15,24 +15,16 @@ async function saveNotificationConfig(config: NotificationConfig): Promise<void>
 }
 
 export const GET = withRateLimit(async function GET(req: NextRequest) {
-  const auth = resolveAdminAuth(req);
-  if (!auth.authenticated) {
-    const res = NextResponse.json({ error: "UNAUTHORIZED_ADMIN" }, { status: 401 });
-    if (auth.source === "invalid") clearAdminSessionCookie(res);
-    return res;
-  }
+  const auth = requireAdminPermission(req, "notifications");
+  if (auth instanceof NextResponse) return auth;
 
   const config = await getNotificationConfig();
   return NextResponse.json(config);
 }, { limit: 30 });
 
 export const PUT = withRateLimit(async function PUT(req: NextRequest) {
-  const auth = resolveAdminAuth(req);
-  if (!auth.authenticated) {
-    const res = NextResponse.json({ error: "UNAUTHORIZED_ADMIN" }, { status: 401 });
-    if (auth.source === "invalid") clearAdminSessionCookie(res);
-    return res;
-  }
+  const auth = requireAdminPermission(req, "notifications");
+  if (auth instanceof NextResponse) return auth;
 
   try {
     const body = (await req.json()) as Partial<NotificationConfig>;

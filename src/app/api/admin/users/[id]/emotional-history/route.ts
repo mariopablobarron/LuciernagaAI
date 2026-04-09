@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
-import { resolveAdminAuth } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 
 // GET /api/admin/users/[id]/emotional-history?days=30
 // Returns daily emotional state for the last N days (from DailyLog)
@@ -8,8 +8,8 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const auth = resolveAdminAuth(req);
-  if (!auth.authenticated) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = requireAdminPermission(req, "users:emotional-history");
+  if (auth instanceof NextResponse) return auth;
 
   const { id: userId } = await params;
   const days = Math.min(90, Math.max(7, Number(req.nextUrl.searchParams.get("days") ?? "30")));

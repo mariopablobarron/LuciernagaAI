@@ -118,7 +118,7 @@ export default function Sidebar({
       .then((d: { ok: boolean; invites?: InviteItem[] }) => {
         if (d.ok) setInvites(d.invites ?? []);
       })
-      .catch(() => {});
+      .catch(() => { /* Invites are non-critical — fail silently */ });
   }, []);
 
   function copyInvite(code: string, url: string) {
@@ -190,7 +190,9 @@ export default function Sidebar({
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Workspace
           </p>
-          <p className="mt-1 text-sm font-medium text-foreground">{profile.name}</p>
+          <Link href="/app/settings" className="mt-1 block text-sm font-medium text-foreground hover:text-primary transition-colors">
+            {profile.name}
+          </Link>
           <p className="mt-1 text-sm text-muted-foreground">
             Conversaciones, continuidad y acceso rápido al producto.
           </p>
@@ -216,6 +218,7 @@ export default function Sidebar({
             variant={pathname === "/editor" ? "default" : "outline"}
             size="sm"
             className="justify-center"
+            title="Escribe y organiza ideas con formato largo"
           >
             <Link href="/editor">Editor</Link>
           </Button>
@@ -225,17 +228,18 @@ export default function Sidebar({
             variant={pathname === "/app/explore" ? "default" : "outline"}
             size="sm"
             className="justify-center"
+            title="Contenido y ejercicios para tu estado emocional"
           >
             <Link href="/app/explore">Explorar</Link>
           </Button>
           <Button
             asChild
             type="button"
-            variant={pathname === "/admin" ? "default" : "outline"}
+            variant={pathname?.startsWith("/app/settings") ? "default" : "outline"}
             size="sm"
             className="justify-center col-span-3"
           >
-            <Link href={adminAuthenticated ? "/admin" : "/admin/login?next=/admin"}>Admin</Link>
+            <Link href="/app/settings">Ajustes</Link>
           </Button>
         </div>
 
@@ -599,50 +603,50 @@ export default function Sidebar({
         )}
       </div>
 
-      <Separator className="my-4" />
+      {adminAuthenticated && (
+        <>
+          <Separator className="my-4" />
 
-      <div className="space-y-3">
-        <div className="flex items-center justify-between gap-2">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              Acceso admin
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {adminLoading
-                ? "Verificando sesión..."
-                : adminAuthenticated
-                  ? "Sesión operativa activa."
-                  : "No autenticado."}
-            </p>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  Acceso admin
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Sesión operativa activa.
+                </p>
+              </div>
+              <Badge
+                variant="success"
+                className="rounded-full px-3 py-1"
+              >
+                <ShieldCheck className="mr-1 size-3.5" />
+                Activa
+              </Badge>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <Button asChild type="button" variant="outline" size="sm" className="justify-between">
+                <Link href="/admin">
+                  Panel admin
+                  <ArrowRight className="size-4" />
+                </Link>
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="justify-between"
+                onClick={() => void onAdminLogout()}
+              >
+                Cerrar sesión
+                <LogOut className="size-4" />
+              </Button>
+            </div>
           </div>
-          <Badge
-            variant={adminAuthenticated ? "success" : "secondary"}
-            className="rounded-full px-3 py-1"
-          >
-            <ShieldCheck className="mr-1 size-3.5" />
-            {adminAuthenticated ? "Activa" : "Inactiva"}
-          </Badge>
-        </div>
-
-        {adminAuthenticated ? (
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full justify-between"
-            onClick={() => void onAdminLogout()}
-          >
-            Cerrar sesión admin
-            <LogOut className="size-4" />
-          </Button>
-        ) : (
-          <Button asChild type="button" variant="outline" className="w-full justify-between">
-            <Link href="/admin/login?next=/admin">
-              Entrar como admin
-              <ArrowRight className="size-4" />
-            </Link>
-          </Button>
-        )}
-      </div>
+        </>
+      )}
 
       {/* Share Story Modal */}
       {showShareStory && (

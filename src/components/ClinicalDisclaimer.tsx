@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ShieldCheck, X, Phone } from "lucide-react";
 
 const EMERGENCY_NUMBERS = [
@@ -12,9 +12,19 @@ const EMERGENCY_NUMBERS = [
 export default function ClinicalDisclaimer() {
   const [open, setOpen] = useState(false);
 
+  const close = useCallback(() => setOpen(false), []);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, close]);
+
   return (
     <>
-      {/* Shield icon — always visible in header */}
       <button
         onClick={() => setOpen(true)}
         className="p-2 rounded-lg text-zinc-500 hover:text-cyan-400 hover:bg-white/5 transition-colors"
@@ -24,25 +34,28 @@ export default function ClinicalDisclaimer() {
         <ShieldCheck className="w-4 h-4" />
       </button>
 
-      {/* Modal */}
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="w-full max-w-md rounded-2xl border border-zinc-700/60 bg-zinc-900 shadow-2xl">
-            {/* Header */}
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150"
+          onClick={close}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl border border-zinc-700/60 bg-zinc-900 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800">
               <div className="flex items-center gap-2.5">
                 <ShieldCheck className="w-5 h-5 text-cyan-400" />
                 <h2 className="text-sm font-semibold text-white">Información importante</h2>
               </div>
               <button
-                onClick={() => setOpen(false)}
-                className="p-1.5 text-zinc-500 hover:text-white transition-colors"
+                onClick={close}
+                className="p-1.5 text-zinc-500 hover:text-white transition-colors rounded-md hover:bg-white/5"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Content */}
             <div className="px-5 py-4 space-y-4">
               <div className="space-y-2">
                 <p className="text-sm text-zinc-300 leading-relaxed">

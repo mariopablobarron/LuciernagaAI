@@ -12,6 +12,7 @@ const NAV = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Guía", href: "/guia" },
   { label: "Precios", href: "/precios" },
+  { label: "Mis Latidos", href: "/calculadora-latidos", highlight: true },
   { label: "Test gratuito", href: "/test", highlight: true },
 ];
 

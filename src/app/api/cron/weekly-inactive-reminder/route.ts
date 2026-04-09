@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { sendUserEmail } from "@/lib/email";
 import { logError, logInfo } from "@/lib/logger";
+import { sendAutomatedAlert } from "@/lib/alerts";
 import { isSyntheticEmail } from "@/services/user";
 import { getNotificationConfig } from "@/lib/notification-config";
 
@@ -130,6 +131,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: true, candidates: users.length, sent, skipped, errors });
   } catch (error) {
     logError("CRON", error, { action: "weekly_inactive_reminder_failed" });
+    sendAutomatedAlert({ type: "critical", title: "Cron falló: weekly-inactive-reminder", message: error instanceof Error ? error.message : "Error desconocido" }).catch(() => {});
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }

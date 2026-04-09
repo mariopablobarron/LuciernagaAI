@@ -13,7 +13,7 @@ describe("coach prompt identity", () => {
     expect(prompt).toContain("No eres un chatbot.");
     expect(prompt).toContain("Claridad sobre consuelo");
     expect(prompt).toContain("Acción sobre reflexión vacía");
-    expect(prompt).toContain("No estoy aquí para entretener. Estoy aquí para ayudarte a avanzar.");
+    expect(prompt).toContain("No estoy aquí para entretener. Estoy aquí para que descubras lo que ya sabes pero no te atreves a ver.");
     expect(prompt).toContain("Reflejo: demuestra que has entendido");
     expect(prompt).toContain("Nunca cierres en vacío.");
   });

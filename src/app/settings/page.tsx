@@ -6,6 +6,7 @@ import Link from 'next/link';
 import {
   ArrowLeft,
   Bell,
+  Camera,
   CheckCircle2,
   Clock,
   CreditCard,
@@ -20,6 +21,8 @@ import {
   Send,
   Sparkles,
   Trash2,
+  User,
+  X,
   AlertTriangle,
 } from 'lucide-react';
 import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
@@ -104,6 +107,16 @@ export default function SettingsPage() {
   const [isExporting, setIsExporting] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Profile state
+  const [profileName, setProfileName] = useState('');
+  const [profileBio, setProfileBio] = useState('');
+  const [profilePhone, setProfilePhone] = useState('');
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [hasAvatar, setHasAvatar] = useState(false);
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileMsg, setProfileMsg] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const saveMsgTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const exportTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -130,6 +143,16 @@ export default function SettingsPage() {
       .then((r) => r.json())
       .then((d: { preferences: Preferences }) => setPrefs(d.preferences))
       .catch(() => { toast.error('No se pudieron cargar las preferencias'); });
+
+    fetch('/api/user/profile', { credentials: 'include' })
+      .then((r) => r.json())
+      .then((d: { profile: { name: string | null; bio: string | null; phone: string | null; hasAvatar: boolean } }) => {
+        setProfileName(d.profile.name ?? '');
+        setProfileBio(d.profile.bio ?? '');
+        setProfilePhone(d.profile.phone ?? '');
+        setHasAvatar(d.profile.hasAvatar);
+      })
+      .catch(() => {});
   }, []);
 
   // Save preferences
@@ -243,6 +266,85 @@ export default function SettingsPage() {
     }
   }
 
+  // Save profile
+  async function handleSaveProfile() {
+    setProfileSaving(true);
+    setProfileMsg(null);
+    try {
+      const body: Record<string, unknown> = {
+        name: profileName,
+        bio: profileBio,
+        phone: profilePhone,
+      };
+      if (avatarPreview !== null) body.avatarData = avatarPreview;
+      const res = await fetch('/api/user/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        const d = (await res.json()) as { profile: { hasAvatar: boolean } };
+        setHasAvatar(d.profile.hasAvatar);
+        setAvatarPreview(null);
+        setProfileMsg('Perfil guardado');
+        setTimeout(() => setProfileMsg(null), 2500);
+      } else {
+        const err = (await res.json().catch(() => ({}))) as { message?: string };
+        toast.error(err.message ?? 'Error al guardar el perfil');
+      }
+    } catch {
+      toast.error('Error al guardar el perfil');
+    } finally {
+      setProfileSaving(false);
+    }
+  }
+
+  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 200 * 1024) {
+      toast.error('La imagen debe ser menor de 200 KB');
+      return;
+    }
+    if (!file.type.startsWith('image/')) {
+      toast.error('Solo se permiten imágenes');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setAvatarPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function handleRemoveAvatar() {
+    setAvatarPreview(null);
+    setHasAvatar(false);
+    // Send null avatar on next save
+    setProfileSaving(true);
+    fetch('/api/user/profile', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ avatarData: null }),
+    }).then((res) => {
+      if (res.ok) {
+        setProfileMsg('Avatar eliminado');
+        setTimeout(() => setProfileMsg(null), 2500);
+      }
+    }).catch(() => {}).finally(() => setProfileSaving(false));
+  }
+
+  const initials = (name: string) => {
+    const parts = name.trim().split(/\s+/);
+    return parts.length >= 2
+      ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+      : (parts[0]?.[0] ?? '?').toUpperCase();
+  };
+
+  const avatarSrc = avatarPreview ?? (hasAvatar && user?.id ? `/api/user/avatar/${user.id}?t=${Date.now()}` : null);
+
   const isPro = user?.plan === 'pro' || user?.plan === 'pro_monthly' || user?.plan === 'pro_annual';
 
   const botUrl = telegram?.botUsername ? `https://t.me/${telegram.botUsername}` : 'https://t.me/';
@@ -263,6 +365,121 @@ export default function SettingsPage() {
               <CheckCircle2 className="w-3.5 h-3.5" /> {saveMsg}
             </span>
           )}
+        </div>
+
+        {/* ── Tu perfil ──────────────────────────────────────────────── */}
+        <div className={`${COMPONENTS.card} p-6 space-y-5`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-cyan-500/15 flex items-center justify-center">
+                <User className="w-4 h-4 text-cyan-400" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-white">Tu perfil</h2>
+                <p className="text-xs text-zinc-500">Nombre, foto y datos personales</p>
+              </div>
+            </div>
+            {profileMsg && (
+              <span className="flex items-center gap-1.5 text-xs text-emerald-400 animate-in fade-in">
+                <CheckCircle2 className="w-3.5 h-3.5" /> {profileMsg}
+              </span>
+            )}
+          </div>
+
+          {/* Avatar */}
+          <div className="flex items-center gap-5">
+            <div className="relative">
+              {avatarSrc ? (
+                <img src={avatarSrc} alt="Avatar" className="w-20 h-20 rounded-full object-cover border-2 border-zinc-700" />
+              ) : (
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-2xl font-bold text-white border-2 border-zinc-700">
+                  {initials(profileName || user?.name || '')}
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-zinc-800 border border-zinc-600 flex items-center justify-center text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors"
+              >
+                <Camera className="w-3.5 h-3.5" />
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="hidden"
+                onChange={handleAvatarChange}
+              />
+            </div>
+            <div className="space-y-1">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="text-sm font-medium text-cyan-400 hover:text-cyan-300 transition-colors"
+              >
+                Cambiar foto
+              </button>
+              {(hasAvatar || avatarPreview) && (
+                <button
+                  type="button"
+                  onClick={handleRemoveAvatar}
+                  className="block text-xs text-zinc-500 hover:text-red-400 transition-colors"
+                >
+                  Eliminar foto
+                </button>
+              )}
+              <p className="text-[10px] text-zinc-600">PNG, JPEG o WebP. Max 200 KB.</p>
+            </div>
+          </div>
+
+          {/* Fields */}
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-zinc-300">Nombre</label>
+              <input
+                type="text"
+                value={profileName}
+                onChange={(e) => setProfileName(e.target.value)}
+                maxLength={100}
+                placeholder="Tu nombre"
+                className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-zinc-300">Bio</label>
+              <textarea
+                value={profileBio}
+                onChange={(e) => setProfileBio(e.target.value)}
+                maxLength={500}
+                rows={3}
+                placeholder="Cuéntanos sobre ti..."
+                className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-white placeholder:text-zinc-600 resize-none focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
+              />
+              <p className="text-right text-[10px] text-zinc-600">{profileBio.length}/500</p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-zinc-300">Teléfono</label>
+              <input
+                type="tel"
+                value={profilePhone}
+                onChange={(e) => setProfilePhone(e.target.value)}
+                maxLength={20}
+                placeholder="+34 612 345 678"
+                className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
+              />
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleSaveProfile}
+            disabled={profileSaving}
+            className="w-full rounded-xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white hover:bg-violet-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {profileSaving ? 'Guardando...' : 'Guardar perfil'}
+          </button>
         </div>
 
         {/* ── AI Coach ──────────────────────────────────────────────── */}

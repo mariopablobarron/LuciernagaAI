@@ -14,6 +14,7 @@ import { buildGoalCoachContext, getFirstPendingAction } from "@/services/goals";
 import { getUserImpulseProfile } from "@/services/impulse-diagnostic";
 import { listRecentImpulseLogs } from "@/services/impulse-challenges";
 import { buildJourneyPromptBlock } from "@/services/journey-coach-bridge";
+import { buildProjectPromptBlock } from "@/services/project-coach-bridge";
 import {
   buildSearchQuery,
   classifyExternalInfoNeed,
@@ -90,10 +91,11 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
     pendingActions: activeGoal?.actions.filter((a) => !a.completed).map((a) => a.description) ?? [],
   });
 
-  const [impulseProfile, impulseLogs, journeyPromptBlock] = await Promise.all([
+  const [impulseProfile, impulseLogs, journeyPromptBlock, projectPromptBlock] = await Promise.all([
     getUserImpulseProfile(userId).catch(() => null),
     listRecentImpulseLogs(userId, 5).catch(() => []),
     buildJourneyPromptBlock(userId).catch(() => null),
+    buildProjectPromptBlock(userId).catch(() => null),
   ]);
 
   // ── Action defaults ─────────────────────────────────────────────────────
@@ -128,6 +130,7 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
     },
     onboarding: onboardingContext,
     journeyPrompt: journeyPromptBlock,
+    projectPrompt: projectPromptBlock,
     access: {
       userPlan: session.userPlan,
       remainingMessages: session.remainingMessages,

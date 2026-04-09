@@ -73,6 +73,7 @@ export type CoachContext = {
   } | null;
   onboarding?: ConversationalOnboardingContext | null;
   journeyPrompt?: string | null;
+  projectPrompt?: string | null;
 };
 
 type ResponseFinalizationContext = {
@@ -356,6 +357,7 @@ export function buildCoachPrompt(
   const accessGuidance = buildAccessGuidance(context);
   const onboardingGuidance = buildOnboardingGuidance(context);
   const journeyGuidance = context.journeyPrompt ?? "";
+  const projectGuidance = context.projectPrompt ?? "";
 
   const goalContext = context.goal
     ? `
@@ -430,6 +432,7 @@ ${legalGuidance ? `\n\n${legalGuidance}` : ""}
 ${accessGuidance ? `\n\n${accessGuidance}` : ""}
 ${onboardingGuidance ? `\n\n${onboardingGuidance}` : ""}
 ${journeyGuidance ? `\n\n${journeyGuidance}` : ""}
+${projectGuidance ? `\n\n${projectGuidance}` : ""}
 
 Consistencia obligatoria de salida:
 - Toda respuesta debe incluir: 1) reconocimiento emocional, 2) referencia de contexto previo si existe, 3) siguiente paso concreto.

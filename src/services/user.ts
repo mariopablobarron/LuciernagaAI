@@ -81,6 +81,8 @@ export type UserSessionProfile = {
   id: string;
   email: string;
   name: string | null;
+  bio: string | null;
+  phone: string | null;
   role: string;
   plan: CanonicalUserPlan;
   planLabel: string;
@@ -648,6 +650,8 @@ export async function getUserSessionProfile(userId: string): Promise<UserSession
           id: created.id,
           email: created.email,
           name: created.name,
+          bio: null,
+          phone: null,
           role: created.role,
           isAnonymous: isSyntheticEmail(created.email),
           emailVerified: false,
@@ -660,6 +664,8 @@ export async function getUserSessionProfile(userId: string): Promise<UserSession
         id: user.id,
         email: user.email,
         name: user.name,
+        bio: user.bio ?? null,
+        phone: user.phone ?? null,
         role: user.role,
         isAnonymous: isSyntheticEmail(user.email),
         emailVerified: user.emailVerified ?? false,

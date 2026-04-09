@@ -31,6 +31,8 @@ model User {
   id              String           @id @default(cuid())
   email           String           @unique
   name            String?
+  bio             String?
+  avatarData      String?
   role            String           @default("user")
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
@@ -76,6 +78,7 @@ model User {
   llmLogs              LlmLog[]
   feedbacks            Feedback[]
   events               Event[]
+  personalProjects     PersonalProject[]
   phone                String?
   emailVerified        Boolean          @default(false)
   emailVerifyToken     String?
@@ -893,6 +896,114 @@ model OrgInvite {
 
   @@index([organizationId, createdAt])
   @@index([code])
+}
+
+// ─── Personal Project System (Proyecto Personal — DFC) ───────────────────────
+
+/// A self-directed personal project following SENTIR > IMAGINAR > ACTUAR > REFLEXIONAR.
+model PersonalProject {
+  id              String                @id @default(cuid())
+  userId          String
+  title           String
+  description     String?               @db.Text
+  phase           String                @default("feel") // "feel" | "imagine" | "act" | "reflect"
+  status          String                @default("active") // "active" | "paused" | "completed" | "abandoned"
+  startedAt       DateTime              @default(now())
+  completedAt     DateTime?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phaseEntries    ProjectPhaseEntry[]
+  focusAreas      ProjectFocusArea[]
+  reflections     ProjectReflection[]
+  insights        ProjectInsight[]
+
+  @@index([userId, status])
+  @@index([userId, phase, status])
+}
+
+/// Q&A interaction within a phase. Questions can be curated or AI-generated.
+model ProjectPhaseEntry {
+  id              String            @id @default(cuid())
+  projectId       String
+  phase           String
+  promptKey       String            // Identifies which prompt/exercise
+  question        String            @db.Text
+  response        String?           @db.Text
+  aiReflection    String?           @db.Text
+  status          String            @default("pending") // "pending" | "completed" | "skipped"
+  order           Int               @default(0)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  project         PersonalProject   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, phase, order])
+}
+
+/// Self-defined focus area — user defines, AI challenges.
+model ProjectFocusArea {
+  id              String            @id @default(cuid())
+  projectId       String
+  title           String
+  description     String?           @db.Text
+  priority        Int               @default(0)
+  status          String            @default("active") // "active" | "completed" | "dropped"
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  project         PersonalProject   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  steps           ProjectStep[]
+
+  @@index([projectId, status])
+}
+
+/// Concrete action step within a focus area (ACT phase).
+model ProjectStep {
+  id              String            @id @default(cuid())
+  focusAreaId     String
+  description     String
+  completed       Boolean           @default(false)
+  completedAt     DateTime?
+  dueDate         DateTime?
+  reflection      String?           @db.Text
+  order           Int               @default(0)
+  createdAt       DateTime          @default(now())
+
+  focusArea       ProjectFocusArea  @relation(fields: [focusAreaId], references: [id], onDelete: Cascade)
+
+  @@index([focusAreaId, completed])
+}
+
+/// Free-form reflections captured at any point.
+model ProjectReflection {
+  id              String            @id @default(cuid())
+  projectId       String
+  phase           String
+  type            String            @default("free") // "free" | "prompted" | "milestone" | "phase_transition"
+  content         String            @db.Text
+  aiChallenge     String?           @db.Text
+  createdAt       DateTime          @default(now())
+
+  project         PersonalProject   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, createdAt])
+}
+
+/// AI-generated observations about patterns the user might not see.
+model ProjectInsight {
+  id              String            @id @default(cuid())
+  projectId       String
+  type            String            // "blind_spot" | "pattern" | "growth" | "avoidance" | "shift"
+  content         String            @db.Text
+  phase           String
+  acknowledged    Boolean           @default(false)
+  createdAt       DateTime          @default(now())
+
+  project         PersonalProject   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, acknowledged])
 }
 
 // ─── Marketing Dashboard ──────────────────────────────────────────────────────

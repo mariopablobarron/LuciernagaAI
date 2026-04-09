@@ -91,8 +91,18 @@ export default function ProfilePage() {
         <div className={`${COMPONENTS.card} p-8 space-y-6`}>
           <div className="flex items-start justify-between">
             <div className="flex gap-4">
-              <div className="w-20 h-20 rounded-full bg-linear-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-2xl font-bold text-white shrink-0">
-                {loading ? '…' : initials(user?.name)}
+              <div className="relative w-20 h-20 shrink-0">
+                {!loading && user?.id ? (
+                  <img
+                    src={`/api/user/avatar/${user.id}`}
+                    alt={user?.name ?? 'Avatar'}
+                    className="w-20 h-20 rounded-full object-cover border-2 border-zinc-700"
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextElementSibling as HTMLElement)?.classList.remove('hidden'); }}
+                  />
+                ) : null}
+                <div className={`w-20 h-20 rounded-full bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-2xl font-bold text-white ${!loading && user?.id ? 'hidden' : ''}`}>
+                  {loading ? '…' : initials(user?.name)}
+                </div>
               </div>
               <div className="space-y-1">
                 {loading ? (
@@ -104,6 +114,7 @@ export default function ProfilePage() {
                   <>
                     <h2 className={`${TYPOGRAPHY.h2} text-white`}>{user?.name ?? 'Usuario'}</h2>
                     <p className="text-zinc-400 capitalize">{user?.planLabel ?? 'Plan gratuito'}</p>
+                    {user?.bio && <p className="text-sm text-zinc-500 mt-1">{user.bio}</p>}
                   </>
                 )}
               </div>

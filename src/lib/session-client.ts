@@ -2,6 +2,8 @@ export type BrowserSessionUser = {
   id: string;
   email: string;
   name: string | null;
+  bio: string | null;
+  phone: string | null;
   role: string;
   plan: string;
   planLabel: string;

@@ -432,7 +432,7 @@ export default function AdminSettingsPage() {
 
   return (
     <AdminShell
-      title="Configuracion del sistema"
+      title="Configuración del sistema"
       subtitle="Estado del sistema, estadisticas rapidas y gestion de organizaciones B2B."
       onLogout={handleLogout}
       showSectionNav={false}
@@ -513,28 +513,28 @@ export default function AdminSettingsPage() {
             {[
               {
                 label: "Base de datos",
-                ok: settings?.system.database === "ok",
-                detail: settings?.system.database === "ok" ? "Conectada" : "Sin conexion",
+                ok: settings?.system?.database === "ok",
+                detail: settings?.system?.database === "ok" ? "Conectada" : "Sin conexion",
                 icon: <Database className="h-4 w-4" />,
               },
               {
                 label: "Email (Resend)",
-                ok: settings?.system.email ?? false,
-                detail: settings?.system.email ? "RESEND_API_KEY configurada" : "No configurada",
+                ok: settings?.system?.email ?? false,
+                detail: settings?.system?.email ? "RESEND_API_KEY configurada" : "No configurada",
                 icon: <Mail className="h-4 w-4" />,
               },
               {
                 label: "Telegram Bot",
-                ok: settings?.system.telegram ?? false,
-                detail: settings?.system.telegram
+                ok: settings?.system?.telegram ?? false,
+                detail: settings?.system?.telegram
                   ? "TELEGRAM_BOT_TOKEN configurado"
                   : "No configurado",
                 icon: <Send className="h-4 w-4" />,
               },
               {
                 label: "Sentry",
-                ok: settings?.system.sentry ?? false,
-                detail: settings?.system.sentry ? "DSN configurado" : "No configurado",
+                ok: settings?.system?.sentry ?? false,
+                detail: settings?.system?.sentry ? "DSN configurado" : "No configurado",
                 icon: <Activity className="h-4 w-4" />,
               },
             ].map((item) => (
@@ -568,31 +568,31 @@ export default function AdminSettingsPage() {
         <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
           <AdminMetricCard
             label="Total usuarios"
-            value={settings?.stats.totalUsers ?? 0}
+            value={settings?.stats?.totalUsers ?? 0}
             icon={<Users className="h-5 w-5" />}
           />
           <AdminMetricCard
             label="Activos (7d)"
-            value={settings?.stats.activeUsers ?? 0}
+            value={settings?.stats?.activeUsers ?? 0}
             accent="emerald"
             icon={<User className="h-5 w-5" />}
             hint="Usuarios vistos en los ultimos 7 dias"
           />
           <AdminMetricCard
             label="Pro"
-            value={settings?.stats.proUsers ?? 0}
+            value={settings?.stats?.proUsers ?? 0}
             accent="violet"
             hint="Suscripciones pro activas"
           />
           <AdminMetricCard
             label="Organizaciones"
-            value={settings?.stats.organizationCount ?? 0}
+            value={settings?.stats?.organizationCount ?? 0}
             accent="sky"
             icon={<Building2 className="h-5 w-5" />}
           />
           <AdminMetricCard
             label="Total mensajes"
-            value={settings?.stats.totalMessages ?? 0}
+            value={settings?.stats?.totalMessages ?? 0}
             accent="amber"
             icon={<MessageSquare className="h-5 w-5" />}
           />
@@ -967,7 +967,7 @@ export default function AdminSettingsPage() {
                                       setNewAdmin({ ...newAdmin, password: e.target.value })
                                     }
                                     className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 pr-10 text-sm text-white placeholder-zinc-600 focus:border-violet-500 focus:outline-none"
-                                    placeholder="Contrasena (min 8 chars)"
+                                    placeholder="Contraseña (mín 8 chars)"
                                   />
                                   <button type="button" onClick={() => setShowSettingsPw(!showSettingsPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300">
                                     {showSettingsPw ? "🙈" : "👁️"}

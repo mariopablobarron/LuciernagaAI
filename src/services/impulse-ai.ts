@@ -8,8 +8,8 @@ interface OpenRouterResponse {
 }
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const OPENROUTER_MODEL = "openai/gpt-4o-mini";
-const REQUEST_TIMEOUT_MS = 15000;
+const OPENROUTER_MODEL = "anthropic/claude-sonnet-4-6";
+const REQUEST_TIMEOUT_MS = 25000;
 
 function estimateMinutes(profileCode: ImpulseProfileSnapshot["code"]): number {
   switch (profileCode) {

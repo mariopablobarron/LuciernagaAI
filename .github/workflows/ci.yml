@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-typecheck-build:
+    name: Lint, Typecheck & Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build (includes TypeScript check)
+        run: npx next build
+        env:
+          DATABASE_URL: "postgresql://fake:fake@localhost:5432/fake"
+          AUTH_TOKEN_SECRET: "ci-test-secret-key-minimum-32-chars"
+          ADMIN_AUTH_SECRET: "ci-test-admin-secret-32-chars-min"
+          OPENROUTER_API_KEY: "sk-fake"
+          ADMIN_USERNAME: "ci-admin"
+          ADMIN_PASSWORD: "ci-password"
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: lint-typecheck-build
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Run tests
+        run: npm test -- --passWithNoTests
+        env:
+          DATABASE_URL: "postgresql://fake:fake@localhost:5432/fake"
+          AUTH_TOKEN_SECRET: "ci-test-secret-key-minimum-32-chars"
+          ADMIN_AUTH_SECRET: "ci-test-admin-secret-32-chars-min"

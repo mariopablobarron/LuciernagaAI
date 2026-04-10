@@ -34,13 +34,15 @@ export async function POST(req: NextRequest) {
     const body = (await req.json()) as AdminLoginBody;
     const username = body.username?.trim() ?? "";
 
-    // Rate-limit by username (per-account lockout)
-    const rl = checkRateLimit(`login-fail:admin:${username}`, 5, 60_000 * 15);
-    if (!rl.allowed) {
-      logInfo("AUTH", "admin_login_rate_limited", { username });
+    // Rate-limit by username AND by IP (dual lockout)
+    const rlUser = checkRateLimit(`login-fail:admin:${username}`, 5, 60_000 * 15);
+    const rlIp = checkRateLimit(`login-fail:ip:${ip}`, 10, 60_000 * 15);
+    if (!rlUser.allowed || !rlIp.allowed) {
+      logInfo("AUTH", "admin_login_rate_limited", { username, ip, byUser: !rlUser.allowed, byIp: !rlIp.allowed });
+      const retryAfter = Math.max(rlUser.retryAfterSeconds ?? 0, rlIp.retryAfterSeconds ?? 0);
       return NextResponse.json(
         { ok: false, error: "ACCOUNT_LOCKED", message: "Demasiados intentos. Espera 15 minutos." },
-        { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } },
+        { status: 429, headers: { "Retry-After": String(retryAfter) } },
       );
     }
     const password = body.password ?? "";

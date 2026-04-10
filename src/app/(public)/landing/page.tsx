@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import TestimonialsSection from "@/components/home/TestimonialsSection";
 
 export default function LandingPage() {
   return (
@@ -115,40 +116,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* TESTIMONIALS */}
-      <section className="py-20 px-4 max-w-5xl mx-auto">
-        <div className="text-center mb-12 space-y-4">
-          <p className="text-sm font-semibold text-violet-400 uppercase tracking-wider">
-            Historias reales
-          </p>
-          <h2 className="text-4xl font-bold">Personas que ya empezaron</h2>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6">
-          {[
-            { quote: "Por fin algo que no me dice qué sentir sino qué hacer.", name: "Valentina", age: "29" },
-            { quote: "Tres semanas y ya completé mi primer reto.", name: "Miguel", age: "34" },
-            { quote: "El check-in diario me cambió la rutina.", name: "Priya", age: "31" },
-          ].map((t, i) => (
-            <div key={i} className="card-surface p-6 space-y-4">
-              <div className="flex gap-0.5">
-                {Array.from({ length: 5 }).map((_, j) => (
-                  <span key={j} className="text-amber-400">★</span>
-                ))}
-              </div>
-              <p className="text-zinc-300 italic text-sm">&ldquo;{t.quote}&rdquo;</p>
-              <div className="flex items-center gap-3 pt-4 border-t border-zinc-800">
-                <div className="w-10 h-10 rounded-full bg-linear-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center font-bold text-sm">
-                  {t.name[0]}
-                </div>
-                <div>
-                  <p className="font-semibold text-white text-sm">{t.name}</p>
-                  <p className="text-xs text-zinc-500">{t.age} años</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* TESTIMONIALS + STATS */}
+      <TestimonialsSection />
 
       {/* PRICING */}
       <section className="py-20 px-4 bg-zinc-900/30 border-y border-zinc-800">

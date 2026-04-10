@@ -28,7 +28,7 @@ type DocMeta = {
 const DOCS: DocMeta[] = [
   {
     id: "guia",
-    title: "Guia de Luciernaga",
+    title: "Guia de la plataforma",
     subtitle: "Vision general, argumentario, fundador, principios pedagogicos y guia completa por rol",
     icon: BookOpen,
     color: "text-violet-400",
@@ -72,9 +72,16 @@ const DOCS: DocMeta[] = [
 /*  Lightweight markdown → JSX renderer                                */
 /* ------------------------------------------------------------------ */
 
-function renderMarkdown(md: string) {
+type TocEntry = { id: string; text: string; level: number };
+
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9áéíóúñü]+/gi, "-").replace(/(^-|-$)/g, "");
+}
+
+function renderMarkdown(md: string): { elements: React.ReactNode[]; toc: TocEntry[] } {
   const lines = md.split("\n");
   const elements: React.ReactNode[] = [];
+  const toc: TocEntry[] = [];
   let i = 0;
   let key = 0;
 
@@ -165,38 +172,49 @@ function renderMarkdown(md: string) {
       continue;
     }
 
-    // Headers
+    // Headers — with id anchors and TOC collection
     if (trimmed.startsWith("# ") && !trimmed.startsWith("## ")) {
+      const text = trimmed.slice(2);
+      const id = slugify(text);
+      toc.push({ id, text, level: 1 });
       elements.push(
-        <h1 key={key++} className="text-2xl font-bold text-white mt-10 mb-4">
-          {inlineFormat(trimmed.slice(2))}
+        <h1 key={key++} id={id} className="text-2xl font-bold text-white mt-10 mb-4 scroll-mt-20">
+          {inlineFormat(text)}
         </h1>
       );
       i++;
       continue;
     }
     if (trimmed.startsWith("## ") && !trimmed.startsWith("### ")) {
+      const text = trimmed.slice(3);
+      const id = slugify(text);
+      toc.push({ id, text, level: 2 });
       elements.push(
-        <h2 key={key++} className="text-xl font-bold text-white mt-8 mb-3 pb-2 border-b border-violet-500/30">
-          {inlineFormat(trimmed.slice(3))}
+        <h2 key={key++} id={id} className="text-xl font-bold text-white mt-8 mb-3 pb-2 border-b border-violet-500/30 scroll-mt-20">
+          {inlineFormat(text)}
         </h2>
       );
       i++;
       continue;
     }
     if (trimmed.startsWith("### ") && !trimmed.startsWith("#### ")) {
+      const text = trimmed.slice(4);
+      const id = slugify(text);
+      toc.push({ id, text, level: 3 });
       elements.push(
-        <h3 key={key++} className="text-lg font-semibold text-violet-300 mt-6 mb-2">
-          {inlineFormat(trimmed.slice(4))}
+        <h3 key={key++} id={id} className="text-lg font-semibold text-violet-300 mt-6 mb-2 scroll-mt-20">
+          {inlineFormat(text)}
         </h3>
       );
       i++;
       continue;
     }
     if (trimmed.startsWith("#### ")) {
+      const text = trimmed.slice(5);
+      const id = slugify(text);
       elements.push(
-        <h4 key={key++} className="text-sm font-semibold text-zinc-200 mt-4 mb-1">
-          {inlineFormat(trimmed.slice(5))}
+        <h4 key={key++} id={id} className="text-sm font-semibold text-zinc-200 mt-4 mb-1 scroll-mt-20">
+          {inlineFormat(text)}
         </h4>
       );
       i++;
@@ -313,7 +331,7 @@ function renderMarkdown(md: string) {
     i++;
   }
 
-  return elements;
+  return { elements, toc };
 }
 
 /* ------------------------------------------------------------------ */
@@ -452,11 +470,39 @@ export default function AdminGuiaPage() {
           </div>
         )}
 
-        {!loading && !error && content && (
-          <div className="px-6 py-8 md:px-10 md:py-10 max-w-4xl mx-auto">
-            {renderMarkdown(content)}
-          </div>
-        )}
+        {!loading && !error && content && (() => {
+          const { elements, toc } = renderMarkdown(content);
+          return (
+            <div className="flex">
+              {/* TOC sidebar */}
+              {toc.length > 0 && (
+                <nav className="hidden xl:block w-56 shrink-0 border-r border-zinc-800 px-4 py-8 sticky top-16 max-h-[calc(100vh-4rem)] overflow-y-auto">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-600 mb-3">Indice</p>
+                  <div className="space-y-0.5">
+                    {toc.map((entry) => (
+                      <a
+                        key={entry.id}
+                        href={`#${entry.id}`}
+                        className={`block text-xs transition-colors hover:text-violet-300 ${
+                          entry.level === 1 ? "text-zinc-300 font-semibold py-1" :
+                          entry.level === 2 ? "text-zinc-400 pl-3 py-0.5" :
+                          "text-zinc-500 pl-6 py-0.5"
+                        }`}
+                      >
+                        {entry.text}
+                      </a>
+                    ))}
+                  </div>
+                </nav>
+              )}
+
+              {/* Content */}
+              <div className="flex-1 px-6 py-8 md:px-10 md:py-10 max-w-4xl">
+                {elements}
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </AdminShell>
   );

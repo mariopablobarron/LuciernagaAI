@@ -124,12 +124,15 @@ model User {
   deletedAt            DateTime?        // soft delete — null means active
   organizationId       String?
   organization         Organization?    @relation(fields: [organizationId], references: [id])
+  classroomId          String?
+  classroom            Classroom?       @relation(fields: [classroomId], references: [id])
 
   @@index([organizationId])
   @@index([isActive, createdAt])
   @@index([lastSeen])
   @@index([createdAt])
   @@index([organizationId, isActive, lastSeen])
+  @@index([classroomId])
   @@index([deletedAt])
 }
 
@@ -904,43 +907,48 @@ model ScheduledEmail {
 
 // ─── B2B: Organizations (Multitenant) ─────────────────────────────────────────
 
-/// An organization (company, clinic, school) that groups users.
+/// An organization (company, clinic, school, training center) that groups users.
 model Organization {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique // URL-friendly identifier
-  type        String   @default("company") // "company" | "clinic" | "school"
-  plan        String   @default("team") // "team" | "enterprise"
-  maxUsers    Int      @default(50)
-  isActive    Boolean  @default(true)
-  contactName String?
+  id           String       @id @default(cuid())
+  name         String
+  slug         String       @unique // URL-friendly identifier
+  type         String       @default("company") // "company" | "clinic" | "school" | "training_center"
+  plan         String       @default("team") // "team" | "enterprise"
+  maxUsers     Int          @default(50)
+  isActive     Boolean      @default(true)
+  contactName  String?
   contactEmail String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  users       User[]
-  orgAdmins   OrgAdmin[]
-  orgInvites  OrgInvite[]
+  logoUrl      String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  users        User[]
+  orgAdmins    OrgAdmin[]
+  orgInvites   OrgInvite[]
+  classrooms   Classroom[]
 
   @@index([slug])
   @@index([type, isActive])
 }
 
-/// Admin users for an organization (HR managers, therapists).
+/// Admin users for an organization (HR managers, therapists, teachers).
 /// Separate from User — they don't chat, they view aggregate data.
 model OrgAdmin {
   id             String       @id @default(cuid())
   organizationId String
   email          String
   name           String
-  role           String       @default("hr") // "hr" | "therapist" | "admin"
+  role           String       @default("hr") // "hr" | "therapist" | "admin" | "teacher"
+  classroomId    String?      // if teacher, which classroom they manage
   passwordHash   String
   lastLoginAt    DateTime?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  classroom      Classroom?   @relation(fields: [classroomId], references: [id])
 
   @@unique([organizationId, email])
   @@index([email])
+  @@index([classroomId])
 }
 
 /// Invitation link for users to join a specific organization.
@@ -959,6 +967,43 @@ model OrgInvite {
 
   @@index([organizationId, createdAt])
   @@index([code])
+}
+
+/// A classroom/group within an organization. Teachers manage classrooms.
+model Classroom {
+  id             String          @id @default(cuid())
+  organizationId String
+  name           String          // "3º ESO A", "Grupo Mindfulness", etc.
+  description    String?
+  teacherId      String?         // OrgAdmin id of the teacher (denormalized for quick access)
+  isActive       Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  users          User[]
+  teachers       OrgAdmin[]
+  codes          ClassroomCode[]
+
+  @@index([organizationId, isActive])
+  @@index([organizationId, createdAt])
+}
+
+/// A registration code that assigns users to a classroom on signup.
+model ClassroomCode {
+  id          String     @id @default(cuid())
+  classroomId String
+  code        String     @unique // short human-friendly code: "MIND-2026-A3"
+  label       String?    // optional label: "Código para padres", "Turno mañana"
+  maxUses     Int        @default(0) // 0 = unlimited
+  usedCount   Int        @default(0)
+  isActive    Boolean    @default(true)
+  expiresAt   DateTime?
+  createdBy   String     // OrgAdmin id who created it
+  createdAt   DateTime   @default(now())
+  classroom   Classroom  @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+
+  @@index([code])
+  @@index([classroomId, isActive])
 }
 
 // ─── Personal Project System (Proyecto Personal — DFC) ───────────────────────

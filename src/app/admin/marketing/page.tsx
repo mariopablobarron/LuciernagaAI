@@ -265,14 +265,23 @@ export default function MarketingPage() {
       });
       if (!checkAuth(res)) return;
       const json = (await res.json()) as {
-        success: number;
-        failed: number;
+        successCount?: number;
+        failureCount?: number;
+        success?: number;
+        failed?: number;
         message?: string;
+        error?: string;
       };
-      setTgResult({
-        ok: json.failed === 0,
-        message: json.message ?? `Enviado: ${json.success} ok, ${json.failed} fallidos`,
-      });
+      if (!res.ok) {
+        setTgResult({ ok: false, message: json.message ?? json.error ?? `Error ${res.status}` });
+      } else {
+        const ok = json.successCount ?? json.success ?? 0;
+        const fail = json.failureCount ?? json.failed ?? 0;
+        setTgResult({
+          ok: fail === 0,
+          message: `Enviado: ${ok} ok, ${fail} fallidos`,
+        });
+      }
     } catch {
       setTgResult({ ok: false, message: "Error de red al enviar broadcast" });
     } finally {

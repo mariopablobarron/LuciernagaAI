@@ -19,7 +19,7 @@ export async function GET(
     return new NextResponse(null, { status: 404 });
   }
 
-  const match = /^data:(image\/\w+);base64,(.+)$/.exec(user.avatarData);
+  const match = /^data:(image\/[\w+.-]+);base64,(.+)$/.exec(user.avatarData);
   if (!match) {
     return new NextResponse(null, { status: 404 });
   }

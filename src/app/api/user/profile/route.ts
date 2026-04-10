@@ -12,7 +12,7 @@ const MAX_BIO = 500;
 const MAX_PHONE = 20;
 const MAX_AVATAR_LENGTH = 270_000; // ~200KB base64
 const PHONE_REGEX = /^\+?[\d\s()-]{6,20}$/;
-const AVATAR_PREFIX_REGEX = /^data:image\/(png|jpeg|webp|gif);base64,/;
+const AVATAR_PREFIX_REGEX = /^data:image\/(png|jpe?g|webp|gif|svg\+xml|bmp|tiff?|avif|heic|heif);base64,/;
 
 export async function GET(req: NextRequest) {
   try {
@@ -94,7 +94,7 @@ export async function PATCH(req: NextRequest) {
       data.avatarData = null;
     } else if (typeof body.avatarData === "string") {
       if (!AVATAR_PREFIX_REGEX.test(body.avatarData)) {
-        return NextResponse.json({ error: "AVATAR_FORMAT_INVALID", message: "La imagen debe ser PNG, JPEG, WebP o GIF." }, { status: 400 });
+        return NextResponse.json({ error: "AVATAR_FORMAT_INVALID", message: "Formato no soportado. Usa PNG, JPG, WebP, GIF, SVG, BMP, TIFF, AVIF o HEIC." }, { status: 400 });
       }
       if (body.avatarData.length > MAX_AVATAR_LENGTH) {
         return NextResponse.json({ error: "AVATAR_TOO_LARGE", message: "La imagen debe ser menor de 200 KB." }, { status: 400 });

@@ -40,23 +40,24 @@ export default function ClinicalDisclaimer() {
           onClick={close}
         >
           <div
-            className="w-full max-w-md rounded-2xl border border-zinc-700/60 bg-zinc-900 shadow-2xl shadow-black/50 max-h-[80vh] overflow-y-auto"
+            className="relative w-full max-w-md rounded-2xl border border-zinc-700/60 bg-zinc-900 shadow-2xl shadow-black/50"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sticky top-0 flex items-center justify-between px-5 py-4 border-b border-zinc-800 bg-zinc-900 rounded-t-2xl">
-              <div className="flex items-center gap-2.5">
+            {/* X button — always visible, outside scroll */}
+            <button
+              onClick={close}
+              className="absolute top-3 right-3 z-10 p-2 text-zinc-400 hover:text-white transition-colors rounded-full hover:bg-white/10"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="max-h-[75vh] overflow-y-auto rounded-2xl">
+              <div className="flex items-center gap-2.5 px-5 pt-5 pb-3">
                 <ShieldCheck className="w-5 h-5 text-cyan-400" />
                 <h2 className="text-sm font-semibold text-white">Información importante</h2>
               </div>
-              <button
-                onClick={close}
-                className="p-1.5 text-zinc-500 hover:text-white transition-colors rounded-md hover:bg-white/5"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
 
-            <div className="px-5 py-4 space-y-4">
+              <div className="px-5 pb-5 space-y-4">
               <div className="space-y-2">
                 <p className="text-sm text-zinc-300 leading-relaxed">
                   <strong className="text-white">Tres Mil Millones de Latidos</strong> es una herramienta
@@ -90,6 +91,7 @@ export default function ClinicalDisclaimer() {
               <p className="text-xs text-zinc-600 text-center">
                 Al usar esta aplicación aceptas estos términos.
               </p>
+            </div>
             </div>
           </div>
         </div>

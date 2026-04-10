@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ArrowRight, MessageSquareDashed, Sparkles, Zap } from "lucide-react";
+import MirrorReveal from "@/components/effects/MirrorReveal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -122,6 +123,24 @@ export default function HomeHero({
             {consentError ? <p className="mt-2 text-sm text-destructive">{consentError}</p> : null}
           </div>
         ) : null}
+
+        <MirrorReveal
+          prompt="Antes de empezar... ¿qué te frena ahora mismo?"
+          onSubmit={async (text) => {
+            try {
+              const res = await fetch("/api/reframe", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ text }),
+              });
+              const data = (await res.json()) as { reframed?: string };
+              return data.reframed ?? "Hay algo detrás de lo que dices que merece atención.";
+            } catch {
+              return "Hay algo detrás de lo que dices que merece atención.";
+            }
+          }}
+        />
 
         <Link
           href="/impulso"

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import type { UserState } from "@/domain/types";
 import Milestones from "@/components/Milestones";
+import RealityLens from "@/components/effects/RealityLens";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -270,6 +271,34 @@ export default function DashboardPage() {
             </>
           )}
         </div>
+
+        {/* ── Reality Lens ──────────────────────────────────────────── */}
+        {!loading && stateData && (
+          <RealityLens
+            surface={
+              <div className="space-y-2">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-600">Lo que ves</p>
+                <p className="text-lg font-semibold text-white">{cfg.emoji} {cfg.label}</p>
+                <p className="text-sm text-zinc-400">{cfg.desc}</p>
+              </div>
+            }
+            revealed={
+              <div className="space-y-2">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-violet-400">Lo que hay detrás</p>
+                <p className="text-lg font-semibold text-cyan-300">
+                  {stateData.state === "bloqueo" && "No es falta de capacidad. Es miedo a que no sea suficiente."}
+                  {stateData.state === "ansiedad" && "La urgencia que sientes no es real. Es ruido disfrazado de acción."}
+                  {stateData.state === "duda" && "No te falta información. Te falta permiso para elegir mal."}
+                  {stateData.state === "claridad" && "Ahora lo ves claro. La pregunta es: ¿vas a actuar antes de que se nuble?"}
+                  {stateData.state === "neutral" && "La calma no siempre es paz. A veces es evitación silenciosa."}
+                </p>
+                <p className="text-xs text-violet-400/70">
+                  Tendencia: {stateData.progressTrend} · Racha: {stateData.streakDays} días
+                </p>
+              </div>
+            }
+          />
+        )}
 
         {/* ── Main Grid ────────────────────────────────────────────── */}
         <div className="grid md:grid-cols-3 gap-6">

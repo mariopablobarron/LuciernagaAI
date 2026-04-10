@@ -41,7 +41,9 @@ describe("HomeHero", () => {
     );
 
     expect(html).toContain("Empezar guiado");
-    expect(html).not.toContain('<button type="button" disabled');
+    // The "Empezar guiado" button should NOT be disabled when consent is checked
+    // (MirrorReveal's "Mirar" button may be disabled — that's separate)
+    expect(html).not.toMatch(/disabled.*Empezar guiado/);
     expect(html).toContain("Necesitamos tu consentimiento");
   });
 });

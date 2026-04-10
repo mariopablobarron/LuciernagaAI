@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AlertTriangle, CheckCircle, TrendingDown, TrendingUp } from "lucide-react";
+import GlassesToggle from "@/components/effects/GlassesToggle";
 
 type AvoidedAction = {
   description: string;
@@ -117,17 +118,33 @@ export default function AvoidanceMap() {
                 : "border-orange-500/20 bg-orange-500/5"
             }`}
           >
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex-1">
-                <p className={`text-sm font-medium ${item.completed ? "text-zinc-500 line-through" : "text-white"}`}>
-                  {item.description}
-                </p>
-                <p className="text-xs text-zinc-600 mt-0.5">{item.goalTitle}</p>
-              </div>
-              <div className="flex items-center gap-1 shrink-0">
-                <span className="text-lg font-bold text-orange-400">{item.count}x</span>
-              </div>
-            </div>
+            <GlassesToggle
+              before={
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1">
+                    <p className={`text-sm font-medium ${item.completed ? "text-zinc-500 line-through" : "text-white"}`}>
+                      {item.description}
+                    </p>
+                    <p className="text-xs text-zinc-600 mt-0.5">{item.goalTitle}</p>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <span className="text-lg font-bold text-orange-400">{item.count}x</span>
+                  </div>
+                </div>
+              }
+              after={
+                <div>
+                  <p className="text-sm font-medium text-cyan-300">
+                    Evitas esto {item.count} veces. ¿Qué protege esa decisión?
+                  </p>
+                  <p className="text-xs text-violet-400 mt-1">
+                    {item.completed
+                      ? "Lo completaste — el patrón se rompió."
+                      : `Cada vez que pospones "${item.description}", refuerzas el patrón.`}
+                  </p>
+                </div>
+              }
+            />
             <div className="flex gap-1.5 flex-wrap">
               {item.types.map((t) => (
                 <span key={t} className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400">

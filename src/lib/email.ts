@@ -743,6 +743,34 @@ function familyLayout(title: string, body: string, cta?: { href: string; label: 
 </body></html>`;
 }
 
+const RELATION_GUIDANCE: Record<string, { role: string; doThis: string; dontDoThis: string }> = {
+  madre: {
+    role: "Tu hijo/a confía en ti para esto. Eso dice mucho de vuestra relación.",
+    doThis: "Estar disponible. Un mensaje natural de vez en cuando. Celebrar los pequeños avances.",
+    dontDoThis: "Intentar arreglarlo todo. Preguntar si ya entró a la app. Dar sermones.",
+  },
+  padre: {
+    role: "Tu hijo/a confía en ti para esto. Eso dice mucho de vuestra relación.",
+    doThis: "Estar disponible. Un mensaje natural de vez en cuando. Celebrar los pequeños avances.",
+    dontDoThis: "Intentar arreglarlo todo. Preguntar si ya entró a la app. Dar sermones.",
+  },
+  pareja: {
+    role: "Tu pareja ha elegido compartir este proceso contigo. Eso es un acto de confianza.",
+    doThis: "Acompañar sin controlar. Preguntar cómo está sin esperar que hable de la app.",
+    dontDoThis: "Usar esta información en discusiones. Vigilar su progreso. Presionar.",
+  },
+  "amigo/a": {
+    role: "Que te haya elegido como apoyo significa que confía en ti de verdad.",
+    doThis: "Ser natural. Proponer planes juntos. Enviar un mensaje cuando te acuerdes.",
+    dontDoThis: "Cambiar cómo le tratas. Dar consejos no pedidos. Hablar de su proceso con otros.",
+  },
+  terapeuta: {
+    role: "Esta información complementa tu trabajo clínico con consentimiento explícito.",
+    doThis: "Usar los datos como contexto entre sesiones. Observar patrones de evitación o crisis.",
+    dontDoThis: "Mencionar datos del portal sin que el paciente los traiga primero a sesión.",
+  },
+};
+
 /** Invite sent to the trusted contact when the user adds them. */
 export function buildFamilyInviteEmail(params: {
   userName: string;
@@ -751,21 +779,52 @@ export function buildFamilyInviteEmail(params: {
   portalUrl: string;
 }): Pick<UserEmail, "subject" | "html" | "text"> {
   const { userName, contactName, relation, portalUrl } = params;
-  const subject = `${escapeHtml(userName)} te ha añadido como contacto de confianza en Tres Mil Millones de Latidos`;
+  const guide = RELATION_GUIDANCE[relation] ?? {
+    role: "Has sido elegido/a como persona de confianza. Eso es un privilegio.",
+    doThis: "Estar presente. Un mensaje natural de vez en cuando. Celebrar avances.",
+    dontDoThis: "Presionar. Vigilar. Usar esta información para confrontar.",
+  };
+
+  const subject = `${escapeHtml(userName)} confía en ti — portal de apoyo`;
   const body = `
     <p style="color:#444;font-size:15px;line-height:1.6">Hola ${escapeHtml(contactName)},</p>
     <p style="color:#444;font-size:15px;line-height:1.6">
-      <strong>${escapeHtml(userName)}</strong> te ha designado como su <em>${escapeHtml(relation)}</em> de confianza
-      en Tres Mil Millones de Latidos, la app que le ayuda a mantener claridad, avanzar en sus objetivos y gestionar su bienestar emocional.
+      <strong>${escapeHtml(userName)}</strong> te ha elegido como su <em>${escapeHtml(relation)}</em> de confianza
+      en Tres Mil Millones de Latidos. Está trabajando en su bienestar emocional y ha decidido
+      que tú formes parte de ese proceso.
     </p>
-    <p style="color:#444;font-size:15px;line-height:1.6">
-      Con tu portal podrás ver su progreso (solo lo que él/ella elija compartir), enviarle mensajes de apoyo
-      y ser alertado/a si necesita ayuda urgente.
+    <p style="color:#444;font-size:15px;line-height:1.6;font-style:italic;border-left:3px solid #d946ef;padding-left:12px;margin:16px 0">
+      ${escapeHtml(guide.role)}
     </p>
+    <p style="color:#111;font-size:14px;font-weight:700;margin:20px 0 8px">🟢 Lo que sí puedes hacer:</p>
+    <p style="color:#444;font-size:14px;line-height:1.6">${escapeHtml(guide.doThis)}</p>
+    <p style="color:#111;font-size:14px;font-weight:700;margin:20px 0 8px">🔴 Lo que no deberías hacer:</p>
+    <p style="color:#444;font-size:14px;line-height:1.6">${escapeHtml(guide.dontDoThis)}</p>
+    <div style="background:#fffbeb;border-left:3px solid #f59e0b;border-radius:4px;padding:14px 16px;margin:20px 0">
+      <p style="margin:0;font-size:14px;color:#92400e;font-weight:600">Regla de oro</p>
+      <p style="margin:8px 0 0;font-size:14px;color:#78350f;line-height:1.6">
+        No le menciones lo que ves en el portal. Si le dices "vi que llevas días sin entrar",
+        rompes la confianza del proceso. El sistema ya le acompaña.
+        Tu papel es estar — no vigilar.
+      </p>
+    </div>
     <p style="color:#444;font-size:15px;line-height:1.6">
       <strong>Guarda este enlace — es tu acceso permanente:</strong>
     </p>`;
-  const text = `Hola ${contactName},\n\n${userName} te ha añadido como contacto de confianza en Tres Mil Millones de Latidos.\n\nTu portal de acceso:\n${portalUrl}`;
+  const text = [
+    `Hola ${contactName},`,
+    ``,
+    `${userName} te ha elegido como su ${relation} de confianza en Tres Mil Millones de Latidos.`,
+    ``,
+    `${guide.role}`,
+    ``,
+    `Lo que sí puedes hacer: ${guide.doThis}`,
+    `Lo que no deberías hacer: ${guide.dontDoThis}`,
+    ``,
+    `REGLA DE ORO: No le menciones lo que ves en el portal. Tu papel es estar, no vigilar.`,
+    ``,
+    `Tu portal: ${portalUrl}`,
+  ].join("\n");
   return { subject, html: familyLayout(subject, body, { href: portalUrl, label: "Abrir mi portal" }), text };
 }
 

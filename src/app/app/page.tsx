@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { MessageCircle, Plus, Sparkles } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 import { trackMetaEvent } from "@/lib/meta-pixel";
+import MirrorMoment from "@/components/effects/MirrorMoment";
 import AppLayout from "@/components/layout/AppLayout";
 import { FloatingButton } from "@/components/effects/FloatingButton";
 import Chat, { type ChatMessage } from "@/components/Chat";
@@ -33,7 +34,8 @@ import { PRODUCT_DISCLAIMERS } from "@/lib/legal";
 import { useSfx } from "@/lib/useSfx";
 import { confettiBurst, confettiHeartbeat } from "@/lib/confetti";
 import { toast } from "sonner";
-// SfxToggle available via sfx.toggle if needed in future
+import GuidedTour from "@/components/GuidedTour";
+import { APP_TOUR } from "@/lib/tours";
 import {
   bootstrapBrowserSession,
   captureBrowserEmail,
@@ -351,6 +353,7 @@ export default function HomePage() {
   const [streakDays, setStreakDays] = useState(0);
   const [sessionLoading, setSessionLoading] = useState(true);
   const [proactivePrompt, setProactivePrompt] = useState<string | null>(null);
+  const [mirrorMoment, setMirrorMoment] = useState<{ type: "return" | "action_done" | "weekly" | "pre_goal"; context?: string } | null>(null);
   const [adminAuthenticated, setAdminAuthenticated] = useState(false);
   const [adminLoading, setAdminLoading] = useState(true);
   const [workspaceTab, setWorkspaceTab] = useState<WorkspaceTab>("chat");
@@ -405,6 +408,16 @@ export default function HomePage() {
 
     setSessionReady(true);
     setError(null);
+
+    // Check if user has been inactive 3+ days → show mirror moment
+    fetch("/api/user/state", { credentials: "include" })
+      .then((r) => r.json())
+      .then((data: { daysInactive?: number }) => {
+        if (data.daysInactive && data.daysInactive >= 3 && !mirrorMoment) {
+          setMirrorMoment({ type: "return", context: String(data.daysInactive) });
+        }
+      })
+      .catch(() => {});
 
     // Fetch context-aware proactive prompt in background
     fetch("/api/user/proactive-prompt", { credentials: "include" })
@@ -1150,6 +1163,8 @@ export default function HomePage() {
       confettiBurst();
       trackEvent("action_completed", { actionId });
       toast.success("Acción completada");
+      // Show mirror moment after completing an action
+      setMirrorMoment({ type: "action_done", context: "tu acción" });
       const nextGoal = payload.goal || null;
       setActiveGoal(nextGoal);
       setActionLock((previous) => {
@@ -1946,6 +1961,14 @@ export default function HomePage() {
             chat={
               <div className="flex min-h-96 max-h-[calc(100vh-14rem)] flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
                 <div className="shrink-0">
+                  {mirrorMoment && (
+                    <MirrorMoment
+                      type={mirrorMoment.type}
+                      context={mirrorMoment.context}
+                      onDismiss={() => setMirrorMoment(null)}
+                      className="m-3"
+                    />
+                  )}
                   <AssessmentFlow userId={sessionProfile?.id} />
                   <QuickCheckin userId={sessionProfile?.id} />
                   <RetoDiario
@@ -2187,6 +2210,8 @@ export default function HomePage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <GuidedTour tourId="app-main" steps={APP_TOUR} delay={1500} />
     </>
   );
 }

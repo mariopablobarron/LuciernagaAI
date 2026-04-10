@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
       }),
       prisma.user.findUnique({
         where: { id: identity.userId },
-        select: { consentGiven: true },
+        select: { consentGiven: true, lastSeen: true },
       }),
       getActiveGoalForUser(identity.userId),
       prisma.streak.findUnique({
@@ -52,6 +52,9 @@ export async function GET(req: NextRequest) {
     const primaryEmotion = userStateRecord?.primaryEmotion ?? "calma";
     const progressTrend = userStateRecord?.progressTrend ?? "igual";
     const consentGiven = userRecord?.consentGiven ?? false;
+    const daysInactive = userRecord?.lastSeen
+      ? Math.floor((Date.now() - new Date(userRecord.lastSeen).getTime()) / (24 * 60 * 60 * 1000))
+      : 0;
     const streakDays = streakRecord?.currentDays ?? 0;
     const progress = activeGoal?.progress ?? 0;
     const pendingActions = (activeGoal?.actions ?? [])
@@ -65,6 +68,7 @@ export async function GET(req: NextRequest) {
       primaryEmotion,
       progressTrend,
       consentGiven,
+      daysInactive,
       streakDays,
       progress,
       pendingActions,

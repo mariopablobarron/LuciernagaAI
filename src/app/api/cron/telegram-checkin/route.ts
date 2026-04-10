@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
         telegramId: true,
         name: true,
         goals: {
-          where: { status: "active" },
+          where: { status: "active" as const },
           select: {
             actions: {
               where: { completed: false },

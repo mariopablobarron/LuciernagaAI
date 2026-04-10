@@ -23,6 +23,7 @@ export const PERMISSIONS: Record<SystemRole, string[]> = {
     "docs",
     "users:read",
     "users:update",
+    "users:delete",
     "users:change-plan",
     "users:reset-password",
     "users:send-email",

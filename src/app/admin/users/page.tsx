@@ -152,13 +152,20 @@ export default function AdminUsersPage() {
     if (!window.confirm(`Eliminar ${selected.size} usuario(s)? Esta accion no se puede deshacer.`)) return;
     setBulkAction(true);
     let deleted = 0;
+    let failed = 0;
     for (const id of selected) {
       try {
         const res = await fetch(`/api/admin/users/${id}`, { method: "DELETE", credentials: "include" });
         if (res.ok) deleted++;
-      } catch { /* continue */ }
+        else failed++;
+      } catch { failed++; }
     }
-    toast.success(`${deleted} usuario(s) eliminado(s)`);
+    if (failed > 0) {
+      toast.error(`${failed} usuario(s) no se pudieron eliminar (permiso insuficiente o error).`);
+    }
+    if (deleted > 0) {
+      toast.success(`${deleted} usuario(s) eliminado(s)`);
+    }
     setSelected(new Set());
     setBulkAction(false);
     void fetchUsers();

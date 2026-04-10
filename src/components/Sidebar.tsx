@@ -266,6 +266,24 @@ export default function Sidebar({
           <ArrowRight className="ml-3 size-4 shrink-0 text-muted-foreground" />
         </Link>
 
+        {/* Mi Proyecto */}
+        <Link
+          href="/proyecto"
+          className={`flex items-center justify-between rounded-2xl border px-4 py-3 text-sm transition hover:border-violet-500/50 hover:bg-violet-500/10 ${
+            pathname.startsWith("/proyecto")
+              ? "border-violet-500/40 bg-violet-500/12 text-foreground"
+              : "border-border bg-muted/30 text-foreground"
+          }`}
+        >
+          <div>
+            <p className="font-semibold leading-snug">🎯 Mi Proyecto</p>
+            <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">
+              Tu proyecto personal con fases, seguimiento y reflexion.
+            </p>
+          </div>
+          <ArrowRight className="ml-3 size-4 shrink-0 text-muted-foreground" />
+        </Link>
+
         {/* Telegram CTA */}
         <a
           href="https://t.me/TRESMILMILLONESDELATIDOSBOT"

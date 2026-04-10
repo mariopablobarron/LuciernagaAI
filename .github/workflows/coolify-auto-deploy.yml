@@ -20,7 +20,18 @@ jobs:
             echo "No webhook configured - deploy manually from Coolify."
             exit 0
           fi
-          curl --fail --silent --show-error --request GET "$COOLIFY_WEBHOOK"
-          echo "Coolify deploy triggered."
+          HTTP_CODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" --request GET "$COOLIFY_WEBHOOK" 2>&1)
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 400 ]; then
+            echo "Coolify deploy triggered (HTTP $HTTP_CODE)."
+          else
+            echo "GET failed ($HTTP_CODE), trying POST..."
+            HTTP_CODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" --request POST "$COOLIFY_WEBHOOK" 2>&1)
+            if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 400 ]; then
+              echo "Coolify deploy triggered via POST (HTTP $HTTP_CODE)."
+            else
+              echo "Deploy webhook failed (HTTP $HTTP_CODE). Check COOLIFY_DEPLOY_WEBHOOK_URL."
+              exit 1
+            fi
+          fi
         env:
           COOLIFY_WEBHOOK: ${{ secrets.COOLIFY_DEPLOY_WEBHOOK_URL }}

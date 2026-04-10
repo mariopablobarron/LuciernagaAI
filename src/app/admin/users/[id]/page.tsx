@@ -953,10 +953,10 @@ export default function AdminUserDetailPage() {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <Target className="size-4" />
-                  Objetivos activos
+                  Objetivos activos ({data.activeGoals.length})
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3 max-h-96 overflow-y-auto">
                 {data.activeGoals.length === 0 ? (
                   <p className="text-sm text-zinc-500">Sin objetivos activos.</p>
                 ) : (
@@ -991,10 +991,10 @@ export default function AdminUserDetailPage() {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <MessageSquareText className="size-4" />
-                  Conversaciones recientes
+                  Todas las conversaciones ({data.conversations.length})
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3 max-h-96 overflow-y-auto">
                 {data.conversations.length === 0 ? (
                   <p className="text-sm text-zinc-500">Sin conversaciones registradas.</p>
                 ) : (
@@ -1022,9 +1022,9 @@ export default function AdminUserDetailPage() {
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
             <Card className="border-zinc-800 bg-zinc-900/50">
               <CardHeader className="pb-3">
-                <CardTitle>Eventos de crisis</CardTitle>
+                <CardTitle>Eventos de crisis ({data.crisisEvents.length})</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3 max-h-96 overflow-y-auto">
                 {data.crisisEvents.length === 0 ? (
                   <p className="text-sm text-zinc-500">Sin eventos de crisis.</p>
                 ) : (
@@ -1049,9 +1049,9 @@ export default function AdminUserDetailPage() {
 
             <Card className="border-zinc-800 bg-zinc-900/50">
               <CardHeader className="pb-3">
-                <CardTitle>Eventos de evasión</CardTitle>
+                <CardTitle>Eventos de evasion ({data.avoidanceEvents.length})</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3 max-h-96 overflow-y-auto">
                 {data.avoidanceEvents.length === 0 ? (
                   <p className="text-sm text-zinc-500">Sin eventos de evasión.</p>
                 ) : (
@@ -1227,14 +1227,14 @@ export default function AdminUserDetailPage() {
 
           <Card className="border-zinc-800 bg-zinc-900/50">
             <CardHeader className="pb-3">
-              <CardTitle>Mensajes recientes</CardTitle>
+              <CardTitle>Todos los mensajes ({data.messages.length})</CardTitle>
               <CardDescription>
-                Últimos mensajes del usuario para contexto de soporte.
+                Historial completo de mensajes del usuario.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-2 max-h-[600px] overflow-y-auto">
               {data.messages.length === 0 ? (
-                <p className="text-sm text-zinc-500">Sin mensajes recientes.</p>
+                <p className="text-sm text-zinc-500">Sin mensajes.</p>
               ) : (
                 data.messages.map((message) => (
                   <div key={message.id} className="rounded-xl border border-zinc-800 p-3">

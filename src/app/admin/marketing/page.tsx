@@ -305,14 +305,23 @@ export default function MarketingPage() {
       });
       if (!checkAuth(res)) return;
       const json = (await res.json()) as {
-        success: number;
-        failed: number;
+        successCount?: number;
+        failureCount?: number;
+        success?: number;
+        failed?: number;
         message?: string;
+        error?: string;
       };
-      setEmResult({
-        ok: json.failed === 0,
-        message: json.message ?? `Enviado: ${json.success} ok, ${json.failed} fallidos`,
-      });
+      if (!res.ok) {
+        setEmResult({ ok: false, message: json.message ?? json.error ?? `Error ${res.status}` });
+      } else {
+        const ok = json.successCount ?? json.success ?? 0;
+        const fail = json.failureCount ?? json.failed ?? 0;
+        setEmResult({
+          ok: fail === 0,
+          message: `Enviado: ${ok} ok, ${fail} fallidos`,
+        });
+      }
     } catch {
       setEmResult({ ok: false, message: "Error de red al enviar campaña" });
     } finally {

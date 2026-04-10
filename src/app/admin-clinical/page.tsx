@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, RefreshCw, ShieldAlert, User } from "lucide-react";
+import { AlertTriangle, Download, RefreshCw, ShieldAlert, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -101,6 +101,22 @@ export default function AdminClinicalPage() {
       onLogout={handleLogout}
       showSectionNav={false}
     >
+      {/* Clinical guide quick access */}
+      <div className="flex items-center justify-between rounded-xl border border-violet-500/20 bg-violet-500/5 px-5 py-3">
+        <p className="text-sm text-zinc-400">
+          <span className="font-semibold text-violet-300">Guia clinica</span> — Protocolos, intervenciones, deteccion de riesgo y rutina recomendada
+        </p>
+        <a
+          href="/api/admin/docs?doc=guia&format=html#36-tu-rol-en-luciernaga"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 rounded-lg bg-violet-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-400 transition-colors shrink-0"
+        >
+          <Download className="w-3.5 h-3.5" />
+          Descargar PDF
+        </a>
+      </div>
+
       {/* Filters */}
       <Card>
         <CardContent className="flex flex-wrap items-center gap-3 p-4">

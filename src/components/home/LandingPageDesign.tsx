@@ -172,7 +172,7 @@ export default function LandingPageDesign() {
                   href="/signup"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-linear-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-fuchsia-500/25 hover:shadow-fuchsia-500/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
                 >
-                  Empieza a latir diferente <ArrowRight className="w-4 h-4" />
+                  Empieza gratis <ArrowRight className="w-4 h-4" />
                 </Link>
                 <button
                   onClick={() =>

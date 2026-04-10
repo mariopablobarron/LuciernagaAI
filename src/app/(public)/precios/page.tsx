@@ -53,7 +53,7 @@ export default function PreciosPage() {
         <h1 className="text-3xl sm:text-4xl font-bold">Acceso completo. Gratuito. Ahora.</h1>
         <p className="text-zinc-400 text-lg max-w-xl mx-auto">
           Estamos en fase MVP. Los primeros usuarios acceden a todo el plan Pro
-          sin coste durante 6 meses.
+          sin coste hasta octubre 2026. Sin tarjeta. Sin compromiso.
         </p>
       </div>
 

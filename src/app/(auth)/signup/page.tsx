@@ -179,7 +179,7 @@ function SignupForm() {
 
           <div className="space-y-2">
             <label htmlFor="phone" className="block text-sm font-semibold text-white">
-              Teléfono <span className="text-zinc-500 font-normal">(opcional)</span>
+              Telefono / Telegram <span className="text-zinc-500 font-normal">(opcional — para recordatorios)</span>
             </label>
             <input
               id="phone" type="tel" value={phone} autoComplete="tel"
@@ -224,10 +224,9 @@ function SignupForm() {
 
           <div className="rounded-lg border border-amber-500/15 bg-amber-500/5 px-4 py-3">
             <p className="text-xs text-zinc-400 leading-relaxed mb-3">
-              Tres Mil Millones de Latidos es un producto en desarrollo activo.
-              Al registrarte, aceptas que tus datos conversacionales y emocionales
-              se usen de forma anonimizada para mejorar la plataforma.
-              Puedes eliminar toda tu información en cualquier momento.
+              Estamos en fase MVP — cada conversacion que tienes nos ayuda a mejorar
+              el mentor para ti y para los que vengan despues. Tus datos se tratan de forma
+              confidencial y puedes eliminarlos en cualquier momento.
             </p>
             <label className="flex items-start gap-3 cursor-pointer">
               <input type="checkbox" required className="rounded border-zinc-700 bg-zinc-900 mt-0.5" />

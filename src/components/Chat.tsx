@@ -567,14 +567,19 @@ export default function Chat({
                 </button>
               ))}
             </div>
-            <a
-              href="https://t.me/TRESMILMILLONESDELATIDOSBOT"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 flex items-center gap-2 rounded-xl border border-cyan-500/20 bg-cyan-500/5 px-4 py-2.5 text-xs text-cyan-400 hover:bg-cyan-500/10 transition-colors"
-            >
-              💬 Tambien puedes hablarme por Telegram
-            </a>
+            <div className="mt-5 flex flex-col items-center gap-2 max-w-sm mx-auto">
+              <a
+                href="https://t.me/TRESMILMILLONESDELATIDOSBOT"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 rounded-xl border border-cyan-500/20 bg-cyan-500/5 px-4 py-2.5 text-xs font-medium text-cyan-400 hover:bg-cyan-500/10 transition-colors"
+              >
+                💬 Llevame en Telegram — mismo mentor, desde el movil
+              </a>
+              <p className="text-[10px] text-zinc-600">
+                Puedes escribir o usar el microfono 🎙️
+              </p>
+            </div>
           </div>
         ) : (
           <div className="space-y-3 px-3 py-4">

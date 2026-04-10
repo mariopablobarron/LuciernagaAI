@@ -76,7 +76,7 @@ function LoginForm() {
         {justVerified && (
           <div className="flex items-center gap-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
             <CheckCircle2 className="w-5 h-5 shrink-0" />
-            <span>Email verificado correctamente. Ya puedes iniciar sesion.</span>
+            <span>Email verificado correctamente. Ya puedes iniciar sesión.</span>
           </div>
         )}
 
@@ -132,11 +132,7 @@ function LoginForm() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" className="rounded border-zinc-700 bg-zinc-900" />
-              <span className="text-zinc-400">Recuérdame</span>
-            </label>
+          <div className="flex items-center justify-end text-sm">
             <Link href="/forgot-password" className="text-cyan-400 hover:text-cyan-300 transition-colors">
               ¿Olvidaste tu contraseña?
             </Link>

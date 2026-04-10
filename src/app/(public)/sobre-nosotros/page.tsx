@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Heart, Sparkles, Users, Globe, Shield } from 'lucide-react';
+import { ArrowRight, Heart, Sparkles, Users, Globe, Shield, User } from 'lucide-react';
 
 export default function SobreNosotrosPage() {
   return (
@@ -136,6 +136,44 @@ export default function SobreNosotrosPage() {
               artificial, psicologia del comportamiento y 15 anos de experiencia en acompanamiento
               real para crear algo que no existia: un mentor que no da respuestas — hace las preguntas
               que tu no te estas haciendo.
+            </p>
+          </div>
+        </div>
+
+        {/* Founder */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
+              <User className="w-5 h-5 text-violet-400" />
+            </div>
+            <h2 className="text-2xl font-bold text-white">Fundador</h2>
+          </div>
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 sm:p-8 space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-violet-500/15 border border-violet-500/30 flex items-center justify-center text-2xl">
+                👤
+              </div>
+              <div>
+                <p className="text-lg font-bold text-white">Mario Pablo Sanchez Barron</p>
+                <p className="text-sm text-zinc-500">Fundador de Startidea · Creador de Tres Mil Millones de Latidos</p>
+              </div>
+            </div>
+            <p className="text-zinc-400 leading-relaxed">
+              Con mas de 15 anos de trayectoria en el desarrollo de productos digitales con impacto
+              social, Mario ha combinado la tecnologia con una vision profundamente humana: las
+              herramientas digitales deben servir para que las personas se entiendan mejor a si
+              mismas y actuen en consecuencia.
+            </p>
+            <p className="text-zinc-400 leading-relaxed">
+              Tras anos trabajando con equipos, clientes y organizaciones de todo tipo, identifico
+              un patron recurrente: la mayoria de las personas no necesitan mas informacion ni mas
+              consejos. Necesitan un espacio donde pensar con claridad, sin juicio, y un empujon
+              concreto para actuar hoy — no manana.
+            </p>
+            <p className="text-zinc-400 leading-relaxed">
+              <strong className="text-white">Tres Mil Millones de Latidos es ese espacio.</strong> La
+              respuesta a una pregunta que Mario se ha hecho durante anos: ¿como ayudo a alguien a
+              dar el primer paso cuando esta bloqueado, sin decirle lo que tiene que hacer?
             </p>
           </div>
         </div>

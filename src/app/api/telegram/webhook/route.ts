@@ -229,9 +229,34 @@ async function buildTasksMessage(): Promise<string> {
   return `📋 *Tareas pendientes* (${tasks.length})\n\n${lines.join("\n")}\n\nEjecuta con: npm run tg-tasks`;
 }
 
+async function sendLongTelegramMessage(chatId: number, text: string): Promise<void> {
+  const MAX_LENGTH = 4000; // Telegram limit is 4096, leave margin
+  if (text.length <= MAX_LENGTH) {
+    await sendTelegramMessage(chatId, text);
+    return;
+  }
+  // Split by paragraphs, then by hard limit
+  const chunks: string[] = [];
+  let current = "";
+  for (const line of text.split("\n")) {
+    if ((current + "\n" + line).length > MAX_LENGTH && current) {
+      chunks.push(current.trim());
+      current = line;
+    } else {
+      current = current ? current + "\n" + line : line;
+    }
+  }
+  if (current.trim()) chunks.push(current.trim());
+  for (const chunk of chunks) {
+    await sendTelegramMessage(chatId, chunk);
+  }
+}
+
 async function callAdminAI(question: string): Promise<string> {
-  const apiKey = process.env.OPENROUTER_API_KEY?.trim();
-  if (!apiKey) return "❌ OPENROUTER_API_KEY no configurada.";
+  // Prefer Anthropic API (Opus with thinking), fall back to OpenRouter
+  const anthropicKey = process.env.ANTHROPIC_API_KEY?.trim();
+  const openrouterKey = process.env.OPENROUTER_API_KEY?.trim();
+  if (!anthropicKey && !openrouterKey) return "❌ Ni ANTHROPIC_API_KEY ni OPENROUTER_API_KEY configurada.";
 
   const prisma = getPrismaClient();
   const startOfDay = new Date();
@@ -253,7 +278,7 @@ async function callAdminAI(question: string): Promise<string> {
 
   const systemPrompt = [
     "Eres el co-piloto técnico y estratégico de Tres Mil Millones de Latidos.",
-    "Eres experto en el código, la arquitectura y la visión del producto.",
+    "Razona en profundidad antes de responder. Analiza el problema desde varios ángulos. Piensa paso a paso.",
     "",
     "PRODUCTO: Plataforma de mentoría conversacional con IA para jóvenes 18-35.",
     "STACK: Next.js 16, Prisma + PostgreSQL, Resend (email), Stripe (pagos), Telegram bot, Coolify (deploy).",
@@ -269,55 +294,105 @@ async function callAdminAI(question: string): Promise<string> {
     `- Waitlist aprobados: ${waitlist}`,
     "",
     "ARQUITECTURA CLAVE:",
-    "- Chat: processMessage.ts → analyze → enrich → buildCoachPrompt → generateAIResponse → persist",
-    "- Mentor: 4 modos (containment/supportive/directive/confrontation) en mentor-protocol.ts",
-    "- Identity: luciernaga-identity.ts — principios: interpelar > instruir, porqué siempre, gafas nuevas, local → global",
-    "- Flows: decision flow (5 pasos con fase gafas nuevas) + avoidance flow en flows.ts",
-    "- Admin: RBAC con 7 roles (superadmin/admin/clinical/marketing/support/content/ops)",
-    "- Crons: 8 endpoints + backup, todos con alertas automáticas si fallan",
-    "- Email: 11 plantillas Resend, unsubscribe RFC 8058",
-    "- Billing: Stripe checkout + webhooks + portal, Free (10 conv/mes) / Pro (9€/mes ilimitado)",
+    "- Repo: github.com/mariopablobarron/LuciernagaAI",
+    "- Chat pipeline: src/application/chat/processMessage.ts → analyze → enrich → buildCoachPrompt → generateAIResponse → persist",
+    "- Mentor modes: src/services/mentor-protocol.ts — 4 modos (containment/supportive/directive/confrontation)",
+    "- Identity & philosophy: src/lib/luciernaga-identity.ts",
+    "- Coach prompt builder: src/services/coach.ts (buildCoachPrompt, 450+ lines)",
+    "- Flows: src/services/flows.ts — decision flow (5 pasos) + avoidance flow",
+    "- Intent detection: src/services/intent.ts",
+    "- Emotional model: src/services/emotional-model.ts",
+    "- Transformation phases: src/services/transformation.ts (bloqueo→exploración→decisión→acción→consistencia)",
+    "- Admin: RBAC 7 roles en src/lib/permissions.ts",
+    "- Auth: HMAC-SHA256 JWT en src/lib/auth.ts",
+    "- Crons: 8+1 endpoints en src/app/api/cron/ con alertas automáticas",
+    "- Email: 11 plantillas Resend en src/lib/email.ts",
+    "- Billing: Stripe en src/services/billing.ts — Free / Pro (9€/mes)",
+    "- User profile: src/app/api/user/profile/route.ts (nombre, bio, avatar, teléfono)",
+    "- Settings: src/app/settings/page.tsx",
+    "- Google OAuth: src/app/api/auth/google/ (pendiente de API key en Coolify)",
     "",
-    "FILOSOFÍA DEL MENTOR (marco pedagógico):",
-    "- Interpelar antes de instruir: preguntar para que descubra, no decir qué hacer",
-    "- Siempre explicar el porqué: sin porqué, la acción es obediencia",
-    "- Gafas nuevas: ayudar a ver lo que han normalizado",
-    "- De lo local a lo global: empezar por lo concreto, descubrir el patrón",
+    "FILOSOFÍA DEL MENTOR (marco pedagógico — NO NEGOCIABLE):",
+    "- Interpelar antes de instruir: preguntar para que la persona descubra, no decir qué hacer",
+    "- Siempre explicar el porqué: sin porqué, la acción es obediencia, no cambio",
+    "- Gafas nuevas: ayudar a ver lo que han normalizado (¿por qué tiene que ser así?)",
+    "- De lo local a lo global: empezar por lo concreto de hoy, descubrir el patrón grande",
     "- El cambio viene de dentro: no se impone, se interpela",
+    "- Estructura de respuesta del mentor: Reflejo → Porqué → Pregunta que abre → Acción posible",
     "",
-    "Responde en español, directo y práctico. Si te preguntan sobre código, da paths de archivos concretos.",
-    "Si te piden cambios, describe qué archivos tocar y cómo — luego el admin lo ejecuta en Claude Code.",
-    "Máximo 500 palabras.",
+    "REGLAS DE RESPUESTA:",
+    "- Responde en español.",
+    "- Razona como un CTO senior que conoce cada línea del código.",
+    "- Si te preguntan sobre código, da paths de archivos concretos y números de línea cuando sea relevante.",
+    "- Si te piden cambios, describe exactamente qué archivos tocar, qué funciones modificar y por qué.",
+    "- Si es una decisión estratégica, analiza pros y contras antes de recomendar.",
+    "- No pongas límite de palabras. Sé tan extenso como necesite el razonamiento.",
+    "- Si no sabes algo con certeza, dilo.",
   ].join("\n");
 
   try {
-    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": process.env.APP_BASE_URL ?? "https://tresmilmillonesdelatidos.es",
-      },
-      body: JSON.stringify({
-        model: "anthropic/claude-sonnet-4-6",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: question },
-        ],
-        max_tokens: 800,
-        temperature: 0.3,
-      }),
-      signal: AbortSignal.timeout(30_000),
-    });
+    // Use Anthropic API directly for Opus + adaptive thinking
+    if (anthropicKey) {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "x-api-key": anthropicKey,
+          "anthropic-version": "2023-06-01",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "claude-opus-4-6",
+          max_tokens: 4096,
+          thinking: { type: "adaptive" },
+          system: systemPrompt,
+          messages: [{ role: "user", content: question }],
+        }),
+        signal: AbortSignal.timeout(90_000),
+      });
 
-    if (!res.ok) {
-      const body = await res.text().catch(() => "");
-      logError("TELEGRAM", new Error(`Admin AI HTTP ${res.status}`), { body: body.slice(0, 200) });
-      return `❌ Error de IA (${res.status}). Intenta de nuevo.`;
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        logError("TELEGRAM", new Error(`Anthropic API HTTP ${res.status}`), { body: body.slice(0, 300) });
+        // Fall through to OpenRouter
+      } else {
+        const data = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
+        const textBlock = data.content?.find((b) => b.type === "text");
+        if (textBlock?.text) return textBlock.text.trim();
+      }
     }
 
-    const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
-    return data.choices?.[0]?.message?.content?.trim() ?? "Sin respuesta.";
+    // Fallback to OpenRouter
+    if (openrouterKey) {
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${openrouterKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": process.env.APP_BASE_URL ?? "https://tresmilmillonesdelatidos.es",
+        },
+        body: JSON.stringify({
+          model: "anthropic/claude-sonnet-4-6",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: question },
+          ],
+          max_tokens: 2000,
+          temperature: 0.3,
+        }),
+        signal: AbortSignal.timeout(30_000),
+      });
+
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        logError("TELEGRAM", new Error(`OpenRouter HTTP ${res.status}`), { body: body.slice(0, 200) });
+        return `❌ Error de IA (${res.status}). Intenta de nuevo.`;
+      }
+
+      const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+      return data.choices?.[0]?.message?.content?.trim() ?? "Sin respuesta.";
+    }
+
+    return "❌ No hay API key disponible.";
   } catch (err: unknown) {
     logError("TELEGRAM", err, { area: "callAdminAI" });
     return "❌ Timeout o error llamando a la IA.";
@@ -554,14 +629,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ ok: true });
     }
 
-    // ---- Admin free-form message → direct AI response ----
+    // ---- Admin free-form message → deep AI reasoning ----
     if (isAdmin(chatId)) {
-      await sendTelegramMessage(chatId, "⏳ Pensando...");
+      await sendTelegramMessage(chatId, "🧠 Razonando en profundidad...");
       const adminChatId = chatId;
       const adminText = text;
       after(async () => {
         const reply = await callAdminAI(adminText);
-        await sendTelegramMessage(adminChatId, reply);
+        await sendLongTelegramMessage(adminChatId, reply);
       });
       return NextResponse.json({ ok: true });
     }

@@ -174,6 +174,7 @@ export default function AdminSettingsPage() {
         router.replace("/admin/login?next=/admin/settings");
         return;
       }
+      if (!res.ok) return;
       const data = (await res.json()) as SettingsData;
       setSettings(data);
     } catch (err: unknown) {
@@ -188,6 +189,7 @@ export default function AdminSettingsPage() {
     try {
       const res = await fetch("/api/admin/organizations", { signal });
       if (res.status === 401) return;
+      if (!res.ok) return;
       const data = (await res.json()) as OrgListItem[];
       if (Array.isArray(data)) setOrgs(data);
     } catch (err: unknown) {

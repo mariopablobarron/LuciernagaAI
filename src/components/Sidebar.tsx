@@ -223,54 +223,26 @@ export default function Sidebar({
           </Button>
         </div>
 
-        <div className="grid grid-cols-3 gap-2" data-tour="nav-buttons">
-          <Button
-            asChild
-            type="button"
-            variant={pathname === "/app" ? "default" : "outline"}
-            size="sm"
-            className="justify-center"
-          >
+        <div className="grid grid-cols-4 gap-1.5" data-tour="nav-buttons">
+          <Button asChild type="button" variant={pathname === "/app" ? "default" : "outline"} size="sm" className="justify-center text-xs">
             <Link href="/app">Chat</Link>
           </Button>
-          <Button
-            asChild
-            type="button"
-            variant={pathname === "/editor" ? "default" : "outline"}
-            size="sm"
-            className="justify-center"
-            title="Escribe y organiza ideas con formato largo"
-          >
-            <Link href="/editor">Editor</Link>
+          <Button asChild type="button" variant={pathname === "/app/diario" ? "default" : "outline"} size="sm" className="justify-center text-xs" title="Diario emocional con editor rico">
+            <Link href="/app/diario">Diario</Link>
           </Button>
-          <Button
-            asChild
-            type="button"
-            variant={pathname === "/app/explore" ? "default" : "outline"}
-            size="sm"
-            className="justify-center"
-            title="Contenido y ejercicios para tu estado emocional"
-          >
+          <Button asChild type="button" variant={pathname === "/app/respirar" ? "default" : "outline"} size="sm" className="justify-center text-xs" title="Ejercicios de respiracion guiada">
+            <Link href="/app/respirar">Respirar</Link>
+          </Button>
+          <Button asChild type="button" variant={pathname === "/app/logros" ? "default" : "outline"} size="sm" className="justify-center text-xs" title="Tus badges y logros desbloqueados">
+            <Link href="/app/logros">Logros</Link>
+          </Button>
+          <Button asChild type="button" variant={pathname === "/app/explore" ? "default" : "outline"} size="sm" className="justify-center text-xs" title="Contenido y ejercicios">
             <Link href="/app/explore">Explorar</Link>
           </Button>
-          <Button
-            asChild
-            type="button"
-            variant={pathname?.startsWith("/community") ? "default" : "outline"}
-            size="sm"
-            className="justify-center"
-            data-tour="comunidad"
-          >
+          <Button asChild type="button" variant={pathname?.startsWith("/community") ? "default" : "outline"} size="sm" className="justify-center text-xs" data-tour="comunidad">
             <Link href="/community">Comunidad</Link>
           </Button>
-          <Button
-            asChild
-            type="button"
-            variant={pathname?.startsWith("/app/settings") ? "default" : "outline"}
-            size="sm"
-            className="justify-center col-span-2"
-            data-tour="ajustes"
-          >
+          <Button asChild type="button" variant={pathname?.startsWith("/app/settings") ? "default" : "outline"} size="sm" className="justify-center text-xs col-span-2" data-tour="ajustes">
             <Link href="/app/settings">Ajustes</Link>
           </Button>
         </div>

@@ -186,6 +186,7 @@ export default function MarketingPage() {
           `/api/admin/marketing/segments?segment=${encodeURIComponent(segment)}&channel=${channel}`
         );
         if (!checkAuth(res)) return;
+        if (!res.ok) return;
         const json = (await res.json()) as { count: number };
         if (channel === "telegram") setTgRecipients(json.count);
         else setEmRecipients(json.count);
@@ -215,10 +216,12 @@ export default function MarketingPage() {
     Promise.all([
       fetch("/api/admin/marketing/metrics").then(async (res) => {
         if (!checkAuth(res)) return null;
+        if (!res.ok) return null;
         return (await res.json()) as MarketingMetrics;
       }),
       fetch("/api/admin/marketing/history").then(async (res) => {
         if (!checkAuth(res)) return [];
+        if (!res.ok) return [];
         return ((await res.json()) as { entries: HistoryEntry[] }).entries ?? [];
       }),
     ])
@@ -237,7 +240,7 @@ export default function MarketingPage() {
     if (activeTab !== "feedback") return;
     setFeedbackLoading(true);
     fetch("/api/admin/feedback")
-      .then((r) => { if (!checkAuth(r)) return null; return r.json(); })
+      .then((r) => { if (!checkAuth(r)) return null; if (!r.ok) return null; return r.json(); })
       .then((d: { feedbacks?: FeedbackItem[]; summary?: FeedbackSummary } | null) => {
         if (d?.feedbacks) setFeedbacks(d.feedbacks);
         if (d?.summary) setFeedbackSummary(d.summary);

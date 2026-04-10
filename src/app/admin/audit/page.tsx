@@ -82,6 +82,7 @@ export default function AdminAuditPage() {
     fetch(`/api/admin/audit?${params}`, { credentials: "include" })
       .then((r) => {
         if (r.status === 401) { router.replace("/admin/login?next=/admin/audit"); return null; }
+        if (!r.ok) return null;
         return r.json();
       })
       .then((d: AuditData | null) => { if (d) setData(d); })

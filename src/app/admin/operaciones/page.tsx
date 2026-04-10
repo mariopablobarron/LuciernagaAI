@@ -83,7 +83,11 @@ export default function OperacionesPage() {
   function load() {
     setLoading(true);
     fetch("/api/admin/operations")
-      .then((r) => { if (r.status === 401) { router.push("/admin/login"); return null; } return r.json(); })
+      .then((r) => {
+        if (r.status === 401) { router.push("/admin/login"); return null; }
+        if (!r.ok) { toast.error(`Error ${r.status} al cargar operaciones`); return null; }
+        return r.json();
+      })
       .then((d: OpsData | null) => { if (d) setData(d); })
       .catch(() => { toast.error("Error al cargar operaciones"); })
       .finally(() => setLoading(false));

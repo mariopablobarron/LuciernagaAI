@@ -79,8 +79,12 @@ export default function CrmPage() {
     setLoading(true);
     const params = new URLSearchParams({ page: String(page), pageSize: "50", search, segment });
     fetch(`/api/admin/crm?${params}`)
-      .then((r) => { if (r.status === 401) { router.push("/admin/login"); return null; } return r.json(); })
-      .then((d: CrmData | null) => { if (d) setData(d); })
+      .then((r) => {
+        if (r.status === 401) { router.push("/admin/login"); return null; }
+        if (!r.ok) { toast.error(`Error ${r.status} al cargar CRM`); return null; }
+        return r.json();
+      })
+      .then((d: CrmData | null) => { if (d?.items) setData(d); })
       .catch(() => { toast.error("Error al cargar CRM"); })
       .finally(() => setLoading(false));
   }

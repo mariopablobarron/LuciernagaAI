@@ -115,6 +115,10 @@ export default function LlmUsagePage() {
           router.replace("/admin/login?next=/admin/llm-usage");
           return;
         }
+        if (!res.ok) {
+          setError(`Error ${res.status} al cargar datos de uso LLM.`);
+          return;
+        }
         setData((await res.json()) as LlmUsageData);
       })
       .catch(() => setError("No se pudieron cargar los datos de uso LLM."));

@@ -111,8 +111,11 @@ export default function AdminPage() {
 
   function loadRetention(signal?: AbortSignal) {
     return fetch("/api/admin/retention", { signal })
-      .then((r) => r.json())
-      .then((d: RetentionData) => setRetention(d))
+      .then((r) => {
+        if (!r.ok) return null;
+        return r.json();
+      })
+      .then((d: RetentionData | null) => { if (d) setRetention(d); })
       .catch((err: unknown) => {
         if (err instanceof DOMException && err.name === "AbortError") return;
         console.error("[admin] retention load failed:", err);

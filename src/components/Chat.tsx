@@ -8,6 +8,7 @@ import {
   Check,
   Copy,
   Heart,
+  ImagePlus,
   Phone,
   Send,
   Shield,
@@ -396,6 +397,8 @@ export default function Chat({
   const [atBottom, setAtBottom] = useState(true);
   const [urgentMode, setUrgentMode] = useState(false);
   const [sessionRating, setSessionRating] = useState<1 | -1 | null>(null);
+  const [attachedImage, setAttachedImage] = useState<string | null>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   // ── Draft save / restore ──────────────────────────────────────────────────
 
@@ -449,7 +452,35 @@ export default function Chat({
   const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
-      if (!loading && input.trim()) void onSend();
+      if (!loading && (input.trim() || attachedImage)) void handleSendWithImage();
+    }
+  };
+
+  const handleImageAttach = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 500 * 1024) {
+      return; // silently reject >500KB
+    }
+    if (!file.type.startsWith("image/")) return;
+    const reader = new FileReader();
+    reader.onload = () => setAttachedImage(reader.result as string);
+    reader.readAsDataURL(file);
+    // Reset input so same file can be selected again
+    e.target.value = "";
+  };
+
+  const handleSendWithImage = () => {
+    if (attachedImage) {
+      // Prepend image indicator to message
+      const imageNote = "[Imagen adjunta]";
+      const fullMessage = input.trim() ? `${imageNote} ${input.trim()}` : imageNote;
+      handleInputChange(fullMessage);
+      setAttachedImage(null);
+      // Small delay to let state update
+      setTimeout(() => void onSend(fullMessage), 50);
+    } else {
+      void onSend();
     }
   };
 
@@ -669,6 +700,23 @@ export default function Chat({
 
       {/* ── Input area ──────────────────────────────────────────────────── */}
       <div className="shrink-0 border-t border-zinc-800/60 bg-zinc-950 px-3 py-3" data-tour="chat-input" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
+        {/* Image preview */}
+        {attachedImage && (
+          <div className="mb-2 flex items-start gap-2 rounded-xl border border-zinc-800 bg-zinc-900/50 p-2">
+            <img src={attachedImage} alt="Adjunto" className="h-16 w-16 rounded-lg object-cover" />
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-zinc-400">Imagen adjunta</p>
+              <p className="text-[10px] text-zinc-600">Se enviara con tu mensaje</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setAttachedImage(null)}
+              className="shrink-0 p-1 text-zinc-500 hover:text-white transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
         <div className="relative flex items-end gap-2">
           <Textarea
             value={input}
@@ -685,9 +733,27 @@ export default function Chat({
             onTranscript={(text) => handleInputChange(input ? `${input} ${text}` : text)}
             disabled={loading}
           />
+          <input
+            ref={imageInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/gif"
+            className="hidden"
+            onChange={handleImageAttach}
+          />
           <Button
-            onClick={() => void onSend()}
-            disabled={loading || !input.trim()}
+            type="button"
+            onClick={() => imageInputRef.current?.click()}
+            disabled={loading}
+            size="icon"
+            variant="ghost"
+            aria-label="Adjuntar imagen"
+            className="h-11 w-11 shrink-0 rounded-xl text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 disabled:opacity-30"
+          >
+            <ImagePlus className="h-4 w-4" />
+          </Button>
+          <Button
+            onClick={handleSendWithImage}
+            disabled={loading || (!input.trim() && !attachedImage)}
             size="icon"
             aria-label="Enviar mensaje"
             className="h-11 w-11 shrink-0 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-30"

@@ -9,10 +9,6 @@ type PendingAssessment = { id: string; type: string; title: string; questions: Q
 
 const SCORE_LABELS = ["Nunca", "Varios días", "Más de la mitad", "Casi todos los días"];
 
-// const SEVERITY_LABELS: Record<string, string> = {
-//   minimal: "Mínimo", mild: "Leve", moderate: "Moderado",
-//   moderately_severe: "Moderadamente severo", severe: "Severo",
-// };
 const SEVERITY_COLORS: Record<string, string> = {
   minimal: "text-emerald-400",
   mild: "text-yellow-400",

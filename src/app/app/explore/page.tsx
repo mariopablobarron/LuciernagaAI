@@ -332,7 +332,6 @@ export default function ExplorePage() {
   const allCompleted = completedCount >= userState.totalActions;
   const hasAnyCompleted = completedCount > 0;
   const currentAction = actions[currentIndex];
-  // const visibleActions = actions.filter((a) => !a.completed);
 
   const handleNext = () => {
     const nextIndex = currentIndex + 1;

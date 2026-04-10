@@ -55,11 +55,15 @@ export async function POST(req: NextRequest) {
       ? body.tags.filter((t: unknown) => typeof t === "string")
       : [];
 
+    // BlockNote blocks (rich content) — stored as JSON, content remains as plain-text index
+    const blocks = body.blocks != null && Array.isArray(body.blocks) ? body.blocks : undefined;
+
     const prisma = getPrismaClient();
     const entry = await prisma.diaryEntry.create({
       data: {
         userId: identity.userId,
         content,
+        blocks: blocks ?? undefined,
         mood,
         tags,
       },

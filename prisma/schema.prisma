@@ -1120,7 +1120,8 @@ model ProjectInsight {
 model DiaryEntry {
   id        String   @id @default(cuid())
   userId    String
-  content   String   @db.Text
+  content   String   @db.Text          // plain-text fallback / search index
+  blocks    Json?                       // BlockNote block array (rich content)
   mood      String?  // "great" | "good" | "neutral" | "bad" | "awful"
   tags      String[] @default([]) // user-selected emotional tags
   createdAt DateTime @default(now())

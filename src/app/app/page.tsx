@@ -1842,58 +1842,6 @@ export default function HomePage() {
   return (
     <>
       <AppLayout
-        title="Tres Mil Millones de Latidos"
-        subtitle="Mentoría conversacional con foco en acción, continuidad emocional y un contexto persistente que acompaña la conversación."
-        summary={
-          <>
-            <Badge variant="secondary" className="rounded-full px-3 py-1">
-              Cuenta:{" "}
-              <span className="ml-1 font-semibold">
-                {sessionProfile?.isAnonymous
-                  ? "Anónima"
-                  : sessionProfile?.email || "Pendiente de vincular"}
-              </span>
-            </Badge>
-            <Badge variant="secondary" className="rounded-full px-3 py-1">
-              Plan:{" "}
-              <span className="ml-1 font-semibold">{sessionProfile?.planLabel || "Free"}</span>
-            </Badge>
-            <Badge variant="secondary" className="rounded-full px-3 py-1">
-              Progreso:{" "}
-              <span className="ml-1 font-semibold">
-                {progress.completedActions}/{progress.totalActions}
-              </span>
-            </Badge>
-            <Badge variant="secondary" className="rounded-full px-3 py-1">
-              Objetivo:{" "}
-              <span className="ml-1 font-semibold">{activeGoal?.title || "Sin objetivo"}</span>
-            </Badge>
-            <Badge
-              variant={pendingActionsCount > 0 || effectiveActionLock ? "warning" : "success"}
-              className="rounded-full px-3 py-1"
-            >
-              {pendingActionsCount > 0
-                ? pendingActionsCount === 1
-                  ? "1 acción pendiente"
-                  : `${pendingActionsCount} acciones pendientes`
-                : "Sin acciones pendientes"}
-            </Badge>
-            <Badge
-              variant={
-                safeConversation.state === "claridad"
-                  ? "success"
-                  : safeConversation.state === "bloqueo" || safeConversation.state === "ansiedad"
-                    ? "warning"
-                    : "secondary"
-              }
-              className="rounded-full px-3 py-1"
-            >
-              Estado:{" "}
-              <span className="ml-1 font-semibold capitalize">{safeConversation.state}</span>
-            </Badge>
-            <SfxToggle enabled={sfx.enabled} onToggle={sfx.toggle} />
-          </>
-        }
         prelude={
           <>
             <DailyQuote />

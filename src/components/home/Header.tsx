@@ -8,9 +8,6 @@ import ClinicalDisclaimer from "@/components/ClinicalDisclaimer";
 
 const NAV = [
   { label: "Chat", href: "/app" },
-  { label: "Itinerarios", href: "/journey" },
-  { label: "Mi Proyecto", href: "/proyecto" },
-  { label: "Dashboard", href: "/dashboard" },
   { label: "Guía", href: "/guia" },
   { label: "Precios", href: "/precios" },
   { label: "Mis Latidos", href: "/calculadora-latidos", highlight: true },

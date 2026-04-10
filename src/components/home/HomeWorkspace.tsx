@@ -162,128 +162,27 @@ export default function HomeWorkspace({
       onValueChange={(value) => onTabChange(value as WorkspaceTab)}
       className="flex h-full flex-col gap-4"
     >
-      <Card className="border-border/80 bg-card/95 shadow-sm">
-        <CardContent className="space-y-4 p-4">
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                Workspace principal
-              </p>
-              <h2 className="mt-1 text-lg font-semibold text-foreground">
-                Todo lo importante vive aquí
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Conversa, aterriza un plan y mantén el hábito diario sin salir del centro del
-                producto.
-              </p>
-            </div>
-
-            <TabsList className="grid w-full grid-cols-4 lg:w-140">
-              <TabsTrigger value="chat" className="gap-2">
-                <MessageSquareText className="size-4" />
-                Chat
-              </TabsTrigger>
-              <TabsTrigger value="plan" className="gap-2">
-                <Target className="size-4" />
-                Plan
-              </TabsTrigger>
-              <TabsTrigger value="checkin" className="gap-2">
-                <ClipboardCheck className="size-4" />
-                Check-in
-              </TabsTrigger>
-              <TabsTrigger value="espejo" className="gap-2" title="Mapa de patrones que postergas — mirarlo de frente es el primer paso">
-                <Eye className="size-4" />
-                Espejo
-              </TabsTrigger>
-            </TabsList>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2 text-sm">
-            <Badge variant="secondary" className="rounded-full px-3 py-1">
-              Conversación: <span className="ml-1 font-semibold">{conversationTitle}</span>
-            </Badge>
-            <Badge variant={statusVariant(conversationState)} className="rounded-full px-3 py-1">
-              Estado: <span className="ml-1 font-semibold capitalize">{conversationState}</span>
-            </Badge>
-            <Badge variant="secondary" className="rounded-full px-3 py-1">
-              Cuenta: <span className="ml-1 font-semibold">{accountLabel}</span>
-            </Badge>
-            {activeGoal ? (
-              <Badge variant="secondary" className="rounded-full px-3 py-1">
-                Objetivo: <span className="ml-1 font-semibold">{activeGoal.title}</span>
-              </Badge>
-            ) : null}
-            {flowSummary ? (
-              <Badge variant="secondary" className="rounded-full px-3 py-1">
-                {flowSummary}
-              </Badge>
-            ) : null}
-          </div>
-        </CardContent>
-      </Card>
+      <TabsList className="grid w-full grid-cols-4 lg:w-140">
+        <TabsTrigger value="chat" className="gap-2">
+          <MessageSquareText className="size-4" />
+          Chat
+        </TabsTrigger>
+        <TabsTrigger value="plan" className="gap-2">
+          <Target className="size-4" />
+          Plan
+        </TabsTrigger>
+        <TabsTrigger value="checkin" className="gap-2">
+          <ClipboardCheck className="size-4" />
+          Check-in
+        </TabsTrigger>
+        <TabsTrigger value="espejo" className="gap-2" title="Mapa de patrones que postergas — mirarlo de frente es el primer paso">
+          <Eye className="size-4" />
+          Espejo
+        </TabsTrigger>
+      </TabsList>
 
       <TabsContent value="chat" className="flex-1">
-        <div className="flex h-full flex-col gap-4">
-          <Card className="border-border/80 bg-card/95 shadow-sm">
-            <CardContent className="flex flex-col gap-3 p-4 lg:flex-row lg:items-center lg:justify-between">
-              <div className="space-y-3">
-                <p className="text-sm font-semibold text-foreground">
-                  Mantén la conversación como superficie principal
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Usa el chat para definir claridad y salta al plan cuando quieras convertirlo en
-                  seguimiento.
-                </p>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge
-                    variant={statusVariant(conversationState)}
-                    className="rounded-full px-3 py-1"
-                  >
-                    Estado {conversationState}
-                  </Badge>
-                  <Badge variant="secondary" className="rounded-full px-3 py-1">
-                    Dominante {progress.dominantState}
-                  </Badge>
-                  {responseSignals?.searchUsed ? (
-                    <Badge variant="secondary" className="rounded-full px-3 py-1">
-                      Internet usado
-                    </Badge>
-                  ) : null}
-                  {responseSignals?.fallback ? (
-                    <Badge variant="warning" className="rounded-full px-3 py-1">
-                      Fallback activo
-                    </Badge>
-                  ) : null}
-                </div>
-                {flowInstruction ? (
-                  <p className="text-sm text-muted-foreground">{flowInstruction}</p>
-                ) : null}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Button type="button" variant="outline" size="sm" onClick={onNewConversation}>
-                  <Plus className="size-4" />
-                  Nueva conversación
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => onTabChange("plan")}
-                >
-                  Ver plan
-                  <ArrowRight className="size-4" />
-                </Button>
-                {showUpgradeCta ? (
-                  <Button type="button" size="sm" onClick={onOpenUpgrade}>
-                    Desbloquear continuidad
-                  </Button>
-                ) : null}
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="flex flex-1 min-h-0 flex-col">{chat}</div>
-        </div>
+        <div className="flex flex-1 min-h-0 flex-col">{chat}</div>
       </TabsContent>
 
       <TabsContent value="plan" className="flex-1">

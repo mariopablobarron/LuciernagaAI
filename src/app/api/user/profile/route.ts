@@ -5,6 +5,7 @@ import { invalidateUserCache } from "@/services/user";
 import { logError } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 30; // allow time for large avatar uploads
 
 const MAX_NAME = 100;
 const MAX_BIO = 500;
@@ -39,8 +40,17 @@ export async function GET(req: NextRequest) {
     if (error instanceof InvalidSessionTokenError) {
       return NextResponse.json({ error: "NOT_AUTHENTICATED" }, { status: 401 });
     }
-    logError("USER", error, { route: "/api/user/profile", method: "GET" });
-    return NextResponse.json({ error: "PROFILE_LOAD_FAILED" }, { status: 500 });
+    const msg = error instanceof Error ? error.message : "Unknown";
+    logError("USER", error, { route: "/api/user/profile", method: "GET", msg });
+
+    if (msg.includes("Unknown argument") || msg.includes("column") || msg.includes("does not exist")) {
+      return NextResponse.json({
+        error: "MIGRATION_PENDING",
+        message: "Los campos de perfil aun no estan disponibles.",
+      }, { status: 503 });
+    }
+
+    return NextResponse.json({ error: "PROFILE_LOAD_FAILED", message: msg.slice(0, 200) }, { status: 500 });
   }
 }
 
@@ -118,7 +128,17 @@ export async function PATCH(req: NextRequest) {
     if (error instanceof InvalidSessionTokenError) {
       return NextResponse.json({ error: "NOT_AUTHENTICATED" }, { status: 401 });
     }
-    logError("USER", error, { route: "/api/user/profile", method: "PATCH" });
-    return NextResponse.json({ error: "PROFILE_UPDATE_FAILED" }, { status: 500 });
+    const msg = error instanceof Error ? error.message : "Unknown";
+    logError("USER", error, { route: "/api/user/profile", method: "PATCH", msg });
+
+    // Detect missing column error (migration not applied)
+    if (msg.includes("Unknown argument") || msg.includes("column") || msg.includes("does not exist")) {
+      return NextResponse.json({
+        error: "MIGRATION_PENDING",
+        message: "Los campos de perfil aun no estan disponibles. Es posible que falte ejecutar una migracion de base de datos.",
+      }, { status: 503 });
+    }
+
+    return NextResponse.json({ error: "PROFILE_UPDATE_FAILED", message: msg.slice(0, 200) }, { status: 500 });
   }
 }

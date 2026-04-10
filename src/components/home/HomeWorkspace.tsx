@@ -306,10 +306,10 @@ export default function HomeWorkspace({
                                         }),
                                       }).then(() => {
                                         const { toast } = require("sonner") as typeof import("sonner");
-                                        toast.success("Te recordaremos manana a las 9:00");
+                                        toast.success("Te recordaremos mañana a las 9:00");
                                       }).catch(() => {});
                                     }}
-                                    title="Recordarme manana a las 9:00"
+                                    title="Recordarme mañana a las 9:00"
                                   >
                                     <Clock className="size-4" />
                                   </Button>

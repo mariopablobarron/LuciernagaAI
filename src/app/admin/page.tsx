@@ -110,7 +110,7 @@ export default function AdminPage() {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   function loadRetention(signal?: AbortSignal) {
-    return fetch("/api/admin/retention", { signal })
+    return fetch("/api/admin/retention", { credentials: "include", signal })
       .then((r) => {
         if (!r.ok) return null;
         return r.json();
@@ -123,7 +123,7 @@ export default function AdminPage() {
   }
 
   const loadInsights = useCallback((signal?: AbortSignal) => {
-    return fetch("/api/admin/insights", { signal })
+    return fetch("/api/admin/insights", { credentials: "include", signal })
       .then(async (res) => {
         const payload = (await res.json().catch(() => null)) as AdminInsightsPartial;
 
@@ -215,7 +215,7 @@ export default function AdminPage() {
   async function handleResetHistory() {
     setResetting(true);
     try {
-      const res = await fetch("/api/admin/insights/history?target=all", { method: "DELETE" });
+      const res = await fetch("/api/admin/insights/history?target=all", { credentials: "include", method: "DELETE" });
       if (res.ok) {
         await loadInsights();
       }
@@ -227,7 +227,7 @@ export default function AdminPage() {
 
   async function handleLogout() {
     try {
-      await fetch("/api/admin/logout", { method: "POST" });
+      await fetch("/api/admin/logout", { credentials: "include", method: "POST" });
     } finally {
       router.replace("/admin/login");
     }

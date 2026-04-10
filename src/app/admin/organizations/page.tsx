@@ -82,7 +82,7 @@ export default function OrganizationsPage() {
   const fetchOrgs = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/organizations");
+      const res = await fetch("/api/admin/organizations", { credentials: "include" });
       if (res.status === 401) { router.replace("/admin/login"); return; }
       if (res.status === 403) { setError("Sin permisos para gestionar organizaciones."); return; }
       setOrgs(await res.json());
@@ -117,8 +117,7 @@ export default function OrganizationsPage() {
   async function handleCreateOrg() {
     setCreating(true);
     try {
-      const res = await fetch("/api/admin/organizations", {
-        method: "POST", headers: { "Content-Type": "application/json" },
+      const res = await fetch("/api/admin/organizations", { credentials: "include",         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...newOrg, contactEmail: newOrg.contactEmail || null }),
       });
       if (!res.ok) { const d = await res.json(); setError(d.message || "Error creando org"); return; }
@@ -200,7 +199,7 @@ export default function OrganizationsPage() {
   }
 
   function handleLogout() {
-    fetch("/api/admin/logout", { method: "POST" }).then(() => router.replace("/admin/login"));
+    fetch("/api/admin/logout", { credentials: "include", method: "POST" }).then(() => router.replace("/admin/login"));
   }
 
   const inputCls = "rounded-xl border border-zinc-700 bg-zinc-900/80 px-3 py-2 text-sm text-zinc-200 placeholder-zinc-600 focus:border-violet-500 focus:outline-none";

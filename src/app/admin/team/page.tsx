@@ -71,7 +71,7 @@ export default function AdminTeamPage() {
   async function fetchAdmins() {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/team");
+      const res = await fetch("/api/admin/team", { credentials: "include" });
       if (res.status === 401) { router.replace("/admin/login"); return; }
       if (res.status === 403) { setError("No tienes permisos para gestionar el equipo."); setLoading(false); return; }
       const data = await res.json();
@@ -89,8 +89,7 @@ export default function AdminTeamPage() {
   async function handleCreate() {
     setCreating(true);
     try {
-      const res = await fetch("/api/admin/team", {
-        method: "POST",
+      const res = await fetch("/api/admin/team", { credentials: "include",         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: newEmail, name: newName, password: newPassword, role: newRole }),
       });
@@ -137,7 +136,7 @@ export default function AdminTeamPage() {
   }
 
   function handleLogout() {
-    fetch("/api/admin/logout", { method: "POST" }).then(() => router.replace("/admin/login"));
+    fetch("/api/admin/logout", { credentials: "include", method: "POST" }).then(() => router.replace("/admin/login"));
   }
 
   return (

@@ -109,7 +109,7 @@ export default function LlmUsagePage() {
   const [expanded, setExpanded] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/admin/llm-usage")
+    fetch("/api/admin/llm-usage", { credentials: "include" })
       .then(async (res) => {
         if (res.status === 401) {
           router.replace("/admin/login?next=/admin/llm-usage");
@@ -125,7 +125,7 @@ export default function LlmUsagePage() {
   }, [router]);
 
   async function handleLogout() {
-    await fetch("/api/admin/logout", { method: "POST" }).catch(() => {});
+    await fetch("/api/admin/logout", { credentials: "include", method: "POST" }).catch(() => {});
     router.replace("/admin/login");
   }
 

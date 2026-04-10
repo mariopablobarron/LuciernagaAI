@@ -344,13 +344,13 @@ export default function ResearchPage() {
     setLoading(true);
     try {
       const [analyticsRes, retentionRes, emotionalRes, crisisRes, transformRes, llmRes, snapshotsRes] = await Promise.all([
-        fetch("/api/admin/analytics").then((r) => r.ok ? r.json() : null).catch(() => null),
-        fetch("/api/admin/retention").then((r) => r.ok ? r.json() : null).catch(() => null),
-        fetch("/api/admin/emotional-model").then((r) => r.ok ? r.json() : null).catch(() => null),
-        fetch("/api/admin/crisis").then((r) => r.ok ? r.json() : null).catch(() => null),
-        fetch("/api/admin/transformation").then((r) => r.ok ? r.json() : null).catch(() => null),
-        fetch("/api/admin/llm-usage").then((r) => r.ok ? r.json() : null).catch(() => null),
-        fetch("/api/admin/insights/history").then((r) => r.ok ? r.json() : null).catch(() => null),
+        fetch("/api/admin/analytics", { credentials: "include" }).then((r) => r.ok ? r.json() : null).catch(() => null),
+        fetch("/api/admin/retention", { credentials: "include" }).then((r) => r.ok ? r.json() : null).catch(() => null),
+        fetch("/api/admin/emotional-model", { credentials: "include" }).then((r) => r.ok ? r.json() : null).catch(() => null),
+        fetch("/api/admin/crisis", { credentials: "include" }).then((r) => r.ok ? r.json() : null).catch(() => null),
+        fetch("/api/admin/transformation", { credentials: "include" }).then((r) => r.ok ? r.json() : null).catch(() => null),
+        fetch("/api/admin/llm-usage", { credentials: "include" }).then((r) => r.ok ? r.json() : null).catch(() => null),
+        fetch("/api/admin/insights/history", { credentials: "include" }).then((r) => r.ok ? r.json() : null).catch(() => null),
       ]);
 
       if (analyticsRes) {
@@ -412,7 +412,7 @@ export default function ResearchPage() {
 
   async function handleReset() {
     if (!confirm("Resetear historial de decisiones/insights? Los datos se archivan como snapshot.")) return;
-    const res = await fetch("/api/admin/insights/history", { method: "DELETE" });
+    const res = await fetch("/api/admin/insights/history", { credentials: "include", method: "DELETE" });
     if (res.ok) {
       toast.success("Historial reseteado y archivado");
       fetchAll();
@@ -422,7 +422,7 @@ export default function ResearchPage() {
   }
 
   function handleLogout() {
-    fetch("/api/admin/logout", { method: "POST" }).then(() => router.replace("/admin/login"));
+    fetch("/api/admin/logout", { credentials: "include", method: "POST" }).then(() => router.replace("/admin/login"));
   }
 
   const totalStateUsers = Object.values(states).reduce((a, b) => a + b, 0);

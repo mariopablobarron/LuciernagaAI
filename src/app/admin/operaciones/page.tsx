@@ -82,7 +82,7 @@ export default function OperacionesPage() {
 
   function load() {
     setLoading(true);
-    fetch("/api/admin/operations")
+    fetch("/api/admin/operations", { credentials: "include" })
       .then((r) => {
         if (r.status === 401) { router.push("/admin/login"); return null; }
         if (!r.ok) { toast.error(`Error ${r.status} al cargar operaciones`); return null; }

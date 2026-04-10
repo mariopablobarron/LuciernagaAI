@@ -82,13 +82,13 @@ export async function GET(req: NextRequest) {
       if (period === "morning") {
         if (pendingAction) {
           message =
-            `☀️ *Buenos dias${firstName ? `, ${firstName}` : ""}*\n\n` +
+            `☀️ *Buenos días${firstName ? `, ${firstName}` : ""}*\n\n` +
             `Tienes algo pendiente:\n` +
             `📌 _${pendingAction}_\n\n` +
-            `¿Hoy es el dia? Escribe lo que vas a hacer.`;
+            `¿Hoy es el día? Escribe lo que vas a hacer.`;
         } else {
           message =
-            `☀️ *Buenos dias${firstName ? `, ${firstName}` : ""}*\n\n` +
+            `☀️ *Buenos días${firstName ? `, ${firstName}` : ""}*\n\n` +
             `¿Que vas a hacer hoy que valga la pena?\n\n` +
             `Escribe una accion concreta.`;
         }
@@ -99,13 +99,13 @@ export async function GET(req: NextRequest) {
         // evening
         if (pendingAction) {
           message =
-            `🌙 *Cierre del dia${firstName ? `, ${firstName}` : ""}*\n\n` +
-            `Esta manana tenias pendiente:\n` +
+            `🌙 *Cierre del día${firstName ? `, ${firstName}` : ""}*\n\n` +
+            `Esta mañana tenias pendiente:\n` +
             `📌 _${pendingAction}_\n\n` +
             `¿Lo hiciste? Cuentame como fue.`;
         } else {
           message =
-            `🌙 *Cierre del dia${firstName ? `, ${firstName}` : ""}*\n\n` +
+            `🌙 *Cierre del día${firstName ? `, ${firstName}` : ""}*\n\n` +
             `¿Que has conseguido hoy? Aunque sea pequeno, anotalo.`;
         }
       }

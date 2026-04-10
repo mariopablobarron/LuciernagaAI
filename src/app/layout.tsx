@@ -51,15 +51,15 @@ export const metadata: Metadata = {
     google: "X1wK9qLyt2L99gHGjvFlj4qlOR8jc_abOlDZc9JGFb0",
   },
   title: {
-    default: "Tres Mil Millones de Latidos — Mentoria con IA en espanol",
+    default: "Tres Mil Millones de Latidos — Mentoria con IA en español",
     template: "%s | Tres Mil Millones de Latidos",
   },
   description:
-    "Tres Mil Millones de Latidos es una plataforma de mentoria con inteligencia artificial. Te ayuda a identificar bloqueos, ordenar ideas y actuar hoy con microacciones concretas. Gratis.",
+    "Tres Mil Millones de Latidos es una plataforma de mentoría con inteligencia artificial. Te ayuda a identificar bloqueos, ordenar ideas y actuar hoy con microacciones concretas. Gratis.",
   keywords: [
     "tres mil millones de latidos",
-    "mentoria IA",
-    "coach IA espanol",
+    "mentoría IA",
+    "coach IA español",
     "mentor inteligencia artificial",
     "desarrollo personal IA",
     "autoconocimiento",
@@ -91,9 +91,9 @@ export const metadata: Metadata = {
     title: "Latidos",
   },
   openGraph: {
-    title: "Tres Mil Millones de Latidos — Mentoria con IA en espanol",
+    title: "Tres Mil Millones de Latidos — Mentoria con IA en español",
     description:
-      "Plataforma de mentoria con inteligencia artificial. Claridad emocional, accion real y seguimiento continuo. Gratis durante el MVP.",
+      "Plataforma de mentoría con inteligencia artificial. Claridad emocional, accion real y seguimiento continuo. Gratis durante el MVP.",
     url: "https://tresmilmillonesdelatidos.es",
     siteName: "Tres Mil Millones de Latidos",
     locale: "es_ES",
@@ -102,7 +102,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tres Mil Millones de Latidos — Mentoria con IA en espanol",
+    title: "Tres Mil Millones de Latidos — Mentoria con IA en español",
     description: "Mentor con IA que detecta tu estado emocional y te guia a la accion concreta. Gratis.",
     images: ["/opengraph-image"],
   },
@@ -129,7 +129,7 @@ const jsonLd = {
       alternateName: "Tres Mil Millones de Latidos",
       url: "https://startidea.es",
       description:
-        "Agencia de innovacion social y desarrollo tecnologico con mas de 15 anos de experiencia.",
+        "Agencia de innovación social y desarrollo tecnológico con más de 15 años de experiencia.",
       foundingDate: "2011",
       founder: { "@id": "https://tresmilmillonesdelatidos.es/#founder" },
     },
@@ -168,7 +168,7 @@ const jsonLd = {
       author: { "@id": "https://tresmilmillonesdelatidos.es/#founder" },
       inLanguage: ["es", "en"],
       description:
-        "Tres Mil Millones de Latidos es una plataforma de mentoria con inteligencia artificial. Detecta tu estado emocional y te guia a la accion concreta con microacciones de 10 minutos.",
+        "Tres Mil Millones de Latidos es una plataforma de mentoría con inteligencia artificial. Detecta tu estado emocional y te guia a la accion concreta con microacciones de 10 minutos.",
     },
     {
       "@type": "WebSite",

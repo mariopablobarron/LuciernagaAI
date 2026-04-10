@@ -43,7 +43,7 @@ export default function IntegracionesPage() {
   const router = useRouter();
 
   function handleLogout() {
-    fetch("/api/admin/logout", { method: "POST" }).then(() => router.replace("/admin/login"));
+    fetch("/api/admin/logout", { credentials: "include", method: "POST" }).then(() => router.replace("/admin/login"));
   }
 
   return (

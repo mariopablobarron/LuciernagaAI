@@ -169,7 +169,7 @@ export default function AdminSettingsPage() {
 
   const loadSettings = useCallback(async (signal?: AbortSignal) => {
     try {
-      const res = await fetch("/api/admin/settings", { signal });
+      const res = await fetch("/api/admin/settings", { credentials: "include", signal });
       if (res.status === 401) {
         router.replace("/admin/login?next=/admin/settings");
         return;
@@ -187,7 +187,7 @@ export default function AdminSettingsPage() {
 
   const loadOrgs = useCallback(async (signal?: AbortSignal) => {
     try {
-      const res = await fetch("/api/admin/organizations", { signal });
+      const res = await fetch("/api/admin/organizations", { credentials: "include", signal });
       if (res.status === 401) return;
       if (!res.ok) return;
       const data = (await res.json()) as OrgListItem[];
@@ -238,8 +238,7 @@ export default function AdminSettingsPage() {
     setCreatingOrg(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/organizations", {
-        method: "POST",
+      const res = await fetch("/api/admin/organizations", { credentials: "include",         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newOrg),
       });
@@ -416,7 +415,7 @@ export default function AdminSettingsPage() {
   // ── Logout ────────────────────────────────────────────────────────────
 
   async function handleLogout() {
-    await fetch("/api/admin/logout", { method: "POST" }).catch(() => {});
+    await fetch("/api/admin/logout", { credentials: "include", method: "POST" }).catch(() => {});
     router.replace("/admin/login");
   }
 

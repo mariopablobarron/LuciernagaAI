@@ -101,7 +101,7 @@ export default function TermsPage() {
               de terceros ni para fines publicitarios.
             </p>
             <p className="text-zinc-300 leading-relaxed">
-              La marca, el diseno, el codigo y los contenidos originales de Tres Mil Millones de Latidos
+              La marca, el diseño, el codigo y los contenidos originales de Tres Mil Millones de Latidos
               son propiedad de Startidea. No se permite su reproduccion sin autorizacion.
             </p>
           </section>

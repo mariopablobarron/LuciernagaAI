@@ -80,41 +80,42 @@ export const POST = withRateLimit(async function POST(req: NextRequest) {
       },
     });
 
-    let successCount = 0;
-    let failureCount = 0;
+    // Respond immediately — send emails in background
+    const logId = log.id;
 
-    // Send emails with 100ms delay between each
-    for (const recipient of emailRecipients) {
-      try {
-        const ok = await sendUserEmail({
-          to: recipient.email,
-          subject,
-          html: emailBody,
-          text: emailBody.replace(/<[^>]*>/g, ""),
-        });
-        if (ok) {
-          successCount++;
-        } else {
+    // Fire-and-forget background sending
+    void (async () => {
+      let successCount = 0;
+      let failureCount = 0;
+
+      for (const recipient of emailRecipients) {
+        try {
+          const ok = await sendUserEmail({
+            to: recipient.email,
+            subject,
+            html: emailBody,
+            text: emailBody.replace(/<[^>]*>/g, ""),
+          });
+          if (ok) successCount++; else failureCount++;
+        } catch {
           failureCount++;
         }
-      } catch {
-        failureCount++;
+        // 100ms delay between sends to avoid rate limits
+        await new Promise((r) => setTimeout(r, 100));
       }
-      await new Promise((r) => setTimeout(r, 100));
-    }
 
-    // Update BroadcastLog with final counts
-    const updatedLog = await prisma.broadcastLog.update({
-      where: { id: log.id },
-      data: {
-        successCount,
-        failureCount,
-        status: "completed",
-        completedAt: new Date(),
-      },
+      await prisma.broadcastLog.update({
+        where: { id: logId },
+        data: { successCount, failureCount, status: "completed", completedAt: new Date() },
+      }).catch((e) => logError("MARKETING_CAMPAIGN", e, { action: "update_broadcast_log" }));
+    })();
+
+    return NextResponse.json({
+      ok: true,
+      message: `Campaña iniciada — enviando a ${emailRecipients.length} destinatarios en segundo plano.`,
+      recipientCount: emailRecipients.length,
+      logId,
     });
-
-    return NextResponse.json(updatedLog);
   } catch (error: unknown) {
     logError("MARKETING_CAMPAIGN", error, { route: "/api/admin/marketing/campaign" });
     return NextResponse.json(

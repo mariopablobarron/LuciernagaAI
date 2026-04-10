@@ -214,12 +214,12 @@ export default function MarketingPage() {
     setMetricsLoading(true);
 
     Promise.all([
-      fetch("/api/admin/marketing/metrics").then(async (res) => {
+      fetch("/api/admin/marketing/metrics", { credentials: "include" }).then(async (res) => {
         if (!checkAuth(res)) return null;
         if (!res.ok) return null;
         return (await res.json()) as MarketingMetrics;
       }),
-      fetch("/api/admin/marketing/history").then(async (res) => {
+      fetch("/api/admin/marketing/history", { credentials: "include" }).then(async (res) => {
         if (!checkAuth(res)) return [];
         if (!res.ok) return [];
         return ((await res.json()) as { entries: HistoryEntry[] }).entries ?? [];
@@ -239,7 +239,7 @@ export default function MarketingPage() {
   useEffect(() => {
     if (activeTab !== "feedback") return;
     setFeedbackLoading(true);
-    fetch("/api/admin/feedback")
+    fetch("/api/admin/feedback", { credentials: "include" })
       .then((r) => { if (!checkAuth(r)) return null; if (!r.ok) return null; return r.json(); })
       .then((d: { feedbacks?: FeedbackItem[]; summary?: FeedbackSummary } | null) => {
         if (d?.feedbacks) setFeedbacks(d.feedbacks);
@@ -261,8 +261,7 @@ export default function MarketingPage() {
     setTgResult(null);
     setTgConfirm(false);
     try {
-      const res = await fetch("/api/admin/marketing/broadcast", {
-        method: "POST",
+      const res = await fetch("/api/admin/marketing/broadcast", { credentials: "include",         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: tgMessage, segment: tgSegment }),
       });
@@ -301,29 +300,26 @@ export default function MarketingPage() {
     setEmResult(null);
     setEmConfirm(false);
     try {
-      const res = await fetch("/api/admin/marketing/campaign", {
-        method: "POST",
+      const res = await fetch("/api/admin/marketing/campaign", { credentials: "include",         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ subject: emSubject, body: emBody, segment: emSegment }),
       });
       if (!checkAuth(res)) return;
       const json = (await res.json()) as {
-        successCount?: number;
-        failureCount?: number;
-        success?: number;
-        failed?: number;
+        ok?: boolean;
+        recipientCount?: number;
         message?: string;
         error?: string;
       };
       if (!res.ok) {
         setEmResult({ ok: false, message: json.message ?? json.error ?? `Error ${res.status}` });
       } else {
-        const ok = json.successCount ?? json.success ?? 0;
-        const fail = json.failureCount ?? json.failed ?? 0;
         setEmResult({
-          ok: fail === 0,
-          message: `Enviado: ${ok} ok, ${fail} fallidos`,
+          ok: true,
+          message: json.message ?? `Enviando a ${json.recipientCount ?? 0} destinatarios...`,
         });
+        setEmSubject("");
+        setEmBody("");
       }
     } catch {
       setEmResult({ ok: false, message: "Error de red al enviar campaña" });
@@ -335,7 +331,7 @@ export default function MarketingPage() {
   // ── Logout ─────────────────────────────────────────────────────────────────
 
   async function handleLogout() {
-    await fetch("/api/admin/logout", { method: "POST" }).catch(() => {});
+    await fetch("/api/admin/logout", { credentials: "include", method: "POST" }).catch(() => {});
     router.replace("/admin/login");
   }
 

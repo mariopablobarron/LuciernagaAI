@@ -121,19 +121,19 @@ export default function SobreNosotrosPage() {
               <a href="https://startidea.es" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300 underline underline-offset-2">
                 Startidea
               </a>
-              , una agencia con 15 anos de experiencia trabajando con organizaciones que buscan
+              , una agencia con 15 años de experiencia trabajando con organizaciones que buscan
               impacto real. Hemos acompanado a empresas, instituciones educativas, ONGs y
               administraciones publicas en procesos de innovacion social y transformacion digital.
             </p>
             <p className="text-zinc-400 leading-relaxed">
-              Despues de 15 anos viendo como las personas se bloquean, posponen y pierden claridad
+              Despues de 15 años viendo como las personas se bloquean, posponen y pierden claridad
               — incluso cuando tienen recursos y motivacion — nos preguntamos: <strong className="text-white">¿y si la tecnologia
               pudiera hacer lo que un buen mentor hace? Estar ahi, en el momento justo, con la
               pregunta correcta.</strong>
             </p>
             <p className="text-zinc-400 leading-relaxed">
               Tres Mil Millones de Latidos es nuestra respuesta. Un proyecto que combina inteligencia
-              artificial, psicologia del comportamiento y 15 anos de experiencia en acompanamiento
+              artificial, psicologia del comportamiento y 15 años de experiencia en acompanamiento
               real para crear algo que no existia: un mentor que no da respuestas — hace las preguntas
               que tu no te estas haciendo.
             </p>
@@ -159,20 +159,20 @@ export default function SobreNosotrosPage() {
               </div>
             </div>
             <p className="text-zinc-400 leading-relaxed">
-              Con mas de 15 anos de trayectoria en el desarrollo de productos digitales con impacto
+              Con mas de 15 años de trayectoria en el desarrollo de productos digitales con impacto
               social, Mario ha combinado la tecnologia con una vision profundamente humana: las
               herramientas digitales deben servir para que las personas se entiendan mejor a si
               mismas y actuen en consecuencia.
             </p>
             <p className="text-zinc-400 leading-relaxed">
-              Tras anos trabajando con equipos, clientes y organizaciones de todo tipo, identifico
+              Tras años trabajando con equipos, clientes y organizaciones de todo tipo, identifico
               un patron recurrente: la mayoria de las personas no necesitan mas informacion ni mas
               consejos. Necesitan un espacio donde pensar con claridad, sin juicio, y un empujon
               concreto para actuar hoy — no manana.
             </p>
             <p className="text-zinc-400 leading-relaxed">
               <strong className="text-white">Tres Mil Millones de Latidos es ese espacio.</strong> La
-              respuesta a una pregunta que Mario se ha hecho durante anos: ¿como ayudo a alguien a
+              respuesta a una pregunta que Mario se ha hecho durante años: ¿como ayudo a alguien a
               dar el primer paso cuando esta bloqueado, sin decirle lo que tiene que hacer?
             </p>
           </div>

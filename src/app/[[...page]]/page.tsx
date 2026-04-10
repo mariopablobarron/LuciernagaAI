@@ -3,15 +3,15 @@ import { notFound } from "next/navigation";
 import LandingPageDesign from "@/components/home/LandingPageDesign";
 
 export const metadata: Metadata = {
-  title: "Tres Mil Millones de Latidos — Mentoria con IA en espanol",
+  title: "Tres Mil Millones de Latidos — Mentoria con IA en español",
   description:
-    "Tres Mil Millones de Latidos es una plataforma de mentoria con inteligencia artificial. Te ayuda a identificar bloqueos, ordenar ideas y actuar hoy con microacciones concretas. Gratis.",
+    "Tres Mil Millones de Latidos es una plataforma de mentoría con inteligencia artificial. Te ayuda a identificar bloqueos, ordenar ideas y actuar hoy con microacciones concretas. Gratis.",
   keywords: [
     "tres mil millones de latidos",
     "tresmilmillonesdelatidos",
     "mentor IA",
-    "mentoria inteligencia artificial",
-    "coach IA espanol",
+    "mentoría inteligencia artificial",
+    "coach IA español",
     "desarrollo personal IA",
     "superar bloqueo mental",
     "claridad emocional",
@@ -25,9 +25,9 @@ export const metadata: Metadata = {
     canonical: "https://tresmilmillonesdelatidos.es",
   },
   openGraph: {
-    title: "Tres Mil Millones de Latidos — Mentoria con IA en espanol",
+    title: "Tres Mil Millones de Latidos — Mentoria con IA en español",
     description:
-      "Plataforma de mentoria con IA. Detecta tu estado emocional y te guia a la accion concreta. Gratis durante el MVP.",
+      "Plataforma de mentoría con IA. Detecta tu estado emocional y te guia a la accion concreta. Gratis durante el MVP.",
     url: "https://tresmilmillonesdelatidos.es",
     siteName: "Tres Mil Millones de Latidos",
     type: "website",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tres Mil Millones de Latidos — Mentoria con IA en espanol",
+    title: "Tres Mil Millones de Latidos — Mentoria con IA en español",
     description:
       "Mentor con IA que detecta tu estado emocional y te guia a la accion concreta. Gratis.",
     images: ["/opengraph-image"],

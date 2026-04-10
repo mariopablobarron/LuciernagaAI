@@ -41,7 +41,7 @@ const PRO_FEATURES = [
 const FUTURE_PRICE = [
   { plan: 'Free', price: '0 euros/mes', features: 'Acceso basico: 10 conversaciones/mes, 20 mensajes/conversacion' },
   { plan: 'Pro', price: '9 euros/mes', features: 'Todo ilimitado + Modo Impulso + retos + insights' },
-  { plan: 'Pro anual', price: '79 euros/ano', features: 'Mismo que Pro, ahorrando 2 meses' },
+  { plan: 'Pro anual', price: '79 euros/año', features: 'Mismo que Pro, ahorrando 2 meses' },
 ];
 
 export default function PreciosPage() {

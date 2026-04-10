@@ -370,7 +370,7 @@ export default function AdminGuiaPage() {
   }
 
   async function handleLogout() {
-    await fetch("/api/admin/logout", { method: "POST" });
+    await fetch("/api/admin/logout", { credentials: "include", method: "POST" });
     router.push("/admin/login");
   }
 

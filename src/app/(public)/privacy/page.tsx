@@ -166,8 +166,8 @@ export default function PrivacyPage() {
           <section className="space-y-4 border-t border-zinc-800 pt-6">
             <h2 className={`${TYPOGRAPHY.h2} text-white`}>10. Menores de edad</h2>
             <p className="text-zinc-300 leading-relaxed">
-              El servicio esta dirigido a mayores de 16 anos. No recopilamos datos de menores de forma deliberada.
-              Si eres menor de 16 anos y has creado una cuenta, contactanos para eliminarla.
+              El servicio esta dirigido a mayores de 16 años. No recopilamos datos de menores de forma deliberada.
+              Si eres menor de 16 años y has creado una cuenta, contactanos para eliminarla.
             </p>
           </section>
 

@@ -114,6 +114,11 @@ export default function Footer() {
             <h4 className="font-semibold text-foreground">Información</h4>
             <ul className="space-y-2.5">
               <li>
+                <a href="/sobre-nosotros" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Sobre nosotros
+                </a>
+              </li>
+              <li>
                 <a href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Política de privacidad
                 </a>

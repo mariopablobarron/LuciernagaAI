@@ -229,12 +229,25 @@ export function ShareStoryCard({ data, onClose }: ShareStoryCardProps) {
     setDownloading(true);
     setDownloadError(false);
     try {
-      const dataUrl = await toPng(cardRef.current, {
-        width: 1080,
-        height: 1920,
-        pixelRatio: 2,
-        backgroundColor: "#09090b",
-      });
+      // Retry up to 3 times — html-to-image sometimes fails on first attempt
+      // due to font loading or image rendering timing
+      let dataUrl = "";
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          dataUrl = await toPng(cardRef.current, {
+            width: 1080,
+            height: 1920,
+            pixelRatio: 1,
+            backgroundColor: "#09090b",
+            skipFonts: true,
+            cacheBust: true,
+          });
+          if (dataUrl) break;
+        } catch {
+          if (attempt < 2) await new Promise((r) => setTimeout(r, 500));
+        }
+      }
+      if (!dataUrl) throw new Error("Failed after retries");
       const link = document.createElement("a");
       link.download = `latidos-${template.id}.png`;
       link.href = dataUrl;
@@ -252,8 +265,10 @@ export function ShareStoryCard({ data, onClose }: ShareStoryCardProps) {
       const dataUrl = await toPng(cardRef.current, {
         width: 1080,
         height: 1920,
-        pixelRatio: 2,
+        pixelRatio: 1,
         backgroundColor: "#09090b",
+        skipFonts: true,
+        cacheBust: true,
       });
       const res = await fetch(dataUrl);
       const blob = await res.blob();

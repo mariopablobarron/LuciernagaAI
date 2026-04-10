@@ -47,6 +47,9 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: getMetadataBase(),
+  verification: {
+    google: "X1wK9qLyt2L99gHGjvFlj4qlOR8jc_abOlDZc9JGFb0",
+  },
   title: {
     default: "Tres Mil Millones de Latidos — Mentoria con IA en espanol",
     template: "%s | Tres Mil Millones de Latidos",

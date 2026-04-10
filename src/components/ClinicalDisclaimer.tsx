@@ -36,14 +36,14 @@ export default function ClinicalDisclaimer() {
 
       {open && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150"
+          className="fixed inset-0 z-[9999] flex items-start justify-center pt-20 sm:pt-24 p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-150"
           onClick={close}
         >
           <div
-            className="w-full max-w-md rounded-2xl border border-zinc-700/60 bg-zinc-900 shadow-2xl"
+            className="w-full max-w-md rounded-2xl border border-zinc-700/60 bg-zinc-900 shadow-2xl shadow-black/50 max-h-[80vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800">
+            <div className="sticky top-0 flex items-center justify-between px-5 py-4 border-b border-zinc-800 bg-zinc-900 rounded-t-2xl">
               <div className="flex items-center gap-2.5">
                 <ShieldCheck className="w-5 h-5 text-cyan-400" />
                 <h2 className="text-sm font-semibold text-white">Información importante</h2>

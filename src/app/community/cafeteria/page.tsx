@@ -151,12 +151,13 @@ function MessageWall({
   posting,
 }: {
   messages: WallMessage[];
-  onPost: (text: string) => void;
+  onPost: (text: string, anonymous: boolean) => void;
   onHeartbeat: (id: string) => void;
   onReply: (id: string, text: string) => void;
   posting: boolean;
 }) {
   const [input, setInput] = useState("");
+  const [anonymous, setAnonymous] = useState(true);
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -239,21 +240,33 @@ function MessageWall({
 
       {/* Post input */}
       <div className="shrink-0 border-t border-zinc-800/60 p-3 bg-zinc-900/50 backdrop-blur-sm" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
+        <div className="flex items-center gap-2 mb-2 px-1">
+          <button
+            type="button"
+            onClick={() => setAnonymous((v) => !v)}
+            className={`relative h-5 w-9 rounded-full transition-colors ${anonymous ? "bg-violet-600" : "bg-zinc-700"}`}
+          >
+            <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${anonymous ? "left-[18px]" : "left-0.5"}`} />
+          </button>
+          <span className="text-xs text-zinc-400">
+            {anonymous ? "Anónimo" : "Con tu nombre"}
+          </span>
+        </div>
         <div className="flex gap-2">
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Escribe en el muro..."
+            placeholder={anonymous ? "Escribe anónimamente..." : "Escribe con tu nombre..."}
             maxLength={500}
             className="flex-1 min-h-11 rounded-xl bg-black/50 border border-zinc-700 px-4 py-2.5 text-base text-white placeholder:text-zinc-600 focus:border-violet-500/50 focus:outline-none"
             onKeyDown={(e) => {
               if (e.key === "Enter" && input.trim()) {
-                onPost(input); setInput(""); hapticFeedback("medium");
+                onPost(input, anonymous); setInput(""); hapticFeedback("medium");
               }
             }}
           />
           <button
-            onClick={() => { onPost(input); setInput(""); hapticFeedback("medium"); }}
+            onClick={() => { onPost(input, anonymous); setInput(""); hapticFeedback("medium"); }}
             disabled={!input.trim() || posting}
             className="h-11 w-11 shrink-0 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center text-white shadow-lg shadow-violet-500/20 disabled:opacity-40 active:scale-90 transition-all"
           >
@@ -273,6 +286,14 @@ export default function CafeteriaPage() {
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [showWall, setShowWall] = useState(false);
   const [posting, setPosting] = useState(false);
+  const [tutorialStep, setTutorialStep] = useState<number | null>(null);
+
+  // Show tutorial on first visit
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const seen = localStorage.getItem("cafeteria_tutorial_done");
+    if (!seen) setTutorialStep(0);
+  }, []);
 
   const loadData = useCallback(async () => {
     try {
@@ -365,14 +386,14 @@ export default function CafeteriaPage() {
     return () => clearInterval(interval);
   }, []);
 
-  async function handlePost(text: string) {
+  async function handlePost(text: string, anonymous = true) {
     if (!text.trim()) return;
     setPosting(true);
     try {
       await fetch("/api/community/posts", {
         method: "POST", credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "reflection", feeling: text, anonymous: true }),
+        body: JSON.stringify({ type: "reflection", feeling: text, anonymous }),
       });
       hapticFeedback("heavy");
       void loadData();
@@ -571,6 +592,105 @@ export default function CafeteriaPage() {
           <Users className="w-4 h-4" /> Comunidad
         </Link>
       </div>
+
+      {/* ── Tutorial overlay ────────────────────────────────────── */}
+      {tutorialStep !== null && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-6">
+          <div
+            className="w-full max-w-sm rounded-3xl border border-zinc-700/60 bg-zinc-900 p-8 text-center space-y-5 shadow-2xl"
+            style={{ animation: "message-appear 0.4s cubic-bezier(0.34,1.56,0.64,1)" }}
+          >
+            {tutorialStep === 0 && (
+              <>
+                <span className="text-5xl block">☕</span>
+                <h2 className="text-xl font-black text-white">Bienvenido/a a La Cafetería</h2>
+                <p className="text-sm text-zinc-400 leading-relaxed">
+                  Un espacio donde ves a otras personas en su proceso de transformación.
+                  Nadie juzga, todos avanzan.
+                </p>
+              </>
+            )}
+            {tutorialStep === 1 && (
+              <>
+                <span className="text-5xl block">👆</span>
+                <h2 className="text-xl font-black text-white">Toca un avatar</h2>
+                <p className="text-sm text-zinc-400 leading-relaxed">
+                  Cada persona que ves aquí está en su propio camino.
+                  Toca su avatar para saber en qué fase está.
+                </p>
+              </>
+            )}
+            {tutorialStep === 2 && (
+              <>
+                <span className="text-5xl block">📝</span>
+                <h2 className="text-xl font-black text-white">El Muro</h2>
+                <p className="text-sm text-zinc-400 leading-relaxed">
+                  Toca el tablón del centro para leer lo que otros comparten
+                  y escribir tú también. Puedes dar "latidos" a los mensajes que te resuenen.
+                </p>
+              </>
+            )}
+            {tutorialStep === 3 && (
+              <>
+                <span className="text-5xl block">🔒</span>
+                <h2 className="text-xl font-black text-white">Tú decides</h2>
+                <p className="text-sm text-zinc-400 leading-relaxed">
+                  Puedes publicar <strong className="text-white">anónimamente</strong> o <strong className="text-white">con tu nombre</strong>.
+                  Tú eliges en cada mensaje. Sin presión.
+                </p>
+              </>
+            )}
+
+            {/* Navigation */}
+            <div className="flex items-center justify-between pt-2">
+              {/* Dots */}
+              <div className="flex gap-1.5">
+                {[0, 1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className={`w-2 h-2 rounded-full transition-all ${
+                      i === tutorialStep ? "bg-violet-400 w-6" : "bg-zinc-700"
+                    }`}
+                  />
+                ))}
+              </div>
+
+              {tutorialStep < 3 ? (
+                <button
+                  onClick={() => { setTutorialStep((s) => (s ?? 0) + 1); hapticFeedback("light"); }}
+                  className="rounded-full bg-violet-600 px-5 py-2.5 text-sm font-bold text-white active:scale-95 transition-all"
+                >
+                  Siguiente
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    setTutorialStep(null);
+                    localStorage.setItem("cafeteria_tutorial_done", "1");
+                    hapticFeedback("heavy");
+                  }}
+                  className="rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-violet-500/25 active:scale-95 transition-all"
+                >
+                  Entrar ☕
+                </button>
+              )}
+            </div>
+
+            {/* Skip */}
+            {tutorialStep < 3 && (
+              <button
+                onClick={() => {
+                  setTutorialStep(null);
+                  localStorage.setItem("cafeteria_tutorial_done", "1");
+                }}
+                className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
+              >
+                Saltar tutorial
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ── Wall sheet ───────────────────────────────────────────── */}
       {showWall && (

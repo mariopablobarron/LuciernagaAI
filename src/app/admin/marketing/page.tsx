@@ -10,6 +10,8 @@ import {
   Send,
   Mail,
   BarChart3,
+  MessageSquarePlus,
+  Star,
   Users,
   Radio,
   ArrowRight,
@@ -42,7 +44,24 @@ type HistoryEntry = {
   createdAt: string;
 };
 
-type Tab = "telegram" | "email" | "metrics";
+type FeedbackItem = {
+  id: string;
+  type: string;
+  rating: number | null;
+  message: string;
+  page: string | null;
+  createdAt: string;
+  user: { email: string; name: string | null };
+};
+
+type FeedbackSummary = {
+  total: number;
+  avgRating: number | null;
+  ratingDistribution: { rating: number; count: number }[];
+  byType: { type: string; count: number }[];
+};
+
+type Tab = "telegram" | "email" | "metrics" | "feedback";
 
 const SEGMENTS = [
   { value: "all", label: "Todos" },
@@ -143,6 +162,11 @@ export default function MarketingPage() {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [metricsLoading, setMetricsLoading] = useState(false);
 
+  // Feedback state
+  const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([]);
+  const [feedbackSummary, setFeedbackSummary] = useState<FeedbackSummary | null>(null);
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
+
   // ── Auth guard helper ──────────────────────────────────────────────────────
 
   function checkAuth(res: Response): boolean {
@@ -204,6 +228,22 @@ export default function MarketingPage() {
       })
       .catch(() => { toast.error("Error al cargar métricas de marketing"); })
       .finally(() => setMetricsLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  // ── Feedback loader ────────────────────────────────────────────────────────
+
+  useEffect(() => {
+    if (activeTab !== "feedback") return;
+    setFeedbackLoading(true);
+    fetch("/api/admin/feedback")
+      .then((r) => { if (!checkAuth(r)) return null; return r.json(); })
+      .then((d: { feedbacks?: FeedbackItem[]; summary?: FeedbackSummary } | null) => {
+        if (d?.feedbacks) setFeedbacks(d.feedbacks);
+        if (d?.summary) setFeedbackSummary(d.summary);
+      })
+      .catch(() => { toast.error("Error al cargar feedback"); })
+      .finally(() => setFeedbackLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
@@ -284,6 +324,7 @@ export default function MarketingPage() {
     { key: "telegram", label: "Telegram", icon: <Radio className="h-3.5 w-3.5" /> },
     { key: "email", label: "Email", icon: <Mail className="h-3.5 w-3.5" /> },
     { key: "metrics", label: "Metricas", icon: <BarChart3 className="h-3.5 w-3.5" /> },
+    { key: "feedback", label: "Feedback", icon: <MessageSquarePlus className="h-3.5 w-3.5" /> },
   ];
 
   return (
@@ -651,6 +692,134 @@ export default function MarketingPage() {
                           <span className="ml-auto text-zinc-500">
                             {formatDate(entry.createdAt)}
                           </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </AdminPanel>
+            </>
+          )}
+        </>
+      )}
+      {/* ── Tab: Feedback ───────────────────────────────────────────────────── */}
+      {activeTab === "feedback" && (
+        <>
+          {feedbackLoading && !feedbackSummary ? (
+            <div className="card-surface rounded-xl border border-zinc-800 p-6">
+              <div className="animate-pulse space-y-3">
+                <div className="h-6 w-48 rounded bg-zinc-800" />
+                <div className="h-20 rounded bg-zinc-800/60" />
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Summary cards */}
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <AdminMetricCard
+                  label="Total feedback"
+                  value={feedbackSummary?.total ?? 0}
+                  accent="violet"
+                  icon={<MessageSquarePlus className="h-5 w-5" />}
+                />
+                <AdminMetricCard
+                  label="Valoracion media"
+                  value={feedbackSummary?.avgRating ? `${feedbackSummary.avgRating.toFixed(1)}/5` : "—"}
+                  accent="rose"
+                  icon={<Star className="h-5 w-5" />}
+                />
+                <AdminMetricCard
+                  label="Sugerencias"
+                  value={feedbackSummary?.byType.find((t) => t.type === "suggestion")?.count ?? 0}
+                  accent="sky"
+                  hint="Tipo: sugerencia"
+                  icon={<MessageSquarePlus className="h-5 w-5" />}
+                />
+                <AdminMetricCard
+                  label="Bugs reportados"
+                  value={feedbackSummary?.byType.find((t) => t.type === "bug")?.count ?? 0}
+                  accent="amber"
+                  hint="Tipo: problema"
+                  icon={<XCircle className="h-5 w-5" />}
+                />
+              </div>
+
+              {/* Rating distribution */}
+              {feedbackSummary && feedbackSummary.ratingDistribution.some((r) => r.count > 0) && (
+                <AdminPanel title="Distribucion de valoraciones">
+                  <div className="flex items-end gap-3 h-32">
+                    {feedbackSummary.ratingDistribution.map((r) => {
+                      const maxCount = Math.max(...feedbackSummary.ratingDistribution.map((d) => d.count), 1);
+                      const pct = (r.count / maxCount) * 100;
+                      return (
+                        <div key={r.rating} className="flex-1 flex flex-col items-center gap-1">
+                          <span className="text-xs text-zinc-500">{r.count}</span>
+                          <div
+                            className="w-full rounded-t-lg bg-fuchsia-500/30 border border-fuchsia-500/20 transition-all"
+                            style={{ height: `${Math.max(pct, 4)}%` }}
+                          />
+                          <div className="flex items-center gap-0.5">
+                            <Star className="w-3 h-3 text-fuchsia-400 fill-fuchsia-400" />
+                            <span className="text-xs text-zinc-400">{r.rating}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </AdminPanel>
+              )}
+
+              {/* Feedback list */}
+              <AdminPanel
+                title="Feedback reciente"
+                tooltip="Ultimos 100 feedbacks ordenados por fecha. Incluye valoracion, tipo, mensaje y pagina."
+              >
+                {feedbacks.length === 0 ? (
+                  <div className="rounded-xl border border-zinc-800 bg-zinc-800/30 p-6 text-center">
+                    <MessageSquarePlus className="mx-auto h-8 w-8 text-zinc-600" />
+                    <p className="mt-3 text-sm text-zinc-500">
+                      Aun no hay feedback de usuarios.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2 max-h-[600px] overflow-y-auto">
+                    {feedbacks.map((fb) => (
+                      <div
+                        key={fb.id}
+                        className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 space-y-2"
+                      >
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                          <div className="flex items-center gap-2">
+                            {fb.rating && (
+                              <div className="flex gap-0.5">
+                                {[1, 2, 3, 4, 5].map((n) => (
+                                  <Star
+                                    key={n}
+                                    className={`w-3 h-3 ${
+                                      n <= fb.rating!
+                                        ? "text-fuchsia-400 fill-fuchsia-400"
+                                        : "text-zinc-700"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            )}
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+                              fb.type === "bug"
+                                ? "bg-red-500/15 text-red-400"
+                                : fb.type === "nps"
+                                  ? "bg-fuchsia-500/15 text-fuchsia-400"
+                                  : "bg-violet-500/15 text-violet-400"
+                            }`}>
+                              {fb.type}
+                            </span>
+                          </div>
+                          <span className="text-[10px] text-zinc-600">{formatDate(fb.createdAt)}</span>
+                        </div>
+                        <p className="text-sm text-zinc-300">{fb.message}</p>
+                        <div className="flex items-center gap-3 text-[10px] text-zinc-600">
+                          <span>{fb.user.name || fb.user.email}</span>
+                          {fb.page && <span className="text-zinc-700">{fb.page}</span>}
                         </div>
                       </div>
                     ))}

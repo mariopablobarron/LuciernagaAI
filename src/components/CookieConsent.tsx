@@ -142,7 +142,7 @@ export default function CookieConsent() {
             </a>
             .
           </p>
-          <div className="flex shrink-0 gap-2">
+          <div className="flex w-full sm:w-auto shrink-0 flex-col sm:flex-row gap-2">
             <button
               onClick={reject}
               className="rounded-lg border border-zinc-600 px-4 py-2 text-sm font-medium text-zinc-300 transition hover:border-zinc-500 hover:bg-zinc-800"

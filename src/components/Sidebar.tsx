@@ -590,11 +590,9 @@ export default function Sidebar({
                 </button>
               </div>
             ))}
-            {availableInvites.length > 3 && (
-              <p className="text-xs text-muted-foreground text-center">
-                +{availableInvites.length - 3} más en /api/user/invites
-              </p>
-            )}
+            <Link href="/app/invitar" className="block text-center text-xs text-violet-400 hover:text-violet-300 transition-colors">
+              {availableInvites.length > 3 ? `+${availableInvites.length - 3} mas — ` : ""}Ver todas las invitaciones
+            </Link>
           </div>
         ) : (
           <div className="rounded-xl border border-dashed border-border bg-muted/20 p-3 text-xs text-muted-foreground space-y-1">

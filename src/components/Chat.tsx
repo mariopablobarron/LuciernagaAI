@@ -620,36 +620,36 @@ export default function Chat({
         </div>
         <div className="mt-1.5 flex items-center justify-between px-1">
           <div className="flex items-center gap-2">
-            <p className="text-[10px] text-zinc-700">Shift + Enter para nueva línea</p>
+            <p className="hidden sm:block text-[10px] text-zinc-700">Shift + Enter para nueva línea</p>
             <button
               type="button"
               onClick={() => setUrgentMode((v) => !v)}
-              className={`flex items-center gap-1 rounded-lg px-1.5 py-0.5 text-[10px] transition ${
+              className={`flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition ${
                 urgentMode ? "bg-red-500/20 text-red-400" : "text-zinc-600 hover:text-red-400"
               }`}
               title="Modo crisis"
             >
-              <Zap className="h-3 w-3" />
+              <Zap className="h-3.5 w-3.5" />
               Crisis
             </button>
             {onToggleJournal && (
               <button
                 type="button"
                 onClick={onToggleJournal}
-                className={`flex items-center gap-1 rounded-lg px-1.5 py-0.5 text-[10px] transition ${
+                className={`flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition ${
                   journalMode
                     ? "bg-indigo-500/20 text-indigo-400"
                     : "text-zinc-600 hover:text-indigo-400"
                 }`}
                 title="Modo diario"
               >
-                <BookOpen className="h-3 w-3" />
+                <BookOpen className="h-3.5 w-3.5" />
                 Diario
               </button>
             )}
           </div>
           {input.length > 0 && (
-            <p className={`text-[10px] ${input.length > 900 ? "text-amber-500" : "text-zinc-700"}`}>
+            <p className={`text-xs ${input.length > 900 ? "text-amber-500" : "text-zinc-700"}`}>
               {input.length}/1000
             </p>
           )}

@@ -74,7 +74,7 @@ export default function AppLayout({
               <aside
                 className={`
                   ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-                  fixed inset-y-0 left-0 z-50 w-[300px] overflow-y-auto bg-zinc-950 border-r border-zinc-800 p-4 transition-transform duration-200 ease-out
+                  fixed inset-y-0 left-0 z-50 w-[280px] max-w-[85vw] overflow-y-auto bg-zinc-950 border-r border-zinc-800 p-4 transition-transform duration-200 ease-out
                   xl:static xl:translate-x-0 xl:w-auto xl:border-r-0 xl:p-0 xl:min-h-0
                 `}
               >

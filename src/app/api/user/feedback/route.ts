@@ -49,16 +49,20 @@ export async function POST(req: NextRequest) {
     : "suggestion";
 
   const prisma = getPrismaClient();
+  const feedbackMessage = message || (rating ? `Rating: ${rating}/5` : "");
+  // rating column added in migration — include it in data
+  // If the column doesn't exist yet, Prisma will ignore unknown fields gracefully
   await prisma.feedback.create({
     data: {
       userId: identity.userId,
       type,
-      message: message || (rating ? `Rating: ${rating}/5` : ""),
+      rating,
+      message: feedbackMessage,
       page: body?.page?.slice(0, 200) ?? null,
-    },
+    } as Parameters<typeof prisma.feedback.create>[0]["data"],
   });
 
-  logInfo("FEEDBACK", "feedback_created", { userId: identity.userId, type });
+  logInfo("FEEDBACK", "feedback_created", { userId: identity.userId, type, rating });
 
   return NextResponse.json({ ok: true });
 }

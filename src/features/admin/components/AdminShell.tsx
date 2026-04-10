@@ -24,6 +24,7 @@ const NAV_LINKS = [
   { href: "/admin/crisis", label: "Crisis", icon: ShieldCheck },
   { href: "/admin/research", label: "Investigacion", icon: FlaskConical, matchPrefix: true },
   { href: "/admin/marketing", label: "Marketing", icon: Megaphone, matchPrefix: true },
+  { href: "/admin/blog", label: "Blog", icon: BookOpen, matchPrefix: true },
   { href: "/admin/crm", label: "CRM", icon: Database },
   { href: "/admin/organizations", label: "Organizaciones", icon: Building2 },
   { href: "/admin-clinical", label: "Panel clinico", icon: Stethoscope, matchPrefix: true },

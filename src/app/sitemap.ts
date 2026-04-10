@@ -16,6 +16,7 @@ const PAGES: Entry[] = [
   { path: "/test", priority: 0.8, changeFrequency: "monthly" },
   { path: "/unirse", priority: 0.8, changeFrequency: "monthly" },
   { path: "/guia", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/blog", priority: 0.8, changeFrequency: "daily" },
   { path: "/reto", priority: 0.7, changeFrequency: "monthly" },
   { path: "/sobre-nosotros", priority: 0.7, changeFrequency: "monthly" },
   { path: "/landing", priority: 0.6, changeFrequency: "monthly" },

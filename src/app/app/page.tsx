@@ -5,13 +5,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { MessageCircle, Plus, Sparkles } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 import { trackMetaEvent } from "@/lib/meta-pixel";
-// MirrorMoment — state kept for logic; render removed to reduce clutter
 import AppLayout from "@/components/layout/AppLayout";
 import { FloatingButton } from "@/components/effects/FloatingButton";
 import Chat, { type ChatMessage } from "@/components/Chat";
-// AssessmentFlow and QuickCheckin moved to their own pages — not shown in chat prelude
-// RetoDiario widget moved to SidebarRetoWidget — not stacked above chat
-// HomeHero and DailyQuote removed from prelude to reduce noise
 import HomeOnboarding from "@/components/home/HomeOnboarding";
 import HomeWorkspace, { type WorkspaceTab } from "@/components/home/HomeWorkspace";
 import InsightsPanel from "@/components/InsightsPanel";
@@ -28,7 +24,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-// PRODUCT_DISCLAIMERS moved to ClinicalDisclaimer modal
 import { useSfx } from "@/lib/useSfx";
 import { confettiBurst, confettiHeartbeat } from "@/lib/confetti";
 import { toast } from "sonner";

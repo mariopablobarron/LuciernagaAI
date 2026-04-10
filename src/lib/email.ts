@@ -395,22 +395,26 @@ export function buildWelcomeEmail(params: {
   appUrl: string;
 }): Pick<UserEmail, "subject" | "html" | "text"> {
   const { name, appUrl } = params;
-  const greeting = name ? `Hola ${escapeHtml(name)}` : "Hola";
-  const drexlerQuote = "Todo se transforma. Todo vibra. Todo late.";
+  const firstName = name ? escapeHtml(name.trim().split(/\s+/)[0]) : null;
+  const greeting = firstName ? `${firstName}` : "Hola";
 
-  const subject = "Bienvenido/a a Tres Mil Millones de Latidos";
+  const subject = firstName
+    ? `${firstName}, tu primer latido empieza aquí`
+    : "Tu primer latido empieza aquí";
 
   const text = [
-    `${name ? `Hola ${name}` : "Hola"},`,
+    `${greeting},`,
     ``,
-    `Bienvenido/a a Tres Mil Millones de Latidos.`,
+    `Has dado el primer paso. La mayoría no llega aquí.`,
     ``,
-    `Esto no es una app de productividad. Es un espacio para ordenar tu pensamiento, validar lo que sientes y avanzar con acción concreta.`,
+    `Tres Mil Millones de Latidos no es una app que te dice qué hacer. Es un espacio que te pregunta lo que nadie te pregunta — para que veas lo que no estás viendo.`,
     ``,
-    `"${drexlerQuote}" — Jorge Drexler`,
+    `No necesitas tenerlo claro. Solo necesitas empezar por lo que sientes hoy.`,
     ``,
     `Tu primer paso: entra y cuéntame cómo estás.`,
     `${appUrl}/app`,
+    ``,
+    `Cada latido cuenta. Y este es el primero.`,
   ].join("\n");
 
   const html = `<!DOCTYPE html>
@@ -427,31 +431,108 @@ export function buildWelcomeEmail(params: {
         </tr>
         <tr>
           <td style="padding:32px;color:#d4d4d8">
-            <p style="margin:0 0 20px;font-size:18px;color:#fff;font-weight:600">${greeting},</p>
+            <p style="margin:0 0 20px;font-size:22px;color:#fff;font-weight:700">${greeting},</p>
             <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#a1a1aa">
-              Bienvenido/a. Esto no es una app de productividad. Es un espacio para ordenar tu pensamiento,
-              validar lo que sientes y avanzar con acción concreta.
+              Has dado el primer paso. La mayoría no llega aquí.
+            </p>
+            <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#a1a1aa">
+              Esto no es una app que te dice qué hacer. Es un espacio que te pregunta lo que nadie
+              te pregunta — para que veas lo que no estás viendo.
             </p>
             <div style="background:#27272a;border-left:3px solid #d946ef;border-radius:4px;padding:16px 20px;margin:24px 0">
-              <p style="margin:0;font-size:16px;color:#e4e4e7;line-height:1.6;font-style:italic">
-                "${drexlerQuote}"
+              <p style="margin:0;font-size:16px;color:#e4e4e7;line-height:1.6">
+                No necesitas tenerlo claro.<br>
+                Solo necesitas empezar por lo que sientes hoy.
               </p>
-              <p style="margin:8px 0 0;font-size:13px;color:#71717a">— Jorge Drexler</p>
             </div>
-            <p style="margin:0 0 28px;font-size:15px;line-height:1.6;color:#a1a1aa">
-              Tu primer paso: entra y cuéntame cómo estás.
-            </p>
-            <div style="text-align:center">
+            <div style="text-align:center;margin:28px 0">
               <a href="${appUrl}/app" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#7c3aed,#d946ef);color:#fff;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px">
-                Empezar ahora
+                Mi primer latido
               </a>
             </div>
+            <p style="margin:0;font-size:14px;line-height:1.6;color:#71717a;text-align:center">
+              Cada latido cuenta. Y este es el primero.
+            </p>
           </td>
         </tr>
         <tr>
           <td style="padding:16px 32px;border-top:1px solid #27272a">
             <p style="margin:0;font-size:11px;color:#52525b;text-align:center">
               Tres Mil Millones de Latidos acompaña — no sustituye ayuda profesional.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  return { subject, html, text };
+}
+
+// ─── 24h nudge email (user signed up but hasn't returned) ───────────────────
+
+export function build24hNudgeEmail(params: {
+  name: string | null;
+  appUrl: string;
+}): Pick<UserEmail, "subject" | "html" | "text"> {
+  const { name, appUrl } = params;
+  const firstName = name ? escapeHtml(name.trim().split(/\s+/)[0]) : null;
+  const greeting = firstName ?? "Hola";
+
+  const subject = firstName
+    ? `${firstName}, ayer empezaste algo`
+    : "Ayer empezaste algo";
+
+  const text = [
+    `${greeting},`,
+    ``,
+    `Ayer diste un paso. Hoy toca el segundo.`,
+    ``,
+    `No necesitas una hora. No necesitas tenerlo claro. Solo necesitas escribir una frase sobre cómo estás ahora mismo.`,
+    ``,
+    `${appUrl}/app`,
+    ``,
+    `A veces volver es solo abrir la puerta y decir "hoy estoy así".`,
+  ].join("\n");
+
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0a0a0a;font-family:system-ui,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 0">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#18181b;border-radius:12px;overflow:hidden;border:1px solid #27272a">
+        <tr>
+          <td style="background:linear-gradient(135deg,#7c3aed 0%,#d946ef 100%);padding:24px 32px">
+            <span style="color:#fff;font-size:18px;font-weight:700">Tres Mil Millones de Latidos</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:32px;color:#d4d4d8">
+            <p style="margin:0 0 20px;font-size:20px;color:#fff;font-weight:700">${greeting},</p>
+            <p style="margin:0 0 8px;font-size:15px;line-height:1.7;color:#a1a1aa">
+              Ayer diste un paso. Hoy toca el segundo.
+            </p>
+            <p style="margin:0 0 24px;font-size:15px;line-height:1.7;color:#a1a1aa">
+              No necesitas una hora. No necesitas tenerlo claro. Solo necesitas escribir una frase
+              sobre cómo estás ahora mismo.
+            </p>
+            <div style="text-align:center;margin:24px 0">
+              <a href="${appUrl}/app" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#7c3aed,#d946ef);color:#fff;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px">
+                Segundo latido
+              </a>
+            </div>
+            <p style="margin:0;font-size:14px;line-height:1.6;color:#71717a;text-align:center;font-style:italic">
+              A veces volver es solo abrir la puerta y decir "hoy estoy así".
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:16px 32px;border-top:1px solid #27272a">
+            <p style="margin:0;font-size:11px;color:#52525b;text-align:center">
+              No sustituye terapia profesional. <a href="${appUrl}/settings" style="color:#71717a">Dejar de recibir estos emails</a>
             </p>
           </td>
         </tr>

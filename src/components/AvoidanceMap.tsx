@@ -34,8 +34,8 @@ export default function AvoidanceMap() {
 
   useEffect(() => {
     fetch("/api/user/avoidance-map")
-      .then((r) => r.json())
-      .then((d: AvoidanceData) => setData(d))
+      .then((r) => r.ok ? r.json() : null)
+      .then((d: AvoidanceData | null) => { if (d?.weeklyTrend) setData(d); })
       .catch(() => { /* Non-critical widget — silent fail */ })
       .finally(() => setLoading(false));
   }, []);

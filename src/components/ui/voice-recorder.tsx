@@ -78,9 +78,17 @@ export function VoiceRecorder({ onTranscript, disabled, className = "" }: VoiceR
     }
   }, [isListening]);
 
-  // Si el navegador no soporta la API (ej. Firefox antiguo), no renderizamos el botón
   if (!isSupported) {
-    return null;
+    return (
+      <button
+        type="button"
+        disabled
+        title="Tu navegador no soporta voz — usa Chrome para esta funcion"
+        className={`p-2.5 min-h-11 min-w-11 rounded-xl flex items-center justify-center bg-zinc-800/30 text-zinc-700 cursor-not-allowed ${className}`}
+      >
+        <Mic className="w-5 h-5" />
+      </button>
+    );
   }
 
   return (
@@ -88,11 +96,11 @@ export function VoiceRecorder({ onTranscript, disabled, className = "" }: VoiceR
       type="button"
       onClick={toggleListening}
       disabled={disabled}
-      title={isListening ? "Detener grabación" : "Hablar para escribir"}
-      className={`p-2.5 rounded-full transition-all duration-300 flex items-center justify-center ${
+      title={isListening ? "Detener grabacion" : "Hablar para escribir"}
+      className={`p-2.5 min-h-11 min-w-11 rounded-xl transition-all duration-300 flex items-center justify-center ${
         isListening
           ? "bg-fuchsia-600 text-white animate-pulse shadow-[0_0_15px_rgba(192,38,211,0.5)]"
-          : "bg-zinc-800/50 text-zinc-400 hover:text-white hover:bg-zinc-800"
+          : "bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 border border-zinc-700"
       } ${className}`}
     >
       <Mic className="w-5 h-5" />

@@ -371,7 +371,23 @@ export default function ResearchPage() {
       if (retentionRes) setRetention(retentionRes.cohorts ?? []);
       if (emotionalRes) setEmotions(emotionalRes.emotions ?? {});
       if (crisisRes) {
-        setCrisisStats(crisisRes.stats ?? null);
+        const s = crisisRes.stats;
+        if (s) {
+          // API returns nested PeriodStats objects; flatten for the UI
+          const last24h = typeof s.last24h === "object" ? s.last24h : { total: s.last24h ?? 0, high: s.high24h ?? 0, critical: s.critical24h ?? 0 };
+          const last7d = typeof s.last7d === "object" ? s.last7d : { total: s.last7d ?? 0 };
+          const last30d = typeof s.last30d === "object" ? s.last30d : { total: s.last30d ?? 0 };
+          setCrisisStats({
+            total: s.totalAllTime ?? s.total ?? 0,
+            last24h: last24h.total ?? 0,
+            last7d: last7d.total ?? 0,
+            last30d: last30d.total ?? 0,
+            high24h: last24h.high ?? 0,
+            critical24h: last24h.critical ?? 0,
+          });
+        } else {
+          setCrisisStats(null);
+        }
         setActiveCrises(crisisRes.activeCrises ?? []);
       }
       if (transformRes) {

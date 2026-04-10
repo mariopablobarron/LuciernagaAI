@@ -133,8 +133,9 @@ export async function GET(req: NextRequest) {
       errors,
     });
   } catch (error) {
+    const msg = error instanceof Error ? `${error.message}\n${error.stack?.slice(0, 500)}` : "Error desconocido";
     logError("CRON", error, { action: `telegram_checkin_${period}` });
-    sendAutomatedAlert({ type: "critical", title: `Cron falló: telegram-checkin (${period})`, message: error instanceof Error ? error.message : "Error desconocido" }).catch(() => {});
-    return NextResponse.json({ error: "CRON_FAILED" }, { status: 500 });
+    sendAutomatedAlert({ type: "critical", title: `Cron falló: telegram-checkin (${period})`, message: msg }).catch(() => {});
+    return NextResponse.json({ error: "CRON_FAILED", message: msg }, { status: 500 });
   }
 }

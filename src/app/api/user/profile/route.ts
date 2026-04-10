@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { resolveIdentity } from "@/lib/auth";
+import { InvalidSessionTokenError, resolveIdentity } from "@/lib/auth";
 import { getPrismaClient } from "@/db/prisma";
 import { invalidateUserCache } from "@/services/user";
 import { logError } from "@/lib/logger";
@@ -36,6 +36,9 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
+    if (error instanceof InvalidSessionTokenError) {
+      return NextResponse.json({ error: "NOT_AUTHENTICATED" }, { status: 401 });
+    }
     logError("USER", error, { route: "/api/user/profile", method: "GET" });
     return NextResponse.json({ error: "PROFILE_LOAD_FAILED" }, { status: 500 });
   }
@@ -112,6 +115,9 @@ export async function PATCH(req: NextRequest) {
       },
     });
   } catch (error) {
+    if (error instanceof InvalidSessionTokenError) {
+      return NextResponse.json({ error: "NOT_AUTHENTICATED" }, { status: 401 });
+    }
     logError("USER", error, { route: "/api/user/profile", method: "PATCH" });
     return NextResponse.json({ error: "PROFILE_UPDATE_FAILED" }, { status: 500 });
   }

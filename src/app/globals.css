@@ -490,3 +490,58 @@ body {
     animation: hb-pulse ease-in-out infinite;
   }
 }
+
+/* ── Glasses Components ─────────────────────────────────────────── */
+
+@keyframes glasses-drop {
+  0%   { transform: translateY(-60px) scale(0.8); opacity: 0; }
+  40%  { transform: translateY(0) scale(1.05); opacity: 1; }
+  55%  { transform: translateY(-8px) scale(1); }
+  70%  { transform: translateY(0) scale(1.02); }
+  85%  { transform: translateY(-3px) scale(1); }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes lens-flare {
+  0%   { transform: scale(0); opacity: 0; }
+  50%  { opacity: 0.6; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+@keyframes text-morph-out {
+  0%   { opacity: 1; filter: blur(0); }
+  100% { opacity: 0; filter: blur(6px); }
+}
+
+@keyframes text-morph-in {
+  0%   { opacity: 0; filter: blur(6px); }
+  100% { opacity: 1; filter: blur(0); }
+}
+
+.animate-glasses-drop {
+  animation: glasses-drop 800ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-lens-flare {
+  animation: lens-flare 1000ms ease-out forwards;
+}
+
+.animate-text-morph-out {
+  animation: text-morph-out 600ms ease-in forwards;
+}
+
+.animate-text-morph-in {
+  animation: text-morph-in 600ms ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-glasses-drop,
+  .animate-lens-flare,
+  .animate-text-morph-out,
+  .animate-text-morph-in {
+    animation: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+  }
+}

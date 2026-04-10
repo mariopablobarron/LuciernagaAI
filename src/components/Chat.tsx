@@ -9,6 +9,7 @@ import {
   Copy,
   Heart,
   ImagePlus,
+  Mic,
   Phone,
   Send,
   Shield,
@@ -22,6 +23,7 @@ import { Button } from "@/components/ui/button";
 
 import { Textarea } from "@/components/ui/textarea";
 import { VoiceRecorder } from "@/components/ui/voice-recorder";
+import { AudioRecorder } from "@/components/ui/audio-recorder";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -398,6 +400,8 @@ export default function Chat({
   const [urgentMode, setUrgentMode] = useState(false);
   const [sessionRating, setSessionRating] = useState<1 | -1 | null>(null);
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
+  const [attachedAudio, setAttachedAudio] = useState<string | null>(null);
+  const [audioDuration, setAudioDuration] = useState(0);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
   // ── Draft save / restore ──────────────────────────────────────────────────
@@ -452,7 +456,7 @@ export default function Chat({
   const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
-      if (!loading && (input.trim() || attachedImage)) void handleSendWithImage();
+      if (!loading && (input.trim() || attachedImage || attachedAudio)) void handleSendWithAttachments();
     }
   };
 
@@ -490,16 +494,27 @@ export default function Chat({
     e.target.value = "";
   };
 
-  const handleSendWithImage = () => {
-    if (attachedImage) {
-      // Send image as base64 data URI embedded in message for the backend to parse
-      const userText = input.trim() || "Mira esta imagen";
-      const fullMessage = `${userText}\n\n[image:${attachedImage}]`;
+  const handleSendWithAttachments = () => {
+    const parts: string[] = [];
+    const userText = input.trim();
+
+    if (attachedAudio) {
+      parts.push(userText || "Nota de voz");
+      parts.push(`\n\n[audio:${audioDuration}s:${attachedAudio}]`);
+      setAttachedAudio(null);
+      setAudioDuration(0);
+    } else if (attachedImage) {
+      parts.push(userText || "Mira esta imagen");
+      parts.push(`\n\n[image:${attachedImage}]`);
       setAttachedImage(null);
-      void onSend(fullMessage);
-    } else {
+    } else if (userText) {
       void onSend();
+      return;
+    } else {
+      return;
     }
+
+    void onSend(parts.join(""));
   };
 
   const handleStarterClick = (text: string) => {
@@ -735,6 +750,27 @@ export default function Chat({
             </button>
           </div>
         )}
+        {/* Audio preview */}
+        {attachedAudio && (
+          <div className="mb-2 flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/50 p-2">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <div className="h-10 w-10 rounded-lg bg-fuchsia-500/15 flex items-center justify-center shrink-0">
+                <Mic className="h-4 w-4 text-fuchsia-400" />
+              </div>
+              <div>
+                <p className="text-xs text-zinc-400">Nota de voz</p>
+                <p className="text-xs text-zinc-600">{audioDuration}s grabados</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => { setAttachedAudio(null); setAudioDuration(0); }}
+              className="shrink-0 p-1 text-zinc-500 hover:text-white transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
         <div className="relative flex items-end gap-2">
           <Textarea
             value={input}
@@ -749,6 +785,10 @@ export default function Chat({
           />
           <VoiceRecorder
             onTranscript={(text) => handleInputChange(input ? `${input} ${text}` : text)}
+            disabled={loading}
+          />
+          <AudioRecorder
+            onAudioReady={(base64, dur) => { setAttachedAudio(base64); setAudioDuration(dur); }}
             disabled={loading}
           />
           <input
@@ -770,8 +810,8 @@ export default function Chat({
             <ImagePlus className="h-4 w-4" />
           </Button>
           <Button
-            onClick={handleSendWithImage}
-            disabled={loading || (!input.trim() && !attachedImage)}
+            onClick={handleSendWithAttachments}
+            disabled={loading || (!input.trim() && !attachedImage && !attachedAudio)}
             size="icon"
             aria-label="Enviar mensaje"
             className="h-11 w-11 shrink-0 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-30"

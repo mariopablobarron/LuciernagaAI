@@ -26,25 +26,28 @@ export async function GET(req: NextRequest, ctx: unknown) {
         lastSeen: true, createdAt: true, messageCount: true,
         userState: { select: { state: true, riskLevel: true, crisisActive: true } },
         streak: { select: { currentDays: true } },
-        subscriptions: { where: { status: "active" }, select: { plan: true }, take: 1 },
+        subscriptions: { select: { plan: true, status: true }, orderBy: { createdAt: "desc" }, take: 1 },
       },
       orderBy: { createdAt: "desc" },
     });
 
-    const items = users.map((u) => ({
-      id: u.id,
-      email: u.email,
-      name: u.name,
-      isActive: u.isActive,
-      lastSeen: u.lastSeen.toISOString(),
-      createdAt: u.createdAt.toISOString(),
-      messageCount: u.messageCount,
-      state: u.userState?.state ?? "neutral",
-      riskLevel: u.userState?.riskLevel ?? "low",
-      crisisActive: u.userState?.crisisActive ?? false,
-      streakDays: u.streak?.currentDays ?? 0,
-      plan: u.subscriptions[0]?.plan ?? "free",
-    }));
+    const items = users.map((u) => {
+      const activeSub = u.subscriptions.find((s) => s.status === "active" || s.status === "trialing");
+      return {
+        id: u.id,
+        email: u.email,
+        name: u.name,
+        isActive: u.isActive,
+        lastSeen: u.lastSeen.toISOString(),
+        createdAt: u.createdAt.toISOString(),
+        messageCount: u.messageCount,
+        state: u.userState?.state ?? "neutral",
+        riskLevel: u.userState?.riskLevel ?? "low",
+        crisisActive: u.userState?.crisisActive ?? false,
+        streakDays: u.streak?.currentDays ?? 0,
+        plan: activeSub?.plan ?? "free",
+      };
+    });
 
     return NextResponse.json({ users: items, total: items.length, maxUsers: org.maxUsers });
   } catch (error: unknown) {

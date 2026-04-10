@@ -94,6 +94,7 @@ model User {
   notifications        Notification[]
   heartbeats           Heartbeat[]
   commitments     DailyCommitment[]
+  files             UserFile[]
   questionsAsked    AnonQuestion[]  @relation("QuestionsAsked")
   questionsReceived AnonQuestion[]  @relation("QuestionsReceived")
   anonAnswers       AnonAnswer[]
@@ -1132,6 +1133,27 @@ model DiaryEntry {
   @@index([userId, mood, createdAt])
 }
 
+// ─── Blog / News ────────────────────────────────────────────────────────────
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String?  @db.Text  // short summary for cards / SEO
+  content     String   @db.Text  // plain-text fallback / search
+  blocks      Json?              // BlockNote rich content
+  coverImage  String?            // URL to cover image
+  tags        String[] @default([])
+  status      String   @default("draft") // draft | published | archived
+  authorName  String   @default("Equipo Luciernaga")
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status, publishedAt])
+  @@index([slug])
+}
+
 // ─── Badges / Achievements ───────────────────────────────────────────────────
 
 /// A badge the user has earned.
@@ -1419,4 +1441,21 @@ model Notification {
   @@index([userId, read, createdAt])
   @@index([userId, createdAt])
   @@index([channel, createdAt])
+}
+
+// ─── User File Library ──────────────────────────────────────────────────────
+
+/// File uploaded by the user (images, documents). Stored as base64.
+model UserFile {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String   // original filename
+  mimeType  String   // e.g. "image/png"
+  size      Int      // bytes
+  data      String   @db.Text // base64 data URL
+  source    String   @default("upload") // "upload" | "chat" | "avatar"
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }

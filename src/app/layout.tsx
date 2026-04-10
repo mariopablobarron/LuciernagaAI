@@ -5,6 +5,7 @@ import Analytics from "@/components/Analytics";
 import MetaPixel from "@/components/MetaPixel";
 import UtmCapture from "@/components/UtmCapture";
 import CookieConsent from "@/components/CookieConsent";
+import InstallPWA from "@/components/InstallPWA";
 import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import { Toaster } from "@/components/ui/sonner";
@@ -230,6 +231,7 @@ export default function RootLayout({
 
           <AccessibilityWidget />
           <CookieConsent />
+          <InstallPWA />
           <Toaster />
         </ThemeProvider>
       </body>

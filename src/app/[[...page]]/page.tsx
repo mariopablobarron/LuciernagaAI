@@ -3,38 +3,54 @@ import { notFound } from "next/navigation";
 import LandingPageDesign from "@/components/home/LandingPageDesign";
 
 export const metadata: Metadata = {
-  title: "Tres Mil Millones de Latidos — Tres mil millones de latidos. Haz que cuenten los tuyos.",
+  title: "Tres Mil Millones de Latidos — Mentoria con IA en espanol",
   description:
-    "El corazón late tres mil millones de veces en una vida. Tres Mil Millones de Latidos existe para que los tuyos tengan dirección real. Mentoría con IA, latido a latido.",
+    "Tres Mil Millones de Latidos es una plataforma de mentoria con inteligencia artificial. Te ayuda a identificar bloqueos, ordenar ideas y actuar hoy con microacciones concretas. Gratis.",
   keywords: [
+    "tres mil millones de latidos",
+    "tresmilmillonesdelatidos",
     "mentor IA",
-    "mentor inteligencia artificial",
-    "coach IA español",
+    "mentoria inteligencia artificial",
+    "coach IA espanol",
+    "desarrollo personal IA",
     "superar bloqueo mental",
     "claridad emocional",
-    "productividad personal",
-    "herramienta bienestar emocional",
-    "ansiedad productividad",
+    "bienestar emocional",
     "app salud mental IA",
-    "mentoría con inteligencia artificial",
-    "pasar del bloqueo a la acción",
-    "seguimiento emocional diario",
-    "tresmilmillonesdelatidos",
+    "microacciones",
+    "Startidea",
+    "Mario Pablo Sanchez Barron",
   ],
+  alternates: {
+    canonical: "https://tresmilmillonesdelatidos.es",
+  },
   openGraph: {
-    title: "Tres Mil Millones de Latidos — Haz que cuenten tus próximos latidos",
+    title: "Tres Mil Millones de Latidos — Mentoria con IA en espanol",
     description:
-      "Mentoría con IA para jóvenes que saben que algo tiene que cambiar. Latido a latido.",
+      "Plataforma de mentoria con IA. Detecta tu estado emocional y te guia a la accion concreta. Gratis durante el MVP.",
+    url: "https://tresmilmillonesdelatidos.es",
+    siteName: "Tres Mil Millones de Latidos",
     type: "website",
     locale: "es_ES",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Tres Mil Millones de Latidos" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tres Mil Millones de Latidos — Haz que cuenten tus próximos latidos",
+    title: "Tres Mil Millones de Latidos — Mentoria con IA en espanol",
     description:
-      "Mentoría con IA para jóvenes que saben que algo tiene que cambiar. Latido a latido.",
+      "Mentor con IA que detecta tu estado emocional y te guia a la accion concreta. Gratis.",
+    images: ["/opengraph-image"],
   },
-  robots: { index: true, follow: true },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 // Routes managed by the app — the catch-all must never intercept these

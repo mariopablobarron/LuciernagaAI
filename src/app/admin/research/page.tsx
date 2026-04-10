@@ -4,8 +4,9 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Activity, AlertTriangle, Archive, BarChart3, Brain, ChevronDown, ChevronUp,
-  Clock, Database, Download, Eye, EyeOff, Flame, Heart, MessageCircle,
-  RefreshCw, Shield, Sparkles, Target, TrendingUp, Users, Zap, X,
+  Clock, Database, Download, Eye, EyeOff, FileSpreadsheet, FileText, Flame,
+  Heart, MessageCircle, RefreshCw, Shield, Sparkles, Target, TrendingUp,
+  Users, Zap, X,
 } from "lucide-react";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 import { AdminPanel } from "@/features/admin/components/AdminPanel";
@@ -112,6 +113,201 @@ function BarRow({ label, value, total, color }: { label: string; value: number; 
       </div>
     </div>
   );
+}
+
+// ─── Export helpers ──────────────────────────────────────────────────────────
+
+function downloadFile(content: string, filename: string, mime: string) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function toCsv(headers: string[], rows: string[][]): string {
+  const escape = (v: string) => `"${String(v).replace(/"/g, '""')}"`;
+  return [headers.map(escape).join(","), ...rows.map((r) => r.map(escape).join(","))].join("\n");
+}
+
+function buildFullCsv(data: {
+  kpis: KPIs | null; funnel: FunnelStep[]; states: StateDistribution;
+  emotions: EmotionDistribution; retention: RetentionCohort[];
+  crisisStats: CrisisStats | null; stuckUsers: StuckUser[];
+  llm7d: LlmSummary | null; transformation: TransformationPhases;
+}): string {
+  const sections: string[] = [];
+  const date = new Date().toISOString().slice(0, 10);
+
+  sections.push(`OBSERVATORIO DE INVESTIGACION - ${date}\n`);
+
+  if (data.kpis) {
+    sections.push("--- KPIs SEMANALES ---");
+    sections.push(toCsv(
+      ["Metrica", "Valor", "Delta vs semana ant"],
+      [
+        ["Usuarios totales", String(data.kpis.totalUsers), ""],
+        ["Registros 7d", String(data.kpis.signups7d), String(data.kpis.signupsDelta)],
+        ["Mensajes 7d", String(data.kpis.messages7d), String(data.kpis.messagesDelta)],
+        ["Check-ins 7d", String(data.kpis.checkins7d), String(data.kpis.checkinsDelta)],
+      ],
+    ));
+  }
+
+  if (data.funnel.length > 0) {
+    sections.push("\n--- FUNNEL DE CONVERSION ---");
+    sections.push(toCsv(["Paso", "Usuarios", "% del total"], data.funnel.map((s) => [
+      s.label, String(s.count), data.funnel[0] ? `${Math.round((s.count / data.funnel[0].count) * 100)}%` : "0%",
+    ])));
+  }
+
+  if (Object.keys(data.states).length > 0) {
+    const total = Object.values(data.states).reduce((a, b) => a + b, 0);
+    sections.push("\n--- ESTADOS DEL SISTEMA ---");
+    sections.push(toCsv(["Estado", "Usuarios", "%"], Object.entries(data.states).map(([k, v]) => [k, String(v), pct(v, total)])));
+  }
+
+  if (Object.keys(data.emotions).length > 0) {
+    const total = Object.values(data.emotions).reduce((a, b) => a + b, 0);
+    sections.push("\n--- MAPA EMOCIONAL ---");
+    sections.push(toCsv(["Emocion", "Usuarios", "%"], Object.entries(data.emotions).map(([k, v]) => [k, String(v), pct(v, total)])));
+  }
+
+  if (data.retention.length > 0) {
+    sections.push("\n--- RETENCION POR COHORTE ---");
+    sections.push(toCsv(
+      ["Semana", "Usuarios", "D1", "D3", "D7", "D14", "D30"],
+      data.retention.map((c) => [
+        c.week, String(c.totalUsers),
+        ...["D1", "D3", "D7", "D14", "D30"].map((m) => c.retention[m] ? `${Math.round(c.retention[m].rate)}%` : "-"),
+      ]),
+    ));
+  }
+
+  if (data.crisisStats) {
+    sections.push("\n--- CRISIS ---");
+    sections.push(toCsv(["Periodo", "Total", "Altas", "Criticas"], [
+      ["24h", String(data.crisisStats.last24h), String(data.crisisStats.high24h), String(data.crisisStats.critical24h)],
+      ["7d", String(data.crisisStats.last7d), "", ""],
+      ["30d", String(data.crisisStats.last30d), "", ""],
+      ["Total", String(data.crisisStats.total), "", ""],
+    ]));
+  }
+
+  if (Object.keys(data.transformation).length > 0) {
+    const total = Object.values(data.transformation).reduce((a, b) => a + b, 0);
+    sections.push("\n--- FASES DE TRANSFORMACION ---");
+    sections.push(toCsv(["Fase", "Usuarios", "%"], Object.entries(data.transformation).map(([k, v]) => [k, String(v), pct(v, total)])));
+  }
+
+  if (data.stuckUsers.length > 0) {
+    sections.push("\n--- USUARIOS ATASCADOS ---");
+    sections.push(toCsv(["Nombre", "Email", "Estado", "Dias inactivo"], data.stuckUsers.map((u) => [u.name || "-", u.email, u.state, String(u.daysSinceUpdate)])));
+  }
+
+  if (data.llm7d) {
+    sections.push("\n--- USO LLM (7d) ---");
+    sections.push(toCsv(["Metrica", "Valor"], [
+      ["Requests", String(data.llm7d.requests)],
+      ["Tokens", String(data.llm7d.totalTokens)],
+      ["Coste USD", `$${data.llm7d.costUsd.toFixed(2)}`],
+      ["Latencia media", `${data.llm7d.avgLatencyMs}ms`],
+    ]));
+  }
+
+  return sections.join("\n");
+}
+
+function buildFullHtml(data: {
+  kpis: KPIs | null; funnel: FunnelStep[]; states: StateDistribution;
+  emotions: EmotionDistribution; retention: RetentionCohort[];
+  crisisStats: CrisisStats | null; stuckUsers: StuckUser[];
+  llm7d: LlmSummary | null; transformation: TransformationPhases;
+}): string {
+  const date = new Date().toLocaleDateString("es-ES", { day: "2-digit", month: "long", year: "numeric" });
+
+  function tableHtml(headers: string[], rows: string[][]) {
+    return `<table style="border-collapse:collapse;width:100%;margin:12px 0;font-size:13px">
+      <thead><tr>${headers.map((h) => `<th style="border:1px solid #ddd;padding:6px 10px;background:#f5f5f5;text-align:left">${h}</th>`).join("")}</tr></thead>
+      <tbody>${rows.map((r) => `<tr>${r.map((c) => `<td style="border:1px solid #ddd;padding:6px 10px">${c}</td>`).join("")}</tr>`).join("")}</tbody>
+    </table>`;
+  }
+
+  const sections: string[] = [];
+
+  sections.push(`<h1 style="font-family:sans-serif;color:#333">Observatorio de Investigacion</h1>`);
+  sections.push(`<p style="color:#888;font-size:13px">Generado: ${date}</p><hr>`);
+
+  if (data.kpis) {
+    sections.push(`<h2 style="font-family:sans-serif;color:#555">KPIs Semanales</h2>`);
+    sections.push(tableHtml(["Metrica", "Valor", "Delta"], [
+      ["Usuarios totales", String(data.kpis.totalUsers), ""],
+      ["Registros 7d", String(data.kpis.signups7d), `${data.kpis.signupsDelta > 0 ? "+" : ""}${data.kpis.signupsDelta}`],
+      ["Mensajes 7d", String(data.kpis.messages7d), `${data.kpis.messagesDelta > 0 ? "+" : ""}${data.kpis.messagesDelta}`],
+      ["Check-ins 7d", String(data.kpis.checkins7d), `${data.kpis.checkinsDelta > 0 ? "+" : ""}${data.kpis.checkinsDelta}`],
+    ]));
+  }
+
+  if (data.funnel.length > 0) {
+    sections.push(`<h2 style="font-family:sans-serif;color:#555">Funnel de Conversion</h2>`);
+    sections.push(tableHtml(["Paso", "Usuarios", "%"], data.funnel.map((s) => [
+      s.label, String(s.count), data.funnel[0] ? `${Math.round((s.count / data.funnel[0].count) * 100)}%` : "0%",
+    ])));
+  }
+
+  if (Object.keys(data.states).length > 0) {
+    const total = Object.values(data.states).reduce((a, b) => a + b, 0);
+    sections.push(`<h2 style="font-family:sans-serif;color:#555">Estados del Sistema</h2>`);
+    sections.push(tableHtml(["Estado", "Usuarios", "%"], Object.entries(data.states).sort(([, a], [, b]) => b - a).map(([k, v]) => [k, String(v), pct(v, total)])));
+  }
+
+  if (Object.keys(data.emotions).length > 0) {
+    const total = Object.values(data.emotions).reduce((a, b) => a + b, 0);
+    sections.push(`<h2 style="font-family:sans-serif;color:#555">Mapa Emocional</h2>`);
+    sections.push(tableHtml(["Emocion", "Usuarios", "%"], Object.entries(data.emotions).sort(([, a], [, b]) => b - a).map(([k, v]) => [k, String(v), pct(v, total)])));
+  }
+
+  if (data.retention.length > 0) {
+    sections.push(`<h2 style="font-family:sans-serif;color:#555">Retencion por Cohorte</h2>`);
+    sections.push(tableHtml(
+      ["Semana", "Usuarios", "D1", "D3", "D7", "D14", "D30"],
+      data.retention.map((c) => [
+        c.week, String(c.totalUsers),
+        ...["D1", "D3", "D7", "D14", "D30"].map((m) => c.retention[m] ? `${Math.round(c.retention[m].rate)}%` : "-"),
+      ]),
+    ));
+  }
+
+  if (data.crisisStats) {
+    sections.push(`<h2 style="font-family:sans-serif;color:#555">Crisis</h2>`);
+    sections.push(tableHtml(["Periodo", "Total", "Altas", "Criticas"], [
+      ["24h", String(data.crisisStats.last24h), String(data.crisisStats.high24h), String(data.crisisStats.critical24h)],
+      ["7d", String(data.crisisStats.last7d), "-", "-"],
+      ["30d", String(data.crisisStats.last30d), "-", "-"],
+    ]));
+  }
+
+  if (Object.keys(data.transformation).length > 0) {
+    const total = Object.values(data.transformation).reduce((a, b) => a + b, 0);
+    sections.push(`<h2 style="font-family:sans-serif;color:#555">Fases de Transformacion</h2>`);
+    sections.push(tableHtml(["Fase", "Usuarios", "%"], Object.entries(data.transformation).sort(([, a], [, b]) => b - a).map(([k, v]) => [k, String(v), pct(v, total)])));
+  }
+
+  if (data.stuckUsers.length > 0) {
+    sections.push(`<h2 style="font-family:sans-serif;color:#555">Usuarios Atascados</h2>`);
+    sections.push(tableHtml(["Nombre", "Email", "Estado", "Dias inactivo"], data.stuckUsers.map((u) => [u.name || "-", u.email, u.state, String(u.daysSinceUpdate)])));
+  }
+
+  if (data.llm7d) {
+    sections.push(`<h2 style="font-family:sans-serif;color:#555">Uso LLM (7d)</h2>`);
+    sections.push(tableHtml(["Metrica", "Valor"], [
+      ["Requests", String(data.llm7d.requests)],
+      ["Tokens", data.llm7d.totalTokens.toLocaleString()],
+      ["Coste", `$${data.llm7d.costUsd.toFixed(2)}`],
+      ["Latencia media", `${data.llm7d.avgLatencyMs}ms`],
+    ]));
+  }
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Observatorio - ${date}</title></head><body style="font-family:sans-serif;max-width:900px;margin:0 auto;padding:20px">${sections.join("\n")}</body></html>`;
 }
 
 // ─── Main ────────────────────────────────────────────────────────────────────
@@ -243,6 +439,26 @@ export default function ResearchPage() {
           <button onClick={() => setShowConfig(!showConfig)} className="flex items-center gap-1.5 rounded-xl bg-zinc-800 px-3 py-2 text-xs font-medium text-zinc-300 hover:bg-zinc-700 border border-zinc-700 transition-colors">
             {showConfig ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
             Configurar widgets
+          </button>
+          <button
+            onClick={() => {
+              const csv = buildFullCsv({ kpis, funnel, states, emotions, retention, crisisStats, stuckUsers, llm7d, transformation });
+              downloadFile(csv, `observatorio-${new Date().toISOString().slice(0, 10)}.csv`, "text/csv;charset=utf-8");
+              toast.success("Excel (CSV) descargado");
+            }}
+            className="flex items-center gap-1.5 rounded-xl bg-emerald-500/10 px-3 py-2 text-xs font-medium text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/30 transition-colors"
+          >
+            <FileSpreadsheet className="h-3.5 w-3.5" /> Excel (CSV)
+          </button>
+          <button
+            onClick={() => {
+              const html = buildFullHtml({ kpis, funnel, states, emotions, retention, crisisStats, stuckUsers, llm7d, transformation });
+              const w = window.open("", "_blank");
+              if (w) { w.document.write(html); w.document.close(); w.print(); }
+            }}
+            className="flex items-center gap-1.5 rounded-xl bg-blue-500/10 px-3 py-2 text-xs font-medium text-blue-400 hover:bg-blue-500/20 border border-blue-500/30 transition-colors"
+          >
+            <FileText className="h-3.5 w-3.5" /> PDF
           </button>
           <button onClick={handleReset} className="flex items-center gap-1.5 rounded-xl bg-red-500/10 px-3 py-2 text-xs font-medium text-red-400 hover:bg-red-500/20 border border-red-500/30 transition-colors">
             <Database className="h-3.5 w-3.5" /> Resetear periodo

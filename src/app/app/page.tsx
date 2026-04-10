@@ -33,7 +33,7 @@ import { PRODUCT_DISCLAIMERS } from "@/lib/legal";
 import { useSfx } from "@/lib/useSfx";
 import { confettiBurst, confettiHeartbeat } from "@/lib/confetti";
 import { toast } from "sonner";
-import SfxToggle from "@/components/SfxToggle";
+// SfxToggle available via sfx.toggle if needed in future
 import {
   bootstrapBrowserSession,
   captureBrowserEmail,

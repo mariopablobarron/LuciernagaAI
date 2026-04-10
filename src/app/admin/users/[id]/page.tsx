@@ -208,6 +208,7 @@ export default function AdminUserDetailPage() {
 
   // Reset password
   const [newPassword, setNewPassword] = useState("");
+  const [showPw, setShowPw] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
 
   // Send email
@@ -726,13 +727,18 @@ export default function AdminUserDetailPage() {
                 <div className="space-y-3 border-t border-zinc-800 px-4 py-4">
                   <div>
                     <label className="mb-1 block text-xs font-medium text-zinc-500">Nueva contrasena</label>
-                    <input
-                      type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      className="h-9 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 text-sm text-white placeholder:text-zinc-600 focus:border-violet-500 focus:outline-none"
-                      placeholder="Nueva contrasena"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showPw ? "text" : "password"}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="h-9 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 pr-10 text-sm text-white placeholder:text-zinc-600 focus:border-violet-500 focus:outline-none"
+                        placeholder="Nueva contrasena"
+                      />
+                      <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300">
+                        {showPw ? "🙈" : "👁️"}
+                      </button>
+                    </div>
                   </div>
                   {actionFeedback?.section === "reset-password" && (
                     <p className={`text-xs font-medium ${actionFeedback.type === "success" ? "text-emerald-400" : "text-red-400"}`}>

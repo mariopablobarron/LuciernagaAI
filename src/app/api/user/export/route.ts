@@ -20,37 +20,16 @@ export async function GET(req: NextRequest) {
   const prisma = getPrismaClient();
 
   try {
-    const [user, messages, dailyLogs, goals, streak] = await Promise.all([
-      prisma.user.findUnique({
-        where: { id: identity.userId },
-        select: { id: true, email: true, name: true, createdAt: true, messageCount: true },
-      }),
-      prisma.message.findMany({
-        where: { userId: identity.userId },
+    const userId = identity.userId;
+
+    // ── CSV shortcut (chat history only) ──────────────────────────────
+    if (format === "csv") {
+      const messages = await prisma.message.findMany({
+        where: { userId },
         select: { role: true, content: true, createdAt: true },
         orderBy: { createdAt: "asc" },
-      }),
-      prisma.dailyLog.findMany({
-        where: { userId: identity.userId },
-        select: { mood: true, note: true, emotionalState: true, createdAt: true },
-        orderBy: { createdAt: "asc" },
-      }),
-      prisma.goal.findMany({
-        where: { userId: identity.userId },
-        select: { title: true, status: true, createdAt: true },
-        orderBy: { createdAt: "asc" },
-      }),
-      prisma.streak.findUnique({
-        where: { userId: identity.userId },
-        select: { currentDays: true, bestDays: true },
-      }),
-    ]);
+      });
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    if (format === "csv") {
       const header = "fecha,rol,contenido";
       const rows = messages.map(
         (m) =>
@@ -61,24 +40,119 @@ export async function GET(req: NextRequest) {
       return new Response(csv, {
         headers: {
           "Content-Type": "text/csv; charset=utf-8",
-          "Content-Disposition": `attachment; filename="historial-${identity.userId}.csv"`,
+          "Content-Disposition": `attachment; filename="historial-${userId}.csv"`,
         },
       });
     }
 
-    // JSON format — full data export
+    // ── Full GDPR JSON export ─────────────────────────────────────────
+    const [
+      user,
+      conversations,
+      goals,
+      diaryEntries,
+      dailyCheckins,
+      streak,
+      crisisEvents,
+      userState,
+      personalProjects,
+      assessments,
+      preferences,
+      dailyLogs,
+    ] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          bio: true,
+          role: true,
+          createdAt: true,
+          updatedAt: true,
+          lastSeen: true,
+          messageCount: true,
+          source: true,
+          consentGiven: true,
+          consentAt: true,
+          phone: true,
+        },
+      }),
+      prisma.conversation.findMany({
+        where: { userId },
+        include: {
+          messageRecords: {
+            select: { role: true, content: true, createdAt: true },
+            orderBy: { createdAt: "asc" },
+          },
+        },
+        orderBy: { createdAt: "asc" },
+      }),
+      prisma.goal.findMany({
+        where: { userId },
+        include: { actions: true },
+        orderBy: { createdAt: "asc" },
+      }),
+      prisma.diaryEntry.findMany({
+        where: { userId },
+        orderBy: { createdAt: "asc" },
+      }),
+      prisma.dailyCheckin.findMany({
+        where: { userId },
+        orderBy: { createdAt: "asc" },
+      }),
+      prisma.streak.findUnique({ where: { userId } }),
+      prisma.crisisEvent.findMany({
+        where: { userId },
+        orderBy: { createdAt: "asc" },
+      }),
+      prisma.userState.findUnique({ where: { userId } }),
+      prisma.personalProject.findMany({
+        where: { userId },
+        include: {
+          phaseEntries: true,
+          focusAreas: { include: { steps: true } },
+          reflections: true,
+          insights: true,
+        },
+        orderBy: { createdAt: "asc" },
+      }),
+      prisma.assessment.findMany({
+        where: { userId },
+        include: { response: true },
+        orderBy: { createdAt: "asc" },
+      }),
+      prisma.userPreferences.findUnique({ where: { userId } }),
+      prisma.dailyLog.findMany({
+        where: { userId },
+        orderBy: { createdAt: "asc" },
+      }),
+    ]);
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
     const data = {
       exportedAt: new Date().toISOString(),
-      user: { ...user, streak },
-      messages,
-      dailyLogs,
+      user,
+      streak,
+      userState,
+      preferences,
+      conversations,
       goals,
+      diaryEntries,
+      dailyCheckins,
+      dailyLogs,
+      crisisEvents,
+      personalProjects,
+      assessments,
     };
 
     return new Response(JSON.stringify(data, null, 2), {
       headers: {
         "Content-Type": "application/json; charset=utf-8",
-        "Content-Disposition": `attachment; filename="datos-${identity.userId}.json"`,
+        "Content-Disposition": `attachment; filename="datos-${userId}.json"`,
       },
     });
   } catch (error) {

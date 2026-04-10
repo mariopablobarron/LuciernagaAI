@@ -1,5 +1,6 @@
 import { getPrismaClient } from "@/db/prisma";
 import { ensureUserSession } from "@/services/conversation";
+import { GoalStatus } from "@prisma/client";
 
 export type GoalActionItem = {
   id: string;
@@ -13,7 +14,7 @@ export type AvoidanceType = "postpone" | "refuse" | "avoidance";
 export type GoalWithProgress = {
   id: string;
   title: string;
-  status: string;
+  status: GoalStatus;
   createdAt: Date;
   updatedAt: Date;
   actions: GoalActionItem[];
@@ -302,7 +303,7 @@ function computeProgress(actions: GoalActionItem[]): {
 function mapGoalWithProgress(goal: {
   id: string;
   title: string;
-  status: string;
+  status: GoalStatus;
   createdAt: Date;
   updatedAt: Date;
   actions: GoalActionItem[];
@@ -321,14 +322,14 @@ function mapGoalWithProgress(goal: {
   };
 }
 
-function getGoalStatusFromActions(actions: GoalActionItem[]): string {
+function getGoalStatusFromActions(actions: GoalActionItem[]): GoalStatus {
   return actions.length > 0 && actions.every((action) => action.completed) ? "completed" : "active";
 }
 
 type GoalRecord = {
   id: string;
   title: string;
-  status: string;
+  status: GoalStatus;
   createdAt: Date;
   updatedAt: Date;
   actions: GoalActionItem[];

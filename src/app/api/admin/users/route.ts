@@ -92,10 +92,7 @@ export async function GET(req: NextRequest) {
 
     let stateUserIds: string[] | null = null;
     if (stateFilter !== "all" || riskOnly) {
-      const stateWhere: {
-        state?: string;
-        OR?: Array<{ riskLevel: string } | { crisisActive: boolean }>;
-      } = {};
+      const stateWhere: Record<string, unknown> = {};
 
       if (stateFilter !== "all") {
         stateWhere.state = stateFilter;

@@ -3,6 +3,22 @@
 @import "shadcn/tailwind.css";
 @custom-variant dark (&:is(.dark *));
 
+/* ── OpenDyslexic font for accessibility ───────────────────────── */
+@font-face {
+  font-family: "OpenDyslexic";
+  src: url("https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/woff/OpenDyslexic-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "OpenDyslexic";
+  src: url("https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/woff/OpenDyslexic-Bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ─── Mobile safe areas (iPhone notch, Dynamic Island) ───────────────────── */
 body {
   padding-top: env(safe-area-inset-top);
@@ -544,4 +560,109 @@ body {
     filter: none !important;
     transform: none !important;
   }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ACCESSIBILITY SYSTEM
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── Skip link ──────────────────────────────────────────────────── */
+.a11y-skip-link {
+  position: absolute;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  padding: 0.75rem 1.5rem;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.875rem;
+  border-radius: 0 0 0.5rem 0.5rem;
+  text-decoration: none;
+  transition: top 0.2s;
+}
+.a11y-skip-link:focus {
+  top: 0;
+}
+
+/* ── Font size scaling (applied via class on <html>) ────────────── */
+html.a11y-font-1 { font-size: 112.5%; }   /* +1 step */
+html.a11y-font-2 { font-size: 125%; }     /* +2 steps */
+html.a11y-font-3 { font-size: 137.5%; }   /* +3 steps */
+html.a11y-font-4 { font-size: 150%; }     /* +4 steps */
+
+/* ── High contrast ──────────────────────────────────────────────── */
+html.a11y-high-contrast {
+  --background: oklch(0 0 0);
+  --foreground: oklch(1 0 0);
+  --card: oklch(0.08 0 0);
+  --card-foreground: oklch(1 0 0);
+  --border: oklch(0.5 0 0);
+  --muted-foreground: oklch(0.85 0 0);
+}
+
+html.a11y-high-contrast * {
+  border-color: oklch(0.5 0 0) !important;
+}
+
+html.a11y-high-contrast img {
+  filter: contrast(1.2);
+}
+
+/* ── Dyslexia-friendly font ─────────────────────────────────────── */
+html.a11y-dyslexia-font,
+html.a11y-dyslexia-font body,
+html.a11y-dyslexia-font * {
+  font-family: "OpenDyslexic", "Comic Sans MS", "Arial", sans-serif !important;
+  letter-spacing: 0.05em;
+  word-spacing: 0.15em;
+}
+
+/* ── Text spacing ───────────────────────────────────────────────── */
+html.a11y-text-spacing {
+  letter-spacing: 0.12em;
+  word-spacing: 0.16em;
+}
+html.a11y-text-spacing p,
+html.a11y-text-spacing li,
+html.a11y-text-spacing span,
+html.a11y-text-spacing div {
+  line-height: 1.8 !important;
+}
+
+/* ── Link highlighting ──────────────────────────────────────────── */
+html.a11y-link-highlight a:not(.a11y-skip-link) {
+  text-decoration: underline !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 3px !important;
+}
+
+/* ── Big cursor ─────────────────────────────────────────────────── */
+html.a11y-big-cursor,
+html.a11y-big-cursor * {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cpath d='M4 4l16 40 6-16 16-6z' fill='%23fff' stroke='%23000' stroke-width='2'/%3E%3C/svg%3E") 4 4, auto !important;
+}
+
+/* ── Reduced motion (manual toggle, complements prefers-reduced-motion) */
+html.a11y-reduced-motion,
+html.a11y-reduced-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* ── OS-level high contrast preference ──────────────────────────── */
+@media (prefers-contrast: more) {
+  :root {
+    --border: oklch(0.5 0 0);
+    --muted-foreground: oklch(0.85 0 0);
+  }
+}
+
+/* ── Focus visible improvements ─────────────────────────────────── */
+:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
 }

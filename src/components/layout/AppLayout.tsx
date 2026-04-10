@@ -37,7 +37,9 @@ export default function AppLayout({
                 <button
                   onClick={() => setSidebarOpen((v) => !v)}
                   className="xl:hidden mt-1 p-2 -ml-1 rounded-lg border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700 transition-colors"
-                  aria-label="Abrir menu"
+                  aria-label={sidebarOpen ? "Cerrar panel lateral" : "Abrir panel lateral"}
+                  aria-expanded={sidebarOpen}
+                  aria-controls="app-sidebar"
                 >
                   <Menu className="w-5 h-5" />
                 </button>
@@ -67,11 +69,15 @@ export default function AppLayout({
               {sidebarOpen && (
                 <div
                   className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm xl:hidden"
+                  aria-hidden="true"
                   onClick={() => setSidebarOpen(false)}
                 />
               )}
               {/* Sidebar panel */}
               <aside
+                id="app-sidebar"
+                role="complementary"
+                aria-label="Panel lateral de navegacion"
                 className={`
                   ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
                   fixed inset-y-0 left-0 z-50 w-[280px] max-w-[85vw] overflow-y-auto bg-zinc-950 border-r border-zinc-800 p-4 transition-transform duration-200 ease-out

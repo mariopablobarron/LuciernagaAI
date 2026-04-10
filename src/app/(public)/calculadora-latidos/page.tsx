@@ -15,7 +15,7 @@ const BEATS_PER_HOUR = BEATS_PER_MIN * 60;
 const BEATS_PER_DAY = BEATS_PER_HOUR * 24;
 const BEATS_PER_YEAR = BEATS_PER_DAY * 365.25;
 const THREE_BILLION = 3_000_000_000;
-const LIFE_YEARS = THREE_BILLION / BEATS_PER_YEAR; // ~79.3 years
+// Life years reference kept for SEO text (~79 years at 72 bpm)
 
 // ─── Presets: everyday moments measured in heartbeats ────────────────────────
 
@@ -176,6 +176,11 @@ export default function CalculadoraLatidosPage() {
   // Results
   const [calculated, setCalculated] = useState(false);
 
+  // Email capture
+  const [captureEmail, setCaptureEmail] = useState("");
+  const [emailSent, setEmailSent] = useState(false);
+  const [emailSending, setEmailSending] = useState(false);
+
   const ageBeats = useMemo(() => {
     if (!birthDate) return 0;
     const birth = new Date(birthDate);
@@ -198,8 +203,7 @@ export default function CalculadoraLatidosPage() {
   }, [customValue, customUnit]);
 
   const currentBeats = mode === "age" ? ageBeats : customBeats;
-  const remaining = Math.max(0, THREE_BILLION - currentBeats);
-  const pct = percentOfLife(currentBeats);
+  // remaining / pct removed — positive framing only
 
   const handleCalculate = useCallback(() => {
     if (currentBeats <= 0) return;
@@ -315,12 +319,12 @@ export default function CalculadoraLatidosPage() {
         {/* Results */}
         {calculated && currentBeats > 0 && (
           <div className="mt-10 max-w-2xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {/* Main number */}
+            {/* Main number — celebratory */}
             <div className="text-center space-y-3">
               <PulsingHeart active />
               <div>
                 <p className="text-sm text-zinc-500 mb-1">
-                  {mode === "age" ? "Latidos vividos (y contando)" : "Latidos en ese tiempo"}
+                  {mode === "age" ? "Latidos que te han traido hasta aqui" : "Latidos en ese tiempo"}
                 </p>
                 <p className="text-4xl md:text-5xl font-bold bg-linear-to-r from-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
                   {mode === "age" ? (
@@ -329,42 +333,47 @@ export default function CalculadoraLatidosPage() {
                     <AnimatedNumber value={customBeats} />
                   )}
                 </p>
+                {mode === "age" && (
+                  <p className="mt-2 text-sm text-zinc-400">
+                    Cada uno de ellos te sostuvo para llegar a este momento.
+                  </p>
+                )}
               </div>
             </div>
 
-            {/* Progress bar of life */}
+            {/* Positive reframe — what you've built */}
             {mode === "age" && (
               <div className={COMPONENTS.card}>
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-sm text-zinc-400">Tu barra de vida</p>
-                  <p className="text-sm font-semibold text-fuchsia-300">{pct.toFixed(2)}%</p>
-                </div>
-                <div className={COMPONENTS.progressBar}>
-                  <div
-                    className={COMPONENTS.progressFill}
-                    style={{ width: `${pct}%`, transition: "width 1.2s ease-out" }}
-                  />
-                </div>
-                <div className="flex justify-between mt-2 text-xs text-zinc-600">
-                  <span>0</span>
-                  <span>3 mil millones</span>
-                </div>
-                <div className="mt-4 grid grid-cols-2 gap-4">
-                  <div className="rounded-xl border border-zinc-800 bg-black/30 p-3 text-center">
-                    <p className="text-xs text-zinc-500">Latidos restantes</p>
-                    <p className="mt-1 text-lg font-bold text-cyan-300">
-                      <AnimatedNumber value={remaining} />
+                <p className="text-sm font-semibold text-white mb-3">Lo que representan tus latidos</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-3 text-center">
+                    <p className="text-2xl font-bold text-violet-300">
+                      {Math.round(currentBeats / BEATS_PER_DAY).toLocaleString("es-ES")}
                     </p>
-                    <p className="text-xs text-zinc-600 mt-1">~ {beatsToTime(remaining)}</p>
+                    <p className="text-xs text-zinc-500 mt-1">amaneceres vividos</p>
                   </div>
-                  <div className="rounded-xl border border-zinc-800 bg-black/30 p-3 text-center">
-                    <p className="text-xs text-zinc-500">Esperanza (latidos)</p>
-                    <p className="mt-1 text-lg font-bold text-violet-300">
-                      ~{LIFE_YEARS.toFixed(0)} años
+                  <div className="rounded-xl border border-fuchsia-500/20 bg-fuchsia-500/5 p-3 text-center">
+                    <p className="text-2xl font-bold text-fuchsia-300">
+                      {Math.round(currentBeats / (AVG_BPM * 3.5)).toLocaleString("es-ES")}
                     </p>
-                    <p className="text-xs text-zinc-600 mt-1">a {AVG_BPM} lpm en reposo</p>
+                    <p className="text-xs text-zinc-500 mt-1">canciones que cabrian</p>
+                  </div>
+                  <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-3 text-center">
+                    <p className="text-2xl font-bold text-cyan-300">
+                      {Math.round(currentBeats / BEATS_PER_HOUR).toLocaleString("es-ES")}
+                    </p>
+                    <p className="text-xs text-zinc-500 mt-1">horas de experiencia</p>
+                  </div>
+                  <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3 text-center">
+                    <p className="text-2xl font-bold text-emerald-300">
+                      {Math.round(currentBeats / (AVG_BPM * 0.33)).toLocaleString("es-ES")}
+                    </p>
+                    <p className="text-xs text-zinc-500 mt-1">abrazos posibles</p>
                   </div>
                 </div>
+                <p className="mt-4 text-xs text-zinc-600 text-center">
+                  Tu corazon late {AVG_BPM} veces por minuto sin que se lo pidas. Esa constancia ya la tienes dentro.
+                </p>
               </div>
             )}
 
@@ -401,14 +410,65 @@ export default function CalculadoraLatidosPage() {
               </div>
             </div>
 
+            {/* Email capture */}
+            {!emailSent ? (
+              <div className={COMPONENTS.card}>
+                <p className="text-sm font-semibold text-zinc-300">
+                  Recibe tu informe de latidos por email
+                </p>
+                <p className="mt-1 text-xs text-zinc-500">
+                  Tu calculo, perspectiva y un primer paso de accion personalizado.
+                </p>
+                <div className="mt-3 flex gap-2">
+                  <input
+                    type="email"
+                    value={captureEmail}
+                    onChange={(e) => setCaptureEmail(e.target.value)}
+                    placeholder="tu@email.com"
+                    className={`${COMPONENTS.inputField} flex-1`}
+                  />
+                  <button
+                    type="button"
+                    disabled={emailSending || !captureEmail.includes("@")}
+                    onClick={async () => {
+                      setEmailSending(true);
+                      try {
+                        await fetch("/api/calculator/email", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            email: captureEmail.trim(),
+                            beats: currentBeats,
+                          }),
+                        });
+                        setEmailSent(true);
+                        trackEvent("calculator_email_captured");
+                      } catch { /* silent */ }
+                      finally { setEmailSending(false); }
+                    }}
+                    className={`${COMPONENTS.buttonPrimary} shrink-0 disabled:opacity-40`}
+                  >
+                    {emailSending ? "..." : "Enviar"}
+                  </button>
+                </div>
+                <p className="mt-2 text-[10px] text-zinc-700">Sin spam. Solo tu informe.</p>
+              </div>
+            ) : (
+              <div className={COMPONENTS.card}>
+                <p className="text-sm text-emerald-400 font-medium text-center">
+                  Enviado — revisa tu bandeja de entrada
+                </p>
+              </div>
+            )}
+
             {/* CTA */}
             <div className="rounded-2xl border border-fuchsia-500/20 bg-fuchsia-500/5 p-6 text-center space-y-4">
               <p className="text-lg font-bold text-white">
-                Cada latido es una oportunidad de hacer algo que importe
+                Tu corazon ya hace su parte. Ahora te toca a ti.
               </p>
               <p className="text-sm text-zinc-400 max-w-md mx-auto">
-                Tres Mil Millones de Latidos te ayuda a convertir la intención en acción.
-                Empieza una conversación y transforma tu siguiente latido.
+                Con la misma constancia con la que late tu corazon, puedes avanzar un paso cada dia.
+                Tres Mil Millones de Latidos te ayuda a convertir la intencion en accion.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link href="/app" className={COMPONENTS.buttonPrimary}>
@@ -427,31 +487,31 @@ export default function CalculadoraLatidosPage() {
           <div className={COMPONENTS.divider} />
           <div className="space-y-4">
             <h2 className={`${TYPOGRAPHY.h4} text-zinc-300`}>
-              Los datos detrás de los latidos
+              Por que contar latidos
             </h2>
             <div className="grid md:grid-cols-2 gap-6 text-sm leading-relaxed">
               <div className="space-y-2">
                 <p>
-                  El corazón humano late unas <strong className="text-zinc-300">{AVG_BPM} veces por minuto</strong> en
-                  reposo. Eso son {BEATS_PER_HOUR.toLocaleString("es-ES")} latidos por hora,{" "}
-                  {BEATS_PER_DAY.toLocaleString("es-ES")} al día, y más de{" "}
-                  {Math.round(BEATS_PER_YEAR / 1_000_000)} millones al año.
+                  Tu corazon late unas <strong className="text-zinc-300">{AVG_BPM} veces por minuto</strong> sin
+                  que se lo pidas. Son {BEATS_PER_HOUR.toLocaleString("es-ES")} por hora,{" "}
+                  {BEATS_PER_DAY.toLocaleString("es-ES")} al dia. Cada uno sostiene todo lo que haces,
+                  piensas y sientes.
                 </p>
                 <p>
-                  A lo largo de una vida media (~{LIFE_YEARS.toFixed(0)} años), el corazón late
-                  aproximadamente <strong className="text-fuchsia-300">3 mil millones de veces</strong> sin
-                  que tengamos que pedírselo.
+                  A lo largo de una vida, el corazon late cerca de{" "}
+                  <strong className="text-fuchsia-300">3 mil millones de veces</strong>.
+                  No es una cuenta atras — es un recordatorio de lo que ya has construido latido a latido.
                 </p>
               </div>
               <div className="space-y-2">
                 <p>
-                  Esta calculadora usa la frecuencia cardíaca en reposo promedio de un adulto sano.
-                  Tu frecuencia real varía con la edad, el ejercicio, el estrés y la genética.
+                  Esta calculadora usa la frecuencia cardiaca en reposo promedio de un adulto sano.
+                  Tu frecuencia real varia con la edad, el ejercicio y la genetica.
                 </p>
                 <p>
-                  El objetivo no es la precisión clínica: es la perspectiva.
-                  Recordar que tu tiempo es finito y medible puede ser el empujón que necesitas para pasar
-                  de pensar a hacer.
+                  El objetivo no es la precision clinica: es la <strong className="text-zinc-300">perspectiva</strong>.
+                  Darte cuenta de que ya cargas con millones de latidos de experiencia
+                  puede ser el empujon que necesitas para dar el siguiente paso.
                 </p>
               </div>
             </div>

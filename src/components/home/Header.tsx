@@ -32,7 +32,7 @@ export default function Header() {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1 flex-1">
+          <nav aria-label="Navegacion principal" className="hidden md:flex items-center gap-1 flex-1">
             {NAV.map((link) => {
               const active = pathname === link.href || pathname.startsWith(link.href + "/");
               if (link.highlight) {
@@ -40,6 +40,7 @@ export default function Header() {
                   <Link
                     key={link.href}
                     href={link.href}
+                    aria-current={active ? "page" : undefined}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border border-cyan-500/40 bg-cyan-500/8 text-cyan-300 hover:bg-cyan-500/15 hover:border-cyan-500/60 transition-all"
                   >
                     {link.label}
@@ -50,6 +51,7 @@ export default function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  aria-current={active ? "page" : undefined}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     active
                       ? "text-white bg-white/8"
@@ -102,7 +104,7 @@ export default function Header() {
       {/* Mobile nav */}
       {open && (
         <div className="md:hidden border-t border-white/8 bg-background/98">
-          <nav className="max-w-7xl mx-auto px-4 py-4 space-y-1">
+          <nav aria-label="Navegacion movil" className="max-w-7xl mx-auto px-4 py-4 space-y-1">
             {NAV.map((link) => {
               const active = pathname === link.href;
               return (
@@ -110,6 +112,7 @@ export default function Header() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setOpen(false)}
+                  aria-current={active ? "page" : undefined}
                   className={`flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                     active
                       ? "text-white bg-white/8"

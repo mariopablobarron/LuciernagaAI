@@ -10,6 +10,7 @@ import { sendUserEmail, buildVerificationEmail, buildWelcomeEmail } from "@/lib/
 import { issueWebLinkToken } from "@/lib/telegram-link";
 import { sendAlert } from "@/lib/alerts";
 import { validateOrigin } from "@/lib/csrf";
+import { scheduleOnboardingEmails } from "@/services/onboarding-emails";
 
 type UtmParams = {
   utm_source?: string;
@@ -185,6 +186,10 @@ export async function POST(req: NextRequest) {
       const welcomeEmail = buildWelcomeEmail({ name: name || null, appUrl: baseUrl });
       sendUserEmail({ to: email, ...welcomeEmail }).catch(
         (e) => logError("AUTH", e, { action: "send_welcome_email", email }),
+      );
+      // Schedule onboarding email sequence (day 1, 3, 7)
+      scheduleOnboardingEmails(result.userId).catch(
+        (e) => logError("AUTH", e, { action: "schedule_onboarding_emails", email }),
       );
     }
     return res;

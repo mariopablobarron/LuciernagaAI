@@ -4,6 +4,7 @@ import { getPrismaClient } from "@/db/prisma";
 import { withRateLimit } from "@/lib/rate-limit";
 import { logError, logInfo } from "@/lib/logger";
 import { invalidateUserCache } from "@/services/user";
+import type { SubscriptionPlan, SubscriptionStatus } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -47,7 +48,8 @@ export const POST = withRateLimit(
       }
 
       // Determine subscription status based on plan
-      const status = plan === "free" ? "canceled" : "active";
+      const status: SubscriptionStatus = plan === "free" ? "canceled" : "active";
+      const typedPlan = plan as SubscriptionPlan;
 
       // Find existing subscription for this user
       const existingSub = await prisma.subscription.findFirst({
@@ -61,7 +63,7 @@ export const POST = withRateLimit(
         await prisma.subscription.update({
           where: { id: existingSub.id },
           data: {
-            plan,
+            plan: typedPlan,
             status,
             cancelledAt: plan === "free" ? new Date() : null,
             cancelAtPeriodEnd: false,
@@ -72,7 +74,7 @@ export const POST = withRateLimit(
         await prisma.subscription.create({
           data: {
             userId: id,
-            plan,
+            plan: typedPlan,
             status,
           },
         });

@@ -6,6 +6,7 @@ import MetaPixel from "@/components/MetaPixel";
 import UtmCapture from "@/components/UtmCapture";
 import CookieConsent from "@/components/CookieConsent";
 import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
+import AccessibilityWidget from "@/components/AccessibilityWidget";
 import { Toaster } from "@/components/ui/sonner";
 import { SAAS_CONFIG } from "@/lib/saas";
 import { validateEnv } from "@/lib/env";
@@ -137,14 +138,32 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        {/* Apply a11y classes before first paint to prevent FOUC */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var p=JSON.parse(localStorage.getItem("a11y-preferences")||"{}");var c=document.documentElement.classList;if(p.fontSize>0)c.add("a11y-font-"+p.fontSize);if(p.highContrast)c.add("a11y-high-contrast");if(p.reducedMotion)c.add("a11y-reduced-motion");if(p.dyslexiaFont)c.add("a11y-dyslexia-font");if(p.linkHighlight)c.add("a11y-link-highlight");if(p.bigCursor)c.add("a11y-big-cursor");if(p.textSpacing)c.add("a11y-text-spacing");}catch(e){}})();`,
+          }}
+        />
       </head>
       <body className="min-h-full flex flex-col">
+        {/* Skip-to-content for keyboard/screen-reader users */}
+        <a href="#main-content" className="a11y-skip-link">
+          Saltar al contenido principal
+        </a>
+
         <Analytics />
         <MetaPixel />
         <UtmCapture />
         <ServiceWorkerRegistrar />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          {children}
+          <div id="main-content" tabIndex={-1}>
+            {children}
+          </div>
+
+          {/* Screen reader announcements */}
+          <div aria-live="polite" aria-atomic="true" className="sr-only" id="a11y-announcer" />
+
+          <AccessibilityWidget />
           <CookieConsent />
           <Toaster />
         </ThemeProvider>

@@ -12,6 +12,33 @@ datasource db {
   provider = "postgresql"
 }
 
+enum SubscriptionStatus {
+  active
+  trialing
+  past_due
+  canceled
+  incomplete
+}
+
+enum SubscriptionPlan {
+  free
+  pro
+}
+
+enum GoalStatus {
+  active
+  paused
+  completed
+  abandoned
+}
+
+enum InterventionStatus {
+  sent
+  read
+  resolved
+}
+
+
 model Conversation {
   id             String    @id @default(cuid())
   userId         String?
@@ -20,7 +47,6 @@ model Conversation {
   journalMode    Boolean   @default(false) // silent / no AI responses
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
-  messages       Json      @default("[]")
   messageRecords Message[] @relation("ConversationMessages")
   user           User?     @relation("UserConversations", fields: [userId], references: [id], onDelete: Cascade)
 
@@ -77,12 +103,17 @@ model User {
   dailyCheckins        DailyCheckin[]
   llmLogs              LlmLog[]
   feedbacks            Feedback[]
+  scheduledEmails      ScheduledEmail[]
   events               Event[]
   personalProjects     PersonalProject[]
+  diaryEntries         DiaryEntry[]
+  userBadges           UserBadge[]
+  communityPosts       CommunityPost[]
   phone                String?
   emailVerified        Boolean          @default(false)
   emailVerifyToken     String?
   emailVerifyExpires   DateTime?
+  deletedAt            DateTime?        // soft delete — null means active
   organizationId       String?
   organization         Organization?    @relation(fields: [organizationId], references: [id])
 
@@ -91,6 +122,7 @@ model User {
   @@index([lastSeen])
   @@index([createdAt])
   @@index([organizationId, isActive, lastSeen])
+  @@index([deletedAt])
 }
 
 model Message {
@@ -140,26 +172,26 @@ model Insight {
 }
 
 model UserState {
-  id               String    @id @default(cuid())
-  userId           String    @unique
-  state            String    // "neutral" | "duda" | "bloqueo" | "ansiedad" | "claridad"
-  systemState      String    @default("ESTABLE") // SystemState — last computed behavioral state
+  id               String              @id @default(cuid())
+  userId           String              @unique
+  state            String              @default("neutral")
+  systemState      String              @default("ESTABLE") // SystemState — last computed behavioral state
   transformationPhase String @default("bloqueo")
   mood             String?
-  primaryEmotion   String    @default("calma")
-  dominantPattern  String    @default("evita_decidir")
-  focusArea        String    @default("propósito")
-  energyLevel      String    @default("medio")
-  riskLevel        String    @default("low")
-  progressTrend    String    @default("igual")
-  crisisActive     Boolean   @default(false)
+  primaryEmotion   String              @default("calma")
+  dominantPattern  String              @default("evita_decidir")
+  focusArea        String              @default("propósito")
+  energyLevel      String              @default("medio")
+  riskLevel        String              @default("low")
+  progressTrend    String              @default("igual")
+  crisisActive     Boolean             @default(false)
   crisisActivatedAt DateTime?
   crisisActiveUntil DateTime?
-  dialogueIntent   String    @default("clarification")
-  dialogueStep     Int       @default(0)
-  dialogueFlow     String?   // active flow name or null
-  updatedAt        DateTime  @updatedAt
-  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dialogueIntent   String              @default("clarification")
+  dialogueStep     Int                 @default(0)
+  dialogueFlow     String?             // active flow name or null
+  updatedAt        DateTime            @updatedAt
+  user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([state, updatedAt])
   @@index([systemState, updatedAt])
@@ -224,16 +256,17 @@ model CrisisEvent {
 
   @@index([level, createdAt])
   @@index([userId, createdAt])
+  @@index([userId, level, createdAt])
 }
 
 model Goal {
-  id        String   @id @default(cuid())
+  id        String     @id @default(cuid())
   userId    String
   title     String
-  status    String   @default("active")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status    GoalStatus @default(active)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   actions   Action[]
 
   @@index([userId, status, createdAt])
@@ -268,22 +301,23 @@ model AvoidanceEvent {
 }
 
 model Subscription {
-  id                   String    @id @default(cuid())
+  id                   String             @id @default(cuid())
   userId               String
-  status               String    // "active" | "trialing" | "past_due" | "canceled" | "incomplete"
-  plan                 String    // "free" | "pro"
-  stripeSubscriptionId String?   @unique
+  status               SubscriptionStatus
+  plan                 SubscriptionPlan
+  stripeSubscriptionId String?            @unique
   stripeCustomerId     String?
   stripePriceId        String?
   currentPeriodStart   DateTime?
   currentPeriodEnd     DateTime?
-  cancelAtPeriodEnd    Boolean   @default(false)
+  cancelAtPeriodEnd    Boolean            @default(false)
   cancelledAt          DateTime?
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
-  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
+  @@index([userId, status])
   @@index([status, plan, createdAt])
   @@index([stripeSubscriptionId])
   @@index([stripeCustomerId])
@@ -673,20 +707,24 @@ model QuizResult {
 // ─── LLM Usage Tracking ───────────────────────────────────────────────────────
 
 /// One record per LLM call — tokens, latency, prompt/response, source context.
+/// PRIVACY: prompt/response contain sensitive user data and should be purged
+/// after retentionDays. A scheduled job should NULL-ify prompt + response
+/// for records older than purgableAfter, keeping only metrics.
 model LlmLog {
-  id               String   @id @default(cuid())
+  id               String    @id @default(cuid())
   userId           String?
   model            String
-  source           String   @default("chat") // "chat" | "impulse" | "checkin" | "cron" | etc.
-  prompt           String   @db.Text
-  response         String   @db.Text
-  promptTokens     Int      @default(0)
-  completionTokens Int      @default(0)
-  totalTokens      Int      @default(0)
-  costUsd          Float    @default(0)
+  source           String    @default("chat") // "chat" | "impulse" | "checkin" | "cron" | etc.
+  prompt           String?   @db.Text         // nullable — purged after retention period
+  response         String?   @db.Text         // nullable — purged after retention period
+  promptTokens     Int       @default(0)
+  completionTokens Int       @default(0)
+  totalTokens      Int       @default(0)
+  costUsd          Float     @default(0)
   latencyMs        Int
-  createdAt        DateTime @default(now())
-  user             User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purgedAt         DateTime?                  // when prompt/response were nullified
+  createdAt        DateTime  @default(now())
+  user             User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([createdAt])
   @@index([userId, createdAt])
@@ -694,27 +732,29 @@ model LlmLog {
   @@index([source, createdAt])
   @@index([model])
   @@index([source])
+  @@index([purgedAt, createdAt])
 }
 
 // ─── Clinical Dashboard ───────────────────────────────────────────────────────
 
 /// Intervention sent by a clinician/admin to a specific user.
 model Intervention {
-  id        String    @id @default(cuid())
+  id        String              @id @default(cuid())
   userId    String
-  adminId   String    // ADMIN_USERNAME who sent it
-  type      String    // "message" | "recommendation" | "resource" | "assessment"
-  content   String    @db.Text
-  status    String    @default("sent") // "sent" | "read" | "resolved"
+  adminId   String              // ADMIN_USERNAME who sent it
+  type      String              // "message" | "recommendation" | "resource" | "assessment"
+  content   String              @db.Text
+  status    InterventionStatus  @default(sent)
   metadata  Json?
-  sentAt    DateTime  @default(now())
+  sentAt    DateTime            @default(now())
   readAt    DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
 
-  user      User      @relation("UserInterventions", fields: [userId], references: [id], onDelete: Cascade)
+  user      User                @relation("UserInterventions", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, sentAt])
+  @@index([userId, status])
   @@index([adminId, sentAt])
 }
 
@@ -838,6 +878,20 @@ model Feedback {
 
   @@index([userId, createdAt])
   @@index([type, createdAt])
+}
+
+/// Scheduled email queue — onboarding sequences, drip campaigns, etc.
+model ScheduledEmail {
+  id          String    @id @default(cuid())
+  userId      String
+  template    String    // "onboarding_day1" | "onboarding_day3" | "onboarding_day7" | "quiz_followup_day3" | etc.
+  scheduledAt DateTime
+  sentAt      DateTime?
+  cancelled   Boolean   @default(false)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([scheduledAt, sentAt])
+  @@index([userId, template])
 }
 
 // ─── B2B: Organizations (Multitenant) ─────────────────────────────────────────
@@ -1007,6 +1061,55 @@ model ProjectInsight {
   @@index([projectId, acknowledged])
 }
 
+// ─── Emotional Diary ─────────────────────────────────────────────────────────
+
+/// Free-form daily diary entry with emotional tags.
+model DiaryEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  content   String   @db.Text
+  mood      String?  // "great" | "good" | "neutral" | "bad" | "awful"
+  tags      String[] @default([]) // user-selected emotional tags
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, mood, createdAt])
+}
+
+// ─── Badges / Achievements ───────────────────────────────────────────────────
+
+/// A badge the user has earned.
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  badge     String   // badge key: "first_project", "streak_7d", "streak_30d", "phase_completed", "first_goal", "invite_used", "diary_7d", "community_first"
+  earnedAt  DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badge])
+  @@index([userId])
+}
+
+// ─── Community Wall ──────────────────────────────────────────────────────────
+
+/// Anonymous community post — shared reflections.
+model CommunityPost {
+  id        String   @id @default(cuid())
+  userId    String
+  content   String   @db.Text
+  phase     String?  // project phase this relates to
+  anonymous Boolean  @default(true)
+  likes     Int      @default(0)
+  hidden    Boolean  @default(false) // moderation flag
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([hidden, createdAt])
+}
+
 // ─── Marketing Dashboard ──────────────────────────────────────────────────────
 
 model BroadcastLog {
@@ -1025,4 +1128,25 @@ model BroadcastLog {
 
   @@index([channel, createdAt])
   @@index([status, createdAt])
+}
+
+// ─── Audit Log (RGPD / LOPD compliance) ─────────────────────────────────────
+
+/// Immutable record of who accessed or modified sensitive clinical data.
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String   // who performed the action
+  actorType  String   // "user" | "admin" | "orgAdmin" | "system"
+  action     String   // "read" | "create" | "update" | "delete" | "export" | "login"
+  resource   String   // model name: "ClinicalNote" | "Assessment" | "User" | etc.
+  resourceId String?  // id of the affected record
+  metadata   Json?    // extra context (e.g. fields changed, export format)
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([actorId, createdAt])
+  @@index([resource, resourceId])
+  @@index([action, createdAt])
+  @@index([createdAt])
 }

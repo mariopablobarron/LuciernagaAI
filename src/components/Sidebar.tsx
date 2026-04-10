@@ -238,6 +238,7 @@ export default function Sidebar({
             variant={pathname?.startsWith("/app/settings") ? "default" : "outline"}
             size="sm"
             className="justify-center col-span-3"
+            data-tour="ajustes"
           >
             <Link href="/app/settings">Ajustes</Link>
           </Button>

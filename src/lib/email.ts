@@ -178,6 +178,176 @@ export function buildVerificationEmail(params: {
   return { to, subject, html, text };
 }
 
+// ─── Heartbeat Calculator Email ──────────────────────────────────────────────
+
+const AVG_BPM = 72;
+const BEATS_PER_HOUR = AVG_BPM * 60;
+const BEATS_PER_DAY = BEATS_PER_HOUR * 24;
+
+function fmtBeats(n: number): string {
+  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)} mil millones`;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)} millones`;
+  return n.toLocaleString("es-ES");
+}
+
+export function buildHeartbeatEmail(params: {
+  to: string;
+  beats: number;
+  appUrl: string;
+}): UserEmail {
+  const { to, beats, appUrl } = params;
+  const days = Math.round(beats / BEATS_PER_DAY);
+  const hours = Math.round(beats / BEATS_PER_HOUR);
+  const songs = Math.round(beats / (AVG_BPM * 3.5));
+  const hugs = Math.round(beats / (AVG_BPM * 0.33));
+
+  const subject = `💓 ${fmtBeats(beats)} latidos — tu informe personal`;
+
+  const text = [
+    `Tu informe de latidos`,
+    ``,
+    `Tu corazon ha latido aproximadamente ${fmtBeats(beats)} veces para traerte hasta aqui.`,
+    ``,
+    `Eso equivale a:`,
+    `- ${days.toLocaleString("es-ES")} amaneceres vividos`,
+    `- ${hours.toLocaleString("es-ES")} horas de experiencia acumulada`,
+    `- ${songs.toLocaleString("es-ES")} canciones que cabrian en ese tiempo`,
+    `- ${hugs.toLocaleString("es-ES")} abrazos posibles`,
+    ``,
+    `Cada latido sostuvo una decision, un momento de duda, un paso adelante.`,
+    `No son numeros — son tu historia.`,
+    ``,
+    `Lo que puedes hacer ahora:`,
+    `Tu corazon ya tiene la constancia. Solo falta que tu le des una direccion.`,
+    `El primer paso no tiene que ser grande — solo tiene que ser tuyo.`,
+    ``,
+    `Dar mi primer paso: ${appUrl}/app`,
+    ``,
+    `---`,
+    ``,
+    `Convierte intencion en accion con Tres Mil Millones de Latidos:`,
+    `Un mentor con IA, check-ins diarios, objetivos y retos de 21 dias.`,
+    ``,
+    `Crear cuenta gratis: ${appUrl}/signup?utm_source=calculator&utm_medium=email&utm_campaign=heartbeat_report`,
+    `Ya tienes cuenta? ${appUrl}/login`,
+    ``,
+    `— Tres Mil Millones de Latidos`,
+  ].join("\n");
+
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0a0a0a;font-family:system-ui,-apple-system,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 0">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#18181b;border-radius:12px;overflow:hidden;border:1px solid #27272a">
+        <tr><td style="background:linear-gradient(135deg,#7c3aed,#ec4899);padding:28px 32px">
+          <p style="margin:0;font-size:22px;font-weight:800;color:#fff">💓 Tu informe de latidos</p>
+          <p style="margin:8px 0 0;font-size:14px;color:rgba(255,255,255,0.8)">Un recuento de todo lo que ya has vivido</p>
+        </td></tr>
+
+        <tr><td style="padding:32px">
+          <p style="margin:0 0 8px;font-size:13px;color:#71717a;text-transform:uppercase;letter-spacing:0.15em;font-weight:600">Latidos acumulados</p>
+          <p style="margin:0 0 24px;font-size:36px;font-weight:800;background:linear-gradient(135deg,#c084fc,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent">${fmtBeats(beats)}</p>
+
+          <p style="margin:0 0 20px;font-size:15px;color:#a1a1aa;line-height:1.6">
+            Tu corazon ha latido <strong style="color:#e4e4e7">${fmtBeats(beats)} veces</strong> para traerte hasta aqui.
+            Cada uno sostuvo una decision, un momento de duda, un paso adelante.
+          </p>
+
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px">
+            <tr>
+              <td width="50%" style="padding:8px">
+                <div style="background:#7c3aed10;border:1px solid #7c3aed30;border-radius:10px;padding:16px;text-align:center">
+                  <p style="margin:0;font-size:24px;font-weight:700;color:#c4b5fd">${days.toLocaleString("es-ES")}</p>
+                  <p style="margin:4px 0 0;font-size:12px;color:#71717a">amaneceres vividos</p>
+                </div>
+              </td>
+              <td width="50%" style="padding:8px">
+                <div style="background:#ec489910;border:1px solid #ec489930;border-radius:10px;padding:16px;text-align:center">
+                  <p style="margin:0;font-size:24px;font-weight:700;color:#f9a8d4">${songs.toLocaleString("es-ES")}</p>
+                  <p style="margin:4px 0 0;font-size:12px;color:#71717a">canciones que cabrian</p>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td width="50%" style="padding:8px">
+                <div style="background:#06b6d410;border:1px solid #06b6d430;border-radius:10px;padding:16px;text-align:center">
+                  <p style="margin:0;font-size:24px;font-weight:700;color:#67e8f9">${hours.toLocaleString("es-ES")}</p>
+                  <p style="margin:4px 0 0;font-size:12px;color:#71717a">horas de experiencia</p>
+                </div>
+              </td>
+              <td width="50%" style="padding:8px">
+                <div style="background:#10b98110;border:1px solid #10b98130;border-radius:10px;padding:16px;text-align:center">
+                  <p style="margin:0;font-size:24px;font-weight:700;color:#6ee7b7">${hugs.toLocaleString("es-ES")}</p>
+                  <p style="margin:4px 0 0;font-size:12px;color:#71717a">abrazos posibles</p>
+                </div>
+              </td>
+            </tr>
+          </table>
+
+          <div style="background:#27272a;border-radius:10px;padding:20px;margin:0 0 24px">
+            <p style="margin:0 0 12px;font-size:16px;font-weight:700;color:#fff">No son numeros — son tu historia</p>
+            <p style="margin:0 0 8px;font-size:14px;color:#a1a1aa;line-height:1.6">
+              Detras de cada latido hubo decisiones que tomaste, miedos que enfrentaste y dias que simplemente aguantaste.
+              Eso es fuerza real — no la del gimnasio, sino la que sostiene todo lo demas.
+            </p>
+            <p style="margin:0;font-size:14px;color:#a1a1aa;line-height:1.6">
+              Tu corazon tiene la constancia. Solo falta que tu le des una direccion.
+            </p>
+          </div>
+
+          <p style="margin:0 0 16px;font-size:15px;color:#e4e4e7;font-weight:600">El primer paso no tiene que ser grande — solo tiene que ser tuyo.</p>
+
+          <a href="${appUrl}/app" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;font-weight:700;font-size:15px;text-decoration:none;border-radius:10px">Dar mi primer paso</a>
+        </td></tr>
+
+        <!-- Marketing block -->
+        <tr><td style="padding:0 32px 32px;border-top:1px solid #27272a">
+          <div style="margin-top:24px;background:#0a0a0a;border:1px solid #27272a;border-radius:10px;padding:24px;text-align:center">
+            <p style="margin:0 0 8px;font-size:16px;font-weight:700;color:#fff">Convierte intencion en accion</p>
+            <p style="margin:0 0 16px;font-size:13px;color:#a1a1aa;line-height:1.5">
+              Un mentor con IA que detecta tu estado emocional y te guia a pasos concretos.<br>
+              Objetivos, check-ins diarios, retos de 21 dias y seguimiento continuo.
+            </p>
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 16px">
+              <tr>
+                <td style="padding:4px 8px;text-align:center">
+                  <p style="margin:0;font-size:11px;color:#71717a">Chat con IA</p>
+                  <p style="margin:2px 0 0;font-size:13px;color:#c4b5fd;font-weight:600">Ilimitado</p>
+                </td>
+                <td style="padding:4px 8px;text-align:center">
+                  <p style="margin:0;font-size:11px;color:#71717a">Check-in diario</p>
+                  <p style="margin:2px 0 0;font-size:13px;color:#c4b5fd;font-weight:600">30 seg</p>
+                </td>
+                <td style="padding:4px 8px;text-align:center">
+                  <p style="margin:0;font-size:11px;color:#71717a">Modo Impulso</p>
+                  <p style="margin:2px 0 0;font-size:13px;color:#c4b5fd;font-weight:600">21 dias</p>
+                </td>
+              </tr>
+            </table>
+            <a href="${appUrl}/signup?utm_source=calculator&utm_medium=email&utm_campaign=heartbeat_report" style="display:inline-block;padding:12px 28px;background:#fff;color:#18181b;font-weight:700;font-size:14px;text-decoration:none;border-radius:8px">Crear cuenta gratis</a>
+            <p style="margin:12px 0 0;font-size:11px;color:#52525b">
+              Ya tienes cuenta? <a href="${appUrl}/login" style="color:#c4b5fd;text-decoration:underline">Inicia sesion</a>
+            </p>
+          </div>
+        </td></tr>
+
+        <tr><td style="padding:0 32px 24px">
+          <p style="margin:0;font-size:11px;color:#52525b;line-height:1.5">
+            Tres Mil Millones de Latidos — mentoria conversacional con IA.<br>
+            Este informe se genero desde la calculadora de latidos.
+          </p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  return { to, subject, html, text };
+}
+
 const RESEND_URL = "https://api.resend.com/emails";
 
 export type UserEmail = {

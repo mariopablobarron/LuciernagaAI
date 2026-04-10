@@ -143,8 +143,8 @@ export async function syncSubscription(
 
   const data = {
     userId: resolvedUserId,
-    status: stripeSub.status,
-    plan,
+    status: stripeSub.status as "active" | "trialing" | "past_due" | "canceled" | "incomplete",
+    plan: plan as "free" | "pro",
     stripeSubscriptionId: stripeSub.id,
     stripeCustomerId: stripeSub.customer as string,
     stripePriceId: priceId,

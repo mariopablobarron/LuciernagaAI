@@ -55,8 +55,10 @@ const SAFETY_KEYWORDS = [
 
 const SAFETY_RESPONSE = `Lo que me estás contando es muy serio y quiero que sepas que no estás solo/a.
 
-Por favor contacta ahora con una línea de crisis:
-🆘 España: 024 (línea de atención a la conducta suicida)
+📞 LLAMA AHORA AL 024 📞
+(Línea de atención a la conducta suicida — España, 24h, gratuita)
+
+Otros países:
 🆘 México: 800 290 0024 (SAPTEL)
 🆘 Argentina: (011) 5275-1135 (Centro de Asistencia al Suicida)
 

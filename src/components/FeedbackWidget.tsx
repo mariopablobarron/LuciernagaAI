@@ -102,6 +102,8 @@ export default function FeedbackWidget() {
         <button
           type="button"
           onClick={() => setOpen(true)}
+          aria-label="Abrir formulario de feedback"
+          data-tour="feedback"
           className="fixed right-0 top-1/2 -translate-y-1/2 z-40 flex items-center gap-1.5 rounded-l-xl border border-r-0 border-zinc-700/60 bg-zinc-900/95 px-3 py-2.5 text-xs font-medium text-zinc-400 hover:text-fuchsia-400 hover:border-fuchsia-500/40 hover:bg-zinc-900 backdrop-blur-sm shadow-lg transition-all"
         >
           <MessageSquarePlus className="w-4 h-4" />
@@ -116,6 +118,9 @@ export default function FeedbackWidget() {
           onClick={close}
         >
           <div
+            role="dialog"
+            aria-label="Formulario de feedback"
+            aria-modal="true"
             className="w-full max-w-md rounded-2xl border border-zinc-700/60 bg-zinc-900 shadow-2xl shadow-black/50 animate-in slide-in-from-bottom-4 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
@@ -138,11 +143,14 @@ export default function FeedbackWidget() {
                 {/* Star rating */}
                 <div className="space-y-2">
                   <p className="text-xs text-zinc-500">Como valoras tu experiencia?</p>
-                  <div className="flex gap-1">
+                  <div className="flex gap-1" role="radiogroup" aria-label="Valoracion de experiencia">
                     {[1, 2, 3, 4, 5].map((n) => (
                       <button
                         key={n}
                         type="button"
+                        role="radio"
+                        aria-checked={rating === n}
+                        aria-label={`${n} de 5 estrellas`}
                         onClick={() => setRating(n)}
                         onMouseEnter={() => setHoverRating(n)}
                         onMouseLeave={() => setHoverRating(0)}
@@ -183,7 +191,9 @@ export default function FeedbackWidget() {
                 </div>
 
                 {/* Message */}
+                <label htmlFor="feedback-message" className="sr-only">Tu comentario</label>
                 <textarea
+                  id="feedback-message"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Que te gustaria que mejorara..."

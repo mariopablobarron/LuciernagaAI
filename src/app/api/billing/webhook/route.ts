@@ -53,12 +53,15 @@ async function upgradeToPro(sub: Stripe.Subscription, email?: string | null) {
     return null;
   }
 
+  // Stripe's status type is compatible but TypeScript needs an explicit cast
+  const subStatus = sub.status as "active" | "trialing" | "past_due" | "canceled" | "incomplete";
+
   await prisma.subscription.upsert({
     where: { stripeSubscriptionId: sub.id },
     create: {
       userId: user.id,
       plan: 'pro',
-      status: sub.status,
+      status: subStatus,
       stripeSubscriptionId: sub.id,
       stripeCustomerId: sub.customer as string,
       stripePriceId: firstItem?.price?.id ?? null,
@@ -68,7 +71,7 @@ async function upgradeToPro(sub: Stripe.Subscription, email?: string | null) {
     },
     update: {
       plan: 'pro',
-      status: sub.status,
+      status: subStatus,
       stripePriceId: firstItem?.price?.id ?? null,
       currentPeriodStart: new Date((firstItem?.current_period_start ?? sub.billing_cycle_anchor) * 1000),
       currentPeriodEnd: new Date((firstItem?.current_period_end ?? sub.billing_cycle_anchor) * 1000),

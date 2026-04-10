@@ -8,6 +8,7 @@ import {
   Check,
   Copy,
   Heart,
+  Phone,
   Send,
   Shield,
   Sparkles,
@@ -160,9 +161,9 @@ function MessageBubble({ message, isStreaming }: { message: ChatMessage; isStrea
   // Crisis variant — full-width red alert
   if (message.variant === "crisis") {
     return (
-      <div className="flex items-start gap-2 px-1">
+      <div className="flex items-start gap-2 px-1" role="alert">
         <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-red-500/20">
-          <Shield className="h-3.5 w-3.5 text-red-400" />
+          <Shield className="h-3.5 w-3.5 text-red-400" aria-hidden="true" />
         </div>
         <div className="flex-1 rounded-xl border border-red-500/30 bg-red-950/30 p-3.5">
           <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-red-400">
@@ -170,6 +171,30 @@ function MessageBubble({ message, isStreaming }: { message: ChatMessage; isStrea
           </p>
           <div className="text-sm leading-relaxed text-red-100">
             {renderMarkdown(message.content)}
+          </div>
+          {/* Emergency call button */}
+          <a
+            href="tel:024"
+            className="mt-3 flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-600/20 transition hover:bg-red-500 active:scale-[0.98]"
+          >
+            <Phone className="h-4 w-4" />
+            Llamar al 024
+          </a>
+          <div className="mt-2 flex gap-2">
+            <a
+              href="tel:8002900024"
+              className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-red-500/30 bg-red-950/50 px-2 py-1.5 text-[11px] font-semibold text-red-200 transition hover:bg-red-900/40"
+            >
+              <Phone className="h-3 w-3" />
+              MX: 800 290 0024
+            </a>
+            <a
+              href="tel:01152751135"
+              className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-red-500/30 bg-red-950/50 px-2 py-1.5 text-[11px] font-semibold text-red-200 transition hover:bg-red-900/40"
+            >
+              <Phone className="h-3 w-3" />
+              AR: 011 5275-1135
+            </a>
           </div>
         </div>
       </div>
@@ -211,6 +236,7 @@ function MessageBubble({ message, isStreaming }: { message: ChatMessage; isStrea
           </div>
           <button
             onClick={() => void handleCopy()}
+            aria-label={copied ? "Copiado" : "Copiar mensaje"}
             className="absolute -left-10 top-0 p-2 opacity-0 transition-opacity group-hover:opacity-100"
           >
             {copied ? (
@@ -261,6 +287,7 @@ function MessageBubble({ message, isStreaming }: { message: ChatMessage; isStrea
         {!isStreaming && (
           <button
             onClick={() => void handleCopy()}
+            aria-label={copied ? "Copiado" : "Copiar respuesta"}
             className="absolute -right-10 top-0 p-2 opacity-0 transition-opacity group-hover:opacity-100"
           >
             {copied ? (
@@ -289,26 +316,44 @@ function UrgentPanel({ onClose }: { onClose: () => void }) {
           <X className="h-4 w-4" />
         </button>
       </div>
+
+      {/* ── Emergency call buttons ──────────────────────────────────── */}
+      <div className="mb-3 space-y-2">
+        <a
+          href="tel:024"
+          className="flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-red-600/20 transition hover:bg-red-500 active:scale-[0.98]"
+        >
+          <Phone className="h-5 w-5" />
+          Llamar al 024
+        </a>
+        <div className="grid grid-cols-2 gap-2">
+          <a
+            href="tel:8002900024"
+            className="flex items-center justify-center gap-1.5 rounded-xl border border-red-500/30 bg-red-950/50 px-3 py-2.5 text-xs font-semibold text-red-200 transition hover:bg-red-900/40 active:scale-[0.98]"
+          >
+            <Phone className="h-3.5 w-3.5" />
+            Mexico: 800 290 0024
+          </a>
+          <a
+            href="tel:01152751135"
+            className="flex items-center justify-center gap-1.5 rounded-xl border border-red-500/30 bg-red-950/50 px-3 py-2.5 text-xs font-semibold text-red-200 transition hover:bg-red-900/40 active:scale-[0.98]"
+          >
+            <Phone className="h-3.5 w-3.5" />
+            Argentina: 011 5275-1135
+          </a>
+        </div>
+      </div>
+
       <div className="space-y-3 text-xs text-zinc-300">
         <div className="rounded-xl border border-red-500/20 bg-red-900/20 px-3 py-2.5">
-          <p className="mb-1 font-semibold text-red-300">Respiración 4-7-8</p>
-          <p>Inhala 4 seg · retén 7 seg · exhala 8 seg. Repite 3 veces.</p>
+          <p className="mb-1 font-semibold text-red-300">Respiracion 4-7-8</p>
+          <p>Inhala 4 seg · reten 7 seg · exhala 8 seg. Repite 3 veces.</p>
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 px-3 py-2.5">
-          <p className="mb-1 font-semibold text-zinc-200">Técnica 5-4-3-2-1</p>
+          <p className="mb-1 font-semibold text-zinc-200">Tecnica 5-4-3-2-1</p>
           <p>5 cosas que ves · 4 que tocas · 3 que oyes · 2 que hueles · 1 que saboreas.</p>
         </div>
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 px-3 py-2.5">
-          <p className="mb-1 font-semibold text-zinc-200">Recursos de emergencia</p>
-          <p>
-            Teléfono de la Esperanza: <span className="font-semibold text-white">717 003 717</span>
-          </p>
-          <p className="mt-0.5">
-            Crisis Now (Latinoamérica):{" "}
-            <span className="font-semibold text-white">800 290 0024</span>
-          </p>
-        </div>
-        <p className="text-zinc-500">Cuéntame lo que está pasando. Estoy aquí contigo.</p>
+        <p className="text-zinc-500">Cuentame lo que esta pasando. Estoy aqui contigo.</p>
       </div>
     </div>
   );
@@ -412,7 +457,7 @@ export default function Chat({
   const flowActive = responseSignals?.flow?.activeFlow;
 
   return (
-    <div className="flex flex-1 min-h-0 flex-col bg-zinc-950">
+    <div className="flex flex-1 min-h-0 flex-col bg-zinc-950" role="region" aria-label="Chat de mentoría">
       {/* ── Flow indicator ──────────────────────────────────────────────── */}
       {flowActive && (
         <div className="shrink-0 border-b border-zinc-800/60 bg-cyan-950/30 px-4 py-2">
@@ -472,7 +517,7 @@ export default function Chat({
       )}
 
       {/* ── Messages area ───────────────────────────────────────────────── */}
-      <div ref={scrollRef} onScroll={handleScroll} className="relative flex-1 overflow-y-auto">
+      <div ref={scrollRef} onScroll={handleScroll} className="relative flex-1 overflow-y-auto" role="log" aria-label="Mensajes del chat" aria-live="polite">
         {isEmpty ? (
           /* Empty state */
           <div className="flex h-full flex-col items-center justify-center px-6 py-12 text-center">
@@ -519,12 +564,12 @@ export default function Chat({
 
             {/* Typing / loading indicator (before assistant responds) */}
             {loading && !streamingMessageId && (
-              <div className="flex items-start gap-2.5 px-1">
+              <div className="flex items-start gap-2.5 px-1" role="status" aria-label="El mentor esta escribiendo">
                 <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-500/20 ring-1 ring-cyan-500/30">
-                  <Sparkles className="h-3 w-3 text-cyan-400" />
+                  <Sparkles className="h-3 w-3 text-cyan-400" aria-hidden="true" />
                 </div>
                 <div className="rounded-2xl rounded-tl-sm border border-zinc-800 bg-zinc-900 px-3.5 py-2.5">
-                  <div className="flex items-center gap-1 py-0.5">
+                  <div className="flex items-center gap-1 py-0.5" aria-hidden="true">
                     <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan-400 [animation-delay:0ms]" />
                     <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan-400 [animation-delay:150ms]" />
                     <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan-400 [animation-delay:300ms]" />
@@ -585,6 +630,7 @@ export default function Chat({
               bottomRef.current?.scrollIntoView({ behavior: "smooth" });
               setAtBottom(true);
             }}
+            aria-label="Ir al ultimo mensaje"
             className="absolute bottom-4 right-4 flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-zinc-400 shadow-lg transition hover:bg-zinc-800 hover:text-white"
           >
             <ArrowDown className="h-4 w-4" />
@@ -602,6 +648,7 @@ export default function Chat({
             placeholder="Escribe lo que te pasa… (Enter para enviar)"
             disabled={loading}
             rows={1}
+            aria-label="Escribe tu mensaje"
             className="min-h-11 max-h-24 sm:max-h-36 flex-1 resize-none overflow-hidden rounded-xl border-zinc-800 bg-zinc-900 text-base sm:text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-indigo-500/50"
             style={{ fieldSizing: "content" } as React.CSSProperties}
           />
@@ -613,6 +660,7 @@ export default function Chat({
             onClick={() => void onSend()}
             disabled={loading || !input.trim()}
             size="icon"
+            aria-label="Enviar mensaje"
             className="h-11 w-11 shrink-0 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-30"
           >
             <Send className="h-4 w-4" />

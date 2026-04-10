@@ -8,6 +8,7 @@ import {
   detectGoalAvoidance,
   detectGoalIntent,
 } from "@/services/goals";
+import { GoalStatus } from "@prisma/client";
 
 describe("goals service", () => {
   it("detecta intenciones de objetivo más allá de 'quiero'", () => {
@@ -29,7 +30,7 @@ describe("goals service", () => {
       {
         id: "goal_1",
         title: "Terminar la tesis",
-        status: "active",
+        status: GoalStatus.active,
         createdAt: new Date(),
         updatedAt: new Date(),
         completedCount: 0,
@@ -63,7 +64,7 @@ describe("goals service", () => {
     const goal = {
       id: "goal_2",
       title: "Reordenar trabajo",
-      status: "active",
+      status: GoalStatus.active,
       createdAt: new Date(),
       updatedAt: new Date(),
       completedCount: 0,

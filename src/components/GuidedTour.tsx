@@ -45,6 +45,8 @@ function getRect(selector: string): Rect | null {
   const el = document.querySelector(selector);
   if (!el) return null;
   const r = el.getBoundingClientRect();
+  // Skip elements that are off-screen (e.g. sidebar hidden via translateX)
+  if (r.width === 0 || r.height === 0 || r.right < 0 || r.bottom < 0) return null;
   return {
     top: r.top + window.scrollY,
     left: r.left + window.scrollX,

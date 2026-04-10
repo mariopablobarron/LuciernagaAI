@@ -5,15 +5,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { MessageCircle, Plus, Sparkles } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 import { trackMetaEvent } from "@/lib/meta-pixel";
-import MirrorMoment from "@/components/effects/MirrorMoment";
+// MirrorMoment — state kept for logic; render removed to reduce clutter
 import AppLayout from "@/components/layout/AppLayout";
 import { FloatingButton } from "@/components/effects/FloatingButton";
 import Chat, { type ChatMessage } from "@/components/Chat";
-import AssessmentFlow from "@/components/AssessmentFlow";
-import QuickCheckin from "@/components/QuickCheckin";
-import RetoDiario from "@/components/RetoDiario";
-import HomeHero from "@/components/home/HomeHero";
-import DailyQuote from "@/components/DailyQuote";
+// AssessmentFlow and QuickCheckin moved to their own pages — not shown in chat prelude
+// RetoDiario widget moved to SidebarRetoWidget — not stacked above chat
+// HomeHero and DailyQuote removed from prelude to reduce noise
 import HomeOnboarding from "@/components/home/HomeOnboarding";
 import HomeWorkspace, { type WorkspaceTab } from "@/components/home/HomeWorkspace";
 import InsightsPanel from "@/components/InsightsPanel";
@@ -30,7 +28,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { PRODUCT_DISCLAIMERS } from "@/lib/legal";
+// PRODUCT_DISCLAIMERS moved to ClinicalDisclaimer modal
 import { useSfx } from "@/lib/useSfx";
 import { confettiBurst, confettiHeartbeat } from "@/lib/confetti";
 import { toast } from "sonner";
@@ -1859,7 +1857,6 @@ export default function HomePage() {
       <AppLayout
         prelude={
           <>
-            <DailyQuote />
             {sessionProfile && !sessionProfile.isAnonymous && !sessionProfile.emailVerified && (
               <EmailVerificationBanner
                 emailVerified={sessionProfile.emailVerified}
@@ -1867,23 +1864,7 @@ export default function HomePage() {
                 email={sessionProfile.email}
               />
             )}
-            {onboardingStep === 0 ? (
-              <HomeHero
-                onUseChat={() => setWorkspaceTab("chat")}
-                onUseExample={handleUseStarterExample}
-                onStartOnboarding={handleStartOnboarding}
-                consentChecked={onboardingConsentChecked}
-                consentRequired={!onboardingConsentGiven}
-                consentSaving={onboardingConsentSaving}
-                consentError={onboardingConsentError}
-                onConsentChange={(checked) => {
-                  setOnboardingConsentChecked(checked);
-                  if (checked) {
-                    setOnboardingConsentError(null);
-                  }
-                }}
-              />
-            ) : (
+            {onboardingStep > 0 && (
               <HomeOnboarding
                 step={onboardingStep as 1 | 2 | 3}
                 situation={onboardingSituation}
@@ -1909,25 +1890,6 @@ export default function HomePage() {
                 }}
               />
             )}
-            <Card className="border-border/70 bg-card/80 shadow-sm">
-              <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="space-y-1">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                    Uso responsable
-                  </p>
-                  <p className="text-sm text-foreground">{PRODUCT_DISCLAIMERS[0]}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {PRODUCT_DISCLAIMERS[1]} Si hay riesgo alto, prioriza ayuda humana inmediata.
-                  </p>
-                </div>
-                <Link
-                  href="/api/legal"
-                  className="text-sm font-medium text-foreground underline underline-offset-4"
-                >
-                  Ver límites del sistema
-                </Link>
-              </CardContent>
-            </Card>
           </>
         }
         sidebar={
@@ -1961,22 +1923,6 @@ export default function HomePage() {
             chat={
               <div className="flex min-h-72 sm:min-h-96 max-h-[calc(100dvh-10rem)] sm:max-h-[calc(100dvh-14rem)] flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
                 <div className="shrink-0">
-                  {mirrorMoment && (
-                    <MirrorMoment
-                      type={mirrorMoment.type}
-                      context={mirrorMoment.context}
-                      onDismiss={() => setMirrorMoment(null)}
-                      className="m-3"
-                    />
-                  )}
-                  <AssessmentFlow userId={sessionProfile?.id} />
-                  <QuickCheckin userId={sessionProfile?.id} />
-                  <RetoDiario
-                    userId={sessionProfile?.id}
-                    onFailed={(retoTitle) =>
-                      void handleSend(`Hoy no pude hacer el reto: ${retoTitle}. ¿Qué hago?`)
-                    }
-                  />
                   <GoalContextBar
                     goal={activeGoal}
                     actionLock={

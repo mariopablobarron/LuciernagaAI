@@ -237,8 +237,8 @@ export async function GET(req: NextRequest) {
       latestLogs: latestLogs.map((l) => ({
         ...l,
         costUsd: formatCost(l.costUsd),
-        prompt: l.prompt.slice(0, 200),
-        response: l.response.slice(0, 200),
+        prompt: l.prompt?.slice(0, 200) ?? "",
+        response: l.response?.slice(0, 200) ?? "",
         createdAt: l.createdAt.toISOString(),
       })),
     });

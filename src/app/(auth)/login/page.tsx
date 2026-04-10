@@ -13,6 +13,8 @@ const ERROR_MESSAGES: Record<string, string> = {
   EMAIL_INVALID: 'El email no es válido.',
   INVALID_CREDENTIALS: 'Email o contraseña incorrectos.',
   LOGIN_FAILED: 'Error al iniciar sesión. Inténtalo de nuevo.',
+  oauth_invalid_state: 'La sesión de Google expiró. Inténtalo de nuevo.',
+  oauth_failed: 'Error al conectar con Google. Inténtalo de nuevo.',
 };
 
 export default function LoginPage() {
@@ -32,7 +34,8 @@ function LoginForm() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const oauthError = searchParams.get('error');
+  const [error, setError] = useState(oauthError ? (ERROR_MESSAGES[oauthError] ?? 'Error de autenticación.') : '');
 
   async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault();

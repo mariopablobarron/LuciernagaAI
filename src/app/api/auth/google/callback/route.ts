@@ -22,6 +22,12 @@ export async function GET(req: NextRequest) {
 
   // Validate CSRF state
   if (!code || !state || state !== storedState) {
+    logError("AUTH", new Error("OAuth state mismatch"), {
+      hasCode: !!code,
+      hasState: !!state,
+      hasStoredState: !!storedState,
+      match: state === storedState,
+    });
     return NextResponse.redirect(`${baseUrl}/login?error=oauth_invalid_state`);
   }
 

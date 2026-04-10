@@ -395,19 +395,19 @@ export default function AdminUserDetailPage() {
         setData(payload);
         userId.current = params?.id ?? null;
 
-        // Load psychologist panel data in parallel
+        // Load psychologist panel data in parallel — errors are non-blocking
         const id = params?.id;
         if (id) {
-          void Promise.all([
+          void Promise.allSettled([
             fetch(`/api/admin/clinical-notes/${id}`, { credentials: "include" })
-              .then((r) => r.json() as Promise<{ notes: ClinicalNote[] }>)
-              .then((d) => setNotes(d.notes ?? [])),
+              .then((r) => r.ok ? r.json() as Promise<{ notes: ClinicalNote[] }> : null)
+              .then((d) => { if (d) setNotes(d.notes ?? []); }),
             fetch(`/api/admin/assessments/${id}`, { credentials: "include" })
-              .then((r) => r.json() as Promise<{ assessments: AssessmentItem[] }>)
-              .then((d) => setAssessments(d.assessments ?? [])),
+              .then((r) => r.ok ? r.json() as Promise<{ assessments: AssessmentItem[] }> : null)
+              .then((d) => { if (d) setAssessments(d.assessments ?? []); }),
             fetch(`/api/admin/users/${id}/emotional-history?days=30`, { credentials: "include" })
-              .then((r) => r.json() as Promise<{ timeline: TimelineEntry[]; crisisMarkers: CrisisMarker[] }>)
-              .then((d) => { setTimeline(d.timeline ?? []); setCrisisMarkers(d.crisisMarkers ?? []); }),
+              .then((r) => r.ok ? r.json() as Promise<{ timeline: TimelineEntry[]; crisisMarkers: CrisisMarker[] }> : null)
+              .then((d) => { if (d) { setTimeline(d.timeline ?? []); setCrisisMarkers(d.crisisMarkers ?? []); } }),
           ]);
         }
       } catch (fetchError: unknown) {

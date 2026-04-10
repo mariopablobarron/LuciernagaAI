@@ -7,17 +7,22 @@ import {
   ArrowDown,
   ArrowRight,
   ArrowUp,
+  Check,
   ChevronLeft,
   ChevronRight,
+  Download,
   Flame,
+  Mail,
   MessageCircle,
   RefreshCw,
   Search,
   ShieldAlert,
   Target,
+  Trash2,
   TrendingUp,
   Users,
 } from "lucide-react";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 
@@ -124,6 +129,58 @@ export default function AdminUsersPage() {
   const [page, setPage] = useState(1);
   const [sortKey, setSortKey] = useState<SortKey>("lastSeen");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkAction, setBulkAction] = useState(false);
+
+  function toggleSelect(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    if (selected.size === users.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(users.map((u) => u.id)));
+    }
+  }
+
+  async function handleBulkDelete() {
+    if (!window.confirm(`Eliminar ${selected.size} usuario(s)? Esta accion no se puede deshacer.`)) return;
+    setBulkAction(true);
+    let deleted = 0;
+    for (const id of selected) {
+      try {
+        const res = await fetch(`/api/admin/users/${id}`, { method: "DELETE", credentials: "include" });
+        if (res.ok) deleted++;
+      } catch { /* continue */ }
+    }
+    toast.success(`${deleted} usuario(s) eliminado(s)`);
+    setSelected(new Set());
+    setBulkAction(false);
+    void fetchUsers();
+  }
+
+  async function handleBulkExport() {
+    const selectedUsers = users.filter((u) => selected.has(u.id));
+    const csv = [
+      "email,nombre,estado,plan,engagement,racha,ultimo_acceso",
+      ...selectedUsers.map((u) =>
+        `${u.email},${u.name ?? ""},${u.state},${u.plan},${u.engagementScore},${u.streakDays},${u.lastSeen}`
+      ),
+    ].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `usuarios-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`${selectedUsers.length} usuario(s) exportado(s)`);
+  }
 
   async function fetchUsers(signal?: AbortSignal) {
     setLoading(true);
@@ -385,8 +442,43 @@ export default function AdminUsersPage() {
         </div>
       ) : (
         <div className="card-surface overflow-hidden rounded-xl border border-zinc-800">
+          {/* Bulk actions bar */}
+          {selected.size > 0 && (
+            <div className="flex items-center gap-3 border-b border-violet-500/20 bg-violet-500/5 px-4 py-2.5">
+              <span className="text-xs font-semibold text-violet-300">
+                {selected.size} seleccionado{selected.size > 1 ? "s" : ""}
+              </span>
+              <div className="flex gap-2 ml-auto">
+                <button
+                  onClick={handleBulkExport}
+                  className="flex items-center gap-1.5 rounded-lg border border-zinc-700 px-3 py-1.5 text-xs text-zinc-300 hover:bg-zinc-800 transition-colors"
+                >
+                  <Download className="h-3 w-3" /> Exportar CSV
+                </button>
+                <button
+                  onClick={handleBulkDelete}
+                  disabled={bulkAction}
+                  className="flex items-center gap-1.5 rounded-lg border border-red-500/30 px-3 py-1.5 text-xs text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-40"
+                >
+                  <Trash2 className="h-3 w-3" /> Eliminar
+                </button>
+                <button
+                  onClick={() => setSelected(new Set())}
+                  className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors px-2"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Table header */}
-          <div className="hidden lg:grid lg:grid-cols-[1.5fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr_0.4fr_auto] gap-3 border-b border-zinc-800 px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+          <div className="hidden lg:grid lg:grid-cols-[auto_1.5fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr_0.4fr_auto] gap-3 border-b border-zinc-800 px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+            <button onClick={toggleSelectAll} className="flex items-center justify-center w-6" title="Seleccionar todos">
+              <div className={`h-4 w-4 rounded border transition-colors ${selected.size === users.length && users.length > 0 ? "bg-violet-500 border-violet-500" : "border-zinc-600 hover:border-zinc-400"}`}>
+                {selected.size === users.length && users.length > 0 && <Check className="h-3 w-3 text-white mx-auto" />}
+              </div>
+            </button>
             <button onClick={() => handleSort("name")} className="text-left hover:text-zinc-300 transition-colors">
               Usuario <SortIcon col="name" />
             </button>
@@ -417,13 +509,21 @@ export default function AdminUsersPage() {
               const planCfg = PLAN_CONFIG[user.plan] ?? PLAN_CONFIG.free;
 
               return (
-                <Link
+                <div
                   key={user.id}
-                  href={`/admin/users/${user.id}`}
                   className="group block transition-colors hover:bg-zinc-800/30"
                 >
                   {/* Desktop row */}
-                  <div className="hidden lg:grid lg:grid-cols-[1.5fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr_0.4fr_auto] items-center gap-3 px-4 py-3">
+                  <div className="hidden lg:grid lg:grid-cols-[auto_1.5fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr_0.4fr_auto] items-center gap-3 px-4 py-3">
+                    {/* Checkbox */}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggleSelect(user.id); }}
+                      className="flex items-center justify-center w-6"
+                    >
+                      <div className={`h-4 w-4 rounded border transition-colors ${selected.has(user.id) ? "bg-violet-500 border-violet-500" : "border-zinc-700 group-hover:border-zinc-500"}`}>
+                        {selected.has(user.id) && <Check className="h-3 w-3 text-white mx-auto" />}
+                      </div>
+                    </button>
                     {/* User */}
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium text-white group-hover:text-violet-300 transition-colors">
@@ -485,34 +585,48 @@ export default function AdminUsersPage() {
                     {/* Last seen */}
                     <span className="text-xs text-zinc-600 tabular-nums">{timeAgo(user.lastSeen)}</span>
 
-                    {/* Arrow */}
-                    <ArrowRight className="h-4 w-4 text-zinc-700 group-hover:text-violet-400 transition-colors" />
+                    {/* Arrow → detail */}
+                    <Link href={`/admin/users/${user.id}`} className="p-1 rounded-lg hover:bg-zinc-700/50 transition-colors">
+                      <ArrowRight className="h-4 w-4 text-zinc-700 group-hover:text-violet-400 transition-colors" />
+                    </Link>
                   </div>
 
                   {/* Mobile card */}
                   <div className="lg:hidden space-y-3 px-4 py-4">
-                    <div className="flex items-start justify-between">
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate font-medium text-white">{user.name || user.email.split("@")[0]}</p>
-                        <p className="truncate text-xs text-zinc-600">{user.email}</p>
+                    <div className="flex items-start gap-3">
+                      <button
+                        onClick={() => toggleSelect(user.id)}
+                        className="mt-1 shrink-0"
+                      >
+                        <div className={`h-4 w-4 rounded border transition-colors ${selected.has(user.id) ? "bg-violet-500 border-violet-500" : "border-zinc-700"}`}>
+                          {selected.has(user.id) && <Check className="h-3 w-3 text-white mx-auto" />}
+                        </div>
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between">
+                          <Link href={`/admin/users/${user.id}`} className="min-w-0 flex-1">
+                            <p className="truncate font-medium text-white">{user.name || user.email.split("@")[0]}</p>
+                            <p className="truncate text-xs text-zinc-600">{user.email}</p>
+                          </Link>
+                          <div className="flex items-center gap-1.5 ml-3">
+                            <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${stateCfg.bg}`}>
+                              <span className={`inline-block h-1.5 w-1.5 rounded-full ${stateCfg.dot}`} />
+                              {stateCfg.label}
+                            </span>
+                            {user.crisisActive && <ShieldAlert className="h-3.5 w-3.5 text-red-400" />}
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap gap-3 text-xs text-zinc-500 mt-2">
+                          <span className={`${planCfg.style} rounded-full border px-2 py-0.5 text-[10px] font-semibold`}>{planCfg.label}</span>
+                          <span>Eng: <strong className="text-zinc-300">{user.engagementScore}</strong></span>
+                          <span>Msgs: <strong className="text-zinc-300">{user.counts.messages7d}</strong></span>
+                          <span>Racha: <strong className={user.streakDays > 0 ? "text-amber-300" : "text-zinc-500"}>{user.streakDays}d</strong></span>
+                          <span>Visto: {timeAgo(user.lastSeen)}</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1.5 ml-3">
-                        <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${stateCfg.bg}`}>
-                          <span className={`inline-block h-1.5 w-1.5 rounded-full ${stateCfg.dot}`} />
-                          {stateCfg.label}
-                        </span>
-                        {user.crisisActive && <ShieldAlert className="h-3.5 w-3.5 text-red-400" />}
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-3 text-xs text-zinc-500">
-                      <span className={`${planCfg.style} rounded-full border px-2 py-0.5 text-[10px] font-semibold`}>{planCfg.label}</span>
-                      <span>Eng: <strong className="text-zinc-300">{user.engagementScore}</strong></span>
-                      <span>Msgs: <strong className="text-zinc-300">{user.counts.messages7d}</strong></span>
-                      <span>Racha: <strong className={user.streakDays > 0 ? "text-amber-300" : "text-zinc-500"}>{user.streakDays}d</strong></span>
-                      <span>Visto: {timeAgo(user.lastSeen)}</span>
                     </div>
                   </div>
-                </Link>
+                </div>
               );
             })}
           </div>

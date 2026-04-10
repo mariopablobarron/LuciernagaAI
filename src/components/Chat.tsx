@@ -459,26 +459,44 @@ export default function Chat({
   const handleImageAttach = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 500 * 1024) {
-      return; // silently reject >500KB
-    }
     if (!file.type.startsWith("image/")) return;
-    const reader = new FileReader();
-    reader.onload = () => setAttachedImage(reader.result as string);
-    reader.readAsDataURL(file);
-    // Reset input so same file can be selected again
+
+    // Compress if > 500KB — resize to max 1200px
+    if (file.size > 500 * 1024) {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        const MAX = 1200;
+        let { width, height } = img;
+        if (width > MAX || height > MAX) {
+          const ratio = Math.min(MAX / width, MAX / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d")?.drawImage(img, 0, 0, width, height);
+        const compressed = canvas.toDataURL("image/jpeg", 0.8);
+        setAttachedImage(compressed);
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+    } else {
+      const reader = new FileReader();
+      reader.onload = () => setAttachedImage(reader.result as string);
+      reader.readAsDataURL(file);
+    }
     e.target.value = "";
   };
 
   const handleSendWithImage = () => {
     if (attachedImage) {
-      // Prepend image indicator to message
-      const imageNote = "[Imagen adjunta]";
-      const fullMessage = input.trim() ? `${imageNote} ${input.trim()}` : imageNote;
-      handleInputChange(fullMessage);
+      // Send image as base64 data URI embedded in message for the backend to parse
+      const userText = input.trim() || "Mira esta imagen";
+      const fullMessage = `${userText}\n\n[image:${attachedImage}]`;
       setAttachedImage(null);
-      // Small delay to let state update
-      setTimeout(() => void onSend(fullMessage), 50);
+      void onSend(fullMessage);
     } else {
       void onSend();
     }
@@ -706,7 +724,7 @@ export default function Chat({
             <img src={attachedImage} alt="Adjunto" className="h-16 w-16 rounded-lg object-cover" />
             <div className="flex-1 min-w-0">
               <p className="text-xs text-zinc-400">Imagen adjunta</p>
-              <p className="text-[10px] text-zinc-600">Se enviara con tu mensaje</p>
+              <p className="text-[10px] text-zinc-600">Describe lo que muestra — el mentor no puede ver imagenes, pero puede ayudarte con lo que le cuentes</p>
             </div>
             <button
               type="button"
@@ -736,7 +754,7 @@ export default function Chat({
           <input
             ref={imageInputRef}
             type="file"
-            accept="image/png,image/jpeg,image/webp,image/gif"
+            accept="image/*"
             className="hidden"
             onChange={handleImageAttach}
           />

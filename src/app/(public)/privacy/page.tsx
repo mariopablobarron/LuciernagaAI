@@ -35,9 +35,9 @@ export default function PrivacyPage() {
           <section className="space-y-4 border-t border-zinc-800 pt-6">
             <h2 className={`${TYPOGRAPHY.h2} text-white`}>2. Datos que recopilamos</h2>
             <ul className="space-y-2 text-zinc-300">
-              <li>Direccion de email (para identificar tu cuenta)</li>
+              <li>Dirección de email (para identificar tu cuenta)</li>
               <li>Nombre (si lo proporcionas voluntariamente)</li>
-              <li>Contrasena (almacenada con hash bcrypt, nunca en texto plano)</li>
+              <li>Contraseña (almacenada con hash, nunca en texto plano)</li>
               <li>Mensajes y conversaciones dentro de la plataforma</li>
               <li>Check-ins emocionales y entradas de diario</li>
               <li>Metas, acciones y progreso</li>

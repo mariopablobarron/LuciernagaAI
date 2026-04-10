@@ -336,7 +336,7 @@ export default function ProjectWorkspacePage() {
             {/* AI Reflection */}
             {entry.aiReflection && (
               <div className="rounded-xl bg-violet-500/5 border border-violet-500/20 p-4">
-                <p className="text-[10px] font-semibold text-violet-400 uppercase tracking-wider mb-1">Reflexion del sistema</p>
+                <p className="text-[10px] font-semibold text-violet-400 uppercase tracking-wider mb-1">Reflexión del sistema</p>
                 <p className="text-sm text-zinc-300 whitespace-pre-wrap">{entry.aiReflection}</p>
               </div>
             )}
@@ -355,7 +355,7 @@ export default function ProjectWorkspacePage() {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Target className="h-3.5 w-3.5" /> Focos de accion
+              <Target className="h-3.5 w-3.5" /> Focos de acción
             </h3>
             <button onClick={() => setShowAddFocus(!showAddFocus)} className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1">
               <Plus className="h-3.5 w-3.5" /> Nuevo foco
@@ -366,7 +366,7 @@ export default function ProjectWorkspacePage() {
             <div className="flex gap-2">
               <input
                 value={newFocusTitle} onChange={(e) => setNewFocusTitle(e.target.value)}
-                placeholder="Nombre del foco de accion..."
+                placeholder="Nombre del foco de acción..."
                 className="flex-1 rounded-xl border border-zinc-700 bg-zinc-900/80 px-3 py-2 text-sm text-zinc-200 placeholder-zinc-600 focus:border-violet-500 focus:outline-none"
                 autoFocus
               />
@@ -420,7 +420,7 @@ export default function ProjectWorkspacePage() {
                 </div>
               ) : (
                 <button onClick={() => { setAddingStepTo(fa.id); setNewStepDesc(""); }} className="text-[10px] text-zinc-500 hover:text-violet-400 flex items-center gap-1">
-                  <Plus className="h-3 w-3" /> Anadir paso
+                  <Plus className="h-3 w-3" /> Añadir paso
                 </button>
               )}
             </div>
@@ -432,7 +432,7 @@ export default function ProjectWorkspacePage() {
       <div className="flex items-center gap-3">
         {!showReflection ? (
           <button onClick={() => setShowReflection(true)} className="text-xs text-zinc-500 hover:text-violet-400 flex items-center gap-1.5 transition-colors">
-            <Plus className="h-3.5 w-3.5" /> Anadir reflexion libre
+            <Plus className="h-3.5 w-3.5" /> Añadir reflexión libre
           </button>
         ) : (
           <div className="w-full space-y-2">

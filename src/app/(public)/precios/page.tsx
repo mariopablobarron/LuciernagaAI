@@ -3,13 +3,24 @@ import Link from 'next/link';
 import { Check, Gift, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Precios — tresmilmillonesdelatidos.es',
-  description: 'Acceso completo gratuito durante la fase MVP. Registrate y accede a todas las funcionalidades Pro sin coste.',
+  title: 'Precios — Tres Mil Millones de Latidos',
+  description: 'Tres Mil Millones de Latidos: acceso completo gratuito durante la fase MVP. Registrate y accede a mentoria con IA, check-ins, diario, Modo Impulso y mas. Sin tarjeta de credito.',
+  alternates: {
+    canonical: 'https://tresmilmillonesdelatidos.es/precios',
+  },
   openGraph: {
-    title: 'Precios — tresmilmillonesdelatidos.es',
-    description: 'Fase MVP: acceso Pro gratuito para los primeros usuarios.',
+    title: 'Precios — Tres Mil Millones de Latidos',
+    description: 'Fase MVP: acceso Pro gratuito. Mentoria con IA, check-ins, diario y Modo Impulso. Sin coste.',
     type: 'website',
     locale: 'es_ES',
+    siteName: 'Tres Mil Millones de Latidos',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Precios — Tres Mil Millones de Latidos' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Precios — Tres Mil Millones de Latidos',
+    description: 'Mentoria con IA gratis durante el MVP. Sin tarjeta de credito.',
+    images: ['/opengraph-image'],
   },
   robots: { index: true, follow: true },
 };

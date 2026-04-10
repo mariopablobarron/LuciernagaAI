@@ -12,6 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import FamilySettings from "@/components/FamilySettings";
+import QuickCheckin from "@/components/QuickCheckin";
 import SidebarRetoWidget from "@/components/SidebarRetoWidget";
 import { ShareStoryCard } from "@/components/ShareStoryCard";
 
@@ -106,6 +107,10 @@ export default function Sidebar({
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  type SupportMsg = { id: string; fromName: string; content: string; deliveredAt: string; readAt: string | null };
+  const [supportMessages, setSupportMessages] = useState<SupportMsg[]>([]);
+  const [unreadSupport, setUnreadSupport] = useState(0);
+
   useEffect(() => {
     return () => {
       if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
@@ -119,6 +124,14 @@ export default function Sidebar({
         if (d.ok) setInvites(d.invites ?? []);
       })
       .catch(() => { /* Invites are non-critical — fail silently */ });
+
+    fetch("/api/user/support-messages", { credentials: "include" })
+      .then((r) => r.ok ? r.json() : null)
+      .then((d: { messages?: SupportMsg[]; unreadCount?: number } | null) => {
+        if (d?.messages) setSupportMessages(d.messages);
+        if (typeof d?.unreadCount === "number") setUnreadSupport(d.unreadCount);
+      })
+      .catch(() => { /* Non-critical */ });
   }, []);
 
   function copyInvite(code: string, url: string) {
@@ -275,6 +288,10 @@ export default function Sidebar({
 
         <SidebarRetoWidget />
       </div>
+
+      <Separator className="my-4" />
+
+      <QuickCheckin />
 
       <Separator className="my-4" />
 
@@ -559,6 +576,43 @@ export default function Sidebar({
       <Separator className="my-4" />
 
       <FamilySettings />
+
+      {/* Support messages from trusted contacts */}
+      {supportMessages.length > 0 && (
+        <>
+          <Separator className="my-4" />
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                Mensajes de apoyo
+              </p>
+              {unreadSupport > 0 && (
+                <Badge variant="warning" className="rounded-full px-2 py-0.5 text-[10px]">
+                  {unreadSupport} nuevo{unreadSupport > 1 ? "s" : ""}
+                </Badge>
+              )}
+            </div>
+            <div className="space-y-2">
+              {supportMessages.slice(0, 3).map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`rounded-xl border p-3 text-sm ${
+                    msg.readAt
+                      ? "border-border bg-muted/20 text-muted-foreground"
+                      : "border-fuchsia-500/30 bg-fuchsia-500/5 text-foreground"
+                  }`}
+                >
+                  <p className="text-xs font-semibold">{msg.fromName}</p>
+                  <p className="mt-1 text-xs leading-relaxed line-clamp-2">{msg.content}</p>
+                  <p className="mt-1 text-[10px] text-muted-foreground">
+                    {new Date(msg.deliveredAt).toLocaleDateString("es-ES")}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
 
       <Separator className="my-4" />
 

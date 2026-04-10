@@ -1,5 +1,6 @@
 import { getPrismaClient } from "@/db/prisma";
 import { sendUserEmail, type UserEmail } from "@/lib/email";
+import { getDailyQuote } from "@/lib/daily-quotes";
 import { logError, logInfo } from "@/lib/logger";
 
 // ─── Templates ───────────────────────────────────────────────────────────────
@@ -62,6 +63,9 @@ const TEMPLATES: Record<string, TemplateBuilder> = {
         ${ctaButton("Abrir mi espacio", `${APP_URL}/app`)}
         <p style="margin:16px 0 0;font-size:13px;color:#52525b;line-height:1.5">
           Tip: los mensajes cortos y honestos funcionan mejor que los largos y pensados.
+        </p>
+        <p style="margin:12px 0 0;font-size:13px;color:#71717a;font-style:italic;line-height:1.5">
+          "${getDailyQuote()}"
         </p>
       `),
       text: `${greeting}, ya tienes tu espacio listo. Abre el chat y escribe como te sientes hoy. ${APP_URL}/app`,

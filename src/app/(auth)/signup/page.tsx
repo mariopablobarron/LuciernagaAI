@@ -227,7 +227,7 @@ function SignupForm() {
               Tres Mil Millones de Latidos es un producto en desarrollo activo.
               Al registrarte, aceptas que tus datos conversacionales y emocionales
               se usen de forma anonimizada para mejorar la plataforma.
-              Puedes eliminar toda tu informacion en cualquier momento.
+              Puedes eliminar toda tu información en cualquier momento.
             </p>
             <label className="flex items-start gap-3 cursor-pointer">
               <input type="checkbox" required className="rounded border-zinc-700 bg-zinc-900 mt-0.5" />

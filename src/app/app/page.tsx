@@ -8,6 +8,7 @@ import { trackMetaEvent } from "@/lib/meta-pixel";
 import AppLayout from "@/components/layout/AppLayout";
 import { FloatingButton } from "@/components/effects/FloatingButton";
 import Chat, { type ChatMessage } from "@/components/Chat";
+import ConsentModal from "@/components/ConsentModal";
 import HomeOnboarding from "@/components/home/HomeOnboarding";
 import HomeWorkspace, { type WorkspaceTab } from "@/components/home/HomeWorkspace";
 import InsightsPanel from "@/components/InsightsPanel";
@@ -2151,6 +2152,13 @@ export default function HomePage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {sessionReady && !onboardingConsentGiven && (
+        <ConsentModal onAccept={() => {
+          setOnboardingConsentGiven(true);
+          setOnboardingConsentChecked(true);
+        }} />
+      )}
 
       <GuidedTour tourId="app-main" steps={APP_TOUR} delay={1500} />
     </>

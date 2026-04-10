@@ -196,6 +196,16 @@ function MessageBubble({ message, isStreaming }: { message: ChatMessage; isStrea
               AR: 011 5275-1135
             </a>
           </div>
+          <button
+            type="button"
+            onClick={() => {
+              void fetch("/api/user/crisis-exit", { method: "POST", credentials: "include" })
+                .then(() => { window.location.reload(); });
+            }}
+            className="mt-3 w-full rounded-lg border border-zinc-700 bg-zinc-900/80 px-3 py-2 text-xs text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors"
+          >
+            Ya me siento mejor — salir del modo crisis
+          </button>
         </div>
       </div>
     );

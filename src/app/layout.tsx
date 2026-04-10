@@ -47,8 +47,35 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: getMetadataBase(),
-  title: SAAS_CONFIG.marketingTitle,
-  description: SAAS_CONFIG.description,
+  title: {
+    default: "Tres Mil Millones de Latidos — Mentoria con IA en espanol",
+    template: "%s | Tres Mil Millones de Latidos",
+  },
+  description:
+    "Tres Mil Millones de Latidos es una plataforma de mentoria con inteligencia artificial. Te ayuda a identificar bloqueos, ordenar ideas y actuar hoy con microacciones concretas. Gratis.",
+  keywords: [
+    "tres mil millones de latidos",
+    "mentoria IA",
+    "coach IA espanol",
+    "mentor inteligencia artificial",
+    "desarrollo personal IA",
+    "autoconocimiento",
+    "claridad emocional",
+    "bloqueo emocional",
+    "microacciones",
+    "bienestar emocional",
+    "Startidea",
+  ],
+  authors: [{ name: "Mario Pablo Sanchez Barron", url: "https://startidea.es" }],
+  creator: "Startidea",
+  publisher: "Tres Mil Millones de Latidos",
+  alternates: {
+    canonical: "https://tresmilmillonesdelatidos.es",
+    languages: {
+      "es": "https://tresmilmillonesdelatidos.es",
+      "en": "https://tresmilmillonesdelatidos.es/en",
+    },
+  },
   manifest: "/manifest.json",
   icons: {
     icon: "/favicon.ico",
@@ -61,10 +88,31 @@ export const metadata: Metadata = {
     title: "Latidos",
   },
   openGraph: {
-    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    title: "Tres Mil Millones de Latidos — Mentoria con IA en espanol",
+    description:
+      "Plataforma de mentoria con inteligencia artificial. Claridad emocional, accion real y seguimiento continuo. Gratis durante el MVP.",
+    url: "https://tresmilmillonesdelatidos.es",
+    siteName: "Tres Mil Millones de Latidos",
+    locale: "es_ES",
+    type: "website",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Tres Mil Millones de Latidos — Mentoria con IA" }],
   },
   twitter: {
+    card: "summary_large_image",
+    title: "Tres Mil Millones de Latidos — Mentoria con IA en espanol",
+    description: "Mentor con IA que detecta tu estado emocional y te guia a la accion concreta. Gratis.",
     images: ["/opengraph-image"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 
@@ -73,17 +121,26 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "Organization",
-      "@id": "#organization",
-      name: "Tres Mil Millones de Latidos",
-      url: "https://tresmilmillonesdelatidos.es",
+      "@id": "https://tresmilmillonesdelatidos.es/#organization",
+      name: "Startidea",
+      alternateName: "Tres Mil Millones de Latidos",
+      url: "https://startidea.es",
       description:
-        "Plataforma de mentoría conversacional con inteligencia artificial. Claridad emocional, acción real y seguimiento continuo.",
-      foundingDate: "2025",
-      sameAs: [],
+        "Agencia de innovacion social y desarrollo tecnologico con mas de 15 anos de experiencia.",
+      foundingDate: "2011",
+      founder: { "@id": "https://tresmilmillonesdelatidos.es/#founder" },
     },
     {
-      "@type": "WebApplication",
-      "@id": "#app",
+      "@type": "Person",
+      "@id": "https://tresmilmillonesdelatidos.es/#founder",
+      name: "Mario Pablo Sanchez Barron",
+      jobTitle: "Fundador",
+      worksFor: { "@id": "https://tresmilmillonesdelatidos.es/#organization" },
+      url: "https://tresmilmillonesdelatidos.es/sobre-nosotros",
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://tresmilmillonesdelatidos.es/#app",
       name: "Tres Mil Millones de Latidos",
       url: "https://tresmilmillonesdelatidos.es",
       applicationCategory: "HealthApplication",
@@ -94,30 +151,35 @@ const jsonLd = {
           price: "0",
           priceCurrency: "EUR",
           name: "Free",
-          description:
-            "10 conversaciones al mes, check-in diario, objetivos y acciones.",
+          description: "10 conversaciones al mes, check-in diario, objetivos y acciones.",
         },
         {
           "@type": "Offer",
           price: "9",
           priceCurrency: "EUR",
           name: "Pro",
-          description:
-            "Conversaciones ilimitadas, Modo Impulso 21 días, retos personalizados y journeys completos.",
+          description: "Conversaciones ilimitadas, Modo Impulso 21 dias, retos personalizados y journeys completos.",
         },
       ],
-      provider: { "@id": "#organization" },
-      inLanguage: "es",
+      provider: { "@id": "https://tresmilmillonesdelatidos.es/#organization" },
+      author: { "@id": "https://tresmilmillonesdelatidos.es/#founder" },
+      inLanguage: ["es", "en"],
       description:
-        "Mentor con IA que detecta tu estado emocional y te guía a la acción concreta. Objetivos, check-ins diarios, retos de 21 días y seguimiento continuo.",
+        "Tres Mil Millones de Latidos es una plataforma de mentoria con inteligencia artificial. Detecta tu estado emocional y te guia a la accion concreta con microacciones de 10 minutos.",
     },
     {
       "@type": "WebSite",
-      "@id": "#website",
+      "@id": "https://tresmilmillonesdelatidos.es/#website",
       url: "https://tresmilmillonesdelatidos.es",
       name: "Tres Mil Millones de Latidos",
-      publisher: { "@id": "#organization" },
+      alternateName: "3000 millones de latidos",
+      publisher: { "@id": "https://tresmilmillonesdelatidos.es/#organization" },
       inLanguage: "es",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: "https://tresmilmillonesdelatidos.es/app?q={search_term_string}",
+        "query-input": "required name=search_term_string",
+      },
     },
   ],
 };

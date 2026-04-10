@@ -101,7 +101,7 @@ export default function OrgTeamPage() {
             <input placeholder="Nombre" value={newAdmin.name} onChange={(e) => setNewAdmin({ ...newAdmin, name: e.target.value })} className={inputCls} />
             <input type="email" placeholder="Email" value={newAdmin.email} onChange={(e) => setNewAdmin({ ...newAdmin, email: e.target.value })} className={inputCls} />
             <div className="relative">
-              <input type={showPw ? "text" : "password"} placeholder="Contrasena (min 8)" value={newAdmin.password} onChange={(e) => setNewAdmin({ ...newAdmin, password: e.target.value })} className={`${inputCls} w-full pr-10`} />
+              <input type={showPw ? "text" : "password"} placeholder="Contraseña (mín 8)" value={newAdmin.password} onChange={(e) => setNewAdmin({ ...newAdmin, password: e.target.value })} className={`${inputCls} w-full pr-10`} />
               <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500">
                 {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>

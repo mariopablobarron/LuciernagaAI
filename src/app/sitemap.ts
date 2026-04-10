@@ -1,82 +1,46 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = process.env.APP_BASE_URL?.trim() || "https://tresmilmillonesdelatidos.es";
+const BASE = "https://tresmilmillonesdelatidos.es";
+
+type Entry = {
+  path: string;
+  priority: number;
+  changeFrequency: "daily" | "weekly" | "monthly" | "yearly";
+  hasEn?: boolean;
+};
+
+const PAGES: Entry[] = [
+  { path: "/", priority: 1, changeFrequency: "weekly", hasEn: true },
+  { path: "/precios", priority: 0.9, changeFrequency: "monthly" },
+  { path: "/calculadora-latidos", priority: 0.9, changeFrequency: "monthly" },
+  { path: "/test", priority: 0.8, changeFrequency: "monthly" },
+  { path: "/unirse", priority: 0.8, changeFrequency: "monthly" },
+  { path: "/guia", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/reto", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/sobre-nosotros", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/landing", priority: 0.6, changeFrequency: "monthly" },
+  { path: "/contact", priority: 0.3, changeFrequency: "yearly" },
+  { path: "/privacy", priority: 0.2, changeFrequency: "yearly" },
+  { path: "/terms", priority: 0.2, changeFrequency: "yearly" },
+];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
-  return [
-    {
-      url: BASE_URL,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 1,
-    },
-    {
-      url: `${BASE_URL}/test`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.9,
-    },
-    {
-      url: `${BASE_URL}/unirse`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/precios`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/reto`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/guia`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/landing`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
-    {
-      url: `${BASE_URL}/sobre-nosotros`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
-    {
-      url: `${BASE_URL}/calculadora-latidos`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/contact`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-    {
-      url: `${BASE_URL}/privacy`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.2,
-    },
-    {
-      url: `${BASE_URL}/terms`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.2,
-    },
-  ];
+  return PAGES.map((page) => ({
+    url: `${BASE}${page.path}`,
+    lastModified: now,
+    changeFrequency: page.changeFrequency,
+    priority: page.priority,
+    ...(page.hasEn
+      ? {
+          alternates: {
+            languages: {
+              es: `${BASE}${page.path}`,
+              en: `${BASE}/en${page.path === "/" ? "" : page.path}`,
+            },
+          },
+        }
+      : {}),
+  }));
 }

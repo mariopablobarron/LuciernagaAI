@@ -1,27 +1,28 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Cómo usar Tres Mil Millones de Latidos — Guía completa del mentor con IA",
+  title: "Guia de usuario — Tres Mil Millones de Latidos",
   description:
-    "Guía paso a paso para usar el mentor con IA: chat, objetivos, check-ins diarios, Modo Impulso de 21 días, Telegram y personas de confianza. Todo lo que necesitas para pasar del bloqueo a la acción.",
+    "Guia completa de Tres Mil Millones de Latidos: chat con mentor IA, check-ins diarios, diario emocional, metas, respiracion, comunidad, Modo Impulso 21 dias y Telegram. Paso a paso.",
+  alternates: {
+    canonical: "https://tresmilmillonesdelatidos.es/guia",
+  },
   openGraph: {
-    title: "Cómo usar Tres Mil Millones de Latidos — Guía completa del mentor con IA",
+    title: "Guia de usuario — Tres Mil Millones de Latidos",
     description:
-      "Guía paso a paso para usar el mentor con IA: chat, objetivos, check-ins diarios, Modo Impulso de 21 días, Telegram y personas de confianza.",
-    type: "website",
+      "Todo lo que necesitas para usar Tres Mil Millones de Latidos: chat, check-ins, diario, metas, respiracion, comunidad y Modo Impulso.",
+    type: "article",
     locale: "es_ES",
     siteName: "Tres Mil Millones de Latidos",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Guia — Tres Mil Millones de Latidos" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cómo usar Tres Mil Millones de Latidos — Guía completa",
-    description:
-      "Guía paso a paso para usar el mentor con IA: chat, objetivos, check-ins, Modo Impulso y más.",
+    title: "Guia de usuario — Tres Mil Millones de Latidos",
+    description: "Guia paso a paso del mentor con IA: chat, check-ins, diario, metas y Modo Impulso.",
+    images: ["/opengraph-image"],
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: { index: true, follow: true },
 };
 
 const faqJsonLd = {

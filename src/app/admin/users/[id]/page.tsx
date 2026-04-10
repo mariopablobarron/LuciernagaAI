@@ -303,9 +303,9 @@ export default function AdminUserDetailPage() {
         credentials: "include",
         body: JSON.stringify({ newPassword }),
       });
-      if (!res.ok) throw new Error("Error al resetear contrasena.");
+      if (!res.ok) throw new Error("Error al resetear contraseña.");
       setNewPassword("");
-      showFeedback("reset-password", "success", "Contrasena reseteada correctamente.");
+      showFeedback("reset-password", "success", "Contraseña reseteada correctamente.");
     } catch {
       showFeedback("reset-password", "error", "No se pudo resetear la contrasena.");
     } finally {

@@ -45,9 +45,9 @@ const PHASE_COLORS: Record<string, string> = {
 const PHASE_OPTIONS = [
   { value: "", label: "Sin fase" },
   { value: "bloqueo", label: "Bloqueo" },
-  { value: "exploracion", label: "Exploracion" },
-  { value: "decision", label: "Decision" },
-  { value: "accion", label: "Accion" },
+  { value: "exploracion", label: "Exploración" },
+  { value: "decision", label: "Decisión" },
+  { value: "accion", label: "Acción" },
   { value: "consistencia", label: "Consistencia" },
 ];
 

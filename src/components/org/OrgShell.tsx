@@ -17,7 +17,7 @@ const NAV_LINKS = [
   { href: "/org/dashboard", label: "Dashboard", icon: BarChart3 },
   { href: "/org/patients", label: "Pacientes", icon: Users, roles: ["therapist", "admin"] },
   { href: "/org/team", label: "Equipo", icon: Shield, roles: ["admin"] },
-  { href: "/org/guia", label: "Guia", icon: BookOpen },
+  { href: "/org/guia", label: "Guía", icon: BookOpen },
 ];
 
 export function OrgShell({ title, subtitle, children }: OrgShellProps) {
@@ -41,7 +41,7 @@ export function OrgShell({ title, subtitle, children }: OrgShellProps) {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
           <div className="flex items-center gap-3">
             <Building2 className="h-5 w-5 text-violet-400" />
-            <span className="text-sm font-semibold text-white">Portal Organizacion</span>
+            <span className="text-sm font-semibold text-white">Portal Organización</span>
           </div>
           <div className="flex items-center gap-1">
             {filteredNav.map((link) => {

@@ -323,7 +323,7 @@ export default function OrganizationsPage() {
                             <input placeholder="Nombre" value={newAdmin.name} onChange={(e) => setNewAdmin({ ...newAdmin, name: e.target.value })} className={inputCls} />
                             <input type="email" placeholder="Email" value={newAdmin.email} onChange={(e) => setNewAdmin({ ...newAdmin, email: e.target.value })} className={inputCls} />
                             <div className="relative">
-                              <input type={showAdminPw ? "text" : "password"} placeholder="Contrasena" value={newAdmin.password} onChange={(e) => setNewAdmin({ ...newAdmin, password: e.target.value })} className={`${inputCls} w-full pr-10`} />
+                              <input type={showAdminPw ? "text" : "password"} placeholder="Contraseña" value={newAdmin.password} onChange={(e) => setNewAdmin({ ...newAdmin, password: e.target.value })} className={`${inputCls} w-full pr-10`} />
                               <button type="button" onClick={() => setShowAdminPw(!showAdminPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500">
                                 {showAdminPw ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                               </button>

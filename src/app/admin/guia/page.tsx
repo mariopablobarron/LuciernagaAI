@@ -29,7 +29,7 @@ const DOCS: DocMeta[] = [
   {
     id: "guia",
     title: "Guia de la plataforma",
-    subtitle: "Vision general, argumentario, fundador, principios pedagogicos y guia completa por rol",
+    subtitle: "Visión general, argumentario, fundador, principios pedagógicos y guía completa por rol",
     icon: BookOpen,
     color: "text-violet-400",
     bg: "bg-violet-500/10",
@@ -59,7 +59,7 @@ const DOCS: DocMeta[] = [
   {
     id: "admin",
     title: "Manual de administracion",
-    subtitle: "Panel admin, RBAC, clinico, marketing, Telegram, Stripe, cron jobs, endpoints",
+    subtitle: "Panel admin, RBAC, clínico, marketing, Telegram, Stripe, cron jobs, endpoints",
     icon: ShieldCheck,
     color: "text-amber-400",
     bg: "bg-amber-500/10",

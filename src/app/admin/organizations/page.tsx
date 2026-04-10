@@ -85,7 +85,9 @@ export default function OrganizationsPage() {
       const res = await fetch("/api/admin/organizations", { credentials: "include" });
       if (res.status === 401) { router.replace("/admin/login"); return; }
       if (res.status === 403) { setError("Sin permisos para gestionar organizaciones."); return; }
-      setOrgs(await res.json());
+      if (!res.ok) { setError("Error cargando organizaciones"); return; }
+      const data = await res.json();
+      setOrgs(Array.isArray(data) ? data : data.organizations ?? []);
     } catch { setError("Error cargando organizaciones"); }
     finally { setLoading(false); }
   }, [router]);
@@ -100,10 +102,16 @@ export default function OrganizationsPage() {
         fetch(`/api/admin/organizations/${id}/users`),
         fetch(`/api/admin/organizations/${id}/invites`),
       ]);
-      const orgData = await orgRes.json();
-      const usersData = await usersRes.json();
-      const invitesData = await invitesRes.json();
-      setDetail({ ...orgData, users: usersData.users ?? orgData.users, invites: invitesData.invites ?? [] });
+      const orgData = orgRes.ok ? await orgRes.json() : null;
+      const usersData = usersRes.ok ? await usersRes.json() : null;
+      const invitesData = invitesRes.ok ? await invitesRes.json() : null;
+      if (!orgData) { setError("Error cargando detalle de organizacion"); return; }
+      setDetail({
+        ...orgData,
+        admins: Array.isArray(orgData.admins) ? orgData.admins : [],
+        users: Array.isArray(usersData?.users) ? usersData.users : Array.isArray(orgData.users) ? orgData.users : [],
+        invites: Array.isArray(invitesData?.invites) ? invitesData.invites : [],
+      });
     } catch { setError("Error cargando detalles"); }
     finally { setDetailLoading(false); }
   }

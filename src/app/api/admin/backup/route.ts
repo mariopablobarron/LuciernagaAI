@@ -12,8 +12,9 @@ export const maxDuration = 120;
 // Returns a gzipped SQL file with CREATE TABLE + COPY data for all tables.
 export async function GET(req: NextRequest) {
   // Require admin auth OR CRON_SECRET (for automated backups)
-  const secret = req.nextUrl.searchParams.get("secret");
-  const hasCronSecret = secret && secret === process.env.CRON_SECRET?.trim();
+  const secret = req.nextUrl.searchParams.get("secret")?.trim();
+  const expectedSecret = process.env.CRON_SECRET?.trim().replace(/[\r\n]/g, "");
+  const hasCronSecret = Boolean(secret && expectedSecret && secret === expectedSecret);
   if (!hasCronSecret) {
     const auth = requireAdminPermission(req, "backup");
     if (auth instanceof NextResponse) return auth;

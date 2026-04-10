@@ -263,6 +263,24 @@ export default function CommunityPage() {
           </div>
         </div>
 
+        {/* Cafeteria CTA */}
+        <Link
+          href="/community/cafeteria"
+          className="group flex items-center justify-between rounded-2xl border border-violet-500/20 bg-gradient-to-r from-violet-500/5 to-fuchsia-500/5 px-5 py-4 transition-all hover:border-violet-500/40 active:scale-[0.98]"
+        >
+          <div className="flex items-center gap-4">
+            <span className="text-3xl">☕</span>
+            <div>
+              <p className="text-sm font-bold text-white">La Cafetería</p>
+              <p className="text-xs text-zinc-400">Espacio virtual interactivo con avatares y muro de mensajes</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[10px] font-semibold text-emerald-300">Live</span>
+          </div>
+        </Link>
+
         {/* Confidentiality */}
         <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3">
           <Shield className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />

@@ -20,6 +20,7 @@ export const PERMISSIONS: Record<SystemRole, string[]> = {
     "crm",
     "operations",
     "research",
+    "docs",
     "users:read",
     "users:update",
     "users:change-plan",
@@ -45,6 +46,7 @@ export const PERMISSIONS: Record<SystemRole, string[]> = {
     "dashboard:read",
     "crisis",
     "research",
+    "docs",
     "users:read",
     "users:export-pdf",
     "users:emotional-history",
@@ -63,6 +65,7 @@ export const PERMISSIONS: Record<SystemRole, string[]> = {
     "analytics",
     "crm",
     "retention",
+    "docs",
     "marketing:broadcast",
     "marketing:campaign",
     "marketing:metrics",
@@ -76,6 +79,7 @@ export const PERMISSIONS: Record<SystemRole, string[]> = {
 
   support: [
     "crisis",
+    "docs",
     "users:read",
     "users:reset-password",
     "users:send-email",
@@ -89,6 +93,7 @@ export const PERMISSIONS: Record<SystemRole, string[]> = {
     "exercises",
     "challenges",
     "resources",
+    "docs",
   ],
 
   ops: [
@@ -96,6 +101,7 @@ export const PERMISSIONS: Record<SystemRole, string[]> = {
     "analytics",
     "audit",
     "operations",
+    "docs",
     "llm-usage",
     "backup",
     "insights:read",

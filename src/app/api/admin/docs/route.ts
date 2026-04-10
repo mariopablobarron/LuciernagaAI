@@ -167,7 +167,7 @@ function inline(s: string): string {
 }
 
 export async function GET(req: NextRequest) {
-  const auth = requireAdminPermission(req, "dashboard");
+  const auth = requireAdminPermission(req, "docs");
   if (auth instanceof NextResponse) return auth;
 
   const doc = req.nextUrl.searchParams.get("doc");

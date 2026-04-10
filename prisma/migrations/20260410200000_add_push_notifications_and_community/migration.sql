@@ -1,5 +1,3 @@
-Loaded Prisma config from prisma.config.ts.
-
 -- CreateEnum
 CREATE TYPE "CirclePhase" AS ENUM ('bloqueo', 'exploracion', 'decision', 'accion', 'consistencia');
 

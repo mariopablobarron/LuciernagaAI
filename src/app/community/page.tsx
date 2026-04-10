@@ -9,6 +9,7 @@ import {
   Users,
   MessageCircle,
   Calendar,
+  HelpCircle,
   Target,
   Send,
   CheckCircle2,
@@ -42,7 +43,12 @@ type Session = {
   circle: { id: string; name: string; phase: string } | null;
 };
 
-type Tab = "victories" | "spaces" | "circle" | "coaches" | "activity";
+type Tab = "victories" | "spaces" | "circle" | "questions" | "coaches";
+
+type Question = {
+  id: string; content: string; isForMe: boolean; answerCount: number; createdAt: string;
+  answers: Array<{ id: string; content: string; author: string | null; isOwn: boolean; likes: number; createdAt: string }>;
+};
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -72,6 +78,10 @@ export default function CommunityPage() {
   const [circlePosts, setCirclePosts] = useState<Post[]>([]);
   const [commitments, setCommitments] = useState<Commitment[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questionText, setQuestionText] = useState("");
+  const [answerText, setAnswerText] = useState("");
+  const [answeringId, setAnsweringId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Post form state
@@ -107,6 +117,10 @@ export default function CommunityPage() {
           setCirclePosts(postsData.posts ?? []);
           setCommitments(commitsData.commitments ?? []);
         }
+      } else if (t === "questions") {
+        const res = await fetch("/api/community/questions", { credentials: "include" });
+        const data = (await res.json()) as { questions: Question[] };
+        setQuestions(data.questions ?? []);
       } else if (t === "coaches") {
         const res = await fetch("/api/community/sessions", { credentials: "include" });
         const data = (await res.json()) as { sessions: Session[] };
@@ -194,10 +208,44 @@ export default function CommunityPage() {
     void fetchData("circle");
   }
 
+  async function handleAskQuestion() {
+    if (!questionText.trim()) return;
+    setPosting(true);
+    try {
+      await fetch("/api/community/questions", {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: questionText }),
+      });
+      setQuestionText("");
+      toast.success("Pregunta publicada");
+      void fetchData("questions");
+    } catch { toast.error("Error al publicar"); }
+    finally { setPosting(false); }
+  }
+
+  async function handleAnswer(questionId: string) {
+    if (!answerText.trim()) return;
+    setPosting(true);
+    try {
+      await fetch("/api/community/questions", {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answerId: questionId, answerContent: answerText, anonymous: false }),
+      });
+      setAnswerText("");
+      setAnsweringId(null);
+      toast.success("Respuesta publicada");
+      void fetchData("questions");
+    } catch { toast.error("Error"); }
+    finally { setPosting(false); }
+  }
+
   const TABS: { key: Tab; label: string; icon: React.ReactNode }[] = [
     { key: "victories", label: "Victorias", icon: <Trophy className="w-4 h-4" /> },
     { key: "spaces", label: "Espacios", icon: <BookOpen className="w-4 h-4" /> },
     { key: "circle", label: "Mi Círculo", icon: <Users className="w-4 h-4" /> },
+    { key: "questions", label: "Preguntas", icon: <HelpCircle className="w-4 h-4" /> },
     { key: "coaches", label: "Sesiones", icon: <Calendar className="w-4 h-4" /> },
   ];
 
@@ -465,6 +513,123 @@ export default function CommunityPage() {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Tab: Questions (ask.fm style) ────────────────────────────── */}
+        {tab === "questions" && (
+          <div className="space-y-4">
+            {/* Ask */}
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-3">
+              <p className="text-sm font-semibold text-white flex items-center gap-2">
+                <HelpCircle className="w-4 h-4 text-violet-400" /> Pregunta a la comunidad
+              </p>
+              <p className="text-xs text-zinc-500">
+                Las preguntas son anónimas. Nadie sabe quién pregunta. Las respuestas pueden ser anónimas o con nombre.
+              </p>
+              <textarea
+                value={questionText}
+                onChange={(e) => setQuestionText(e.target.value)}
+                placeholder="¿Qué te gustaría preguntar?"
+                rows={2}
+                maxLength={500}
+                className="w-full rounded-lg border border-zinc-700 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-zinc-600 resize-none focus:border-violet-500/50 focus:outline-none"
+              />
+              <div className="flex justify-between items-center">
+                <p className="text-[10px] text-zinc-600">{questionText.length}/500 · Anónima</p>
+                <button
+                  onClick={() => void handleAskQuestion()}
+                  disabled={!questionText.trim() || posting}
+                  className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-xs font-semibold text-white hover:bg-violet-500 disabled:opacity-40 transition-all"
+                >
+                  <Send className="w-3.5 h-3.5" /> Preguntar
+                </button>
+              </div>
+            </div>
+
+            {/* Questions list */}
+            {loading ? (
+              <p className="text-sm text-zinc-500 text-center py-8">Cargando preguntas...</p>
+            ) : questions.length === 0 ? (
+              <div className="text-center py-12 space-y-2">
+                <HelpCircle className="w-10 h-10 text-zinc-700 mx-auto" />
+                <p className="text-zinc-500">Aún no hay preguntas. Sé el primero.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {questions.map((q) => (
+                  <div key={q.id} className="rounded-xl border border-zinc-800 bg-zinc-900/50 overflow-hidden">
+                    {/* Question */}
+                    <div className="p-5">
+                      <p className="text-base text-white font-medium leading-relaxed">{q.content}</p>
+                      <div className="flex items-center gap-3 mt-3 text-xs text-zinc-500">
+                        <span>{q.answerCount} {q.answerCount === 1 ? "respuesta" : "respuestas"}</span>
+                        <span>{timeAgo(q.createdAt)}</span>
+                        {q.isForMe && (
+                          <span className="text-cyan-400 font-semibold">Para ti</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Answers */}
+                    {q.answers.length > 0 && (
+                      <div className="border-t border-zinc-800 divide-y divide-zinc-800/50">
+                        {q.answers.map((a) => (
+                          <div key={a.id} className="px-5 py-3 bg-zinc-950/50">
+                            <p className="text-sm text-zinc-300 leading-relaxed">{a.content}</p>
+                            <div className="flex items-center gap-3 mt-2 text-xs text-zinc-600">
+                              <span>{a.author ?? "Anónimo"}</span>
+                              <span>{timeAgo(a.createdAt)}</span>
+                              <button className="inline-flex items-center gap-1 hover:text-fuchsia-400 transition-colors">
+                                <Heart className="w-3 h-3" /> {a.likes}
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Answer form */}
+                    <div className="border-t border-zinc-800 p-4">
+                      {answeringId === q.id ? (
+                        <div className="space-y-2">
+                          <textarea
+                            value={answerText}
+                            onChange={(e) => setAnswerText(e.target.value)}
+                            placeholder="Tu respuesta..."
+                            rows={2}
+                            maxLength={1000}
+                            className="w-full rounded-lg border border-zinc-700 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-zinc-600 resize-none focus:border-violet-500/50 focus:outline-none"
+                          />
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => void handleAnswer(q.id)}
+                              disabled={!answerText.trim() || posting}
+                              className="rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500 disabled:opacity-40"
+                            >
+                              Responder
+                            </button>
+                            <button
+                              onClick={() => { setAnsweringId(null); setAnswerText(""); }}
+                              className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs text-zinc-400 hover:text-white"
+                            >
+                              Cancelar
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setAnsweringId(q.id)}
+                          className="text-xs text-violet-400 hover:text-violet-300 font-medium transition-colors"
+                        >
+                          Responder a esta pregunta
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>

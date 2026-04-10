@@ -102,6 +102,16 @@ export default function Footer() {
                 </a>
               </li>
               <li>
+                <a href="/calculadora-latidos" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Calculadora de latidos
+                </a>
+              </li>
+              <li>
+                <a href="/guia" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Guía de uso
+                </a>
+              </li>
+              <li>
                 <a href="/app" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Acceder
                 </a>

@@ -1,5 +1,6 @@
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
+import { dispatchN8nEvent } from "@/lib/n8n";
 import type {
   ProjectPhase,
   ProjectCoachContext,
@@ -119,6 +120,8 @@ export async function createProject(
     })),
   });
 
+  dispatchN8nEvent("project.created", { projectId: project.id, title }, userId);
+
   return project;
 }
 
@@ -165,6 +168,8 @@ export async function updateProjectPhase(
       content: `Transicion de fase: ${oldPhase} → ${newPhase}`,
     },
   });
+
+  dispatchN8nEvent("project.phase_change", { projectId, oldPhase, newPhase }, userId);
 
   return updated;
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import Link from "next/link";
 import {
   ArrowRight,
   ChartNoAxesColumn,
@@ -410,14 +411,19 @@ export default function HomeWorkspace({
                   </div>
                 )}
 
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => onTabChange("chat")}
-                >
-                  Volver al chat
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => onTabChange("chat")}
+                  >
+                    Volver al chat
+                  </Button>
+                  <Button asChild type="button" variant="outline" className="flex-1">
+                    <Link href="/app/goals">Historial de objetivos</Link>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -537,6 +543,12 @@ export default function HomeWorkspace({
                   Ver plan activo
                   <ChartNoAxesColumn className="size-4" />
                 </Button>
+                <Button asChild type="button" variant="outline" size="sm" className="justify-between">
+                  <Link href="/app/checkins">
+                    Historial de check-ins
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </Button>
               </CardContent>
             </Card>
           </div>
@@ -551,8 +563,11 @@ export default function HomeWorkspace({
               Esto es lo que llevas posponiendo y por qué. Mirarlo de frente es el primer paso.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <AvoidanceMap />
+            <Button asChild type="button" variant="outline" size="sm">
+              <Link href="/app/patrones">Ver analisis completo de patrones</Link>
+            </Button>
           </CardContent>
         </Card>
       </TabsContent>

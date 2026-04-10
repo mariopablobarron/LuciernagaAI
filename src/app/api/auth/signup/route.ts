@@ -9,6 +9,7 @@ import { getUserSessionProfile, normalizeEmail } from "@/services/user";
 import { sendUserEmail, buildVerificationEmail, buildWelcomeEmail } from "@/lib/email";
 import { issueWebLinkToken } from "@/lib/telegram-link";
 import { sendAlert } from "@/lib/alerts";
+import { dispatchN8nEvent } from "@/lib/n8n";
 import { validateOrigin } from "@/lib/csrf";
 import { scheduleOnboardingEmails } from "@/services/onboarding-emails";
 
@@ -174,6 +175,7 @@ export async function POST(req: NextRequest) {
         title: "Nuevo usuario registrado",
         message: `${name || "Sin nombre"} (${email})${phone ? ` — Tel: ${phone}` : ""}`,
       }).catch(() => {});
+      dispatchN8nEvent("user.signup", { email, name, phone, source: utmSource, orgId }, result.userId);
     }
 
     // Send verification + welcome emails for new and upgraded users

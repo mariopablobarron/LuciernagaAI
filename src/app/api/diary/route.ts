@@ -7,6 +7,7 @@ import {
 } from "@/lib/auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
+import { dispatchN8nEvent } from "@/lib/n8n";
 
 export const dynamic = "force-dynamic";
 
@@ -63,6 +64,8 @@ export async function POST(req: NextRequest) {
         tags,
       },
     });
+
+    dispatchN8nEvent("diary.entry", { mood, tags }, identity.userId);
 
     const response = NextResponse.json({ entry }, { status: 201 });
     if (identity.shouldSetCookie) {

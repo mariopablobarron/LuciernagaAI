@@ -6,6 +6,7 @@ import {
   resolveIdentity,
 } from "@/lib/auth";
 import { logError, logInfo } from "@/lib/logger";
+import { dispatchN8nEvent } from "@/lib/n8n";
 import { getPrismaClient } from "@/db/prisma";
 import { createGoalForUser, getActiveGoalForUser } from "@/services/goals";
 import { trackSafe } from "@/services/events";
@@ -176,16 +177,7 @@ export async function POST(
     });
 
     // 5. Notify n8n — fire-and-forget ────────────────────────────────────────
-    const n8nUrl = process.env.N8N_ACTION_WEBHOOK;
-    if (n8nUrl) {
-      void fetch(n8nUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, userId: identity.userId, state: updatedState }),
-      }).catch((err) =>
-        logError("EXPLORE", err instanceof Error ? err : new Error(String(err)), { context: "n8n_webhook", userId: identity.userId }),
-      );
-    }
+    dispatchN8nEvent("action.completed", { type, userId: identity.userId, state: updatedState }, identity.userId);
 
     // 6. Telegram admin alerts (all fire-and-forget via notifyAdmin) ──────────
     if (updatedState === "bloqueo" || updatedState === "claridad") {

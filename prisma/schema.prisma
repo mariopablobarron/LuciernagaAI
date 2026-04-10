@@ -94,6 +94,9 @@ model User {
   notifications        Notification[]
   heartbeats           Heartbeat[]
   commitments     DailyCommitment[]
+  questionsAsked    AnonQuestion[]  @relation("QuestionsAsked")
+  questionsReceived AnonQuestion[]  @relation("QuestionsReceived")
+  anonAnswers       AnonAnswer[]
   preferences     UserPreferences?
   trustedContact  TrustedContact?
   supportMessages SupportMessage[]
@@ -1298,6 +1301,40 @@ model LiveSession {
 
   @@index([scheduledAt])
   @@index([circleId, scheduledAt])
+}
+
+// ─── Community: Anonymous Questions (ask.fm style) ──────────────────────────
+
+/// Anonymous question asked to the community or to a specific user.
+model AnonQuestion {
+  id          String        @id @default(cuid())
+  content     String        // the question text (max 500)
+  authorId    String?       // null = truly anonymous (not logged in — future)
+  targetId    String?       // null = asked to everyone; set = asked to specific user
+  hidden      Boolean       @default(false) // moderation
+  createdAt   DateTime      @default(now())
+  author      User?         @relation("QuestionsAsked", fields: [authorId], references: [id], onDelete: SetNull)
+  target      User?         @relation("QuestionsReceived", fields: [targetId], references: [id], onDelete: SetNull)
+  answers     AnonAnswer[]
+
+  @@index([targetId, createdAt])
+  @@index([hidden, createdAt])
+}
+
+/// Answer to an anonymous question — can also be anonymous.
+model AnonAnswer {
+  id         String       @id @default(cuid())
+  questionId String
+  userId     String
+  content    String       // max 1000
+  anonymous  Boolean      @default(false)
+  likes      Int          @default(0)
+  hidden     Boolean      @default(false)
+  createdAt  DateTime     @default(now())
+  question   AnonQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([questionId, createdAt])
 }
 
 // ─── Push Notifications ─────────────────────────────────────────────────────

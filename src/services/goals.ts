@@ -1,4 +1,5 @@
 import { getPrismaClient } from "@/db/prisma";
+import { dispatchN8nEvent } from "@/lib/n8n";
 import { ensureUserSession } from "@/services/conversation";
 import { GoalStatus } from "@prisma/client";
 
@@ -646,6 +647,10 @@ export async function updateGoalAction(params: {
       ...goal,
       status: nextStatus,
     };
+
+    if (nextStatus === "completed") {
+      dispatchN8nEvent("goal.completed", { goalId: goal.id, goalTitle: goal.title }, params.userId);
+    }
   }
 
   return mapGoalWithProgress(goal);

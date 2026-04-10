@@ -10,6 +10,7 @@
  */
 
 import { logError, logInfo } from "@/lib/logger";
+import { dispatchN8nEvent } from "@/lib/n8n";
 import { sendCrisisEscalationAlert } from "@/lib/alerts";
 import { generateDecision as generateDomainDecision } from "@/domain/decisionEngine";
 import {
@@ -235,14 +236,7 @@ export async function interceptTransitionalVoid(input: InterceptInput): Promise<
     metadata: { conversationId: input.conversationId, state: input.state },
   });
 
-  const n8nWebhook = process.env.N8N_TRANSITIONAL_VOID_WEBHOOK;
-  if (n8nWebhook) {
-    void fetch(n8nWebhook, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: input.userId, state: "TRANSITIONAL_VOID" }),
-    }).catch(() => {});
-  }
+  dispatchN8nEvent("state.transitional_void", { state: "TRANSITIONAL_VOID" }, input.userId);
 
   if (input.persistenceAvailable) {
     try {

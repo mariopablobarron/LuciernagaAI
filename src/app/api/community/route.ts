@@ -7,6 +7,7 @@ import {
 } from "@/lib/auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
+import { dispatchN8nEvent } from "@/lib/n8n";
 
 export const dynamic = "force-dynamic";
 
@@ -123,6 +124,8 @@ export async function POST(req: NextRequest) {
         anonymous: body.anonymous !== false, // default true
       },
     });
+
+    dispatchN8nEvent("community.post", { postId: post.id, anonymous: post.anonymous }, identity.userId);
 
     const response = NextResponse.json(
       {

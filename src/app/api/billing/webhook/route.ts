@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe';
 import { getPrismaClient } from '@/db/prisma';
 import { notifyAdmin, buildAdminAlert } from '@/services/telegram';
 import { logError, logInfo, logWarn } from '@/lib/logger';
+import { dispatchN8nEvent } from '@/lib/n8n';
 import { STRIPE_PLANS } from '@/lib/stripe';
 import { invalidateUserCache } from '@/services/user';
 import Stripe from 'stripe';
@@ -82,6 +83,8 @@ async function upgradeToPro(sub: Stripe.Subscription, email?: string | null) {
 
   // Bust cached access state so the user sees their new plan immediately
   invalidateUserCache(user.id);
+
+  dispatchN8nEvent("subscription.changed", { plan: "pro", status: subStatus, stripeId: sub.id }, user.id);
 
   return user;
 }

@@ -1,6 +1,7 @@
 import { getPrismaClient } from "@/db/prisma";
 import { PRODUCT_DISCLAIMERS, RESPONSIBLE_USE_NOTES, formatCrisisResourceLines } from "@/lib/legal";
 import { logError, logInfo } from "@/lib/logger";
+import { dispatchN8nEvent } from "@/lib/n8n";
 import { buildAdminAlert, notifyAdmin } from "@/services/telegram";
 import { safeFamilyNotify, notifyTrustedContactOnCrisis } from "@/services/family";
 
@@ -202,6 +203,8 @@ export async function registerCrisisEvent(payload: CrisisEventPayload): Promise<
       userId: payload.userId,
       level: payload.level,
     });
+
+    dispatchN8nEvent("crisis.detected", { level: payload.level, message: payload.message }, payload.userId);
 
     // Notify psychologist/admin immediately for high and critical events
     if (payload.level === "high" || payload.level === "critical") {

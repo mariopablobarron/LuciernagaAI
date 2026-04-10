@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   BarChart3, BookOpen, Building2, FlaskConical, LayoutDashboard, LogOut,
   Megaphone, Menu, Settings, Shield, ShieldCheck, Sparkles, Stethoscope,
-  Users, Wrench, X, Database,
+  Users, Webhook, Wrench, X, Database,
 } from "lucide-react";
 
 type AdminShellProps = {
@@ -27,6 +27,7 @@ const NAV_LINKS = [
   { href: "/admin-clinical", label: "Panel clinico", icon: Stethoscope, matchPrefix: true },
   { href: "/admin/operaciones", label: "Operaciones", icon: Wrench },
   { href: "/admin/team", label: "Equipo", icon: Shield },
+  { href: "/admin/integraciones", label: "Integraciones", icon: Webhook },
   { href: "/admin/settings", label: "Configuracion", icon: Settings, matchPrefix: true },
   { href: "/admin/guia", label: "Guia", icon: BookOpen },
 ];

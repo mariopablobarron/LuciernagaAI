@@ -1,124 +1,213 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { MessageSquarePlus, X, Send, CheckCircle2 } from "lucide-react";
+import { MessageSquarePlus, Star, X } from "lucide-react";
+import { toast } from "sonner";
+import { useSfx } from "@/lib/useSfx";
 
-const TYPES = [
-  { value: "suggestion", label: "Sugerencia" },
-  { value: "bug", label: "Problema" },
-  { value: "other", label: "Otro" },
-] as const;
+// ─── Config ──────────────────────────────────────────────────────────────────
+
+const LAST_SHOWN_KEY = "feedback-last-shown";
+const MIN_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000; // once per week max
+
+type FeedbackType = "suggestion" | "bug" | "other";
+
+const TYPE_OPTIONS: { value: FeedbackType; label: string; emoji: string }[] = [
+  { value: "suggestion", label: "Sugerencia", emoji: "💡" },
+  { value: "bug", label: "Problema", emoji: "🐛" },
+  { value: "other", label: "Otro", emoji: "💬" },
+];
+
+// ─── Component ───────────────────────────────────────────────────────────────
 
 export default function FeedbackWidget() {
   const pathname = usePathname();
+  const sfx = useSfx();
   const [open, setOpen] = useState(false);
-  const [type, setType] = useState("suggestion");
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [type, setType] = useState<FeedbackType>("suggestion");
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
 
-  const handleSubmit = useCallback(async () => {
-    if (!message.trim() || message.trim().length < 5) return;
+  // Auto-prompt once per week, 90s into the session
+  useEffect(() => {
+    const last = localStorage.getItem(LAST_SHOWN_KEY);
+    if (last && Date.now() - Number(last) < MIN_INTERVAL_MS) return;
+    const timer = setTimeout(() => {
+      setOpen(true);
+      localStorage.setItem(LAST_SHOWN_KEY, String(Date.now()));
+    }, 90_000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const close = useCallback(() => setOpen(false), []);
+
+  const submit = useCallback(async () => {
+    if (sending) return;
+    if (!rating && message.trim().length < 5) {
+      toast.error("Selecciona una valoracion o escribe un comentario");
+      return;
+    }
     setSending(true);
     try {
       const res = await fetch("/api/user/feedback", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, message: message.trim(), page: pathname }),
+        body: JSON.stringify({
+          type: rating ? "nps" : type,
+          rating: rating || undefined,
+          message: message.trim() || undefined,
+          page: pathname,
+        }),
       });
-      if (res.ok) {
-        setSent(true);
-        setMessage("");
-        setTimeout(() => {
-          setSent(false);
-          setOpen(false);
-        }, 2000);
+      if (!res.ok) {
+        const data = await res.json().catch(() => null) as { error?: string } | null;
+        throw new Error(data?.error || "Error al enviar");
       }
-    } catch {
-      // Silent
+      sfx.play("success");
+      setSent(true);
+      localStorage.setItem(LAST_SHOWN_KEY, String(Date.now()));
+      setTimeout(() => {
+        setOpen(false);
+        setTimeout(() => { setSent(false); setRating(0); setMessage(""); setType("suggestion"); }, 300);
+      }, 2000);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo enviar");
     } finally {
       setSending(false);
     }
-  }, [type, message, pathname]);
+  }, [rating, type, message, pathname, sending, sfx]);
+
+  // Escape to close
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") close(); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, close]);
+
+  const ratingLabel =
+    rating <= 2 ? "Sentimos que no haya sido mejor. Cuentanos mas." :
+    rating === 3 ? "Bien, pero se puede mejorar." :
+    rating === 4 ? "Nos alegra." : "Genial!";
 
   return (
     <>
-      {/* Trigger button — small, bottom-right, subtle */}
+      {/* Floating tab — right edge */}
       {!open && (
         <button
+          type="button"
           onClick={() => setOpen(true)}
-          className="fixed bottom-24 right-4 z-40 p-2.5 rounded-full bg-zinc-800/80 border border-zinc-700/50 text-zinc-500 hover:text-violet-400 hover:border-violet-500/40 hover:bg-zinc-800 transition-all backdrop-blur-sm"
-          title="Enviar feedback"
+          className="fixed right-0 top-1/2 -translate-y-1/2 z-40 flex items-center gap-1.5 rounded-l-xl border border-r-0 border-zinc-700/60 bg-zinc-900/95 px-3 py-2.5 text-xs font-medium text-zinc-400 hover:text-fuchsia-400 hover:border-fuchsia-500/40 hover:bg-zinc-900 backdrop-blur-sm shadow-lg transition-all"
         >
           <MessageSquarePlus className="w-4 h-4" />
+          <span className="hidden sm:inline">Feedback</span>
         </button>
       )}
 
-      {/* Panel */}
+      {/* Modal */}
       {open && (
-        <div className="fixed bottom-24 right-4 z-50 w-80 rounded-xl border border-zinc-700/60 bg-zinc-900/95 backdrop-blur-md shadow-2xl shadow-black/40 animate-in slide-in-from-bottom-2 fade-in duration-200">
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800/60">
-            <p className="text-sm font-semibold text-zinc-200">Feedback</p>
-            <button
-              onClick={() => setOpen(false)}
-              className="p-1 text-zinc-500 hover:text-zinc-300 transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-
-          {sent ? (
-            <div className="px-4 py-8 text-center">
-              <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
-              <p className="text-sm text-emerald-300 font-medium">Gracias por tu feedback</p>
-            </div>
-          ) : (
-            <div className="p-4 space-y-3">
-              {/* Type selector */}
-              <div className="flex gap-1.5">
-                {TYPES.map((t) => (
-                  <button
-                    key={t.value}
-                    onClick={() => setType(t.value)}
-                    className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-medium transition-all ${
-                      type === t.value
-                        ? "bg-violet-500/20 text-violet-300 border border-violet-500/40"
-                        : "bg-zinc-800/50 text-zinc-500 border border-transparent hover:text-zinc-300"
-                    }`}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Message */}
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Cuéntanos..."
-                maxLength={2000}
-                rows={3}
-                className="w-full p-3 rounded-lg bg-zinc-800/50 border border-zinc-700/50 text-sm text-zinc-100 placeholder:text-zinc-600 resize-none focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/30"
-              />
-
-              {/* Submit */}
-              <button
-                onClick={handleSubmit}
-                disabled={sending || message.trim().length < 5}
-                className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <Send className="w-3.5 h-3.5" />
-                {sending ? "Enviando..." : "Enviar"}
+        <div
+          className="fixed inset-0 z-[9998] flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150"
+          onClick={close}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl border border-zinc-700/60 bg-zinc-900 shadow-2xl shadow-black/50 animate-in slide-in-from-bottom-4 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 pt-5 pb-2">
+              <h2 className="text-sm font-semibold text-white">
+                {sent ? "Gracias" : "Tu opinion nos importa"}
+              </h2>
+              <button onClick={close} className="p-1.5 text-zinc-500 hover:text-white transition-colors rounded-md hover:bg-white/5">
+                <X className="w-4 h-4" />
               </button>
-
-              <p className="text-[10px] text-zinc-600 text-center">
-                Tu feedback nos ayuda a mejorar
-              </p>
             </div>
-          )}
+
+            {sent ? (
+              <div className="px-5 pb-6 pt-2 text-center space-y-2">
+                <p className="text-3xl">💜</p>
+                <p className="text-sm text-zinc-300">Tu feedback nos ayuda a mejorar.</p>
+              </div>
+            ) : (
+              <div className="px-5 pb-5 space-y-4">
+                {/* Star rating */}
+                <div className="space-y-2">
+                  <p className="text-xs text-zinc-500">Como valoras tu experiencia?</p>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <button
+                        key={n}
+                        type="button"
+                        onClick={() => setRating(n)}
+                        onMouseEnter={() => setHoverRating(n)}
+                        onMouseLeave={() => setHoverRating(0)}
+                        className="p-1 transition-transform hover:scale-110"
+                      >
+                        <Star
+                          className={`w-7 h-7 transition-colors ${
+                            n <= (hoverRating || rating)
+                              ? "text-fuchsia-400 fill-fuchsia-400"
+                              : "text-zinc-700"
+                          }`}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                  {rating > 0 && <p className="text-xs text-zinc-500">{ratingLabel}</p>}
+                </div>
+
+                {/* Type selector */}
+                <div className="space-y-2">
+                  <p className="text-xs text-zinc-500">Tipo de feedback</p>
+                  <div className="flex gap-2">
+                    {TYPE_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setType(opt.value)}
+                        className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${
+                          type === opt.value
+                            ? "bg-fuchsia-500/15 border border-fuchsia-500/40 text-fuchsia-300"
+                            : "border border-zinc-800 text-zinc-500 hover:text-zinc-300 hover:border-zinc-700"
+                        }`}
+                      >
+                        {opt.emoji} {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Message */}
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Que te gustaria que mejorara..."
+                  rows={3}
+                  maxLength={2000}
+                  className="w-full rounded-xl border border-zinc-800 bg-black/40 px-3 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-fuchsia-500/50 resize-none"
+                />
+
+                {/* Submit */}
+                <button
+                  type="button"
+                  onClick={() => void submit()}
+                  disabled={sending || (!rating && message.trim().length < 5)}
+                  className="w-full rounded-xl bg-fuchsia-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-fuchsia-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  {sending ? "Enviando..." : "Enviar feedback"}
+                </button>
+
+                <p className="text-[10px] text-zinc-700 text-center">
+                  Tu feedback es anonimo y nos ayuda a priorizar mejoras.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </>

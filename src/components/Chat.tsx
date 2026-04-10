@@ -211,7 +211,7 @@ function MessageBubble({ message, isStreaming }: { message: ChatMessage; isStrea
           </div>
           <button
             onClick={() => void handleCopy()}
-            className="absolute -left-8 top-1 opacity-0 transition-opacity group-hover:opacity-100"
+            className="absolute -left-10 top-0 p-2 opacity-0 transition-opacity group-hover:opacity-100"
           >
             {copied ? (
               <Check className="h-3.5 w-3.5 text-emerald-400" />
@@ -261,7 +261,7 @@ function MessageBubble({ message, isStreaming }: { message: ChatMessage; isStrea
         {!isStreaming && (
           <button
             onClick={() => void handleCopy()}
-            className="absolute -right-8 top-1 opacity-0 transition-opacity group-hover:opacity-100"
+            className="absolute -right-10 top-0 p-2 opacity-0 transition-opacity group-hover:opacity-100"
           >
             {copied ? (
               <Check className="h-3.5 w-3.5 text-emerald-400" />
@@ -537,7 +537,7 @@ export default function Chat({
             {!loading && conversationId && messages.some((m) => m.role === "assistant") && (
               <div className="flex items-center gap-2 px-1 pb-1">
                 <Heart className="h-3 w-3 text-zinc-600" />
-                <span className="text-[11px] text-zinc-600">¿Fue útil esta sesión?</span>
+                <span className="text-xs text-zinc-600">¿Fue útil?</span>
                 <button
                   type="button"
                   onClick={() => {
@@ -602,7 +602,7 @@ export default function Chat({
             placeholder="Escribe lo que te pasa… (Enter para enviar)"
             disabled={loading}
             rows={1}
-            className="min-h-11 max-h-36 flex-1 resize-none overflow-hidden rounded-xl border-zinc-800 bg-zinc-900 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-indigo-500/50"
+            className="min-h-11 max-h-24 sm:max-h-36 flex-1 resize-none overflow-hidden rounded-xl border-zinc-800 bg-zinc-900 text-base sm:text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-indigo-500/50"
             style={{ fieldSizing: "content" } as React.CSSProperties}
           />
           <VoiceRecorder

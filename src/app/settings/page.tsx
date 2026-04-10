@@ -24,8 +24,10 @@ import {
   User,
   X,
   AlertTriangle,
+  HelpCircle,
 } from 'lucide-react';
 import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
+import { resetAllTours } from '@/components/GuidedTour';
 import type { BrowserSessionUser } from '@/lib/session-client';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -846,6 +848,25 @@ export default function SettingsPage() {
               Datos completos (JSON)
             </button>
           </div>
+        </div>
+
+        {/* ── Help ────────────────────────────────────────────────────── */}
+        <div className={`${COMPONENTS.card} p-6 space-y-4`}>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-fuchsia-500/15 flex items-center justify-center">
+              <HelpCircle className="w-4 h-4 text-fuchsia-400" />
+            </div>
+            <h2 className="text-lg font-semibold text-white">Ayuda</h2>
+          </div>
+          <button
+            onClick={() => {
+              resetAllTours();
+              toast.success('Tour reiniciado — vuelve al chat para verlo');
+            }}
+            className={`${COMPONENTS.buttonSecondary} w-full`}
+          >
+            Repetir el tour guiado
+          </button>
         </div>
 
         {/* ── Danger Zone ────────────────────────────────────────────── */}

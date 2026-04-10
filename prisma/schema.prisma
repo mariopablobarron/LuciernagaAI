@@ -829,7 +829,8 @@ model UserExercise {
 model Feedback {
   id        String   @id @default(cuid())
   userId    String
-  type      String   @default("suggestion") // "suggestion" | "bug" | "other"
+  type      String   @default("suggestion") // "suggestion" | "bug" | "other" | "nps"
+  rating    Int?     // 1-5 star rating (null for text-only feedback)
   message   String   @db.Text
   page      String?  // URL path where feedback was submitted
   createdAt DateTime @default(now())

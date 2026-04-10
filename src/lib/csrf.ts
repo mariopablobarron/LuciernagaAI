@@ -29,7 +29,11 @@ export function validateOrigin(req: NextRequest): boolean {
   // In dev/test (no base URL), allow to avoid breaking local tooling.
   if (!incoming) {
     const baseUrl = process.env.APP_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "";
-    if (!baseUrl) return true; // dev/test — no base URL configured
+    if (!baseUrl) {
+      // In production without base URL, reject origin-less mutation requests
+      if (process.env.NODE_ENV === "production") return false;
+      return true; // dev/test — no base URL configured
+    }
     const hasCronSecret = req.nextUrl.searchParams.get("secret") === process.env.CRON_SECRET?.trim();
     const hasSessionCookie = req.cookies.has("session") || req.cookies.has("auth_token");
     const isAuthEndpoint = req.nextUrl.pathname.startsWith("/api/auth/");
@@ -42,9 +46,9 @@ export function validateOrigin(req: NextRequest): boolean {
     "";
 
   if (!baseUrl) {
-    // If we have no configured base URL we can't validate — allow to avoid
-    // breaking local development.
-    return true;
+    // In production, reject if no base URL — configuration error
+    if (process.env.NODE_ENV === "production") return false;
+    return true; // dev/test — allow
   }
 
   try {

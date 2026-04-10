@@ -1,13 +1,17 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { sendUserEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
 // GET /api/admin/test-email?secret=CRON_SECRET&to=email@example.com
 export async function GET(req: NextRequest) {
+  // Require admin auth OR CRON_SECRET
   const secret = req.nextUrl.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const hasCronSecret = secret && secret === process.env.CRON_SECRET?.trim();
+  if (!hasCronSecret) {
+    const auth = requireAdminPermission(req, "settings");
+    if (auth instanceof NextResponse) return auth;
   }
 
   const to = req.nextUrl.searchParams.get("to");

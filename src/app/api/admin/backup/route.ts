@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { logError, logInfo } from "@/lib/logger";
 import { notifyAdmin } from "@/services/telegram";
 import pg from "pg";
@@ -10,9 +11,12 @@ export const maxDuration = 120;
 // Pure-JS PostgreSQL backup — no pg_dump binary needed.
 // Returns a gzipped SQL file with CREATE TABLE + COPY data for all tables.
 export async function GET(req: NextRequest) {
+  // Require admin auth OR CRON_SECRET (for automated backups)
   const secret = req.nextUrl.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const hasCronSecret = secret && secret === process.env.CRON_SECRET?.trim();
+  if (!hasCronSecret) {
+    const auth = requireAdminPermission(req, "backup");
+    if (auth instanceof NextResponse) return auth;
   }
 
   const dbUrl = process.env.DATABASE_URL?.trim();

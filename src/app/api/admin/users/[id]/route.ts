@@ -115,7 +115,6 @@ export async function GET(req: NextRequest, { params }: Params) {
           },
         },
         orderBy: { updatedAt: "desc" },
-        take: 12,
       }),
       prisma.message.findMany({
         where: { userId: id },
@@ -127,7 +126,6 @@ export async function GET(req: NextRequest, { params }: Params) {
           conversationId: true,
         },
         orderBy: { createdAt: "desc" },
-        take: 20,
       }),
       prisma.goal.findMany({
         where: { userId: id, status: "active" },
@@ -144,7 +142,6 @@ export async function GET(req: NextRequest, { params }: Params) {
               completed: true,
             },
             orderBy: { createdAt: "desc" },
-            take: 15,
           },
         },
         orderBy: { updatedAt: "desc" },
@@ -159,7 +156,6 @@ export async function GET(req: NextRequest, { params }: Params) {
           createdAt: true,
         },
         orderBy: { createdAt: "desc" },
-        take: 20,
       }),
       prisma.avoidanceEvent.findMany({
         where: { userId: id },
@@ -178,7 +174,6 @@ export async function GET(req: NextRequest, { params }: Params) {
           },
         },
         orderBy: { createdAt: "desc" },
-        take: 20,
       }),
       prisma.userChallenge.findMany({
         where: { userId: id },
@@ -200,7 +195,6 @@ export async function GET(req: NextRequest, { params }: Params) {
           },
         },
         orderBy: { updatedAt: "desc" },
-        take: 12,
       }),
     ]);
 

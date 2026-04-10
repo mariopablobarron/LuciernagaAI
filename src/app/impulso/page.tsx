@@ -191,6 +191,9 @@ export default function ImpulsoPage() {
   const programTotal = 21;
   const programProgress = Math.min(Math.round((programDays / programTotal) * 100), 100);
 
+  // Not started: show onboarding screen
+  const notStarted = !loading && !error && !profile;
+
   return (
     <div className="bg-zinc-950">
       {/* Background glows */}
@@ -201,14 +204,75 @@ export default function ImpulsoPage() {
 
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
 
-        {/* ── Header ─────────────────────────────────────────────── */}
+        {/* ── Welcome screen (first time) ────────────────────────── */}
+        {notStarted && (
+          <div className="max-w-2xl mx-auto space-y-8 py-8">
+            <div className="text-center space-y-4">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 border border-violet-500/30">
+                <Zap className="w-10 h-10 text-violet-400" />
+              </div>
+              <h1 className="text-4xl font-black text-white">Modo Impulso</h1>
+              <p className="text-lg text-zinc-400 max-w-lg mx-auto leading-relaxed">
+                21 dias para romper los patrones que te frenan.
+                No es motivacion — es estructura, accion y evidencia.
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              {[
+                { icon: Brain, color: "text-cyan-400", bg: "bg-cyan-500/10", border: "border-cyan-500/20", title: "Diagnostico", desc: "12 preguntas para identificar tu perfil: alto potencial, bloqueado, ansioso o desmotivado." },
+                { icon: Target, color: "text-violet-400", bg: "bg-violet-500/10", border: "border-violet-500/20", title: "Retos personalizados", desc: "Retos de 3 a 7 dias adaptados a tu perfil. Cada uno rompe un patron especifico." },
+                { icon: Flame, color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20", title: "Check-in diario", desc: "Registra tu avance cada dia. La constancia es lo que genera el cambio, no la intensidad." },
+                { icon: TrendingUp, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20", title: "Insights de comportamiento", desc: "Analisis de tus patrones en ventanas de 14 dias. Ve lo que no ves." },
+              ].map((item) => (
+                <div key={item.title} className={`rounded-xl border ${item.border} ${item.bg} p-5 space-y-2`}>
+                  <item.icon className={`w-6 h-6 ${item.color}`} />
+                  <p className="text-sm font-bold text-white">{item.title}</p>
+                  <p className="text-xs text-zinc-400 leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-3">
+              <p className="text-sm font-semibold text-white">¿Como funciona?</p>
+              <div className="space-y-2">
+                {[
+                  "Haces el diagnostico (5 min) — identificamos tu punto de partida.",
+                  "Recibes tu primer reto personalizado — adaptado a lo que te bloquea.",
+                  "Cada dia haces check-in — registras si avanzaste y como te sientes.",
+                  "A los 14 dias, el sistema te muestra tus patrones reales.",
+                  "A los 21 dias, lo que empezo como esfuerzo es habito.",
+                ].map((step, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <span className="shrink-0 w-6 h-6 rounded-full bg-violet-500/15 border border-violet-500/30 flex items-center justify-center text-xs font-bold text-violet-300">{i + 1}</span>
+                    <p className="text-sm text-zinc-400 leading-relaxed">{step}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="text-center space-y-3">
+              <Link
+                href="/impulso/diagnostico"
+                data-tour="impulso-diagnostico"
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-bold text-lg shadow-xl shadow-fuchsia-500/25 hover:from-violet-400 hover:to-fuchsia-400 active:scale-95 transition-all"
+              >
+                <Brain className="w-5 h-5" /> Empezar diagnostico
+              </Link>
+              <p className="text-xs text-zinc-600">5 minutos · 12 preguntas · gratuito</p>
+            </div>
+          </div>
+        )}
+
+        {/* ── Header (only when started) ─────────────────────────── */}
+        {!notStarted && (
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-violet-400 mb-1">
               Programa
             </p>
             <h1 className="text-3xl font-bold text-white">Impulso</h1>
-            <p className="text-zinc-400 text-sm mt-1">21 días de acción consistente</p>
+            <p className="text-zinc-400 text-sm mt-1">21 dias de accion consistente</p>
           </div>
           <Link
             href="/impulso/checkin"
@@ -218,7 +282,9 @@ export default function ImpulsoPage() {
             Check-in de hoy
           </Link>
         </div>
+        )}
 
+        {!notStarted && <>
         {/* ── Stats Row ──────────────────────────────────────────── */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {loading ? (
@@ -667,6 +733,8 @@ export default function ImpulsoPage() {
             ))}
           </div>
         )}
+
+        </>}
 
       </div>
     </div>

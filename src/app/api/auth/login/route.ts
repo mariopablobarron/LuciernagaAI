@@ -8,6 +8,8 @@ import {
 } from "@/lib/auth";
 import { getPrismaClient } from "@/db/prisma";
 import { verifyPassword } from "@/lib/password";
+// Zod validation available via @/lib/validate but login uses manual validation
+// due to dual flow (password + anonymous bootstrap)
 import { logError, logInfo } from "@/lib/logger";
 import {
   getUserSessionProfile,

@@ -316,6 +316,12 @@ export default function TestPage() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: email.trim(), state: result }),
           }).catch(() => { /* Fire-and-forget email delivery */ });
+          // Schedule day-3 follow-up email
+          fetch("/api/quiz/followup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email.trim() }),
+          }).catch(() => { /* Fire-and-forget */ });
         }
       } catch {
         setEmailStatus("error");

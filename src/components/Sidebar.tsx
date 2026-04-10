@@ -110,6 +110,7 @@ export default function Sidebar({
   type SupportMsg = { id: string; fromName: string; content: string; deliveredAt: string; readAt: string | null };
   const [supportMessages, setSupportMessages] = useState<SupportMsg[]>([]);
   const [unreadSupport, setUnreadSupport] = useState(0);
+  const [hasPendingAssessment, setHasPendingAssessment] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -124,6 +125,13 @@ export default function Sidebar({
         if (d.ok) setInvites(d.invites ?? []);
       })
       .catch(() => { /* Invites are non-critical — fail silently */ });
+
+    fetch("/api/user/assessments/pending", { credentials: "include" })
+      .then((r) => r.ok ? r.json() : null)
+      .then((d: { assessment?: unknown } | null) => {
+        if (d?.assessment) setHasPendingAssessment(true);
+      })
+      .catch(() => { /* Non-critical */ });
 
     fetch("/api/user/support-messages", { credentials: "include" })
       .then((r) => r.ok ? r.json() : null)
@@ -292,6 +300,16 @@ export default function Sidebar({
       <Separator className="my-4" />
 
       <QuickCheckin />
+
+      {hasPendingAssessment && (
+        <div className="mt-3 rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-3">
+          <p className="text-xs font-semibold text-cyan-400">Evaluacion pendiente</p>
+          <p className="mt-1 text-xs text-muted-foreground">Tu profesional te ha asignado una evaluacion. Completala para que pueda hacer seguimiento.</p>
+          <Button asChild type="button" size="sm" variant="outline" className="mt-2 w-full">
+            <Link href="/app/checkins">Completar evaluacion</Link>
+          </Button>
+        </div>
+      )}
 
       <Separator className="my-4" />
 

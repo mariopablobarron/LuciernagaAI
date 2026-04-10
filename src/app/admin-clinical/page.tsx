@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, Download, RefreshCw, ShieldAlert, User } from "lucide-react";
+import { AlertTriangle, Download, Heart, RefreshCw, Send, ShieldAlert, User } from "lucide-react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -65,6 +66,13 @@ export default function AdminClinicalPage() {
   const [riskOnly, setRiskOnly] = useState(false);
   const [page, setPage] = useState(1);
 
+  // Accompaniment
+  type AccompanimentItem = { userId: string; email: string; name: string | null; state: string; lastSeen: string; reason: string };
+  const [accompaniment, setAccompaniment] = useState<AccompanimentItem[]>([]);
+  const [interventionUserId, setInterventionUserId] = useState<string | null>(null);
+  const [interventionMsg, setInterventionMsg] = useState("");
+  const [sendingIntervention, setSendingIntervention] = useState(false);
+
   async function load() {
     setLoading(true);
     setError(null);
@@ -88,6 +96,39 @@ export default function AdminClinicalPage() {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { void load(); }, [stateFilter, riskOnly, page]);
+
+  useEffect(() => {
+    fetch("/api/admin/accompaniment", { credentials: "include" })
+      .then((r) => r.ok ? r.json() : null)
+      .then((d: { items?: AccompanimentItem[] } | null) => {
+        if (d?.items) setAccompaniment(d.items);
+      })
+      .catch(() => { /* Non-critical */ });
+  }, []);
+
+  async function sendIntervention() {
+    if (!interventionUserId || !interventionMsg.trim()) return;
+    setSendingIntervention(true);
+    try {
+      const res = await fetch("/api/admin/accompaniment", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: interventionUserId, message: interventionMsg.trim() }),
+      });
+      if (res.ok) {
+        toast.success("Mensaje de intervencion enviado");
+        setInterventionUserId(null);
+        setInterventionMsg("");
+      } else {
+        toast.error("Error al enviar mensaje");
+      }
+    } catch {
+      toast.error("Error de red");
+    } finally {
+      setSendingIntervention(false);
+    }
+  }
 
   async function handleLogout() {
     await fetch("/api/admin/logout", { method: "POST" });
@@ -116,6 +157,53 @@ export default function AdminClinicalPage() {
           Descargar PDF
         </a>
       </div>
+
+      {/* Accompaniment section */}
+      {accompaniment.length > 0 && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Heart className="w-4 h-4 text-fuchsia-400" />
+              Usuarios que necesitan acompanamiento ({accompaniment.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {accompaniment.map((item) => (
+              <div key={item.userId} className="flex items-center justify-between gap-3 rounded-xl border border-zinc-800 bg-zinc-900/50 p-3">
+                <div className="min-w-0">
+                  <Link href={`/admin-clinical/user/${item.userId}`} className="text-sm font-medium text-white hover:text-violet-300 transition-colors">
+                    {item.name || item.email.split("@")[0]}
+                  </Link>
+                  <p className="text-xs text-zinc-500 truncate">{item.reason}</p>
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  {interventionUserId === item.userId ? (
+                    <div className="flex gap-2">
+                      <input
+                        value={interventionMsg}
+                        onChange={(e) => setInterventionMsg(e.target.value)}
+                        placeholder="Mensaje..."
+                        className="w-40 rounded-lg border border-zinc-700 bg-zinc-900 px-2 py-1.5 text-xs text-white placeholder:text-zinc-600"
+                        onKeyDown={(e) => { if (e.key === "Enter") void sendIntervention(); }}
+                      />
+                      <Button size="sm" onClick={() => void sendIntervention()} disabled={sendingIntervention || !interventionMsg.trim()}>
+                        <Send className="w-3 h-3" />
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => setInterventionUserId(null)}>
+                        X
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button size="sm" variant="outline" onClick={() => setInterventionUserId(item.userId)}>
+                      <Send className="w-3 h-3 mr-1" /> Intervenir
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Filters */}
       <Card>

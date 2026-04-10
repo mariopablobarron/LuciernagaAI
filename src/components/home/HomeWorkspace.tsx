@@ -7,6 +7,7 @@ import {
   ChartNoAxesColumn,
   CheckCheck,
   ClipboardCheck,
+  Clock,
   Compass,
   MessageSquareText,
   Eye,
@@ -157,22 +158,22 @@ export default function HomeWorkspace({
       onValueChange={(value) => onTabChange(value as WorkspaceTab)}
       className="flex h-full flex-col gap-4"
     >
-      <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:w-140" data-tour="workspace-tabs">
-        <TabsTrigger value="chat" className="gap-2">
+      <TabsList className="grid w-full grid-cols-4 lg:w-140" data-tour="workspace-tabs">
+        <TabsTrigger value="chat" className="gap-1.5">
           <MessageSquareText className="size-4" />
-          Chat
+          <span className="hidden sm:inline">Chat</span>
         </TabsTrigger>
-        <TabsTrigger value="plan" className="gap-2">
+        <TabsTrigger value="plan" className="gap-1.5">
           <Target className="size-4" />
-          Plan
+          <span className="hidden sm:inline">Plan</span>
         </TabsTrigger>
-        <TabsTrigger value="checkin" className="gap-2">
+        <TabsTrigger value="checkin" className="gap-1.5">
           <ClipboardCheck className="size-4" />
-          Check-in
+          <span className="hidden sm:inline">Check-in</span>
         </TabsTrigger>
-        <TabsTrigger value="espejo" className="gap-2" title="Mapa de patrones que postergas — mirarlo de frente es el primer paso">
+        <TabsTrigger value="espejo" className="gap-1.5" title="Mapa de patrones que postergas">
           <Eye className="size-4" />
-          Espejo
+          <span className="hidden sm:inline">Espejo</span>
         </TabsTrigger>
       </TabsList>
 
@@ -264,27 +265,56 @@ export default function HomeWorkspace({
                                   {goalAction.description}
                                 </p>
                               </div>
-                              <Button
-                                type="button"
-                                variant={goalAction.completed ? "outline" : "secondary"}
-                                size="sm"
-                                disabled={goalLoading}
-                                onClick={() =>
-                                  void onToggleAction?.(goalAction.id, !goalAction.completed)
-                                }
-                              >
-                                {goalAction.completed ? (
-                                  <>
-                                    <Compass className="size-4" />
-                                    Marcar pendiente
-                                  </>
-                                ) : (
-                                  <>
-                                    <CheckCheck className="size-4" />
-                                    Marcar hecha
-                                  </>
+                              <div className="flex gap-2 shrink-0">
+                                <Button
+                                  type="button"
+                                  variant={goalAction.completed ? "outline" : "secondary"}
+                                  size="sm"
+                                  disabled={goalLoading}
+                                  onClick={() =>
+                                    void onToggleAction?.(goalAction.id, !goalAction.completed)
+                                  }
+                                >
+                                  {goalAction.completed ? (
+                                    <>
+                                      <Compass className="size-4" />
+                                      <span className="hidden sm:inline">Marcar pendiente</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <CheckCheck className="size-4" />
+                                      <span className="hidden sm:inline">Marcar hecha</span>
+                                    </>
+                                  )}
+                                </Button>
+                                {!goalAction.completed && (
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      const tomorrow = new Date();
+                                      tomorrow.setDate(tomorrow.getDate() + 1);
+                                      tomorrow.setHours(9, 0, 0, 0);
+                                      void fetch("/api/user/action-reminder", {
+                                        method: "POST",
+                                        credentials: "include",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify({
+                                          actionText: goalAction.description,
+                                          remindAt: tomorrow.toISOString(),
+                                        }),
+                                      }).then(() => {
+                                        const { toast } = require("sonner") as typeof import("sonner");
+                                        toast.success("Te recordaremos manana a las 9:00");
+                                      }).catch(() => {});
+                                    }}
+                                    title="Recordarme manana a las 9:00"
+                                  >
+                                    <Clock className="size-4" />
+                                  </Button>
                                 )}
-                              </Button>
+                              </div>
                             </div>
                           ))
                         )}

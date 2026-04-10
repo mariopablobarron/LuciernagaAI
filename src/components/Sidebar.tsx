@@ -196,13 +196,13 @@ export default function Sidebar({
           <p className="mt-1 text-sm text-muted-foreground">
             Conversaciones, continuidad y acceso rápido al producto.
           </p>
-          <Button type="button" className="mt-4 w-full justify-between" onClick={onNewConversation}>
+          <Button type="button" className="mt-4 w-full justify-between" onClick={onNewConversation} data-tour="new-conversation">
             Nueva conversación
             <Plus className="size-4" />
           </Button>
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-2" data-tour="nav-buttons">
           <Button
             asChild
             type="button"
@@ -245,6 +245,7 @@ export default function Sidebar({
 
         <Link
           href="/impulso"
+          data-tour="modo-impulso"
           className={`flex items-center justify-between rounded-2xl border px-4 py-3 text-sm transition hover:border-signal-warning/50 hover:bg-signal-warning/10 ${
             pathname.startsWith("/impulso")
               ? "border-signal-warning/40 bg-signal-warning/12 text-foreground"
@@ -422,7 +423,7 @@ export default function Sidebar({
           </ScrollArea>
         </div>
 
-        <div id="mi-progreso" className="space-y-4">
+        <div id="mi-progreso" data-tour="mi-progreso" className="space-y-4">
           <div className="rounded-2xl border border-border bg-muted/40 p-4">
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="secondary" className="rounded-full px-3 py-1">

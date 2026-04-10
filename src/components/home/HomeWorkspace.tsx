@@ -156,7 +156,7 @@ export default function HomeWorkspace({
       onValueChange={(value) => onTabChange(value as WorkspaceTab)}
       className="flex h-full flex-col gap-4"
     >
-      <TabsList className="grid w-full grid-cols-4 lg:w-140">
+      <TabsList className="grid w-full grid-cols-4 lg:w-140" data-tour="workspace-tabs">
         <TabsTrigger value="chat" className="gap-2">
           <MessageSquareText className="size-4" />
           Chat

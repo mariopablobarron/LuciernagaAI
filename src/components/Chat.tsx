@@ -593,7 +593,7 @@ export default function Chat({
       </div>
 
       {/* ── Input area ──────────────────────────────────────────────────── */}
-      <div className="shrink-0 border-t border-zinc-800/60 bg-zinc-950 px-3 py-3" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
+      <div className="shrink-0 border-t border-zinc-800/60 bg-zinc-950 px-3 py-3" data-tour="chat-input" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
         <div className="relative flex items-end gap-2">
           <Textarea
             value={input}

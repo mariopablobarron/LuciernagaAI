@@ -218,6 +218,44 @@ export default function ImpulsoPage() {
               </p>
             </div>
 
+            {/* Why 21 days */}
+            <div className="rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-500/5 to-fuchsia-500/5 p-6 sm:p-8 space-y-4">
+              <h2 className="text-lg font-bold text-white">¿Por que 21 dias?</h2>
+              <div className="space-y-3 text-sm text-zinc-400 leading-relaxed">
+                <p>
+                  La investigacion en psicologia del comportamiento muestra que un habito no se forma en un dia
+                  ni se rompe con una decision. Se necesita <strong className="text-white">repeticion sostenida</strong> en
+                  un entorno con estructura y retroalimentacion.
+                </p>
+                <p>
+                  21 dias es el punto donde lo que empezo como esfuerzo consciente empieza a convertirse en
+                  <strong className="text-white"> inercia positiva</strong>. No es magia — es neuroplasticidad: tu cerebro
+                  crea nuevas conexiones cuando repites una accion con intencion.
+                </p>
+              </div>
+              <div className="grid grid-cols-3 gap-3 pt-2">
+                <div className="text-center p-3 rounded-xl bg-zinc-900/50 border border-zinc-800">
+                  <p className="text-2xl font-black text-cyan-400">7</p>
+                  <p className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider mt-1">Primer ciclo</p>
+                  <p className="text-[10px] text-zinc-600 mt-0.5">Rompes la inercia</p>
+                </div>
+                <div className="text-center p-3 rounded-xl bg-zinc-900/50 border border-zinc-800">
+                  <p className="text-2xl font-black text-violet-400">14</p>
+                  <p className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider mt-1">Segundo ciclo</p>
+                  <p className="text-[10px] text-zinc-600 mt-0.5">Ves tus patrones</p>
+                </div>
+                <div className="text-center p-3 rounded-xl bg-zinc-900/50 border border-zinc-800">
+                  <p className="text-2xl font-black text-fuchsia-400">21</p>
+                  <p className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider mt-1">Transformacion</p>
+                  <p className="text-[10px] text-zinc-600 mt-0.5">El cambio es tuyo</p>
+                </div>
+              </div>
+              <p className="text-xs text-zinc-500 italic">
+                No se trata de ser perfecto 21 dias. Se trata de no abandonar cuando fallas en el dia 4.
+                El sistema te acompana para que el dia 5 vuelvas.
+              </p>
+            </div>
+
             <div className="grid sm:grid-cols-2 gap-4">
               {[
                 { icon: Brain, color: "text-cyan-400", bg: "bg-cyan-500/10", border: "border-cyan-500/20", title: "Diagnostico", desc: "12 preguntas para identificar tu perfil: alto potencial, bloqueado, ansioso o desmotivado." },

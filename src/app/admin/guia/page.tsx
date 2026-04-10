@@ -1,180 +1,320 @@
 "use client";
 
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
-  ShieldCheck, Users, Brain, AlertTriangle, BarChart3,
-  Bell, Terminal, CreditCard, Clock, ChevronRight,
-  Building2, Heart, Send, Eye, Flame, Activity,
-  BookOpen, Lock, Zap, MessageCircle, Bot,
+  BookOpen, Download, Users, Building2, ShieldCheck,
+  Stethoscope, ChevronRight, FileText, Loader2, ExternalLink,
 } from "lucide-react";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 
 /* ------------------------------------------------------------------ */
-/*  Data                                                               */
+/*  Types & constants                                                  */
 /* ------------------------------------------------------------------ */
 
-type Step = { text: string };
-type Feature = { icon: typeof ShieldCheck; label: string; desc: string };
-type FaqItem = { q: string; a: string };
+type DocId = "guia" | "usuario" | "organizaciones" | "admin";
 
-type Section = {
-  id: string;
-  icon: typeof ShieldCheck;
+type DocMeta = {
+  id: DocId;
+  title: string;
+  subtitle: string;
+  icon: typeof BookOpen;
   color: string;
   bg: string;
   border: string;
-  title: string;
-  subtitle: string;
-  steps?: Step[];
-  features?: Feature[];
-  table?: { headers: string[]; rows: string[][] };
+  audience: string;
 };
 
-const SECTIONS: Section[] = [
+const DOCS: DocMeta[] = [
   {
-    id: "acceso",
-    icon: Lock,
+    id: "guia",
+    title: "Guia de Luciernaga",
+    subtitle: "Vision general, argumentario, fundador, principios pedagogicos y guia completa por rol",
+    icon: BookOpen,
     color: "text-violet-400",
     bg: "bg-violet-500/10",
     border: "border-violet-500/20",
-    title: "1. Acceso y roles",
-    subtitle: "4 sistemas de autenticacion independientes",
-    features: [
-      { icon: ShieldCheck, label: "Admin / Clinico", desc: "Login en /admin/login con ADMIN_USERNAME y ADMIN_PASSWORD. Cookie de 24h. Acceso a todo el panel admin y panel clinico." },
-      { icon: Building2, label: "Organizaciones (B2B)", desc: "Login en /org/login con slug + email + contrasena. Roles: HR (dashboard) y terapeuta (pacientes)." },
-      { icon: Heart, label: "Portal familia", desc: "Acceso via token unico en /family/[token]. Solo lectura: progreso, logros, racha. Puede enviar mensajes de apoyo." },
-      { icon: Users, label: "Usuarios finales", desc: "Login en /login con email + contrasena. Sesion anonima posible via bootstrap. Alternativa: bot de Telegram." },
-    ],
+    audience: "Todos los roles",
   },
   {
-    id: "panel",
-    icon: BarChart3,
+    id: "usuario",
+    title: "Manual de usuario",
+    subtitle: "Como usar la plataforma dia a dia: chat, metas, diario, check-ins, Modo Impulso, Telegram",
+    icon: Users,
     color: "text-cyan-400",
     bg: "bg-cyan-500/10",
     border: "border-cyan-500/20",
-    title: "2. Panel de administracion",
-    subtitle: "Todas las secciones del admin",
-    features: [
-      { icon: BarChart3, label: "Dashboard", desc: "Metricas generales, insights, alertas, retencion, distribucion emocional, crisis y decisiones." },
-      { icon: Users, label: "Usuarios", desc: "Listado con filtros, engagement score. Detalle: conversaciones, timeline emocional, objetivos, export PDF." },
-      { icon: Brain, label: "Panel clinico", desc: "Monitorizacion de estados emocionales, riesgo, rachas, intervenciones. Misma sesion que admin." },
-      { icon: Activity, label: "Analytics", desc: "Retencion por cohortes, funnels de conversion." },
-      { icon: AlertTriangle, label: "Crisis", desc: "Eventos activos e historico (24h/7d/30d). Nivel, mensaje trigger y acciones." },
-      { icon: Eye, label: "Auditoria", desc: "Log completo de eventos del sistema." },
-      { icon: Zap, label: "LLM Usage", desc: "Consumo de tokens y costes de IA por periodo." },
-      { icon: BookOpen, label: "Investigacion", desc: "Herramientas de analisis de datos." },
-    ],
+    audience: "Usuarios finales",
   },
   {
-    id: "clinico",
-    icon: Brain,
-    color: "text-fuchsia-400",
-    bg: "bg-fuchsia-500/10",
-    border: "border-fuchsia-500/20",
-    title: "3. Panel clinico",
-    subtitle: "Monitorizacion emocional e intervenciones",
-    steps: [
-      { text: "Accede a /admin-clinical para ver la lista de usuarios con estado emocional, riesgo y racha." },
-      { text: "Filtra por estado (ansiedad, bloqueo, duda, claridad, neutral) o solo riesgo alto/critico." },
-      { text: "Haz clic en \"Ver\" para el detalle: perfil emocional, objetivos, crisis, mensajes." },
-      { text: "Envia intervenciones (mensaje, recomendacion, recurso o evaluacion) desde el panel lateral sticky." },
-      { text: "Si el usuario tiene Telegram vinculado, marca \"Notificar por Telegram\" para envio inmediato." },
-    ],
-  },
-  {
-    id: "riesgo",
-    icon: AlertTriangle,
-    color: "text-amber-400",
-    bg: "bg-amber-500/10",
-    border: "border-amber-500/20",
-    title: "4. Niveles de riesgo y crisis",
-    subtitle: "Como interpretar y actuar",
-    table: {
-      headers: ["Nivel", "Significado", "Accion"],
-      rows: [
-        ["Low", "Sin senales de alarma", "Seguimiento rutinario"],
-        ["Medium", "Patron de evitacion o estado negativo sostenido", "Revisar historial"],
-        ["High", "Crisis recientes o ansiedad persistente", "Contactar en 24h"],
-        ["Critical", "Crisis activa en este momento", "Intervencion inmediata"],
-      ],
-    },
-  },
-  {
-    id: "telegram",
-    icon: Bot,
-    color: "text-cyan-400",
-    bg: "bg-cyan-500/10",
-    border: "border-cyan-500/20",
-    title: "5. Telegram — notificaciones y comandos",
-    subtitle: "Recibes alertas automaticas y puedes consultar metricas",
-    features: [
-      { icon: Users, label: "Actividad", desc: "Nuevo usuario, email capturado, racha destacada (3/7/14/21/30 dias)." },
-      { icon: AlertTriangle, label: "Crisis", desc: "Deteccion de riesgo vital en web o Telegram. Nivel, fragmento y origen." },
-      { icon: CreditCard, label: "Pagos", desc: "Trial iniciado, pago confirmado, suscripcion cancelada (Stripe webhook)." },
-      { icon: MessageCircle, label: "Otros", desc: "Test diagnostico completado, formulario de contacto, resumen semanal." },
-    ],
-  },
-  {
-    id: "comandos",
-    icon: Terminal,
+    id: "organizaciones",
+    title: "Manual de organizaciones",
+    subtitle: "Portal B2B para HR y terapeutas: dashboard, pacientes, estados emocionales, crisis",
+    icon: Building2,
     color: "text-emerald-400",
     bg: "bg-emerald-500/10",
     border: "border-emerald-500/20",
-    title: "6. Comandos admin en Telegram",
-    subtitle: "Escribe al bot desde tu ADMIN_TELEGRAM_ID",
-    steps: [
-      { text: "/ayuda — Lista todos los comandos admin disponibles" },
-      { text: "/stats — Activos hoy, nuevos hoy, mensajes totales, distribucion de estados" },
-      { text: "/usuarios — Ultimos 20 usuarios activos en las 24h anteriores" },
-      { text: "/crisis — Usuarios con crisis activa en este momento" },
-      { text: "/retencion — Totales, activos esta semana, rachas activas" },
-      { text: "/estado — Distribucion emocional actual de todos los usuarios" },
-      { text: "/tareas — Cola de tareas admin pendientes" },
-      { text: "Cualquier otro mensaje activa modo IA libre con contexto de metricas del sistema." },
-    ],
+    audience: "HR y terapeutas de organizaciones",
   },
   {
-    id: "billing",
-    icon: CreditCard,
-    color: "text-violet-400",
-    bg: "bg-violet-500/10",
-    border: "border-violet-500/20",
-    title: "7. Planes y billing",
-    subtitle: "Stripe: Free (0 EUR), Pro mensual (9 EUR/mes), Pro anual (79 EUR/ano)",
-    features: [
-      { icon: Zap, label: "Free", desc: "10 conversaciones/mes, 20 mensajes/conversacion. Check-in y objetivos incluidos." },
-      { icon: Flame, label: "Pro", desc: "Ilimitado + Modo Impulso + Journeys completos. 7 dias de prueba gratuita." },
-      { icon: Send, label: "Flujo", desc: "Checkout via /api/billing/checkout. Portal de gestion via /api/billing/portal." },
-      { icon: Bell, label: "Override", desc: "FREE_PLAN_UNLIMITED=true desactiva limites del plan gratuito (testing)." },
-    ],
-  },
-  {
-    id: "cron",
-    icon: Clock,
+    id: "admin",
+    title: "Manual de administracion",
+    subtitle: "Panel admin, RBAC, clinico, marketing, Telegram, Stripe, cron jobs, endpoints",
+    icon: ShieldCheck,
     color: "text-amber-400",
     bg: "bg-amber-500/10",
     border: "border-amber-500/20",
-    title: "8. Cron jobs automaticos",
-    subtitle: "Todos requieren ?secret=CRON_SECRET",
-    steps: [
-      { text: "/api/cron/weekly-summary — Resumen semanal enviado por Telegram" },
-      { text: "/api/cron/action-reminders — Recordatorios de acciones pendientes" },
-      { text: "/api/cron/reminders — Recordatorios generales a usuarios" },
-      { text: "/api/cron/user-weekly-review — Revision semanal proactiva por usuario" },
-      { text: "/api/cron/proactive-review — Revision proactiva de progreso" },
-      { text: "/api/cron/inactivity-check — Deteccion de usuarios inactivos" },
-    ],
+    audience: "Equipo tecnico y operativo",
   },
 ];
 
-const FAQ: FaqItem[] = [
-  { q: "El panel clinico requiere login separado?", a: "No. Usa la misma sesion que el admin (/admin/login). La cookie mw_admin_session da acceso a ambos paneles." },
-  { q: "Como creo una organizacion B2B?", a: "Las organizaciones se gestionan en la base de datos (tabla Organization + OrgAdmin). Usa como referencia el script scripts/seed-org-demo.mjs." },
-  { q: "Como registro el webhook de Telegram?", a: "Ejecuta: curl -X POST \"https://api.telegram.org/bot<TOKEN>/setWebhook\" -H \"Content-Type: application/json\" -d '{\"url\": \"https://tu-dominio.com/api/telegram/webhook\"}'" },
-  { q: "Como obtengo mi ADMIN_TELEGRAM_ID?", a: "Escribe /start a @userinfobot en Telegram. El bot responde con tu ID numerico." },
-  { q: "Donde se configuran las credenciales admin?", a: "En las variables de entorno ADMIN_USERNAME y ADMIN_PASSWORD. En produccion se configuran en Coolify, nunca en el repositorio." },
-  { q: "Puedo exportar los datos de un usuario?", a: "Si. Desde /admin/users/[id] puedes exportar un PDF con el historial completo del usuario via /api/admin/users/[id]/export-pdf." },
-];
+/* ------------------------------------------------------------------ */
+/*  Lightweight markdown → JSX renderer                                */
+/* ------------------------------------------------------------------ */
+
+function renderMarkdown(md: string) {
+  const lines = md.split("\n");
+  const elements: React.ReactNode[] = [];
+  let i = 0;
+  let key = 0;
+
+  function inlineFormat(text: string): React.ReactNode {
+    // Split on bold, italic, code, links
+    const parts: React.ReactNode[] = [];
+    let remaining = text;
+    let pKey = 0;
+
+    while (remaining.length > 0) {
+      // Bold
+      const boldMatch = remaining.match(/\*\*(.+?)\*\*/);
+      // Inline code
+      const codeMatch = remaining.match(/`([^`]+)`/);
+      // Link
+      const linkMatch = remaining.match(/\[([^\]]+)\]\(([^)]+)\)/);
+
+      // Find earliest match
+      type Match = { type: string; index: number; match: RegExpMatchArray };
+      const matches: Match[] = [];
+      if (boldMatch?.index != null) matches.push({ type: "bold", index: boldMatch.index, match: boldMatch });
+      if (codeMatch?.index != null) matches.push({ type: "code", index: codeMatch.index, match: codeMatch });
+      if (linkMatch?.index != null) matches.push({ type: "link", index: linkMatch.index, match: linkMatch });
+
+      if (matches.length === 0) {
+        parts.push(remaining);
+        break;
+      }
+
+      matches.sort((a, b) => a.index - b.index);
+      const first = matches[0];
+
+      if (first.index > 0) {
+        parts.push(remaining.slice(0, first.index));
+      }
+
+      if (first.type === "bold") {
+        parts.push(<strong key={pKey++} className="text-white font-semibold">{first.match[1]}</strong>);
+        remaining = remaining.slice(first.index + first.match[0].length);
+      } else if (first.type === "code") {
+        parts.push(
+          <code key={pKey++} className="bg-zinc-800 px-1.5 py-0.5 rounded text-xs text-violet-300 font-mono">
+            {first.match[1]}
+          </code>
+        );
+        remaining = remaining.slice(first.index + first.match[0].length);
+      } else if (first.type === "link") {
+        parts.push(
+          <span key={pKey++} className="text-violet-400 underline underline-offset-2">
+            {first.match[1]}
+          </span>
+        );
+        remaining = remaining.slice(first.index + first.match[0].length);
+      }
+    }
+
+    return parts.length === 1 && typeof parts[0] === "string" ? parts[0] : <>{parts}</>;
+  }
+
+  while (i < lines.length) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    // Skip empty lines
+    if (trimmed === "") { i++; continue; }
+
+    // Horizontal rules
+    if (/^-{3,}$/.test(trimmed)) {
+      elements.push(<hr key={key++} className="border-zinc-800 my-6" />);
+      i++;
+      continue;
+    }
+
+    // Code blocks
+    if (trimmed.startsWith("```")) {
+      const codeLines: string[] = [];
+      i++;
+      while (i < lines.length && !lines[i].trim().startsWith("```")) {
+        codeLines.push(lines[i]);
+        i++;
+      }
+      i++; // skip closing ```
+      elements.push(
+        <pre key={key++} className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 overflow-x-auto text-xs text-zinc-300 font-mono my-3">
+          {codeLines.join("\n")}
+        </pre>
+      );
+      continue;
+    }
+
+    // Headers
+    if (trimmed.startsWith("# ") && !trimmed.startsWith("## ")) {
+      elements.push(
+        <h1 key={key++} className="text-2xl font-bold text-white mt-10 mb-4">
+          {inlineFormat(trimmed.slice(2))}
+        </h1>
+      );
+      i++;
+      continue;
+    }
+    if (trimmed.startsWith("## ") && !trimmed.startsWith("### ")) {
+      elements.push(
+        <h2 key={key++} className="text-xl font-bold text-white mt-8 mb-3 pb-2 border-b border-violet-500/30">
+          {inlineFormat(trimmed.slice(3))}
+        </h2>
+      );
+      i++;
+      continue;
+    }
+    if (trimmed.startsWith("### ") && !trimmed.startsWith("#### ")) {
+      elements.push(
+        <h3 key={key++} className="text-lg font-semibold text-violet-300 mt-6 mb-2">
+          {inlineFormat(trimmed.slice(4))}
+        </h3>
+      );
+      i++;
+      continue;
+    }
+    if (trimmed.startsWith("#### ")) {
+      elements.push(
+        <h4 key={key++} className="text-sm font-semibold text-zinc-200 mt-4 mb-1">
+          {inlineFormat(trimmed.slice(5))}
+        </h4>
+      );
+      i++;
+      continue;
+    }
+
+    // Blockquote
+    if (trimmed.startsWith("> ")) {
+      const quoteLines: string[] = [];
+      while (i < lines.length && lines[i].trim().startsWith("> ")) {
+        quoteLines.push(lines[i].trim().slice(2));
+        i++;
+      }
+      elements.push(
+        <blockquote key={key++} className="border-l-3 border-violet-500 bg-violet-500/5 rounded-r-lg px-4 py-3 my-3 text-sm text-violet-200 italic">
+          {quoteLines.map((l, j) => <p key={j}>{inlineFormat(l)}</p>)}
+        </blockquote>
+      );
+      continue;
+    }
+
+    // Table
+    if (trimmed.startsWith("|") && trimmed.endsWith("|")) {
+      const tableRows: string[][] = [];
+      while (i < lines.length && lines[i].trim().startsWith("|") && lines[i].trim().endsWith("|")) {
+        const cells = lines[i].split("|").slice(1, -1).map((c) => c.trim());
+        // Skip separator row
+        if (!cells.every((c) => /^[-:]+$/.test(c))) {
+          tableRows.push(cells);
+        }
+        i++;
+      }
+      if (tableRows.length > 0) {
+        const headers = tableRows[0];
+        const body = tableRows.slice(1);
+        elements.push(
+          <div key={key++} className="overflow-x-auto my-3 rounded-xl border border-zinc-800">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-zinc-900/80">
+                  {headers.map((h, j) => (
+                    <th key={j} className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500 border-b border-zinc-800">
+                      {inlineFormat(h)}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-800/50">
+                {body.map((row, ri) => (
+                  <tr key={ri} className="hover:bg-zinc-800/20 transition-colors">
+                    {row.map((cell, ci) => (
+                      <td key={ci} className={`px-3 py-2 text-xs ${ci === 0 ? "font-medium text-zinc-200" : "text-zinc-400"}`}>
+                        {inlineFormat(cell)}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      }
+      continue;
+    }
+
+    // Unordered list
+    if (/^\s*[-*]\s+/.test(line)) {
+      const items: string[] = [];
+      while (i < lines.length && /^\s*[-*]\s+/.test(lines[i])) {
+        items.push(lines[i].replace(/^\s*[-*]\s+/, ""));
+        i++;
+      }
+      elements.push(
+        <ul key={key++} className="space-y-1 my-2 ml-4">
+          {items.map((item, j) => (
+            <li key={j} className="flex items-start gap-2 text-sm text-zinc-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-violet-500/60 shrink-0 mt-2" />
+              <span>{inlineFormat(item)}</span>
+            </li>
+          ))}
+        </ul>
+      );
+      continue;
+    }
+
+    // Ordered list
+    if (/^\s*\d+\.\s+/.test(line)) {
+      const items: string[] = [];
+      while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i])) {
+        items.push(lines[i].replace(/^\s*\d+\.\s+/, ""));
+        i++;
+      }
+      elements.push(
+        <ol key={key++} className="space-y-1 my-2 ml-4">
+          {items.map((item, j) => (
+            <li key={j} className="flex items-start gap-2 text-sm text-zinc-400">
+              <span className="w-5 h-5 rounded-full bg-zinc-800 flex items-center justify-center shrink-0 mt-0.5">
+                <span className="text-[10px] font-bold text-zinc-500">{j + 1}</span>
+              </span>
+              <span>{inlineFormat(item)}</span>
+            </li>
+          ))}
+        </ol>
+      );
+      continue;
+    }
+
+    // Paragraph
+    elements.push(
+      <p key={key++} className="text-sm text-zinc-400 leading-relaxed my-1.5">
+        {inlineFormat(trimmed)}
+      </p>
+    );
+    i++;
+  }
+
+  return elements;
+}
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
@@ -182,142 +322,141 @@ const FAQ: FaqItem[] = [
 
 export default function AdminGuiaPage() {
   const router = useRouter();
+  const [activeDoc, setActiveDoc] = useState<DocId>("guia");
+  const [content, setContent] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadDoc = useCallback(async (docId: DocId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/docs?doc=${docId}&format=md`);
+      if (res.status === 401) { router.push("/admin/login"); return; }
+      if (!res.ok) throw new Error(`Error ${res.status}`);
+      const text = await res.text();
+      setContent(text);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Error al cargar el documento");
+    } finally {
+      setLoading(false);
+    }
+  }, [router]);
+
+  useEffect(() => {
+    void loadDoc(activeDoc);
+  }, [activeDoc, loadDoc]);
+
+  function handleDownloadPdf(docId: DocId) {
+    window.open(`/api/admin/docs?doc=${docId}&format=html`, "_blank");
+  }
 
   async function handleLogout() {
     await fetch("/api/admin/logout", { method: "POST" });
     router.push("/admin/login");
   }
 
+  const activeMeta = DOCS.find((d) => d.id === activeDoc)!;
+
   return (
     <AdminShell
-      title="Guia de administracion"
-      subtitle="Todo lo que necesitas para gestionar la plataforma, el panel clinico, notificaciones y operaciones."
+      title="Documentacion"
+      subtitle="Guias y manuales de la plataforma — consultables y descargables en PDF"
       onLogout={handleLogout}
       showSectionNav={false}
     >
-      {/* Quick nav */}
-      <div className="flex flex-wrap gap-2">
-        {SECTIONS.map((s) => (
-          <a
-            key={s.id}
-            href={`#${s.id}`}
-            className="rounded-lg border border-zinc-800 bg-zinc-900/50 px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white hover:border-violet-500/40 transition-all"
+      {/* Document selector cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        {DOCS.map((doc) => {
+          const Icon = doc.icon;
+          const isActive = doc.id === activeDoc;
+          return (
+            <button
+              key={doc.id}
+              onClick={() => setActiveDoc(doc.id)}
+              className={`text-left rounded-xl border p-4 transition-all ${
+                isActive
+                  ? `${doc.border} ${doc.bg} ring-1 ring-violet-500/30`
+                  : "border-zinc-800 bg-zinc-900/30 hover:bg-zinc-900/60 hover:border-zinc-700"
+              }`}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <div className={`w-8 h-8 rounded-lg ${doc.bg} border ${doc.border} flex items-center justify-center`}>
+                  <Icon className={`w-4 h-4 ${doc.color}`} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className={`text-xs font-semibold truncate ${isActive ? "text-white" : "text-zinc-300"}`}>
+                    {doc.title}
+                  </p>
+                </div>
+              </div>
+              <p className="text-[10px] text-zinc-500 leading-relaxed line-clamp-2">{doc.audience}</p>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Active document header */}
+      <div className="flex items-start justify-between gap-4 rounded-xl border border-zinc-800 bg-zinc-900/30 p-5">
+        <div className="flex items-start gap-4 min-w-0">
+          <div className={`w-12 h-12 rounded-xl ${activeMeta.bg} border ${activeMeta.border} flex items-center justify-center shrink-0`}>
+            <activeMeta.icon className={`w-6 h-6 ${activeMeta.color}`} />
+          </div>
+          <div className="min-w-0">
+            <h2 className="text-lg font-bold text-white">{activeMeta.title}</h2>
+            <p className="text-sm text-zinc-400 mt-1">{activeMeta.subtitle}</p>
+            <p className="text-xs text-zinc-600 mt-2 flex items-center gap-1">
+              <Stethoscope className="w-3 h-3" />
+              Audiencia: {activeMeta.audience}
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-2 shrink-0">
+          <button
+            onClick={() => handleDownloadPdf(activeDoc)}
+            className="flex items-center gap-2 rounded-lg bg-violet-500 px-4 py-2.5 text-xs font-semibold text-white hover:bg-violet-400 transition-colors shadow-lg shadow-violet-500/20"
           >
-            {s.title.split(". ")[1]}
-          </a>
+            <Download className="w-4 h-4" />
+            Descargar PDF
+          </button>
+        </div>
+      </div>
+
+      {/* Quick download all */}
+      <div className="flex flex-wrap gap-2">
+        {DOCS.map((doc) => (
+          <button
+            key={doc.id}
+            onClick={() => handleDownloadPdf(doc.id)}
+            className="flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900/50 px-3 py-1.5 text-[10px] font-medium text-zinc-400 hover:text-white hover:border-violet-500/40 transition-all"
+          >
+            <FileText className="w-3 h-3" />
+            {doc.title}
+            <ExternalLink className="w-2.5 h-2.5" />
+          </button>
         ))}
       </div>
 
-      {/* Sections */}
-      <div className="space-y-12">
-        {SECTIONS.map((section) => {
-          const Icon = section.icon;
-          return (
-            <section key={section.id} id={section.id} className="scroll-mt-24">
-              <div className="flex items-start gap-4 mb-6">
-                <div
-                  className={`w-11 h-11 rounded-xl ${section.bg} border ${section.border} flex items-center justify-center shrink-0`}
-                >
-                  <Icon className={`w-5 h-5 ${section.color}`} />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-white">{section.title}</h2>
-                  <p className="text-sm text-zinc-400 mt-1">{section.subtitle}</p>
-                </div>
-              </div>
-
-              {/* Steps */}
-              {section.steps && (
-                <div className="space-y-3 ml-14">
-                  {section.steps.map((step, i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <span className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center shrink-0 mt-0.5">
-                        <span className="text-xs font-bold text-zinc-400">{i + 1}</span>
-                      </span>
-                      <p className="text-sm text-zinc-300 leading-relaxed">{step.text}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Features */}
-              {section.features && (
-                <div className="grid sm:grid-cols-2 gap-3 ml-14">
-                  {section.features.map((f) => {
-                    const FIcon = f.icon;
-                    return (
-                      <div
-                        key={f.label}
-                        className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4"
-                      >
-                        <div className="flex items-center gap-2 mb-2">
-                          <FIcon className={`w-4 h-4 ${section.color}`} />
-                          <p className="text-sm font-semibold text-white">{f.label}</p>
-                        </div>
-                        <p className="text-xs text-zinc-400 leading-relaxed">{f.desc}</p>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Table */}
-              {section.table && (
-                <div className="ml-14 overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-zinc-800">
-                        {section.table.headers.map((h) => (
-                          <th
-                            key={h}
-                            className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500"
-                          >
-                            {h}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-zinc-800/50">
-                      {section.table.rows.map((row, i) => (
-                        <tr key={i} className="hover:bg-zinc-800/20 transition-colors">
-                          {row.map((cell, j) => (
-                            <td
-                              key={j}
-                              className={`px-4 py-3 ${j === 0 ? "font-semibold text-white" : "text-zinc-400"}`}
-                            >
-                              {cell}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </section>
-          );
-        })}
-
-        {/* FAQ */}
-        <section id="faq" className="scroll-mt-24">
-          <h2 className="text-2xl font-bold text-white mb-6">Preguntas frecuentes</h2>
-          <div className="space-y-3">
-            {FAQ.map((faq, i) => (
-              <details
-                key={i}
-                className="group rounded-xl border border-zinc-800 bg-zinc-900/50"
-              >
-                <summary className="flex items-center justify-between px-5 py-4 cursor-pointer text-sm font-semibold text-white">
-                  {faq.q}
-                  <ChevronRight className="w-4 h-4 text-zinc-500 group-open:rotate-90 transition-transform shrink-0" />
-                </summary>
-                <div className="px-5 pb-4">
-                  <p className="text-sm text-zinc-400 leading-relaxed">{faq.a}</p>
-                </div>
-              </details>
-            ))}
+      {/* Document content */}
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900/20 overflow-hidden">
+        {loading && (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-6 h-6 text-violet-400 animate-spin" />
+            <span className="ml-3 text-sm text-zinc-500">Cargando documento...</span>
           </div>
-        </section>
+        )}
+
+        {error && (
+          <div className="p-6 text-sm text-red-400">
+            Error: {error}
+          </div>
+        )}
+
+        {!loading && !error && content && (
+          <div className="px-6 py-8 md:px-10 md:py-10 max-w-4xl mx-auto">
+            {renderMarkdown(content)}
+          </div>
+        )}
       </div>
     </AdminShell>
   );

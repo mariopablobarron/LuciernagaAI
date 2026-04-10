@@ -63,7 +63,7 @@ export default function GoalContextBar({ goal, actionLock, onToggleAction }: Goa
 
         <div className="flex items-center gap-2 shrink-0">
           {goal && (
-            <span className="text-[10px] text-zinc-500 font-medium">
+            <span className="text-xs text-zinc-500 font-medium">
               {goal.completedCount}/{goal.totalCount}
             </span>
           )}
@@ -82,7 +82,7 @@ export default function GoalContextBar({ goal, actionLock, onToggleAction }: Goa
             <>
               <div className="flex items-center justify-between">
                 <p className="text-xs font-semibold text-white">{goal.title}</p>
-                <span className="text-[10px] text-zinc-500">{goal.progress}%</span>
+                <span className="text-xs text-zinc-500">{goal.progress}%</span>
               </div>
               <div className="h-1 bg-zinc-800 rounded-full overflow-hidden">
                 <div

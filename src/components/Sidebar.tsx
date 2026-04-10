@@ -394,7 +394,7 @@ export default function Sidebar({
                           <button
                             type="button"
                             onClick={() => setEditingId(null)}
-                            className="rounded-lg p-1 hover:bg-muted"
+                            className="rounded-lg p-2 hover:bg-muted"
                           >
                             <X className="size-3.5" />
                           </button>
@@ -425,10 +425,10 @@ export default function Sidebar({
                               e.stopPropagation();
                               startEditing(conversation.id, conversation.title);
                             }}
-                            className={`rounded-lg p-1 hover:bg-muted/60 ${isActive ? "text-primary-foreground/70 hover:text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                            className={`rounded-lg p-2 hover:bg-muted/60 ${isActive ? "text-primary-foreground/70 hover:text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
                             title="Renombrar"
                           >
-                            <Pencil className="size-3" />
+                            <Pencil className="size-3.5" />
                           </button>
                           <button
                             type="button"
@@ -436,10 +436,10 @@ export default function Sidebar({
                               e.stopPropagation();
                               setDeletingId(conversation.id);
                             }}
-                            className={`rounded-lg p-1 hover:bg-destructive/10 ${isActive ? "text-primary-foreground/70 hover:text-primary-foreground" : "text-muted-foreground hover:text-destructive"}`}
+                            className={`rounded-lg p-2 hover:bg-destructive/10 ${isActive ? "text-primary-foreground/70 hover:text-primary-foreground" : "text-muted-foreground hover:text-destructive"}`}
                             title="Eliminar"
                           >
-                            <Trash2 className="size-3" />
+                            <Trash2 className="size-3.5" />
                           </button>
                         </div>
                       ) : null}

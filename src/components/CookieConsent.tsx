@@ -132,7 +132,7 @@ export default function CookieConsent() {
       <div
         role="dialog"
         aria-label="Consentimiento de cookies"
-        className="fixed inset-x-0 bottom-0 z-[9999] border-t border-zinc-700 bg-zinc-900/95 px-4 py-4 backdrop-blur-sm sm:px-6"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-700 bg-zinc-900/95 px-4 py-4 backdrop-blur-sm sm:px-6"
       >
         <div className="mx-auto flex max-w-4xl flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
           <p className="flex-1 text-sm leading-relaxed text-zinc-300">
@@ -172,7 +172,7 @@ export default function CookieConsent() {
     return (
       <button
         onClick={() => setShowPrefs(true)}
-        className="fixed bottom-4 left-4 z-40 rounded-full border border-zinc-700/50 bg-zinc-800/80 p-2.5 text-zinc-500 backdrop-blur-sm transition-all hover:border-zinc-600 hover:text-zinc-300"
+        className="fixed bottom-4 left-4 z-40 rounded-full border border-zinc-700/50 bg-zinc-800/80 p-3 min-h-11 min-w-11 flex items-center justify-center text-zinc-500 backdrop-blur-sm transition-all hover:border-zinc-600 hover:text-zinc-300"
         title="Preferencias de cookies"
       >
         <Cookie className="h-4 w-4" />

@@ -599,14 +599,14 @@ export default function Chat({
                     setSessionRating(1);
                     onRateSession?.(1);
                   }}
-                  className={`rounded-lg p-1.5 transition ${
+                  className={`rounded-lg p-2.5 min-h-11 min-w-11 flex items-center justify-center transition ${
                     sessionRating === 1
                       ? "bg-emerald-500/20 text-emerald-400"
                       : "text-zinc-600 hover:bg-zinc-800 hover:text-emerald-400"
                   }`}
                   title="Útil"
                 >
-                  <ThumbsUp className="h-3.5 w-3.5" />
+                  <ThumbsUp className="h-4 w-4" />
                 </button>
                 <button
                   type="button"
@@ -614,17 +614,17 @@ export default function Chat({
                     setSessionRating(-1);
                     onRateSession?.(-1);
                   }}
-                  className={`rounded-lg p-1.5 transition ${
+                  className={`rounded-lg p-2.5 min-h-11 min-w-11 flex items-center justify-center transition ${
                     sessionRating === -1
                       ? "bg-red-500/20 text-red-400"
                       : "text-zinc-600 hover:bg-zinc-800 hover:text-red-400"
                   }`}
                   title="No fue útil"
                 >
-                  <ThumbsDown className="h-3.5 w-3.5" />
+                  <ThumbsDown className="h-4 w-4" />
                 </button>
                 {sessionRating !== null && (
-                  <span className="text-[11px] text-zinc-500">Gracias por tu feedback.</span>
+                  <span className="text-xs text-zinc-500">Gracias por tu feedback.</span>
                 )}
               </div>
             )}

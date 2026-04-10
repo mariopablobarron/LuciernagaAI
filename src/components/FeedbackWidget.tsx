@@ -112,7 +112,7 @@ export default function FeedbackWidget() {
           onClick={() => setOpen(true)}
           aria-label="Abrir formulario de feedback"
           data-tour="feedback"
-          className="fixed right-0 top-1/2 -translate-y-1/2 z-40 flex items-center gap-1.5 rounded-l-xl border border-r-0 border-zinc-700/60 bg-zinc-900/95 px-3 py-2.5 text-xs font-medium text-zinc-400 hover:text-fuchsia-400 hover:border-fuchsia-500/40 hover:bg-zinc-900 backdrop-blur-sm shadow-lg transition-all"
+          className="fixed right-4 top-1/2 -translate-y-1/2 z-50 flex items-center gap-1.5 rounded-xl border border-zinc-700/60 bg-zinc-900/95 px-3 py-2.5 text-xs font-medium text-zinc-400 hover:text-fuchsia-400 hover:border-fuchsia-500/40 hover:bg-zinc-900 backdrop-blur-sm shadow-lg transition-all"
         >
           <MessageSquarePlus className="w-4 h-4" />
           <span className="hidden sm:inline">Feedback</span>
@@ -162,7 +162,7 @@ export default function FeedbackWidget() {
                         onClick={() => setRating(n)}
                         onMouseEnter={() => setHoverRating(n)}
                         onMouseLeave={() => setHoverRating(0)}
-                        className="p-1 transition-transform hover:scale-110"
+                        className="p-2 transition-transform hover:scale-110"
                       >
                         <Star
                           className={`w-7 h-7 transition-colors ${
@@ -220,7 +220,7 @@ export default function FeedbackWidget() {
                   {sending ? "Enviando..." : "Enviar feedback"}
                 </button>
 
-                <p className="text-[10px] text-zinc-700 text-center">
+                <p className="text-xs text-zinc-700 text-center">
                   Tu feedback es anonimo y nos ayuda a priorizar mejoras.
                 </p>
               </div>

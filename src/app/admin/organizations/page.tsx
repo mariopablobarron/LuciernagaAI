@@ -35,7 +35,7 @@ type OrgInvite = {
 
 type OrgDetail = OrgSummary & { admins: OrgAdmin[]; users: OrgUser[]; invites: OrgInvite[] };
 
-const TYPE_LABELS: Record<string, string> = { company: "Empresa", clinic: "Clinica", school: "Escuela" };
+const TYPE_LABELS: Record<string, string> = { company: "Empresa", clinic: "Clinica", school: "Escuela", training_center: "Centro de formacion" };
 const PLAN_LABELS: Record<string, string> = { team: "Team", enterprise: "Enterprise" };
 
 function formatDate(iso: string | null) {
@@ -240,6 +240,7 @@ export default function OrganizationsPage() {
               <option value="company">Empresa</option>
               <option value="clinic">Clinica</option>
               <option value="school">Escuela</option>
+              <option value="training_center">Centro de formacion</option>
             </select>
             <select value={newOrg.plan} onChange={(e) => setNewOrg({ ...newOrg, plan: e.target.value })} className={inputCls}>
               <option value="team">Team</option>
@@ -331,6 +332,7 @@ export default function OrganizationsPage() {
                               <option value="hr">HR</option>
                               <option value="therapist">Terapeuta</option>
                               <option value="admin">Admin org</option>
+                              <option value="teacher">Profesor</option>
                             </select>
                           </div>
                           <button onClick={handleAddAdmin} disabled={!newAdmin.email || !newAdmin.name || !newAdmin.password} className={btnPrimary}>

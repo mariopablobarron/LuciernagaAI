@@ -160,9 +160,9 @@ export async function POST(req: NextRequest) {
 
     // Notify admin
     sendAlert({
-      level: "info",
+      type: "info",
       title: "Nuevo alumno registrado",
-      body: `${name || normalizedEmail} se unio a ${classroom.name} (${classroom.organization.name}) con codigo ${classroomCode.code}`,
+      message: `${name || normalizedEmail} se unio a ${classroom.name} (${classroom.organization.name}) con codigo ${classroomCode.code}`,
     });
 
     const token = issueSessionToken(user.id);

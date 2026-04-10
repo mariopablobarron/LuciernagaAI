@@ -157,6 +157,18 @@ export const GET = withRateLimit(async function GET(req: NextRequest) {
       retentionRate7d,
     };
 
+    // Classrooms summary
+    const classrooms = await prisma.classroom.findMany({
+      where: { organizationId: orgId, isActive: true },
+      orderBy: { name: "asc" },
+      select: {
+        id: true,
+        name: true,
+        _count: { select: { users: true } },
+        teachers: { select: { id: true, name: true } },
+      },
+    });
+
     return NextResponse.json({
       ok: true,
       organization: org.name,
@@ -164,6 +176,12 @@ export const GET = withRateLimit(async function GET(req: NextRequest) {
       generatedAt: now.toISOString(),
       privacyNotice: "All data is anonymized and aggregated. No individual user data is exposed.",
       stats,
+      classrooms: classrooms.map((c) => ({
+        id: c.id,
+        name: c.name,
+        userCount: c._count.users,
+        teachers: c.teachers,
+      })),
     });
   } catch (error) {
     logError("ORG", error, { action: "dashboard_fetch", orgId });

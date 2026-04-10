@@ -294,6 +294,22 @@ export default function Sidebar({
           <ArrowRight className="ml-3 size-4 shrink-0 text-muted-foreground" />
         </Link>
 
+        {/* Telegram CTA */}
+        <a
+          href="https://t.me/TRESMILMILLONESDELATIDOSBOT"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 rounded-2xl border border-cyan-500/20 bg-cyan-500/5 px-4 py-3 text-sm transition hover:border-cyan-500/40 hover:bg-cyan-500/10"
+        >
+          <span className="text-xl">💬</span>
+          <div>
+            <p className="font-semibold text-cyan-300 leading-snug">Llevame en Telegram</p>
+            <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">
+              Habla con tu mentor, recibe recordatorios y haz check-in sin abrir la web.
+            </p>
+          </div>
+        </a>
+
         <SidebarRetoWidget />
       </div>
 

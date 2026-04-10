@@ -62,7 +62,7 @@ function reserveAutomatedAlert(key: string, cooldownMs = AUTOMATED_ALERT_COOLDOW
 }
 
 async function sendTelegram(alert: Alert): Promise<void> {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const botToken = process.env.TELEGRAM_BOT_TOKEN_ADMIN?.trim() || process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
 
   if (!botToken || !chatId) {
@@ -70,10 +70,10 @@ async function sendTelegram(alert: Alert): Promise<void> {
     return;
   }
 
-  const emoji = alert.type === "critical" ? "🚨" : alert.type === "warning" ? "⚠️" : "ℹ️";
-  const message = `${emoji} *${alert.title}*\n\n${alert.message}${
+  const bar = alert.type === "critical" ? "🔴🔴🔴🔴🔴" : alert.type === "warning" ? "🟠🟠🟠🟠🟠" : "🔵🔵🔵🔵🔵";
+  const message = `${bar} ${alert.type.toUpperCase()} ${bar}\n\n*${alert.title}*\n\n${alert.message}${
     alert.metric ? `\n\n📊 ${alert.metric}: ${alert.value}` : ""
-  }`;
+  }\n\n🕐 ${new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" })}`;
 
   try {
     const response = await fetchWithTimeout(`https://api.telegram.org/bot${botToken}/sendMessage`, {
@@ -245,7 +245,7 @@ export async function sendAdminUserAlert(params: {
   reason?: string;
 }): Promise<void> {
   const adminChatId = process.env.ADMIN_TELEGRAM_ID;
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const botToken = process.env.TELEGRAM_BOT_TOKEN_ADMIN?.trim() || process.env.TELEGRAM_BOT_TOKEN;
   if (!adminChatId || !botToken) {
     logError("ALERTS", new Error("ADMIN_TELEGRAM_ID or TELEGRAM_BOT_TOKEN not configured for admin alerts"), {
       area: "sendAdminUserAlert",
@@ -255,16 +255,19 @@ export async function sendAdminUserAlert(params: {
   }
 
   const isCritical = params.state === "riesgo" || params.state === "ansiedad";
-  const emoji = isCritical ? "🚨" : "⚠️";
+  const bar = isCritical ? "🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴" : "🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠";
   const via = params.userId.startsWith("tg_") ? "Telegram" : "App web";
 
   const text =
-    `${emoji} *Usuario requiere atención*\n\n` +
+    `${bar}\n` +
+    `⚠️ *USUARIO REQUIERE ATENCIÓN*\n` +
+    `${bar}\n\n` +
     `👤 ID: \`${params.userId}\`\n` +
-    (params.state ? `🧠 Estado: *${params.state}*\n` : "") +
+    (params.state ? `🧠 Estado: *${params.state.toUpperCase()}*\n` : "") +
     (params.reason ? `📌 Motivo: ${params.reason}\n` : "") +
-    `💬 _${truncateText(params.lastMessage)}_\n` +
-    `_Vía: ${via}_`;
+    `💬 _"${truncateText(params.lastMessage)}"_\n\n` +
+    `_Vía: ${via}_\n` +
+    `🕐 ${new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" })}`;
 
   try {
     await fetchWithTimeout(`https://api.telegram.org/bot${botToken}/sendMessage`, {

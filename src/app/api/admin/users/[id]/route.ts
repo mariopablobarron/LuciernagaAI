@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdminPermission } from "@/lib/admin-auth";
+import { requireAdminPermission, resolveAdminAuth } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { withRateLimit } from "@/lib/rate-limit";
+import { audit } from "@/lib/audit";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +25,8 @@ export async function GET(req: NextRequest, { params }: Params) {
     if (adminAuth instanceof NextResponse) return adminAuth;
 
     const { id } = await params;
+    const auth = resolveAdminAuth(req);
+    audit({ actorId: auth.adminId ?? "unknown", actorType: "admin", action: "read", resource: "User", resourceId: id });
     if (!id) {
       return NextResponse.json(
         { error: "INVALID_USER_ID", message: "User id is required." },

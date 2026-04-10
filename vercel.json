@@ -39,6 +39,10 @@
     {
       "path": "/api/cron/scheduled-emails?secret=${CRON_SECRET}",
       "schedule": "0 */2 * * *"
+    },
+    {
+      "path": "/api/cron/24h-nudge?secret=${CRON_SECRET}",
+      "schedule": "0 10 * * *"
     }
   ]
 }

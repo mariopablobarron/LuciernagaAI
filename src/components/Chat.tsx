@@ -567,6 +567,14 @@ export default function Chat({
                 </button>
               ))}
             </div>
+            <a
+              href="https://t.me/TRESMILMILLONESDELATIDOSBOT"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 flex items-center gap-2 rounded-xl border border-cyan-500/20 bg-cyan-500/5 px-4 py-2.5 text-xs text-cyan-400 hover:bg-cyan-500/10 transition-colors"
+            >
+              💬 Tambien puedes hablarme por Telegram
+            </a>
           </div>
         ) : (
           <div className="space-y-3 px-3 py-4">

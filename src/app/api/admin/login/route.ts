@@ -10,6 +10,7 @@ import { getPrismaClient } from "@/db/prisma";
 import { verifyPassword } from "@/lib/password";
 import { logError, logInfo } from "@/lib/logger";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { audit } from "@/lib/audit";
 import type { SystemRole } from "@prisma/client";
 
 type AdminLoginBody = {
@@ -74,11 +75,13 @@ export async function POST(req: NextRequest) {
         const response = NextResponse.json({ ok: true, next: nextPath, role: adminUser.role });
         attachAdminSessionCookie(response, token);
         logInfo("AUTH", "admin_login_success", { username: adminUser.name, role: adminUser.role, source: "db" });
+        audit({ actorId: adminUser.id, actorType: "admin", action: "login", resource: "AdminUser", resourceId: adminUser.id, ip, metadata: { role: adminUser.role } });
         return response;
       }
 
       // DB user found but wrong password
       logInfo("AUTH", "admin_login_failed", { username, ip, source: "db" });
+      audit({ actorId: username, actorType: "admin", action: "login", resource: "AdminUser", ip, metadata: { success: false } });
       return NextResponse.json({ ok: false, error: "INVALID_ADMIN_CREDENTIALS" }, { status: 401 });
     }
 
@@ -92,6 +95,7 @@ export async function POST(req: NextRequest) {
       const response = NextResponse.json({ ok: true, next: nextPath, role: "superadmin" });
       attachAdminSessionCookie(response, token);
       logInfo("AUTH", "admin_login_success", { username, role: "superadmin", source: "env" });
+      audit({ actorId: "env", actorType: "admin", action: "login", resource: "AdminUser", ip, metadata: { role: "superadmin", source: "env" } });
       return response;
     }
 

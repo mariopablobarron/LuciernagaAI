@@ -27,6 +27,11 @@ export const GET = withRateLimit(async function GET(req: NextRequest) {
     const sentryConfigured = !!(
       process.env.SENTRY_DSN?.trim() || process.env.NEXT_PUBLIC_SENTRY_DSN?.trim()
     );
+    const cronConfigured = !!process.env.CRON_SECRET?.trim();
+    const n8nConfigured = !!process.env.N8N_EVENTS_WEBHOOK_URL?.trim();
+    const pushConfigured = !!(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY?.trim() && process.env.VAPID_PRIVATE_KEY?.trim());
+    const googleOAuthConfigured = !!(process.env.GOOGLE_CLIENT_ID?.trim() && process.env.GOOGLE_CLIENT_SECRET?.trim());
+    const stripeConfigured = !!process.env.STRIPE_SECRET_KEY?.trim();
 
     const adminUsername = process.env.ADMIN_USERNAME?.trim() || "admin";
 
@@ -58,7 +63,20 @@ export const GET = withRateLimit(async function GET(req: NextRequest) {
         email: emailConfigured,
         telegram: telegramConfigured,
         sentry: sentryConfigured,
+        cron: cronConfigured,
+        n8n: n8nConfigured,
+        push: pushConfigured,
+        googleOAuth: googleOAuthConfigured,
+        stripe: stripeConfigured,
       },
+      warnings: [
+        ...(!cronConfigured ? ["CRON_SECRET no configurado — los cron jobs (reminders, weekly summary, nudges) no funcionan"] : []),
+        ...(!n8nConfigured ? ["N8N_EVENTS_WEBHOOK_URL no configurado — las automatizaciones externas no se disparan"] : []),
+        ...(!telegramConfigured ? ["TELEGRAM_BOT_TOKEN no configurado — el bot de Telegram esta desactivado"] : []),
+        ...(!pushConfigured ? ["VAPID keys no configuradas — las push notifications no funcionan"] : []),
+        ...(!stripeConfigured ? ["STRIPE_SECRET_KEY no configurado — los pagos estan desactivados"] : []),
+        ...(!googleOAuthConfigured ? ["Google OAuth no configurado — el login con Google esta desactivado"] : []),
+      ],
       stats: {
         totalUsers,
         activeUsers,

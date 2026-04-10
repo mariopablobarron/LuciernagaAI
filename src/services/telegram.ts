@@ -218,7 +218,21 @@ export async function sendTelegramMessageAsync(
 export function notifyAdmin(text: string, parseMode: TelegramParseMode = "Markdown"): void {
   const adminChatId = process.env.ADMIN_TELEGRAM_ID?.trim();
   if (!adminChatId) return;
-  sendTelegramNotification(adminChatId, text, parseMode);
+
+  // Use dedicated admin bot if configured, otherwise fall back to main bot
+  const adminToken = process.env.TELEGRAM_BOT_TOKEN_ADMIN?.trim();
+  const token = adminToken || process.env.TELEGRAM_BOT_TOKEN?.trim();
+  if (!token) return;
+
+  void fetchWithTimeout(
+    `${TELEGRAM_NOTIFY_BASE}/bot${token}/sendMessage`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: adminChatId, text, parse_mode: parseMode }),
+    },
+    5_000
+  ).catch(() => {});
 }
 
 // ─── Admin alert builder ──────────────────────────────────────────────────────
@@ -252,72 +266,96 @@ function userVia(userId: string): string {
   return userId.startsWith("tg_") ? "_Vía: Telegram_" : "_Vía: App web_";
 }
 
-/** Builds a Markdown-formatted admin notification string. */
+/**
+ * Builds a Markdown-formatted admin notification with visual color coding.
+ *
+ * Color system (emoji blocks as visual bars):
+ *   🔴 ROJO    = Crisis, peligro — acción inmediata
+ *   🟠 NARANJA = Cancelación, riesgo — atención pronto
+ *   🟡 AMARILLO = Cambio de estado — seguimiento
+ *   🟢 VERDE   = Nuevo usuario, email, racha — buenas noticias
+ *   🟣 MORADO  = Pago, suscripción — dinero
+ */
 export function buildAdminAlert(input: AdminAlertInput): string {
   switch (input.tipo) {
     case "new_user":
       return (
-        `👤 *Nuevo usuario*\n\n` +
-        `ID: \`${input.userId}\`\n` +
-        userVia(input.userId)
+        `🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢\n` +
+        `*NUEVO USUARIO*\n` +
+        `🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢\n\n` +
+        `👤 ID: \`${input.userId}\`\n` +
+        `${userVia(input.userId)}\n` +
+        `🕐 ${new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" })}`
       );
 
     case "email_captured":
       return (
-        `📧 *Usuario identificado*\n\n` +
-        `ID: \`${input.userId}\`\n` +
-        `Email: ${input.email}\n` +
-        userVia(input.userId)
+        `🟢🟢🟢 EMAIL CAPTURADO 🟢🟢🟢\n\n` +
+        `👤 ID: \`${input.userId}\`\n` +
+        `📧 *${input.email}*\n` +
+        `${userVia(input.userId)}`
       );
 
     case "state_change": {
       const actionLabel = ACTION_LABELS[input.actionType] ?? input.actionType;
+      const isPositive = input.newState === "claridad";
+      const isDanger = input.newState === "bloqueo" || input.newState === "ansiedad";
+      const bar = isDanger ? "🟡🟡🟡" : isPositive ? "🟢🟢🟢" : "🟡🟡🟡";
       return (
-        `🧠 *Cambio de estado emocional*\n\n` +
-        `👤 Usuario: \`${input.userId}\`\n` +
+        `${bar} CAMBIO EMOCIONAL ${bar}\n\n` +
+        `👤 \`${input.userId}\`\n` +
+        `📊 *${input.previousState}* → *${input.newState}*\n` +
         `🎯 Acción: ${actionLabel}\n` +
-        `💡 Estado: ${input.previousState} → *${input.newState}*\n` +
-        userVia(input.userId)
+        `${userVia(input.userId)}`
       );
     }
 
     case "crisis":
       return (
-        `🚨 *Crisis detectada*\n\n` +
+        `🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴\n` +
+        `⚠️ *CRISIS DETECTADA* ⚠️\n` +
+        `🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴\n\n` +
         `👤 Usuario: \`${input.userId}\`\n` +
-        `⚡ Nivel: *${input.crisisLevel}*` +
-        (input.lastMessage ? `\n💬 _${input.lastMessage.slice(0, 120)}_` : "") +
-        `\n` + userVia(input.userId)
+        `💥 Nivel: *${input.crisisLevel.toUpperCase()}*\n` +
+        (input.lastMessage ? `💬 _"${input.lastMessage.slice(0, 120)}"_\n` : "") +
+        `\n${userVia(input.userId)}\n` +
+        `🕐 ${new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" })}`
       );
 
-    case "streak_milestone":
+    case "streak_milestone": {
+      const isBig = input.streakDays >= 30;
+      const bar = isBig ? "🟢🟢🟢🟢🟢" : "🟢🟢🟢";
       return (
-        `🔥 *Racha destacada*\n\n` +
-        `ID: \`${input.userId}\`\n` +
-        `Racha: *${input.streakDays} días*\n` +
-        `_Vía: Check-in diario_`
+        `${bar} RACHA ${bar}\n\n` +
+        `🔥 *${input.streakDays} días consecutivos*\n` +
+        `👤 \`${input.userId}\`\n` +
+        `${isBig ? "🏆 _Racha épica — este usuario va en serio_" : "_Buen ritmo_"}`
       );
+    }
 
     case "payment": {
       const isTrialing = input.status === "trialing";
-      const emoji = isTrialing ? "🎉" : "💰";
-      const statusLabel = isTrialing ? "Prueba gratuita iniciada (7 días)" : "Pago confirmado";
       return (
-        `${emoji} *${statusLabel}*\n\n` +
-        `📧 Email: \`${input.email}\`\n` +
+        `🟣🟣🟣🟣🟣🟣🟣🟣🟣🟣\n` +
+        `💰 *${isTrialing ? "PRUEBA GRATUITA" : "PAGO CONFIRMADO"}*\n` +
+        `🟣🟣🟣🟣🟣🟣🟣🟣🟣🟣\n\n` +
+        `📧 *${input.email}*\n` +
         `📦 Plan: *${input.plan}* — ${input.amount}\n` +
-        `👤 ID: \`${input.userId}\`\n` +
-        `_Vía: Stripe webhook_`
+        `👤 \`${input.userId}\`\n` +
+        `${isTrialing ? "⏳ _7 días de prueba_" : "✅ _Cobro realizado_"}\n` +
+        `🕐 ${new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" })}`
       );
     }
 
     case "cancellation":
       return (
-        `❌ *Suscripción cancelada*\n\n` +
-        `📧 Email: \`${input.email}\`\n` +
-        `👤 ID: \`${input.userId}\`\n` +
+        `🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠\n` +
+        `❌ *CANCELACIÓN*\n` +
+        `🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠\n\n` +
+        `📧 *${input.email}*\n` +
+        `👤 \`${input.userId}\`\n` +
         `🔑 Sub: \`${input.subscriptionId}\`\n` +
-        `_Vía: Stripe webhook_`
+        `🕐 ${new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" })}`
       );
   }
 }

@@ -137,22 +137,24 @@ export default function SettingsPage() {
       .catch(() => { toast.error('No se pudo cargar tu perfil'); });
 
     fetch('/api/user/telegram-status', { credentials: 'include' })
-      .then((r) => r.json())
-      .then((d: TelegramStatus) => setTelegram(d))
+      .then((r) => r.ok ? r.json() : null)
+      .then((d: TelegramStatus | null) => { if (d?.linked !== undefined) setTelegram(d); })
       .catch(() => { /* Telegram status is optional */ });
 
     fetch('/api/user/preferences', { credentials: 'include' })
-      .then((r) => r.json())
-      .then((d: { preferences: Preferences }) => setPrefs(d.preferences))
+      .then((r) => r.ok ? r.json() : null)
+      .then((d: { preferences?: Preferences } | null) => { if (d?.preferences) setPrefs(d.preferences); })
       .catch(() => { toast.error('No se pudieron cargar las preferencias'); });
 
     fetch('/api/user/profile', { credentials: 'include' })
-      .then((r) => r.json())
-      .then((d: { profile: { name: string | null; bio: string | null; phone: string | null; hasAvatar: boolean } }) => {
-        setProfileName(d.profile.name ?? '');
-        setProfileBio(d.profile.bio ?? '');
-        setProfilePhone(d.profile.phone ?? '');
-        setHasAvatar(d.profile.hasAvatar);
+      .then((r) => r.ok ? r.json() : null)
+      .then((d: { profile?: { name: string | null; bio: string | null; phone: string | null; hasAvatar: boolean } } | null) => {
+        if (d?.profile) {
+          setProfileName(d.profile.name ?? '');
+          setProfileBio(d.profile.bio ?? '');
+          setProfilePhone(d.profile.phone ?? '');
+          setHasAvatar(d.profile.hasAvatar);
+        }
       })
       .catch(() => {});
   }, []);

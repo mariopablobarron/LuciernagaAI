@@ -235,9 +235,19 @@ export default function Sidebar({
           <Button
             asChild
             type="button"
+            variant={pathname?.startsWith("/community") ? "default" : "outline"}
+            size="sm"
+            className="justify-center"
+            data-tour="comunidad"
+          >
+            <Link href="/community">Comunidad</Link>
+          </Button>
+          <Button
+            asChild
+            type="button"
             variant={pathname?.startsWith("/app/settings") ? "default" : "outline"}
             size="sm"
-            className="justify-center col-span-3"
+            className="justify-center col-span-2"
             data-tour="ajustes"
           >
             <Link href="/app/settings">Ajustes</Link>

@@ -44,6 +44,12 @@ export const APP_TOUR: TourStep[] = [
     placement: "bottom",
   },
   {
+    target: "[data-tour='comunidad']",
+    title: "La Comunidad",
+    body: "Conecta con personas en tu misma fase. Circulos de transformacion, preguntas anonimas y La Cafeteria — un espacio virtual con avatares.",
+    placement: "bottom",
+  },
+  {
     target: "[data-tour='feedback']",
     title: "Tu opinion cuenta",
     body: "Si algo no funciona o tienes ideas, usa este boton. Lo leemos todo y nos ayuda a priorizar mejoras.",

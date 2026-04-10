@@ -204,6 +204,7 @@ export default function DashboardPage() {
                   </span>
                 </div>
                 <p className="text-xs text-zinc-500 leading-tight">{cfg.desc}</p>
+                <p className="text-[10px] text-zinc-600 leading-snug mt-1">Tu estado cambia segun lo que escribes. El mentor adapta su tono y sus preguntas a como estas.</p>
               </div>
 
               {/* Streak ring */}

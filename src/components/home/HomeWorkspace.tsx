@@ -466,7 +466,9 @@ export default function HomeWorkspace({
             <CardHeader className="pb-4">
               <CardTitle className="text-xl">Ritual diario</CardTitle>
               <CardDescription>
-                Úsalo para registrar cómo llegas hoy, aunque no necesites una conversación larga.
+                Usalo para registrar como llegas hoy, aunque no necesites una conversacion larga.
+                ¿Por que cada dia? Porque el cambio no viene de un dia bueno — viene de no perder el hilo.
+                30 segundos bastan. La constancia pequena gana siempre al esfuerzo perfecto.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

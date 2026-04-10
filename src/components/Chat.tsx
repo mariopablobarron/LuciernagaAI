@@ -500,10 +500,13 @@ export default function Chat({
       {actionLock && (
         <div className="shrink-0 border-b border-amber-500/20 bg-amber-950/20 px-4 py-2.5">
           <p className="text-xs text-amber-300">
-            <span className="font-semibold">Acción pendiente:</span>{" "}
+            <span className="font-semibold">Accion pendiente:</span>{" "}
             <span className="italic">{actionLock.actionTitle}</span>
           </p>
           <p className="mt-0.5 text-xs text-amber-500/80">{actionLock.message}</p>
+          <p className="mt-1 text-[10px] text-amber-600/60">
+            ¿Por que no te dejo cambiar de tema? Porque abrir frentes nuevos sin cerrar los anteriores es el patron que te mantiene bloqueado.
+          </p>
         </div>
       )}
 
@@ -537,6 +540,9 @@ export default function Chat({
             <h3 className="mb-1 text-base font-semibold text-white">
               ¿En qué te puedo ayudar hoy?
             </h3>
+            <p className="mb-3 max-w-sm text-xs text-zinc-600 leading-relaxed">
+              No soy un chatbot. No doy consejos genericos. Te hago las preguntas que no te estas haciendo para que veas lo que no estas viendo.
+            </p>
             {proactivePrompt ? (
               <button
                 onClick={() => handleStarterClick(proactivePrompt)}

@@ -522,6 +522,16 @@ export default function CalculadoraLatidosPage() {
                   puede ser el empujon que necesitas para dar el siguiente paso.
                 </p>
               </div>
+              <div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-4 space-y-2">
+                <p className="text-sm font-semibold text-white">¿Y ahora que?</p>
+                <p className="text-sm text-zinc-400 leading-relaxed">
+                  Saber cuantos latidos quedan no cambia nada. Lo que cambia es decidir que haces con el siguiente.
+                  Tres Mil Millones de Latidos te ayuda a dar ese paso.
+                </p>
+                <a href="/app" className="inline-flex items-center gap-2 mt-1 text-sm font-semibold text-violet-400 hover:text-violet-300 transition-colors">
+                  Empezar ahora →
+                </a>
+              </div>
             </div>
           </div>
         </div>

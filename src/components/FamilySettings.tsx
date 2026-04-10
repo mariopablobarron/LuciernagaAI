@@ -150,7 +150,7 @@ export default function FamilySettings() {
             <p className="text-xs text-muted-foreground">
               {contact
                 ? `${contact.name} · ${contact.relation ?? "contacto de confianza"}`
-                : "Sin contacto configurado"}
+                : "Sin contacto configurado — el cambio es mas facil cuando alguien sabe que lo estas intentando"}
             </p>
           </div>
         </div>

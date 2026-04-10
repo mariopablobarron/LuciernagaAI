@@ -142,6 +142,15 @@ export default function PreciosPage() {
             </div>
           ))}
         </div>
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-6 space-y-3 max-w-lg mx-auto">
+          <p className="text-sm font-semibold text-white text-center">¿Por que existe el plan Pro?</p>
+          <p className="text-xs text-zinc-400 leading-relaxed text-center">
+            El cambio real no ocurre en una conversacion — ocurre cuando mantienes el hilo durante semanas.
+            La continuidad es lo que transforma una idea en un habito. Pro existe para que no pierdas
+            ese hilo: conversaciones ilimitadas, seguimiento de acciones, y un mentor que recuerda
+            tu historia completa.
+          </p>
+        </div>
       </div>
 
       {/* FAQ */}

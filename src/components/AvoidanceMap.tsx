@@ -107,7 +107,11 @@ export default function AvoidanceMap() {
       <div className="space-y-2">
         <p className="text-sm font-semibold text-zinc-300 flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-orange-400" />
-          Lo que más evitas
+          Lo que mas evitas
+        </p>
+        <p className="text-[10px] text-zinc-600 leading-relaxed">
+          La procrastinacion no es pereza — es el indicador mas fiable de que algo te importa y te da miedo.
+          Lo que evitas repetidamente es exactamente lo que necesitas enfrentar.
         </p>
         {data.topAvoided.map((item, i) => (
           <div

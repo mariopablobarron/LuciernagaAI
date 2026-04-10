@@ -64,12 +64,16 @@ function getSessionSecret(): string {
   }
 
   // In test/dev without any secret configured, use a per-process random value.
-  // This means sessions don't survive restarts, which is fine for dev/test.
-  logInfo("CHAT", "auth_using_ephemeral_secret", {
-    nodeEnv: process.env.NODE_ENV || "development",
-  });
-  const { randomBytes } = require("crypto") as typeof import("crypto");
-  return randomBytes(32).toString("hex");
+  // Cached in global to survive hot reloads in dev.
+  const g = globalThis as unknown as { __devSessionSecret?: string };
+  if (!g.__devSessionSecret) {
+    const { randomBytes } = require("crypto") as typeof import("crypto");
+    g.__devSessionSecret = randomBytes(32).toString("hex");
+    logInfo("CHAT", "auth_using_ephemeral_secret", {
+      nodeEnv: process.env.NODE_ENV || "development",
+    });
+  }
+  return g.__devSessionSecret;
 }
 
 function base64UrlEncode(value: string): string {

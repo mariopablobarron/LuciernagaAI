@@ -1,8 +1,9 @@
 # Manual de administracion — Tres Mil Millones de Latidos
 
-**Version:** 2.0
-**Fecha:** 7 de abril de 2026
+**Version:** 3.0
+**Fecha:** 10 de abril de 2026
 **Audiencia:** Administradores del sistema, equipo clinico y responsables B2B
+**Referencia conceptual:** Para la vision general de la plataforma, roles y argumentario, consulta la [Guia de Luciernaga](GUIA-LUCIERNAGAS.md). Para el detalle clinico completo, la Parte V de la guia.
 
 ---
 
@@ -10,18 +11,22 @@
 
 0. [URLs y accesos rapidos](#0-urls-y-accesos-rapidos)
 1. [Mapa de accesos y roles](#1-mapa-de-accesos-y-roles)
-2. [Panel admin — acceso y secciones](#2-panel-admin--acceso-y-secciones)
-3. [Panel clinico — lista de usuarios](#3-panel-clinico--lista-de-usuarios)
-4. [Panel clinico — detalle de usuario](#4-panel-clinico--detalle-de-usuario)
-5. [Enviar intervenciones](#5-enviar-intervenciones)
-6. [Portal organizacional B2B](#6-portal-organizacional-b2b)
-7. [Portal familia / contacto de confianza](#7-portal-familia--contacto-de-confianza)
-8. [Notificaciones Telegram](#8-notificaciones-telegram)
-9. [Comandos Telegram como administrador](#9-comandos-telegram-como-administrador)
-10. [Planes y billing (Stripe)](#10-planes-y-billing-stripe)
-11. [Cron jobs automaticos](#11-cron-jobs-automaticos)
-12. [Variables de entorno clave](#12-variables-de-entorno-clave)
-13. [Referencia rapida de endpoints](#13-referencia-rapida-de-endpoints)
+2. [Roles de administracion (RBAC)](#2-roles-de-administracion-rbac)
+3. [Panel admin — acceso y secciones](#3-panel-admin--acceso-y-secciones)
+4. [Panel clinico — lista de usuarios](#4-panel-clinico--lista-de-usuarios)
+5. [Panel clinico — detalle de usuario](#5-panel-clinico--detalle-de-usuario)
+6. [Enviar intervenciones](#6-enviar-intervenciones)
+7. [Marketing y campanas](#7-marketing-y-campanas)
+8. [Gestion de equipos](#8-gestion-de-equipos)
+9. [Organizaciones B2B](#9-organizaciones-b2b)
+10. [Portal organizacional B2B](#10-portal-organizacional-b2b)
+11. [Portal familia / contacto de confianza](#11-portal-familia--contacto-de-confianza)
+12. [Notificaciones Telegram](#12-notificaciones-telegram)
+13. [Comandos Telegram como administrador](#13-comandos-telegram-como-administrador)
+14. [Planes y billing (Stripe)](#14-planes-y-billing-stripe)
+15. [Cron jobs automaticos](#15-cron-jobs-automaticos)
+16. [Variables de entorno clave](#16-variables-de-entorno-clave)
+17. [Referencia rapida de endpoints](#17-referencia-rapida-de-endpoints)
 
 ---
 
@@ -44,17 +49,27 @@
 | Panel clinico | `https://tresmilmillonesdelatidos.es/admin-clinical` |
 | Crisis | `https://tresmilmillonesdelatidos.es/admin/crisis` |
 | Analytics | `https://tresmilmillonesdelatidos.es/admin/analytics` |
+| Retencion | `https://tresmilmillonesdelatidos.es/admin/retention` |
+| Marketing | `https://tresmilmillonesdelatidos.es/admin/marketing` |
+| CRM | `https://tresmilmillonesdelatidos.es/admin/crm` |
+| Equipo | `https://tresmilmillonesdelatidos.es/admin/team` |
+| Organizaciones | `https://tresmilmillonesdelatidos.es/admin/organizations` |
+| Guia/Contenido | `https://tresmilmillonesdelatidos.es/admin/guia` |
+| Investigacion | `https://tresmilmillonesdelatidos.es/admin/research` |
 | Auditoria | `https://tresmilmillonesdelatidos.es/admin/audit` |
 | LLM Usage | `https://tresmilmillonesdelatidos.es/admin/llm-usage` |
+| Operaciones | `https://tresmilmillonesdelatidos.es/admin/operaciones` |
 | Configuracion | `https://tresmilmillonesdelatidos.es/admin/settings` |
 
 ### Portal organizacional B2B
 
 | Seccion | URL |
 |---|---|
+| Registro organizacion | `https://tresmilmillonesdelatidos.es/org/registro` |
 | Login organizacion | `https://tresmilmillonesdelatidos.es/org/login` |
-| Dashboard org | `https://tresmilmillonesdelatidos.es/org/dashboard` |
+| Dashboard org (HR) | `https://tresmilmillonesdelatidos.es/org/dashboard` |
 | Pacientes (terapeuta) | `https://tresmilmillonesdelatidos.es/org/patients` |
+| Guia del portal | `https://tresmilmillonesdelatidos.es/org/guia` |
 
 ### Bot de Telegram
 
@@ -82,7 +97,7 @@ curl "https://api.telegram.org/bot<TOKEN>/getWebhookInfo"
 
 ---
 
-## 1. Mapa de accesos y roles
+## 1. Mapa de accesos y autenticacion
 
 Hay 4 sistemas de autenticacion independientes:
 
@@ -142,7 +157,33 @@ Para crear el seed: `node scripts/seed-org-demo.mjs`
 
 ---
 
-## 2. Panel admin — acceso y secciones
+## 2. Roles de administracion (RBAC)
+
+El sistema de administracion usa control de acceso basado en roles (RBAC). Cada miembro del equipo tiene un rol que determina que puede ver y hacer.
+
+### Roles disponibles
+
+| Rol | Permisos principales |
+|---|---|
+| **superadmin** | Acceso total a todas las funciones (`*`) |
+| **admin** | Dashboard, analitica, auditoria, CRM, gestion de usuarios (lectura, edicion, cambio de plan, reset contrasena, envio de email), conversaciones, insights, notificaciones, Telegram |
+| **clinical** | Crisis, investigacion, datos de usuario, notas clinicas, intervenciones, evaluaciones |
+| **marketing** | Analitica, CRM, retencion, campanas broadcast, segmentos de email, notificaciones |
+| **support** | Respuesta a crisis, soporte a usuarios, reset de contrasenas, envio de emails |
+| **content** | Gestion de Journeys, ejercicios, retos y recursos educativos |
+| **ops** | Dashboard, analitica, auditoria, operaciones, uso de LLM, backups, tareas del sistema |
+
+### Como asignar roles
+
+Los roles se gestionan desde `/admin/team` (ver seccion 8). Solo un superadmin puede crear o modificar roles de otros administradores.
+
+### Permisos granulares
+
+Cada rol tiene una lista de permisos especificos (ej. `users:read`, `users:update`, `clinical-notes`, `marketing:broadcast`). El sistema verifica el permiso en cada endpoint antes de permitir la accion. Si un admin intenta acceder a una seccion sin permiso, recibe un error 403.
+
+---
+
+## 3. Panel admin — acceso y secciones
 
 ### Pasos de acceso
 
@@ -153,24 +194,32 @@ Para crear el seed: `node scripts/seed-org-demo.mjs`
 
 ### Secciones disponibles
 
-| Seccion | Ruta | Descripcion |
-|---|---|---|
-| Dashboard | `/admin` | Metricas generales, insights, alertas, retencion, distribucion emocional, crisis, evitacion, decisiones |
-| Usuarios | `/admin/users` | Listado completo con filtros, engagement score, detalle por usuario |
-| Detalle usuario | `/admin/users/[id]` | Conversaciones, timeline emocional, objetivos, notas clinicas, export PDF |
-| Conversacion | `/admin/users/[id]/conversations/[convId]` | Visualizador de conversacion individual |
-| Panel clinico | `/admin-clinical` | Monitorizacion clinica, estados emocionales, riesgo, intervenciones |
-| Analytics | `/admin/analytics` | Retencion por cohortes, funnels |
-| Crisis | `/admin/crisis` | Eventos de crisis activos e historico (24h/7d/30d) |
-| Auditoria | `/admin/audit` | Log de eventos del sistema |
-| LLM Usage | `/admin/llm-usage` | Consumo de tokens y costes IA |
-| Configuracion | `/admin/settings` | Configuracion del sistema |
+| Seccion | Ruta | Descripcion | Roles con acceso |
+|---|---|---|---|
+| Dashboard | `/admin` | Metricas generales, insights, alertas, retencion, distribucion emocional, crisis, evitacion | superadmin, admin, ops |
+| Usuarios | `/admin/users` | Listado completo con filtros, engagement score, detalle por usuario | superadmin, admin, support |
+| Detalle usuario | `/admin/users/[id]` | Conversaciones, timeline emocional, objetivos, notas clinicas, export PDF | superadmin, admin |
+| Conversacion | `/admin/users/[id]/conversations/[convId]` | Visualizador de conversacion individual | superadmin, admin |
+| Panel clinico | `/admin-clinical` | Monitorizacion clinica, estados emocionales, riesgo, intervenciones | superadmin, clinical |
+| Analytics | `/admin/analytics` | Retencion por cohortes, funnels, actividad | superadmin, admin, marketing, ops |
+| Retencion | `/admin/retention` | Analisis de cohortes, hitos de retencion (D1/D3/D7/D14/D30) | superadmin, admin, marketing |
+| Crisis | `/admin/crisis` | Eventos de crisis activos e historico (24h/7d/30d) | superadmin, admin, clinical, support |
+| Marketing | `/admin/marketing` | Campanas broadcast, segmentos, metricas, historial | superadmin, marketing |
+| CRM | `/admin/crm` | Gestion de relaciones con usuarios | superadmin, admin, marketing |
+| Equipo | `/admin/team` | Gestion de admins, asignacion de roles | superadmin |
+| Organizaciones | `/admin/organizations` | Gestion de organizaciones B2B, OrgAdmins, limites | superadmin, admin |
+| Guia/Contenido | `/admin/guia` | Gestion de Journeys, modulos, ejercicios, retos | superadmin, content |
+| Investigacion | `/admin/research` | Datos anonimizados, analisis de patrones | superadmin, clinical |
+| Auditoria | `/admin/audit` | Log de eventos del sistema | superadmin, admin, ops |
+| LLM Usage | `/admin/llm-usage` | Consumo de tokens y costes IA | superadmin, ops |
+| Operaciones | `/admin/operaciones` | Estado del sistema, cron jobs, backups | superadmin, ops |
+| Configuracion | `/admin/settings` | Configuracion general del sistema | superadmin |
 
 > El panel clinico (`/admin-clinical`) usa la misma sesion que el resto del admin — no requiere login separado.
 
 ---
 
-## 3. Panel clinico — lista de usuarios
+## 4. Panel clinico — lista de usuarios
 
 **Ruta:** `/admin-clinical`
 
@@ -205,7 +254,7 @@ Muestra todos los usuarios con informacion clinica relevante.
 
 ---
 
-## 4. Panel clinico — detalle de usuario
+## 5. Panel clinico — detalle de usuario
 
 **Ruta:** `/admin-clinical/user/[id]`
 
@@ -245,7 +294,7 @@ Ultimos 50 mensajes de la conversacion del usuario, formato de burbuja. Los mens
 
 ---
 
-## 5. Enviar intervenciones
+## 6. Enviar intervenciones
 
 El panel de intervencion esta en la columna derecha del detalle de usuario. Es sticky — permanece visible mientras navegas la pagina.
 
@@ -278,7 +327,92 @@ Debajo del panel de envio aparecen las intervenciones anteriores, ordenadas de m
 
 ---
 
-## 6. Portal organizacional B2B
+## 7. Marketing y campanas
+
+**Ruta:** `/admin/marketing`
+**Roles:** superadmin, marketing
+
+### Funcionalidades
+
+#### Campanas broadcast
+- Envio de mensajes masivos a segmentos de usuarios.
+- Seleccion de segmento destino.
+- Programacion de envio.
+- Tracking de metricas.
+
+#### Segmentos
+- Creacion y gestion de segmentos de usuarios basados en comportamiento, estado emocional, plan, engagement, etc.
+- Endpoint: `GET /api/admin/marketing/segments`
+
+#### Metricas de campana
+- Tasa de apertura, clics, conversiones.
+- Endpoint: `GET /api/admin/marketing/metrics`
+
+#### Historial
+- Registro completo de todas las campanas enviadas.
+- Endpoint: `GET /api/admin/marketing/history`
+
+### Emails programados
+
+El sistema tiene emails automaticos que se gestionan via cron jobs:
+
+| Email | Cuando se envia |
+|---|---|
+| Bienvenida personalizada | Tras el registro |
+| Nudge 24h | 24 horas despues del registro si el usuario no ha vuelto |
+| Recordatorio semanal | Cada semana para usuarios inactivos |
+| Resumen semanal | Cada semana para usuarios activos |
+
+---
+
+## 8. Gestion de equipos
+
+**Ruta:** `/admin/team`
+**Roles:** superadmin
+
+### Operaciones disponibles
+
+- **Listar** todos los miembros del equipo admin con su rol.
+- **Crear** un nuevo admin: nombre, email, contrasena y rol.
+- **Editar** rol de un admin existente.
+- **Eliminar** un admin del equipo.
+
+### Endpoints
+
+| Metodo | Ruta | Descripcion |
+|---|---|---|
+| `GET` | `/api/admin/team` | Lista de todos los admins |
+| `POST` | `/api/admin/team` | Crear nuevo admin |
+| `PUT` | `/api/admin/team/[id]` | Editar admin |
+| `DELETE` | `/api/admin/team/[id]` | Eliminar admin |
+
+---
+
+## 9. Organizaciones B2B (gestion admin)
+
+**Ruta:** `/admin/organizations`
+**Roles:** superadmin, admin
+
+### Que puedes hacer
+
+- **Listar** todas las organizaciones registradas.
+- **Crear** una nueva organizacion: nombre, slug, tipo (empresa/clinica/centro educativo).
+- **Asignar OrgAdmins**: crear cuentas de HR o terapeuta para la organizacion.
+- **Gestionar invitaciones**: asignar usuarios a la organizacion.
+- **Configurar limites**: numero maximo de usuarios por plan.
+- **Ver metricas** por organizacion.
+
+### Endpoints
+
+| Metodo | Ruta | Descripcion |
+|---|---|---|
+| `GET` | `/api/admin/organizations` | Lista de organizaciones |
+| `POST` | `/api/admin/organizations` | Crear organizacion |
+| `GET` | `/api/admin/organizations/[id]/users` | Usuarios de la organizacion |
+
+---
+
+## 10. Portal organizacional B2B
 
 ### Que es
 
@@ -314,7 +448,7 @@ Las organizaciones se gestionan directamente en la base de datos (tabla `Organiz
 
 ---
 
-## 7. Portal familia / contacto de confianza
+## 11. Portal familia / contacto de confianza
 
 ### Que es
 
@@ -342,7 +476,7 @@ Cada persona de confianza recibe un token unico. Accede a `/family/[token]` sin 
 
 ---
 
-## 8. Notificaciones Telegram
+## 12. Notificaciones Telegram
 
 El bot envia notificaciones automaticas al administrador configurado en `ADMIN_TELEGRAM_ID`.
 
@@ -411,7 +545,7 @@ El constructor de mensajes admin esta centralizado en src/services/telegram.ts �
 
 ---
 
-## 9. Comandos Telegram como administrador
+## 13. Comandos Telegram como administrador
 
 Cuando escribes al bot desde el chat configurado como `ADMIN_TELEGRAM_ID`, tienes acceso a comandos exclusivos.
 
@@ -444,15 +578,19 @@ Cualquier mensaje que no sea un comando activa el modo IA directa: el bot consul
 
 ---
 
-## 10. Planes y billing (Stripe)
+## 14. Planes y billing (Stripe)
 
-### Planes configurados
+### Estado actual: MVP gratuito (hasta octubre 2026)
+
+Durante el periodo MVP, todos los usuarios tienen acceso completo a las funciones Pro sin necesidad de pago. La variable `FREE_PLAN_UNLIMITED=true` controla esto.
+
+### Planes configurados (post-MVP)
 
 | Plan | Precio | Limites |
 |---|---|---|
 | Free | 0 euros | 10 conversaciones/mes, 20 mensajes/conversacion |
-| Pro mensual | 9 euros/mes | Ilimitado + Modo Impulso |
-| Pro anual | 79 euros/ano | Ilimitado + Modo Impulso |
+| Pro mensual | 9 euros/mes | Ilimitado + Modo Impulso + Telegram + Portal familiar |
+| Pro anual | 79 euros/ano | Ilimitado + Modo Impulso + Telegram + Portal familiar |
 
 El plan Pro incluye 7 dias de prueba gratuita.
 
@@ -479,22 +617,26 @@ El plan Pro incluye 7 dias de prueba gratuita.
 
 ---
 
-## 11. Cron jobs automaticos
+## 15. Cron jobs automaticos
 
 Todos los cron jobs requieren el parametro `?secret=CRON_SECRET`.
 
-| Ruta | Descripcion |
-|---|---|
-| `/api/cron/weekly-summary` | Resumen semanal enviado por Telegram |
-| `/api/cron/action-reminders` | Recordatorios de acciones pendientes |
-| `/api/cron/reminders` | Recordatorios generales a usuarios |
-| `/api/cron/user-weekly-review` | Revision semanal proactiva por usuario |
-| `/api/cron/proactive-review` | Revision proactiva de progreso |
-| `/api/cron/inactivity-check` | Deteccion de usuarios inactivos |
+| Ruta | Descripcion | Frecuencia recomendada |
+|---|---|---|
+| `/api/cron/24h-nudge` | Nudge a usuarios nuevos inactivos tras 24h | Diaria |
+| `/api/cron/action-reminders` | Recordatorios de acciones pendientes via Telegram | Diaria |
+| `/api/cron/inactivity-check` | Deteccion de usuarios inactivos | Diaria |
+| `/api/cron/proactive-review` | Revision proactiva de progreso | Diaria |
+| `/api/cron/reminders` | Recordatorios generales a usuarios | Diaria |
+| `/api/cron/scheduled-emails` | Envio de campanas de email programadas | Cada hora |
+| `/api/cron/telegram-checkin` | Recordatorio de check-in diario via Telegram | Diaria (manana) |
+| `/api/cron/user-weekly-review` | Revision semanal proactiva por usuario | Semanal |
+| `/api/cron/weekly-inactive-reminder` | Re-engagement de usuarios inactivos | Semanal |
+| `/api/cron/weekly-summary` | Resumen semanal enviado por Telegram al admin | Semanal |
 
 ---
 
-## 12. Variables de entorno clave
+## 16. Variables de entorno clave
 
 ### Obligatorias en produccion
 
@@ -546,7 +688,7 @@ curl "https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/getWebhookInfo"
 
 ---
 
-## 13. Referencia rapida de endpoints
+## 17. Referencia rapida de endpoints
 
 ### Auth usuario
 
@@ -570,19 +712,57 @@ curl "https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/getWebhookInfo"
 | `POST` | `/api/admin/logout` | Logout admin |
 | `GET` | `/api/admin/users` | Lista de usuarios |
 | `GET` | `/api/admin/users/[id]` | Detalle de usuario |
+| `POST` | `/api/admin/users/[id]/change-plan` | Cambiar plan de suscripcion |
 | `GET` | `/api/admin/users/[id]/emotional-history` | Historial emocional |
 | `GET` | `/api/admin/users/[id]/export-pdf` | Exportar PDF del usuario |
 | `GET` | `/api/admin/insights` | Metricas y alertas del dashboard |
 | `GET` | `/api/admin/retention` | Retencion por cohortes |
+| `GET` | `/api/admin/analytics` | Analytics general |
 | `GET` | `/api/admin/llm-usage` | Consumo de tokens y costes |
-| `GET` | `/api/admin/clinical-notes/[userId]` | Notas clinicas |
+| `GET/POST` | `/api/admin/clinical-notes/[userId]` | Notas clinicas (listar/crear) |
+| `DELETE` | `/api/admin/clinical-notes/[userId]?noteId=X` | Eliminar nota clinica |
 | `GET` | `/api/admin/assessments/[userId]` | Evaluaciones |
 | `GET` | `/api/admin/conversations/[id]` | Conversacion individual |
+| `GET` | `/api/admin/crisis` | Eventos de crisis |
+| `GET` | `/api/admin/crm` | Datos de CRM |
+| `GET` | `/api/admin/export` | Exportacion de datos |
+| `GET` | `/api/admin/family` | Datos de portales familiares |
+| `GET` | `/api/admin/feedback` | Feedback de usuarios |
+| `GET` | `/api/admin/notifications` | Configuracion de notificaciones |
+| `GET` | `/api/admin/operations` | Estado de operaciones |
+| `GET` | `/api/admin/settings` | Configuracion del sistema |
 | `GET` | `/api/admin/telegram-report` | Generar y enviar resumen Telegram |
 | `POST` | `/api/admin/test-email` | Test de envio de email |
 | `POST` | `/api/admin/backup` | Backup de datos |
 | `GET` | `/api/admin/tasks` | Tareas admin pendientes |
 | `GET` | `/api/admin/accompaniment` | Datos de acompanamiento |
+
+### Admin — Marketing (requieren cookie `mw_admin_session` + rol marketing)
+
+| Metodo | Ruta | Descripcion |
+|---|---|---|
+| `POST` | `/api/admin/marketing/broadcast` | Enviar broadcast a segmento |
+| `GET/POST` | `/api/admin/marketing/campaign` | Gestionar campanas |
+| `GET` | `/api/admin/marketing/metrics` | Metricas de campanas |
+| `GET` | `/api/admin/marketing/history` | Historial de envios |
+| `GET` | `/api/admin/marketing/segments` | Listar segmentos |
+
+### Admin — Equipos (requieren cookie `mw_admin_session` + superadmin)
+
+| Metodo | Ruta | Descripcion |
+|---|---|---|
+| `GET` | `/api/admin/team` | Lista de admins |
+| `POST` | `/api/admin/team` | Crear admin |
+| `PUT` | `/api/admin/team/[id]` | Editar admin |
+| `DELETE` | `/api/admin/team/[id]` | Eliminar admin |
+
+### Admin — Organizaciones (requieren cookie `mw_admin_session`)
+
+| Metodo | Ruta | Descripcion |
+|---|---|---|
+| `GET` | `/api/admin/organizations` | Lista de organizaciones |
+| `POST` | `/api/admin/organizations` | Crear organizacion |
+| `GET` | `/api/admin/organizations/[id]/users` | Usuarios de una organizacion |
 
 ### Admin clinico (requieren cookie `mw_admin_session`)
 
@@ -640,12 +820,16 @@ Tipos validos: `message` | `recommendation` | `resource` | `assessment`
 
 | Metodo | Ruta | Descripcion |
 |---|---|---|
-| `GET` | `/api/cron/weekly-summary` | Resumen semanal |
-| `GET` | `/api/cron/action-reminders` | Recordatorios de acciones |
-| `GET` | `/api/cron/reminders` | Recordatorios generales |
-| `GET` | `/api/cron/user-weekly-review` | Revision semanal por usuario |
-| `GET` | `/api/cron/proactive-review` | Revision proactiva |
+| `GET` | `/api/cron/24h-nudge` | Nudge a usuarios inactivos tras 24h |
+| `GET` | `/api/cron/action-reminders` | Recordatorios de acciones pendientes |
 | `GET` | `/api/cron/inactivity-check` | Deteccion de inactividad |
+| `GET` | `/api/cron/proactive-review` | Revision proactiva de progreso |
+| `GET` | `/api/cron/reminders` | Recordatorios generales |
+| `GET` | `/api/cron/scheduled-emails` | Envio de emails programados |
+| `GET` | `/api/cron/telegram-checkin` | Check-in diario via Telegram |
+| `GET` | `/api/cron/user-weekly-review` | Revision semanal por usuario |
+| `GET` | `/api/cron/weekly-inactive-reminder` | Re-engagement de inactivos |
+| `GET` | `/api/cron/weekly-summary` | Resumen semanal |
 
 ### Sistema
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { ArrowRight, CheckCircle2, Link2 } from "lucide-react";
 import { COMPONENTS } from "@/styles/design-system";
+import PrivacyCheckbox from "@/components/PrivacyCheckbox";
 import { trackEvent } from "@/lib/analytics";
 import { trackMetaEvent } from "@/lib/meta-pixel";
 
@@ -250,6 +251,7 @@ export default function TestPage() {
   const [answers, setAnswers] = useState<(number | null)[]>(Array(QUESTIONS.length).fill(null));
   const [email, setEmail] = useState("");
   const [emailStatus, setEmailStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [emailConsent, setEmailConsent] = useState(false);
   const [result, setResult] = useState<EmotionalState | null>(null);
   const [previousState, setPreviousState] = useState<EmotionalState | null>(null);
   const autoAdvanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -466,9 +468,14 @@ export default function TestPage() {
                 if (e.key === "Enter" && email.trim()) void handleEmailSubmit(false);
               }}
             />
+            <PrivacyCheckbox
+              checked={emailConsent}
+              onChange={setEmailConsent}
+              context="Tu email y resultado se usaran para enviarte el diagnostico y seguimiento."
+            />
             <button
               onClick={() => void handleEmailSubmit(false)}
-              disabled={!email.trim() || emailStatus === "sending"}
+              disabled={!email.trim() || !emailConsent || emailStatus === "sending"}
               className={`${COMPONENTS.buttonPrimary} w-full py-3 text-sm disabled:opacity-40 disabled:cursor-not-allowed`}
             >
               {emailStatus === "sending" ? "Enviando…" : "Ver resultado →"}

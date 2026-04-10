@@ -6,6 +6,7 @@ import { ArrowRight, Heart, Clock, Calendar, Baby, Sparkles } from "lucide-react
 import { COMPONENTS, GRADIENTS, TYPOGRAPHY, LAYOUTS } from "@/styles/design-system";
 import { trackEvent } from "@/lib/analytics";
 import { useSfx } from "@/lib/useSfx";
+import PrivacyCheckbox from "@/components/PrivacyCheckbox";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -178,6 +179,7 @@ export default function CalculadoraLatidosPage() {
 
   // Email capture
   const [captureEmail, setCaptureEmail] = useState("");
+  const [emailConsent, setEmailConsent] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [emailSending, setEmailSending] = useState(false);
 
@@ -429,7 +431,7 @@ export default function CalculadoraLatidosPage() {
                   />
                   <button
                     type="button"
-                    disabled={emailSending || !captureEmail.includes("@")}
+                    disabled={emailSending || !captureEmail.includes("@") || !emailConsent}
                     onClick={async () => {
                       setEmailSending(true);
                       try {
@@ -451,7 +453,13 @@ export default function CalculadoraLatidosPage() {
                     {emailSending ? "..." : "Enviar"}
                   </button>
                 </div>
-                <p className="mt-2 text-[10px] text-zinc-700">Sin spam. Solo tu informe.</p>
+                <div className="mt-3">
+                  <PrivacyCheckbox
+                    checked={emailConsent}
+                    onChange={setEmailConsent}
+                    context="Tu email se usara solo para enviar este informe."
+                  />
+                </div>
               </div>
             ) : (
               <div className={COMPONENTS.card}>

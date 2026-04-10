@@ -88,6 +88,12 @@ model User {
   assessments     Assessment[]
   wins            Win[]
   actionReminders ActionReminder[]
+  circleMembers   CircleMember[]
+  communityPosts       CommunityPost[]
+  pushSubscriptions    PushSubscription[]
+  notifications        Notification[]
+  heartbeats           Heartbeat[]
+  commitments     DailyCommitment[]
   preferences     UserPreferences?
   trustedContact  TrustedContact?
   supportMessages SupportMessage[]
@@ -108,7 +114,6 @@ model User {
   personalProjects     PersonalProject[]
   diaryEntries         DiaryEntry[]
   userBadges           UserBadge[]
-  communityPosts       CommunityPost[]
   phone                String?
   emailVerified        Boolean          @default(false)
   emailVerifyToken     String?
@@ -1092,22 +1097,34 @@ model UserBadge {
   @@index([userId])
 }
 
-// ─── Community Wall ──────────────────────────────────────────────────────────
+// ─── Community System ────────────────────────────────────────────────────────
 
-/// Anonymous community post — shared reflections.
+/// Structured community post — guided format, not free text.
 model CommunityPost {
-  id        String   @id @default(cuid())
-  userId    String
-  content   String   @db.Text
-  phase     String?  // project phase this relates to
-  anonymous Boolean  @default(true)
-  likes     Int      @default(0)
-  hidden    Boolean  @default(false) // moderation flag
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String          @id @default(cuid())
+  userId     String
+  circleId   String?
+  spaceId    String?
+  type       String          @default("reflection") // "reflection" | "victory" | "commitment" | "question"
+  feeling    String?         // "Hoy me siento..."
+  blocker    String?         // "Lo que me frena es..."
+  step       String?         // "Mi paso de hoy es..."
+  content    String?         @db.Text
+  phase      String?
+  anonymous  Boolean         @default(true)
+  likes      Int             @default(0)
+  hidden     Boolean         @default(false)
+  createdAt  DateTime        @default(now())
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  circle     Circle?         @relation(fields: [circleId], references: [id], onDelete: SetNull)
+  space      CommunitySpace? @relation(fields: [spaceId], references: [id], onDelete: SetNull)
+  heartbeats Heartbeat[]
 
   @@index([createdAt])
   @@index([hidden, createdAt])
+  @@index([circleId, createdAt])
+  @@index([spaceId, createdAt])
+  @@index([type, createdAt])
 }
 
 // ─── Marketing Dashboard ──────────────────────────────────────────────────────
@@ -1149,4 +1166,174 @@ model AuditLog {
   @@index([resource, resourceId])
   @@index([action, createdAt])
   @@index([createdAt])
+}
+
+// ─── Community: Circles of Transformation ────────────────────────────────────
+
+enum CirclePhase {
+  bloqueo
+  exploracion
+  decision
+  accion
+  consistencia
+}
+
+enum CircleRole {
+  member
+  mentor_par
+  coach
+  psychologist
+}
+
+/// A small group (5-8 people) in the same transformation phase.
+model Circle {
+  id          String      @id @default(cuid())
+  name        String
+  phase       CirclePhase
+  maxMembers  Int         @default(8)
+  description String?
+  startsAt    DateTime    @default(now())
+  endsAt      DateTime?
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  members     CircleMember[]
+  posts       CommunityPost[]
+  commitments DailyCommitment[]
+  challenges  CircleChallenge[]
+  sessions    LiveSession[]
+
+  @@index([phase, isActive])
+}
+
+model CircleMember {
+  id       String     @id @default(cuid())
+  circleId String
+  userId   String
+  role     CircleRole @default(member)
+  joinedAt DateTime   @default(now())
+  leftAt   DateTime?
+  circle   Circle     @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([circleId, userId])
+  @@index([userId])
+}
+
+/// Weekly challenge set by the coach for the whole circle.
+model CircleChallenge {
+  id          String   @id @default(cuid())
+  circleId    String
+  title       String
+  description String?
+  weekStart   DateTime
+  weekEnd     DateTime
+  createdAt   DateTime @default(now())
+  circle      Circle   @relation(fields: [circleId], references: [id], onDelete: Cascade)
+
+  @@index([circleId, weekStart])
+}
+
+// ─── Community: Spaces ───────────────────────────────────────────────────────
+
+/// Thematic space (e.g. "Bloqueo y procrastinación").
+model CommunitySpace {
+  id          String          @id @default(cuid())
+  slug        String          @unique
+  name        String
+  description String?
+  icon        String?         // emoji
+  sortOrder   Int             @default(0)
+  isActive    Boolean         @default(true)
+  posts       CommunityPost[]
+}
+
+/// "Latido" reaction — instead of likes.
+model Heartbeat {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+}
+
+// ─── Community: Daily Commitments ────────────────────────────────────────────
+
+/// "Hoy voy a..." — visible to the circle.
+model DailyCommitment {
+  id        String   @id @default(cuid())
+  userId    String
+  circleId  String
+  text      String
+  date      DateTime @db.Date
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  circle    Circle   @relation(fields: [circleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, circleId, date])
+  @@index([circleId, date])
+}
+
+// ─── Community: Live Sessions ────────────────────────────────────────────────
+
+/// Scheduled group session with a professional.
+model LiveSession {
+  id          String   @id @default(cuid())
+  circleId    String?
+  title       String
+  description String?
+  hostName    String
+  hostRole    String   // "coach" | "psychologist"
+  scheduledAt DateTime
+  durationMin Int      @default(60)
+  meetingUrl  String?
+  isOpen      Boolean  @default(false) // open to all or circle-only
+  status      String   @default("scheduled") // "scheduled" | "live" | "completed" | "cancelled"
+  createdAt   DateTime @default(now())
+  circle      Circle?  @relation(fields: [circleId], references: [id], onDelete: SetNull)
+
+  @@index([scheduledAt])
+  @@index([circleId, scheduledAt])
+}
+
+// ─── Push Notifications ─────────────────────────────────────────────────────
+
+/// Browser push subscription (one per device per user).
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @db.Text
+  p256dh    String   // encryption key
+  auth      String   // auth secret
+  userAgent String?  // browser/device identifier
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, endpoint])
+  @@index([userId])
+}
+
+/// In-app notification delivered to a user (push + bell icon).
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String
+  body      String
+  url       String?   // deep link to open on click
+  icon      String?   // emoji or icon key
+  channel   String    @default("system") // "system" | "goal" | "streak" | "crisis" | "insight" | "challenge" | "admin"
+  read      Boolean   @default(false)
+  pushed    Boolean   @default(false) // was a web push sent?
+  pushedAt  DateTime?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read, createdAt])
+  @@index([userId, createdAt])
+  @@index([channel, createdAt])
 }

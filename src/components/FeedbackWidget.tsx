@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { MessageSquarePlus, Star, X } from "lucide-react";
 import { toast } from "sonner";
@@ -31,6 +31,12 @@ export default function FeedbackWidget() {
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const closeTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  // Cleanup pending timers on unmount
+  useEffect(() => {
+    return () => closeTimers.current.forEach(clearTimeout);
+  }, []);
 
   // Auto-prompt once per week, 90s into the session
   useEffect(() => {
@@ -71,10 +77,12 @@ export default function FeedbackWidget() {
       sfx.play("success");
       setSent(true);
       localStorage.setItem(LAST_SHOWN_KEY, String(Date.now()));
-      setTimeout(() => {
+      const t1 = setTimeout(() => {
         setOpen(false);
-        setTimeout(() => { setSent(false); setRating(0); setMessage(""); setType("suggestion"); }, 300);
+        const t2 = setTimeout(() => { setSent(false); setRating(0); setMessage(""); setType("suggestion"); }, 300);
+        closeTimers.current.push(t2);
       }, 2000);
+      closeTimers.current.push(t1);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo enviar");
     } finally {

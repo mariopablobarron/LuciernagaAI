@@ -4,6 +4,7 @@ import { Suspense, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ArrowRight, CheckCircle, Lock, Sparkles } from "lucide-react";
 import { COMPONENTS } from "@/styles/design-system";
+import PrivacyCheckbox from "@/components/PrivacyCheckbox";
 import { trackEvent } from "@/lib/analytics";
 import { trackMetaEvent } from "@/lib/meta-pixel";
 import { getUtmParams } from "@/lib/utm";
@@ -43,6 +44,7 @@ function UnirseContent() {
   const [current, setCurrent] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
   // Pre-fill email if stored from invite page
   useEffect(() => {
@@ -176,9 +178,15 @@ function UnirseContent() {
               required
               className={COMPONENTS.inputField}
             />
+            <PrivacyCheckbox
+              checked={privacyAccepted}
+              onChange={setPrivacyAccepted}
+              context="Tus respuestas y email se usaran para personalizar tu experiencia."
+            />
             <button
               type="submit"
-              className={`${COMPONENTS.buttonPrimary} w-full flex items-center justify-center gap-2 py-3`}
+              disabled={!privacyAccepted}
+              className={`${COMPONENTS.buttonPrimary} w-full flex items-center justify-center gap-2 py-3 disabled:opacity-40 disabled:cursor-not-allowed`}
             >
               Empezar las misiones <ArrowRight className="h-4 w-4" />
             </button>

@@ -59,8 +59,14 @@ export default function ConsentModal({ onAccept }: Props) {
             <strong className="text-white">Líneas de crisis:</strong> España 024 · EE.UU. 988 ·
             Emergencias 112/911
           </p>
+          <p className="text-zinc-500 text-xs">
+            Consulta nuestra{" "}
+            <a href="/privacy" target="_blank" className="text-violet-400 underline underline-offset-2 hover:text-violet-300">politica de privacidad</a>{" "}
+            y los{" "}
+            <a href="/terms" target="_blank" className="text-violet-400 underline underline-offset-2 hover:text-violet-300">terminos de uso</a>.
+          </p>
           <p className="text-zinc-600 text-xs">
-            Versión 1.0 · {new Date().toLocaleDateString("es-ES", { year: "numeric", month: "long", day: "numeric" })}
+            Version 1.0 · {new Date().toLocaleDateString("es-ES", { year: "numeric", month: "long", day: "numeric" })}
           </p>
         </div>
 

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import PrivacyCheckbox from "@/components/PrivacyCheckbox";
 
 type Contact = {
   id: string;
@@ -29,6 +30,7 @@ export default function FamilySettings() {
   const [contact, setContact] = useState<Contact | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [thirdPartyConsent, setThirdPartyConsent] = useState(false);
   const [saved, setSaved] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -277,12 +279,21 @@ export default function FamilySettings() {
             </div>
           )}
 
+          {/* Third-party consent */}
+          {!contact && (
+            <PrivacyCheckbox
+              checked={thirdPartyConsent}
+              onChange={setThirdPartyConsent}
+              context="Confirmo que tengo permiso de esta persona para compartir su email y recibira una invitacion para acceder a mi progreso."
+            />
+          )}
+
           {/* Actions */}
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"
               onClick={() => void handleSave()}
-              disabled={saving || !name.trim() || !email.trim()}
+              disabled={saving || !name.trim() || !email.trim() || (!contact && !thirdPartyConsent)}
               className="flex-1"
               size="sm"
             >

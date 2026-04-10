@@ -335,7 +335,8 @@ type GoalRecord = {
   actions: GoalActionItem[];
 };
 
-function prioritizeGoalRecords(goals: GoalRecord[]): GoalRecord {
+function prioritizeGoalRecords(goals: GoalRecord[]): GoalRecord | undefined {
+  if (goals.length === 0) return undefined;
   return [...goals].sort((left, right) => {
     const leftHasPending = left.actions.some((action) => !action.completed) ? 1 : 0;
     const rightHasPending = right.actions.some((action) => !action.completed) ? 1 : 0;
@@ -439,6 +440,7 @@ export async function getActiveGoalForUser(userId: string): Promise<GoalWithProg
   }
 
   const prioritizedGoal = prioritizeGoalRecords(goals);
+  if (!prioritizedGoal) return null;
   const staleGoalIds = goals
     .filter((goal) => goal.id !== prioritizedGoal.id)
     .map((goal) => goal.id);

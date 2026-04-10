@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { COMPONENTS, TYPOGRAPHY } from "@/styles/design-system";
+import PrivacyCheckbox from "@/components/PrivacyCheckbox";
 
 export default function ContactForm() {
   const [name, setName] = useState("");
@@ -9,6 +10,7 @@ export default function ContactForm() {
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -118,18 +120,21 @@ export default function ContactForm() {
             </div>
           )}
 
+          {/* Privacy consent */}
+          <PrivacyCheckbox
+            checked={privacyAccepted}
+            onChange={setPrivacyAccepted}
+            context="Tus datos se usaran solo para responder tu mensaje."
+          />
+
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={isSubmitting || !name.trim() || !email.trim() || !message.trim()}
+            disabled={isSubmitting || !privacyAccepted || !name.trim() || !email.trim() || !message.trim()}
             className={`${COMPONENTS.buttonPrimary} w-full py-2`}
           >
             {isSubmitting ? "Enviando..." : "Enviar mensaje"}
           </button>
-
-          <p className="text-xs text-zinc-500 text-center">
-            Responderemos en las próximas 24 horas.
-          </p>
         </form>
       </div>
     </div>

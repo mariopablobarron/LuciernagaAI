@@ -1,8 +1,9 @@
 # Manual para Organizaciones — Tres Mil Millones de Latidos
 
-**Version:** 1.0
-**Fecha:** 7 de abril de 2026
+**Version:** 2.0
+**Fecha:** 10 de abril de 2026
 **Audiencia:** Responsables de HR, psicologos y terapeutas de centros que usan la plataforma
+**Referencia conceptual:** Para entender la filosofia y el marco pedagogico, consulta la [Guia de Luciernaga](GUIA-LUCIERNAGAS.md) (Parte I). Para el detalle clinico completo, consulta la Parte V de la guia.
 
 ---
 
@@ -19,20 +20,33 @@ Hay dos roles:
 
 ---
 
-## 2. Como acceder
+## 2. Registro de una nueva organizacion
+
+Si tu centro aun no esta dado de alta en la plataforma:
+
+1. Ve a `/org/registro`
+2. Sigue el formulario de tres pasos:
+   - **Paso 1:** Tipo de organizacion (empresa, clinica, centro educativo)
+   - **Paso 2:** Nombre de la organizacion y slug identificador (ej. `mi-centro`)
+   - **Paso 3:** Datos del primer administrador (email y contrasena) y seleccion de plan
+3. Al completar el registro, se crea la organizacion y tu cuenta de OrgAdmin
+
+---
+
+## 3. Como acceder al portal
 
 1. Entra en la web y ve a `/org/login`
 2. Introduce los tres campos:
    - **Organizacion:** el identificador de tu centro (ej. `demo-corp`)
    - **Email:** tu email profesional
-   - **Contrasena:** la que te proporciono el administrador del sistema
+   - **Contrasena:** la que configuraste al registrarte o la que te proporciono el administrador
 3. Pulsa "Entrar"
 
 Si no tienes credenciales, solicitalas al responsable tecnico de tu organizacion.
 
 ---
 
-## 3. Dashboard de bienestar (rol HR)
+## 4. Dashboard de bienestar (rol HR)
 
 Al entrar como HR ves un dashboard con datos **anonimizados y agregados**. Ningun dato individual es visible.
 
@@ -75,7 +89,7 @@ Muestra las emociones mas frecuentes detectadas en las conversaciones del equipo
 
 ---
 
-## 4. Lista de pacientes (rol terapeuta)
+## 5. Lista de pacientes (rol terapeuta)
 
 Al entrar como terapeuta ves una lista de las personas asignadas a tu organizacion con indicadores clinicos.
 
@@ -114,7 +128,7 @@ El terapeuta ve un resumen clinico, no el detalle de las sesiones.
 
 ---
 
-## 5. Interpretacion de estados emocionales
+## 6. Interpretacion de estados emocionales
 
 El sistema detecta automaticamente el estado emocional de cada persona en base a sus conversaciones y check-ins.
 
@@ -139,7 +153,7 @@ El sistema detecta automaticamente el estado emocional de cada persona en base a
 
 ---
 
-## 6. Protocolo de crisis
+## 7. Protocolo de crisis
 
 Cuando el sistema detecta una situacion de alto riesgo emocional (palabras clave de riesgo vital):
 
@@ -155,7 +169,7 @@ Como terapeuta, los pacientes con crisis activa aparecen marcados en **rojo** en
 
 ---
 
-## 7. Buenas practicas para centros
+## 8. Buenas practicas para centros
 
 ### Para HR
 
@@ -174,7 +188,26 @@ Como terapeuta, los pacientes con crisis activa aparecen marcados en **rojo** en
 
 ---
 
-## 8. Preguntas frecuentes
+## 9. Guia integrada en el portal
+
+Dentro del portal organizacional hay una guia completa accesible desde el icono de libro (`/org/guia`). Incluye:
+
+- Como acceder al portal
+- Explicacion de cada rol (HR y terapeuta)
+- Detalle del dashboard de bienestar
+- Estados emocionales y como interpretarlos
+- Lista de pacientes y sus indicadores
+- Niveles de riesgo y cuando actuar
+- Protocolo de crisis
+- Privacidad y proteccion de datos
+- Buenas practicas para cada rol
+- Preguntas frecuentes
+
+Recomendamos que todos los nuevos usuarios del portal la lean antes de empezar a usar el sistema.
+
+---
+
+## 10. Preguntas frecuentes
 
 ### Puedo ver las conversaciones de chat de mis pacientes?
 
@@ -202,7 +235,7 @@ Actualmente no hay boton de exportacion en el portal. Coordina con el administra
 
 ---
 
-## 9. Soporte
+## 11. Soporte
 
 Si tienes problemas con el acceso o necesitas asistencia:
 
@@ -213,5 +246,5 @@ Si tienes problemas con el acceso o necesitas asistencia:
 
 Documento: Manual para Organizaciones
 Producto: Tres Mil Millones de Latidos
-Version: v1.0
-Fecha: 7 de abril de 2026
+Version: v2.0
+Fecha: 10 de abril de 2026

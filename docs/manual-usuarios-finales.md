@@ -1,7 +1,8 @@
-# Guía de usuario — Tres Mil Millones de Latidos
+# Manual de usuario — Tres Mil Millones de Latidos
 
-**Versión:** v2.1
-**Fecha:** 9 de abril de 2026
+**Version:** v3.0
+**Fecha:** 10 de abril de 2026
+**Referencia conceptual:** Para entender la filosofia, el argumentario y el marco pedagogico de la plataforma, consulta la [Guia de Luciernaga](GUIA-LUCIERNAGAS.md) (Parte I).
 
 ---
 
@@ -36,12 +37,22 @@ No necesitas conocimientos técnicos ni descargar ninguna aplicación.
 
 ### 3.1 ¿Cómo creo mi cuenta?
 
-1. Entra en la web de Tres Mil Millones de Latidos.
-2. Haz clic en «Registrarse» o «Unirse».
-3. Introduce tu email y crea una contraseña.
-4. Ya puedes empezar a usar la plataforma.
+Hay tres formas de crear una cuenta:
 
-También puedes empezar de forma anónima y registrar tu email más adelante para guardar tu progreso.
+**Opcion A — Email y contrasena:**
+1. Entra en la web de Tres Mil Millones de Latidos.
+2. Haz clic en «Registrarse».
+3. Introduce tu email y crea una contraseña.
+4. Verifica tu email (recibirás un enlace de confirmación).
+
+**Opcion B — Google:**
+1. Haz clic en «Continuar con Google».
+2. Selecciona tu cuenta de Google.
+3. Listo, tu cuenta se crea automáticamente.
+
+**Opcion C — Empezar sin cuenta:**
+1. Ve a «Unirse» para empezar de forma anónima.
+2. Puedes registrar tu email más adelante para guardar tu progreso.
 
 ### 3.2 ¿Cómo inicio sesión?
 
@@ -183,7 +194,11 @@ El resultado se guarda en tu perfil y puedes recibir un email con los detalles y
 
 ## 11. ¿Cuánto cuesta Tres Mil Millones de Latidos? Planes y precios
 
-Tres Mil Millones de Latidos ofrece dos planes:
+### Ahora mismo: todo gratis (MVP)
+
+Hasta **octubre de 2026**, todas las funciones Pro están disponibles de forma gratuita para todos los usuarios. No necesitas tarjeta de crédito. Es el periodo de validación del producto con usuarios reales.
+
+### Planes futuros (después del MVP)
 
 | Característica            | Free (0 €)     | Pro (9 €/mes o 79 €/año) |
 | ------------------------- | -------------- | -------------------------------- |
@@ -193,6 +208,11 @@ Tres Mil Millones de Latidos ofrece dos planes:
 | Objetivos y acciones      | Sí             | Sí                               |
 | Modo Impulso              | No             | Sí                               |
 | Journeys                  | Básico         | Completo                         |
+| Diario personal           | Sí             | Sí                               |
+| Comunidad                 | Sí             | Sí                               |
+| Bot Telegram              | No             | Sí                               |
+| Portal familiar           | No             | Sí                               |
+| Mapa de patrones          | No             | Sí                               |
 
 Para cambiar de plan o gestionar tu suscripción, ve a Ajustes > Suscripción. El pago se gestiona a través de Stripe de forma segura.
 
@@ -269,7 +289,120 @@ Desde la barra lateral, ve a la sección de invitaciones para copiar tu código 
 
 ---
 
-## 15. ¿Qué puedo configurar en ajustes y preferencias?
+## 15. ¿Cómo uso el diario personal?
+
+El diario es un espacio privado para escribir libremente, sin que el mentor responda.
+
+### Cómo escribir una entrada
+
+1. Ve a la sección **Diario** desde el menú.
+2. Haz clic en «Nueva entrada».
+3. Escribe lo que necesites: reflexiones, desahogos, ideas, gratitud.
+4. Selecciona tu estado de ánimo con un emoji (genial / bien / neutral / mal / terrible).
+5. Añade etiquetas opcionales para organizar tus entradas.
+6. Guarda la entrada.
+
+### Para qué sirve
+
+- Procesar emociones sin necesidad de que nadie responda.
+- Crear un registro personal que puedes revisar con el tiempo.
+- Identificar patrones emocionales a lo largo de las semanas.
+
+---
+
+## 16. ¿Cómo funciona la comunidad?
+
+La comunidad es un espacio anónimo donde los usuarios comparten reflexiones y avances.
+
+### Cómo participar
+
+1. Ve a la sección **Comunidad** desde el menú.
+2. Lee los posts de otros usuarios (todo es anónimo).
+3. Dale «Me gusta» a los posts que te resuenen.
+4. Escribe tu propio post si quieres compartir algo.
+
+### Reglas
+
+- Todo es anónimo: nadie sabe quién escribe qué.
+- Los posts se organizan por la fase del proceso en la que estás.
+- No se permite contenido que identifique a otras personas.
+
+---
+
+## 17. ¿Qué son los logros e insignias?
+
+Luciérnaga celebra tus avances con insignias que se desbloquean automáticamente.
+
+| Insignia | Cómo se consigue |
+|---|---|
+| Primer proyecto | Creas tu primer proyecto personal |
+| Racha 7 días | 7 días seguidos de check-in |
+| Racha 30 días | 30 días seguidos de check-in |
+| Fase completada | Completas una fase de un Journey |
+| Primera meta | Creas tu primera meta con acciones |
+| Invitación usada | Alguien usa tu código de invitación |
+| Diario 7 días | 7 días seguidos escribiendo en el diario |
+| Primer post | Publicas en la comunidad por primera vez |
+
+Consulta tus insignias en la sección **Logros**.
+
+---
+
+## 18. ¿Cómo funcionan los ejercicios de respiración?
+
+Disponibles en la sección **Respirar**. Son ejercicios guiados que te ayudan a gestionar la ansiedad y el estrés.
+
+### Ejercicios disponibles
+
+| Ejercicio | Cómo funciona |
+|---|---|
+| **Respiración 4-7-8** | Inhala 4s, retén 7s, exhala 8s. Ideal para calmar ansiedad |
+| **Respiración cuadrada** | Inhala 4s, retén 4s, exhala 4s, retén 4s. Para centrarte |
+
+### Cuándo usarlos
+
+- Cuando el mentor detecta ansiedad, puede sugerirte una sesión.
+- Puedes acceder por tu cuenta en cualquier momento desde el menú.
+- Antes de una conversación importante o una decisión difícil.
+
+---
+
+## 19. ¿Qué son los patrones de evitación?
+
+El sistema detecta automáticamente cuando pospones o rechazas acciones de forma repetida.
+
+### Tipos de evitación
+
+- **Posponer:** «Lo hago mañana» (y mañana nunca llega).
+- **Rechazar:** «Eso no es para mí» (sin haberlo intentado).
+
+### Cómo te ayuda
+
+- El mentor te lo señala (con respeto) cuando caes en el mismo patrón.
+- Puedes ver tus patrones más frecuentes en tu perfil.
+- Sirve para tomar conciencia de lo que evitas sistemáticamente.
+
+---
+
+## 20. Accesibilidad
+
+La plataforma incluye un widget de accesibilidad que puedes activar con **Alt+A** o desde el icono de accesibilidad.
+
+### Opciones disponibles
+
+| Ajuste | Qué hace |
+|---|---|
+| Tamaño de fuente | 5 niveles, de pequeño a muy grande |
+| Alto contraste | Mejora el contraste de colores |
+| Movimiento reducido | Desactiva animaciones |
+| Fuente para dislexia | Activa una tipografía más legible |
+| Resaltar enlaces | Hace los enlaces más visibles |
+| Cursor grande | Aumenta el tamaño del cursor |
+| Espaciado de texto | Mejora la separación entre letras y líneas |
+
+---
+
+## 21. ¿Qué puedo configurar en ajustes y preferencias?
 
 En Ajustes puedes configurar:
 
@@ -278,10 +411,15 @@ En Ajustes puedes configurar:
 - **Email semanal:** resumen de tu progreso por correo
 - **Zona horaria:** para que los recordatorios lleguen a la hora correcta
 - **Contraseña:** cambiar tu contraseña actual
+- **Telegram:** vincular o desvincular tu cuenta
+- **Accesibilidad:** ajustes visuales (ver sección 20)
+- **Consentimiento:** gestión de tus datos y permisos
+- **Cookies:** preferencias de cookies
+- **Exportar datos:** descarga toda tu información en JSON (datos completos) o CSV (historial de chat)
 
 ---
 
-## 16. ¿Qué pasa si me siento en crisis emocional?
+## 22. ¿Qué pasa si me siento en crisis emocional?
 
 Si el sistema detecta una situación de alto riesgo emocional, puede activar un modo de contención con recursos de emergencia.
 
@@ -296,7 +434,7 @@ Para salir del modo crisis, usa la opción correspondiente en la app o espera a 
 
 ---
 
-## 17. Privacidad, seguridad y uso responsable
+## 23. Privacidad, seguridad y uso responsable
 
 Tres Mil Millones de Latidos utiliza tus interacciones para mejorar continuidad y seguimiento dentro de la plataforma. No comparte tus datos con terceros para fines publicitarios.
 
@@ -315,7 +453,7 @@ Recomendaciones de privacidad:
 
 ---
 
-## 18. ¿Cuáles son los límites del servicio?
+## 24. ¿Cuáles son los límites del servicio?
 
 Tres Mil Millones de Latidos puede equivocarse o dar sugerencias que no apliquen a tu contexto exacto.
 
@@ -327,7 +465,7 @@ Ten en cuenta:
 
 ---
 
-## 19. Preguntas frecuentes y solución rápida
+## 25. Preguntas frecuentes y solución rápida
 
 ### ¿Por qué no responde el chat?
 
@@ -360,7 +498,7 @@ Ten en cuenta:
 
 ---
 
-## 20. Rutina recomendada: 5 minutos al día para avanzar
+## 26. Rutina recomendada: 5 minutos al día para avanzar
 
 Rutina sugerida:
 
@@ -373,7 +511,7 @@ Constancia pequeña > esfuerzo perfecto.
 
 ---
 
-## 21. ¿Cómo contacto con soporte?
+## 27. ¿Cómo contacto con soporte?
 
 Si necesitas ayuda con el uso de la plataforma, puedes:
 
@@ -388,21 +526,26 @@ Incluye en tu mensaje:
 
 ---
 
-## 22. Resumen rápido
+## 28. Resumen rápido
 
-- Regístrate con email y contraseña (o empieza en modo anónimo).
+- Regístrate con email, Google o empieza en modo anónimo.
 - Habla claro y en corto.
 - Define acciones pequeñas y alcanzables.
 - Registra check-in diario.
+- Usa el diario para escribir libremente.
+- Explora la comunidad para sentir que no estás solo.
 - Prueba el Modo Impulso si quieres un programa estructurado de 21 días.
+- Haz ejercicios de respiración cuando necesites calmarte.
 - Conecta Telegram para usar la plataforma desde el móvil.
 - Añade una persona de confianza si quieres acompañamiento.
+- Usa el widget de accesibilidad (Alt+A) si necesitas ajustes visuales.
+- Exporta tus datos cuando quieras desde Ajustes.
 - Usa el servicio como apoyo, no como reemplazo profesional.
 - Si hay riesgo inmediato, llama al 024 y prioriza ayuda humana de emergencia.
 
 ---
 
-Documento: Guía de usuario final
+Documento: Manual de usuario final
 Producto: Tres Mil Millones de Latidos
-Versión: v2.1
-Fecha: 9 de abril de 2026
+Version: v3.0
+Fecha: 10 de abril de 2026

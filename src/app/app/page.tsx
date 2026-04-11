@@ -1951,26 +1951,33 @@ export default function HomePage() {
         </DialogContent>
       </Dialog>
 
-      {/* Consent: non-blocking banner instead of modal — accept on first message */}
+      {/* Consent: non-blocking banner with legal acceptance */}
       {sessionReady && !onboardingConsentGiven && (
-        <div className="fixed bottom-0 inset-x-0 z-40 border-t border-zinc-800 bg-zinc-900/95 backdrop-blur-sm px-4 py-3">
-          <div className="mx-auto max-w-3xl flex flex-col sm:flex-row items-start sm:items-center gap-3">
-            <p className="text-xs text-zinc-400 flex-1 leading-relaxed">
-              IA supervisada por psicologos, mentores y coaches. No sustituye atencion clinica.{" "}
-              <a href="/privacy" className="text-violet-400 underline underline-offset-2">Privacidad</a>{" · "}
-              <a href="/terms" className="text-violet-400 underline underline-offset-2">Terminos</a>{" · "}
-              Crisis: <a href="tel:024" className="text-red-400 font-semibold">024</a>
-            </p>
-            <button
-              onClick={() => {
-                setOnboardingConsentGiven(true);
-                setOnboardingConsentChecked(true);
-                fetch("/api/user/consent", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ consent: true }) }).catch(() => {});
-              }}
-              className="shrink-0 rounded-lg bg-violet-600 px-4 py-2 text-xs font-semibold text-white hover:bg-violet-500 transition-colors"
-            >
-              Entendido
-            </button>
+        <div className="fixed bottom-0 inset-x-0 z-40 border-t border-zinc-800 bg-zinc-950/98 backdrop-blur-md px-4 py-4">
+          <div className="mx-auto max-w-3xl space-y-3">
+            <p className="text-xs font-semibold text-zinc-300">Antes de continuar</p>
+            <ul className="text-xs text-zinc-400 space-y-1.5 leading-relaxed">
+              <li>• Esta herramienta usa <strong className="text-zinc-300">inteligencia artificial supervisada</strong> por un equipo de psicologos, mentores y coaches.</li>
+              <li>• <strong className="text-amber-400">No sustituye</strong> terapia psicologica, psiquiatrica ni atencion profesional de salud mental.</li>
+              <li>• En caso de crisis o riesgo inmediato, contacta con el <a href="tel:024" className="text-red-400 font-semibold">024</a> o el 112.</li>
+              <li>• Tus datos se almacenan de forma segura. Puedes eliminarlos en cualquier momento desde Ajustes.</li>
+            </ul>
+            <div className="flex items-center justify-between gap-3 pt-1">
+              <p className="text-[10px] text-zinc-600">
+                <a href="/privacy" className="text-violet-400/70 underline underline-offset-2">Politica de privacidad</a>{" · "}
+                <a href="/terms" className="text-violet-400/70 underline underline-offset-2">Terminos de uso</a>
+              </p>
+              <button
+                onClick={() => {
+                  setOnboardingConsentGiven(true);
+                  setOnboardingConsentChecked(true);
+                  fetch("/api/user/consent", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ consent: true, version: "1.1", acceptedAt: new Date().toISOString() }) }).catch(() => {});
+                }}
+                className="shrink-0 rounded-lg bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-violet-500 transition-colors"
+              >
+                Acepto
+              </button>
+            </div>
           </div>
         </div>
       )}

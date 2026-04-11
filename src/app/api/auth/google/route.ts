@@ -9,7 +9,8 @@ import { getGoogleConfig, getGoogleAuthUrl } from "@/lib/google-oauth";
 export async function GET(req: NextRequest) {
   const { enabled } = getGoogleConfig();
   if (!enabled) {
-    return NextResponse.json({ error: "Google OAuth not configured" }, { status: 501 });
+    const baseUrl = process.env.APP_BASE_URL ?? "http://localhost:3000";
+    return NextResponse.redirect(`${baseUrl}/login?error=google_not_configured`);
   }
 
   const state = randomBytes(16).toString("hex");

@@ -13,8 +13,9 @@ const ERROR_MESSAGES: Record<string, string> = {
   EMAIL_INVALID: 'El email no es válido.',
   INVALID_CREDENTIALS: 'Email o contraseña incorrectos.',
   LOGIN_FAILED: 'Error al iniciar sesión. Inténtalo de nuevo.',
-  oauth_invalid_state: 'La sesión de Google expiró. Inténtalo de nuevo.',
-  oauth_failed: 'Error al conectar con Google. Inténtalo de nuevo.',
+  oauth_invalid_state: 'La sesion de Google expiro. Intentalo de nuevo.',
+  oauth_failed: 'Error al conectar con Google. Intentalo de nuevo.',
+  google_not_configured: 'El inicio con Google no esta disponible en este momento. Usa email y contrasena.',
 };
 
 export default function LoginPage() {

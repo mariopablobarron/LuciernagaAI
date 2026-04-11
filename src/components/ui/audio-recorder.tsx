@@ -16,6 +16,7 @@ export function AudioRecorder({ onAudioReady, disabled, className = "" }: AudioR
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const secondsRef = useRef(0);
 
   const start = useCallback(async () => {
     try {
@@ -29,13 +30,24 @@ export function AudioRecorder({ onAudioReady, disabled, className = "" }: AudioR
 
       recorder.onstop = () => {
         stream.getTracks().forEach((t) => t.stop());
-        setProcessing(true);
+        if (timerRef.current) clearInterval(timerRef.current);
 
         const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+
+        // Ignore recordings that are too short (< 500 bytes ≈ silence/empty)
+        if (blob.size < 500) {
+          setRecording(false);
+          setSeconds(0);
+          return;
+        }
+
+        setProcessing(true);
         const reader = new FileReader();
         reader.onload = () => {
           const base64 = reader.result as string;
-          onAudioReady(base64, seconds);
+          // Use the ref-based duration to avoid stale closure
+          const duration = Math.max(1, secondsRef.current);
+          onAudioReady(base64, duration);
           setProcessing(false);
           setSeconds(0);
         };
@@ -47,15 +59,17 @@ export function AudioRecorder({ onAudioReady, disabled, className = "" }: AudioR
       setRecording(true);
       setSeconds(0);
 
+      secondsRef.current = 0;
       timerRef.current = setInterval(() => {
         setSeconds((s) => {
-          if (s >= 120) {
-            // Max 2 min
+          const next = s + 1;
+          secondsRef.current = next;
+          if (next >= 120) {
             mediaRecorderRef.current?.stop();
             if (timerRef.current) clearInterval(timerRef.current);
             return s;
           }
-          return s + 1;
+          return next;
         });
       }, 1000);
     } catch {

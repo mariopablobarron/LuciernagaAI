@@ -95,11 +95,34 @@ const STARTERS = [
 // No external dependencies.
 
 function renderMarkdown(text: string): React.ReactNode[] {
-  const lines = text.split("\n");
+  // Strip raw audio base64 tags — render as a clean audio player or label
+  const cleaned = text.replace(
+    /\[audio:(\d+)s:(data:audio\/[^;]+;base64,[^\]]+)\]/g,
+    (_match, dur, dataUri) => {
+      // We'll handle the player below via a separate pass
+      return `[__AUDIO_PLAYER__:${dur}:${dataUri}]`;
+    },
+  );
+
+  const lines = cleaned.split("\n");
   const nodes: React.ReactNode[] = [];
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+
+    // Audio player placeholder
+    const audioMatch = /\[__AUDIO_PLAYER__:(\d+):(data:audio\/[^:]+;base64,[^\]]+)\]/.exec(line);
+    if (audioMatch) {
+      const dur = parseInt(audioMatch[1], 10);
+      const src = audioMatch[2];
+      nodes.push(
+        <div key={`audio-${i}`} className="flex items-center gap-2 rounded-lg bg-zinc-800/60 px-3 py-2 my-1">
+          <audio controls preload="metadata" className="h-8 max-w-full" src={src} />
+          <span className="text-xs text-zinc-500">{dur > 0 ? `${dur}s` : "Nota de voz"}</span>
+        </div>
+      );
+      continue;
+    }
 
     // Bullet point
     const bulletMatch = /^[-*•]\s+(.+)/.exec(line);
@@ -499,6 +522,12 @@ export default function Chat({
     const userText = input.trim();
 
     if (attachedAudio) {
+      // Skip empty/broken audio (0s duration or tiny base64)
+      if (audioDuration < 1 || attachedAudio.length < 1000) {
+        setAttachedAudio(null);
+        setAudioDuration(0);
+        return;
+      }
       parts.push(userText || "Nota de voz");
       parts.push(`\n\n[audio:${audioDuration}s:${attachedAudio}]`);
       setAttachedAudio(null);

@@ -24,8 +24,7 @@ export default function LandingPage() {
             </h1>
           </div>
           <p className="text-lg text-zinc-400 leading-relaxed max-w-lg">
-            Tres Mil Millones de Latidos te guía a través de la transformación real. No es teoría. No es
-            perfección. Es acción pequeña, consistente, que genera cambios duraderos.
+            Mentoria con inteligencia artificial que te acompana a pasar de la paralisis a la accion. No es terapia. No es teoria. Es un mentor que te escucha, te reta y te ayuda a dar el siguiente paso.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <Link

@@ -615,8 +615,8 @@ export default function HomePage() {
             if (isFirstTime) localStorage.setItem("luc_auto_greeted", "1");
 
             const greetContent = isFirstTime
-              ? "Hola. Esto es un espacio seguro para pensar en voz alta.\n\n" +
-                "Puedes contarme como te sientes, que te bloquea, o que quieres cambiar.\n\n" +
+              ? "Hola. Soy un mentor con inteligencia artificial creado para acompanarte.\n\n" +
+                "No soy terapia, pero puedo ayudarte a ordenar ideas, tomar decisiones y pasar a la accion.\n\n" +
                 "**¿Como llegas hoy?**"
               : "**¿Que necesitas hoy?**";
 

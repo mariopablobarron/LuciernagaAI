@@ -43,7 +43,7 @@ describe("generateAIResponse", () => {
     expect(global.fetch).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({
-        body: expect.stringContaining("Emoción primaria: frustración"),
+        body: expect.stringContaining("emoción=frustración"),
       })
     );
   });

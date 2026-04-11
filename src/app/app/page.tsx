@@ -614,10 +614,10 @@ export default function HomePage() {
             if (isFirstTime) localStorage.setItem("luc_auto_greeted", "1");
 
             const greetContent = isFirstTime
-              ? "Hola. Soy tu mentor en Tres Mil Millones de Latidos.\n\n" +
-                "No voy a darte consejos genéricos. Voy a ayudarte a ver lo que ya sabes pero no estás haciendo.\n\n" +
-                "**¿Qué llevas semanas evitando?** Cuéntame en una frase — sin filtros."
-              : "**¿Qué necesitas resolver hoy?**\n\nUna frase. Sin rodeos.";
+              ? "Hola. Esto es un espacio seguro para pensar en voz alta.\n\n" +
+                "Puedes contarme como te sientes, que te bloquea, o que quieres cambiar.\n\n" +
+                "**¿Como llegas hoy?**"
+              : "**¿Que necesitas hoy?**";
 
             setConversations((prev) =>
               prev.map((c) =>
@@ -1677,41 +1677,13 @@ export default function HomePage() {
     <>
       <AppLayout
         prelude={
-          <>
-            {sessionProfile && !sessionProfile.isAnonymous && !sessionProfile.emailVerified && (
-              <EmailVerificationBanner
-                emailVerified={sessionProfile.emailVerified}
-                isAnonymous={sessionProfile.isAnonymous}
-                email={sessionProfile.email}
-              />
-            )}
-            {onboardingStep > 0 && (
-              <HomeOnboarding
-                step={onboardingStep as 1 | 2 | 3}
-                situation={onboardingSituation}
-                time={onboardingTime}
-                onSelectSituation={(value) => {
-                  setOnboardingSituation(value);
-                  setOnboardingStep(2);
-                }}
-                onSelectTime={(value) => {
-                  setOnboardingTime(value);
-                  setOnboardingStep(3);
-                }}
-                onSubmitGoal={(goal) => {
-                  const message =
-                    `${onboardingSituation} Tengo ${onboardingTime} ahora. ` +
-                    `Lo que quiero resolver: ${goal}`;
-                  setOnboardingStep(0);
-                  handleUseStarterExample(message);
-                }}
-                onSkip={() => {
-                  setOnboardingStep(0);
-                  setWorkspaceTab("chat");
-                }}
-              />
-            )}
-          </>
+          sessionProfile && !sessionProfile.isAnonymous && !sessionProfile.emailVerified ? (
+            <EmailVerificationBanner
+              emailVerified={sessionProfile.emailVerified}
+              isAnonymous={sessionProfile.isAnonymous}
+              email={sessionProfile.email}
+            />
+          ) : undefined
         }
         sidebar={
           <Sidebar
@@ -1978,14 +1950,32 @@ export default function HomePage() {
         </DialogContent>
       </Dialog>
 
+      {/* Consent: non-blocking banner instead of modal — accept on first message */}
       {sessionReady && !onboardingConsentGiven && (
-        <ConsentModal onAccept={() => {
-          setOnboardingConsentGiven(true);
-          setOnboardingConsentChecked(true);
-        }} />
+        <div className="fixed bottom-0 inset-x-0 z-40 border-t border-zinc-800 bg-zinc-900/95 backdrop-blur-sm px-4 py-3">
+          <div className="mx-auto max-w-3xl flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <p className="text-xs text-zinc-400 flex-1 leading-relaxed">
+              Al usar esta herramienta aceptas que no sustituye atencion profesional de salud mental.{" "}
+              <a href="/privacy" className="text-violet-400 underline underline-offset-2">Privacidad</a>{" · "}
+              <a href="/terms" className="text-violet-400 underline underline-offset-2">Terminos</a>{" · "}
+              Crisis: <a href="tel:024" className="text-red-400 font-semibold">024</a>
+            </p>
+            <button
+              onClick={() => {
+                setOnboardingConsentGiven(true);
+                setOnboardingConsentChecked(true);
+                fetch("/api/user/consent", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ consent: true }) }).catch(() => {});
+              }}
+              className="shrink-0 rounded-lg bg-violet-600 px-4 py-2 text-xs font-semibold text-white hover:bg-violet-500 transition-colors"
+            >
+              Entendido
+            </button>
+          </div>
+        </div>
       )}
 
-      <GuidedTour tourId="app-main" steps={APP_TOUR} delay={1500} />
+      {/* Tour: only on second visit — first visit should be frictionless */}
+      <GuidedTour tourId="app-main" steps={APP_TOUR} delay={3000} />
     </>
   );
 }

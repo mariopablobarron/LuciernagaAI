@@ -15,6 +15,7 @@ describe("coach prompt identity", () => {
     expect(prompt).toContain("descubras lo que ya sabes");
     expect(prompt).toContain("Reflejo: demuestra que entiendes");
     expect(prompt).toContain("Pregunta que abre");
+    expect(prompt).toContain("Local → global");
   });
 
   it("fuerza cierre con acción y pregunta cuando la respuesta queda vacía", () => {

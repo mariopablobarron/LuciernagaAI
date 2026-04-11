@@ -75,9 +75,13 @@ export default function GuidedTour({
     return -1; // no more visible steps
   }, [steps]);
 
-  // Start tour after delay
+  // Start tour after delay — skip on first visit to reduce friction
   useEffect(() => {
     if (isTourDone(tourId) || steps.length === 0) return;
+    const visitKey = `visit-count:${tourId}`;
+    const visits = Number(localStorage.getItem(visitKey) || "0") + 1;
+    localStorage.setItem(visitKey, String(visits));
+    if (visits < 2) return; // First visit: no tour — let user explore freely
     const timer = setTimeout(() => {
       const firstVisible = findNextVisibleStep(0);
       if (firstVisible >= 0) {

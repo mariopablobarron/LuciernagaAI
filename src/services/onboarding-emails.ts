@@ -76,28 +76,24 @@ const TEMPLATES: Record<string, TemplateBuilder> = {
     const greeting = name || "Hola";
     return {
       to: "",
-      subject: "3 dias: el momento donde la mayoria abandona",
-      textOnly: `${greeting}, a los 3 dias la mayoria deja de usar herramientas nuevas. Si tu sigues aqui, ya estas por encima de la media. Hoy solo tienes que hacer una cosa: abrir el chat y contarle al mentor que ha pasado desde tu ultimo mensaje. ${APP_URL}/app`,
+      subject: `${greeting}, ¿sigues ahi?`,
+      textOnly: `${greeting}, hace 3 dias diste un paso. No importa si no has vuelto — lo que importa es que hoy puedes. Solo abre el chat y escribe una frase. Como te sientes ahora mismo. Eso es todo. ${APP_URL}/app`,
       html: emailShell(`
         <p style="margin:0 0 16px;font-size:16px;color:#e4e4e7;line-height:1.6">
           ${greeting},
         </p>
         <p style="margin:0 0 16px;font-size:15px;color:#a1a1aa;line-height:1.6">
-          A los 3 dias la mayoria deja de usar herramientas nuevas.
-          Si tu sigues aqui, ya estas por encima de la media.
+          Hace 3 dias diste un paso. No importa si no has vuelto desde entonces — lo que importa es que hoy puedes.
         </p>
         <p style="margin:0 0 8px;font-size:17px;color:#fff;font-weight:600;line-height:1.5">
-          Hoy solo tienes que hacer una cosa:
+          Solo escribe una frase: como te sientes ahora mismo.
         </p>
-        <p style="margin:0 0 24px;font-size:15px;color:#c4b5fd;line-height:1.5">
-          Abre el chat y cuentale al mentor que ha pasado desde tu ultimo mensaje.
+        <p style="margin:0 0 24px;font-size:14px;color:#71717a;line-height:1.5">
+          No hay respuesta correcta. No tienes que haber avanzado. Solo volver.
         </p>
-        ${ctaButton("Continuar mi proceso", `${APP_URL}/app`)}
-        <p style="margin:16px 0 0;font-size:13px;color:#52525b;line-height:1.5">
-          Recuerda: puedes usar la tab "Check-in" para registrar como llegas hoy en 30 segundos.
-        </p>
+        ${ctaButton("Volver al chat", `${APP_URL}/app`)}
       `),
-      text: `${greeting}, a los 3 dias la mayoria abandona. Si sigues aqui, ya estas por encima de la media. Abre el chat y cuenta que ha pasado. ${APP_URL}/app`,
+      text: `${greeting}, hace 3 dias diste un paso. No importa si no has vuelto. Solo abre el chat y escribe como te sientes. ${APP_URL}/app`,
     };
   },
 
@@ -163,8 +159,8 @@ export async function scheduleOnboardingEmails(userId: string): Promise<void> {
   const now = new Date();
 
   const emails = [
-    { template: "onboarding_day1", delayMs: 2 * 60 * 60 * 1000 },        // 2h after signup
-    { template: "onboarding_day3", delayMs: 3 * 24 * 60 * 60 * 1000 },   // day 3
+    { template: "onboarding_day1", delayMs: 30 * 60 * 1000 },             // 30min after signup
+    { template: "onboarding_day3", delayMs: 3 * 24 * 60 * 60 * 1000 },   // day 3 (critical retention)
     { template: "onboarding_day7", delayMs: 7 * 24 * 60 * 60 * 1000 },   // day 7
   ];
 

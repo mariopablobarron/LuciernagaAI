@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 import { AdminPanel } from "@/features/admin/components/AdminPanel";
+import DateRangePicker, { defaultRange, type DateRange } from "@/components/admin/DateRangePicker";
 import { toast } from "sonner";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -329,6 +330,9 @@ export default function ResearchPage() {
   const [llm30d, setLlm30d] = useState<LlmSummary | null>(null);
   const [snapshots, setSnapshots] = useState<SnapshotSummary[]>([]);
 
+  // Date range
+  const [dateRange, setDateRange] = useState<DateRange>(defaultRange);
+
   // UI
   const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState<WidgetKey[]>(DEFAULT_VISIBLE);
@@ -343,8 +347,9 @@ export default function ResearchPage() {
   const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
-      const [analyticsRes, retentionRes, emotionalRes, crisisRes, transformRes, llmRes, snapshotsRes] = await Promise.all([
-        fetch("/api/admin/analytics", { credentials: "include" }).then((r) => r.ok ? r.json() : null).catch(() => null),
+      const statsUrl = `/api/admin/stats?from=${dateRange.from}&to=${dateRange.to}`;
+      const [statsRes, retentionRes, emotionalRes, crisisRes, transformRes, llmRes, snapshotsRes] = await Promise.all([
+        fetch(statsUrl, { credentials: "include" }).then((r) => r.ok ? r.json() : null).catch(() => null),
         fetch("/api/admin/retention", { credentials: "include" }).then((r) => r.ok ? r.json() : null).catch(() => null),
         fetch("/api/admin/emotional-model", { credentials: "include" }).then((r) => r.ok ? r.json() : null).catch(() => null),
         fetch("/api/admin/crisis", { credentials: "include" }).then((r) => r.ok ? r.json() : null).catch(() => null),
@@ -353,19 +358,19 @@ export default function ResearchPage() {
         fetch("/api/admin/insights/history", { credentials: "include" }).then((r) => r.ok ? r.json() : null).catch(() => null),
       ]);
 
-      if (analyticsRes) {
+      if (statsRes) {
         setKpis({
-          totalUsers: analyticsRes.kpis?.totalUsers ?? 0,
-          signups7d: analyticsRes.kpis?.signups7d?.value ?? 0,
-          signupsDelta: analyticsRes.kpis?.signups7d?.delta ?? 0,
-          messages7d: analyticsRes.kpis?.messages7d?.value ?? 0,
-          messagesDelta: analyticsRes.kpis?.messages7d?.delta ?? 0,
-          checkins7d: analyticsRes.kpis?.checkins7d?.value ?? 0,
-          checkinsDelta: analyticsRes.kpis?.checkins7d?.delta ?? 0,
-          conversations7d: analyticsRes.kpis?.conversations7d?.value ?? 0,
+          totalUsers: statsRes.kpis?.totalUsers ?? 0,
+          signups7d: statsRes.kpis?.signups?.value ?? 0,
+          signupsDelta: statsRes.kpis?.signups?.delta ?? 0,
+          messages7d: statsRes.kpis?.messages?.value ?? 0,
+          messagesDelta: statsRes.kpis?.messages?.delta ?? 0,
+          checkins7d: statsRes.kpis?.checkins?.value ?? 0,
+          checkinsDelta: statsRes.kpis?.checkins?.delta ?? 0,
+          conversations7d: statsRes.kpis?.conversations ?? 0,
         });
-        setStates(analyticsRes.stateDistribution ?? {});
-        setFunnel(analyticsRes.funnel ?? []);
+        setStates(statsRes.states ?? {});
+        setFunnel(statsRes.funnel ?? []);
       }
 
       if (retentionRes) setRetention(retentionRes.cohorts ?? []);
@@ -408,7 +413,7 @@ export default function ResearchPage() {
     }
   }, []);
 
-  useEffect(() => { fetchAll(); }, [fetchAll]);
+  useEffect(() => { fetchAll(); }, [fetchAll, dateRange]);
 
   async function handleReset() {
     if (!confirm("Resetear historial de decisiones/insights? Los datos se archivan como snapshot.")) return;

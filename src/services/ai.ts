@@ -147,7 +147,7 @@ async function requestOpenRouter(
               { role: "user", content: message },
             ],
             temperature: 0.7,
-            max_tokens: 500,
+            max_tokens: 350,
           }),
         },
         REQUEST_TIMEOUT_MS

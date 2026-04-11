@@ -454,6 +454,7 @@ export default function HomePage() {
       id: message.id,
       role: message.role,
       content: message.content,
+      createdAt: message.createdAt ?? undefined,
     }));
 
     setConversations((previous) =>

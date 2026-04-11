@@ -384,8 +384,19 @@ ${webContext}
 Nunca respondas igual a dos usuarios distintos si su perfil emocional acumulado es diferente aunque digan algo parecido.`;
 }
 
-export function buildFallbackResponse(): string {
-  return "Vamos a hacerlo simple. Dime qué estás evitando ahora mismo y lo convertimos en un paso concreto hoy.";
+export function buildFallbackResponse(state?: UserState): string {
+  switch (state) {
+    case "bloqueo":
+      return "Parece que algo se ha trabado. Dime una cosa: ¿qué es lo que llevas posponiendo y por qué?";
+    case "ansiedad":
+      return "Respira. Una cosa a la vez. ¿Qué es lo que más te presiona ahora mismo?";
+    case "duda":
+      return "Entiendo la incertidumbre. Vamos a ordenar: ¿cuáles son las dos opciones que ves?";
+    case "claridad":
+      return "Tienes claridad — aprovechemos. ¿Cuál es el paso más concreto que puedes dar hoy?";
+    default:
+      return "Vamos a hacerlo simple. Dime qué estás evitando ahora mismo y lo convertimos en un paso concreto hoy.";
+  }
 }
 
 function buildActionLine(context: ResponseFinalizationContext): string {

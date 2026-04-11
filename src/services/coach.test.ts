@@ -82,5 +82,9 @@ describe("coach prompt identity", () => {
 
   it("usa un fallback más activo cuando falla la IA", () => {
     expect(buildFallbackResponse()).toContain("qué estás evitando ahora mismo");
+    expect(buildFallbackResponse("bloqueo")).toContain("posponiendo");
+    expect(buildFallbackResponse("ansiedad")).toContain("presiona");
+    expect(buildFallbackResponse("duda")).toContain("opciones");
+    expect(buildFallbackResponse("claridad")).toContain("paso más concreto");
   });
 });

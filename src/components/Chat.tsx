@@ -31,6 +31,7 @@ export type ChatMessage = {
   id: string;
   role: "user" | "assistant";
   content: string;
+  createdAt?: string;
   isError?: boolean;
   variant?: "action_required" | "crisis";
   meta?: {
@@ -93,6 +94,20 @@ const STARTERS = [
 // ─── Simple markdown renderer ─────────────────────────────────────────────────
 // Handles: **bold**, `inline code`, line breaks, and - bullet lists.
 // No external dependencies.
+
+function formatMsgTime(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return "ahora";
+  if (diffMin < 60) return `hace ${diffMin}m`;
+  const diffH = Math.floor(diffMin / 60);
+  if (diffH < 24 && d.getDate() === now.getDate()) {
+    return d.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+  }
+  return d.toLocaleDateString("es-ES", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+}
 
 function renderMarkdown(text: string): React.ReactNode[] {
   // Strip raw audio/image base64 tags — render as clean player/image
@@ -284,8 +299,11 @@ function MessageBubble({ message, isStreaming }: { message: ChatMessage; isStrea
                 : "bg-cyan-600 text-white"
             }`}
           >
-            <p className="text-sm leading-relaxed">{message.content}</p>
+            <div className="text-sm leading-relaxed">{renderMarkdown(message.content)}</div>
           </div>
+          {message.createdAt && (
+            <p className="mt-0.5 text-right text-[10px] text-zinc-600">{formatMsgTime(message.createdAt)}</p>
+          )}
           <button
             onClick={() => void handleCopy()}
             aria-label={copied ? "Copiado" : "Copiar mensaje"}
@@ -337,17 +355,22 @@ function MessageBubble({ message, isStreaming }: { message: ChatMessage; isStrea
         </div>
 
         {!isStreaming && (
-          <button
-            onClick={() => void handleCopy()}
-            aria-label={copied ? "Copiado" : "Copiar respuesta"}
-            className="absolute -right-10 top-0 p-2 opacity-0 transition-opacity group-hover:opacity-100"
-          >
-            {copied ? (
-              <Check className="h-3.5 w-3.5 text-emerald-400" />
-            ) : (
-              <Copy className="h-3.5 w-3.5 text-zinc-600 hover:text-zinc-400" />
+          <>
+            {message.createdAt && (
+              <p className="mt-0.5 text-[10px] text-zinc-600">{formatMsgTime(message.createdAt)}</p>
             )}
-          </button>
+            <button
+              onClick={() => void handleCopy()}
+              aria-label={copied ? "Copiado" : "Copiar respuesta"}
+              className="absolute -right-10 top-0 p-2 opacity-0 transition-opacity group-hover:opacity-100"
+            >
+              {copied ? (
+                <Check className="h-3.5 w-3.5 text-emerald-400" />
+              ) : (
+                <Copy className="h-3.5 w-3.5 text-zinc-600 hover:text-zinc-400" />
+              )}
+            </button>
+          </>
         )}
       </div>
     </div>
@@ -780,7 +803,7 @@ export default function Chat({
       </div>
 
       {/* ── Input area ──────────────────────────────────────────────────── */}
-      <div className="shrink-0 border-t border-zinc-800/60 bg-zinc-950 px-3 py-3" data-tour="chat-input" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
+      <div className="sticky bottom-0 z-10 shrink-0 border-t border-zinc-800/60 bg-zinc-950 px-3 py-3" data-tour="chat-input" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
         {/* Image preview */}
         {attachedImage && (
           <div className="mb-2 flex items-start gap-2 rounded-xl border border-zinc-800 bg-zinc-900/50 p-2">

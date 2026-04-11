@@ -95,13 +95,14 @@ const STARTERS = [
 // No external dependencies.
 
 function renderMarkdown(text: string): React.ReactNode[] {
-  // Strip raw audio base64 tags — render as a clean audio player or label
-  const cleaned = text.replace(
+  // Strip raw audio/image base64 tags — render as clean player/image
+  let cleaned = text.replace(
     /\[audio:(\d+)s:(data:audio\/[^;]+;base64,[^\]]+)\]/g,
-    (_match, dur, dataUri) => {
-      // We'll handle the player below via a separate pass
-      return `[__AUDIO_PLAYER__:${dur}:${dataUri}]`;
-    },
+    (_match, dur, dataUri) => `[__AUDIO_PLAYER__:${dur}:${dataUri}]`,
+  );
+  cleaned = cleaned.replace(
+    /\[image:(data:image\/[^;]+;base64,[^\]]+)\]/g,
+    (_match, dataUri) => `[__IMAGE_EMBED__:${dataUri}]`,
   );
 
   const lines = cleaned.split("\n");
@@ -119,6 +120,21 @@ function renderMarkdown(text: string): React.ReactNode[] {
         <div key={`audio-${i}`} className="flex items-center gap-2 rounded-lg bg-zinc-800/60 px-3 py-2 my-1">
           <audio controls preload="metadata" className="h-8 max-w-full" src={src} />
           <span className="text-xs text-zinc-500">{dur > 0 ? `${dur}s` : "Nota de voz"}</span>
+        </div>
+      );
+      continue;
+    }
+
+    // Image embed placeholder
+    const imageMatch = /\[__IMAGE_EMBED__:(data:image\/[^:]+;base64,[^\]]+)\]/.exec(line);
+    if (imageMatch) {
+      nodes.push(
+        <div key={`img-${i}`} className="my-2">
+          <img
+            src={imageMatch[1]}
+            alt="Imagen adjunta"
+            className="max-w-xs max-h-64 rounded-xl border border-zinc-700 object-contain"
+          />
         </div>
       );
       continue;

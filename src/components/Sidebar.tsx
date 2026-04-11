@@ -239,13 +239,28 @@ export default function Sidebar({
           <Button asChild type="button" variant={pathname === "/app/explore" ? "default" : "outline"} size="sm" className="justify-center text-xs" title="Contenido y ejercicios">
             <Link href="/app/explore">Explorar</Link>
           </Button>
-          <Button asChild type="button" variant={pathname?.startsWith("/community") ? "default" : "outline"} size="sm" className="justify-center text-xs" data-tour="comunidad">
-            <Link href="/community">Comunidad</Link>
-          </Button>
           <Button asChild type="button" variant={pathname?.startsWith("/app/settings") ? "default" : "outline"} size="sm" className="justify-center text-xs col-span-2" data-tour="ajustes">
             <Link href="/app/settings">Ajustes</Link>
           </Button>
         </div>
+
+        <Link
+          href="/community"
+          data-tour="comunidad"
+          className={`flex items-center justify-between rounded-2xl border px-4 py-3 text-sm transition hover:border-fuchsia-500/50 hover:bg-fuchsia-500/10 ${
+            pathname?.startsWith("/community")
+              ? "border-fuchsia-500/40 bg-fuchsia-500/12 text-foreground"
+              : "border-border bg-muted/30 text-foreground"
+          }`}
+        >
+          <div>
+            <p className="font-semibold leading-snug">👥 Comunidad</p>
+            <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">
+              Victorias, espacios y reflexiones anonimas con otros que estan en el mismo camino.
+            </p>
+          </div>
+          <ArrowRight className="ml-3 size-4 shrink-0 text-muted-foreground" />
+        </Link>
 
         <Link
           href="/impulso"

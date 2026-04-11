@@ -1,5 +1,6 @@
 import { getPrismaClient } from "@/db/prisma";
 import { dispatchN8nEvent } from "@/lib/n8n";
+import { awardLatidos } from "@/services/latidos";
 import { ensureUserSession } from "@/services/conversation";
 import { GoalStatus } from "@prisma/client";
 
@@ -624,6 +625,11 @@ export async function updateGoalAction(params: {
     data: { completed: params.completed },
   });
 
+  // Award latidos when completing (not uncompleting) an action
+  if (params.completed) {
+    void awardLatidos(params.userId, "action_complete").catch(() => {});
+  }
+
   let goal = await prisma.goal.findUnique({
     where: { id: action.goalId },
     include: {
@@ -650,6 +656,7 @@ export async function updateGoalAction(params: {
 
     if (nextStatus === "completed") {
       dispatchN8nEvent("goal.completed", { goalId: goal.id, goalTitle: goal.title }, params.userId);
+      void awardLatidos(params.userId, "goal_complete").catch(() => {});
     }
   }
 

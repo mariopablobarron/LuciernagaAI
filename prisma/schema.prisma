@@ -71,6 +71,7 @@ model User {
   consentAt       DateTime?
   source          String?
   isActive        Boolean          @default(true)
+  latidos         Int              @default(0)
   messageCount    Int              @default(0)
   lastMessageAt   DateTime?
   conversations   Conversation[]   @relation("UserConversations")
@@ -114,6 +115,7 @@ model User {
   llmLogs              LlmLog[]
   feedbacks            Feedback[]
   scheduledEmails      ScheduledEmail[]
+  latidoTransactions   LatidoTransaction[]
   events               Event[]
   personalProjects     PersonalProject[]
   diaryEntries         DiaryEntry[]
@@ -890,6 +892,20 @@ model Feedback {
 
   @@index([userId, createdAt])
   @@index([type, createdAt])
+}
+
+/// Latido (gem) transactions — gamification currency
+model LatidoTransaction {
+  id        String   @id @default(cuid())
+  userId    String
+  amount    Int      // positive = earned, negative = spent
+  reason    String   // "checkin", "action_complete", "streak_3d", "streak_7d", "streak_21d", "goal_complete", "community_reply", "victory_shared", "first_message_today", "spend_unlock", "spend_gift", "spend_theme"
+  meta      String?  // extra context (e.g. which feature unlocked)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([reason, createdAt])
 }
 
 /// Scheduled email queue — onboarding sequences, drip campaigns, etc.

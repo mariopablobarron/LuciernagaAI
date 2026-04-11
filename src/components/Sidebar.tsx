@@ -138,6 +138,7 @@ export default function Sidebar({
   const [supportMessages, setSupportMessages] = useState<SupportMsg[]>([]);
   const [unreadSupport, setUnreadSupport] = useState(0);
   const [hasPendingAssessment, setHasPendingAssessment] = useState(false);
+  const [latidosBalance, setLatidosBalance] = useState(0);
 
   useEffect(() => {
     return () => {
@@ -157,6 +158,13 @@ export default function Sidebar({
       .then((r) => r.ok ? r.json() : null)
       .then((d: { assessment?: unknown } | null) => {
         if (d?.assessment) setHasPendingAssessment(true);
+      })
+      .catch(() => { /* Non-critical */ });
+
+    fetch("/api/user/latidos", { credentials: "include" })
+      .then((r) => r.ok ? r.json() : null)
+      .then((d: { balance?: number } | null) => {
+        if (typeof d?.balance === "number") setLatidosBalance(d.balance);
       })
       .catch(() => { /* Non-critical */ });
 
@@ -229,9 +237,14 @@ export default function Sidebar({
               onError={() => setLogoSrc("/placeholder.png")}
             />
           </Link>
-          <Badge variant="secondary" className="rounded-full px-3 py-1">
-            {profile.plan}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="rounded-full px-2.5 py-1 gap-1">
+              💓 <span className="font-bold tabular-nums">{latidosBalance}</span>
+            </Badge>
+            <Badge variant="secondary" className="rounded-full px-3 py-1">
+              {profile.plan}
+            </Badge>
+          </div>
         </div>
 
         <div className="rounded-2xl border border-border bg-muted/40 p-4">

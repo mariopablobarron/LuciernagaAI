@@ -1715,7 +1715,7 @@ export default function HomePage() {
             activeTab={workspaceTab}
             onTabChange={setWorkspaceTab}
             chat={
-              <div className="flex min-h-72 sm:min-h-96 max-h-[calc(100dvh-10rem)] sm:max-h-[calc(100dvh-14rem)] flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
+              <div className={`flex min-h-72 sm:min-h-96 flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 ${onboardingConsentGiven ? "max-h-[calc(100dvh-10rem)] sm:max-h-[calc(100dvh-14rem)]" : "max-h-[calc(100dvh-22rem)] sm:max-h-[calc(100dvh-24rem)]"}`}>
                 <div className="shrink-0">
                   <GoalContextBar
                     goal={activeGoal}

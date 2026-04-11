@@ -9,13 +9,12 @@ describe("coach prompt identity", () => {
   it("integra la identidad central de Tres Mil Millones de Latidos", () => {
     const prompt = buildCoachPrompt("duda");
 
-    expect(prompt).toContain("Eres Tres Mil Millones de Latidos.");
-    expect(prompt).toContain("No eres un chatbot.");
-    expect(prompt).toContain("Claridad sobre consuelo");
-    expect(prompt).toContain("Acción sobre reflexión vacía");
-    expect(prompt).toContain("No estoy aquí para entretener. Estoy aquí para que descubras lo que ya sabes pero no te atreves a ver.");
-    expect(prompt).toContain("Reflejo: demuestra que has entendido");
-    expect(prompt).toContain("Nunca cierres en vacío.");
+    expect(prompt).toContain("Tres Mil Millones de Latidos");
+    expect(prompt).toContain("Interpelar > instruir");
+    expect(prompt).toContain("Claridad > consuelo");
+    expect(prompt).toContain("descubras lo que ya sabes");
+    expect(prompt).toContain("Reflejo: demuestra que entiendes");
+    expect(prompt).toContain("Pregunta que abre");
   });
 
   it("fuerza cierre con acción y pregunta cuando la respuesta queda vacía", () => {

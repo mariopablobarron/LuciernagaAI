@@ -32,6 +32,7 @@ type UserItem = {
   id: string;
   email: string;
   name: string | null;
+  hasAvatar: boolean;
   role: string;
   createdAt: string;
   updatedAt: string;
@@ -532,11 +533,20 @@ export default function AdminUsersPage() {
                       </div>
                     </button>
                     {/* User */}
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-white group-hover:text-violet-300 transition-colors">
-                        {user.name || user.email.split("@")[0]}
-                      </p>
-                      <p className="truncate text-xs text-zinc-600">{user.email}</p>
+                    <div className="flex items-center gap-3 min-w-0">
+                      {user.hasAvatar ? (
+                        <img src={`/api/user/avatar/${user.id}`} alt="" className="h-8 w-8 rounded-full object-cover shrink-0" />
+                      ) : (
+                        <div className="h-8 w-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-500 shrink-0">
+                          {(user.name || user.email)[0].toUpperCase()}
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-white group-hover:text-violet-300 transition-colors">
+                          {user.name || user.email.split("@")[0]}
+                        </p>
+                        <p className="truncate text-xs text-zinc-600">{user.email}</p>
+                      </div>
                     </div>
 
                     {/* State */}
@@ -611,9 +621,18 @@ export default function AdminUsersPage() {
                       </button>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between">
-                          <Link href={`/admin/users/${user.id}`} className="min-w-0 flex-1">
-                            <p className="truncate font-medium text-white">{user.name || user.email.split("@")[0]}</p>
-                            <p className="truncate text-xs text-zinc-600">{user.email}</p>
+                          <Link href={`/admin/users/${user.id}`} className="min-w-0 flex-1 flex items-center gap-2.5">
+                            {user.hasAvatar ? (
+                              <img src={`/api/user/avatar/${user.id}`} alt="" className="h-8 w-8 rounded-full object-cover shrink-0" />
+                            ) : (
+                              <div className="h-8 w-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-500 shrink-0">
+                                {(user.name || user.email)[0].toUpperCase()}
+                              </div>
+                            )}
+                            <div className="min-w-0">
+                              <p className="truncate font-medium text-white">{user.name || user.email.split("@")[0]}</p>
+                              <p className="truncate text-xs text-zinc-600">{user.email}</p>
+                            </div>
                           </Link>
                           <div className="flex items-center gap-1.5 ml-3">
                             <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${stateCfg.bg}`}>

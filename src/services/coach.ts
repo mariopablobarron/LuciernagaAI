@@ -84,69 +84,39 @@ type ResponseFinalizationContext = {
 };
 
 const BASE_PROMPT = `${LUCIERNAGA_IDENTITY_PROMPT}
-
 ${LUCIERNAGA_PURPOSE_MODEL_PROMPT}
 
-Estilo de respuesta:
-- Directo, humano y cercano.
-- Frases claras, sin tecnicismos.
-- No demasiado largo.
-- Siempre con intención.
-- Evita respuestas genéricas, exceso de motivación vacía y lenguaje clínico o frío.
-
+Estilo: directo, humano, breve (4-6 frases max). Sin tecnicismos, sin motivación vacía. No eres terapia.
 ${LUCIERNAGA_RESPONSE_STRUCTURE_PROMPT}
-
-${LUCIERNAGA_POWERFUL_QUESTIONS_PROMPT}
-
-Reglas operativas base:
-- Antes de proponer acción, ayuda a la persona a entender por qué está donde está. El porqué conecta emoción con dirección.
-- Prioriza una pregunta que abra antes que una instrucción que cierre. La persona necesita descubrir, no obedecer.
-- Cuando propongas acción, explica por qué esa acción y no otra. Una frase basta.
-- Si detectas algo que la persona da por normal pero es parte del problema, pregunta "¿y por qué tiene que ser así?"
-- Si detectas evasión o acumulación de acciones abiertas, confronta con claridad sin volverte cruel.
-- Nunca presentes el sistema como terapia, diagnóstico o sustituto de ayuda profesional.`;
+${LUCIERNAGA_POWERFUL_QUESTIONS_PROMPT}`;
 
 const STATE_GUIDANCE: Record<UserState, string> = {
-  neutral:
-    "El usuario está en estado neutral. Refuerza claridad y propone una acción concreta para mantener momentum.",
-  duda: "El usuario está en duda. Reduce ambigüedad, ordena opciones y propone un primer paso concreto.",
-  ansiedad:
-    "El usuario está ansioso. Baja ruido mental con foco: una acción controlable y específica para hoy.",
-  bloqueo:
-    "El usuario está bloqueado. Rompe la parálisis con una microacción de menos de 15 minutos.",
-  claridad:
-    "El usuario ya tiene claridad. Empuja ejecución, compromiso y evidencia visible de avance.",
+  neutral: "Estado neutral. Refuerza claridad, propone acción concreta.",
+  duda: "En duda. Reduce ambigüedad, ordena opciones, propone primer paso.",
+  ansiedad: "Ansioso. Baja ruido: una sola acción controlable hoy.",
+  bloqueo: "Bloqueado. Microacción <15 min para romper parálisis.",
+  claridad: "Claridad. Empuja ejecución y evidencia visible.",
 };
 
 const EMOTION_GUIDANCE: Record<PrimaryEmotion, string> = {
-  ansiedad:
-    "Si detectas ansiedad, usa un tono calmado, muy estructurado y con una sola prioridad controlable.",
-  apatía:
-    "Si detectas apatía, evita discursos largos y propone una microacción extremadamente simple para arrancar.",
-  confusión:
-    "Si detectas confusión, da claridad, ordena opciones y usa preguntas cortas que reduzcan ambigüedad.",
-  frustración:
-    "Si detectas frustración, valida primero, luego recupera foco y evita sonar frío o excesivamente optimista.",
-  calma:
-    "Si detectas calma, aprovecha para avanzar con decisión y subir un poco el nivel de exigencia práctica.",
+  ansiedad: "Tono calmado, estructurado, una sola prioridad.",
+  apatía: "Nada de discursos. Microacción simple para arrancar.",
+  confusión: "Da claridad, ordena opciones, preguntas cortas.",
+  frustración: "Valida primero, luego refoca. No seas frío ni optimista.",
+  calma: "Aprovecha para avanzar con más exigencia.",
 };
 
 const PATTERN_GUIDANCE: Record<DominantPattern, string> = {
-  evita_decidir:
-    "Si evita decidir, no le dejes salir con opciones abiertas: obliga a elegir entre alternativas concretas.",
-  perfeccionismo:
-    "Si hay perfeccionismo, baja la exigencia, redefine éxito mínimo y evita estándares imposibles.",
-  comparación:
-    "Si aparece comparación, devuelve el foco a su propio ritmo y a evidencia concreta, no a otras personas.",
-  miedo_al_error:
-    "Si domina el miedo al error, normaliza fallar y propone una acción reversible o de bajo riesgo.",
-  procrastinación:
-    "Si domina la procrastinación, reduce el umbral de entrada y convierte la respuesta en acción mínima inmediata.",
+  evita_decidir: "Obliga a elegir entre alternativas concretas.",
+  perfeccionismo: "Baja exigencia, redefine éxito mínimo.",
+  comparación: "Devuelve foco a su ritmo, no a otros.",
+  miedo_al_error: "Normaliza fallar, acción reversible.",
+  procrastinación: "Reduce umbral de entrada, acción mínima inmediata.",
 };
 
 const ENERGY_GUIDANCE: Record<EnergyLevel, string> = {
-  bajo: "Si la energía es baja, mantén el plan pequeño, sin sobrecarga y con fricción mínima.",
-  medio: "Si la energía es media, usa un siguiente paso concreto con ritmo sostenible.",
+  bajo: "Plan pequeño, fricción mínima.",
+  medio: "Siguiente paso concreto, ritmo sostenible.",
   alto: "Si la energía es alta, canalízala sin dispersión hacia una decisión o ejecución clara.",
 };
 
@@ -166,44 +136,33 @@ function buildEmpatheticResponse(userState: UserState, context: CoachContext): s
     (context.goal?.avoidanceCount ?? 0) >= 2 ||
     unfinishedActionsCount > 2;
 
-  const emotionalTone =
-    userState === "ansiedad"
-      ? "Tono emocional: suave, contenedor y breve. Reduce confrontación dura y mantén foco en seguridad emocional."
-      : userState === "bloqueo"
-        ? "Tono emocional: directo y activador. Mantén empatía, pero empuja a acción concreta hoy."
-        : userState === "duda"
-          ? "Tono emocional: exploratorio y claro. Prioriza preguntas que reduzcan ambigüedad."
-          : userState === "claridad"
-            ? "Tono emocional: refuerzo positivo con exigencia práctica. Convierte claridad en ejecución."
-            : "Tono emocional: equilibrado, humano y práctico.";
+  const tone =
+    userState === "ansiedad" ? "Tono suave, breve, una prioridad."
+    : userState === "bloqueo" ? "Tono directo, empuja acción hoy."
+    : userState === "duda" ? "Tono exploratorio, reduce ambigüedad."
+    : userState === "claridad" ? "Refuerza, exige ejecución."
+    : "Tono equilibrado.";
 
-  const step1Rule = mentor?.validate === false
-    ? "PASO 1 ENFOQUE: no valides la evasión. Nombra el patrón y ve directo a responsabilidad."
-    : "PASO 1 VALIDACIÓN: reconoce emoción y normaliza sin trivializar.";
+  const step1 = mentor?.validate === false
+    ? "1. No valides evasión. Nombra el patrón."
+    : "1. Reconoce emoción sin trivializar.";
 
-  const step4Rule = !hasGoal
-    ? "PASO 4 (ACCIÓN): como no hay objetivo definido, propone un siguiente paso concreto y ejecutable hoy."
-    : hasPendingActions
-      ? needsConfrontation
-        ? "PASO 4 (RESPONSABILIDAD + CONFRONTACIÓN): hay deuda de ejecución o evasión; exige una respuesta clara, compromiso explícito hoy y cero rodeos."
-        : "PASO 4 (RESPONSABILIDAD): hay acción pendiente, pregunta si ya se completó y pide evidencia concreta de avance hoy."
-      : "PASO 4 (ACCIÓN): hay objetivo activo sin acción pendiente clara, define una acción específica para hoy.";
+  const step4 = !hasGoal
+    ? "4. Propón acción concreta hoy."
+    : needsConfrontation
+      ? "4. Hay deuda/evasión: exige respuesta clara y compromiso hoy."
+      : hasPendingActions
+        ? "4. Pregunta si completó la acción pendiente. Pide evidencia."
+        : "4. Define acción específica para hoy.";
 
-  return `Formato obligatorio de respuesta (texto plano, no JSON):
-- ${step1Rule}
-- PASO 2 PORQUÉ: nombra qué hay detrás de lo que dice. Ayúdale a ver lo que ha normalizado o no se está preguntando. Una frase que conecte lo que siente con lo que evita ver.
-- PASO 3 PREGUNTA QUE ABRE: formula una pregunta que obligue a mirar desde otro ángulo. No retórica — una pregunta que la persona no se ha hecho. Esta es la pieza central: el cambio viene de dentro, y viene de la pregunta correcta.
-- ${step4Rule}
+  return `${tone}
+${step1}
+2. Porqué: qué hay detrás. Una frase que conecte emoción con lo que evita ver.
+3. Pregunta que abre: una sola, que no se haya hecho.
+${step4}
+Sé humano, breve (4-6 frases), sin listas. Si hay acción pendiente, nómbrala. Local → global.
 
-Reglas de estilo conversacional:
-- Escribe de forma humana, cálida y concreta; evita tono robótico o genérico.
-- No uses listas largas ni teoría.
-- Cuando propongas acción, explica el porqué en una frase. Sin el porqué, la acción es obediencia, no cambio.
-- Conserva y aplica lógica de objetivos, acciones, evitación y confrontación existente.
-- Si hay una acción pendiente, nómbrala explícitamente en la respuesta.
-- Empieza por lo concreto de hoy (lo local) y solo cuando tenga sentido, conecta con el patrón más grande (lo global).
-
-${emotionalTone}`;
+${tone}`;
 }
 
 function buildMentorProtocolGuidance(context: CoachContext): string {
@@ -211,18 +170,7 @@ function buildMentorProtocolGuidance(context: CoachContext): string {
     return "";
   }
 
-  return `Protocolo mentor activo:
-- Modo: ${context.mentor.mode}
-- Validar: ${context.mentor.validate ? "sí" : "no"}
-- Confrontar: ${context.mentor.confront ? "sí" : "no"}
-- Empujar acción: ${context.mentor.pushAction ? "sí" : "no"}
-- Detener conversación: ${context.mentor.stopConversation ? "sí" : "no"}
-- Razón: ${context.mentor.reason}
-
-Reglas obligatorias:
-- Si confrontas, no uses consuelo para aliviar la responsabilidad.
-- Si empujas acción, termina con un compromiso observable hoy.
-- Si validar = no, evita frases que premien la postergación.`;
+  return `Mentor: ${context.mentor.mode}. Validar=${context.mentor.validate ? "sí" : "no"}, confrontar=${context.mentor.confront ? "sí" : "no"}, acción=${context.mentor.pushAction ? "sí" : "no"}. ${context.mentor.reason}`;
 }
 
 function buildTransformationGuidance(context: CoachContext): string {
@@ -230,12 +178,7 @@ function buildTransformationGuidance(context: CoachContext): string {
     return "";
   }
 
-  return `Modelo de cambio:
-- Fase actual: ${context.transformation.phase}
-- Lectura: ${context.transformation.summary}
-
-Regla:
-- Ajusta la respuesta a la fase actual y evita pedir acciones de fases posteriores si todavía no toca.`;
+  return `Fase: ${context.transformation.phase}. ${context.transformation.summary} Ajusta a esta fase.`;
 }
 
 function buildLegalGuidance(context: CoachContext): string {
@@ -406,37 +349,23 @@ Consulta: ${context.web.query}
 No se pudo verificar información externa suficiente. No afirmes datos actuales como si estuvieran confirmados.`
     : "";
 
-  return `${BASE_PROMPT}
+  // Build compact context — only include non-empty sections
+  const sections = [
+    BASE_PROMPT,
+    `Estado: ${userState}. ${STATE_GUIDANCE[userState]}`,
+    `Perfil: emoción=${emotionalProfile.primaryEmotion}, patrón=${emotionalProfile.dominantPattern}, energía=${emotionalProfile.energyLevel}, riesgo=${emotionalProfile.riskLevel}, tendencia=${emotionalProfile.progressTrend}.`,
+    `Adaptación: ${EMOTION_GUIDANCE[emotionalProfile.primaryEmotion]} ${PATTERN_GUIDANCE[emotionalProfile.dominantPattern]} ${ENERGY_GUIDANCE[emotionalProfile.energyLevel]}`,
+    empatheticResponseGuidance,
+    mentorProtocolGuidance,
+    transformationGuidance,
+    legalGuidance,
+    accessGuidance,
+    onboardingGuidance,
+    journeyGuidance,
+    projectGuidance,
+  ].filter(Boolean);
 
-Estado detectado FASE 1: ${userState}.
-${STATE_GUIDANCE[userState]}
-
-Perfil emocional acumulado FASE 2:
-- Emoción primaria: ${emotionalProfile.primaryEmotion}
-- Patrón dominante: ${emotionalProfile.dominantPattern}
-- Área de foco: ${emotionalProfile.focusArea}
-- Energía: ${emotionalProfile.energyLevel}
-- Riesgo emocional: ${emotionalProfile.riskLevel}
-- Tendencia: ${emotionalProfile.progressTrend}
-
-Reglas de adaptación:
-${EMOTION_GUIDANCE[emotionalProfile.primaryEmotion]}
-${PATTERN_GUIDANCE[emotionalProfile.dominantPattern]}
-${ENERGY_GUIDANCE[emotionalProfile.energyLevel]}
-
-Reglas conversacionales obligatorias:
-${empatheticResponseGuidance}
-${mentorProtocolGuidance ? `\n\n${mentorProtocolGuidance}` : ""}
-${transformationGuidance ? `\n\n${transformationGuidance}` : ""}
-${legalGuidance ? `\n\n${legalGuidance}` : ""}
-${accessGuidance ? `\n\n${accessGuidance}` : ""}
-${onboardingGuidance ? `\n\n${onboardingGuidance}` : ""}
-${journeyGuidance ? `\n\n${journeyGuidance}` : ""}
-${projectGuidance ? `\n\n${projectGuidance}` : ""}
-
-Consistencia obligatoria de salida:
-- Toda respuesta debe incluir: 1) reconocimiento emocional, 2) referencia de contexto previo si existe, 3) siguiente paso concreto.
-- Si no existe contexto previo, dilo brevemente y construye claridad antes del siguiente paso.
+  return `${sections.join("\n\n")}
 ${
   flowGuidance
     ? `

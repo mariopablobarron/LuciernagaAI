@@ -523,12 +523,20 @@ export default function AdminUserDetailPage() {
           <Card className="border-zinc-800 bg-zinc-900/50 shadow-sm">
             <CardContent className="space-y-4 p-5">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-                <div>
-                  <p className="text-xl font-semibold text-white">
-                    {data.user.name || data.user.email}
-                  </p>
-                  <p className="text-sm text-zinc-500">{data.user.email}</p>
-                  <p className="mt-1 text-xs text-zinc-500">ID {data.user.id}</p>
+                <div className="flex items-center gap-4">
+                  <img
+                    src={`/api/user/avatar/${data.user.id}`}
+                    alt=""
+                    className="h-14 w-14 rounded-full object-cover border-2 border-zinc-700 shrink-0"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
+                  <div>
+                    <p className="text-xl font-semibold text-white">
+                      {data.user.name || data.user.email}
+                    </p>
+                    <p className="text-sm text-zinc-500">{data.user.email}</p>
+                    <p className="mt-1 text-xs text-zinc-500">ID {data.user.id}</p>
+                  </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">

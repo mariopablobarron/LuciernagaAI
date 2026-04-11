@@ -153,6 +153,7 @@ export async function GET(req: NextRequest) {
         createdAt: true,
         updatedAt: true,
         lastSeen: true,
+        avatarData: true,
         _count: {
           select: {
             conversations: true,
@@ -269,6 +270,7 @@ export async function GET(req: NextRequest) {
         id: user.id,
         email: user.email,
         name: user.name,
+        hasAvatar: Boolean(user.avatarData),
         role: user.role,
         createdAt: user.createdAt.toISOString(),
         updatedAt: user.updatedAt.toISOString(),

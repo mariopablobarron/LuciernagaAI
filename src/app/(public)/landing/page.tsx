@@ -24,7 +24,7 @@ export default function LandingPage() {
             </h1>
           </div>
           <p className="text-lg text-zinc-400 leading-relaxed max-w-lg">
-            Mentoria con inteligencia artificial que te acompana a pasar de la paralisis a la accion. No es terapia. No es teoria. Es un mentor que te escucha, te reta y te ayuda a dar el siguiente paso.
+            Un equipo de psicologos, mentores y coaches que usa inteligencia artificial para acompanarte a pasar de la paralisis a la accion. La IA es la herramienta — el seguimiento es humano.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <Link

@@ -60,12 +60,15 @@ export default function ClinicalDisclaimer() {
               <div className="px-5 pb-5 space-y-4">
               <div className="space-y-2">
                 <p className="text-sm text-zinc-300 leading-relaxed">
-                  <strong className="text-white">Tres Mil Millones de Latidos</strong> es una herramienta
-                  de coaching y autoconocimiento con inteligencia artificial.
+                  <strong className="text-white">Tres Mil Millones de Latidos</strong> es una plataforma
+                  de coaching y autoconocimiento que combina inteligencia artificial con supervision profesional.
+                </p>
+                <p className="text-sm text-cyan-300/80 leading-relaxed">
+                  Detras de cada conversacion hay un equipo de <strong className="text-white">psicologos, mentores y coaches</strong> que supervisan el proceso. La IA es la herramienta — el acompanamiento es humano.
                 </p>
                 <p className="text-sm text-zinc-400 leading-relaxed">
-                  <strong className="text-amber-400">No sustituye</strong> terapia psicológica,
-                  psiquiátrica ni intervención profesional de salud mental.
+                  <strong className="text-amber-400">No sustituye</strong> terapia psicologica,
+                  psiquiatrica ni intervencion profesional de salud mental.
                 </p>
               </div>
 

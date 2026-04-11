@@ -927,7 +927,7 @@ export default function Chat({
           )}
         </div>
         <p className="mt-1.5 text-center text-[10px] text-zinc-700">
-          Mentoria con inteligencia artificial · No sustituye atencion profesional · <a href="tel:024" className="text-red-500/60 hover:text-red-400">Crisis: 024</a>
+          IA supervisada por psicologos, mentores y coaches · No sustituye atencion clinica · <a href="tel:024" className="text-red-500/60 hover:text-red-400">Crisis: 024</a>
         </p>
       </div>
     </div>

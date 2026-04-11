@@ -67,6 +67,9 @@ const TEMPLATES: Record<string, TemplateBuilder> = {
         <p style="margin:12px 0 0;font-size:13px;color:#71717a;font-style:italic;line-height:1.5">
           "${getDailyQuote()}"
         </p>
+        <p style="margin:16px 0 0;font-size:12px;color:#52525b;line-height:1.5;border-top:1px solid #27272a;padding-top:12px">
+          Detras de la IA hay un equipo de psicologos, mentores y coaches que supervisan tu proceso. No estas solo.
+        </p>
       `),
       text: `${greeting}, ya tienes tu espacio listo. Abre el chat y escribe como te sientes hoy. ${APP_URL}/app`,
     };

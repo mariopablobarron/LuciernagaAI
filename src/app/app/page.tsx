@@ -615,8 +615,8 @@ export default function HomePage() {
             if (isFirstTime) localStorage.setItem("luc_auto_greeted", "1");
 
             const greetContent = isFirstTime
-              ? "Hola. Soy un mentor con inteligencia artificial creado para acompanarte.\n\n" +
-                "No soy terapia, pero puedo ayudarte a ordenar ideas, tomar decisiones y pasar a la accion.\n\n" +
+              ? "Hola. Soy tu mentor en Tres Mil Millones de Latidos.\n\n" +
+                "Uso inteligencia artificial, pero detras hay un equipo de psicologos, mentores y coaches que supervisan tu proceso.\n\n" +
                 "**¿Como llegas hoy?**"
               : "**¿Que necesitas hoy?**";
 
@@ -1956,7 +1956,7 @@ export default function HomePage() {
         <div className="fixed bottom-0 inset-x-0 z-40 border-t border-zinc-800 bg-zinc-900/95 backdrop-blur-sm px-4 py-3">
           <div className="mx-auto max-w-3xl flex flex-col sm:flex-row items-start sm:items-center gap-3">
             <p className="text-xs text-zinc-400 flex-1 leading-relaxed">
-              Al usar esta herramienta aceptas que no sustituye atencion profesional de salud mental.{" "}
+              IA supervisada por psicologos, mentores y coaches. No sustituye atencion clinica.{" "}
               <a href="/privacy" className="text-violet-400 underline underline-offset-2">Privacidad</a>{" · "}
               <a href="/terms" className="text-violet-400 underline underline-offset-2">Terminos</a>{" · "}
               Crisis: <a href="tel:024" className="text-red-400 font-semibold">024</a>

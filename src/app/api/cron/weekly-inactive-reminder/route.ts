@@ -10,25 +10,49 @@ export const dynamic = "force-dynamic";
 
 const APP_URL = process.env.APP_BASE_URL || "https://tresmilmillonesdelatidos.es";
 
-function buildWeeklyInactiveReminderEmail(name: string | null): {
+type InactiveUserData = {
+  name: string | null;
+  daysSinceLastSeen: number;
+  lastGoalTitle: string | null;
+  streakDays: number;
+};
+
+function buildWeeklyInactiveReminderEmail(data: InactiveUserData): {
   subject: string;
   html: string;
   text: string;
 } {
+  const { name, daysSinceLastSeen, lastGoalTitle, streakDays } = data;
   const greeting = name ? `Hola ${name}` : "Hola";
+  const daysText = daysSinceLastSeen === 1 ? "1 dia" : `${daysSinceLastSeen} dias`;
 
-  const subject = "¿Cómo estás? Tu coach te espera";
+  // Personalized subject
+  const subject = lastGoalTitle
+    ? `Tu meta "${lastGoalTitle}" te espera`
+    : streakDays > 0
+      ? `Llevabas ${streakDays} dias de racha — no la pierdas`
+      : "¿Como estas? Tu mentor te espera";
+
+  // Personalized body
+  const contextLine = lastGoalTitle
+    ? `Tu ultima meta era <strong style="color:#fff">"${lastGoalTitle}"</strong>. ¿Que paso con ella?`
+    : streakDays > 0
+      ? `Llegaste a una racha de <strong style="color:#fff">${streakDays} dias consecutivos</strong>. Ese esfuerzo no desaparece.`
+      : `A veces volver es solo abrir la puerta y decir <em>"hoy estoy asi"</em>.`;
+
+  const nudgeLine = lastGoalTitle
+    ? "No tienes que resolver todo. Solo retoma el siguiente paso."
+    : "No necesitas un plan. Solo di como te sientes hoy.";
 
   const text = [
     `${greeting},`,
     ``,
-    `Hace más de una semana que no pasas por aquí.`,
-    `No pasa nada — pero quería recordarte que este espacio sigue siendo tuyo.`,
-    ``,
-    `A veces volver es solo abrir la puerta y decir "hoy estoy así".`,
+    `Llevas ${daysText} sin pasar por aqui.`,
+    lastGoalTitle ? `Tu ultima meta era "${lastGoalTitle}". ¿Que paso?` : "",
+    nudgeLine,
     ``,
     `${APP_URL}/app`,
-  ].join("\n");
+  ].filter(Boolean).join("\n");
 
   const html = `<!DOCTYPE html>
 <html lang="es">
@@ -45,12 +69,14 @@ function buildWeeklyInactiveReminderEmail(name: string | null): {
         <tr>
           <td style="padding:32px;color:#d4d4d8">
             <p style="margin:0 0 20px;font-size:18px;color:#fff;font-weight:600">${greeting},</p>
+            <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#a1a1aa">
+              Llevas <strong style="color:#fff">${daysText}</strong> sin pasar por aqui.
+            </p>
             <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#a1a1aa">
-              Hace más de una semana que no pasas por aquí. No pasa nada — pero quería recordarte
-              que este espacio sigue siendo tuyo.
+              ${contextLine}
             </p>
             <p style="margin:0 0 28px;font-size:15px;line-height:1.6;color:#a1a1aa">
-              A veces volver es solo abrir la puerta y decir <em>"hoy estoy así"</em>.
+              ${nudgeLine}
             </p>
             <div style="text-align:center">
               <a href="${APP_URL}/app" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#7c3aed,#d946ef);color:#fff;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px">
@@ -101,7 +127,19 @@ export async function GET(req: NextRequest) {
           { preferences: { weeklyEmailEnabled: true } },
         ],
       },
-      select: { id: true, email: true, name: true },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        lastSeen: true,
+        goals: {
+          where: { status: "active" },
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          select: { title: true },
+        },
+        streak: { select: { currentDays: true } },
+      },
       take: 200,
     });
 
@@ -116,7 +154,13 @@ export async function GET(req: NextRequest) {
       }
 
       try {
-        const email = buildWeeklyInactiveReminderEmail(user.name);
+        const daysSinceLastSeen = Math.floor((Date.now() - new Date(user.lastSeen).getTime()) / (1000 * 60 * 60 * 24));
+        const email = buildWeeklyInactiveReminderEmail({
+          name: user.name,
+          daysSinceLastSeen,
+          lastGoalTitle: user.goals[0]?.title ?? null,
+          streakDays: user.streak?.currentDays ?? 0,
+        });
         const ok = await sendUserEmail({ to: user.email, ...email });
         if (ok) sent++;
         else errors++;

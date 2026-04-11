@@ -1,58 +1,39 @@
 import type { TourStep } from "@/components/GuidedTour";
 
 /**
- * Tour for the main /app workspace.
- * Order: chat first (what you came for), then tabs, then sidebar context.
- * Sidebar steps (3-6) only work on desktop — GuidedTour auto-skips
- * if the target element is not found (hidden in mobile drawer).
+ * Tour for the main /app workspace — first-time users.
+ * 5 steps: chat → tabs → diario/comunidad → impulso → progreso.
+ * Sidebar steps auto-skip if target is hidden (mobile drawer).
  */
 export const APP_TOUR: TourStep[] = [
   {
     target: "[data-tour='chat-input']",
-    title: "Empieza aqui",
-    body: "Escribe como te sientes o que necesitas resolver. El mentor te guiara paso a paso hacia una accion concreta.",
+    title: "1. Empieza aqui",
+    body: "Escribe como te sientes o que necesitas resolver. El mentor te hara preguntas para que descubras tu siguiente paso.",
     placement: "top",
   },
   {
     target: "[data-tour='workspace-tabs']",
-    title: "Cuatro espacios, un solo lugar",
-    body: "Chat para conversar, Plan para tus objetivos, Check-in para registrar tu dia, y Espejo para ver patrones que repites.",
+    title: "2. Cuatro espacios",
+    body: "Chat para conversar, Plan para tus objetivos, Check-in para registrar tu dia, y Espejo para ver patrones.",
     placement: "bottom",
   },
   {
-    target: "[data-tour='new-conversation']",
-    title: "Cada tema, su conversacion",
-    body: "Crea conversaciones separadas para distintos temas. Tu historial se guarda automaticamente.",
-    placement: "bottom",
-  },
-  {
-    target: "[data-tour='mi-progreso']",
-    title: "Tu progreso visible",
-    body: "Acciones completadas, racha de dias consecutivos y estado emocional. Se actualiza solo conforme avanzas.",
-    placement: "left",
-  },
-  {
-    target: "[data-tour='modo-impulso']",
-    title: "Modo Impulso (21 dias)",
-    body: "Programa intensivo con diagnostico, retos personalizados y seguimiento diario. Disponible en el plan Pro.",
-    placement: "left",
-  },
-  {
-    target: "[data-tour='ajustes']",
-    title: "Tus preferencias",
-    body: "Tono de la IA, recordatorios, zona horaria, personas de confianza y exportacion de datos. Tambien puedes repetir este tour desde aqui.",
+    target: "[data-tour='nav-buttons']",
+    title: "3. Tu caja de herramientas",
+    body: "Diario para escribir libremente, Respirar para calmar la ansiedad, Logros para celebrar avances, y Explorar para ejercicios guiados.",
     placement: "bottom",
   },
   {
     target: "[data-tour='comunidad']",
-    title: "La Comunidad",
-    body: "Conecta con personas en tu misma fase. Circulos de transformacion, preguntas anonimas y La Cafeteria — un espacio virtual con avatares.",
-    placement: "bottom",
+    title: "4. No estas solo",
+    body: "Conecta con personas en tu misma situacion. Victorias, reflexiones anonimas y espacios de apoyo mutuo.",
+    placement: "left",
   },
   {
-    target: "[data-tour='feedback']",
-    title: "Tu opinion cuenta",
-    body: "Si algo no funciona o tienes ideas, usa este boton. Lo leemos todo y nos ayuda a priorizar mejoras.",
+    target: "[data-tour='modo-impulso']",
+    title: "5. Modo Impulso",
+    body: "Programa de 21 dias con diagnostico, retos personalizados y seguimiento diario. Para cuando quieras ir en serio.",
     placement: "left",
   },
 ];
@@ -70,7 +51,7 @@ export const IMPULSO_TOUR: TourStep[] = [
   {
     target: "[data-tour='impulso-retos']",
     title: "Retos personalizados",
-    body: "Cada reto dura entre 3 y 7 dias. Estan diseñados para romper los patrones que te bloquean.",
+    body: "Cada reto dura entre 3 y 7 dias. Estan disenados para romper los patrones que te bloquean.",
     placement: "bottom",
   },
 ];

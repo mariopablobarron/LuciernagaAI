@@ -95,6 +95,33 @@ export default function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname();
   const [logoSrc, setLogoSrc] = useState("/logo-startidea.png");
+
+  // ── Progressive unlock system ──────────────────────────────────────────────
+  const daysSinceSignup = useMemo(() => {
+    if (typeof window === "undefined") return 0;
+    const key = "luc_first_visit";
+    let first = localStorage.getItem(key);
+    if (!first) {
+      first = new Date().toISOString();
+      localStorage.setItem(key, first);
+    }
+    return Math.floor((Date.now() - new Date(first).getTime()) / (1000 * 60 * 60 * 24));
+  }, []);
+  const streak = progress.streakDays ?? 0;
+
+  const unlocks = useMemo(() => ({
+    chat: true,
+    checkin: true,
+    comunidad: true,
+    plan: daysSinceSignup >= 3,
+    diario: daysSinceSignup >= 7,
+    respirar: streak >= 3,
+    logros: streak >= 7,
+    impulso: daysSinceSignup >= 21,
+  }), [daysSinceSignup, streak]);
+
+  const unlockedCount = Object.values(unlocks).filter(Boolean).length;
+  const totalFeatures = Object.keys(unlocks).length;
   const [searchQuery, setSearchQuery] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
@@ -223,81 +250,77 @@ export default function Sidebar({
           </Button>
         </div>
 
-        <div className="grid grid-cols-4 gap-1.5" data-tour="nav-buttons">
-          <Button asChild type="button" variant={pathname === "/app" ? "default" : "outline"} size="sm" className="justify-center text-xs">
-            <Link href="/app">Chat</Link>
-          </Button>
-          <Button asChild type="button" variant={pathname === "/app/diario" ? "default" : "outline"} size="sm" className="justify-center text-xs" title="Diario emocional con editor rico">
-            <Link href="/app/diario">Diario</Link>
-          </Button>
-          <Button asChild type="button" variant={pathname === "/app/respirar" ? "default" : "outline"} size="sm" className="justify-center text-xs" title="Ejercicios de respiracion guiada">
-            <Link href="/app/respirar">Respirar</Link>
-          </Button>
-          <Button asChild type="button" variant={pathname === "/app/logros" ? "default" : "outline"} size="sm" className="justify-center text-xs" title="Tus badges y logros desbloqueados">
-            <Link href="/app/logros">Logros</Link>
-          </Button>
-          <Button asChild type="button" variant={pathname === "/app/explore" ? "default" : "outline"} size="sm" className="justify-center text-xs" title="Contenido y ejercicios">
-            <Link href="/app/explore">Explorar</Link>
-          </Button>
-          <Button asChild type="button" variant={pathname?.startsWith("/app/settings") ? "default" : "outline"} size="sm" className="justify-center text-xs col-span-2" data-tour="ajustes">
+        {/* ── Progressive unlock roadmap ──────────────────────────────── */}
+        <div className="rounded-2xl border border-border bg-muted/30 p-3 space-y-3" data-tour="nav-buttons">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              Tu camino
+            </p>
+            <Badge variant="secondary" className="rounded-full px-2 py-0.5 text-[10px]">
+              {unlockedCount}/{totalFeatures}
+            </Badge>
+          </div>
+
+          {/* Progress bar */}
+          <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-cyan-500 transition-all duration-700"
+              style={{ width: `${(unlockedCount / totalFeatures) * 100}%` }}
+            />
+          </div>
+
+          {/* Feature list */}
+          <div className="space-y-1">
+            {([
+              { key: "chat" as const, label: "Chat", href: "/app", icon: "💬", req: "Siempre", tour: undefined },
+              { key: "checkin" as const, label: "Check-in", href: "/app/checkins", icon: "✅", req: "Siempre", tour: undefined },
+              { key: "comunidad" as const, label: "Comunidad", href: "/community", icon: "👥", req: "Siempre", tour: "comunidad" },
+              { key: "plan" as const, label: "Plan", href: "/app/goals", icon: "🎯", req: "Dia 3", tour: undefined },
+              { key: "diario" as const, label: "Diario", href: "/app/diario", icon: "📔", req: "Dia 7", tour: undefined },
+              { key: "respirar" as const, label: "Respirar", href: "/app/respirar", icon: "🌬", req: "Racha 3d", tour: undefined },
+              { key: "logros" as const, label: "Logros", href: "/app/logros", icon: "🏆", req: "Racha 7d", tour: undefined },
+              { key: "impulso" as const, label: "Impulso 21d", href: "/impulso", icon: "⚡", req: "Dia 21", tour: "modo-impulso" },
+            ]).map((item) => {
+              const unlocked = unlocks[item.key];
+              const active = item.href === "/app" ? pathname === "/app" : pathname?.startsWith(item.href);
+
+              if (unlocked) {
+                return (
+                  <Link
+                    key={item.key}
+                    href={item.href}
+                    data-tour={item.tour}
+                    className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition-colors ${
+                      active
+                        ? "bg-primary text-primary-foreground"
+                        : "hover:bg-muted/60 text-foreground"
+                    }`}
+                  >
+                    <span className="text-base">{item.icon}</span>
+                    <span className="font-medium">{item.label}</span>
+                  </Link>
+                );
+              }
+
+              return (
+                <div
+                  key={item.key}
+                  className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-muted-foreground/50 cursor-not-allowed"
+                  title={`Se desbloquea en: ${item.req}`}
+                >
+                  <span className="text-base grayscale opacity-40">🔒</span>
+                  <span className="font-medium">{item.label}</span>
+                  <span className="ml-auto text-[10px] text-muted-foreground/40">{item.req}</span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Settings always accessible */}
+          <Button asChild type="button" variant={pathname?.startsWith("/app/settings") ? "default" : "outline"} size="sm" className="w-full justify-center text-xs" data-tour="ajustes">
             <Link href="/app/settings">Ajustes</Link>
           </Button>
         </div>
-
-        <Link
-          href="/community"
-          data-tour="comunidad"
-          className={`flex items-center justify-between rounded-2xl border px-4 py-3 text-sm transition hover:border-fuchsia-500/50 hover:bg-fuchsia-500/10 ${
-            pathname?.startsWith("/community")
-              ? "border-fuchsia-500/40 bg-fuchsia-500/12 text-foreground"
-              : "border-border bg-muted/30 text-foreground"
-          }`}
-        >
-          <div>
-            <p className="font-semibold leading-snug">👥 Comunidad</p>
-            <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">
-              Victorias, espacios y reflexiones anonimas con otros que estan en el mismo camino.
-            </p>
-          </div>
-          <ArrowRight className="ml-3 size-4 shrink-0 text-muted-foreground" />
-        </Link>
-
-        <Link
-          href="/impulso"
-          data-tour="modo-impulso"
-          className={`flex items-center justify-between rounded-2xl border px-4 py-3 text-sm transition hover:border-signal-warning/50 hover:bg-signal-warning/10 ${
-            pathname.startsWith("/impulso")
-              ? "border-signal-warning/40 bg-signal-warning/12 text-foreground"
-              : "border-border bg-muted/30 text-foreground"
-          }`}
-        >
-          <div>
-            <p className="font-semibold leading-snug">⚡ Modo Impulso</p>
-            <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">
-              Diagnóstico, retos personalizados y racha diaria para convertir intención en
-              ejecución.
-            </p>
-          </div>
-          <ArrowRight className="ml-3 size-4 shrink-0 text-muted-foreground" />
-        </Link>
-
-        {/* Mi Proyecto */}
-        <Link
-          href="/proyecto"
-          className={`flex items-center justify-between rounded-2xl border px-4 py-3 text-sm transition hover:border-violet-500/50 hover:bg-violet-500/10 ${
-            pathname.startsWith("/proyecto")
-              ? "border-violet-500/40 bg-violet-500/12 text-foreground"
-              : "border-border bg-muted/30 text-foreground"
-          }`}
-        >
-          <div>
-            <p className="font-semibold leading-snug">🎯 Mi Proyecto</p>
-            <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">
-              Tu proyecto personal con fases, seguimiento y reflexion.
-            </p>
-          </div>
-          <ArrowRight className="ml-3 size-4 shrink-0 text-muted-foreground" />
-        </Link>
 
         {/* Telegram CTA */}
         <a

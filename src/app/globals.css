@@ -538,6 +538,11 @@ body {
   animation: glasses-drop 800ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
 .animate-lens-flare {
   animation: lens-flare 1000ms ease-out forwards;
 }

@@ -8,6 +8,7 @@ import CookieConsent from "@/components/CookieConsent";
 import InstallPWA from "@/components/InstallPWA";
 import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
+import TopProgressBar from "@/components/TopProgressBar";
 import { Toaster } from "@/components/ui/sonner";
 import { SAAS_CONFIG } from "@/lib/saas";
 import { validateEnv } from "@/lib/env";
@@ -221,6 +222,7 @@ export default function RootLayout({
         <MetaPixel />
         <UtmCapture />
         <ServiceWorkerRegistrar />
+        <TopProgressBar />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <div id="main-content" tabIndex={-1}>
             {children}

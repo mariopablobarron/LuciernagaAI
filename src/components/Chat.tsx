@@ -702,15 +702,18 @@ export default function Chat({
 
             {/* Typing / loading indicator (before assistant responds) */}
             {loading && !streamingMessageId && (
-              <div className="flex items-start gap-2.5 px-1" role="status" aria-label="El mentor esta escribiendo">
+              <div className="flex items-start gap-2.5 px-1 animate-in fade-in duration-300" role="status" aria-label="El mentor esta pensando">
                 <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-500/20 ring-1 ring-cyan-500/30">
-                  <Sparkles className="h-3 w-3 text-cyan-400" aria-hidden="true" />
+                  <Sparkles className="h-3 w-3 text-cyan-400 animate-pulse" aria-hidden="true" />
                 </div>
                 <div className="rounded-2xl rounded-tl-sm border border-zinc-800 bg-zinc-900 px-3.5 py-2.5">
-                  <div className="flex items-center gap-1 py-0.5" aria-hidden="true">
-                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan-400 [animation-delay:0ms]" />
-                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan-400 [animation-delay:150ms]" />
-                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan-400 [animation-delay:300ms]" />
+                  <div className="flex items-center gap-2" aria-hidden="true">
+                    <div className="flex items-center gap-1">
+                      <span className="h-2 w-2 animate-bounce rounded-full bg-violet-400 [animation-delay:0ms]" />
+                      <span className="h-2 w-2 animate-bounce rounded-full bg-fuchsia-400 [animation-delay:150ms]" />
+                      <span className="h-2 w-2 animate-bounce rounded-full bg-cyan-400 [animation-delay:300ms]" />
+                    </div>
+                    <span className="text-xs text-zinc-600 animate-pulse">Pensando...</span>
                   </div>
                 </div>
               </div>

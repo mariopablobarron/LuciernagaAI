@@ -91,6 +91,7 @@ model User {
   actionReminders ActionReminder[]
   circleMembers   CircleMember[]
   communityPosts       CommunityPost[]
+  communityReports     CommunityReport[]
   pushSubscriptions    PushSubscription[]
   notifications        Notification[]
   heartbeats           Heartbeat[]
@@ -1206,12 +1207,32 @@ model CommunityPost {
   circle     Circle?         @relation(fields: [circleId], references: [id], onDelete: SetNull)
   space      CommunitySpace? @relation(fields: [spaceId], references: [id], onDelete: SetNull)
   heartbeats Heartbeat[]
+  reports    CommunityReport[]
 
   @@index([createdAt])
   @@index([hidden, createdAt])
   @@index([circleId, createdAt])
   @@index([spaceId, createdAt])
   @@index([type, createdAt])
+}
+
+/// Reports filed against community posts (moderation queue).
+/// Consumed by src/app/api/community/report/route.ts — 3 pending reports
+/// auto-hide the post; self_harm reports also page admin via Telegram.
+model CommunityReport {
+  id         String        @id @default(cuid())
+  postId     String
+  reporterId String
+  reason     String        // "harmful" | "self_harm" | "harassment" | "spam" | "other"
+  details    String?
+  status     String        @default("pending") // "pending" | "reviewed" | "dismissed"
+  createdAt  DateTime      @default(now())
+  post       CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reporter   User          @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@index([reporterId, createdAt])
+  @@index([postId, status])
+  @@index([status, createdAt])
 }
 
 // ─── Marketing Dashboard ──────────────────────────────────────────────────────

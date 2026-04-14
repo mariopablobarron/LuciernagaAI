@@ -37,6 +37,10 @@ jest.mock("@/services/streak", () => ({
   updateStreak: jest.fn(),
 }));
 
+jest.mock("@/services/latidos", () => ({
+  awardLatidos: jest.fn().mockResolvedValue(0),
+}));
+
 import { NextRequest } from "next/server";
 import { POST } from "./route";
 import { resolveIdentity } from "@/lib/auth";

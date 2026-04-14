@@ -90,6 +90,10 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
 # Use dumb-init to handle graceful shutdown
 ENTRYPOINT ["/usr/sbin/dumb-init", "--"]
 
-# Apply pending migrations, seed superadmin, then start server
-# Migration failure is non-blocking so the app starts even if DB is temporarily unavailable
-CMD ["sh", "-c", "npx prisma migrate deploy || echo '[WARN] Migration failed, starting anyway...'; node scripts/seed-superadmin.mjs || echo '[WARN] Superadmin seed skipped'; exec npm start"]
+# Apply pending migrations, seed superadmin, then start server.
+# Migration failure is FATAL: a container running against an out-of-date
+# schema fails silently at runtime (see post-mortem 2026-04-14 where a
+# missing latidos/CommunityReport migration tumbled the chat for 3 days).
+# Seed failure stays non-fatal — the seed is idempotent convenience, not
+# a correctness invariant.
+CMD ["sh", "-c", "npx prisma migrate deploy || { echo '[FATAL] Migration failed — refusing to start'; exit 1; }; node scripts/seed-superadmin.mjs || echo '[WARN] Superadmin seed skipped'; exec npm start"]

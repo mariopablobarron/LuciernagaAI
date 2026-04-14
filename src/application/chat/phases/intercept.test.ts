@@ -105,8 +105,13 @@ function makeInput(overrides: Partial<InterceptInput> = {}): InterceptInput {
     actionLockAssistantMessage: null,
     captureEmailRecommended: false,
     captureEmailMessage: "",
-    domainState: "STABLE",
-    domainDecision: { action: "CONTINUE", rationale: "ok", expectedImpact: 0.5 } as InterceptInput["domainDecision"],
+    domainState: "ESTABLE",
+    domainDecision: {
+      type: "MANTENER_RUMBO",
+      reason: "ok",
+      confidence: "medium",
+      recommendedActions: [],
+    },
     activeGoal: null,
     ...overrides,
   };
@@ -291,7 +296,7 @@ describe("interceptCrisis", () => {
 
 describe("interceptTransitionalVoid", () => {
   it("returns intercepted:false when domainState is not TRANSITIONAL_VOID", async () => {
-    const result = await interceptTransitionalVoid(makeInput({ domainState: "STABLE" }));
+    const result = await interceptTransitionalVoid(makeInput({ domainState: "ESTABLE" }));
     expect(result.intercepted).toBe(false);
   });
 

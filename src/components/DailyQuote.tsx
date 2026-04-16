@@ -7,6 +7,8 @@ export default function DailyQuote() {
   const [quote, setQuote] = useState("");
 
   useEffect(() => {
+    // Hydration-safe: getDailyQuote() reads `new Date()` so must run client-side
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setQuote(getDailyQuote());
   }, []);
 

@@ -62,9 +62,11 @@ function applyToDOM(prefs: A11yPreferences) {
 export function useAccessibility() {
   const [prefs, setPrefs] = useState<A11yPreferences>(DEFAULT_PREFS);
 
-  // Load on mount
+  // Load on mount. Can't use lazy init because it would run during SSR
+  // with DEFAULT_PREFS and mismatch the hydrated client value.
   useEffect(() => {
     const loaded = loadPrefs();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- hydration-safe: reading localStorage can only happen client-side after mount
     setPrefs(loaded);
     applyToDOM(loaded);
   }, []);

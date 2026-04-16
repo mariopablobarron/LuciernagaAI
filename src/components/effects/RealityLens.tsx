@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { type ReactNode, useCallback, useRef, useState } from "react";
 
 interface RealityLensProps {
   surface: ReactNode;
@@ -18,16 +18,15 @@ export default function RealityLens({
   const containerRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef(false);
   const [pos, setPos] = useState({ x: 0, y: 0 });
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile] = useState(() =>
+    typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches,
+  );
   const [tapped, setTapped] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const [reducedMotion] = useState(() =>
+    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
   const radius = size / 2;
-
-  useEffect(() => {
-    setIsMobile(window.matchMedia("(pointer: coarse)").matches);
-    setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  }, []);
 
   const updatePos = useCallback(
     (clientX: number, clientY: number) => {

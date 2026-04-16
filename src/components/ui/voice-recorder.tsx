@@ -3,6 +3,24 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Mic } from "lucide-react";
 
+type SpeechRecognitionResult = { isFinal: boolean; 0: { transcript: string } };
+type SpeechRecognitionEvent = {
+  resultIndex: number;
+  results: ArrayLike<SpeechRecognitionResult>;
+};
+type SpeechRecognitionErrorEvent = { error: string };
+type SpeechRecognitionInstance = {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+};
+type SpeechRecognitionConstructor = new () => SpeechRecognitionInstance;
+
 interface VoiceRecorderProps {
   /** Función que se ejecuta cuando el navegador detecta texto nuevo */
   onTranscript: (text: string) => void;
@@ -10,29 +28,30 @@ interface VoiceRecorderProps {
   className?: string;
 }
 
+function getSpeechRecognitionCtor(): SpeechRecognitionConstructor | null {
+  if (typeof window === "undefined") return null;
+  const w = window as unknown as {
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+  };
+  return w.SpeechRecognition || w.webkitSpeechRecognition || null;
+}
+
 export function VoiceRecorder({ onTranscript, disabled, className = "" }: VoiceRecorderProps) {
   const [isListening, setIsListening] = useState(false);
-  const [isSupported, setIsSupported] = useState(true);
+  const [isSupported] = useState(() => getSpeechRecognitionCtor() !== null);
   // Referencia al objeto de reconocimiento de voz
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
 
   useEffect(() => {
-    // Verificamos si estamos en el navegador y si la API está soportada
-    if (typeof window !== "undefined") {
-      const SpeechRecognition =
-        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-
-      if (!SpeechRecognition) {
-        setIsSupported(false);
-        return;
-      }
-
+    const SpeechRecognition = getSpeechRecognitionCtor();
+    if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
       recognition.continuous = false; // Se detiene al terminar la frase
       recognition.interimResults = true; // Para capturar mientras el usuario habla
       recognition.lang = "es-ES"; // Idioma español
 
-      recognition.onresult = (event: any) => {
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
         let interimTranscript = "";
         let finalTranscript = "";
 
@@ -55,7 +74,7 @@ export function VoiceRecorder({ onTranscript, disabled, className = "" }: VoiceR
         }
       };
 
-      recognition.onerror = (event: any) => {
+      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
         console.error("Error en reconocimiento de voz:", event.error);
         setIsListening(false);
       };

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 const buttonVariants = cva(
@@ -113,12 +114,16 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       className,
     });
 
-    if (asChild && React.isValidElement(children)) {
-      const childProps = children.props as Record<string, unknown>;
-      return React.cloneElement(children as React.ReactElement<Record<string, unknown>>, {
-        className: `${buttonClass} ${String(childProps.className ?? '')}`,
-        ref,
-      });
+    if (asChild) {
+      return (
+        <Slot
+          className={buttonClass}
+          ref={ref as React.Ref<HTMLElement>}
+          {...props}
+        >
+          {children}
+        </Slot>
+      );
     }
 
     return (

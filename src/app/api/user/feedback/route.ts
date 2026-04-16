@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
 
   // Try with rating column first; fall back without it if column doesn't exist yet
   try {
-    await (prisma.feedback.create as Function)({
+    await (prisma.feedback.create as (args: unknown) => Promise<unknown>)({
       data: {
         userId: identity.userId,
         type,

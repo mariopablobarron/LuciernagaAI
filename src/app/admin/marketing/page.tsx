@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { AdminMetricCard } from "@/features/admin/components/AdminMetricCard";
 import { AdminPanel } from "@/features/admin/components/AdminPanel";
 import { AdminShell } from "@/features/admin/components/AdminShell";
+import Link from "next/link";
 import {
   Send,
   Mail,
@@ -17,6 +18,7 @@ import {
   ArrowRight,
   CheckCircle2,
   XCircle,
+  Video,
 } from "lucide-react";
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -351,6 +353,18 @@ export default function MarketingPage() {
       onLogout={handleLogout}
       showSectionNav={false}
     >
+      {/* Quick-nav: sub-páginas del panel de marketing */}
+      <div className="flex flex-wrap gap-2">
+        <Link
+          href="/admin/marketing/avatar-videos"
+          className="inline-flex items-center gap-2 rounded-xl border border-violet-500/30 bg-violet-500/10 px-4 py-2.5 text-xs font-semibold text-violet-200 hover:bg-violet-500/20 transition-colors"
+        >
+          <Video className="h-3.5 w-3.5" />
+          Video avatar semanal
+          <ArrowRight className="h-3 w-3" />
+        </Link>
+      </div>
+
       {/* Tab bar */}
       <div className="flex flex-wrap gap-2">
         {tabs.map((tab) => (

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 
 interface SparklesProps {
   children: React.ReactNode;
@@ -19,20 +19,27 @@ export function Sparkles({
   className = '',
   color = 'cyan',
 }: SparklesProps) {
-  const sparkles = Array.from({ length: 6 });
+  const [sparkles] = useState(() =>
+    Array.from({ length: 6 }, () => ({
+      width: Math.random() * 4 + 2,
+      height: Math.random() * 4 + 2,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+    })),
+  );
 
   return (
     <div className={`relative inline-block ${className}`}>
       {/* Sparkles */}
-      {sparkles.map((_, i) => (
+      {sparkles.map((s, i) => (
         <div
           key={i}
           className={`absolute ${colorMap[color]} rounded-full opacity-0 animate-sparkle`}
           style={{
-            width: `${Math.random() * 4 + 2}px`,
-            height: `${Math.random() * 4 + 2}px`,
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
+            width: `${s.width}px`,
+            height: `${s.height}px`,
+            left: `${s.left}%`,
+            top: `${s.top}%`,
             animationDelay: `${i * 0.1}s`,
           }}
         />

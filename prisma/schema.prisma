@@ -121,6 +121,8 @@ model User {
   personalProjects     PersonalProject[]
   diaryEntries         DiaryEntry[]
   userBadges           UserBadge[]
+  goalAvatarVideos     GoalAvatarVideo[]
+  broadcastAvatarDeliveries BroadcastAvatarDelivery[]
   phone                String?
   emailVerified        Boolean          @default(false)
   emailVerifyToken     String?
@@ -153,6 +155,100 @@ model Message {
   @@index([conversationId, createdAt])
   @@index([createdAt])
   @@index([userId, createdAt])
+}
+
+// ── Goal avatar videos (HeyGen) ────────────────────────────────────────────
+// Three milestone videos per goal: START (umbral), MIDPOINT (prueba — triggered
+// by low emotional state while goal is active), END (retorno — on completion).
+// Delivered once via modal on app open. See /api/cron/goal-avatar-midpoint.
+
+model GoalAvatarVideo {
+  id            String    @id @default(cuid())
+  userId        String
+  goalId        String
+  phase         String    // START | MIDPOINT | END
+  trigger       String    // goal_created | state_bloqueo | state_low_energy | goal_completed
+  script        String    @db.Text
+  heygenVideoId String?
+  videoUrl      String?
+  status        String    @default("PENDING") // PENDING | READY | FAILED
+  errorMessage  String?
+  seenAt        DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal          Goal      @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@unique([goalId, phase]) // exactly one video per phase per goal
+  @@index([status])
+  @@index([userId, seenAt])
+}
+
+// ── Broadcast avatar videos ────────────────────────────────────────────────
+// Admin-initiated personalized videos from the marketing panel. One campaign
+// row per "send" + one delivery row per recipient. When isShared=true the
+// HeyGen video is generated once and the URL is copied to every delivery.
+
+model BroadcastAvatarCampaign {
+  id             String    @id @default(cuid())
+  title          String    // admin-facing label
+  segment        String    // "all" | "single" | "active_7d" | ...
+  mode           String    // "literal" | "briefing"
+  isShared       Boolean   @default(false) // one video reused for all recipients
+  briefing       String?   @db.Text // briefing text if mode=briefing
+  literalScript  String?   @db.Text // explicit script if mode=literal
+  sharedVideoUrl String?   // filled when isShared && generation completed
+  sharedHeygenId String?
+  status         String    @default("PENDING") // PENDING | GENERATING | READY | FAILED
+  errorMessage   String?
+  recipientCount Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  createdBy      String?
+  deliveries     BroadcastAvatarDelivery[]
+
+  @@index([createdAt])
+  @@index([status])
+}
+
+model BroadcastAvatarDelivery {
+  id            String    @id @default(cuid())
+  campaignId    String
+  userId        String
+  script        String    @db.Text
+  heygenVideoId String?   // only for per-user videos; null for shared
+  videoUrl      String?   // final URL served to the user
+  status        String    @default("PENDING") // PENDING | READY | FAILED
+  errorMessage  String?
+  seenAt        DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  user          User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  campaign      BroadcastAvatarCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, userId])
+  @@index([userId, seenAt])
+  @@index([status])
+}
+
+// Singleton row (id="singleton") edited from /admin/marketing.
+model AvatarVideoConfig {
+  id                       String   @id @default("singleton")
+  enabled                  Boolean  @default(false) // global kill switch
+  maxVideosPerDay          Int      @default(30)    // hard cap per day to cap cost
+  midpointMinDays          Int      @default(3)     // wait at least N days after goal start
+  // Broadcast guardrails — discipline-as-code so the marketing channel
+  // doesn't degrade through overuse.
+  maxBroadcastsPerMonth    Int      @default(4)     // hard cap on broadcasts in any rolling 30-day window
+  broadcastUserCooldownDays Int     @default(7)     // skip recipients who got any broadcast in last N days
+  welcomeCampaignId        String?                  // BroadcastAvatarCampaign.id used as welcome video for new signups
+  tone                     String   @default("interpellation")
+  avatarId                 String   @default("e2ff51edb1154b0dbe2c8f0df59818cf")
+  promptTemplateStart      String   @db.Text
+  promptTemplateMidpoint   String   @db.Text
+  promptTemplateEnd        String   @db.Text
+  updatedAt                DateTime @updatedAt
+  updatedBy                String?
 }
 
 model DailyLog {
@@ -275,14 +371,15 @@ model CrisisEvent {
 }
 
 model Goal {
-  id        String     @id @default(cuid())
-  userId    String
-  title     String
-  status    GoalStatus @default(active)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  actions   Action[]
+  id           String             @id @default(cuid())
+  userId       String
+  title        String
+  status       GoalStatus         @default(active)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  actions      Action[]
+  avatarVideos GoalAvatarVideo[]
 
   @@index([userId, status, createdAt])
   @@index([status])
@@ -532,6 +629,7 @@ model UserPreferences {
   notifyInsights     Boolean  @default(true)
   notifyGoals        Boolean  @default(true)
   notifyUpdates      Boolean  @default(false)
+  avatarVideosEnabled Boolean @default(true) // opt-out for weekly avatar videos
   timezone           String   @default("Europe/Madrid")
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt

@@ -97,7 +97,7 @@ export default function Sidebar({
   const [logoSrc, setLogoSrc] = useState("/logo-startidea.png");
 
   // ── Progressive unlock system ──────────────────────────────────────────────
-  const daysSinceSignup = useMemo(() => {
+  const [daysSinceSignup] = useState(() => {
     if (typeof window === "undefined") return 0;
     const key = "luc_first_visit";
     let first = localStorage.getItem(key);
@@ -106,7 +106,7 @@ export default function Sidebar({
       localStorage.setItem(key, first);
     }
     return Math.floor((Date.now() - new Date(first).getTime()) / (1000 * 60 * 60 * 24));
-  }, []);
+  });
   const streak = progress.streakDays ?? 0;
 
   const unlocks = useMemo(() => ({

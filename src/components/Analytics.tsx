@@ -10,7 +10,9 @@ export default function Analytics() {
 
   useEffect(() => {
     const stored = typeof window !== "undefined" ? localStorage.getItem("cookie_consent") : null;
-    // Load GA only if user explicitly accepted cookies
+    // Hydration-safe: reading localStorage must happen after mount, so initial
+    // render uses consent=null and GA only mounts on the subsequent render.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setConsent(stored === "true");
   }, []);
 

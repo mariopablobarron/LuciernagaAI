@@ -3,6 +3,7 @@ import { getPrismaClient } from "@/db/prisma";
 import { hashPassword } from "@/lib/password";
 import { issueSessionToken, attachSessionCookie } from "@/lib/auth";
 import { normalizeEmail } from "@/services/user";
+import { triggerWelcomeAvatarVideoAsync } from "@/services/welcomeAvatarVideo";
 import { logError, logInfo } from "@/lib/logger";
 import { sendAlert } from "@/lib/alerts";
 
@@ -157,6 +158,8 @@ export async function POST(req: NextRequest) {
       orgName: classroom.organization.name,
       code: classroomCode.code,
     });
+
+    triggerWelcomeAvatarVideoAsync(user.id);
 
     // Notify admin
     sendAlert({

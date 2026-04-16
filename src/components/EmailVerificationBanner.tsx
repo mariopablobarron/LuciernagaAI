@@ -13,19 +13,25 @@ export function EmailVerificationBanner({ emailVerified, isAnonymous, email }: P
   const [dismissed, setDismissed] = useState(false);
   const [resending, setResending] = useState(false);
   const [resent, setResent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Don't show for anonymous users (they don't have a real email)
-  // Don't show if already verified or dismissed
   if (isAnonymous || emailVerified || dismissed) return null;
 
   async function handleResend() {
     setResending(true);
+    setError(null);
     try {
       const res = await fetch("/api/auth/resend-verification", { method: "POST", credentials: "include" });
-      const data = (await res.json()) as { success?: boolean };
-      if (data.success) setResent(true);
+      const data = (await res.json()) as { success?: boolean; error?: string };
+      if (data.success) {
+        setResent(true);
+      } else if (res.status === 429) {
+        setError("Demasiados intentos. Espera un poco antes de reintentar.");
+      } else {
+        setError("No pudimos enviar el email. Inténtalo de nuevo más tarde.");
+      }
     } catch {
-      // Silent fail — user can try again
+      setError("Error de conexión. Revisa tu internet e inténtalo de nuevo.");
     } finally {
       setResending(false);
     }
@@ -36,7 +42,18 @@ export function EmailVerificationBanner({ emailVerified, isAnonymous, email }: P
       <Mail className="w-4 h-4 text-amber-400 shrink-0" />
       <div className="flex-1 text-amber-200">
         {resent ? (
-          <span>Email de verificacion reenviado a <strong>{email}</strong>. Revisa tu bandeja.</span>
+          <span>Email de verificación reenviado a <strong>{email}</strong>. Revisa tu bandeja.</span>
+        ) : error ? (
+          <span>
+            <span className="text-red-300">{error}</span>{" "}
+            <button
+              onClick={handleResend}
+              disabled={resending}
+              className="inline-flex items-center gap-1 font-semibold text-amber-300 hover:text-amber-100 underline underline-offset-2 disabled:opacity-50"
+            >
+              Reintentar
+            </button>
+          </span>
         ) : (
           <span>
             Verifica tu email para completar el registro.{" "}

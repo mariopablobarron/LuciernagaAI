@@ -4,6 +4,7 @@ import { getPrismaClient } from "@/db/prisma";
 import { getGoogleConfig, exchangeCodeForTokens, getGoogleProfile } from "@/lib/google-oauth";
 import { logError, logInfo } from "@/lib/logger";
 import { normalizeEmail } from "@/services/user";
+import { triggerWelcomeAvatarVideoAsync } from "@/services/welcomeAvatarVideo";
 
 /**
  * GET /api/auth/google/callback?code=xxx&state=yyy
@@ -64,6 +65,7 @@ export async function GET(req: NextRequest) {
         select: { id: true, googleId: true, email: true },
       });
       logInfo("AUTH", "google_signup", { userId: user.id, email });
+      triggerWelcomeAvatarVideoAsync(user.id);
     }
 
     const token = issueSessionToken(user.id);

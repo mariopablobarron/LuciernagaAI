@@ -1,0 +1,569 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`processMessage — golden masters 01 - mensaje neutral, sin goal, sin crisis → flujo normal IA 1`] = `
+{
+  "data": {
+    "action": "Define una sola accion concreta para hoy y ejecútala.",
+    "captureEmail": false,
+    "captureEmailMessage": null,
+    "conversationId": "conv_1",
+    "conversionTrigger": false,
+    "conversionType": undefined,
+    "decision": {
+      "confidence": "low",
+      "reason": "El sistema está estable sin señales críticas activas.",
+      "recommendedActions": [
+        "Mantener estrategia actual y monitoreo continuo.",
+        "Reevaluar estado con ventana móvil de 7 días.",
+        "Ajustar prompts de manera incremental.",
+      ],
+      "type": "MANTENER_RUMBO",
+    },
+    "emotionalProfile": {
+      "dominantPattern": "evita_decidir",
+      "energyLevel": "medio",
+      "focusArea": "propósito",
+      "primaryEmotion": "calma",
+      "progressTrend": "igual",
+      "riskLevel": "low",
+    },
+    "fallback": false,
+    "flow": {
+      "activeFlow": null,
+      "currentIntent": "clarification",
+      "currentStep": 0,
+      "instruction": null,
+    },
+    "goal": null,
+    "mentorMode": "supportive",
+    "persistenceAvailable": true,
+    "response": "Respuesta IA de prueba.",
+    "searchUsed": false,
+    "state": "neutral",
+    "success": true,
+    "systemState": "ESTABLE",
+    "transformationPhase": "exploración",
+  },
+  "kind": "data",
+}
+`;
+
+exports[`processMessage — golden masters 02 - riskLevel high → crisis intercept (detected) 1`] = `
+{
+  "data": {
+    "alerts": [
+      {
+        "name": "112",
+        "url": "tel:112",
+      },
+    ],
+    "continueChat": false,
+    "conversationId": "conv_1",
+    "crisis": true,
+    "crisisActive": true,
+    "crisisActiveUntil": "2026-04-06T12:00:00.000Z",
+    "decision": {
+      "confidence": "high",
+      "reason": "Se detectaron señales de riesgo alto o crítico.",
+      "recommendedActions": [
+        "Activar protocolo de contención inmediato.",
+        "Priorizar mensajes de seguridad y recursos de ayuda.",
+        "Notificar al panel admin para seguimiento manual.",
+      ],
+      "type": "ESCALAR_CRISIS",
+    },
+    "detectedRiskLevel": "high",
+    "emotionalProfile": {
+      "dominantPattern": "evita_decidir",
+      "energyLevel": "medio",
+      "focusArea": "propósito",
+      "primaryEmotion": "calma",
+      "progressTrend": "igual",
+      "riskLevel": "low",
+    },
+    "fallback": true,
+    "flow": {
+      "activeFlow": null,
+      "currentIntent": "clarification",
+      "currentStep": 0,
+      "instruction": null,
+    },
+    "goal": null,
+    "legalDisclaimer": "No sustituye terapia.",
+    "legalFlag": true,
+    "persistenceAvailable": true,
+    "response": "Estoy contigo. Si estás en peligro inmediato, llama al 112.",
+    "riskLevel": "high",
+    "searchUsed": false,
+    "state": "neutral",
+    "success": true,
+    "systemState": "CRISIS",
+    "type": "crisis",
+  },
+  "kind": "data",
+}
+`;
+
+exports[`processMessage — golden masters 03 - crisis activa en BD → crisis intercept (active_state) 1`] = `
+{
+  "data": {
+    "alerts": [
+      {
+        "name": "112",
+        "url": "tel:112",
+      },
+    ],
+    "continueChat": false,
+    "conversationId": "conv_1",
+    "crisis": true,
+    "crisisActive": true,
+    "crisisActiveUntil": "2026-04-06T18:00:00Z",
+    "decision": {
+      "confidence": "high",
+      "reason": "Se detectaron señales de riesgo alto o crítico.",
+      "recommendedActions": [
+        "Activar protocolo de contención inmediato.",
+        "Priorizar mensajes de seguridad y recursos de ayuda.",
+        "Notificar al panel admin para seguimiento manual.",
+      ],
+      "type": "ESCALAR_CRISIS",
+    },
+    "detectedRiskLevel": "low",
+    "emotionalProfile": {
+      "dominantPattern": "evita_decidir",
+      "energyLevel": "medio",
+      "focusArea": "propósito",
+      "primaryEmotion": "calma",
+      "progressTrend": "igual",
+      "riskLevel": "low",
+    },
+    "fallback": true,
+    "flow": {
+      "activeFlow": null,
+      "currentIntent": "clarification",
+      "currentStep": 0,
+      "instruction": null,
+    },
+    "goal": null,
+    "legalDisclaimer": "No sustituye terapia.",
+    "legalFlag": true,
+    "persistenceAvailable": true,
+    "response": "Estoy contigo. Si estás en peligro inmediato, llama al 112.",
+    "riskLevel": "high",
+    "searchUsed": false,
+    "state": "neutral",
+    "success": true,
+    "systemState": "CRISIS",
+    "type": "crisis",
+  },
+  "kind": "data",
+}
+`;
+
+exports[`processMessage — golden masters 04 - goal con acción pendiente, usuario evade → action_required 1`] = `
+{
+  "data": {
+    "action": {
+      "id": "act_1",
+      "title": "Escribir 3 valores que guían tus decisiones.",
+    },
+    "captureEmail": false,
+    "captureEmailMessage": null,
+    "conversationId": "conv_1",
+    "emotionalProfile": {
+      "dominantPattern": "evita_decidir",
+      "energyLevel": "medio",
+      "focusArea": "propósito",
+      "primaryEmotion": "calma",
+      "progressTrend": "igual",
+      "riskLevel": "low",
+    },
+    "fallback": true,
+    "flow": {
+      "activeFlow": null,
+      "currentIntent": "clarification",
+      "currentStep": 0,
+      "instruction": null,
+    },
+    "goal": {
+      "actions": [
+        {
+          "completed": false,
+          "createdAt": "2026-04-01T08:00:00.000Z",
+          "description": "Escribir 3 valores que guían tus decisiones.",
+          "id": "act_1",
+        },
+      ],
+      "completedCount": 0,
+      "createdAt": "2026-04-01T08:00:00.000Z",
+      "id": "goal_1",
+      "progress": 0,
+      "status": "active",
+      "title": "Clarificar propósito",
+      "totalCount": 1,
+      "updatedAt": "2026-04-05T08:00:00.000Z",
+    },
+    "mentorMode": "supportive",
+    "message": "Antes de seguir: hay una acción pendiente.",
+    "persistenceAvailable": true,
+    "response": "Antes de seguir: hay una acción pendiente.",
+    "searchUsed": false,
+    "state": "neutral",
+    "success": true,
+    "transformationPhase": "exploración",
+    "type": "action_required",
+  },
+  "kind": "data",
+}
+`;
+
+exports[`processMessage — golden masters 05 - goal con acción pendiente, usuario la completa → feedback + flujo normal 1`] = `
+{
+  "data": {
+    "action": "Cierra hoy una sola accion visible de tu objetivo activo.",
+    "captureEmail": false,
+    "captureEmailMessage": null,
+    "conversationId": "conv_1",
+    "conversionTrigger": false,
+    "conversionType": undefined,
+    "decision": {
+      "confidence": "medium",
+      "reason": "Hay ejecución sostenida y baja fricción operativa.",
+      "recommendedActions": [
+        "Incrementar dificultad progresiva de acciones.",
+        "Introducir objetivos semanales con hitos diarios.",
+        "Reforzar wins para sostener momentum.",
+      ],
+      "type": "ACELERAR_ACCION",
+    },
+    "emotionalProfile": {
+      "dominantPattern": "evita_decidir",
+      "energyLevel": "medio",
+      "focusArea": "propósito",
+      "primaryEmotion": "calma",
+      "progressTrend": "igual",
+      "riskLevel": "low",
+    },
+    "fallback": false,
+    "flow": {
+      "activeFlow": null,
+      "currentIntent": "clarification",
+      "currentStep": 0,
+      "instruction": null,
+    },
+    "goal": {
+      "actions": [
+        {
+          "completed": true,
+          "createdAt": "2026-04-01T08:00:00.000Z",
+          "description": "Escribir 3 valores que guían tus decisiones.",
+          "id": "act_1",
+        },
+      ],
+      "completedCount": 1,
+      "createdAt": "2026-04-01T08:00:00.000Z",
+      "id": "goal_1",
+      "progress": 1,
+      "status": "active",
+      "title": "Clarificar propósito",
+      "totalCount": 1,
+      "updatedAt": "2026-04-05T08:00:00.000Z",
+    },
+    "mentorMode": "supportive",
+    "persistenceAvailable": true,
+    "response": "Bien. Has avanzado. Siguiente paso: consolida este avance hoy con una evidencia concreta.
+
+Respuesta IA de prueba.",
+    "searchUsed": false,
+    "state": "neutral",
+    "success": true,
+    "systemState": "ACTIVO",
+    "transformationPhase": "exploración",
+  },
+  "kind": "data",
+}
+`;
+
+exports[`processMessage — golden masters 06 - avoidance streak ≥3 → registro + escalación + action_required 1`] = `
+{
+  "data": {
+    "action": {
+      "id": "act_1",
+      "title": "Escribir 3 valores que guían tus decisiones.",
+    },
+    "captureEmail": false,
+    "captureEmailMessage": null,
+    "conversationId": "conv_1",
+    "emotionalProfile": {
+      "dominantPattern": "evita_decidir",
+      "energyLevel": "medio",
+      "focusArea": "propósito",
+      "primaryEmotion": "calma",
+      "progressTrend": "igual",
+      "riskLevel": "low",
+    },
+    "fallback": true,
+    "flow": {
+      "activeFlow": null,
+      "currentIntent": "clarification",
+      "currentStep": 0,
+      "instruction": null,
+    },
+    "goal": {
+      "actions": [
+        {
+          "completed": false,
+          "createdAt": "2026-04-01T08:00:00.000Z",
+          "description": "Escribir 3 valores que guían tus decisiones.",
+          "id": "act_1",
+        },
+      ],
+      "completedCount": 0,
+      "createdAt": "2026-04-01T08:00:00.000Z",
+      "id": "goal_1",
+      "progress": 0,
+      "status": "active",
+      "title": "Clarificar propósito",
+      "totalCount": 1,
+      "updatedAt": "2026-04-05T08:00:00.000Z",
+    },
+    "mentorMode": "supportive",
+    "message": "Antes de seguir: hay una acción pendiente.",
+    "persistenceAvailable": true,
+    "response": "Antes de seguir: hay una acción pendiente.",
+    "searchUsed": false,
+    "state": "neutral",
+    "success": true,
+    "transformationPhase": "exploración",
+    "type": "action_required",
+  },
+  "kind": "data",
+}
+`;
+
+exports[`processMessage — golden masters 07 - intent de crear goal → createGoalFromIntent + flujo normal 1`] = `
+{
+  "data": {
+    "action": "Escribir 3 valores que guían tus decisiones.",
+    "captureEmail": false,
+    "captureEmailMessage": null,
+    "conversationId": "conv_1",
+    "conversionTrigger": true,
+    "conversionType": "progress",
+    "decision": {
+      "confidence": "medium",
+      "reason": "La retención temprana y/o adherencia diaria muestran fricción alta.",
+      "recommendedActions": [
+        "Reducir carga cognitiva a una sola microacción.",
+        "Usar prompts de enfoque de 5-10 minutos.",
+        "Eliminar pasos opcionales en onboarding conversacional.",
+      ],
+      "type": "DESTRABAR_BLOQUEO",
+    },
+    "emotionalProfile": {
+      "dominantPattern": "evita_decidir",
+      "energyLevel": "medio",
+      "focusArea": "propósito",
+      "primaryEmotion": "calma",
+      "progressTrend": "igual",
+      "riskLevel": "low",
+    },
+    "fallback": false,
+    "flow": {
+      "activeFlow": null,
+      "currentIntent": "clarification",
+      "currentStep": 0,
+      "instruction": null,
+    },
+    "goal": {
+      "actions": [
+        {
+          "completed": false,
+          "createdAt": "2026-04-01T08:00:00.000Z",
+          "description": "Escribir 3 valores que guían tus decisiones.",
+          "id": "act_1",
+        },
+      ],
+      "completedCount": 0,
+      "createdAt": "2026-04-01T08:00:00.000Z",
+      "id": "goal_new",
+      "progress": 0,
+      "status": "active",
+      "title": "Objetivo creado desde intent",
+      "totalCount": 1,
+      "updatedAt": "2026-04-05T08:00:00.000Z",
+    },
+    "mentorMode": "supportive",
+    "persistenceAvailable": true,
+    "response": "Respuesta IA de prueba.",
+    "searchUsed": false,
+    "state": "neutral",
+    "success": true,
+    "systemState": "BLOQUEADO",
+    "transformationPhase": "exploración",
+  },
+  "kind": "data",
+}
+`;
+
+exports[`processMessage — golden masters 08 - señales de transitional void → TV intercept 1`] = `
+{
+  "data": {
+    "conversationId": "conv_1",
+    "decision": {
+      "confidence": "high",
+      "reason": "El usuario está en una transición de identidad sin dirección clara.",
+      "recommendedActions": [
+        "IDENTIFY_WHAT_ENDED: Identifica qué parte de tu vida ya no encaja",
+        "DETECT_ESCAPE: Detecta qué estás intentando resolver demasiado rápido",
+        "ALLOW_UNCERTAINTY: Permítete no decidir hoy",
+      ],
+      "type": "SOSTENER_VACIO",
+    },
+    "emotionalProfile": {
+      "dominantPattern": "evita_decidir",
+      "energyLevel": "medio",
+      "focusArea": "propósito",
+      "primaryEmotion": "calma",
+      "progressTrend": "igual",
+      "riskLevel": "low",
+    },
+    "fallback": false,
+    "flow": {
+      "activeFlow": null,
+      "currentIntent": "clarification",
+      "currentStep": 0,
+      "instruction": null,
+    },
+    "goal": null,
+    "persistenceAvailable": true,
+    "response": "No estás perdido.
+
+Estás en una transición.
+
+El problema no es que no sepas qué hacer.
+Es que estás intentando decidir demasiado pronto.
+
+Vamos a hacer algo simple.
+
+Escribe:
+→ qué parte de tu vida ya no encaja contigo",
+    "searchUsed": false,
+    "state": "neutral",
+    "success": true,
+    "systemState": "TRANSITIONAL_VOID",
+    "type": "transitional_void",
+  },
+  "kind": "data",
+}
+`;
+
+exports[`processMessage — golden masters 09 - último mensaje del día (soft paywall activo) 1`] = `
+{
+  "data": {
+    "action": "Cierra hoy una sola accion visible de tu objetivo activo.",
+    "captureEmail": false,
+    "captureEmailMessage": null,
+    "conversationId": "conv_1",
+    "conversionTrigger": false,
+    "conversionType": undefined,
+    "decision": {
+      "confidence": "medium",
+      "reason": "La retención temprana y/o adherencia diaria muestran fricción alta.",
+      "recommendedActions": [
+        "Reducir carga cognitiva a una sola microacción.",
+        "Usar prompts de enfoque de 5-10 minutos.",
+        "Eliminar pasos opcionales en onboarding conversacional.",
+      ],
+      "type": "DESTRABAR_BLOQUEO",
+    },
+    "emotionalProfile": {
+      "dominantPattern": "evita_decidir",
+      "energyLevel": "medio",
+      "focusArea": "propósito",
+      "primaryEmotion": "calma",
+      "progressTrend": "igual",
+      "riskLevel": "low",
+    },
+    "fallback": false,
+    "flow": {
+      "activeFlow": null,
+      "currentIntent": "clarification",
+      "currentStep": 0,
+      "instruction": null,
+    },
+    "goal": {
+      "actions": [
+        {
+          "completed": false,
+          "createdAt": "2026-04-01T08:00:00.000Z",
+          "description": "Escribir 3 valores que guían tus decisiones.",
+          "id": "act_1",
+        },
+      ],
+      "completedCount": 0,
+      "createdAt": "2026-04-01T08:00:00.000Z",
+      "id": "goal_1",
+      "progress": 0,
+      "status": "active",
+      "title": "Clarificar propósito",
+      "totalCount": 1,
+      "updatedAt": "2026-04-05T08:00:00.000Z",
+    },
+    "mentorMode": "supportive",
+    "persistenceAvailable": true,
+    "response": "Respuesta IA de prueba. [paywall]",
+    "searchUsed": false,
+    "state": "neutral",
+    "success": true,
+    "systemState": "BLOQUEADO",
+    "transformationPhase": "exploración",
+  },
+  "kind": "data",
+}
+`;
+
+exports[`processMessage — golden masters 10 - modo stream (jsonMode=false) → meta payload estable 1`] = `
+{
+  "kind": "stream",
+  "meta": {
+    "action": "Define una sola accion concreta para hoy y ejecútala.",
+    "captureEmail": false,
+    "captureEmailMessage": null,
+    "conversationId": "conv_1",
+    "conversionTrigger": false,
+    "conversionType": undefined,
+    "decision": {
+      "confidence": "low",
+      "reason": "El sistema está estable sin señales críticas activas.",
+      "recommendedActions": [
+        "Mantener estrategia actual y monitoreo continuo.",
+        "Reevaluar estado con ventana móvil de 7 días.",
+        "Ajustar prompts de manera incremental.",
+      ],
+      "type": "MANTENER_RUMBO",
+    },
+    "emotionalProfile": {
+      "dominantPattern": "evita_decidir",
+      "energyLevel": "medio",
+      "focusArea": "propósito",
+      "primaryEmotion": "calma",
+      "progressTrend": "igual",
+      "riskLevel": "low",
+    },
+    "flow": {
+      "activeFlow": null,
+      "currentIntent": "clarification",
+      "currentStep": 0,
+      "instruction": null,
+    },
+    "goal": null,
+    "mentorMode": "supportive",
+    "searchUsed": false,
+    "state": "neutral",
+    "success": true,
+    "systemState": "ESTABLE",
+    "transformationPhase": "exploración",
+  },
+}
+`;

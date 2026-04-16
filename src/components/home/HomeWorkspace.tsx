@@ -14,6 +14,7 @@ import {
   Target,
 } from "lucide-react";
 import dynamic from "next/dynamic";
+import { toast } from "sonner";
 import type { BrowserSessionUser } from "@/lib/session-client";
 
 const AvoidanceMap = dynamic(() => import("@/components/AvoidanceMap"), { ssr: false });
@@ -305,7 +306,6 @@ export default function HomeWorkspace({
                                           remindAt: tomorrow.toISOString(),
                                         }),
                                       }).then(() => {
-                                        const { toast } = require("sonner") as typeof import("sonner");
                                         toast.success("Te recordaremos mañana a las 9:00");
                                       }).catch(() => {});
                                     }}

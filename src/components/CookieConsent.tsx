@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Cookie } from "lucide-react";
 
 const STORAGE_KEY = "cookie_consent";
@@ -16,6 +17,8 @@ export default function CookieConsent() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     const stored = localStorage.getItem(STORAGE_KEY);
+    /* eslint-disable react-hooks/set-state-in-effect
+       -- hydration-safe: localStorage can only be read client-side after mount */
     if (stored === null) {
       setVisible(true);
     } else {
@@ -23,6 +26,7 @@ export default function CookieConsent() {
       setAnalytics(stored === "true");
       setMarketing(localStorage.getItem(META_STORAGE_KEY) === "true");
     }
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
   function accept() {
@@ -119,7 +123,7 @@ export default function CookieConsent() {
           </div>
 
           <p className="text-center text-xs text-zinc-600">
-            <a href="/privacy" className="underline underline-offset-2 hover:text-zinc-400">Politica de privacidad</a>
+            <Link href="/privacy" className="underline underline-offset-2 hover:text-zinc-400">Politica de privacidad</Link>
           </p>
         </div>
       </div>
@@ -137,9 +141,9 @@ export default function CookieConsent() {
         <div className="mx-auto flex max-w-4xl flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
           <p className="flex-1 text-sm leading-relaxed text-zinc-300">
             Usamos cookies para mejorar tu experiencia. Al continuar, aceptas nuestra{" "}
-            <a href="/privacy" className="underline underline-offset-2 text-indigo-400 hover:text-indigo-300">
+            <Link href="/privacy" className="underline underline-offset-2 text-indigo-400 hover:text-indigo-300">
               politica de cookies
-            </a>
+            </Link>
             .
           </p>
           <div className="flex w-full sm:w-auto shrink-0 flex-col sm:flex-row gap-2">

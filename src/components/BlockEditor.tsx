@@ -28,6 +28,9 @@ export default function BlockEditor({
 
   // Sync editable state
   useEffect(() => {
+    // BlockNote exposes `isEditable` as a settable property on the editor instance;
+    // this is the documented way to toggle edit mode post-mount.
+    // eslint-disable-next-line react-hooks/immutability
     editor.isEditable = editable;
   }, [editor, editable]);
 

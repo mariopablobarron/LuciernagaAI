@@ -9,8 +9,12 @@ export default function TopProgressBar() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
+    // Progress-bar animation triggered by route change — the sync setState is
+    // intentional: it's the "start" signal of the animation.
+    /* eslint-disable react-hooks/set-state-in-effect */
     setLoading(true);
     setProgress(30);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     const t1 = setTimeout(() => setProgress(60), 100);
     const t2 = setTimeout(() => setProgress(85), 300);

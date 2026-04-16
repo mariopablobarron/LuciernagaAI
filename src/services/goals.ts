@@ -2,6 +2,7 @@ import { getPrismaClient } from "@/db/prisma";
 import { dispatchN8nEvent } from "@/lib/n8n";
 import { awardLatidos } from "@/services/latidos";
 import { ensureUserSession } from "@/services/conversation";
+import { triggerGoalAvatarVideoAsync } from "@/services/goalAvatarVideos";
 import { GoalStatus } from "@prisma/client";
 
 export type GoalActionItem = {
@@ -657,6 +658,12 @@ export async function updateGoalAction(params: {
     if (nextStatus === "completed") {
       dispatchN8nEvent("goal.completed", { goalId: goal.id, goalTitle: goal.title }, params.userId);
       void awardLatidos(params.userId, "goal_complete").catch(() => {});
+      triggerGoalAvatarVideoAsync({
+        userId: params.userId,
+        goalId: goal.id,
+        phase: "END",
+        trigger: "goal_completed",
+      });
     }
   }
 

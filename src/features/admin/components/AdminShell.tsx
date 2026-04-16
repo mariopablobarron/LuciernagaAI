@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   BarChart3, BookOpen, Building2, FlaskConical, LayoutDashboard, LogOut,
   Megaphone, Menu, Settings, Shield, ShieldCheck, Sparkles, Stethoscope,
-  Users, Webhook, Wrench, X, Database,
+  Users, Webhook, Wrench, X, Database, Activity,
 } from "lucide-react";
 
 type AdminShellProps = {
@@ -22,19 +22,20 @@ const NAV_LINKS = [
   { href: "/admin/users", label: "Usuarios", icon: Users, matchPrefix: true },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/admin/crisis", label: "Crisis", icon: ShieldCheck },
-  { href: "/admin/research", label: "Investigacion", icon: FlaskConical, matchPrefix: true },
+  { href: "/admin/research", label: "Investigación", icon: FlaskConical, matchPrefix: true },
   { href: "/admin/marketing", label: "Marketing", icon: Megaphone, matchPrefix: true },
   { href: "/admin/blog", label: "Blog", icon: BookOpen, matchPrefix: true },
   { href: "/admin/crm", label: "CRM", icon: Database },
   { href: "/admin/organizations", label: "Organizaciones", icon: Building2 },
-  { href: "/admin-clinical", label: "Panel clinico", icon: Stethoscope, matchPrefix: true },
+  { href: "/admin-clinical", label: "Panel clínico", icon: Stethoscope, matchPrefix: true },
   { href: "/admin/operaciones", label: "Operaciones", icon: Wrench },
+  { href: "/admin/status", label: "Estado sistema", icon: Activity },
   { href: "/admin/audit", label: "Audit Log", icon: Sparkles },
   { href: "/admin/llm-usage", label: "LLM Usage", icon: BarChart3 },
   { href: "/admin/team", label: "Equipo", icon: Shield },
   { href: "/admin/integraciones", label: "Integraciones", icon: Webhook },
-  { href: "/admin/settings", label: "Configuracion", icon: Settings, matchPrefix: true },
-  { href: "/admin/guia", label: "Guia", icon: BookOpen },
+  { href: "/admin/settings", label: "Configuración", icon: Settings, matchPrefix: true },
+  { href: "/admin/guia", label: "Guía", icon: BookOpen },
 ];
 
 export function AdminShell({

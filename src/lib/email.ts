@@ -363,7 +363,7 @@ export async function sendUserEmail(email: UserEmail): Promise<boolean> {
   const baseUrl = process.env.APP_BASE_URL?.trim() ?? "https://tresmilmillonesdelatidos.es";
 
   if (!apiKey) {
-    console.error("[EMAIL] RESEND_API_KEY not configured — email not sent");
+    console.error(`[EMAIL] RESEND_API_KEY not configured — email to ${email.to} not sent`);
     return false;
   }
 
@@ -391,12 +391,12 @@ export async function sendUserEmail(email: UserEmail): Promise<boolean> {
 
     if (!res.ok) {
       const body = await res.text().catch(() => "");
-      console.error(`[EMAIL] Resend API error ${res.status}: ${body}`);
+      console.error(`[EMAIL] Resend API error ${res.status} for ${email.to}: ${body}`);
     }
 
     return res.ok;
   } catch (err) {
-    console.error("[EMAIL] Failed to send:", err);
+    console.error(`[EMAIL] Failed to send to ${email.to}:`, err);
     return false;
   }
 }

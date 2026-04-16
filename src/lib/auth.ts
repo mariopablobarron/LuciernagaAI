@@ -1,4 +1,4 @@
-import { createHmac, randomUUID, timingSafeEqual } from "crypto";
+import { createHmac, randomBytes, randomUUID, timingSafeEqual } from "crypto";
 import type { NextRequest, NextResponse } from "next/server";
 import { logError, logInfo } from "@/lib/logger";
 import { ensureUserAccount, linkIdentityToEmail, touchLastSeen } from "@/services/user";
@@ -67,7 +67,6 @@ function getSessionSecret(): string {
   // Cached in global to survive hot reloads in dev.
   const g = globalThis as unknown as { __devSessionSecret?: string };
   if (!g.__devSessionSecret) {
-    const { randomBytes } = require("crypto") as typeof import("crypto");
     g.__devSessionSecret = randomBytes(32).toString("hex");
     logInfo("CHAT", "auth_using_ephemeral_secret", {
       nodeEnv: process.env.NODE_ENV || "development",

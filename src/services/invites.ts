@@ -39,7 +39,7 @@ export async function validateInviteCode(code: string) {
   return invite;
 }
 
-export async function useInviteCode(code: string, email: string): Promise<boolean> {
+export async function consumeInviteCode(code: string, email: string): Promise<boolean> {
   try {
     const prisma = getPrismaClient();
     const invite = await prisma.invitation.findUnique({ where: { code } });

@@ -789,12 +789,165 @@ Cuando la IA detecta indicadores de crisis:
 - **Metricas de campana**: Apertura, clics, conversiones.
 - **Historial de mensajes**: Registro de todos los envios.
 
+### Videos avatar con HeyGen (`/admin/marketing/avatar-videos`)
+
+Sistema de videos cortos del fundador como mentor. **No es un canal de engagement**: esta disenado para tener presencia rara y significativa, con guardrails duros en codigo para que no degrade.
+
+Tres fuentes:
+
+1. **Arco del objetivo** — Tres videos automaticos por cada Goal del usuario (inicio/medio/final). El medio solo se dispara si el usuario esta en estado emocional bajo y el goal tiene al menos 3 dias.
+2. **Broadcast manual** — El equipo puede enviar un video a un usuario o segmento con texto literal o via briefing del LLM. Con cap de 4/mes rodante y cooldown de 7 dias por usuario.
+3. **Video de bienvenida** — Disparado en cada nuevo registro, reutiliza el sistema de broadcast con coste marginal cero.
+
+Principios pedagogicos hardcoded: prohibidos los imperativos huecos ("deberias", "tu puedes", "sigue asi"), obligatorio terminar en pregunta, prohibido celebrar rapido. Todas las plantillas del prompt lo imponen. Ver detalle completo en `docs/manual-admin.md` seccion 7B.
+
 ### Emails programados
 Sistema de emails automaticos:
+
 - Email de bienvenida personalizado tras el registro.
 - Nudge a las 24 horas si el usuario no ha vuelto.
 - Recordatorio semanal para usuarios inactivos.
 - Resumen semanal de progreso.
+
+---
+
+## 30B. Videos avatar con HeyGen
+
+**Ruta del panel:** `/admin/marketing/avatar-videos`
+**Permiso requerido:** `marketing:avatar_videos` (roles `superadmin` o `marketing`)
+**Referencia tecnica completa:** `docs/manual-admin.md` seccion 7B
+
+### Que es este sistema
+
+Un canal de presencia — no de engagement — donde el fundador aparece como mentor en video corto (≈20 segundos) en momentos especificos del viaje del usuario. La diferencia con email, Telegram o notificaciones push es cualitativa: **el avatar aparece raramente y con intencion**. Si se usa bien, cada aparicion significa algo. Si se usa mal, se vuelve ruido con cara y pierde valor irreversible.
+
+Todo el sistema esta construido alrededor de ese principio: **la escasez es el valor**. Por eso hay guardrails duros en codigo, por eso las plantillas del prompt prohiben frases vacias, y por eso el sistema arranca con `enabled=false`.
+
+### Tres fuentes de videos (de mas automatica a mas manual)
+
+**1. Arco del objetivo — completamente automatico**
+
+Tres videos por cada Goal del usuario, atados a momentos reales de su viaje:
+
+| Fase | Cuando aparece | Tono del guion |
+|---|---|---|
+| **Inicio (START)** | Al crear un goal | Reconoce el umbral. No felicita. Pregunta que cambia desde hoy. |
+| **Medio (MIDPOINT)** | Cuando el usuario esta en estado emocional bajo **y** el goal tiene ≥ 3 dias | Acompana la prueba. No anima. Pregunta si el objetivo sigue siendo suyo. |
+| **Final (END)** | Al completar el goal | Marca el retorno. No felicita rapido. Pregunta quien es ahora que lo tiene. |
+
+Cada goal recibe como maximo un video por fase. Si el usuario nunca completa, nunca vera el END. Si nunca entra en estado bajo, nunca vera el MIDPOINT. **El sistema respeta el ritmo del usuario — no le fuerza a recibir nada**.
+
+El MIDPOINT es el mas delicado. La decision pedagogica es que un buen mentor aparece precisamente cuando el alumno flaquea, no solo en los hitos buenos. Pero esa aparicion tiene riesgo: puede sentirse como vigilancia calculadora ("el algoritmo me detecto fragil"). Por eso el cooldown minimo de 3 dias y por eso hay que vigilar la tasa de opt-out en las primeras semanas como senal de salud.
+
+**2. Broadcast manual — disparado por el equipo de marketing**
+
+El equipo puede enviar un video a un usuario concreto o a un segmento, con dos modalidades de contenido:
+
+- **Texto literal** — el admin escribe exactamente lo que dira el avatar.
+- **Briefing con IA** — el admin escribe un brief ("agradecele su constancia esta semana") y el LLM lo transforma en guion con la voz de Luciernaga, prohibiendo los imperativos huecos.
+
+Y dos modalidades de coste:
+
+- **Compartido** (recomendado) — una sola generacion HeyGen reutilizada para todos los destinatarios. Coste fijo ~$0.10 independiente del tamano del segmento.
+- **Personalizado** — un video unico por destinatario con contexto individual del usuario. Coste lineal ~$0.10 × N. Solo tiene sentido para pocos usuarios donde la personalizacion justifique el gasto.
+
+**3. Video de bienvenida — automatico en cada registro**
+
+Disparado en los 4 puntos donde un usuario real se crea: registro con email/password, OAuth de Google, codigo de aula, o conversion de sesion anonima a email. Reutiliza el sistema de broadcast: el admin crea un broadcast normal con el guion de bienvenida, espera a que este READY, y lo marca como "welcome template" desde el historial. A partir de ese momento, cada nuevo signup recibe automaticamente una `BroadcastAvatarDelivery` apuntando al mismo video ya generado. **Coste marginal cero** — el video se genera una vez, los 100, 1000 o 10000 siguientes signups lo reciben gratis.
+
+Esta es la unica aparicion del avatar que es **segura por diseno**: ocurre una sola vez en la vida del usuario, en el momento exacto donde una cara real es mas reconfortante que cualquier copy. No genera ritual, no crea expectativa, no se puede abusar.
+
+### Guardrails de disciplina
+
+El sistema tiene seis limites duros, todos editables desde el panel pero con defaults pensados. **Estos guardrails son disciplina-como-codigo**: existen porque la disciplina humana falla bajo presion de metricas, y el canal avatar es demasiado valioso para dejarlo en manos del buen criterio del momento.
+
+| Guardrail | Default | Que hace |
+|---|---|---|
+| `enabled` | `false` | Kill switch global. Nada funciona hasta activar explicitamente. |
+| `maxVideosPerDay` | 30 | Cap global diario sobre cualquier generacion de video (arco + broadcast). Protege de facturas sorpresa. |
+| `maxBroadcastsPerMonth` | 4 | Cap rolling de 30 dias sobre broadcasts. Al llegar, el endpoint devuelve HTTP 429 y la UI bloquea el boton. ≈1 broadcast por semana es el limite donde "presencia significativa" no se vuelve "newsletter". |
+| `broadcastUserCooldownDays` | 7 | Un usuario que recibio cualquier broadcast en los ultimos N dias queda excluido del siguiente. Protege al usuario individual aunque el equipo envie a segmentos que se solapan. |
+| `midpointMinDays` | 3 | Un goal debe tener al menos N dias antes de que se dispare el MIDPOINT. Evita que el algoritmo parezca vigilante. |
+| `UserPreferences.avatarVideosEnabled` | `true` | Opt-out por usuario. El modal del video tiene un boton "No quiero recibir mas videos" visible (no escondido en ajustes). El test del mentor sano es que el alumno puede irse. |
+
+### Como se ve el panel admin
+
+El panel `/admin/marketing/avatar-videos` esta dividido en cinco zonas:
+
+1. **Cabecera de stats** — contadores de videos generados hoy, Inicios totales, Medios totales, Finales totales, y usuarios opt-out. Los opt-outs son la senal mas honesta de salud del canal.
+2. **Configuracion** — los seis guardrails editables, las tres plantillas de prompt (una por fase) con variables `{userName}`, `{goalTitle}`, `{currentState}`, `{recentContext}`, el avatar ID de HeyGen, y el tono.
+3. **Acciones manuales** — botones para disparar manualmente el scan midpoint y el polling de HeyGen (util para debugging o para el flujo de primera activacion).
+4. **Enviar broadcast** — el formulario de envio con contador del mes en la cabecera (verde/ambar/rojo), selector de destinatario, modo literal/briefing, toggle shared/personalizado, estimacion de coste en USD antes de enviar, y paso de confirmacion.
+5. **Historial** — dos tablas: broadcasts enviados (con boton "Marcar como bienvenida" en las elegibles) y los ultimos 100 videos individuales con fase, trigger, estado y el guion.
+
+### Principios pedagogicos no negociables
+
+Hay tres reglas **hardcoded** en las plantillas del prompt por defecto y en el validador de guiones:
+
+1. **Prohibidos los imperativos huecos** — "deberias", "tienes que", "sigue asi", "tu puedes", "no te rindas". El validador registra en logs cualquier guion que los contenga. No bloquea la emision (esta pensado para ser automatico), pero deja rastro para auditoria.
+2. **Terminar siempre en pregunta** — cada fase tiene su pregunta obligatoria. El avatar no cierra con afirmaciones, cierra interpelando. Esa es la diferencia entre mentor y coach motivacional.
+3. **Prohibido celebrar rapido** — especialmente en el END. El silencio despues del logro tambien es parte del trabajo. Felicitar antes de tiempo ensena al usuario a perseguir la celebracion, no el cambio.
+
+Las plantillas se pueden editar desde el panel, pero cambiar estas reglas es un acto deliberado que queda en el audit log (`updatedBy`). Si alguien en el equipo propone "podriamos ser mas calidos en los END", la respuesta correcta es **primero leer por que estas reglas existen**, no moverlas por intuicion.
+
+### Flujo tipico de activacion (primera vez)
+
+Para arrancar el sistema en un entorno nuevo, el orden correcto es:
+
+1. **Env vars en Coolify**: `HEYGEN_API_KEY`, `HEYGEN_VOICE_ID`, y verificar que `CRON_SECRET` ya existe.
+2. **Aplicar la migracion de Prisma** (`npx prisma migrate deploy`).
+3. **Montar volumen persistente** en `/app/public/avatars` para que los videos sobrevivan deploys.
+4. **Anadir los dos crons en Coolify** (ver `docs/coolify-crons.md`): midpoint scan diario a las 04:00 UTC, polling cada 10 minutos.
+5. **Entrar al panel** con el toggle aun en `false`. Revisar las tres plantillas del prompt. Ajustar el tono si hace falta.
+6. **Activar el toggle** (`enabled=true`).
+7. **Probar con tu propio usuario**: crear un goal, esperar 1-2 minutos, dar a "Polling" en el panel, abrir `/app`. Deberia aparecer el modal START.
+8. **Crear el video de bienvenida**: enviar un broadcast a tu propio email con texto literal, esperar a que este READY, marcarlo como "bienvenida" desde el historial.
+9. **Observar durante 2 semanas** antes de anadir nada mas. El instinto de seguir construyendo features se resiste — el aprendizaje real viene del uso.
+
+### Metricas de salud que hay que vigilar
+
+El panel muestra los numeros pero **los numeros importantes son dos**:
+
+1. **Tasa de opt-out** — porcentaje de usuarios activos que han desactivado el video. Si esta por debajo del 5% en las primeras 4 semanas, el mensaje conecta. Si sube del 20%, el canal molesta mas de lo que aporta. Entre medias: se necesita feedback cualitativo.
+2. **Tiempo desde el ultimo broadcast** — el contador del mes en el panel. Si el equipo esta cerca del cap semana tras semana, el canal se esta usando demasiado. Si pasa meses en 0, se esta desaprovechando. El equilibrio sano es ~2 broadcasts al mes con valor real.
+
+No hay KPIs de "tasa de visualizacion" ni "engagement por video" a proposito. Esas metricas convierten un gesto en un numero a optimizar, y el dia que empieces a optimizar el avatar por clicks, el avatar pierde su razon de ser.
+
+### Advertencia al CMO futuro (lee esto antes de pulsar "Enviar broadcast")
+
+El canal broadcast puede degradarse facilmente. Es tu trabajo evitarlo. Usa este test mental antes de cada envio:
+
+**¿Justifica esto que aparezca la cara del fundador en el modal del usuario?**
+
+Si la respuesta honesta es "hmm, supongo", no lo envies.
+
+Usos apropiados del broadcast:
+
+- Avisos importantes de producto (cambio de plan, incidente tecnico relevante, nueva funcionalidad critica).
+- Eventos reales con beneficio para el usuario (charla del fundador, Q&A abierto).
+- Respuesta a una conversacion colectiva del equipo (ej: despues de un feedback recurrente, el fundador responde en video).
+
+Usos que degradan el canal:
+
+- Engagement generico, "hola, te extranamos, vuelve". Ya hay Telegram y email para eso.
+- Felicitaciones en fechas senaladas (cumple, navidad, aniversario). Cliche que devalua el resto.
+- Anuncios de blog o contenido de marketing. Pertenecen a email.
+- Urgencia fabricada, "oferta ultima hora". El avatar no es un canal comercial.
+- Mensajes largos que no caben en 20 segundos. Mejor escribir un email largo.
+
+Un uso al mes bien aprovechado vale mas que cuatro al mes diluidos. Si el cap de 4 te queda apretado, **no subas el cap** — reduce la frecuencia.
+
+### Que hacer si algo va mal
+
+| Sintoma | Diagnostico probable | Accion |
+|---|---|---|
+| Ningun usuario ve videos | `enabled=false` o ningun video en `READY` | Revisar toggle + ejecutar "Polling" manual |
+| Videos quedan en `PENDING` para siempre | El cron de polling no esta configurado o falla | Verificar cron en Coolify + logs |
+| Videos `FAILED` con error HeyGen | Env vars incorrectas o cuota agotada | Revisar `HEYGEN_API_KEY`, `HEYGEN_VOICE_ID`, dashboard HeyGen |
+| Broadcast devuelve 429 | Cap mensual alcanzado | Esperar o (si es urgente) subir `maxBroadcastsPerMonth` dejando rastro en audit |
+| Broadcast devuelve "no recipients after cooldown" | Todos los destinatarios recibieron otro broadcast reciente | Esperar al cooldown o enviar a otro segmento |
+| Usuario se queja de haber recibido video repetido | Bug improbable — hay UNIQUE en la tabla | Revisar logs `AVATAR_GOAL` o `AVATAR_BROADCAST` con el `userId` |
+| Tasa de opt-out subiendo rapido | El canal esta molestando | Parar broadcasts manuales, reducir `midpointMinDays`, revisar las plantillas del prompt |
 
 ---
 

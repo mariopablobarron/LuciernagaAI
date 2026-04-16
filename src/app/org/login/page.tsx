@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Building2, Lock, Mail } from "lucide-react";
 
@@ -120,9 +121,9 @@ export default function OrgLoginPage() {
 
         <p className="text-center text-xs text-zinc-600">
           ¿No tienes cuenta?{" "}
-          <a href="/org/registro" className="text-violet-400 hover:text-violet-300">
+          <Link href="/org/registro" className="text-violet-400 hover:text-violet-300">
             Registra tu organizacion
-          </a>
+          </Link>
         </p>
       </div>
     </div>

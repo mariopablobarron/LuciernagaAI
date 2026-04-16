@@ -17,7 +17,9 @@ export default function MetaPixel() {
     if (typeof window === "undefined") return;
     const general = localStorage.getItem("cookie_consent");
     const meta = localStorage.getItem("meta_consent");
-    // Respect specific meta consent if set, otherwise fall back to general consent
+    // Respect specific meta consent if set, otherwise fall back to general consent.
+    // Hydration-safe: reading localStorage must happen after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setConsent(meta !== null ? meta === "true" : general === "true");
   }, []);
 

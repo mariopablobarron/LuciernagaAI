@@ -30,6 +30,18 @@ curl -sf "$DOMAIN/api/cron/inactivity-check?secret=$CRON_SECRET" -o /dev/null
 
 # 21:00 UTC — Check-in nocturno (Telegram)
 curl -sf "$DOMAIN/api/cron/telegram-checkin?secret=$CRON_SECRET&period=evening" -o /dev/null
+
+# 04:00 UTC — Scan midpoint de videos avatar (detecta usuarios con goal activo en estado bajo
+# y genera video de fase MIDPOINT). Sujeto a maxVideosPerDay en AvatarVideoConfig.
+curl -sf "$DOMAIN/api/cron/goal-avatar-midpoint?secret=$CRON_SECRET" -o /dev/null
+```
+
+## Tareas de alta frecuencia
+
+```bash
+# Cada 10 min — Polling de HeyGen (descarga videos avatar listos y actualiza estados).
+# Cubre tanto los videos del arco del goal como los broadcasts del equipo.
+curl -sf "$DOMAIN/api/cron/poll-avatar-videos?secret=$CRON_SECRET" -o /dev/null
 ```
 
 ## Tareas semanales
@@ -59,6 +71,8 @@ curl -sf "$DOMAIN/api/cron/user-weekly-review?secret=$CRON_SECRET" -o /dev/null
 | Resumen admin | `0 9 * * 1` | `curl -sf "$DOMAIN/api/cron/weekly-summary?secret=$CRON_SECRET" -o /dev/null` |
 | Inactivos semanal | `0 10 * * 1` | `curl -sf "$DOMAIN/api/cron/weekly-inactive-reminder?secret=$CRON_SECRET" -o /dev/null` |
 | Review usuario | `0 20 * * 0` | `curl -sf "$DOMAIN/api/cron/user-weekly-review?secret=$CRON_SECRET" -o /dev/null` |
+| Avatar midpoint scan | `0 4 * * *` | `curl -sf "$DOMAIN/api/cron/goal-avatar-midpoint?secret=$CRON_SECRET" -o /dev/null` |
+| Avatar poll (HeyGen) | `*/10 * * * *` | `curl -sf "$DOMAIN/api/cron/poll-avatar-videos?secret=$CRON_SECRET" -o /dev/null` |
 
 ## Notas
 
@@ -66,3 +80,4 @@ curl -sf "$DOMAIN/api/cron/user-weekly-review?secret=$CRON_SECRET" -o /dev/null
 - Si un cron falla, se envia alerta automatica a Telegram y email (deduplicacion de 30 min).
 - El backup genera un SQL comprimido y notifica por Telegram con tamano y numero de tablas.
 - Los flags `cronDailyCheckin`, `cronWeeklyReview`, `cronWeeklyInactiveReminder` se pueden desactivar desde la tabla `NotificationConfig` sin necesidad de tocar los crons.
+- Los crons de avatar video (`goal-avatar-midpoint`, `poll-avatar-videos`) son no-op silenciosos si `AvatarVideoConfig.enabled=false`. El kill switch global esta en `/admin/marketing/avatar-videos`.

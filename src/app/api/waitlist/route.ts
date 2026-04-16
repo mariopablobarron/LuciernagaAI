@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
-import { useInviteCode } from "@/services/invites";
+import { consumeInviteCode } from "@/services/invites";
 import { buildWaitlistWelcomeEmail, sendUserEmail } from "@/lib/email";
 
 const MAX_BODY_SIZE = 10 * 1024; // 10 KB
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     // If coming via invite, skip waitlist — mark invite as used
     if (inviteCode) {
-      await useInviteCode(inviteCode, emailLower);
+      await consumeInviteCode(inviteCode, emailLower);
     }
 
     // Upsert so repeated submissions don't error

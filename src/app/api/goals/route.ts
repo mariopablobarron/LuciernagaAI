@@ -11,6 +11,7 @@ import {
   getActiveGoalForUser,
   type GoalWithProgress,
 } from "@/services/goals";
+import { triggerGoalAvatarVideoAsync } from "@/services/goalAvatarVideos";
 import { getUserSessionProfile, isSyntheticEmail } from "@/services/user";
 import { getClientIp, withRateLimit } from "@/lib/rate-limit";
 
@@ -108,6 +109,15 @@ export const POST = withRateLimit(async function POST(req: NextRequest) {
     logInfo("STATE", "goal_created_manual", {
       userId: identity.userId,
       goalId: goal.id,
+    });
+
+    // Fire-and-forget: generate START avatar video asynchronously.
+    // Never blocks the response; failures are logged silently.
+    triggerGoalAvatarVideoAsync({
+      userId: identity.userId,
+      goalId: goal.id,
+      phase: "START",
+      trigger: "goal_created",
     });
 
     const response = NextResponse.json({

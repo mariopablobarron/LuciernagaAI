@@ -76,6 +76,11 @@ function timeAgo(iso: string): string {
 // ─── Floating Avatar ────────────────────────────────────────────────────────
 
 function FloatingAvatar({ avatar, onTap, selected }: { avatar: Avatar; onTap: (id: string) => void; selected: boolean }) {
+  const [anim] = useState(() => ({
+    shadowDur: 3 + Math.random() * 2,
+    floatDur: 3 + Math.random() * 2,
+    floatDelay: Math.random() * 2,
+  }));
   return (
     <button
       onClick={() => onTap(avatar.id)}
@@ -103,13 +108,13 @@ function FloatingAvatar({ avatar, onTap, selected }: { avatar: Avatar; onTap: (i
       <div className="relative flex flex-col items-center gap-0.5">
         <div
           className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-8 h-2 rounded-full bg-black/25 blur-sm"
-          style={{ animation: `shadow-pulse ${3 + Math.random() * 2}s ease-in-out infinite` }}
+          style={{ animation: `shadow-pulse ${anim.shadowDur}s ease-in-out infinite` }}
         />
         <div
           className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br ${avatar.color} flex items-center justify-center text-xl sm:text-2xl shadow-lg ${
             avatar.isMe ? "ring-2 ring-cyan-400 ring-offset-1 ring-offset-transparent" : ""
           }`}
-          style={{ animation: `float-avatar ${3 + Math.random() * 2}s ease-in-out infinite ${Math.random() * 2}s` }}
+          style={{ animation: `float-avatar ${anim.floatDur}s ease-in-out infinite ${anim.floatDelay}s` }}
         >
           {avatar.emoji}
         </div>
@@ -322,7 +327,7 @@ export default function CafeteriaPage() {
                   <p className="text-2xl mb-1">{av.emoji}</p>
                   <p className="text-sm font-bold text-white">{av.isMe ? "Tu" : av.name}</p>
                   {av.message && (
-                    <p className="text-xs text-zinc-400 mt-2 italic leading-relaxed">"{av.message.slice(0, 100)}"</p>
+                    <p className="text-xs text-zinc-400 mt-2 italic leading-relaxed">&ldquo;{av.message.slice(0, 100)}&rdquo;</p>
                   )}
                   <button onClick={() => setSelectedAvatar(null)} className="mt-2 text-[10px] text-zinc-600 hover:text-zinc-400">Cerrar</button>
                 </div>

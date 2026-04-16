@@ -105,23 +105,26 @@ export default function NotificationBell() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [pushEnabled, setPushEnabled] = useState(false);
-  const [pushSupported, setPushSupported] = useState(false);
+  const [pushSupported] = useState(
+    () =>
+      typeof navigator !== "undefined" &&
+      typeof window !== "undefined" &&
+      "serviceWorker" in navigator &&
+      "PushManager" in window &&
+      "Notification" in window,
+  );
   const panelRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // Check push support & current subscription on mount
+  // Check current push subscription on mount (only if supported)
   useEffect(() => {
-    const supported = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
-    setPushSupported(supported);
-
-    if (supported) {
-      navigator.serviceWorker.ready.then((reg) => {
-        reg.pushManager.getSubscription().then((sub) => {
-          setPushEnabled(!!sub);
-        });
+    if (!pushSupported) return;
+    navigator.serviceWorker.ready.then((reg) => {
+      reg.pushManager.getSubscription().then((sub) => {
+        setPushEnabled(!!sub);
       });
-    }
-  }, []);
+    });
+  }, [pushSupported]);
 
   // Fetch notifications
   const fetchNotifications = useCallback(async () => {
@@ -139,6 +142,7 @@ export default function NotificationBell() {
 
   // Poll every 60s + on mount
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- legitimate fetch-on-mount; setState only after await
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 60_000);
     return () => clearInterval(interval);

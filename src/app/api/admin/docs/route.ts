@@ -11,7 +11,7 @@ const DOCS: Record<string, { file: string; title: string }> = {
 };
 
 function mdToHtml(md: string): string {
-  let html = md;
+  const html = md;
 
   // Escape HTML entities inside content (but preserve our generated tags)
   // We'll process line by line instead
@@ -24,7 +24,7 @@ function mdToHtml(md: string): string {
   let tableHeaders: string[] = [];
 
   for (let i = 0; i < lines.length; i++) {
-    let line = lines[i];
+    const line = lines[i];
 
     // Code blocks
     if (line.trim().startsWith("```")) {

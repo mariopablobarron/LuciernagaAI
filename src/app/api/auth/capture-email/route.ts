@@ -14,6 +14,7 @@ import {
   normalizeEmail,
 } from "@/services/user";
 import { buildAdminAlert, notifyAdmin } from "@/services/telegram";
+import { triggerWelcomeAvatarVideoAsync } from "@/services/welcomeAvatarVideo";
 
 type CaptureEmailBody = {
   email?: string;
@@ -71,6 +72,11 @@ export async function POST(req: NextRequest) {
     });
     const token = issueSessionToken(linkedIdentity.userId);
     const user = await getUserSessionProfile(linkedIdentity.userId);
+
+    // Capture-email is the moment an anonymous browser session becomes a
+    // real, identifiable user. Trigger the welcome video here too — it's
+    // idempotent so it won't fire twice if the user was already registered.
+    triggerWelcomeAvatarVideoAsync(linkedIdentity.userId);
 
     const response = NextResponse.json({
       success: true,

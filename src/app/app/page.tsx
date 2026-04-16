@@ -7,6 +7,7 @@ import { trackEvent } from "@/lib/analytics";
 import { trackMetaEvent } from "@/lib/meta-pixel";
 import AppLayout from "@/components/layout/AppLayout";
 import { FloatingButton } from "@/components/effects/FloatingButton";
+import { AvatarWeeklyModal } from "@/components/AvatarWeeklyModal";
 import Chat, { type ChatMessage } from "@/components/Chat";
 import ConsentModal from "@/components/ConsentModal";
 import HomeOnboarding from "@/components/home/HomeOnboarding";
@@ -1676,6 +1677,7 @@ export default function HomePage() {
 
   return (
     <>
+      <AvatarWeeklyModal />
       <AppLayout
         prelude={
           sessionProfile && !sessionProfile.isAnonymous && !sessionProfile.emailVerified ? (
@@ -1964,8 +1966,8 @@ export default function HomePage() {
             </ul>
             <div className="flex items-center justify-between gap-3 pt-1">
               <p className="text-[10px] text-zinc-600">
-                <a href="/privacy" className="text-violet-400/70 underline underline-offset-2">Politica de privacidad</a>{" · "}
-                <a href="/terms" className="text-violet-400/70 underline underline-offset-2">Terminos de uso</a>
+                <Link href="/privacy" className="text-violet-400/70 underline underline-offset-2">Politica de privacidad</Link>{" · "}
+                <Link href="/terms" className="text-violet-400/70 underline underline-offset-2">Terminos de uso</Link>
               </p>
               <button
                 onClick={() => {

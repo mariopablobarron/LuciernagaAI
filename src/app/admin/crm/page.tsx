@@ -89,7 +89,8 @@ export default function CrmPage() {
       .finally(() => setLoading(false));
   }
 
-  useEffect(() => { load(); }, [page, segment]); // eslint-disable-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- legitimate fetch-on-filter-change; setLoading is UI feedback, not derived state
+  useEffect(() => { load(); }, [page, segment]);
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();

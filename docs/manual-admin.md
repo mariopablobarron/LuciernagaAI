@@ -365,6 +365,120 @@ El sistema tiene emails automaticos que se gestionan via cron jobs:
 
 ---
 
+## 7B. Videos avatar con HeyGen
+
+**Ruta:** `/admin/marketing/avatar-videos`
+**Roles:** superadmin, marketing (permiso `marketing:avatar_videos`)
+**Env vars requeridas:** `HEYGEN_API_KEY`, `HEYGEN_VOICE_ID`
+
+Sistema de videos cortos (≈20 segundos) del fundador como mentor, generados via HeyGen. El usuario los ve una sola vez en un modal al abrir `/app`. Pensado para tener **presencia rara y valiosa**, no para ser un canal de engagement de alta frecuencia.
+
+### Tres fuentes de videos
+
+**1. Arco del objetivo (automatico)** — Tres momentos por cada Goal del usuario:
+
+| Fase | Disparador | Trigger en codigo |
+|---|---|---|
+| **START** (umbral) | Usuario crea un goal | Hook en `POST /api/goals` |
+| **MIDPOINT** (prueba) | Usuario en estado emocional bajo **y** goal tiene ≥ `midpointMinDays` dias | Cron diario `/api/cron/goal-avatar-midpoint` |
+| **END** (retorno) | Goal pasa a `status=completed` | Hook en `services/goals.ts` al completar la ultima accion |
+
+Cada goal recibe como maximo un video por fase (`UNIQUE(goalId, phase)` en BD). Si el usuario nunca completa el goal, nunca vera el END. Si nunca entra en estado bajo, nunca vera el MIDPOINT. El sistema respeta el ritmo del usuario.
+
+**2. Broadcast manual desde marketing** — Admin envia un video a un usuario concreto o a un segmento, en cualquier momento.
+
+Dos modos de contenido:
+
+- **Literal**: el admin escribe exactamente lo que dira el avatar (maximo control).
+- **Briefing**: el admin escribe un brief ("agradecele su constancia esta semana") y el LLM genera el guion con la voz de Luciernaga.
+
+Dos modos de generacion:
+
+- **Compartido** (`isShared=true`): una sola generacion HeyGen reutilizada para todos los destinatarios. Coste fijo (~$0.10 total).
+- **Personalizado** (`isShared=false`): una generacion por destinatario, con contexto individual del usuario. Coste lineal (~$0.10 × N).
+
+**3. Video de bienvenida automatico** — Disparado en cada nuevo registro (email/password, Google, codigo de aula, conversion anonimo→real). Reutiliza el sistema de broadcast: el admin marca una campaign existente como "welcome template" y a partir de ese momento cada signup recibe automaticamente una `BroadcastAvatarDelivery` apuntando al mismo video ya generado. **Cero coste marginal** por nuevo usuario.
+
+### Guardrails de disciplina
+
+El sistema tiene limites duros en codigo para que el canal broadcast no se degrade a "newsletter con cara":
+
+| Guardrail | Default | Accion |
+|---|---|---|
+| `maxVideosPerDay` | 30 | Cap global diario. El cron midpoint y los triggers se detienen al llegar. |
+| `maxBroadcastsPerMonth` | 4 | Cap rolling 30 dias sobre broadcasts. El endpoint devuelve HTTP 429. |
+| `broadcastUserCooldownDays` | 7 | Usuarios que recibieron cualquier broadcast en los ultimos N dias quedan excluidos del siguiente. |
+| `midpointMinDays` | 3 | Un goal debe tener al menos N dias antes de disparar MIDPOINT. |
+| `enabled` | `false` | Kill switch global. Nada funciona hasta que se activa explicitamente. |
+| `UserPreferences.avatarVideosEnabled` | `true` | Opt-out por usuario. El modal tiene un boton "No quiero recibir mas videos". |
+
+Todos los limites se editan desde `/admin/marketing/avatar-videos` → panel "Configuracion".
+
+### Panel admin — que veras
+
+**Cabecera:** 5 contadores — videos de hoy, startts totales, midpoints totales, ends totales, opt-outs.
+
+**Configuracion:** toggle enabled, limites diarios/mensuales/cooldown, tono, avatar ID (default `e2ff51edb1154b0dbe2c8f0df59818cf`), 3 plantillas editables (una por fase) con variables `{userName}`, `{goalTitle}`, `{currentState}`, `{recentContext}`.
+
+**Acciones manuales:**
+
+- *Ejecutar scan midpoint* — dispara el cron manualmente.
+- *Polling de estados* — dispara el poller de HeyGen manualmente.
+
+**Enviar broadcast:** formulario con contador del mes en la cabecera (verde/ambar/rojo), estimacion de coste en $, boton bloqueado cuando se alcanza el cap mensual.
+
+**Broadcasts enviados:** historial con status, destinatarios, script, y boton "Marcar como bienvenida" en las campanas elegibles (shared + READY).
+
+**Historial de videos:** ultimos 100 videos individuales con filtro visual por fase (START/MIDPOINT/END) y status.
+
+### Flujo tipico de activacion (primera vez)
+
+1. **Setear env vars** en Coolify: `HEYGEN_API_KEY`, `HEYGEN_VOICE_ID`.
+2. **Aplicar migracion** (`npx prisma migrate deploy`).
+3. **Montar volumen persistente** en `/app/public/avatars` para que los videos sobrevivan deploys.
+4. **Anadir crons en Coolify** (ver `docs/coolify-crons.md`).
+5. **Entrar a `/admin/marketing/avatar-videos`** y activar el toggle.
+6. **Probar con un usuario solo**: crear un goal propio, esperar 1-2 min, dar a "Polling", abrir `/app` — el modal START deberia aparecer.
+7. **Crear video de bienvenida**: enviar un broadcast a tu email con contenido literal, esperar a que este READY, marcarlo como "bienvenida" desde el historial.
+
+### Endpoints expuestos
+
+| Ruta | Metodo | Permiso | Proposito |
+| --- | --- | --- | --- |
+| `/api/admin/marketing/avatar-videos/config` | GET, PUT | `marketing:avatar_videos` | Leer/editar config |
+| `/api/admin/marketing/avatar-videos/history` | GET | `marketing:avatar_videos` | Listar videos generados |
+| `/api/admin/marketing/avatar-videos/trigger` | POST | `marketing:avatar_videos` | Disparar cron manual (`midpoint-scan`, `poll`, `manual`) |
+| `/api/admin/marketing/avatar-videos/broadcast` | POST, GET | `marketing:avatar_videos` | Crear / listar broadcasts |
+| `/api/admin/marketing/avatar-videos/broadcast/limits` | GET | `marketing:avatar_videos` | Contador mensual + cooldown |
+| `/api/admin/marketing/avatar-videos/broadcast/mark-welcome` | POST | `marketing:avatar_videos` | Marcar una campaign como welcome template |
+| `/api/avatar/weekly` | GET, PATCH | usuario autenticado | Proximo video pendiente / marcar visto |
+| `/api/avatar/weekly/opt-out` | POST | usuario autenticado | Togglear `avatarVideosEnabled` |
+| `/api/cron/goal-avatar-midpoint` | GET, POST | `CRON_SECRET` | Scan diario |
+| `/api/cron/poll-avatar-videos` | GET, POST | `CRON_SECRET` | Polling continuo HeyGen |
+
+### Principios pedagogicos (no negociables)
+
+Tres reglas que estan **hardcoded** en las plantillas del prompt y en la validacion del guion:
+
+1. **Prohibidos los imperativos huecos** — "deberias", "tienes que", "sigue asi", "tu puedes". El validador registra cualquier guion que los contenga.
+2. **Terminar siempre en pregunta** — cada fase tiene su pregunta obligatoria (START: que cambia desde hoy; MIDPOINT: sigue siendo tuyo este objetivo; END: quien eres ahora que lo tienes).
+3. **Prohibido celebrar rapido** — especialmente en END. El silencio despues del logro tambien es parte del trabajo.
+
+Si el equipo de marketing quiere sobreescribir estas reglas, tiene que editar las plantillas del prompt en el panel de config. Queda en el audit (`updatedBy`). **No es un cambio trivial** — se discute antes, no despues.
+
+### Tension conocida (lee esto si eres CMO futuro)
+
+El canal broadcast puede degradarse facilmente. Si lo usas para:
+
+- Recordatorios de eventos → bien.
+- Avisos importantes de producto → bien.
+- Engagement general, "hola, te extranamos" → mal. Ya hay Telegram y email para eso.
+- Felicitaciones en dias de fecha (cumple, navidad, etc.) → mal. Cliche que devalua el resto.
+
+El test mental antes de cada envio: **¿justifica esto que aparezca la cara del fundador en el modal del usuario?** Si dudas, no lo envies. Un uso al mes bien aprovechado vale mas que cuatro al mes diluidos.
+
+---
+
 ## 8. Gestion de equipos
 
 **Ruta:** `/admin/team`

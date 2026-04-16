@@ -93,7 +93,8 @@ export default function OperacionesPage() {
       .finally(() => setLoading(false));
   }
 
-  useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- legitimate fetch-on-mount; setLoading is UI feedback, not derived state
+  useEffect(() => { load(); }, []);
 
   async function handleLogout() {
     await fetch("/api/admin/logout", { method: "POST" });

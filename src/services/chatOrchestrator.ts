@@ -10,6 +10,7 @@ import { checkRateLimit } from "@/lib/rate-limit";
 import { getErrorMessage } from "@/lib/utils";
 import { getUserSessionProfile, isSyntheticEmail } from "@/services/user";
 import { processMessage } from "@/application/chat/processMessage";
+import { PAYWALL_MESSAGE } from "@/services/coach";
 import type { UserState } from "@/domain/types";
 import { FREE_LIMIT_MESSAGE } from "@/lib/plans";
 
@@ -26,16 +27,7 @@ export function buildErrorResponse(
 }
 
 function buildHardPaywallMessage(): string {
-  return [
-    "No es falta de claridad.",
-    "Es que necesitas continuidad.",
-    "",
-    "Aquí es donde la mayoría falla.",
-    "",
-    "Si quieres que te acompañe de verdad, necesitas acceso completo.",
-    "",
-    "¿Quieres sostener este avance con continuidad real?",
-  ].join("\n");
+  return PAYWALL_MESSAGE;
 }
 
 export async function orchestrateChat(req: NextRequest): Promise<Response> {

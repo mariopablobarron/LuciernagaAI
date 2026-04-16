@@ -96,7 +96,8 @@ export default function AdminCrisisPage() {
       .finally(() => setLoading(false));
   }
 
-  useEffect(() => { load(); }, [page, levelFilter]); // eslint-disable-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- legitimate fetch-on-filter-change; setLoading is UI feedback, not derived state
+  useEffect(() => { load(); }, [page, levelFilter]);
 
   const stats = data?.stats;
   const active = data?.activeCrises ?? [];

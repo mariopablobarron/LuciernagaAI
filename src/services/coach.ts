@@ -494,28 +494,32 @@ export function buildActionRequiredMessage(params: {
 }): string {
   const avoidanceCount = params.avoidanceCount ?? 0;
   const unfinishedActionsCount = params.unfinishedActionsCount ?? 0;
-  const focusLine = params.goalTitle
-    ? `Tu objetivo activo es "${params.goalTitle}".`
-    : "Tenemos una acción activa que no se puede ignorar.";
   const confront = params.mentorMode?.confront ?? false;
+  const action = `«${params.actionTitle}»`;
 
   if (avoidanceCount >= 2 || unfinishedActionsCount > 2) {
-    return `${focusLine} Estás acumulando decisiones sin cerrar. No te voy a ayudar a abrir otro frente hasta resolver este. ¿Ya completaste "${params.actionTitle}"? Responde sí o no, y si no, dime cuándo la harás hoy.`;
+    return `Oye, antes de abrir algo nuevo vuelvo a esto porque importa. Se están quedando varios cabos sueltos y no quiero acompañarte a otro frente con este aún en el aire. ¿Hiciste ${action} o todavía no? Si no, cuéntame a qué hora lo haces hoy.`;
   }
 
   if (confront) {
-    return `${focusLine} No voy a validar más rodeos aquí. Responde directo: ¿ya completaste "${params.actionTitle}"? Sí o no, y si no, dime la hora exacta en que la harás hoy.`;
+    return `Vamos sin rodeos, porque creo que le estamos dando vueltas: ¿ya hiciste ${action}? Si aún no, dime a qué hora lo cierras hoy.`;
   }
 
-  return `${focusLine} Antes de seguir, necesito una respuesta directa: ¿ya completaste "${params.actionTitle}"? Responde sí o no.`;
+  return `Antes de seguir, cuéntame una cosa: ¿ya hiciste ${action}? Con un sí o un no me oriento y vemos por dónde seguimos.`;
 }
+
+export const CAPTURE_EMAIL_PROMPT =
+  "Si quieres retomar esto otro día justo donde lo dejamos, déjame tu email y te lo guardo.";
+
+export const PAYWALL_MESSAGE =
+  "No es falta de claridad. Es que esto se sostiene cuando vuelves mañana, y al día siguiente. Si quieres que te acompañe con esa continuidad, te cuento cómo seguimos.\n\n¿Quieres sostener este avance con continuidad real?";
 
 export function appendCaptureEmailPrompt(response: string, shouldAsk: boolean): string {
   if (!shouldAsk) {
     return response;
   }
 
-  return `${response}\n\n¿Quieres guardar tu progreso y continuar otro día? Déjame tu email.`;
+  return `${response}\n\n${CAPTURE_EMAIL_PROMPT}`;
 }
 
 export function appendConversionPrompt(response: string, conversionTrigger: boolean): string {
@@ -523,7 +527,7 @@ export function appendConversionPrompt(response: string, conversionTrigger: bool
     return response;
   }
 
-  return `${response}\n\nEsto que acabas de definir es importante.\nSi no lo guardas, lo vas a perder.\n¿Quieres que lo guarde por ti?`;
+  return `${response}\n\nEsto que acabas de definir es importante. Si quieres, lo guardo para que no se te escape entre el ruido del día. ¿Te lo guardo?`;
 }
 
 export function appendSoftPaywallPrompt(response: string, shouldPrompt: boolean): string {
@@ -531,5 +535,5 @@ export function appendSoftPaywallPrompt(response: string, shouldPrompt: boolean)
     return response;
   }
 
-  return `${response}\n\nNo es falta de claridad.\nEs que necesitas continuidad.\n\nAquí es donde la mayoría falla.\n\nSi quieres que te acompañe de verdad, necesitas acceso completo.\n\n¿Quieres sostener este avance con continuidad real?`;
+  return `${response}\n\n${PAYWALL_MESSAGE}`;
 }

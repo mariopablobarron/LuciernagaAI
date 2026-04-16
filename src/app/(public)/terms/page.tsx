@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
 
 export default function TermsPage() {
@@ -134,9 +135,9 @@ export default function TermsPage() {
             <h2 className={`${TYPOGRAPHY.h2} text-white`}>9. Privacidad y datos</h2>
             <p className="text-zinc-300 leading-relaxed">
               Tu privacidad es nuestra prioridad. Consulta nuestra{' '}
-              <a href="/privacy" className="text-cyan-400 hover:underline">
+              <Link href="/privacy" className="text-cyan-400 hover:underline">
                 Politica de Privacidad
-              </a>{' '}
+              </Link>{' '}
               para entender en detalle como recopilamos, usamos y protegemos tus datos.
             </p>
           </section>

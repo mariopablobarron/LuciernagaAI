@@ -82,6 +82,7 @@ function LoginForm() {
         )}
 
         <div className={`${COMPONENTS.card} p-8 space-y-6`}>
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- OAuth flow requires full page navigation, not client-side routing */}
           <a
             href="/api/auth/google"
             className="flex w-full items-center justify-center gap-3 rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3 text-sm font-medium text-zinc-200 transition hover:border-zinc-600 hover:bg-zinc-800"

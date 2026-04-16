@@ -125,10 +125,13 @@ function AnimatedNumber({ value, duration = 1200 }: { value: number; duration?: 
 
 function LiveCounter({ baseBeats }: { baseBeats: number }) {
   const [extra, setExtra] = useState(0);
-  const startRef = useRef(Date.now());
+  const startRef = useRef(0);
 
   useEffect(() => {
     startRef.current = Date.now();
+    // Reset accumulated extra when baseBeats changes, to avoid a stale
+    // display for up to 830ms until the first interval tick.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setExtra(0);
     const id = setInterval(() => {
       const elapsed = (Date.now() - startRef.current) / 1000;
@@ -528,9 +531,9 @@ export default function CalculadoraLatidosPage() {
                   Saber cuantos latidos quedan no cambia nada. Lo que cambia es decidir que haces con el siguiente.
                   Tres Mil Millones de Latidos te ayuda a dar ese paso.
                 </p>
-                <a href="/app" className="inline-flex items-center gap-2 mt-1 text-sm font-semibold text-violet-400 hover:text-violet-300 transition-colors">
+                <Link href="/app" className="inline-flex items-center gap-2 mt-1 text-sm font-semibold text-violet-400 hover:text-violet-300 transition-colors">
                   Empezar ahora →
-                </a>
+                </Link>
               </div>
             </div>
           </div>

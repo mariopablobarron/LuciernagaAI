@@ -387,7 +387,7 @@ describe("POST /api/chat", () => {
     expect(body.captureEmail).toBe(true);
     expect(body.response).toContain("Esto que acabas de definir es importante.");
     expect(body.response).toContain(
-      "¿Quieres guardar tu progreso y continuar otro día? Déjame tu email."
+      "Si quieres retomar esto otro día justo donde lo dejamos, déjame tu email y te lo guardo."
     );
     expect(generateAIResponse).toHaveBeenCalledWith(
       "Ya lo veo claro",
@@ -745,7 +745,7 @@ describe("POST /api/chat", () => {
       title: "Enviar el borrador al cliente",
     });
     expect(body.message).toBe(
-      'Tu objetivo activo es "Terminar propuesta". Antes de seguir, necesito una respuesta directa: ¿ya completaste "Enviar el borrador al cliente"? Responde sí o no.\n\n¿Quieres guardar tu progreso y continuar otro día? Déjame tu email.'
+      'Antes de seguir, cuéntame una cosa: ¿ya hiciste «Enviar el borrador al cliente»? Con un sí o un no me oriento y vemos por dónde seguimos.\n\nSi quieres retomar esto otro día justo donde lo dejamos, déjame tu email y te lo guardo.'
     );
     expect(generateAIResponse).not.toHaveBeenCalled();
   });
@@ -822,7 +822,7 @@ describe("POST /api/chat", () => {
     });
     expect(body.type).toBe("action_required");
     expect(body.message).toBe(
-      'Tu objetivo activo es "Terminar propuesta". Estás acumulando decisiones sin cerrar. No te voy a ayudar a abrir otro frente hasta resolver este. ¿Ya completaste "Enviar el borrador al cliente"? Responde sí o no, y si no, dime cuándo la harás hoy.\n\n¿Quieres guardar tu progreso y continuar otro día? Déjame tu email.'
+      'Oye, antes de abrir algo nuevo vuelvo a esto porque importa. Se están quedando varios cabos sueltos y no quiero acompañarte a otro frente con este aún en el aire. ¿Hiciste «Enviar el borrador al cliente» o todavía no? Si no, cuéntame a qué hora lo haces hoy.\n\nSi quieres retomar esto otro día justo donde lo dejamos, déjame tu email y te lo guardo.'
     );
     expect(generateAIResponse).not.toHaveBeenCalled();
   });
@@ -898,7 +898,7 @@ describe("POST /api/chat", () => {
       goalTitle: "Cerrar propuesta",
     });
     expect(body.type).toBe("action_required");
-    expect(body.message).toContain("¿Ya completaste");
+    expect(body.message).toContain("¿Hiciste «Enviar el borrador al cliente»");
     expect(generateAIResponse).not.toHaveBeenCalled();
   });
 

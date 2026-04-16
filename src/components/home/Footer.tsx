@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Heart } from "lucide-react";
 
 export default function Footer() {
@@ -9,10 +10,10 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           {/* Brand */}
           <div className="space-y-4">
-            <a href="/" className="flex items-center gap-2.5 group transition-opacity hover:opacity-80">
+            <Link href="/" className="flex items-center gap-2.5 group transition-opacity hover:opacity-80">
               <div className="text-2xl">💓</div>
               <span className="font-black text-foreground tracking-tight">Tres Mil Millones de Latidos</span>
-            </a>
+            </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Cada latido es una elección. Tres Mil Millones de Latidos existe para que los tuyos tengan dirección real.
             </p>
@@ -82,44 +83,44 @@ export default function Footer() {
             <h4 className="font-semibold text-foreground">Producto</h4>
             <ul className="space-y-2.5">
               <li>
-                <a href="/blog" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/blog" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Blog
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/precios" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/precios" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Precios
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/unirse" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/unirse" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Unirse al reto
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/reto" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/reto" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   El reto 30 días
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/test" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/test" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Test gratuito
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/calculadora-latidos" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/calculadora-latidos" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Calculadora de latidos
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/guia" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/guia" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Guía de uso
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/app" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/app" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Acceder
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -129,24 +130,24 @@ export default function Footer() {
             <h4 className="font-semibold text-foreground">Información</h4>
             <ul className="space-y-2.5">
               <li>
-                <a href="/sobre-nosotros" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/sobre-nosotros" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Sobre nosotros
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Política de privacidad
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Términos de servicio
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Contacto
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

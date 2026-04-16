@@ -487,7 +487,8 @@ export default function Chat({
 
   useEffect(() => {
     if (atBottom) {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      const el = scrollRef.current;
+      if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
     }
   }, [messages.length, loading, atBottom]);
 
@@ -791,7 +792,8 @@ export default function Chat({
         {!atBottom && (
           <button
             onClick={() => {
-              bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+              const el = scrollRef.current;
+              if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
               setAtBottom(true);
             }}
             aria-label="Ir al ultimo mensaje"

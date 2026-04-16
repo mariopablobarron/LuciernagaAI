@@ -12,6 +12,7 @@ import { sendAlert } from "@/lib/alerts";
 import { dispatchN8nEvent } from "@/lib/n8n";
 import { validateOrigin } from "@/lib/csrf";
 import { scheduleOnboardingEmails } from "@/services/onboarding-emails";
+import { triggerWelcomeAvatarVideoAsync } from "@/services/welcomeAvatarVideo";
 
 type UtmParams = {
   utm_source?: string;
@@ -170,10 +171,31 @@ export async function POST(req: NextRequest) {
 
     if (result.status === "CREATED") {
       logInfo("AUTH", "signup_completed", { userId: result.userId, email });
+      triggerWelcomeAvatarVideoAsync(result.userId);
+
+      // Build rich Telegram alert
+      const ua = req.headers.get("user-agent") ?? "";
+      const device = /mobile|android|iphone/i.test(ua) ? "📱 Móvil" : "💻 Desktop";
+      const utmLines: string[] = [];
+      if (body.utm?.utm_source) utmLines.push(`source: ${body.utm.utm_source}`);
+      if (body.utm?.utm_medium) utmLines.push(`medium: ${body.utm.utm_medium}`);
+      if (body.utm?.utm_campaign) utmLines.push(`campaign: ${body.utm.utm_campaign}`);
+
+      const lines = [
+        `👤 ${name || "Sin nombre"}`,
+        `📧 ${email}`,
+        phone ? `📞 ${phone}` : null,
+        `🆔 ${result.userId}`,
+        `🌐 IP: ${ip}`,
+        `${device}`,
+        utmLines.length > 0 ? `📣 UTM: ${utmLines.join(" | ")}` : null,
+        orgId ? `🏢 Org invite: ${orgInviteCode}` : null,
+      ].filter(Boolean).join("\n");
+
       sendAlert({
         type: "info",
-        title: "Nuevo usuario registrado",
-        message: `${name || "Sin nombre"} (${email})${phone ? ` — Tel: ${phone}` : ""}`,
+        title: "🆕 Nuevo usuario registrado",
+        message: lines,
       }).catch(() => {});
       dispatchN8nEvent("user.signup", { email, name, phone, source: utmSource, orgId }, result.userId);
     }

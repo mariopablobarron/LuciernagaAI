@@ -3,10 +3,20 @@ import { getPrismaClient } from "@/db/prisma";
 import { generateResetToken, resetTokenExpiry } from "@/lib/reset-token";
 import { sendUserEmail } from "@/lib/email";
 import { logError } from "@/lib/logger";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { normalizeEmail } from "@/services/user";
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+    const rl = checkRateLimit(`forgot-pwd:${ip}`, 3, 60_000 * 15); // 3 requests/15min per IP
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { success: true }, // always return success to avoid enumeration
+        { status: 200, headers: { "Retry-After": String(rl.retryAfterSeconds) } },
+      );
+    }
+
     const body = (await req.json()) as { email?: string };
     const email = normalizeEmail(body.email?.trim() ?? "");
 

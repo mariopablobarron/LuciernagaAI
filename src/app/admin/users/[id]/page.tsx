@@ -995,6 +995,26 @@ export default function AdminUserDetailPage() {
               </CardContent>
             </Card>
 
+            <Link
+              href={`/admin/users/${data.user.id}/contenido`}
+              className="group flex items-center justify-between rounded-xl border border-violet-500/30 bg-gradient-to-r from-violet-500/10 to-fuchsia-500/5 px-4 py-3 transition-all hover:border-violet-500/50 hover:from-violet-500/15"
+            >
+              <div className="flex items-center gap-3">
+                <div className="rounded-lg bg-violet-500/20 p-2 text-violet-300">
+                  <MessageSquareText className="size-4" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-white">Ver todo lo que ha escrito</p>
+                  <p className="text-xs text-zinc-500">
+                    Timeline unificado: mensajes · comunidad · diario · check-ins · feedback. Con filtros y exportación CSV/TXT.
+                  </p>
+                </div>
+              </div>
+              <span className="text-xs font-semibold text-violet-300 group-hover:text-violet-200 whitespace-nowrap">
+                Abrir →
+              </span>
+            </Link>
+
             <Card className="border-zinc-800 bg-zinc-900/50">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">

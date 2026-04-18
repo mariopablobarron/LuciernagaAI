@@ -13,6 +13,7 @@ import {
 } from "@/services/emotional-model";
 import { detectUserState, updateUserState } from "@/services/state";
 import { awardLatidos } from "@/services/latidos";
+import { rewardInviterOnActivation } from "@/services/invites";
 import {
   upsertDailyImpulseLog,
   updateActiveChallengesFromCheckin,
@@ -161,6 +162,14 @@ export async function POST(req: NextRequest) {
 
     // Award latidos for check-in + streak milestones
     void awardLatidos(userId, "checkin").catch(() => {});
+
+    // First check-in ever → reward the inviter (if user came via a referral).
+    // Uses total count (not checkinsToday) so it fires exactly once per user.
+    const totalCheckins = await prisma.dailyCheckin.count({ where: { userId } });
+    if (totalCheckins === 1) {
+      void rewardInviterOnActivation(userId).catch(() => {});
+    }
+
     if (streak.currentDays === 3) void awardLatidos(userId, "streak_3d").catch(() => {});
     if (streak.currentDays === 7) void awardLatidos(userId, "streak_7d").catch(() => {});
     if (streak.currentDays === 14) void awardLatidos(userId, "streak_14d").catch(() => {});

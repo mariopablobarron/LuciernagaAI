@@ -13,6 +13,9 @@ import { dispatchN8nEvent } from "@/lib/n8n";
 import { validateOrigin } from "@/lib/csrf";
 import { scheduleOnboardingEmails } from "@/services/onboarding-emails";
 import { triggerWelcomeAvatarVideoAsync } from "@/services/welcomeAvatarVideo";
+import { bindInviteToUser } from "@/services/invites";
+import { awardLatidos } from "@/services/latidos";
+import { trackSafe } from "@/services/events";
 
 type UtmParams = {
   utm_source?: string;
@@ -29,6 +32,7 @@ type SignupBody = {
   phone?: string;
   utm?: UtmParams;
   orgInviteCode?: string;
+  inviteCode?: string;
 };
 
 function isValidEmail(e: string) {
@@ -169,6 +173,45 @@ export async function POST(req: NextRequest) {
     const res = NextResponse.json({ success: true, user, telegramLink });
     attachSessionCookie(res, token);
 
+    // Bind referral invite (if present) — fires for both CREATED and UPGRADED,
+    // since an anonymous user can also arrive via a personal invite link.
+    const referralCode = body.inviteCode?.trim();
+    let referredInviterId: string | null = null;
+    if (referralCode) {
+      const bindResult = await bindInviteToUser({
+        code: referralCode,
+        userId: result.userId,
+        email,
+      });
+      if (bindResult.ok) {
+        referredInviterId = bindResult.inviterUserId;
+        // Reward the new user — reason is defined in LATIDO_REWARDS so amount is automatic.
+        void awardLatidos(result.userId, "referral_signup", undefined, `code=${referralCode}`).catch(
+          () => {},
+        );
+        void trackSafe({
+          userId: result.userId,
+          type: "USER_ONBOARDED",
+          metadata: {
+            referral: true,
+            inviterUserId: bindResult.inviterUserId,
+            inviteCode: referralCode,
+          },
+        });
+        logInfo("INVITES", "referral_signup", {
+          userId: result.userId,
+          inviterUserId: bindResult.inviterUserId,
+          code: referralCode,
+        });
+      } else {
+        logInfo("INVITES", "referral_signup_skipped", {
+          userId: result.userId,
+          code: referralCode,
+          reason: bindResult.reason,
+        });
+      }
+    }
+
     if (result.status === "CREATED") {
       logInfo("AUTH", "signup_completed", { userId: result.userId, email });
       triggerWelcomeAvatarVideoAsync(result.userId);
@@ -190,14 +233,19 @@ export async function POST(req: NextRequest) {
         `${device}`,
         utmLines.length > 0 ? `📣 UTM: ${utmLines.join(" | ")}` : null,
         orgId ? `🏢 Org invite: ${orgInviteCode}` : null,
+        referredInviterId ? `🎁 Invitado por: ${referredInviterId}` : null,
       ].filter(Boolean).join("\n");
 
       sendAlert({
         type: "info",
-        title: "🆕 Nuevo usuario registrado",
+        title: referredInviterId ? "🎁 Nuevo usuario (vía referido)" : "🆕 Nuevo usuario registrado",
         message: lines,
       }).catch(() => {});
-      dispatchN8nEvent("user.signup", { email, name, phone, source: utmSource, orgId }, result.userId);
+      dispatchN8nEvent(
+        "user.signup",
+        { email, name, phone, source: utmSource, orgId, referredBy: referredInviterId },
+        result.userId,
+      );
     }
 
     // Send verification + welcome emails for new and upgraded users

@@ -1,6 +1,8 @@
 import { getPrismaClient } from "@/db/prisma";
 import { dispatchN8nEvent } from "@/lib/n8n";
 import { awardLatidos } from "@/services/latidos";
+import { earnInvite } from "@/services/invites";
+import { awardBadge } from "@/services/badges";
 import { ensureUserSession } from "@/services/conversation";
 import { triggerGoalAvatarVideoAsync } from "@/services/goalAvatarVideos";
 import { GoalStatus } from "@prisma/client";
@@ -658,6 +660,19 @@ export async function updateGoalAction(params: {
     if (nextStatus === "completed") {
       dispatchN8nEvent("goal.completed", { goalId: goal.id, goalTitle: goal.title }, params.userId);
       void awardLatidos(params.userId, "goal_complete").catch(() => {});
+      // Award invite + badge the first time the user completes a goal.
+      // Counting BEFORE/AFTER the status flip is equivalent here because the
+      // transition is guarded by `goal.status !== nextStatus`, but we count
+      // after the write to be robust against retries.
+      void prisma.goal
+        .count({ where: { userId: params.userId, status: "completed" } })
+        .then((count) => {
+          if (count === 1) {
+            void earnInvite(params.userId, "goal_complete").catch(() => {});
+            void awardBadge(params.userId, "first_goal").catch(() => {});
+          }
+        })
+        .catch(() => {});
       triggerGoalAvatarVideoAsync({
         userId: params.userId,
         goalId: goal.id,

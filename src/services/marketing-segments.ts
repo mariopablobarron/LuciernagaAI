@@ -95,6 +95,18 @@ export async function getRecipientsBySegment(
           select,
         });
       }
+      // Handle "tag:X" — users manually tagged by the marketing team
+      if (segment.startsWith("tag:")) {
+        const tag = segment.slice("tag:".length).toLowerCase().trim();
+        if (!tag) return [];
+        return prisma.user.findMany({
+          where: {
+            isActive: true,
+            tags: { has: tag },
+          },
+          select,
+        });
+      }
       return [];
     }
   }

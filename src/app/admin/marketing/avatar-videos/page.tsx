@@ -992,7 +992,7 @@ export default function AvatarVideosAdminPage() {
             <p className="mt-3 text-sm text-zinc-500">No hay broadcasts todavía.</p>
           </div>
         ) : (
-          <div className="space-y-2 max-h-[500px] overflow-y-auto">
+          <div className="space-y-2 max-h-125 overflow-y-auto">
             {campaigns.map((c) => (
               <div
                 key={c.id}
@@ -1102,7 +1102,7 @@ export default function AvatarVideosAdminPage() {
             <p className="mt-3 text-sm text-zinc-500">Aún no hay videos generados.</p>
           </div>
         ) : (
-          <div className="space-y-2 max-h-[600px] overflow-y-auto">
+          <div className="space-y-2 max-h-150 overflow-y-auto">
             {history.map((entry) => {
               const badge = phaseBadge(entry.phase);
               const BadgeIcon = badge.icon;

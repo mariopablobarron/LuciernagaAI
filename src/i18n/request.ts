@@ -1,5 +1,6 @@
 import { getRequestConfig } from "next-intl/server";
 import { routing } from "./routing";
+import { applySiteContentOverrides } from "./overrides";
 
 export default getRequestConfig(async ({ requestLocale }) => {
   let locale = await requestLocale;
@@ -8,8 +9,11 @@ export default getRequestConfig(async ({ requestLocale }) => {
     locale = routing.defaultLocale;
   }
 
+  const baseMessages = (await import(`../../messages/${locale}.json`)).default;
+  const messages = await applySiteContentOverrides(baseMessages, locale);
+
   return {
     locale,
-    messages: (await import(`../../messages/${locale}.json`)).default,
+    messages,
   };
 });

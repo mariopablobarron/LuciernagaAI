@@ -11,15 +11,18 @@
     "brandFull": "Heartbeats"
   },
   "hero": {
-    "badge": "Three billion heartbeats",
-    "title": "Make your next",
-    "titleHighlight": "heartbeats count.",
-    "subtitle": "The human heart beats three billion times in a lifetime. Three Billion Heartbeats exists so the ones you have left carry real direction. No theory. No perfection. Concrete action, heartbeat by heartbeat.",
-    "cta": "Start beating differently",
+    "badge": "AI Mentoring · Method designed by a human team",
+    "title": "Tell it what's blocking you.",
+    "titleHighlight": "Walk away with a concrete next step.",
+    "subtitle": "Three Billion Heartbeats is an AI mentor that listens without judgment, detects where you are (stuck, anxious, clear) and gives you a real action in under 10 minutes. The AI is the tool. A human team designs the method and supervises the system.",
+    "bullet1": "Write what's going on — no filters, no forms",
+    "bullet2": "Detects your state and adapts the conversation",
+    "bullet3": "Ends with an actionable next step for today",
+    "cta": "Try it free",
     "ctaSecondary": "See how it works",
     "socialProof": "+200 people",
-    "socialProofText": "beating differently",
-    "langNote": "AI mentoring in English. Every heartbeat, a real choice."
+    "socialProofText": "using it weekly",
+    "langNote": "AI mentoring in English. Not a replacement for therapy."
   },
   "features": {
     "sectionLabel": "How it works",
@@ -52,6 +55,46 @@
     "step3": {
       "title": "Act in under 5 min",
       "description": "A concrete, actionable next step that generates real momentum starting today."
+    }
+  },
+  "team": {
+    "sectionLabel": "Who's behind this",
+    "title": "We're not a loose AI",
+    "subtitle": "The AI runs a method we designed, supervise and improve every week. This is not a generic chatbot: it's a system with named people accountable for it.",
+    "aiRole": {
+      "title": "The AI",
+      "description": "Reads what you write, detects your state, returns questions and next steps. Fast, available anytime, no judgment."
+    },
+    "humanRole": {
+      "title": "The human team",
+      "description": "Designs the pedagogical method, reviews anonymized conversations, tunes the system and decides when something needs a real professional."
+    },
+    "founder": {
+      "name": "Mario Pablo Sánchez Barrón",
+      "role": "Founder · CEO Startidea",
+      "bio": "I design the method, supervise the system's behavior and personally answer support email."
+    },
+    "advisor": {
+      "name": "Amaya Prado",
+      "role": "Clinical advisor · Psychologist",
+      "bio": "Psychologist specialized in childhood, adolescence and youth, with 20+ years in psychological intervention, family counseling and educational psychology. Preventive and integrative approach. Regular contributor to national media."
+    },
+    "transparency": "We do not read your conversations in real time. We review anonymized samples to improve the system, and the clinical criteria is reviewed with professional advisory. If anything borders on crisis or therapy, we tell you and refer you. We don't play psychologist."
+  },
+  "notWhat": {
+    "sectionLabel": "What it is NOT",
+    "title": "So there's no confusion",
+    "item1": {
+      "title": "It's not therapy",
+      "description": "It does not replace a psychologist or clinical intervention. If you're in crisis, we refer you."
+    },
+    "item2": {
+      "title": "It's not generic ChatGPT",
+      "description": "It's a system with method, guardrails and human supervision. Not loose advice or book summaries."
+    },
+    "item3": {
+      "title": "It's not motivational coaching",
+      "description": "No pretty quotes or empty affirmations. Concrete questions and a real step for today."
     }
   },
   "finalCta": {

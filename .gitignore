@@ -56,3 +56,7 @@ clauditor/
 .testing-agent/
 .windsurf/
 .env.sentry-build-plugin
+
+# Playwright MCP local artifacts
+.playwright-mcp/
+*-snapshot.yml

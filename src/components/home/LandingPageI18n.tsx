@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useTranslations, useLocale } from 'next-intl';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles, Bot, Users, Check, X } from 'lucide-react';
 import Header from '@/components/home/Header';
 import Footer from '@/components/home/Footer';
 import HeartbeatParticles from '@/components/effects/HeartbeatParticles';
@@ -76,7 +77,15 @@ const FEATURE_COLORS = [
   { color: 'text-fuchsia-400', bg: 'bg-fuchsia-500/10', border: 'border-fuchsia-500/20' },
 ];
 
-export default function LandingPageI18n() {
+type LandingProps = {
+  founderPhotoUrl?: string;
+  advisorPhotoUrl?: string | null;
+};
+
+export default function LandingPageI18n({
+  founderPhotoUrl = '/team/mario.png',
+  advisorPhotoUrl = null,
+}: LandingProps = {}) {
   const t = useTranslations();
   const locale = useLocale();
   const otherLocale = locale === 'es' ? 'en' : 'es';
@@ -127,6 +136,17 @@ export default function LandingPageI18n() {
                 </p>
               </div>
 
+              <ul className="space-y-2.5 max-w-lg">
+                {(['bullet1', 'bullet2', 'bullet3'] as const).map((key) => (
+                  <li key={key} className="flex items-start gap-2.5 text-zinc-200">
+                    <span className="mt-1 shrink-0 w-5 h-5 rounded-full bg-violet-500/15 ring-1 ring-violet-500/30 flex items-center justify-center">
+                      <Check className="w-3 h-3 text-violet-300" />
+                    </span>
+                    <span className="text-base leading-snug">{t(`hero.${key}`)}</span>
+                  </li>
+                ))}
+              </ul>
+
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link
                   href="/signup"
@@ -166,7 +186,7 @@ export default function LandingPageI18n() {
               <p className="text-xs text-zinc-500">{t('hero.langNote')}</p>
             </div>
 
-            <div className="hidden md:block">
+            <div className="mt-4 md:mt-0">
               <ChatMockup />
             </div>
           </div>
@@ -214,6 +234,107 @@ export default function LandingPageI18n() {
                 </div>
                 <h3 className="text-lg font-bold text-white">{t(`howItWorks.${step}.title`)}</h3>
                 <p className="text-zinc-300 text-base leading-relaxed">{t(`howItWorks.${step}.description`)}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TEAM — quién está detrás */}
+      <section className="py-20 border-t border-zinc-800/60">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <p className="text-xs font-semibold uppercase tracking-widest text-fuchsia-400 mb-3">
+              {t('team.sectionLabel')}
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{t('team.title')}</h2>
+            <p className="text-zinc-300 text-lg max-w-2xl mx-auto leading-relaxed">{t('team.subtitle')}</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6 mb-10">
+            <div className="p-7 rounded-2xl border border-cyan-500/20 bg-cyan-500/5">
+              <div className="w-11 h-11 rounded-xl bg-cyan-500/15 ring-1 ring-cyan-500/30 flex items-center justify-center mb-4">
+                <Bot className="w-5 h-5 text-cyan-300" />
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2">{t('team.aiRole.title')}</h3>
+              <p className="text-zinc-300 leading-relaxed">{t('team.aiRole.description')}</p>
+            </div>
+            <div className="p-7 rounded-2xl border border-violet-500/20 bg-violet-500/5">
+              <div className="w-11 h-11 rounded-xl bg-violet-500/15 ring-1 ring-violet-500/30 flex items-center justify-center mb-4">
+                <Users className="w-5 h-5 text-violet-300" />
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2">{t('team.humanRole.title')}</h3>
+              <p className="text-zinc-300 leading-relaxed">{t('team.humanRole.description')}</p>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-5">
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 md:p-7 flex flex-col sm:flex-row gap-5 items-start">
+              <div className="relative w-20 h-20 rounded-full overflow-hidden bg-linear-to-br from-violet-500 to-fuchsia-500 shrink-0 ring-2 ring-violet-500/30">
+                <Image
+                  src={founderPhotoUrl}
+                  alt={t('team.founder.name')}
+                  fill
+                  sizes="80px"
+                  className="object-cover"
+                  unoptimized
+                />
+              </div>
+              <div className="flex-1">
+                <p className="text-white font-bold">{t('team.founder.name')}</p>
+                <p className="text-violet-300 text-sm mb-2">{t('team.founder.role')}</p>
+                <p className="text-zinc-300 text-sm leading-relaxed">{t('team.founder.bio')}</p>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 md:p-7 flex flex-col sm:flex-row gap-5 items-start">
+              {advisorPhotoUrl ? (
+                <div className="relative w-20 h-20 rounded-full overflow-hidden bg-linear-to-br from-cyan-500 to-violet-500 shrink-0 ring-2 ring-cyan-500/30">
+                  <Image
+                    src={advisorPhotoUrl}
+                    alt={t('team.advisor.name')}
+                    fill
+                    sizes="80px"
+                    className="object-cover"
+                    unoptimized
+                  />
+                </div>
+              ) : (
+                <div className="w-20 h-20 rounded-full bg-linear-to-br from-cyan-500 to-violet-500 flex items-center justify-center font-bold text-white text-2xl shrink-0 ring-2 ring-cyan-500/30">
+                  AP
+                </div>
+              )}
+              <div className="flex-1">
+                <p className="text-white font-bold">{t('team.advisor.name')}</p>
+                <p className="text-cyan-300 text-sm mb-2">{t('team.advisor.role')}</p>
+                <p className="text-zinc-300 text-sm leading-relaxed">{t('team.advisor.bio')}</p>
+              </div>
+            </div>
+          </div>
+
+          <p className="mt-8 text-sm text-zinc-400 leading-relaxed max-w-3xl mx-auto text-center border-t border-zinc-800/60 pt-8">
+            {t('team.transparency')}
+          </p>
+        </div>
+      </section>
+
+      {/* NOT WHAT — qué NO es */}
+      <section className="py-20 bg-zinc-900/30 border-y border-zinc-800/60">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-3">
+              {t('notWhat.sectionLabel')}
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white">{t('notWhat.title')}</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {(['item1', 'item2', 'item3'] as const).map((key) => (
+              <div key={key} className="p-6 rounded-2xl border border-zinc-800 bg-zinc-950/40">
+                <div className="w-10 h-10 rounded-xl bg-red-500/10 ring-1 ring-red-500/20 flex items-center justify-center mb-4">
+                  <X className="w-5 h-5 text-red-400" />
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2">{t(`notWhat.${key}.title`)}</h3>
+                <p className="text-zinc-300 leading-relaxed text-sm">{t(`notWhat.${key}.description`)}</p>
               </div>
             ))}
           </div>

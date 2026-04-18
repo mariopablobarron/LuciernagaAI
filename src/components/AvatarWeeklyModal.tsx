@@ -103,7 +103,7 @@ export function AvatarWeeklyModal() {
       role="dialog"
       aria-modal="true"
       aria-label="Mensaje semanal de tu mentor"
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-100 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
       onClick={(e) => {
         // Close when clicking backdrop, not the modal content
         if (e.target === e.currentTarget) markSeenAndClose();
@@ -125,7 +125,7 @@ export function AvatarWeeklyModal() {
             autoPlay
             controls
             playsInline
-            className="w-full aspect-[9/16] bg-black"
+            className="w-full aspect-9/16 bg-black"
             onPlay={() => setPlaying(true)}
             onEnded={markSeenAndClose}
           />

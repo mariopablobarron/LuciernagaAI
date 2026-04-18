@@ -14,6 +14,8 @@ export const LATIDO_REWARDS = {
   streak_14d: 100,
   streak_21d: 150,
   goal_complete: 75,
+  referral_signup: 50,   // granted to the referred user on signup
+  referral_active: 30,   // granted to the inviter when the referred user first checks in
 } as const;
 
 export type LatidoReason = keyof typeof LATIDO_REWARDS | "spend_unlock" | "spend_gift" | "spend_theme" | "spend_session" | "admin_grant";

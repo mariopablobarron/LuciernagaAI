@@ -11,15 +11,18 @@
     "brandFull": "de Latidos"
   },
   "hero": {
-    "badge": "Tres mil millones de latidos",
-    "title": "Haz que cuenten",
-    "titleHighlight": "tus próximos latidos.",
-    "subtitle": "El corazón humano late tres mil millones de veces en una vida. Tres Mil Millones de Latidos existe para que los que te quedan tengan dirección real. No teoría. No perfección. Acción concreta, latido a latido.",
-    "cta": "Empieza a latir diferente",
+    "badge": "Mentoría con IA · Método diseñado por un equipo humano",
+    "title": "Cuéntale lo que te bloquea.",
+    "titleHighlight": "Sal con un paso concreto para hoy.",
+    "subtitle": "Tres Mil Millones de Latidos es un mentor con IA que te escucha sin juicio, detecta dónde estás (bloqueo, ansiedad, claridad) y te devuelve una acción real en menos de 10 minutos. La IA es la herramienta. El método y la supervisión los pone un equipo humano.",
+    "bullet1": "Escribes lo que te pasa, sin filtros ni formularios",
+    "bullet2": "Detecta tu estado y adapta la conversación",
+    "bullet3": "Termina con un siguiente paso accionable hoy",
+    "cta": "Probar ahora gratis",
     "ctaSecondary": "Ver cómo funciona",
     "socialProof": "+200 personas",
-    "socialProofText": "latiendo diferente",
-    "langNote": "Mentoría con IA en español. Cada latido, una elección real."
+    "socialProofText": "usándolo cada semana",
+    "langNote": "Mentoría con IA en español. No sustituye terapia."
   },
   "features": {
     "sectionLabel": "Cómo funciona",
@@ -52,6 +55,46 @@
     "step3": {
       "title": "Actúas en menos de 5 min",
       "description": "Un siguiente paso concreto, accionable, que genera momentum real desde hoy."
+    }
+  },
+  "team": {
+    "sectionLabel": "Quién está detrás",
+    "title": "No somos una IA suelta",
+    "subtitle": "La IA ejecuta un método que diseñamos, supervisamos y mejoramos cada semana. Esto no es un chatbot genérico: es un sistema con responsables con nombre y apellido.",
+    "aiRole": {
+      "title": "La IA",
+      "description": "Lee lo que escribes, detecta tu estado y devuelve preguntas y siguientes pasos. Ejecuta rápido, a cualquier hora, sin juicio."
+    },
+    "humanRole": {
+      "title": "El equipo humano",
+      "description": "Diseña el método pedagógico, revisa conversaciones anónimas, ajusta el sistema y decide cuándo algo se debe derivar a un profesional."
+    },
+    "founder": {
+      "name": "Mario Pablo Sánchez Barrón",
+      "role": "Fundador · CEO Startidea",
+      "bio": "Diseño el método, superviso el comportamiento del sistema y respondo personalmente al correo de soporte."
+    },
+    "advisor": {
+      "name": "Amaya Prado",
+      "role": "Asesora clínica · Psicóloga",
+      "bio": "Psicóloga especializada en infancia, adolescencia y juventud, con más de 20 años de experiencia en intervención psicológica, orientación familiar y psicología educativa. Enfoque preventivo e integrador. Colaboradora habitual en medios nacionales."
+    },
+    "transparency": "No leemos tus conversaciones en tiempo real. Revisamos muestras anonimizadas para mejorar el sistema y el criterio clínico se revisa con asesoría profesional. Si algo roza crisis o requiere terapia, te lo decimos y te derivamos. No jugamos a psicólogos."
+  },
+  "notWhat": {
+    "sectionLabel": "Qué NO es",
+    "title": "Para que no haya confusión",
+    "item1": {
+      "title": "No es terapia",
+      "description": "No sustituye a un psicólogo ni a una intervención clínica. Si estás en crisis, te derivamos."
+    },
+    "item2": {
+      "title": "No es ChatGPT genérico",
+      "description": "Es un sistema con método, guardarraíles y supervisión humana. No te va a dar consejos sueltos ni resumirte un libro."
+    },
+    "item3": {
+      "title": "No es coaching motivacional",
+      "description": "Nada de frases bonitas ni afirmaciones vacías. Preguntas concretas y un paso real para hoy."
     }
   },
   "finalCta": {

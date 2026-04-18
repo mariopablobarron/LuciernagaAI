@@ -63,7 +63,94 @@ type FeedbackSummary = {
   byType: { type: string; count: number }[];
 };
 
-type Tab = "telegram" | "email" | "metrics" | "feedback";
+type Tab = "telegram" | "email" | "metrics" | "feedback" | "atribucion" | "tagging" | "testimonials" | "referidos";
+
+type AttributionRow = {
+  source: string;
+  medium: string | null;
+  campaign: string | null;
+  signups: number;
+  proUsers: number;
+  proRate: number;
+};
+
+type AttributionReport = {
+  range: "7d" | "30d" | "90d" | "all";
+  rangeStart: string | null;
+  totalSignups: number;
+  totalPro: number;
+  overallProRate: number;
+  rows: AttributionRow[];
+};
+
+type TestimonialCandidate = {
+  id: string;
+  type: string;
+  rating: number | null;
+  message: string;
+  createdAt: string;
+  isPublicTestimonial: boolean;
+  testimonialOrder: number | null;
+  user: { name: string | null; email: string };
+};
+
+type ReferralRow = {
+  userId: string;
+  name: string | null;
+  email: string;
+  invitesCreated: number;
+  invitesUsed: number;
+  invitesEarned: number;
+  conversionRate: number;
+};
+
+type ReferralReason = {
+  reason: string;
+  generated: number;
+  used: number;
+  conversionRate: number; // 0..1
+};
+
+type ReferralRetentionWindow = {
+  referred: number;       // % retained (0..100)
+  nonReferred: number;
+  referredCohort: number;
+  nonReferredCohort: number;
+};
+
+type ReferralTimelinePoint = {
+  date: string;
+  generated: number;
+  used: number;
+};
+
+type ReferralSummary = {
+  totalInvitationsCreated: number;
+  totalInvitationsUsed: number;
+  uniqueInviters: number;
+  overallConversionRate: number;
+  topInviters: ReferralRow[];
+  pending: number;
+  generated7d: number;
+  used7d: number;
+  generated30d: number;
+  used30d: number;
+  byReason: ReferralReason[];
+  retention: {
+    d7: ReferralRetentionWindow;
+    d30: ReferralRetentionWindow;
+  };
+  dailyTimeline: ReferralTimelinePoint[];
+};
+
+const REFERRAL_REASON_LABEL: Record<string, string> = {
+  streak_7d: "Racha 7 días",
+  streak_30d: "Racha 30 días",
+  goal_complete: "Primer objetivo",
+  active_30d: "30 días activo",
+  manual: "Manual",
+  unknown: "Sin clasificar",
+};
 
 const SEGMENTS = [
   { value: "all", label: "Todos" },
@@ -169,6 +256,28 @@ export default function MarketingPage() {
   const [feedbackSummary, setFeedbackSummary] = useState<FeedbackSummary | null>(null);
   const [feedbackLoading, setFeedbackLoading] = useState(false);
 
+  // Attribution state
+  const [attribution, setAttribution] = useState<AttributionReport | null>(null);
+  const [attributionLoading, setAttributionLoading] = useState(false);
+  const [attributionRange, setAttributionRange] =
+    useState<AttributionReport["range"]>("30d");
+
+  // Tagging state
+  const [tagEmail, setTagEmail] = useState("");
+  const [tagCurrentTags, setTagCurrentTags] = useState<string[] | null>(null);
+  const [tagInput, setTagInput] = useState("");
+  const [tagLoading, setTagLoading] = useState(false);
+  const [tagUserId, setTagUserId] = useState<string | null>(null);
+
+  // Testimonials state
+  const [testimonials, setTestimonials] = useState<TestimonialCandidate[]>([]);
+  const [testimonialsPublishedCount, setTestimonialsPublishedCount] = useState(0);
+  const [testimonialsLoading, setTestimonialsLoading] = useState(false);
+
+  // Referrals state
+  const [referrals, setReferrals] = useState<ReferralSummary | null>(null);
+  const [referralsLoading, setReferralsLoading] = useState(false);
+
   // ── Auth guard helper ──────────────────────────────────────────────────────
 
   function checkAuth(res: Response): boolean {
@@ -235,6 +344,173 @@ export default function MarketingPage() {
       .finally(() => setMetricsLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
+
+  // ── Attribution loader ────────────────────────────────────────────────────
+
+  useEffect(() => {
+    if (activeTab !== "atribucion") return;
+    setAttributionLoading(true);
+    fetch(
+      `/api/admin/marketing/attribution?range=${encodeURIComponent(attributionRange)}`,
+      { credentials: "include" },
+    )
+      .then(async (res) => {
+        if (!checkAuth(res)) return null;
+        if (!res.ok) return null;
+        const json = (await res.json()) as { report: AttributionReport };
+        return json.report;
+      })
+      .then((report) => {
+        if (report) setAttribution(report);
+      })
+      .catch(() => {
+        toast.error("Error al cargar atribución");
+      })
+      .finally(() => setAttributionLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, attributionRange]);
+
+  // ── Testimonials loader ───────────────────────────────────────────────────
+
+  const loadTestimonials = useCallback(async () => {
+    setTestimonialsLoading(true);
+    try {
+      const res = await fetch("/api/admin/marketing/testimonials", {
+        credentials: "include",
+      });
+      if (!checkAuth(res)) return;
+      if (!res.ok) return;
+      const json = (await res.json()) as {
+        candidates: TestimonialCandidate[];
+        publishedCount: number;
+      };
+      setTestimonials(json.candidates);
+      setTestimonialsPublishedCount(json.publishedCount);
+    } finally {
+      setTestimonialsLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (activeTab !== "testimonials") return;
+    loadTestimonials();
+  }, [activeTab, loadTestimonials]);
+
+  // ── Referrals loader ──────────────────────────────────────────────────────
+
+  useEffect(() => {
+    if (activeTab !== "referidos") return;
+    setReferralsLoading(true);
+    fetch("/api/admin/marketing/referrals", { credentials: "include" })
+      .then(async (res) => {
+        if (!checkAuth(res)) return null;
+        if (!res.ok) return null;
+        const json = (await res.json()) as { summary: ReferralSummary };
+        return json.summary;
+      })
+      .then((s) => {
+        if (s) setReferrals(s);
+      })
+      .finally(() => setReferralsLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  // ── Tagging handlers ──────────────────────────────────────────────────────
+
+  async function loadTagsForEmail() {
+    if (!tagEmail.trim()) return;
+    setTagLoading(true);
+    setTagCurrentTags(null);
+    setTagUserId(null);
+    try {
+      // First resolve email → userId via segment lookup trick (a dedicated
+      // endpoint would be cleaner; reusing the users search to avoid another file)
+      const lookup = await fetch(
+        `/api/admin/users?search=${encodeURIComponent(tagEmail.trim())}&limit=1`,
+        { credentials: "include" },
+      );
+      if (!checkAuth(lookup)) return;
+      if (!lookup.ok) {
+        toast.error("Usuario no encontrado");
+        return;
+      }
+      const data = (await lookup.json()) as {
+        users?: Array<{ id: string; email: string; tags?: string[] }>;
+      };
+      const user = data.users?.find(
+        (u) => u.email.toLowerCase() === tagEmail.trim().toLowerCase(),
+      );
+      if (!user) {
+        toast.error("Email no encontrado exactamente");
+        return;
+      }
+      setTagUserId(user.id);
+      // Explicit tags fetch using the new endpoint
+      const tagsRes = await fetch(
+        `/api/admin/users/${encodeURIComponent(user.id)}/tags`,
+        { credentials: "include" },
+      );
+      if (!checkAuth(tagsRes)) return;
+      if (tagsRes.ok) {
+        const tj = (await tagsRes.json()) as { tags: string[] };
+        setTagCurrentTags(tj.tags);
+      } else {
+        setTagCurrentTags([]);
+      }
+    } finally {
+      setTagLoading(false);
+    }
+  }
+
+  async function saveTags(nextTags: string[]) {
+    if (!tagUserId) return;
+    setTagLoading(true);
+    try {
+      const res = await fetch(
+        `/api/admin/users/${encodeURIComponent(tagUserId)}/tags`,
+        {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tags: nextTags }),
+        },
+      );
+      if (!checkAuth(res)) return;
+      if (!res.ok) {
+        const j = (await res.json().catch(() => ({}))) as { error?: string };
+        toast.error(j.error ?? "Error al guardar tags");
+        return;
+      }
+      const j = (await res.json()) as { tags: string[] };
+      setTagCurrentTags(j.tags);
+      toast.success("Tags actualizados");
+    } finally {
+      setTagLoading(false);
+    }
+  }
+
+  async function toggleTestimonial(
+    id: string,
+    isPublicTestimonial: boolean,
+  ) {
+    try {
+      const res = await fetch("/api/admin/marketing/testimonials", {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, isPublicTestimonial }),
+      });
+      if (!checkAuth(res)) return;
+      if (!res.ok) {
+        toast.error("Error");
+        return;
+      }
+      await loadTestimonials();
+    } catch {
+      toast.error("Error de red");
+    }
+  }
 
   // ── Feedback loader ────────────────────────────────────────────────────────
 
@@ -344,6 +620,10 @@ export default function MarketingPage() {
     { key: "email", label: "Email", icon: <Mail className="h-3.5 w-3.5" /> },
     { key: "metrics", label: "Metricas", icon: <BarChart3 className="h-3.5 w-3.5" /> },
     { key: "feedback", label: "Feedback", icon: <MessageSquarePlus className="h-3.5 w-3.5" /> },
+    { key: "atribucion", label: "Atribución", icon: <BarChart3 className="h-3.5 w-3.5" /> },
+    { key: "tagging", label: "Tags", icon: <Users className="h-3.5 w-3.5" /> },
+    { key: "testimonials", label: "Testimonials", icon: <Star className="h-3.5 w-3.5" /> },
+    { key: "referidos", label: "Referidos", icon: <Users className="h-3.5 w-3.5" /> },
   ];
 
   return (
@@ -361,6 +641,14 @@ export default function MarketingPage() {
         >
           <Video className="h-3.5 w-3.5" />
           Video avatar semanal
+          <ArrowRight className="h-3 w-3" />
+        </Link>
+        <Link
+          href="/admin/marketing/equipo"
+          className="inline-flex items-center gap-2 rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-4 py-2.5 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/20 transition-colors"
+        >
+          <Users className="h-3.5 w-3.5" />
+          Contenido del equipo
           <ArrowRight className="h-3 w-3" />
         </Link>
       </div>
@@ -854,6 +1142,580 @@ export default function MarketingPage() {
                         </div>
                       </div>
                     ))}
+                  </div>
+                )}
+              </AdminPanel>
+            </>
+          )}
+        </>
+      )}
+
+      {/* ── Tab: Atribución ─────────────────────────────────────────────────── */}
+      {activeTab === "atribucion" && (
+        <>
+          {/* Range selector + overall stats */}
+          <AdminPanel
+            title="Atribución por fuente"
+            tooltip="Agrupa los signups del rango seleccionado por utm_source (o el valor legacy de User.source si no hay UTMs). Muestra la tasa de conversión a Pro de cada fuente."
+          >
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-2">
+                {(["7d", "30d", "90d", "all"] as const).map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => setAttributionRange(r)}
+                    className={`inline-flex items-center rounded-xl border px-4 py-2 text-xs font-semibold transition-colors ${
+                      attributionRange === r
+                        ? "border-violet-500/40 bg-violet-500/15 text-violet-200"
+                        : "border-zinc-700 bg-zinc-800/40 text-zinc-400 hover:border-zinc-600"
+                    }`}
+                  >
+                    {r === "7d"
+                      ? "Últimos 7 días"
+                      : r === "30d"
+                        ? "Últimos 30 días"
+                        : r === "90d"
+                          ? "Últimos 90 días"
+                          : "Todo el tiempo"}
+                  </button>
+                ))}
+              </div>
+
+              {attributionLoading && !attribution ? (
+                <p className="text-sm text-zinc-500">Cargando...</p>
+              ) : !attribution ? (
+                <p className="text-sm text-zinc-500">Sin datos.</p>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <AdminMetricCard
+                      label="Signups en rango"
+                      value={attribution.totalSignups}
+                      accent="emerald"
+                      icon={<Users className="h-5 w-5" />}
+                    />
+                    <AdminMetricCard
+                      label="Conversiones Pro"
+                      value={attribution.totalPro}
+                      accent="violet"
+                      icon={<Star className="h-5 w-5" />}
+                    />
+                    <AdminMetricCard
+                      label="Tasa Pro global"
+                      value={`${(attribution.overallProRate * 100).toFixed(1)}%`}
+                      accent="sky"
+                      hint="Pro activos / signups del rango"
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          </AdminPanel>
+
+          {/* Sources table */}
+          {attribution && attribution.rows.length > 0 && (
+            <AdminPanel
+              title="Desglose por fuente"
+              tooltip="Ordenado por volumen. 'Medium' y 'Campaign' muestran el valor más común dentro de cada fuente."
+            >
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-zinc-800 text-xs uppercase tracking-wide text-zinc-500">
+                      <th className="text-left py-2 px-3 font-semibold">Source</th>
+                      <th className="text-left py-2 px-3 font-semibold">Medium</th>
+                      <th className="text-left py-2 px-3 font-semibold">Campaign</th>
+                      <th className="text-right py-2 px-3 font-semibold">Signups</th>
+                      <th className="text-right py-2 px-3 font-semibold">Pro</th>
+                      <th className="text-right py-2 px-3 font-semibold">Tasa Pro</th>
+                      <th className="text-left py-2 px-3 font-semibold">% del total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {attribution.rows.map((row) => {
+                      const share =
+                        attribution.totalSignups > 0
+                          ? row.signups / attribution.totalSignups
+                          : 0;
+                      const proPct = row.proRate * 100;
+                      const proColour =
+                        proPct >= 10
+                          ? "text-emerald-300"
+                          : proPct >= 3
+                            ? "text-amber-300"
+                            : "text-zinc-400";
+                      return (
+                        <tr
+                          key={row.source}
+                          className="border-b border-zinc-900 hover:bg-zinc-900/40 transition-colors"
+                        >
+                          <td className="py-2 px-3 text-white font-semibold">
+                            {row.source}
+                          </td>
+                          <td className="py-2 px-3 text-zinc-400">
+                            {row.medium ?? <span className="text-zinc-700">—</span>}
+                          </td>
+                          <td className="py-2 px-3 text-zinc-400">
+                            {row.campaign ?? <span className="text-zinc-700">—</span>}
+                          </td>
+                          <td className="py-2 px-3 text-right text-white font-semibold">
+                            {row.signups}
+                          </td>
+                          <td className="py-2 px-3 text-right text-white">
+                            {row.proUsers}
+                          </td>
+                          <td className={`py-2 px-3 text-right font-semibold ${proColour}`}>
+                            {proPct.toFixed(1)}%
+                          </td>
+                          <td className="py-2 px-3">
+                            <div className="flex items-center gap-2">
+                              <div className="h-2 flex-1 rounded-full bg-zinc-800 overflow-hidden max-w-35">
+                                <div
+                                  className="h-full rounded-full bg-violet-500/60"
+                                  style={{ width: `${Math.max(share * 100, 2)}%` }}
+                                />
+                              </div>
+                              <span className="text-[11px] text-zinc-500 w-10 text-right">
+                                {(share * 100).toFixed(1)}%
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <p className="mt-3 text-[11px] text-zinc-500">
+                Las fuentes <code>(direct)</code> corresponden a signups sin UTMs.{" "}
+                <code>(unknown)</code> indica UTM presente pero sin <code>utm_source</code>.{" "}
+                <code>(malformed)</code> indica que el JSON de <code>User.source</code> no se pudo parsear (usuarios legacy).
+              </p>
+            </AdminPanel>
+          )}
+        </>
+      )}
+
+      {/* ── Tab: Tags ──────────────────────────────────────────────────────── */}
+      {activeTab === "tagging" && (
+        <AdminPanel
+          title="Gestión de tags de usuarios"
+          tooltip="Asigna etiquetas manuales a un usuario (beta, vip, churning, etc.). Luego usa 'tag:nombre' como segmento en broadcasts de Telegram/Email/Avatar. Solo letras, números, guión y guión bajo. Máximo 20 tags por usuario."
+        >
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-end gap-3">
+              <div className="flex-1 min-w-60 space-y-2">
+                <label className="block text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                  Email del usuario
+                </label>
+                <input
+                  type="email"
+                  value={tagEmail}
+                  onChange={(e) => setTagEmail(e.target.value)}
+                  placeholder="usuario@dominio.com"
+                  className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-violet-500 focus:outline-none"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={loadTagsForEmail}
+                disabled={tagLoading || !tagEmail.trim()}
+                className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-500 transition-colors disabled:opacity-50"
+              >
+                {tagLoading ? "Cargando..." : "Buscar"}
+              </button>
+            </div>
+
+            {tagCurrentTags !== null && tagUserId && (
+              <div className="space-y-3 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                  Tags actuales ({tagCurrentTags.length})
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {tagCurrentTags.length === 0 ? (
+                    <p className="text-xs text-zinc-500 italic">Sin tags</p>
+                  ) : (
+                    tagCurrentTags.map((t) => (
+                      <span
+                        key={t}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-xs font-semibold text-violet-200"
+                      >
+                        {t}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            saveTags(tagCurrentTags.filter((x) => x !== t))
+                          }
+                          className="text-violet-300 hover:text-white"
+                          aria-label={`Eliminar tag ${t}`}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && tagInput.trim()) {
+                        e.preventDefault();
+                        const newTag = tagInput.trim().toLowerCase();
+                        if (!tagCurrentTags.includes(newTag)) {
+                          saveTags([...tagCurrentTags, newTag]);
+                        }
+                        setTagInput("");
+                      }
+                    }}
+                    placeholder="Nuevo tag (enter para añadir)"
+                    className="flex-1 rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-white focus:border-violet-500 focus:outline-none"
+                  />
+                </div>
+                <p className="text-[11px] text-zinc-500">
+                  Una vez asignado un tag, úsalo como segmento escribiendo{" "}
+                  <code className="text-zinc-400">tag:{"<nombre>"}</code> en cualquier broadcast.
+                </p>
+              </div>
+            )}
+          </div>
+        </AdminPanel>
+      )}
+
+      {/* ── Tab: Testimonials ─────────────────────────────────────────────── */}
+      {activeTab === "testimonials" && (
+        <AdminPanel
+          title="Testimonials públicos"
+          tooltip="Selecciona qué feedbacks se muestran en la landing como testimonios. Solo se listan feedbacks con rating ≥ 4 o ya publicados. Endpoint público: GET /api/testimonials"
+        >
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/40 p-3">
+              <Star className="h-5 w-5 text-amber-400" />
+              <p className="text-sm text-white">
+                <strong>{testimonialsPublishedCount}</strong> testimonios publicados actualmente
+              </p>
+            </div>
+
+            {testimonialsLoading && testimonials.length === 0 ? (
+              <p className="text-sm text-zinc-500">Cargando...</p>
+            ) : testimonials.length === 0 ? (
+              <div className="rounded-xl border border-zinc-800 bg-zinc-800/30 p-6 text-center">
+                <Star className="mx-auto h-8 w-8 text-zinc-600" />
+                <p className="mt-3 text-sm text-zinc-500">
+                  Aún no hay feedbacks elegibles (rating ≥ 4).
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-150 overflow-y-auto">
+                {testimonials.map((t) => (
+                  <div
+                    key={t.id}
+                    className={`rounded-xl border p-4 space-y-2 transition-colors ${
+                      t.isPublicTestimonial
+                        ? "border-emerald-500/30 bg-emerald-500/5"
+                        : "border-zinc-800 bg-zinc-900/60"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <div className="flex items-center gap-2">
+                        {t.rating && (
+                          <div className="flex gap-0.5">
+                            {[1, 2, 3, 4, 5].map((n) => (
+                              <Star
+                                key={n}
+                                className={`w-3 h-3 ${
+                                  n <= t.rating!
+                                    ? "text-fuchsia-400 fill-fuchsia-400"
+                                    : "text-zinc-700"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        )}
+                        <span className="text-xs text-zinc-400">
+                          {t.user.name || t.user.email}
+                        </span>
+                        <span className="text-[10px] text-zinc-600">
+                          {formatDate(t.createdAt)}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => toggleTestimonial(t.id, !t.isPublicTestimonial)}
+                        className={`rounded-full px-3 py-1 text-[11px] font-semibold transition-colors ${
+                          t.isPublicTestimonial
+                            ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30"
+                            : "border border-zinc-700 bg-zinc-800/50 text-zinc-400 hover:border-violet-500/40 hover:text-violet-300"
+                        }`}
+                      >
+                        {t.isPublicTestimonial ? "✓ Publicado" : "Publicar"}
+                      </button>
+                    </div>
+                    <p className="text-sm text-zinc-300">{t.message}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </AdminPanel>
+      )}
+
+      {/* ── Tab: Referidos ────────────────────────────────────────────────── */}
+      {activeTab === "referidos" && (
+        <>
+          {referralsLoading && !referrals ? (
+            <AdminPanel title="Programa de referidos">
+              <p className="text-sm text-zinc-500">Cargando...</p>
+            </AdminPanel>
+          ) : !referrals ? (
+            <AdminPanel title="Programa de referidos">
+              <p className="text-sm text-zinc-500">Sin datos.</p>
+            </AdminPanel>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+                <AdminMetricCard
+                  label="Invitaciones creadas"
+                  value={referrals.totalInvitationsCreated}
+                  accent="emerald"
+                  icon={<Users className="h-5 w-5" />}
+                  hint={`+${referrals.generated7d} en 7d · +${referrals.generated30d} en 30d`}
+                />
+                <AdminMetricCard
+                  label="Usadas"
+                  value={referrals.totalInvitationsUsed}
+                  accent="violet"
+                  hint={`+${referrals.used7d} en 7d · +${referrals.used30d} en 30d`}
+                />
+                <AdminMetricCard
+                  label="Tasa conversión"
+                  value={`${(referrals.overallConversionRate * 100).toFixed(1)}%`}
+                  accent="sky"
+                  hint="Usadas / creadas"
+                />
+                <AdminMetricCard
+                  label="Pendientes"
+                  value={referrals.pending}
+                  accent="amber"
+                  hint={`${referrals.uniqueInviters} inviters únicos`}
+                />
+              </div>
+
+              {/* Retención referidos vs no-referidos */}
+              <AdminPanel
+                title="Retención referidos vs no-referidos"
+                tooltip="Compara el % de usuarios activos N días después del signup. Cohorte D7: signups 7–60 días atrás. Cohorte D30: signups 30–90 días atrás. Activo = lastSeen ≥ createdAt + N días."
+              >
+                <div className="grid gap-4 md:grid-cols-2">
+                  {([
+                    { label: "D7", data: referrals.retention.d7 },
+                    { label: "D30", data: referrals.retention.d30 },
+                  ] as const).map(({ label, data }) => {
+                    const lift =
+                      data.nonReferred > 0
+                        ? (data.referred - data.nonReferred).toFixed(1)
+                        : null;
+                    return (
+                      <div
+                        key={label}
+                        className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-semibold text-white">
+                            Retención {label}
+                          </span>
+                          {lift !== null && (
+                            <span
+                              className={`text-xs font-semibold rounded-full px-2 py-0.5 ${
+                                Number(lift) >= 0
+                                  ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30"
+                                  : "bg-red-500/15 text-red-300 border border-red-500/30"
+                              }`}
+                            >
+                              {Number(lift) >= 0 ? "+" : ""}
+                              {lift} pp
+                            </span>
+                          )}
+                        </div>
+                        <div className="space-y-2">
+                          {[
+                            {
+                              cohortLabel: "Referidos",
+                              pctVal: data.referred,
+                              size: data.referredCohort,
+                              color: "bg-violet-500/60",
+                            },
+                            {
+                              cohortLabel: "No referidos",
+                              pctVal: data.nonReferred,
+                              size: data.nonReferredCohort,
+                              color: "bg-zinc-600",
+                            },
+                          ].map((row) => (
+                            <div key={row.cohortLabel}>
+                              <div className="flex items-center justify-between mb-1 text-xs">
+                                <span className="text-zinc-400">
+                                  {row.cohortLabel}{" "}
+                                  <span className="text-zinc-600">(n={row.size})</span>
+                                </span>
+                                <span className="font-semibold text-white">
+                                  {row.pctVal.toFixed(1)}%
+                                </span>
+                              </div>
+                              <div className="h-2 w-full rounded-full bg-zinc-800 overflow-hidden">
+                                <div
+                                  className={`h-full rounded-full ${row.color} transition-all`}
+                                  style={{ width: `${Math.min(row.pctVal, 100)}%` }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </AdminPanel>
+
+              {/* Distribución por motivo */}
+              <AdminPanel
+                title="Distribución por motivo"
+                tooltip="Cómo se ganan las invitaciones: racha 7d/30d, primer objetivo, 30 días activo, o asignación manual."
+              >
+                {referrals.byReason.length === 0 ? (
+                  <p className="text-sm text-zinc-500">Aún no hay invitaciones registradas.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {referrals.byReason.map((r) => {
+                      const maxGen = Math.max(
+                        ...referrals.byReason.map((x) => x.generated),
+                        1,
+                      );
+                      const widthGen = (r.generated / maxGen) * 100;
+                      return (
+                        <div
+                          key={r.reason}
+                          className="rounded-lg border border-zinc-800 bg-zinc-900/30 p-3"
+                        >
+                          <div className="flex items-center justify-between mb-1.5 text-sm">
+                            <span className="text-white font-medium">
+                              {REFERRAL_REASON_LABEL[r.reason] ?? r.reason}
+                            </span>
+                            <span className="text-xs text-zinc-400">
+                              <span className="text-white font-semibold">{r.used}</span>
+                              <span className="text-zinc-600"> / {r.generated} usadas</span>
+                              <span className="ml-2 text-violet-300">
+                                ({(r.conversionRate * 100).toFixed(0)}%)
+                              </span>
+                            </span>
+                          </div>
+                          <div className="h-2 w-full rounded-full bg-zinc-800 overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-violet-500/60"
+                              style={{ width: `${Math.max(widthGen, 2)}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </AdminPanel>
+
+              {/* Timeline diaria */}
+              <AdminPanel
+                title="Actividad últimos 30 días"
+                tooltip="Invitaciones generadas (violeta) y usadas (emerald) por día."
+              >
+                {(() => {
+                  const max = Math.max(
+                    ...referrals.dailyTimeline.map((d) =>
+                      Math.max(d.generated, d.used),
+                    ),
+                    1,
+                  );
+                  return (
+                    <div className="flex items-end gap-1 h-32">
+                      {referrals.dailyTimeline.map((d) => {
+                        const gH = (d.generated / max) * 100;
+                        const uH = (d.used / max) * 100;
+                        return (
+                          <div
+                            key={d.date}
+                            className="flex-1 flex flex-col justify-end items-center gap-0.5"
+                            title={`${d.date}: ${d.generated} generadas · ${d.used} usadas`}
+                          >
+                            <div className="w-full flex flex-col gap-px">
+                              <div
+                                className="w-full rounded-sm bg-violet-500/40"
+                                style={{ height: `${Math.max(gH, d.generated > 0 ? 4 : 0)}%` }}
+                              />
+                              <div
+                                className="w-full rounded-sm bg-emerald-500/60"
+                                style={{ height: `${Math.max(uH, d.used > 0 ? 4 : 0)}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
+                <div className="flex gap-4 text-xs text-zinc-500 mt-3 justify-center">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-sm bg-violet-500/40" />
+                    Generadas
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-sm bg-emerald-500/60" />
+                    Usadas
+                  </span>
+                </div>
+              </AdminPanel>
+
+              <AdminPanel
+                title="Top inviters"
+                tooltip="Ranking por invitaciones usadas. 'Invites earned' es el contador interno de gamificación (no coincide necesariamente con invitaciones creadas)."
+              >
+                {referrals.topInviters.length === 0 ? (
+                  <p className="text-sm text-zinc-500">Nadie ha enviado invitaciones todavía.</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-zinc-800 text-xs uppercase tracking-wide text-zinc-500">
+                          <th className="text-left py-2 px-3 font-semibold">Usuario</th>
+                          <th className="text-right py-2 px-3 font-semibold">Creadas</th>
+                          <th className="text-right py-2 px-3 font-semibold">Usadas</th>
+                          <th className="text-right py-2 px-3 font-semibold">Conv.</th>
+                          <th className="text-right py-2 px-3 font-semibold">Ganadas</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {referrals.topInviters.map((r) => (
+                          <tr
+                            key={r.userId}
+                            className="border-b border-zinc-900 hover:bg-zinc-900/40 transition-colors"
+                          >
+                            <td className="py-2 px-3 text-white">
+                              {r.name || r.email.split("@")[0]}
+                              <span className="ml-2 text-[10px] text-zinc-600">{r.email}</span>
+                            </td>
+                            <td className="py-2 px-3 text-right text-zinc-300">{r.invitesCreated}</td>
+                            <td className="py-2 px-3 text-right text-white font-semibold">
+                              {r.invitesUsed}
+                            </td>
+                            <td className="py-2 px-3 text-right text-violet-300 font-semibold">
+                              {(r.conversionRate * 100).toFixed(0)}%
+                            </td>
+                            <td className="py-2 px-3 text-right text-emerald-300">{r.invitesEarned}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 )}
               </AdminPanel>

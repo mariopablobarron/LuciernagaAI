@@ -104,8 +104,10 @@ model User {
   trustedContact  TrustedContact?
   supportMessages SupportMessage[]
   familyPings     FamilyPing[]
-  invitations          Invitation[]
+  invitations          Invitation[]         @relation("InvitationsSent")
+  invitationsReceived  Invitation[]         @relation("InvitationsReceived")
   invitesEarned        Int                  @default(0)
+  tags                 String[]             @default([]) // manual marketing tags (e.g. "beta", "vip", "churning")
   passwordResetTokens  PasswordResetToken[]
   userActions          UserAction[]
   interventions        Intervention[]       @relation("UserInterventions")
@@ -697,15 +699,22 @@ model WaitlistEntry {
 
 /// An invitation code a user earns via milestones (streak 7d, goal complete, 30d active).
 model Invitation {
-  id          String    @id @default(cuid())
-  code        String    @unique @default(cuid())
-  userId      String
-  usedByEmail String?
-  usedAt      DateTime?
-  createdAt   DateTime  @default(now())
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String    @id @default(cuid())
+  code         String    @unique @default(cuid())
+  userId       String
+  reason       String?   // "streak_7d" | "streak_30d" | "goal_complete" | "active_30d" | "manual"
+  usedByEmail  String?
+  usedByUserId String?
+  usedAt       DateTime?
+  createdAt    DateTime  @default(now())
+  user         User      @relation("InvitationsSent", fields: [userId], references: [id], onDelete: Cascade)
+  usedByUser   User?     @relation("InvitationsReceived", fields: [usedByUserId], references: [id], onDelete: SetNull)
 
   @@index([userId, createdAt])
+  @@index([createdAt])
+  @@index([usedAt])
+  @@index([usedByUserId])
+  @@index([reason])
 }
 
 // ─── Family / trusted contact system ──────────────────────────────────────────
@@ -980,17 +989,22 @@ model UserExercise {
 
 /// User feedback, suggestions, and bug reports.
 model Feedback {
-  id        String   @id @default(cuid())
-  userId    String
-  type      String   @default("suggestion") // "suggestion" | "bug" | "other" | "nps"
-  rating    Int?     // 1-5 star rating (null for text-only feedback)
-  message   String   @db.Text
-  page      String?  // URL path where feedback was submitted
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                   String   @id @default(cuid())
+  userId               String
+  type                 String   @default("suggestion") // "suggestion" | "bug" | "other" | "nps"
+  rating               Int?     // 1-5 star rating (null for text-only feedback)
+  message              String   @db.Text
+  page                 String?  // URL path where feedback was submitted
+  // When true, this feedback is curated by the marketing team and exposed
+  // publicly as a testimonial via /api/testimonials. Admin-only toggle.
+  isPublicTestimonial  Boolean  @default(false)
+  testimonialOrder     Int?     // optional ordering on the landing page (lower first)
+  createdAt            DateTime @default(now())
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
   @@index([type, createdAt])
+  @@index([isPublicTestimonial, testimonialOrder])
 }
 
 /// Latido (gem) transactions — gamification currency
@@ -1593,4 +1607,24 @@ model UserFile {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
+}
+
+model SiteContent {
+  key       String
+  locale    String
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+
+  @@id([key, locale])
+  @@index([locale])
+}
+
+model MediaAsset {
+  key       String   @id
+  mimeType  String
+  size      Int
+  data      String   @db.Text
+  updatedAt DateTime @updatedAt
+  updatedBy String?
 }

@@ -57,11 +57,15 @@ function SignupForm() {
     try {
       const utm = getUtmParams();
       const orgInviteCode = searchParams.get('org_invite') || undefined;
+      const inviteCode =
+        searchParams.get('invite') ||
+        (typeof window !== 'undefined' ? localStorage.getItem('luc_invite_code') : null) ||
+        undefined;
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ name, email, phone: phone || undefined, password, utm, orgInviteCode }),
+        body: JSON.stringify({ name, email, phone: phone || undefined, password, utm, orgInviteCode, inviteCode }),
       });
       const data = (await res.json()) as { success: boolean; error?: string; telegramLink?: string };
       if (!res.ok || !data.success) {
@@ -69,6 +73,10 @@ function SignupForm() {
         return;
       }
       if (data.telegramLink) setTelegramLink(data.telegramLink);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('luc_invite_code');
+        localStorage.removeItem('luc_inviter_name');
+      }
       trackEvent('signup_completed');
       trackMetaEvent('CompleteRegistration', { content_name: 'signup' });
       sfx.play('milestone');

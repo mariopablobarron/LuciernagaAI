@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import LandingPageI18n from "@/components/home/LandingPageI18n";
+import { resolveMedia } from "@/i18n/media";
 
 export async function generateMetadata({
   params,
@@ -60,5 +61,15 @@ export default async function LocaleLandingPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  return <LandingPageI18n />;
+  const [founderPhoto, advisorPhoto] = await Promise.all([
+    resolveMedia("team-founder"),
+    resolveMedia("team-advisor"),
+  ]);
+
+  return (
+    <LandingPageI18n
+      founderPhotoUrl={founderPhoto.url ?? "/team/mario.png"}
+      advisorPhotoUrl={advisorPhoto.url}
+    />
+  );
 }

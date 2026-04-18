@@ -2,7 +2,9 @@ import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { awardLatidos } from "@/services/latidos";
 import { awardBadge } from "@/services/badges";
-import { createNotification } from "@/lib/web-push";
+// NOTE: `createNotification` is imported lazily inside `rewardInviterOnActivation`
+// because `@/lib/web-push` validates VAPID config at module load, which breaks
+// test environments that don't set valid keys.
 
 // Guardrail: hard cap on how many outstanding invites a single user can earn.
 // Prevents runaway rewards from repeated milestones / manual grants.
@@ -157,6 +159,7 @@ export async function rewardInviterOnActivation(referredUserId: string): Promise
 
     await awardLatidos(invite.userId, "referral_active", undefined, referredUserId);
     await awardBadge(invite.userId, "invite_used");
+    const { createNotification } = await import("@/lib/web-push");
     await createNotification(invite.userId, {
       title: "Tu invitación dio fruto",
       body: "Alguien a quien invitaste acaba de dar su primer latido.",

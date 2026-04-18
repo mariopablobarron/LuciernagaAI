@@ -1680,13 +1680,15 @@ export default function HomePage() {
       <AvatarWeeklyModal />
       <AppLayout
         prelude={
-          sessionProfile && !sessionProfile.isAnonymous && !sessionProfile.emailVerified ? (
-            <EmailVerificationBanner
-              emailVerified={sessionProfile.emailVerified}
-              isAnonymous={sessionProfile.isAnonymous}
-              email={sessionProfile.email}
-            />
-          ) : undefined
+          <>
+            {sessionProfile && !sessionProfile.isAnonymous && !sessionProfile.emailVerified && (
+              <EmailVerificationBanner
+                emailVerified={sessionProfile.emailVerified}
+                isAnonymous={sessionProfile.isAnonymous}
+                email={sessionProfile.email}
+              />
+            )}
+          </>
         }
         sidebar={
           <Sidebar

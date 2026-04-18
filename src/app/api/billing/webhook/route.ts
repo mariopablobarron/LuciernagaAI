@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { getPrismaClient } from '@/db/prisma';
 import { notifyAdmin, buildAdminAlert } from '@/services/telegram';
@@ -121,27 +121,27 @@ async function cancelSubscription(stripeSubscriptionId: string) {
 // ─── Handler ──────────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
-  const sig = req.headers.get('stripe-signature');
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
+    const sig = req.headers.get('stripe-signature');
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
 
-  if (!sig || !webhookSecret) {
-    return NextResponse.json({ error: 'Missing signature or webhook secret' }, { status: 400 });
-  }
+    if (!sig || !webhookSecret) {
+      return NextResponse.json({ error: 'Missing signature or webhook secret' }, { status: 400 });
+    }
 
-  let event: Stripe.Event;
-  try {
-    const rawBody = await req.text();
-    event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
-  } catch (err) {
-    logError('BILLING', err, {
-      area: 'webhook_signature',
-      sigHeader: sig.substring(0, 30) + '…',  // partial, safe to log
-      secretPrefix: webhookSecret.substring(0, 7),
-    });
-    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
-  }
+    let event: Stripe.Event;
+    try {
+      const rawBody = await req.text();
+      event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
+    } catch (err) {
+      logError('BILLING', err, {
+        area: 'webhook_signature',
+        sigHeader: sig.substring(0, 30) + '…',  // partial, safe to log
+        secretPrefix: webhookSecret.substring(0, 7),
+      });
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+    }
 
-  logInfo('BILLING', 'webhook_received', { type: event.type });
+    logInfo('BILLING', 'webhook_received', { type: event.type });
 
   try {
     switch (event.type) {
@@ -251,5 +251,5 @@ export async function POST(req: NextRequest) {
     // Return 200 so Stripe doesn't retry — the error is logged
   }
 
-  return NextResponse.json({ received: true });
+    return NextResponse.json({ received: true });
 }

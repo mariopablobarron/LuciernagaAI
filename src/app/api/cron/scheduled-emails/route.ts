@@ -6,7 +6,8 @@ import { sendAutomatedAlert } from "@/lib/alerts";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret");
+  const url = new URL(req.url);
+  const secret = url.searchParams.get("secret");
   if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

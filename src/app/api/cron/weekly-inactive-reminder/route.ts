@@ -103,7 +103,8 @@ function buildWeeklyInactiveReminderEmail(data: InactiveUserData): {
 
 // GET /api/cron/weekly-inactive-reminder?secret=CRON_SECRET
 export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret");
+  const url = new URL(req.url);
+  const secret = url.searchParams.get("secret");
   if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -161,7 +162,12 @@ export async function GET(req: NextRequest) {
           lastGoalTitle: user.goals[0]?.title ?? null,
           streakDays: user.streak?.currentDays ?? 0,
         });
-        const ok = await sendUserEmail({ to: user.email, ...email });
+        const ok = await sendUserEmail({
+          to: user.email,
+          ...email,
+          userId: user.id,
+          template: "weekly_inactive",
+        });
         if (ok) sent++;
         else errors++;
         await new Promise((r) => setTimeout(r, 200)); // throttle: 5 emails/sec max

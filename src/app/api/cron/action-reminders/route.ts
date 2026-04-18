@@ -8,7 +8,8 @@ import { sendAutomatedAlert } from "@/lib/alerts";
 // Run once per hour. Sends at most 1 Telegram reminder per user per day,
 // respecting the user's preferred reminderTime ("HH:MM"). Default: 09:00.
 export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret");
+  const url = new URL(req.url);
+  const secret = url.searchParams.get("secret");
   if (!secret || secret !== process.env.CRON_SECRET?.trim())
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

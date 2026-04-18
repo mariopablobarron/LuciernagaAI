@@ -1,16 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { runMidpointScan } from "@/services/goalAvatarVideos";
 import { logError, logInfo } from "@/lib/logger";
 import { sendAutomatedAlert } from "@/lib/alerts";
 
 export const dynamic = "force-dynamic";
 
-function isAuthorized(req: NextRequest): boolean {
+function isAuthorized(req: Request): boolean {
   const secret = process.env.CRON_SECRET?.trim();
   if (!secret) {
     return process.env.NODE_ENV !== "production";
   }
-  return req.nextUrl.searchParams.get("secret") === secret;
+  const url = new URL(req.url);
+  return url.searchParams.get("secret") === secret;
 }
 
 export async function POST(req: NextRequest) {
@@ -33,6 +34,4 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET(req: NextRequest) {
-  return POST(req);
-}
+export const GET = POST;

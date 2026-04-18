@@ -1,5 +1,5 @@
 import { after } from "next/server";
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { logError, logInfo, logWarn } from "@/lib/logger";
 import { generateAIResponse } from "@/services/ai";
 import { saveConversationMessage } from "@/services/conversation";
@@ -296,10 +296,10 @@ async function callAdminAI(question: string): Promise<string> {
     `- Waitlist aprobados: ${waitlist}`,
     "",
     "ARQUITECTURA CLAVE:",
-    "- Repo: github.com/mariopablobarron/LuciernagaAI",
+    "- Repo: github.com/mariopablobarron/TresMilMillonesAI",
     "- Chat pipeline: src/application/chat/processMessage.ts → analyze → enrich → buildCoachPrompt → generateAIResponse → persist",
     "- Mentor modes: src/services/mentor-protocol.ts — 4 modos (containment/supportive/directive/confrontation)",
-    "- Identity & philosophy: src/lib/luciernaga-identity.ts",
+    "- Identity & philosophy: src/lib/mentor-identity.ts",
     "- Coach prompt builder: src/services/coach.ts (buildCoachPrompt, 450+ lines)",
     "- Flows: src/services/flows.ts — decision flow (5 pasos) + avoidance flow",
     "- Intent detection: src/services/intent.ts",
@@ -456,7 +456,7 @@ async function sendTelegramMessage(chatId: number, text: string): Promise<void> 
 
 // ---- Webhook handler ----
 
-export async function POST(req: NextRequest): Promise<NextResponse> {
+export async function POST(req: NextRequest) {
   // Global rate limit: 100 req/min — protects against webhook abuse
   const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "telegram";
   const rl = checkRateLimit(`webhook:global:${ip}`, 100, 60_000);

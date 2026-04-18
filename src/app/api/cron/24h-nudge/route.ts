@@ -15,7 +15,8 @@ export const dynamic = "force-dynamic";
  * Run daily at 10:00 UTC.
  */
 export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret");
+  const url = new URL(req.url);
+  const secret = url.searchParams.get("secret");
   if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -50,7 +51,12 @@ export async function GET(req: NextRequest) {
 
       try {
         const email = build24hNudgeEmail({ name: user.name, appUrl });
-        const ok = await sendUserEmail({ to: user.email, ...email });
+        const ok = await sendUserEmail({
+          to: user.email,
+          ...email,
+          userId: user.id,
+          template: "nudge_24h",
+        });
         if (ok) sent++;
         else errors++;
         await new Promise((r) => setTimeout(r, 200)); // throttle

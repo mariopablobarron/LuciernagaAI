@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import ContactForm from "@/components/contact/ContactForm";
 import { TYPOGRAPHY, GRADIENTS, LAYOUTS } from "@/styles/design-system";
 
@@ -23,7 +24,9 @@ export default function ContactPage() {
         </div>
 
         {/* Contact Form */}
-        <ContactForm />
+        <Suspense fallback={null}>
+          <ContactForm />
+        </Suspense>
       </div>
     </div>
   );

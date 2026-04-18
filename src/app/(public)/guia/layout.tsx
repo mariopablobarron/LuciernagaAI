@@ -80,12 +80,63 @@ const faqJsonLd = {
   ],
 };
 
+// HowTo JSON-LD — AI engines (Google AI Overviews, Perplexity) cite
+// step-by-step content with HowTo schema in answers to "¿Cómo uso X?"
+// queries. Each step has a name + description AI can extract directly.
+const howToJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  name: "Cómo empezar en Tres Mil Millones de Latidos",
+  description:
+    "Pasos para empezar a usar Tres Mil Millones de Latidos: del registro a tu primera acción concreta del día.",
+  totalTime: "PT10M",
+  inLanguage: "es",
+  image: "https://tresmilmillonesdelatidos.es/opengraph-image",
+  step: [
+    {
+      "@type": "HowToStep",
+      name: "Crear cuenta",
+      text: "Regístrate con email o Google. Aceptas el consentimiento informado, que explica que la plataforma no sustituye a un terapeuta y que el equipo clínico puede revisar tu información en casos de riesgo.",
+      url: "https://tresmilmillonesdelatidos.es/signup",
+    },
+    {
+      "@type": "HowToStep",
+      name: "Hacer tu primer check-in",
+      text: "Respondes qué sientes (bloqueo, ansiedad, duda, claridad, neutral), tu nivel de energía y una nota breve. El sistema calcula un estado emocional que calibra las respuestas del mentor a partir de ahí.",
+    },
+    {
+      "@type": "HowToStep",
+      name: "Crear tu primer objetivo",
+      text: "Declaras lo que te tiene parado en una frase. El sistema lo convierte en un objetivo con 3-5 acciones concretas acotadas en tiempo. El mentor te acompañará hasta completarlo.",
+    },
+    {
+      "@type": "HowToStep",
+      name: "Conversar con el mentor",
+      text: "Escribe en el chat como hablarías con alguien que te conoce. El mentor interpela, no instruye — hace preguntas que te obligan a ver lo que no estás viendo. Nunca da motivación hueca.",
+    },
+    {
+      "@type": "HowToStep",
+      name: "Ejecutar una microacción",
+      text: "El mentor cierra cada conversación con una acción de 10-15 minutos. La haces hoy, la marcas como completada o postpuesta, y mañana se ajusta en función de lo que hiciste.",
+    },
+    {
+      "@type": "HowToStep",
+      name: "Vincular Telegram (opcional)",
+      text: "Desde ajustes, vinculas Telegram con /vincular. Recibes check-ins diarios por la mañana y por la noche, y puedes conversar con el mentor sin abrir la web.",
+    },
+  ],
+};
+
 export default function GuiaLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
       />
       {children}
     </>

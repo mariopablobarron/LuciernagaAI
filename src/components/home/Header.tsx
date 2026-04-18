@@ -10,9 +10,10 @@ import { useSession } from "@/lib/useSession";
 
 const NAV = [
   { label: "Chat", href: "/app" },
-  { label: "Guía", href: "/guia" },
+  { label: "Método", href: "/como-funciona" },
+  { label: "Comparativa", href: "/comparativa" },
   { label: "Precios", href: "/precios" },
-  { label: "Mis Latidos", href: "/calculadora-latidos", highlight: true },
+  { label: "FAQ", href: "/faq" },
   { label: "Test gratuito", href: "/test", highlight: true },
 ];
 

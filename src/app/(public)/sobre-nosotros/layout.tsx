@@ -26,6 +26,28 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
+// AboutPage JSON-LD — helps AI engines identify this as the canonical
+// "about" page for the organization + the founder, boosting entity
+// recognition when users ask "¿quién está detrás de Tres Mil Millones de Latidos?".
+const aboutPageJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  "@id": "https://tresmilmillonesdelatidos.es/sobre-nosotros",
+  name: "Sobre nosotros — Tres Mil Millones de Latidos",
+  url: "https://tresmilmillonesdelatidos.es/sobre-nosotros",
+  inLanguage: "es",
+  mainEntity: { "@id": "https://tresmilmillonesdelatidos.es/#organization" },
+  about: { "@id": "https://tresmilmillonesdelatidos.es/#founder" },
+};
+
 export default function SobreNosotrosLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutPageJsonLd) }}
+      />
+      {children}
+    </>
+  );
 }

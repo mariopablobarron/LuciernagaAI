@@ -118,6 +118,31 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/como-funciona" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  El método
+                </Link>
+              </li>
+              <li>
+                <Link href="/comparativa" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Comparativa
+                </Link>
+              </li>
+              <li>
+                <Link href="/casos-de-uso" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Casos de uso
+                </Link>
+              </li>
+              <li>
+                <Link href="/recursos" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Recursos
+                </Link>
+              </li>
+              <li>
+                <Link href="/faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Preguntas frecuentes
+                </Link>
+              </li>
+              <li>
                 <Link href="/app" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Acceder
                 </Link>
@@ -132,6 +157,21 @@ export default function Footer() {
               <li>
                 <Link href="/sobre-nosotros" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Sobre nosotros
+                </Link>
+              </li>
+              <li>
+                <Link href="/para-profesionales" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Para profesionales
+                </Link>
+              </li>
+              <li>
+                <Link href="/etica" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Ética y límites
+                </Link>
+              </li>
+              <li>
+                <Link href="/changelog" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Novedades
                 </Link>
               </li>
               <li>

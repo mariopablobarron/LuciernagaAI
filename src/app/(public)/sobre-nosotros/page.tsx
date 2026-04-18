@@ -223,6 +223,16 @@ export default function SobreNosotrosPage() {
               Conocer Startidea <Globe className="w-4 h-4" />
             </a>
           </div>
+          <p className="pt-6 text-sm text-zinc-500">
+            ¿Profesional de la psicología, coaching o acompañamiento?{' '}
+            <Link
+              href="/para-profesionales"
+              className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4"
+            >
+              Mira cómo complementa tu consulta
+            </Link>
+            .
+          </p>
         </div>
       </section>
     </>

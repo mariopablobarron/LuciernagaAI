@@ -1,13 +1,35 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { COMPONENTS, TYPOGRAPHY } from "@/styles/design-system";
 import PrivacyCheckbox from "@/components/PrivacyCheckbox";
 
+const MOTIVO_STARTERS: Record<string, { label: string; message: string }> = {
+  profesional: {
+    label: "Psicóloga, coach o profesional del bienestar",
+    message:
+      "Hola, soy [profesión + colegiación si aplica] y me gustaría explorar cómo Tres Mil Millones de Latidos podría encajar con mi consulta. Me interesa especialmente:\n\n- ",
+  },
+  etica: {
+    label: "Reportar un fallo ético",
+    message:
+      "Hola, he detectado algo en la plataforma que creo que va en contra de lo que prometéis en /etica. Contexto:\n\n- Qué pasó:\n- Dónde (URL o sección):\n- Cuándo:\n",
+  },
+  sugerencia: {
+    label: "Sugerencia o feedback de producto",
+    message: "Hola, echo en falta / me gustaría que…\n\n",
+  },
+};
+
 export default function ContactForm() {
+  const searchParams = useSearchParams();
+  const motivo = searchParams.get("motivo");
+  const starter = motivo && MOTIVO_STARTERS[motivo] ? MOTIVO_STARTERS[motivo] : null;
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(starter?.message ?? "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
@@ -55,6 +77,17 @@ export default function ContactForm() {
   return (
     <div className="flex items-center justify-center">
       <div className={`w-full max-w-md ${COMPONENTS.card}`}>
+        {starter && (
+          <div className="mb-5 rounded-xl border border-emerald-500/30 bg-emerald-500/5 px-4 py-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-400">
+              Motivo
+            </p>
+            <p className="mt-1 text-sm text-zinc-200">{starter.label}</p>
+            <p className="mt-1 text-xs text-zinc-500">
+              Hemos preparado un mensaje de partida abajo. Edítalo antes de enviar.
+            </p>
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Name Field */}
           <div className="space-y-2">

@@ -4,10 +4,11 @@ import { join } from "node:path";
 import { requireAdminPermission } from "@/lib/admin-auth";
 
 const DOCS: Record<string, { file: string; title: string }> = {
-  guia: { file: "GUIA-LUCIERNAGAS.md", title: "Guia completa de Tres Mil Millones de Latidos" },
+  guia: { file: "GUIA-TRES-MIL-MILLONES.md", title: "Guia completa de Tres Mil Millones de Latidos" },
   usuario: { file: "manual-usuarios-finales.md", title: "Manual de usuario" },
   organizaciones: { file: "manual-organizaciones.md", title: "Manual para organizaciones" },
   admin: { file: "manual-admin.md", title: "Manual de administracion" },
+  psicologa: { file: "manual-psicologa.md", title: "Manual para la Psicologa Responsable" },
 };
 
 function mdToHtml(md: string): string {

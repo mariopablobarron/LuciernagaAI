@@ -54,11 +54,15 @@ export async function POST(req: NextRequest) {
     const baseUrl = process.env.APP_BASE_URL ?? "http://localhost:3000";
     const verifyUrl = `${baseUrl}/api/auth/verify-email?token=${verifyToken}`;
 
-    const sent = await sendUserEmail(buildVerificationEmail({
-      to: user.email,
-      verifyUrl,
-      name: user.name ?? undefined,
-    }));
+    const sent = await sendUserEmail({
+      ...buildVerificationEmail({
+        to: user.email,
+        verifyUrl,
+        name: user.name ?? undefined,
+      }),
+      userId: user.id,
+      template: "verification",
+    });
 
     if (!sent) {
       logError("AUTH", new Error("sendUserEmail returned false"), {

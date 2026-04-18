@@ -349,12 +349,12 @@ export default function CommunityPage() {
             <span className="text-3xl">☕</span>
             <div>
               <p className="text-sm font-bold text-white">La Cafetería</p>
-              <p className="text-xs text-zinc-400">Espacio virtual interactivo con avatares y muro de mensajes</p>
+              <p className="text-xs text-zinc-400">Una pregunta del día. Respondes y ves cómo la viven los demás.</p>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[10px] font-semibold text-emerald-300">Live</span>
+          <div className="flex items-center gap-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 px-2.5 py-1">
+            <div className="w-1.5 h-1.5 rounded-full bg-violet-400" />
+            <span className="text-[10px] font-semibold text-violet-300">Hoy</span>
           </div>
         </Link>
 

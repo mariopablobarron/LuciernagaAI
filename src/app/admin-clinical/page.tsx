@@ -148,7 +148,7 @@ export default function AdminClinicalPage() {
           <span className="font-semibold text-violet-300">Guia clinica</span> — Protocolos, intervenciones, deteccion de riesgo y rutina recomendada
         </p>
         <a
-          href="/api/admin/docs?doc=guia&format=html#36-tu-rol-en-luciernaga"
+          href="/api/admin/docs?doc=guia&format=html#36-tu-rol-en-tres-mil-millones-de-latidos"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-2 rounded-lg bg-violet-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-400 transition-colors shrink-0"

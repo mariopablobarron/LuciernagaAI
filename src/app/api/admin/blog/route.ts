@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     const excerpt = typeof body.excerpt === "string" ? body.excerpt.trim() : null;
     const coverImage = typeof body.coverImage === "string" ? body.coverImage.trim() : null;
     const tags = Array.isArray(body.tags) ? body.tags.filter((t: unknown) => typeof t === "string") : [];
-    const authorName = typeof body.authorName === "string" ? body.authorName.trim() : "Equipo Luciernaga";
+    const authorName = typeof body.authorName === "string" ? body.authorName.trim() : "Equipo Tres Mil Millones de Latidos";
     const status = body.status === "published" ? "published" : "draft";
 
     const prisma = getPrismaClient();

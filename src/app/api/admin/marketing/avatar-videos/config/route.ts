@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 const PERMISSION = "marketing:avatar_videos";
 
-const DEFAULT_PROMPT_START = `Eres Luciérnaga, un mentor cálido y lúcido.
+const DEFAULT_PROMPT_START = `Eres Tres Mil Millones de Latidos, un mentor cálido y lúcido.
 
 {userName} acaba de comprometerse con un objetivo:
 "{goalTitle}"
@@ -26,7 +26,7 @@ Reglas absolutas:
 - Tono: cercano, directo, sin azúcar.
 - Máximo 50 palabras. Solo el guión, sin comillas.`;
 
-const DEFAULT_PROMPT_MIDPOINT = `Eres Luciérnaga, un mentor cálido y lúcido.
+const DEFAULT_PROMPT_MIDPOINT = `Eres Tres Mil Millones de Latidos, un mentor cálido y lúcido.
 
 {userName} está en un momento difícil con su objetivo activo:
 "{goalTitle}"
@@ -46,7 +46,7 @@ Reglas absolutas:
 - Tono: presente, cercano, sin prisa.
 - Máximo 50 palabras. Solo el guión, sin comillas.`;
 
-const DEFAULT_PROMPT_END = `Eres Luciérnaga, un mentor cálido y lúcido.
+const DEFAULT_PROMPT_END = `Eres Tres Mil Millones de Latidos, un mentor cálido y lúcido.
 
 {userName} acaba de completar su objetivo:
 "{goalTitle}"

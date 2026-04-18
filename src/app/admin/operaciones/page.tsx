@@ -7,6 +7,7 @@ import {
   AlertTriangle, CheckCircle2, Database, Download, Info,
   RefreshCw, Shield, ShieldAlert, Activity, Bot,
   Building2, CreditCard, Brain, Users, Zap, Clock,
+  Mail, Send, MailX,
 } from "lucide-react";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 
@@ -45,6 +46,20 @@ type OpsData = {
   recommendations: Recommendation[];
 };
 
+type UnverifiedUser = {
+  id: string;
+  email: string;
+  name: string | null;
+  source: string | null;
+  createdAt: string;
+  lastSeen: string;
+  daysAgo: number;
+  tokenStatus: "valid" | "expired" | "missing";
+  tokenExpiresAt: string | null;
+  hasGoogleId: boolean;
+  messagesSent: number;
+};
+
 const LEVEL_CONFIG = {
   critical: { icon: ShieldAlert, color: "text-red-400", bg: "bg-red-500/10", border: "border-red-500/20", label: "Critico" },
   warning: { icon: AlertTriangle, color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20", label: "Atencion" },
@@ -79,6 +94,17 @@ export default function OperacionesPage() {
   const router = useRouter();
   const [data, setData] = useState<OpsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [unverified, setUnverified] = useState<UnverifiedUser[] | null>(null);
+  const [resending, setResending] = useState<string | "all" | null>(null);
+
+  function loadUnverified() {
+    fetch("/api/admin/operations/unverified", { credentials: "include" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { users: UnverifiedUser[] } | null) => {
+        if (d) setUnverified(d.users);
+      })
+      .catch(() => {});
+  }
 
   function load() {
     setLoading(true);
@@ -91,6 +117,36 @@ export default function OperacionesPage() {
       .then((d: OpsData | null) => { if (d) setData(d); })
       .catch(() => { toast.error("Error al cargar operaciones"); })
       .finally(() => setLoading(false));
+    loadUnverified();
+  }
+
+  async function handleResend(userId: string | "all") {
+    if (userId === "all" && !confirm("¿Reenviar verificación a todos los usuarios sin verificar?")) return;
+    setResending(userId);
+    try {
+      const body = userId === "all" ? { all: true } : { userId };
+      const res = await fetch("/api/admin/operations/unverified/resend", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const json = await res.json();
+      if (userId === "all") {
+        const sent = json.results?.filter((r: { status: string }) => r.status === "sent").length ?? 0;
+        const failed = json.results?.filter((r: { status: string }) => r.status === "send_failed").length ?? 0;
+        toast.success(`Reenviados: ${sent}. Fallos: ${failed}.`);
+      } else if (json.status === "sent") {
+        toast.success("Correo reenviado");
+      } else {
+        toast.error(`No se pudo reenviar: ${json.status ?? json.error ?? "error"}`);
+      }
+      loadUnverified();
+    } catch {
+      toast.error("Error al reenviar");
+    } finally {
+      setResending(null);
+    }
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- legitimate fetch-on-mount; setLoading is UI feedback, not derived state
@@ -196,6 +252,81 @@ export default function OperacionesPage() {
               </div>
             )}
           </div>
+
+          {/* Unverified users */}
+          {unverified && unverified.length > 0 && (
+            <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-amber-500/20">
+                <div className="flex items-center gap-3">
+                  <Mail className="w-4 h-4 text-amber-400" />
+                  <h2 className="text-sm font-semibold text-white">
+                    Usuarios sin verificar email
+                  </h2>
+                  <span className="rounded-full bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[10px] font-bold text-amber-300">
+                    {unverified.length}
+                  </span>
+                </div>
+                <button
+                  onClick={() => handleResend("all")}
+                  disabled={resending === "all"}
+                  className="flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-200 hover:bg-amber-500/20 transition-colors disabled:opacity-50"
+                >
+                  <Send className={`w-3.5 h-3.5 ${resending === "all" ? "animate-pulse" : ""}`} />
+                  {resending === "all" ? "Reenviando…" : "Reenviar a todos"}
+                </button>
+              </div>
+              <div className="divide-y divide-amber-500/10">
+                {unverified.map((u) => {
+                  const statusConfig =
+                    u.tokenStatus === "expired"
+                      ? { icon: MailX, color: "text-red-300", label: "Token expirado" }
+                      : u.tokenStatus === "missing"
+                        ? { icon: MailX, color: "text-zinc-500", label: "Sin token" }
+                        : { icon: Mail, color: "text-emerald-400", label: "Token válido" };
+                  const StatusIcon = statusConfig.icon;
+                  return (
+                    <div key={u.id} className="flex items-center gap-4 px-5 py-3 hover:bg-amber-500/5 transition-colors">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="text-sm font-medium text-white truncate">{u.email}</p>
+                          {u.name && <span className="text-xs text-zinc-500">— {u.name}</span>}
+                          {u.hasGoogleId && (
+                            <span className="rounded-full bg-blue-500/15 border border-blue-500/30 px-1.5 py-0.5 text-[9px] font-bold text-blue-300">
+                              Google
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3 mt-1 text-[11px] text-zinc-500">
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            hace {u.daysAgo}d
+                          </span>
+                          <span className={`flex items-center gap-1 ${statusConfig.color}`}>
+                            <StatusIcon className="w-3 h-3" />
+                            {statusConfig.label}
+                          </span>
+                          {u.messagesSent > 0 && (
+                            <span className="text-cyan-400">
+                              {u.messagesSent} mensaje{u.messagesSent > 1 ? "s" : ""}
+                            </span>
+                          )}
+                          {u.source && <span>desde {u.source}</span>}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleResend(u.id)}
+                        disabled={resending !== null}
+                        className="flex items-center gap-1.5 rounded-lg border border-zinc-700 bg-zinc-800/50 px-3 py-1.5 text-xs font-semibold text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors disabled:opacity-50 shrink-0"
+                      >
+                        <Send className={`w-3 h-3 ${resending === u.id ? "animate-pulse" : ""}`} />
+                        {resending === u.id ? "…" : "Reenviar"}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* LLM Usage mini */}
           <div className="grid grid-cols-2 gap-3">

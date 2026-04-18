@@ -252,13 +252,18 @@ export async function POST(req: NextRequest) {
     if ("verifyToken" in result) {
       const baseUrl = process.env.APP_BASE_URL ?? "http://localhost:3000";
       const verifyUrl = `${baseUrl}/api/auth/verify-email?token=${result.verifyToken}`;
-      sendUserEmail(buildVerificationEmail({ to: email, verifyUrl, name: name || undefined })).catch(
-        (e) => logError("AUTH", e, { action: "send_verification_email", email }),
-      );
+      sendUserEmail({
+        ...buildVerificationEmail({ to: email, verifyUrl, name: name || undefined }),
+        userId: result.userId,
+        template: "verification",
+      }).catch((e) => logError("AUTH", e, { action: "send_verification_email", email }));
       const welcomeEmail = buildWelcomeEmail({ name: name || null, appUrl: baseUrl });
-      sendUserEmail({ to: email, ...welcomeEmail }).catch(
-        (e) => logError("AUTH", e, { action: "send_welcome_email", email }),
-      );
+      sendUserEmail({
+        to: email,
+        ...welcomeEmail,
+        userId: result.userId,
+        template: "welcome",
+      }).catch((e) => logError("AUTH", e, { action: "send_welcome_email", email }));
       // Schedule onboarding email sequence (day 1, 3, 7)
       scheduleOnboardingEmails(result.userId).catch(
         (e) => logError("AUTH", e, { action: "schedule_onboarding_emails", email }),

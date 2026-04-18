@@ -3,6 +3,93 @@ import { getErrorMessage } from "@/lib/utils";
 // In production suppress info-level console logs; warn and error always go through.
 const IS_PROD = process.env.NODE_ENV === "production";
 
+// ── SystemLog DB writer (async buffer) ────────────────────────────────────────
+// Persists logs to Postgres via Prisma. Runs node-only. Flushes in batches to
+// avoid per-request latency. Failures fall back to stderr — never throw.
+type BufferedEntry = {
+  timestamp: Date;
+  level: "info" | "warn" | "error";
+  tag: string;
+  message: string;
+  context: Record<string, unknown> | null;
+  stack?: string;
+};
+
+const MAX_BUFFER = 50;
+const FLUSH_INTERVAL_MS = 5000;
+const logBuffer: BufferedEntry[] = [];
+let flushTimer: ReturnType<typeof setTimeout> | null = null;
+let flushing = false;
+let dbDisabled = false;
+
+function isDbSinkEnabled(): boolean {
+  if (dbDisabled) return false;
+  if (typeof window !== "undefined") return false;
+  if (process.env.NEXT_RUNTIME === "edge") return false;
+  if (process.env.SYSTEM_LOG_DB === "0") return false;
+  return true;
+}
+
+async function flushBuffer(): Promise<void> {
+  if (flushing || logBuffer.length === 0) return;
+  flushing = true;
+  const batch = logBuffer.splice(0);
+  try {
+    if (!isDbSinkEnabled()) return;
+    const { getPrismaClient } = await import("@/db/prisma");
+    const prisma = getPrismaClient();
+    await prisma.systemLog.createMany({
+      data: batch.map((b) => ({
+        timestamp: b.timestamp,
+        level: b.level,
+        tag: b.tag,
+        message: b.message.slice(0, 8000),
+        context: (b.context === null
+          ? undefined
+          : JSON.parse(JSON.stringify(b.context))) as object | undefined,
+        stack: b.stack?.slice(0, 4000),
+      })),
+    });
+  } catch (err) {
+    // Avoid re-entering the logger on failure — use stderr directly
+    process.stderr.write(
+      `[logger] flush of ${batch.length} logs failed: ${(err as Error).message}\n`,
+    );
+    // If we keep failing, disable the DB sink after a threshold
+    dbDisabled = true;
+    setTimeout(() => {
+      dbDisabled = false;
+    }, 60_000);
+  } finally {
+    flushing = false;
+  }
+}
+
+function scheduleFlush(): void {
+  if (flushTimer) return;
+  flushTimer = setTimeout(() => {
+    flushTimer = null;
+    void flushBuffer();
+  }, FLUSH_INTERVAL_MS);
+}
+
+function enqueueLog(entry: BufferedEntry): void {
+  if (!isDbSinkEnabled()) return;
+  logBuffer.push(entry);
+  if (logBuffer.length >= MAX_BUFFER) {
+    void flushBuffer();
+  } else {
+    scheduleFlush();
+  }
+}
+
+// Best-effort flush on process exit
+if (typeof process !== "undefined" && typeof process.on === "function") {
+  process.on("beforeExit", () => {
+    void flushBuffer();
+  });
+}
+
 // ── Better Stack (Logtail) ────────────────────────────────────────────────────
 // Lazy-initialized singleton — safe in edge + node runtimes.
 let _logtail: { info: F; warn: F; error: F; flush: () => Promise<void> } | null = null;
@@ -49,12 +136,37 @@ export function logInfo(tag: string, message: string, meta?: Record<string, unkn
   const ctx = { tag, ...meta };
   if (!IS_PROD) console.info(`[${ts()}] [INFO] [${tag}] ${message}`, meta ?? "");
   void getLogtail()?.info(message, ctx);
+  enqueueLog({
+    timestamp: new Date(),
+    level: "info",
+    tag,
+    message,
+    context: meta ?? null,
+  });
+}
+
+async function fireAlerts(entry: { level: "warn" | "error"; tag: string; message: string; stack?: string }): Promise<void> {
+  if (!isDbSinkEnabled()) return;
+  try {
+    const { evaluateLogForAlerts } = await import("@/lib/alerts-fire");
+    await evaluateLogForAlerts(entry);
+  } catch {
+    // silent — alerting must not break logging
+  }
 }
 
 export function logWarn(tag: string, message: string, meta?: Record<string, unknown>): void {
   const ctx = { tag, ...meta };
   console.warn(`[${ts()}] [WARN] [${tag}] ${message}`, meta ?? "");
   void getLogtail()?.warn(message, ctx);
+  enqueueLog({
+    timestamp: new Date(),
+    level: "warn",
+    tag,
+    message,
+    context: meta ?? null,
+  });
+  void fireAlerts({ level: "warn", tag, message });
 }
 
 export function logError(tag: string, error: unknown, meta?: Record<string, unknown>): void {
@@ -63,6 +175,16 @@ export function logError(tag: string, error: unknown, meta?: Record<string, unkn
   console.error(`[${ts()}] [ERROR] [${tag}] ${base}`, meta ?? "");
   void getLogtail()?.error(base, ctx);
   void captureToSentry(error, { tag, ...meta });
+  const stack = error instanceof Error ? error.stack : undefined;
+  enqueueLog({
+    timestamp: new Date(),
+    level: "error",
+    tag,
+    message: base,
+    context: meta ?? null,
+    stack,
+  });
+  void fireAlerts({ level: "error", tag, message: base, stack });
 }
 
 // ── Namespaced helpers ────────────────────────────────────────────────────────

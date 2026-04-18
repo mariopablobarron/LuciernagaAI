@@ -4,9 +4,9 @@ import { type ReactNode, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  BarChart3, BookOpen, Building2, FlaskConical, LayoutDashboard, LogOut,
+  BarChart3, BookOpen, Building2, Coffee, FlaskConical, LayoutDashboard, LogOut,
   Megaphone, Menu, Settings, Shield, ShieldCheck, Sparkles, Stethoscope,
-  StickyNote, Users, Webhook, Wrench, X, Database, Activity,
+  StickyNote, Users, Webhook, Wrench, X, Database, Activity, FileText, Bell,
 } from "lucide-react";
 
 type AdminShellProps = {
@@ -31,10 +31,13 @@ const NAV_LINKS = [
   { href: "/admin/operaciones", label: "Operaciones", icon: Wrench },
   { href: "/admin/status", label: "Estado sistema", icon: Activity },
   { href: "/admin/audit", label: "Audit Log", icon: Sparkles },
+  { href: "/admin/logs", label: "Logs", icon: FileText },
+  { href: "/admin/alertas", label: "Alertas", icon: Bell },
   { href: "/admin/llm-usage", label: "LLM Usage", icon: BarChart3 },
   { href: "/admin/team", label: "Equipo", icon: Shield },
   { href: "/admin/integraciones", label: "Integraciones", icon: Webhook },
   { href: "/admin/notas", label: "Notas", icon: StickyNote },
+  { href: "/admin/ronda-diaria", label: "Ronda Diaria", icon: Coffee },
   { href: "/admin/settings", label: "Configuración", icon: Settings, matchPrefix: true },
   { href: "/admin/guia", label: "Guía", icon: BookOpen },
 ];

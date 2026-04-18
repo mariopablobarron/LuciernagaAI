@@ -873,7 +873,7 @@ export default function AvatarVideosAdminPage() {
                 className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-violet-500 focus:outline-none"
               />
               <p className="text-[11px] text-zinc-500">
-                La IA transformará este briefing en un guión con la voz de Luciérnaga.
+                La IA transformará este briefing en un guión con la voz de Tres Mil Millones de Latidos.
               </p>
             </div>
           )}

@@ -49,6 +49,8 @@ export async function POST(req: NextRequest) {
 
     await sendUserEmail({
       to: email,
+      userId: user.id,
+      template: "password_reset",
       subject: "Recupera tu acceso",
       text: `Hola${user.name ? ` ${user.name}` : ""},\n\nRecibimos una petición para restablecer tu contraseña.\n\nHaz clic en el enlace (válido 1 hora):\n${resetUrl}\n\nSi no pediste esto, ignora este mensaje.`,
       html: `<!DOCTYPE html>

@@ -42,7 +42,7 @@ export default function BlogEditorPage({ params }: { params: Promise<{ id: strin
   const [excerpt, setExcerpt] = useState("");
   const [coverImage, setCoverImage] = useState("");
   const [tagsInput, setTagsInput] = useState("");
-  const [authorName, setAuthorName] = useState("Equipo Luciernaga");
+  const [authorName, setAuthorName] = useState("Equipo Tres Mil Millones de Latidos");
   const [status, setStatus] = useState("draft");
   const [initialBlocks, setInitialBlocks] = useState<Block[] | undefined>(undefined);
   const blocksRef = useRef<Block[]>([]);

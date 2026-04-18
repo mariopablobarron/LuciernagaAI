@@ -22,15 +22,15 @@ export interface Alert {
 const AUTOMATED_ALERT_COOLDOWN_MS = 30 * 60 * 1000;
 
 const globalForAlerts = globalThis as {
-  luciernagaAutomatedAlerts?: Map<string, number>;
+  automatedAlerts?: Map<string, number>;
 };
 
 function getAutomatedAlertsCache(): Map<string, number> {
-  if (!globalForAlerts.luciernagaAutomatedAlerts) {
-    globalForAlerts.luciernagaAutomatedAlerts = new Map<string, number>();
+  if (!globalForAlerts.automatedAlerts) {
+    globalForAlerts.automatedAlerts = new Map<string, number>();
   }
 
-  return globalForAlerts.luciernagaAutomatedAlerts;
+  return globalForAlerts.automatedAlerts;
 }
 
 function truncateText(value: string, maxLength = 140): string {

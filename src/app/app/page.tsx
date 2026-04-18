@@ -14,6 +14,7 @@ import HomeOnboarding from "@/components/home/HomeOnboarding";
 import HomeWorkspace, { type WorkspaceTab } from "@/components/home/HomeWorkspace";
 import InsightsPanel from "@/components/InsightsPanel";
 import Sidebar, { type SidebarConversation } from "@/components/Sidebar";
+import { UserInterventionsBanner } from "@/components/UserInterventionsBanner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -1688,6 +1689,7 @@ export default function HomePage() {
                 email={sessionProfile.email}
               />
             )}
+            <UserInterventionsBanner />
           </>
         }
         sidebar={

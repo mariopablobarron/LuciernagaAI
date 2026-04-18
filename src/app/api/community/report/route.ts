@@ -10,10 +10,11 @@ const VALID_REASONS = ["harmful", "self_harm", "harassment", "spam", "other"];
 const AUTO_HIDE_THRESHOLD = 3;
 const MAX_REPORTS_PER_DAY = 5;
 
+type TargetKind = "post" | "question" | "answer" | "daily_response" | "daily_mirror";
+
 /**
- * POST /api/community/report — report a community post, anon question or anon answer.
- * Body: { postId? | anonQuestionId? | anonAnswerId?, reason, details? }
- * Exactly one of the three target IDs must be provided.
+ * POST /api/community/report — report a community post, anon question/answer,
+ * or a daily round response/mirror. Exactly one target ID must be provided.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -22,14 +23,22 @@ export async function POST(req: NextRequest) {
       postId?: string;
       anonQuestionId?: string;
       anonAnswerId?: string;
+      dailyRoundResponseId?: string;
+      dailyRoundMirrorId?: string;
       reason?: string;
       details?: string;
     };
 
-    const targets = [body.postId, body.anonQuestionId, body.anonAnswerId].filter(Boolean);
+    const targets = [
+      body.postId,
+      body.anonQuestionId,
+      body.anonAnswerId,
+      body.dailyRoundResponseId,
+      body.dailyRoundMirrorId,
+    ].filter(Boolean);
     if (targets.length !== 1) {
       return NextResponse.json(
-        { error: "Exactamente uno de postId / anonQuestionId / anonAnswerId es requerido" },
+        { error: "Exactamente uno de los IDs de target es requerido" },
         { status: 400 },
       );
     }
@@ -42,7 +51,6 @@ export async function POST(req: NextRequest) {
 
     const prisma = getPrismaClient();
 
-    // Rate limit per reporter (shared across all target types).
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const reportsToday = await prisma.communityReport.count({
@@ -55,9 +63,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verify target exists + grab a snippet for the admin alert.
     let snippet = "";
-    let targetKind: "post" | "question" | "answer";
+    let targetKind: TargetKind;
     if (body.postId) {
       const post = await prisma.communityPost.findUnique({
         where: { id: body.postId },
@@ -74,14 +81,30 @@ export async function POST(req: NextRequest) {
       if (!q) return NextResponse.json({ error: "Pregunta no encontrada" }, { status: 404 });
       snippet = q.content.slice(0, 100);
       targetKind = "question";
-    } else {
+    } else if (body.anonAnswerId) {
       const a = await prisma.anonAnswer.findUnique({
-        where: { id: body.anonAnswerId! },
+        where: { id: body.anonAnswerId },
         select: { id: true, content: true },
       });
       if (!a) return NextResponse.json({ error: "Respuesta no encontrada" }, { status: 404 });
       snippet = a.content.slice(0, 100);
       targetKind = "answer";
+    } else if (body.dailyRoundResponseId) {
+      const r = await prisma.dailyRoundResponse.findUnique({
+        where: { id: body.dailyRoundResponseId },
+        select: { id: true, content: true },
+      });
+      if (!r) return NextResponse.json({ error: "Respuesta no encontrada" }, { status: 404 });
+      snippet = r.content.slice(0, 100);
+      targetKind = "daily_response";
+    } else {
+      const m = await prisma.dailyRoundMirror.findUnique({
+        where: { id: body.dailyRoundMirrorId! },
+        select: { id: true, question: true },
+      });
+      if (!m) return NextResponse.json({ error: "Espejo no encontrado" }, { status: 404 });
+      snippet = m.question.slice(0, 100);
+      targetKind = "daily_mirror";
     }
 
     const report = await prisma.communityReport.create({
@@ -89,6 +112,8 @@ export async function POST(req: NextRequest) {
         postId: body.postId ?? null,
         anonQuestionId: body.anonQuestionId ?? null,
         anonAnswerId: body.anonAnswerId ?? null,
+        dailyRoundResponseId: body.dailyRoundResponseId ?? null,
+        dailyRoundMirrorId: body.dailyRoundMirrorId ?? null,
         reporterId: identity.userId,
         reason: body.reason,
         details: body.details?.trim().slice(0, 500) || null,
@@ -103,47 +128,53 @@ export async function POST(req: NextRequest) {
       reporterId: identity.userId,
     });
 
-    // Count pending reports on the same target and auto-hide if threshold reached.
-    const pendingFilter = body.postId
-      ? { postId: body.postId, status: "pending" }
-      : body.anonQuestionId
-        ? { anonQuestionId: body.anonQuestionId, status: "pending" }
-        : { anonAnswerId: body.anonAnswerId!, status: "pending" };
+    const pendingFilter: Record<string, unknown> = { status: "pending" };
+    if (body.postId) pendingFilter.postId = body.postId;
+    else if (body.anonQuestionId) pendingFilter.anonQuestionId = body.anonQuestionId;
+    else if (body.anonAnswerId) pendingFilter.anonAnswerId = body.anonAnswerId;
+    else if (body.dailyRoundResponseId) pendingFilter.dailyRoundResponseId = body.dailyRoundResponseId;
+    else pendingFilter.dailyRoundMirrorId = body.dailyRoundMirrorId;
 
     const totalReports = await prisma.communityReport.count({ where: pendingFilter });
 
     if (totalReports >= AUTO_HIDE_THRESHOLD) {
       if (body.postId) {
-        await prisma.communityPost.update({
-          where: { id: body.postId },
-          data: { hidden: true },
-        });
+        await prisma.communityPost.update({ where: { id: body.postId }, data: { hidden: true } });
       } else if (body.anonQuestionId) {
-        await prisma.anonQuestion.update({
-          where: { id: body.anonQuestionId },
+        await prisma.anonQuestion.update({ where: { id: body.anonQuestionId }, data: { hidden: true } });
+      } else if (body.anonAnswerId) {
+        await prisma.anonAnswer.update({ where: { id: body.anonAnswerId }, data: { hidden: true } });
+      } else if (body.dailyRoundResponseId) {
+        await prisma.dailyRoundResponse.update({
+          where: { id: body.dailyRoundResponseId },
           data: { hidden: true },
         });
       } else {
-        await prisma.anonAnswer.update({
-          where: { id: body.anonAnswerId! },
+        await prisma.dailyRoundMirror.update({
+          where: { id: body.dailyRoundMirrorId! },
           data: { hidden: true },
         });
       }
       logInfo("COMMUNITY", "item_auto_hidden", { targetKind, totalReports });
     }
 
-    // Immediate admin alert for self_harm.
     if (body.reason === "self_harm") {
-      const targetLabel =
+      const label =
         targetKind === "post" ? `Post \`${body.postId}\`` :
         targetKind === "question" ? `Pregunta \`${body.anonQuestionId}\`` :
-        `Respuesta \`${body.anonAnswerId}\``;
+        targetKind === "answer" ? `Respuesta \`${body.anonAnswerId}\`` :
+        targetKind === "daily_response" ? `Ronda / respuesta \`${body.dailyRoundResponseId}\`` :
+        `Ronda / espejo \`${body.dailyRoundMirrorId}\``;
       notifyAdmin(
-        `🚨 *Reporte de autolesion en comunidad*\n\n${targetLabel}\nContenido: _${snippet}_\nReportes totales: ${totalReports}`,
+        `🚨 *Reporte de autolesion en comunidad*\n\n${label}\nContenido: _${snippet}_\nReportes totales: ${totalReports}`,
       );
     }
 
-    return NextResponse.json({ ok: true, reportId: report.id, autoHidden: totalReports >= AUTO_HIDE_THRESHOLD });
+    return NextResponse.json({
+      ok: true,
+      reportId: report.id,
+      autoHidden: totalReports >= AUTO_HIDE_THRESHOLD,
+    });
   } catch (error) {
     if (error instanceof InvalidSessionTokenError) {
       return NextResponse.json({ error: "NOT_AUTHENTICATED" }, { status: 401 });

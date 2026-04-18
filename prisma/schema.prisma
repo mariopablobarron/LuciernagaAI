@@ -4,7 +4,7 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "darwin-arm64"]
 }
 
@@ -38,12 +38,11 @@ enum InterventionStatus {
   resolved
 }
 
-
 model Conversation {
   id             String    @id @default(cuid())
   userId         String?
   title          String    @default("Nueva conversación")
-  rating         Int?      // 1 = helpful, -1 = not helpful
+  rating         Int? // 1 = helpful, -1 = not helpful
   journalMode    Boolean   @default(false) // silent / no AI responses
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
@@ -54,87 +53,90 @@ model Conversation {
 }
 
 model User {
-  id              String           @id @default(cuid())
-  email           String           @unique
-  name            String?
-  bio             String?
-  avatarData      String?
-  role            String           @default("user")
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  lastSeen        DateTime         @default(now())
-  passwordHash    String?
-  telegramId       String?          @unique
-  googleId         String?          @unique
-  stripeCustomerId String?          @unique
-  consentGiven     Boolean          @default(false)
-  consentAt       DateTime?
-  source          String?
-  isActive        Boolean          @default(true)
-  latidos         Int              @default(0)
-  messageCount    Int              @default(0)
-  lastMessageAt   DateTime?
-  conversations   Conversation[]   @relation("UserConversations")
-  messages        Message[]        @relation("UserMessages")
-  goals           Goal[]
-  crisisEvents    CrisisEvent[]
-  avoidanceEvents AvoidanceEvent[]
-  subscriptions   Subscription[]
-  userProfile     UserProfile?
-  userChallenges  UserChallenge[]
-  dailyLogs       DailyLog[]
-  futureMessages  FutureMessage[]
-  streak          Streak?
-  clinicalNotes   ClinicalNote[]
-  assessments     Assessment[]
-  wins            Win[]
-  actionReminders ActionReminder[]
-  circleMembers   CircleMember[]
-  communityPosts       CommunityPost[]
-  communityReports     CommunityReport[]
-  pushSubscriptions    PushSubscription[]
-  notifications        Notification[]
-  heartbeats           Heartbeat[]
-  commitments     DailyCommitment[]
-  files             UserFile[]
-  questionsAsked    AnonQuestion[]  @relation("QuestionsAsked")
-  questionsReceived AnonQuestion[]  @relation("QuestionsReceived")
-  anonAnswers       AnonAnswer[]
-  anonAnswerVotes   AnonAnswerVote[]
-  preferences     UserPreferences?
-  trustedContact  TrustedContact?
-  supportMessages SupportMessage[]
-  familyPings     FamilyPing[]
-  invitations          Invitation[]         @relation("InvitationsSent")
-  invitationsReceived  Invitation[]         @relation("InvitationsReceived")
-  invitesEarned        Int                  @default(0)
-  tags                 String[]             @default([]) // manual marketing tags (e.g. "beta", "vip", "churning")
-  passwordResetTokens  PasswordResetToken[]
-  userActions          UserAction[]
-  interventions        Intervention[]       @relation("UserInterventions")
-  userJourneys         UserJourney[]
-  userExercises        UserExercise[]
-  userState            UserState?
-  dailyCheckins        DailyCheckin[]
-  llmLogs              LlmLog[]
-  feedbacks            Feedback[]
-  scheduledEmails      ScheduledEmail[]
-  latidoTransactions   LatidoTransaction[]
-  events               Event[]
-  personalProjects     PersonalProject[]
-  diaryEntries         DiaryEntry[]
-  userBadges           UserBadge[]
-  goalAvatarVideos     GoalAvatarVideo[]
+  id                        String                    @id @default(cuid())
+  email                     String                    @unique
+  name                      String?
+  bio                       String?
+  avatarData                String?
+  role                      String                    @default("user")
+  createdAt                 DateTime                  @default(now())
+  updatedAt                 DateTime                  @updatedAt
+  lastSeen                  DateTime                  @default(now())
+  passwordHash              String?
+  telegramId                String?                   @unique
+  googleId                  String?                   @unique
+  stripeCustomerId          String?                   @unique
+  consentGiven              Boolean                   @default(false)
+  consentAt                 DateTime?
+  source                    String?
+  isActive                  Boolean                   @default(true)
+  latidos                   Int                       @default(0)
+  messageCount              Int                       @default(0)
+  lastMessageAt             DateTime?
+  conversations             Conversation[]            @relation("UserConversations")
+  messages                  Message[]                 @relation("UserMessages")
+  goals                     Goal[]
+  crisisEvents              CrisisEvent[]
+  avoidanceEvents           AvoidanceEvent[]
+  subscriptions             Subscription[]
+  userProfile               UserProfile?
+  userChallenges            UserChallenge[]
+  dailyLogs                 DailyLog[]
+  futureMessages            FutureMessage[]
+  streak                    Streak?
+  clinicalNotes             ClinicalNote[]
+  assessments               Assessment[]
+  wins                      Win[]
+  actionReminders           ActionReminder[]
+  circleMembers             CircleMember[]
+  communityPosts            CommunityPost[]
+  communityReports          CommunityReport[]
+  pushSubscriptions         PushSubscription[]
+  notifications             Notification[]
+  heartbeats                Heartbeat[]
+  commitments               DailyCommitment[]
+  files                     UserFile[]
+  questionsAsked            AnonQuestion[]            @relation("QuestionsAsked")
+  questionsReceived         AnonQuestion[]            @relation("QuestionsReceived")
+  anonAnswers               AnonAnswer[]
+  anonAnswerVotes           AnonAnswerVote[]
+  preferences               UserPreferences?
+  trustedContact            TrustedContact?
+  supportMessages           SupportMessage[]
+  familyPings               FamilyPing[]
+  invitations               Invitation[]              @relation("InvitationsSent")
+  invitationsReceived       Invitation[]              @relation("InvitationsReceived")
+  invitesEarned             Int                       @default(0)
+  tags                      String[]                  @default([]) // manual marketing tags (e.g. "beta", "vip", "churning")
+  passwordResetTokens       PasswordResetToken[]
+  userActions               UserAction[]
+  interventions             Intervention[]            @relation("UserInterventions")
+  userJourneys              UserJourney[]
+  userExercises             UserExercise[]
+  userState                 UserState?
+  dailyCheckins             DailyCheckin[]
+  llmLogs                   LlmLog[]
+  feedbacks                 Feedback[]
+  scheduledEmails           ScheduledEmail[]
+  latidoTransactions        LatidoTransaction[]
+  events                    Event[]
+  personalProjects          PersonalProject[]
+  diaryEntries              DiaryEntry[]
+  userBadges                UserBadge[]
+  goalAvatarVideos          GoalAvatarVideo[]
   broadcastAvatarDeliveries BroadcastAvatarDelivery[]
-  phone                String?
-  emailVerified        Boolean          @default(false)
-  emailVerifyToken     String?
-  emailVerifyExpires   DateTime?
-  deletedAt            DateTime?        // soft delete — null means active
-  organizationId       String?
-  organization         Organization?    @relation(fields: [organizationId], references: [id])
-  classroomId          String?
-  classroom            Classroom?       @relation(fields: [classroomId], references: [id])
+  dailyRoundResponses       DailyRoundResponse[]
+  dailyRoundReactions       DailyRoundReaction[]
+  dailyRoundMirrors         DailyRoundMirror[]
+  phone                     String?
+  emailVerified             Boolean                   @default(false)
+  emailVerifyToken          String?
+  emailVerifyExpires        DateTime?
+  deletedAt                 DateTime? // soft delete — null means active
+  organizationId            String?
+  organization              Organization?             @relation(fields: [organizationId], references: [id])
+  classroomId               String?
+  classroom                 Classroom?                @relation(fields: [classroomId], references: [id])
 
   @@index([organizationId])
   @@index([isActive, createdAt])
@@ -169,8 +171,8 @@ model GoalAvatarVideo {
   id            String    @id @default(cuid())
   userId        String
   goalId        String
-  phase         String    // START | MIDPOINT | END
-  trigger       String    // goal_created | state_bloqueo | state_low_energy | goal_completed
+  phase         String // START | MIDPOINT | END
+  trigger       String // goal_created | state_bloqueo | state_low_energy | goal_completed
   script        String    @db.Text
   heygenVideoId String?
   videoUrl      String?
@@ -193,20 +195,20 @@ model GoalAvatarVideo {
 // HeyGen video is generated once and the URL is copied to every delivery.
 
 model BroadcastAvatarCampaign {
-  id             String    @id @default(cuid())
-  title          String    // admin-facing label
-  segment        String    // "all" | "single" | "active_7d" | ...
-  mode           String    // "literal" | "briefing"
-  isShared       Boolean   @default(false) // one video reused for all recipients
-  briefing       String?   @db.Text // briefing text if mode=briefing
-  literalScript  String?   @db.Text // explicit script if mode=literal
-  sharedVideoUrl String?   // filled when isShared && generation completed
+  id             String                    @id @default(cuid())
+  title          String // admin-facing label
+  segment        String // "all" | "single" | "active_7d" | ...
+  mode           String // "literal" | "briefing"
+  isShared       Boolean                   @default(false) // one video reused for all recipients
+  briefing       String?                   @db.Text // briefing text if mode=briefing
+  literalScript  String?                   @db.Text // explicit script if mode=literal
+  sharedVideoUrl String? // filled when isShared && generation completed
   sharedHeygenId String?
-  status         String    @default("PENDING") // PENDING | GENERATING | READY | FAILED
+  status         String                    @default("PENDING") // PENDING | GENERATING | READY | FAILED
   errorMessage   String?
-  recipientCount Int       @default(0)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  recipientCount Int                       @default(0)
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
   createdBy      String?
   deliveries     BroadcastAvatarDelivery[]
 
@@ -215,17 +217,17 @@ model BroadcastAvatarCampaign {
 }
 
 model BroadcastAvatarDelivery {
-  id            String    @id @default(cuid())
+  id            String                  @id @default(cuid())
   campaignId    String
   userId        String
-  script        String    @db.Text
-  heygenVideoId String?   // only for per-user videos; null for shared
-  videoUrl      String?   // final URL served to the user
-  status        String    @default("PENDING") // PENDING | READY | FAILED
+  script        String                  @db.Text
+  heygenVideoId String? // only for per-user videos; null for shared
+  videoUrl      String? // final URL served to the user
+  status        String                  @default("PENDING") // PENDING | READY | FAILED
   errorMessage  String?
   seenAt        DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime                @default(now())
+  updatedAt     DateTime                @updatedAt
   user          User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
   campaign      BroadcastAvatarCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
@@ -236,37 +238,37 @@ model BroadcastAvatarDelivery {
 
 // Singleton row (id="singleton") edited from /admin/marketing.
 model AvatarVideoConfig {
-  id                       String   @id @default("singleton")
-  enabled                  Boolean  @default(false) // global kill switch
-  maxVideosPerDay          Int      @default(30)    // hard cap per day to cap cost
-  midpointMinDays          Int      @default(3)     // wait at least N days after goal start
+  id                        String   @id @default("singleton")
+  enabled                   Boolean  @default(false) // global kill switch
+  maxVideosPerDay           Int      @default(30) // hard cap per day to cap cost
+  midpointMinDays           Int      @default(3) // wait at least N days after goal start
   // Broadcast guardrails — discipline-as-code so the marketing channel
   // doesn't degrade through overuse.
-  maxBroadcastsPerMonth    Int      @default(4)     // hard cap on broadcasts in any rolling 30-day window
-  broadcastUserCooldownDays Int     @default(7)     // skip recipients who got any broadcast in last N days
-  welcomeCampaignId        String?                  // BroadcastAvatarCampaign.id used as welcome video for new signups
-  tone                     String   @default("interpellation")
-  avatarId                 String   @default("e2ff51edb1154b0dbe2c8f0df59818cf")
-  promptTemplateStart      String   @db.Text
-  promptTemplateMidpoint   String   @db.Text
-  promptTemplateEnd        String   @db.Text
-  updatedAt                DateTime @updatedAt
-  updatedBy                String?
+  maxBroadcastsPerMonth     Int      @default(4) // hard cap on broadcasts in any rolling 30-day window
+  broadcastUserCooldownDays Int      @default(7) // skip recipients who got any broadcast in last N days
+  welcomeCampaignId         String? // BroadcastAvatarCampaign.id used as welcome video for new signups
+  tone                      String   @default("interpellation")
+  avatarId                  String   @default("e2ff51edb1154b0dbe2c8f0df59818cf")
+  promptTemplateStart       String   @db.Text
+  promptTemplateMidpoint    String   @db.Text
+  promptTemplateEnd         String   @db.Text
+  updatedAt                 DateTime @updatedAt
+  updatedBy                 String?
 }
 
 model DailyLog {
-  id            String   @id @default(cuid())
-  userId        String
-  checkIns      Int      @default(0)
-  messagesCount Int      @default(0)
-  logDate       DateTime @default(now())
-  emotionalState String?
-  note          String?
-  mood          String?
+  id              String   @id @default(cuid())
+  userId          String
+  checkIns        Int      @default(0)
+  messagesCount   Int      @default(0)
+  logDate         DateTime @default(now())
+  emotionalState  String?
+  note            String?
+  mood            String?
   challengeStatus String?
-  momentum      Int?
-  createdAt     DateTime @default(now())
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  momentum        Int?
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
   @@index([userId, logDate])
@@ -275,37 +277,37 @@ model DailyLog {
 }
 
 model Insight {
-  id        String   @id @default(cuid())
-  type      String   // retention, behavior, risk, clarity, engagement
-  title     String
-  content   String
-  action    String
-  confidence String  @default("medium") // low, medium, high
-  priority  String   @default("medium") // low, medium, high
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  type       String // retention, behavior, risk, clarity, engagement
+  title      String
+  content    String
+  action     String
+  confidence String   @default("medium") // low, medium, high
+  priority   String   @default("medium") // low, medium, high
+  createdAt  DateTime @default(now())
 }
 
 model UserState {
-  id               String              @id @default(cuid())
-  userId           String              @unique
-  state            String              @default("neutral")
-  systemState      String              @default("ESTABLE") // SystemState — last computed behavioral state
-  transformationPhase String @default("bloqueo")
-  mood             String?
-  primaryEmotion   String              @default("calma")
-  dominantPattern  String              @default("evita_decidir")
-  focusArea        String              @default("propósito")
-  energyLevel      String              @default("medio")
-  riskLevel        String              @default("low")
-  progressTrend    String              @default("igual")
-  crisisActive     Boolean             @default(false)
-  crisisActivatedAt DateTime?
-  crisisActiveUntil DateTime?
-  dialogueIntent   String              @default("clarification")
-  dialogueStep     Int                 @default(0)
-  dialogueFlow     String?             // active flow name or null
-  updatedAt        DateTime            @updatedAt
-  user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                  String    @id @default(cuid())
+  userId              String    @unique
+  state               String    @default("neutral")
+  systemState         String    @default("ESTABLE") // SystemState — last computed behavioral state
+  transformationPhase String    @default("bloqueo")
+  mood                String?
+  primaryEmotion      String    @default("calma")
+  dominantPattern     String    @default("evita_decidir")
+  focusArea           String    @default("propósito")
+  energyLevel         String    @default("medio")
+  riskLevel           String    @default("low")
+  progressTrend       String    @default("igual")
+  crisisActive        Boolean   @default(false)
+  crisisActivatedAt   DateTime?
+  crisisActiveUntil   DateTime?
+  dialogueIntent      String    @default("clarification")
+  dialogueStep        Int       @default(0)
+  dialogueFlow        String? // active flow name or null
+  updatedAt           DateTime  @updatedAt
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([state, updatedAt])
   @@index([systemState, updatedAt])
@@ -336,13 +338,13 @@ model DecisionLog {
 }
 
 model AdminSnapshot {
-  id        String   @id @default(cuid())
-  type      String   // "reset" | "manual" | "scheduled"
-  label     String?  // Optional label (e.g. "Pre-reset 2026-04-07")
-  data      Json     // Full snapshot of decisions + insights at time of archive
-  summary   String?  // Human-readable summary of what was archived
-  recordCount Int    @default(0) // Total records archived
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  type        String // "reset" | "manual" | "scheduled"
+  label       String? // Optional label (e.g. "Pre-reset 2026-04-07")
+  data        Json // Full snapshot of decisions + insights at time of archive
+  summary     String? // Human-readable summary of what was archived
+  recordCount Int      @default(0) // Total records archived
+  createdAt   DateTime @default(now())
 
   @@index([type, createdAt])
 }
@@ -374,13 +376,13 @@ model CrisisEvent {
 }
 
 model Goal {
-  id           String             @id @default(cuid())
+  id           String            @id @default(cuid())
   userId       String
   title        String
-  status       GoalStatus         @default(active)
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
-  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status       GoalStatus        @default(active)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   actions      Action[]
   avatarVideos GoalAvatarVideo[]
 
@@ -389,12 +391,12 @@ model Goal {
 }
 
 model Action {
-  id          String   @id @default(cuid())
-  goalId      String
-  description String
-  completed   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  goal        Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  id              String           @id @default(cuid())
+  goalId          String
+  description     String
+  completed       Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  goal            Goal             @relation(fields: [goalId], references: [id], onDelete: Cascade)
   avoidanceEvents AvoidanceEvent[]
 
   @@index([goalId, createdAt])
@@ -439,14 +441,14 @@ model Subscription {
 }
 
 model Profile {
-  id               String       @id @default(cuid())
-  code             String       @unique
+  id               String        @id @default(cuid())
+  code             String        @unique
   type             String
   title            String
   description      String
   operationalFocus String
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
   userProfiles     UserProfile[]
   challenges       Challenge[]
 
@@ -563,15 +565,15 @@ model ClinicalNote {
 
 /// A standardised scale (PHQ-9, GAD-7, custom) assigned to a user by the psychologist.
 model Assessment {
-  id        String               @id @default(cuid())
+  id        String              @id @default(cuid())
   userId    String
-  type      String               // "phq9" | "gad7" | "custom"
+  type      String // "phq9" | "gad7" | "custom"
   title     String
-  questions Json                 // Array<{ id: string; text: string; scale: number }>
-  status    String               @default("pending") // "pending" | "completed"
-  createdAt DateTime             @default(now())
-  updatedAt DateTime             @updatedAt
-  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questions Json // Array<{ id: string; text: string; scale: number }>
+  status    String              @default("pending") // "pending" | "completed"
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   response  AssessmentResponse?
 
   @@index([userId, status, createdAt])
@@ -582,9 +584,9 @@ model AssessmentResponse {
   id           String     @id @default(cuid())
   assessmentId String     @unique
   userId       String
-  answers      Json       // Array<{ questionId: string; score: number }>
+  answers      Json // Array<{ questionId: string; score: number }>
   totalScore   Int
-  severity     String     // "minimal" | "mild" | "moderate" | "moderately_severe" | "severe"
+  severity     String // "minimal" | "mild" | "moderate" | "moderately_severe" | "severe"
   completedAt  DateTime   @default(now())
   assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
 
@@ -623,20 +625,20 @@ model ActionReminder {
 
 /// Per-user app preferences.
 model UserPreferences {
-  id                 String   @id @default(cuid())
-  userId             String   @unique
-  aiTone             String   @default("directo") // "directo" | "socratico" | "calido"
-  reminderTime       String?  // "HH:MM" local time for daily check-in nudge
-  reminderEnabled    Boolean  @default(true)
-  weeklyEmailEnabled Boolean  @default(true)
-  notifyInsights     Boolean  @default(true)
-  notifyGoals        Boolean  @default(true)
-  notifyUpdates      Boolean  @default(false)
-  avatarVideosEnabled Boolean @default(true) // opt-out for weekly avatar videos
-  timezone           String   @default("Europe/Madrid")
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  aiTone              String   @default("directo") // "directo" | "socratico" | "calido"
+  reminderTime        String? // "HH:MM" local time for daily check-in nudge
+  reminderEnabled     Boolean  @default(true)
+  weeklyEmailEnabled  Boolean  @default(true)
+  notifyInsights      Boolean  @default(true)
+  notifyGoals         Boolean  @default(true)
+  notifyUpdates       Boolean  @default(false)
+  avatarVideosEnabled Boolean  @default(true) // opt-out for weekly avatar videos
+  timezone            String   @default("Europe/Madrid")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // ─── System Admin Users (RBAC) ────────────────────────────────────────────────
@@ -677,8 +679,8 @@ model AdminNote {
   title      String
   body       String?   @db.Text
   tag        String    @default("general") // "referrals" | "migration" | "env" | "cron" | "ui" | "incident" | "general"
-  priority   String    @default("medium")  // "low" | "medium" | "high"
-  status     String    @default("open")    // "open" | "done"
+  priority   String    @default("medium") // "low" | "medium" | "high"
+  status     String    @default("open") // "open" | "done"
   createdBy  String?
   resolvedBy String?
   resolvedAt DateTime?
@@ -715,7 +717,7 @@ model WaitlistEntry {
   mission2   String   @db.Text
   mission3   String   @db.Text
   status     String   @default("approved") // "approved" | "rejected"
-  inviteCode String?  // if they came via invite
+  inviteCode String? // if they came via invite
   createdAt  DateTime @default(now())
 
   @@index([status, createdAt])
@@ -726,7 +728,7 @@ model Invitation {
   id           String    @id @default(cuid())
   code         String    @unique @default(cuid())
   userId       String
-  reason       String?   // "streak_7d" | "streak_30d" | "goal_complete" | "active_30d" | "manual"
+  reason       String? // "streak_7d" | "streak_30d" | "goal_complete" | "active_30d" | "manual"
   usedByEmail  String?
   usedByUserId String?
   usedAt       DateTime?
@@ -745,20 +747,20 @@ model Invitation {
 
 /// A person the user trusts to have limited visibility and receive crisis alerts.
 model TrustedContact {
-  id          String  @id @default(cuid())
-  userId      String  @unique
-  name        String
-  email       String
-  phone       String?
-  relation    String? // "madre" | "padre" | "pareja" | "amigo" | "hermano/a" | "terapeuta"
+  id       String  @id @default(cuid())
+  userId   String  @unique
+  name     String
+  email    String
+  phone    String?
+  relation String? // "madre" | "padre" | "pareja" | "amigo" | "hermano/a" | "terapeuta"
 
   /// Token embedded in the family portal URL — acts as access credential.
-  accessToken String  @unique @default(cuid())
+  accessToken String @unique @default(cuid())
 
   /// What data the user allows the family member to see.
   shareProgress Boolean @default(false) // emotional trend + goal progress
-  shareWins     Boolean @default(false)  // notified when user records a win
-  shareStreak   Boolean @default(false)  // streak milestone notifications
+  shareWins     Boolean @default(false) // notified when user records a win
+  shareStreak   Boolean @default(false) // streak milestone notifications
 
   /// Notification triggers.
   notifyOnCrisis     Boolean @default(true)
@@ -782,15 +784,15 @@ model TrustedContact {
 
 /// A message of support sent by the trusted contact to the user (shown in-app).
 model SupportMessage {
-  id               String          @id @default(cuid())
-  userId           String          // recipient (the app user)
+  id               String    @id @default(cuid())
+  userId           String // recipient (the app user)
   trustedContactId String?
-  fromName         String          // display name shown to user
-  content          String          @db.Text
-  scheduledAt      DateTime?       // optional delayed delivery
-  deliveredAt      DateTime?       // when shown to user
-  readAt           DateTime?       // when user tapped "read"
-  createdAt        DateTime        @default(now())
+  fromName         String // display name shown to user
+  content          String    @db.Text
+  scheduledAt      DateTime? // optional delayed delivery
+  deliveredAt      DateTime? // when shown to user
+  readAt           DateTime? // when user tapped "read"
+  createdAt        DateTime  @default(now())
 
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   trustedContact TrustedContact? @relation(fields: [trustedContactId], references: [id], onDelete: SetNull)
@@ -805,7 +807,7 @@ model FamilyPing {
   userId           String
   trustedContactId String
   respondedAt      DateTime?
-  response         String?   // "ok" | "not_ok" | null (unanswered)
+  response         String? // "ok" | "not_ok" | null (unanswered)
   createdAt        DateTime  @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -815,12 +817,12 @@ model FamilyPing {
 }
 
 model PasswordResetToken {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
-  tokenHash String   @unique
+  tokenHash String    @unique
   expiresAt DateTime
   usedAt    DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -831,7 +833,7 @@ model PasswordResetToken {
 model UserAction {
   id        String   @id @default(cuid())
   userId    String
-  type      String   // e.g. "IDENTIFY_WHAT_ENDED" | "DETECT_ESCAPE" | "ALLOW_UNCERTAINTY"
+  type      String // e.g. "IDENTIFY_WHAT_ENDED" | "DETECT_ESCAPE" | "ALLOW_UNCERTAINTY"
   status    String   @default("PENDING") // "PENDING" | "DONE"
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -843,8 +845,8 @@ model UserAction {
 /// Result of the public diagnostic quiz (anonymous users included).
 model QuizResult {
   id        String   @id @default(cuid())
-  userId    String   // anonymous or authenticated user id
-  state     String   // "bloqueo" | "ansiedad" | "duda" | "claridad" | "neutral"
+  userId    String // anonymous or authenticated user id
+  state     String // "bloqueo" | "ansiedad" | "duda" | "claridad" | "neutral"
   createdAt DateTime @default(now())
 
   @@index([userId, createdAt])
@@ -861,14 +863,14 @@ model LlmLog {
   userId           String?
   model            String
   source           String    @default("chat") // "chat" | "impulse" | "checkin" | "cron" | etc.
-  prompt           String?   @db.Text         // nullable — purged after retention period
-  response         String?   @db.Text         // nullable — purged after retention period
+  prompt           String?   @db.Text // nullable — purged after retention period
+  response         String?   @db.Text // nullable — purged after retention period
   promptTokens     Int       @default(0)
   completionTokens Int       @default(0)
   totalTokens      Int       @default(0)
   costUsd          Float     @default(0)
   latencyMs        Int
-  purgedAt         DateTime?                  // when prompt/response were nullified
+  purgedAt         DateTime? // when prompt/response were nullified
   createdAt        DateTime  @default(now())
   user             User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -885,19 +887,19 @@ model LlmLog {
 
 /// Intervention sent by a clinician/admin to a specific user.
 model Intervention {
-  id        String              @id @default(cuid())
+  id        String             @id @default(cuid())
   userId    String
-  adminId   String              // ADMIN_USERNAME who sent it
-  type      String              // "message" | "recommendation" | "resource" | "assessment"
-  content   String              @db.Text
-  status    InterventionStatus  @default(sent)
+  adminId   String // ADMIN_USERNAME who sent it
+  type      String // "message" | "recommendation" | "resource" | "assessment"
+  content   String             @db.Text
+  status    InterventionStatus @default(sent)
   metadata  Json?
-  sentAt    DateTime            @default(now())
+  sentAt    DateTime           @default(now())
   readAt    DateTime?
-  createdAt DateTime            @default(now())
-  updatedAt DateTime            @updatedAt
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
 
-  user      User                @relation("UserInterventions", fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation("UserInterventions", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, sentAt])
   @@index([userId, status])
@@ -912,7 +914,7 @@ model Journey {
   slug          String          @unique
   title         String
   description   String          @db.Text
-  phase         String          // "autoconocimiento" | "gestion_emocional" | "proposito" | "accion"
+  phase         String // "autoconocimiento" | "gestion_emocional" | "proposito" | "accion"
   order         Int             @default(0)
   iconEmoji     String          @default("🌱")
   durationWeeks Int             @default(4)
@@ -928,18 +930,18 @@ model Journey {
 
 /// A module within a journey.
 model JourneyModule {
-  id                   String     @id @default(cuid())
-  journeyId            String
-  slug                 String
-  title                String
-  description          String     @db.Text
-  order                Int        @default(0)
-  unlockAfterModuleId  String?
-  iconEmoji            String     @default("📘")
-  createdAt            DateTime   @default(now())
-  updatedAt            DateTime   @updatedAt
-  journey              Journey    @relation(fields: [journeyId], references: [id], onDelete: Cascade)
-  exercises            Exercise[]
+  id                  String     @id @default(cuid())
+  journeyId           String
+  slug                String
+  title               String
+  description         String     @db.Text
+  order               Int        @default(0)
+  unlockAfterModuleId String?
+  iconEmoji           String     @default("📘")
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+  journey             Journey    @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+  exercises           Exercise[]
 
   @@unique([journeyId, slug])
   @@index([journeyId, order])
@@ -952,10 +954,10 @@ model Exercise {
   slug             String
   title            String
   description      String         @db.Text
-  type             String         // "reflection" | "writing" | "action" | "assessment" | "breathing" | "visualization"
+  type             String // "reflection" | "writing" | "action" | "assessment" | "breathing" | "visualization"
   order            Int            @default(0)
   estimatedMinutes Int            @default(10)
-  instructions     Json           // Array<{ step: number; title: string; prompt: string; inputType: "text" | "choice" | "scale" | "none" }>
+  instructions     Json // Array<{ step: number; title: string; prompt: string; inputType: "text" | "choice" | "scale" | "none" }>
   debrief          String?        @db.Text
   tags             String[]       @default([])
   createdAt        DateTime       @default(now())
@@ -1013,18 +1015,18 @@ model UserExercise {
 
 /// User feedback, suggestions, and bug reports.
 model Feedback {
-  id                   String   @id @default(cuid())
-  userId               String
-  type                 String   @default("suggestion") // "suggestion" | "bug" | "other" | "nps"
-  rating               Int?     // 1-5 star rating (null for text-only feedback)
-  message              String   @db.Text
-  page                 String?  // URL path where feedback was submitted
+  id                  String   @id @default(cuid())
+  userId              String
+  type                String   @default("suggestion") // "suggestion" | "bug" | "other" | "nps"
+  rating              Int? // 1-5 star rating (null for text-only feedback)
+  message             String   @db.Text
+  page                String? // URL path where feedback was submitted
   // When true, this feedback is curated by the marketing team and exposed
   // publicly as a testimonial via /api/testimonials. Admin-only toggle.
-  isPublicTestimonial  Boolean  @default(false)
-  testimonialOrder     Int?     // optional ordering on the landing page (lower first)
-  createdAt            DateTime @default(now())
-  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isPublicTestimonial Boolean  @default(false)
+  testimonialOrder    Int? // optional ordering on the landing page (lower first)
+  createdAt           DateTime @default(now())
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
   @@index([type, createdAt])
@@ -1035,9 +1037,9 @@ model Feedback {
 model LatidoTransaction {
   id        String   @id @default(cuid())
   userId    String
-  amount    Int      // positive = earned, negative = spent
-  reason    String   // "checkin", "action_complete", "streak_3d", "streak_7d", "streak_21d", "goal_complete", "community_reply", "victory_shared", "first_message_today", "spend_unlock", "spend_gift", "spend_theme"
-  meta      String?  // extra context (e.g. which feature unlocked)
+  amount    Int // positive = earned, negative = spent
+  reason    String // "checkin", "action_complete", "streak_3d", "streak_7d", "streak_21d", "goal_complete", "community_reply", "victory_shared", "first_message_today", "spend_unlock", "spend_gift", "spend_theme"
+  meta      String? // extra context (e.g. which feature unlocked)
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -1049,7 +1051,7 @@ model LatidoTransaction {
 model ScheduledEmail {
   id          String    @id @default(cuid())
   userId      String
-  template    String    // "onboarding_day1" | "onboarding_day3" | "onboarding_day7" | "quiz_followup_day3" | etc.
+  template    String // "onboarding_day1" | "onboarding_day3" | "onboarding_day7" | "quiz_followup_day3" | etc.
   scheduledAt DateTime
   sentAt      DateTime?
   cancelled   Boolean   @default(false)
@@ -1063,18 +1065,18 @@ model ScheduledEmail {
 
 /// An organization (company, clinic, school, training center) that groups users.
 model Organization {
-  id           String       @id @default(cuid())
+  id           String      @id @default(cuid())
   name         String
-  slug         String       @unique // URL-friendly identifier
-  type         String       @default("company") // "company" | "clinic" | "school" | "training_center"
-  plan         String       @default("team") // "team" | "enterprise"
-  maxUsers     Int          @default(50)
-  isActive     Boolean      @default(true)
+  slug         String      @unique // URL-friendly identifier
+  type         String      @default("company") // "company" | "clinic" | "school" | "training_center"
+  plan         String      @default("team") // "team" | "enterprise"
+  maxUsers     Int         @default(50)
+  isActive     Boolean     @default(true)
   contactName  String?
   contactEmail String?
   logoUrl      String?
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
   users        User[]
   orgAdmins    OrgAdmin[]
   orgInvites   OrgInvite[]
@@ -1092,7 +1094,7 @@ model OrgAdmin {
   email          String
   name           String
   role           String       @default("hr") // "hr" | "therapist" | "admin" | "teacher"
-  classroomId    String?      // if teacher, which classroom they manage
+  classroomId    String? // if teacher, which classroom they manage
   passwordHash   String
   lastLoginAt    DateTime?
   createdAt      DateTime     @default(now())
@@ -1110,12 +1112,12 @@ model OrgInvite {
   id             String       @id @default(cuid())
   organizationId String
   code           String       @unique @default(cuid())
-  email          String?      // if set, only this email can use the invite
-  role           String?      // optional: pre-assign a label like "empleado" | "paciente"
+  email          String? // if set, only this email can use the invite
+  role           String? // optional: pre-assign a label like "empleado" | "paciente"
   maxUses        Int          @default(1)
   usedCount      Int          @default(0)
   expiresAt      DateTime?
-  createdBy      String       // admin who created it
+  createdBy      String // admin who created it
   createdAt      DateTime     @default(now())
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
@@ -1127,9 +1129,9 @@ model OrgInvite {
 model Classroom {
   id             String          @id @default(cuid())
   organizationId String
-  name           String          // "3º ESO A", "Grupo Mindfulness", etc.
+  name           String // "3º ESO A", "Grupo Mindfulness", etc.
   description    String?
-  teacherId      String?         // OrgAdmin id of the teacher (denormalized for quick access)
+  teacherId      String? // OrgAdmin id of the teacher (denormalized for quick access)
   isActive       Boolean         @default(true)
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
@@ -1144,17 +1146,17 @@ model Classroom {
 
 /// A registration code that assigns users to a classroom on signup.
 model ClassroomCode {
-  id          String     @id @default(cuid())
+  id          String    @id @default(cuid())
   classroomId String
-  code        String     @unique // short human-friendly code: "MIND-2026-A3"
-  label       String?    // optional label: "Código para padres", "Turno mañana"
-  maxUses     Int        @default(0) // 0 = unlimited
-  usedCount   Int        @default(0)
-  isActive    Boolean    @default(true)
+  code        String    @unique // short human-friendly code: "MIND-2026-A3"
+  label       String? // optional label: "Código para padres", "Turno mañana"
+  maxUses     Int       @default(0) // 0 = unlimited
+  usedCount   Int       @default(0)
+  isActive    Boolean   @default(true)
   expiresAt   DateTime?
-  createdBy   String     // OrgAdmin id who created it
-  createdAt   DateTime   @default(now())
-  classroom   Classroom  @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  createdBy   String // OrgAdmin id who created it
+  createdAt   DateTime  @default(now())
+  classroom   Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
 
   @@index([code])
   @@index([classroomId, isActive])
@@ -1164,22 +1166,22 @@ model ClassroomCode {
 
 /// A self-directed personal project following SENTIR > IMAGINAR > ACTUAR > REFLEXIONAR.
 model PersonalProject {
-  id              String                @id @default(cuid())
-  userId          String
-  title           String
-  description     String?               @db.Text
-  phase           String                @default("feel") // "feel" | "imagine" | "act" | "reflect"
-  status          String                @default("active") // "active" | "paused" | "completed" | "abandoned"
-  startedAt       DateTime              @default(now())
-  completedAt     DateTime?
-  createdAt       DateTime              @default(now())
-  updatedAt       DateTime              @updatedAt
+  id          String    @id @default(cuid())
+  userId      String
+  title       String
+  description String?   @db.Text
+  phase       String    @default("feel") // "feel" | "imagine" | "act" | "reflect"
+  status      String    @default("active") // "active" | "paused" | "completed" | "abandoned"
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  phaseEntries    ProjectPhaseEntry[]
-  focusAreas      ProjectFocusArea[]
-  reflections     ProjectReflection[]
-  insights        ProjectInsight[]
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phaseEntries ProjectPhaseEntry[]
+  focusAreas   ProjectFocusArea[]
+  reflections  ProjectReflection[]
+  insights     ProjectInsight[]
 
   @@index([userId, status])
   @@index([userId, phase, status])
@@ -1187,83 +1189,83 @@ model PersonalProject {
 
 /// Q&A interaction within a phase. Questions can be curated or AI-generated.
 model ProjectPhaseEntry {
-  id              String            @id @default(cuid())
-  projectId       String
-  phase           String
-  promptKey       String            // Identifies which prompt/exercise
-  question        String            @db.Text
-  response        String?           @db.Text
-  aiReflection    String?           @db.Text
-  status          String            @default("pending") // "pending" | "completed" | "skipped"
-  order           Int               @default(0)
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  id           String   @id @default(cuid())
+  projectId    String
+  phase        String
+  promptKey    String // Identifies which prompt/exercise
+  question     String   @db.Text
+  response     String?  @db.Text
+  aiReflection String?  @db.Text
+  status       String   @default("pending") // "pending" | "completed" | "skipped"
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  project         PersonalProject   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project PersonalProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([projectId, phase, order])
 }
 
 /// Self-defined focus area — user defines, AI challenges.
 model ProjectFocusArea {
-  id              String            @id @default(cuid())
-  projectId       String
-  title           String
-  description     String?           @db.Text
-  priority        Int               @default(0)
-  status          String            @default("active") // "active" | "completed" | "dropped"
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  id          String   @id @default(cuid())
+  projectId   String
+  title       String
+  description String?  @db.Text
+  priority    Int      @default(0)
+  status      String   @default("active") // "active" | "completed" | "dropped"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  project         PersonalProject   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  steps           ProjectStep[]
+  project PersonalProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  steps   ProjectStep[]
 
   @@index([projectId, status])
 }
 
 /// Concrete action step within a focus area (ACT phase).
 model ProjectStep {
-  id              String            @id @default(cuid())
-  focusAreaId     String
-  description     String
-  completed       Boolean           @default(false)
-  completedAt     DateTime?
-  dueDate         DateTime?
-  reflection      String?           @db.Text
-  order           Int               @default(0)
-  createdAt       DateTime          @default(now())
+  id          String    @id @default(cuid())
+  focusAreaId String
+  description String
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  dueDate     DateTime?
+  reflection  String?   @db.Text
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
 
-  focusArea       ProjectFocusArea  @relation(fields: [focusAreaId], references: [id], onDelete: Cascade)
+  focusArea ProjectFocusArea @relation(fields: [focusAreaId], references: [id], onDelete: Cascade)
 
   @@index([focusAreaId, completed])
 }
 
 /// Free-form reflections captured at any point.
 model ProjectReflection {
-  id              String            @id @default(cuid())
-  projectId       String
-  phase           String
-  type            String            @default("free") // "free" | "prompted" | "milestone" | "phase_transition"
-  content         String            @db.Text
-  aiChallenge     String?           @db.Text
-  createdAt       DateTime          @default(now())
+  id          String   @id @default(cuid())
+  projectId   String
+  phase       String
+  type        String   @default("free") // "free" | "prompted" | "milestone" | "phase_transition"
+  content     String   @db.Text
+  aiChallenge String?  @db.Text
+  createdAt   DateTime @default(now())
 
-  project         PersonalProject   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project PersonalProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([projectId, createdAt])
 }
 
 /// AI-generated observations about patterns the user might not see.
 model ProjectInsight {
-  id              String            @id @default(cuid())
-  projectId       String
-  type            String            // "blind_spot" | "pattern" | "growth" | "avoidance" | "shift"
-  content         String            @db.Text
-  phase           String
-  acknowledged    Boolean           @default(false)
-  createdAt       DateTime          @default(now())
+  id           String   @id @default(cuid())
+  projectId    String
+  type         String // "blind_spot" | "pattern" | "growth" | "avoidance" | "shift"
+  content      String   @db.Text
+  phase        String
+  acknowledged Boolean  @default(false)
+  createdAt    DateTime @default(now())
 
-  project         PersonalProject   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project PersonalProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([projectId, acknowledged])
 }
@@ -1274,9 +1276,9 @@ model ProjectInsight {
 model DiaryEntry {
   id        String   @id @default(cuid())
   userId    String
-  content   String   @db.Text          // plain-text fallback / search index
-  blocks    Json?                       // BlockNote block array (rich content)
-  mood      String?  // "great" | "good" | "neutral" | "bad" | "awful"
+  content   String   @db.Text // plain-text fallback / search index
+  blocks    Json? // BlockNote block array (rich content)
+  mood      String? // "great" | "good" | "neutral" | "bad" | "awful"
   tags      String[] @default([]) // user-selected emotional tags
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1289,19 +1291,19 @@ model DiaryEntry {
 // ─── Blog / News ────────────────────────────────────────────────────────────
 
 model BlogPost {
-  id          String   @id @default(cuid())
-  slug        String   @unique
+  id          String    @id @default(cuid())
+  slug        String    @unique
   title       String
-  excerpt     String?  @db.Text  // short summary for cards / SEO
-  content     String   @db.Text  // plain-text fallback / search
-  blocks      Json?              // BlockNote rich content
-  coverImage  String?            // URL to cover image
-  tags        String[] @default([])
-  status      String   @default("draft") // draft | published | archived
-  authorName  String   @default("Equipo Luciernaga")
+  excerpt     String?   @db.Text // short summary for cards / SEO
+  content     String    @db.Text // plain-text fallback / search
+  blocks      Json? // BlockNote rich content
+  coverImage  String? // URL to cover image
+  tags        String[]  @default([])
+  status      String    @default("draft") // draft | published | archived
+  authorName  String    @default("Equipo Tres Mil Millones de Latidos")
   publishedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([status, publishedAt])
   @@index([slug])
@@ -1311,11 +1313,11 @@ model BlogPost {
 
 /// A badge the user has earned.
 model UserBadge {
-  id        String   @id @default(cuid())
-  userId    String
-  badge     String   // badge key: "first_project", "streak_7d", "streak_30d", "phase_completed", "first_goal", "invite_used", "diary_7d", "community_first"
-  earnedAt  DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id       String   @id @default(cuid())
+  userId   String
+  badge    String // badge key: "first_project", "streak_7d", "streak_30d", "phase_completed", "first_goal", "invite_used", "diary_7d", "community_first"
+  earnedAt DateTime @default(now())
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, badge])
   @@index([userId])
@@ -1325,23 +1327,23 @@ model UserBadge {
 
 /// Structured community post — guided format, not free text.
 model CommunityPost {
-  id         String          @id @default(cuid())
+  id         String            @id @default(cuid())
   userId     String
   circleId   String?
   spaceId    String?
-  type       String          @default("reflection") // "reflection" | "victory" | "commitment" | "question"
-  feeling    String?         // "Hoy me siento..."
-  blocker    String?         // "Lo que me frena es..."
-  step       String?         // "Mi paso de hoy es..."
-  content    String?         @db.Text
+  type       String            @default("reflection") // "reflection" | "victory" | "commitment" | "question"
+  feeling    String? // "Hoy me siento..."
+  blocker    String? // "Lo que me frena es..."
+  step       String? // "Mi paso de hoy es..."
+  content    String?           @db.Text
   phase      String?
-  anonymous  Boolean         @default(true)
-  likes      Int             @default(0)
-  hidden     Boolean         @default(false)
-  createdAt  DateTime        @default(now())
-  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  circle     Circle?         @relation(fields: [circleId], references: [id], onDelete: SetNull)
-  space      CommunitySpace? @relation(fields: [spaceId], references: [id], onDelete: SetNull)
+  anonymous  Boolean           @default(true)
+  likes      Int               @default(0)
+  hidden     Boolean           @default(false)
+  createdAt  DateTime          @default(now())
+  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  circle     Circle?           @relation(fields: [circleId], references: [id], onDelete: SetNull)
+  space      CommunitySpace?   @relation(fields: [spaceId], references: [id], onDelete: SetNull)
   heartbeats Heartbeat[]
   reports    CommunityReport[]
 
@@ -1356,35 +1358,105 @@ model CommunityPost {
 /// Consumed by src/app/api/community/report/route.ts — 3 pending reports
 /// auto-hide the post; self_harm reports also page admin via Telegram.
 model CommunityReport {
-  id             String         @id @default(cuid())
-  postId         String?        // nullable — reports can target posts, anon questions or anon answers
-  anonQuestionId String?
-  anonAnswerId   String?
-  reporterId     String
-  reason         String         // "harmful" | "self_harm" | "harassment" | "spam" | "other"
-  details        String?
-  status         String         @default("pending") // "pending" | "reviewed" | "dismissed"
-  createdAt      DateTime       @default(now())
-  post           CommunityPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
-  anonQuestion   AnonQuestion?  @relation("ReportOnQuestion", fields: [anonQuestionId], references: [id], onDelete: Cascade)
-  anonAnswer     AnonAnswer?    @relation("ReportOnAnswer", fields: [anonAnswerId], references: [id], onDelete: Cascade)
-  reporter       User           @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  id                   String              @id @default(cuid())
+  postId               String? // nullable — reports can target posts, anon items or daily-round items
+  anonQuestionId       String?
+  anonAnswerId         String?
+  dailyRoundResponseId String?
+  dailyRoundMirrorId   String?
+  reporterId           String
+  reason               String // "harmful" | "self_harm" | "harassment" | "spam" | "other"
+  details              String?
+  status               String              @default("pending") // "pending" | "reviewed" | "dismissed"
+  createdAt            DateTime            @default(now())
+  post                 CommunityPost?      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  anonQuestion         AnonQuestion?       @relation("ReportOnQuestion", fields: [anonQuestionId], references: [id], onDelete: Cascade)
+  anonAnswer           AnonAnswer?         @relation("ReportOnAnswer", fields: [anonAnswerId], references: [id], onDelete: Cascade)
+  dailyRoundResponse   DailyRoundResponse? @relation(fields: [dailyRoundResponseId], references: [id], onDelete: Cascade)
+  dailyRoundMirror     DailyRoundMirror?   @relation(fields: [dailyRoundMirrorId], references: [id], onDelete: Cascade)
+  reporter             User                @relation(fields: [reporterId], references: [id], onDelete: Cascade)
 
   @@index([reporterId, createdAt])
   @@index([postId, status])
   @@index([anonQuestionId, status])
   @@index([anonAnswerId, status])
+  @@index([dailyRoundResponseId, status])
+  @@index([dailyRoundMirrorId, status])
   @@index([status, createdAt])
+}
+
+// ─── Community: Ronda Diaria (Cafetería) ─────────────────────────────────────
+
+/// Prompt único del día en la Cafetería. Creado por el cron daily-round-create.
+model DailyRound {
+  id        String               @id @default(cuid())
+  date      DateTime             @unique @db.Date
+  prompt    String               @db.Text
+  createdAt DateTime             @default(now())
+  responses DailyRoundResponse[]
+
+  @@index([date])
+}
+
+/// Respuesta del usuario a la ronda del día (una por usuario por ronda).
+model DailyRoundResponse {
+  id        String               @id @default(cuid())
+  roundId   String
+  userId    String
+  content   String               @db.Text
+  anonymous Boolean              @default(true)
+  hidden    Boolean              @default(false)
+  createdAt DateTime             @default(now())
+  round     DailyRound           @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reactions DailyRoundReaction[]
+  mirrors   DailyRoundMirror[]
+  reports   CommunityReport[]
+
+  @@unique([roundId, userId])
+  @@index([roundId, createdAt])
+  @@index([userId, createdAt])
+}
+
+/// Reacción emoji a una respuesta (una por usuario por respuesta; re-tap sustituye).
+model DailyRoundReaction {
+  id         String             @id @default(cuid())
+  responseId String
+  userId     String
+  emoji      String // allowlist aplicada en API
+  createdAt  DateTime           @default(now())
+  response   DailyRoundResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([responseId, userId])
+  @@index([responseId])
+}
+
+/// Pregunta-espejo enviada a una respuesta. 1 por autor por respuesta, max 3 por respuesta.
+model DailyRoundMirror {
+  id         String             @id @default(cuid())
+  responseId String
+  authorId   String
+  question   String             @db.Text
+  hidden     Boolean            @default(false)
+  createdAt  DateTime           @default(now())
+  response   DailyRoundResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  author     User               @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  reports    CommunityReport[]
+
+  @@unique([responseId, authorId])
+  @@index([responseId, createdAt])
+  @@index([authorId, createdAt])
 }
 
 // ─── Marketing Dashboard ──────────────────────────────────────────────────────
 
 model BroadcastLog {
   id             String    @id @default(cuid())
-  channel        String    // "telegram" | "email"
-  segment        String    // audience segment key
+  channel        String // "telegram" | "email"
+  segment        String // audience segment key
   message        String
-  subject        String?   // only for email
+  subject        String? // only for email
   recipientCount Int
   successCount   Int       @default(0)
   failureCount   Int       @default(0)
@@ -1402,12 +1474,12 @@ model BroadcastLog {
 /// Immutable record of who accessed or modified sensitive clinical data.
 model AuditLog {
   id         String   @id @default(cuid())
-  actorId    String   // who performed the action
-  actorType  String   // "user" | "admin" | "orgAdmin" | "system"
-  action     String   // "read" | "create" | "update" | "delete" | "export" | "login"
-  resource   String   // model name: "ClinicalNote" | "Assessment" | "User" | etc.
-  resourceId String?  // id of the affected record
-  metadata   Json?    // extra context (e.g. fields changed, export format)
+  actorId    String // who performed the action
+  actorType  String // "user" | "admin" | "orgAdmin" | "system"
+  action     String // "read" | "create" | "update" | "delete" | "export" | "login"
+  resource   String // model name: "ClinicalNote" | "Assessment" | "User" | etc.
+  resourceId String? // id of the affected record
+  metadata   Json? // extra context (e.g. fields changed, export format)
   ip         String?
   userAgent  String?
   createdAt  DateTime @default(now())
@@ -1437,16 +1509,16 @@ enum CircleRole {
 
 /// A small group (5-8 people) in the same transformation phase.
 model Circle {
-  id          String      @id @default(cuid())
+  id          String            @id @default(cuid())
   name        String
   phase       CirclePhase
-  maxMembers  Int         @default(8)
+  maxMembers  Int               @default(8)
   description String?
-  startsAt    DateTime    @default(now())
+  startsAt    DateTime          @default(now())
   endsAt      DateTime?
-  isActive    Boolean     @default(true)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  isActive    Boolean           @default(true)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
   members     CircleMember[]
   posts       CommunityPost[]
   commitments DailyCommitment[]
@@ -1492,7 +1564,7 @@ model CommunitySpace {
   slug        String          @unique
   name        String
   description String?
-  icon        String?         // emoji
+  icon        String? // emoji
   sortOrder   Int             @default(0)
   isActive    Boolean         @default(true)
   posts       CommunityPost[]
@@ -1500,12 +1572,12 @@ model CommunitySpace {
 
 /// "Latido" reaction — instead of likes.
 model Heartbeat {
-  id        String   @id @default(cuid())
+  id        String        @id @default(cuid())
   postId    String
   userId    String
-  createdAt DateTime @default(now())
+  createdAt DateTime      @default(now())
   post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([postId, userId])
 }
@@ -1537,7 +1609,7 @@ model LiveSession {
   title       String
   description String?
   hostName    String
-  hostRole    String   // "coach" | "psychologist"
+  hostRole    String // "coach" | "psychologist"
   scheduledAt DateTime
   durationMin Int      @default(60)
   meetingUrl  String?
@@ -1555,9 +1627,9 @@ model LiveSession {
 /// Anonymous question asked to the community or to a specific user.
 model AnonQuestion {
   id             String            @id @default(cuid())
-  content        String            // the question text (max 500)
-  authorId       String?           // null = truly anonymous (not logged in — future)
-  targetId       String?           // null = asked to everyone; set = asked to specific user
+  content        String // the question text (max 500)
+  authorId       String? // null = truly anonymous (not logged in — future)
+  targetId       String? // null = asked to everyone; set = asked to specific user
   hidden         Boolean           @default(false) // moderation
   crisisDetected Boolean           @default(false) // flagged by content-safety as crisis
   createdAt      DateTime          @default(now())
@@ -1577,15 +1649,15 @@ model AnonAnswer {
   id         String            @id @default(cuid())
   questionId String
   userId     String
-  content    String             // max 1000
-  anonymous  Boolean            @default(false)
-  likes      Int                @default(0)  // kept for back-compat; new votes use AnonAnswerVote
-  hidden     Boolean            @default(false)
-  createdAt  DateTime           @default(now())
-  question   AnonQuestion       @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content    String // max 1000
+  anonymous  Boolean           @default(false)
+  likes      Int               @default(0) // kept for back-compat; new votes use AnonAnswerVote
+  hidden     Boolean           @default(false)
+  createdAt  DateTime          @default(now())
+  question   AnonQuestion      @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   votes      AnonAnswerVote[]
-  reports    CommunityReport[]  @relation("ReportOnAnswer")
+  reports    CommunityReport[] @relation("ReportOnAnswer")
 
   @@index([questionId, createdAt])
   @@index([questionId, hidden])
@@ -1611,9 +1683,9 @@ model PushSubscription {
   id        String   @id @default(cuid())
   userId    String
   endpoint  String   @db.Text
-  p256dh    String   // encryption key
-  auth      String   // auth secret
-  userAgent String?  // browser/device identifier
+  p256dh    String // encryption key
+  auth      String // auth secret
+  userAgent String? // browser/device identifier
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -1627,8 +1699,8 @@ model Notification {
   userId    String
   title     String
   body      String
-  url       String?   // deep link to open on click
-  icon      String?   // emoji or icon key
+  url       String? // deep link to open on click
+  icon      String? // emoji or icon key
   channel   String    @default("system") // "system" | "goal" | "streak" | "crisis" | "insight" | "challenge" | "admin"
   read      Boolean   @default(false)
   pushed    Boolean   @default(false) // was a web push sent?
@@ -1648,9 +1720,9 @@ model Notification {
 model UserFile {
   id        String   @id @default(cuid())
   userId    String
-  name      String   // original filename
-  mimeType  String   // e.g. "image/png"
-  size      Int      // bytes
+  name      String // original filename
+  mimeType  String // e.g. "image/png"
+  size      Int // bytes
   data      String   @db.Text // base64 data URL
   source    String   @default("upload") // "upload" | "chat" | "avatar"
   createdAt DateTime @default(now())
@@ -1677,4 +1749,94 @@ model MediaAsset {
   data      String   @db.Text
   updatedAt DateTime @updatedAt
   updatedBy String?
+}
+
+model SystemLog {
+  id         String   @id @default(cuid())
+  timestamp  DateTime @default(now())
+  level      String
+  tag        String
+  message    String   @db.Text
+  context    Json?
+  userId     String?
+  route      String?
+  statusCode Int?
+  durationMs Int?
+  stack      String?  @db.Text
+
+  @@index([level, timestamp])
+  @@index([tag, timestamp])
+  @@index([userId, timestamp])
+  @@index([timestamp])
+}
+
+model EmailLog {
+  id           String    @id @default(cuid())
+  userId       String?
+  to           String
+  template     String
+  subject      String
+  status       String    @default("queued")
+  providerId   String?
+  errorMessage String?   @db.Text
+  sentAt       DateTime?
+  deliveredAt  DateTime?
+  bouncedAt    DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+  @@index([template, createdAt])
+  @@index([to, createdAt])
+}
+
+model CronRunLog {
+  id               String    @id @default(cuid())
+  jobName          String
+  status           String    @default("running")
+  startedAt        DateTime  @default(now())
+  finishedAt       DateTime?
+  durationMs       Int?
+  recordsProcessed Int?
+  errorMessage     String?   @db.Text
+  metadata         Json?
+
+  @@index([jobName, startedAt])
+  @@index([status, startedAt])
+  @@index([startedAt])
+}
+
+model WebhookLog {
+  id             String    @id @default(cuid())
+  source         String
+  event          String?
+  status         String    @default("received")
+  signatureValid Boolean?
+  statusCode     Int?
+  durationMs     Int?
+  errorMessage   String?   @db.Text
+  payload        Json?
+  receivedAt     DateTime  @default(now())
+  processedAt    DateTime?
+
+  @@index([source, receivedAt])
+  @@index([status, receivedAt])
+  @@index([receivedAt])
+}
+
+model AlertRule {
+  id              String    @id @default(cuid())
+  name            String
+  enabled         Boolean   @default(true)
+  level           String
+  tagPattern      String?
+  messagePattern  String?
+  channel         String    @default("telegram")
+  throttleMinutes Int       @default(15)
+  lastFiredAt     DateTime?
+  firedCount      Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([enabled, level])
 }

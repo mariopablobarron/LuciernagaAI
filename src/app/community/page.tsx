@@ -45,9 +45,34 @@ type Session = {
 
 type Tab = "victories" | "spaces" | "circle" | "questions" | "coaches";
 
+type QuestionAnswer = {
+  id: string;
+  content: string;
+  author: string | null;
+  isOwn: boolean;
+  helpfulCount: number;
+  helpfulByMe: boolean;
+  createdAt: string;
+};
+
 type Question = {
-  id: string; content: string; isForMe: boolean; answerCount: number; createdAt: string;
-  answers: Array<{ id: string; content: string; author: string | null; isOwn: boolean; likes: number; createdAt: string }>;
+  id: string;
+  content: string;
+  isForMe: boolean;
+  answerCount: number;
+  answersFull: boolean;
+  crisisDetected: boolean;
+  topAnswerId: string | null;
+  createdAt: string;
+  answers: QuestionAnswer[];
+};
+
+type QuestionsFilter = "community" | "personal" | "mine";
+
+type GuardianClassification = {
+  isPrescriptive: boolean;
+  suggestedReformulation: string | null;
+  reasoning: string;
 };
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -79,9 +104,12 @@ export default function CommunityPage() {
   const [commitments, setCommitments] = useState<Commitment[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [questionsFilter, setQuestionsFilter] = useState<QuestionsFilter>("community");
   const [questionText, setQuestionText] = useState("");
   const [answerText, setAnswerText] = useState("");
   const [answeringId, setAnsweringId] = useState<string | null>(null);
+  const [guardian, setGuardian] = useState<GuardianClassification | null>(null);
+  const [guardianLoading, setGuardianLoading] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Post form state
@@ -118,7 +146,9 @@ export default function CommunityPage() {
           setCommitments(commitsData.commitments ?? []);
         }
       } else if (t === "questions") {
-        const res = await fetch("/api/community/questions", { credentials: "include" });
+        const res = await fetch(`/api/community/questions?filter=${questionsFilter}`, {
+          credentials: "include",
+        });
         const data = (await res.json()) as { questions: Question[] };
         setQuestions(data.questions ?? []);
       } else if (t === "coaches") {
@@ -131,7 +161,7 @@ export default function CommunityPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [questionsFilter]);
 
   useEffect(() => { void fetchData(tab); }, [tab, fetchData]);
 
@@ -224,21 +254,68 @@ export default function CommunityPage() {
     finally { setPosting(false); }
   }
 
-  async function handleAnswer(questionId: string) {
+  async function handleCheckAnswer() {
     if (!answerText.trim()) return;
+    setGuardianLoading(true);
+    setGuardian(null);
+    try {
+      const res = await fetch("/api/community/questions/check-answer", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: answerText }),
+      });
+      if (res.status === 422) {
+        toast.error("Tu respuesta contiene contenido que no podemos publicar.");
+        return;
+      }
+      const data = (await res.json()) as { classification: GuardianClassification | null };
+      setGuardian(data.classification ?? null);
+    } catch {
+      // Guardian is best-effort; if it fails, allow publishing anyway.
+      setGuardian(null);
+    } finally {
+      setGuardianLoading(false);
+    }
+  }
+
+  async function submitAnswer(questionId: string, content: string) {
     setPosting(true);
     try {
-      await fetch("/api/community/questions", {
-        method: "POST", credentials: "include",
+      const res = await fetch("/api/community/questions", {
+        method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answerId: questionId, answerContent: answerText, anonymous: false }),
+        body: JSON.stringify({ answerId: questionId, answerContent: content, anonymous: false }),
       });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string; message?: string };
+        toast.error(data.message ?? "No se pudo publicar la respuesta");
+        return;
+      }
       setAnswerText("");
       setAnsweringId(null);
+      setGuardian(null);
       toast.success("Respuesta publicada");
       void fetchData("questions");
-    } catch { toast.error("Error"); }
-    finally { setPosting(false); }
+    } finally {
+      setPosting(false);
+    }
+  }
+
+  async function handleVoteHelpful(answerId: string) {
+    const res = await fetch(`/api/community/answers/${answerId}/helpful`, {
+      method: "POST",
+      credentials: "include",
+    });
+    if (!res.ok) {
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      if (data.error === "SELF_VOTE_FORBIDDEN") {
+        toast.error("No puedes votar tu propia respuesta.");
+      }
+      return;
+    }
+    void fetchData("questions");
   }
 
   const TABS: { key: Tab; label: string; icon: React.ReactNode }[] = [
@@ -539,6 +616,27 @@ export default function CommunityPage() {
         {/* ── Tab: Questions (ask.fm style) ────────────────────────────── */}
         {tab === "questions" && (
           <div className="space-y-4">
+            {/* Filter tabs */}
+            <div className="flex gap-2">
+              {([
+                { key: "community", label: "Comunidad" },
+                { key: "personal", label: "Para ti" },
+                { key: "mine", label: "Mías" },
+              ] as const).map((f) => (
+                <button
+                  key={f.key}
+                  onClick={() => setQuestionsFilter(f.key)}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold border transition-colors ${
+                    questionsFilter === f.key
+                      ? "border-violet-500/40 bg-violet-500/15 text-violet-300"
+                      : "border-zinc-700 bg-zinc-900/60 text-zinc-400 hover:text-zinc-200"
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+
             {/* Ask */}
             <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-3">
               <p className="text-sm font-semibold text-white flex items-center gap-2">
@@ -573,7 +671,13 @@ export default function CommunityPage() {
             ) : questions.length === 0 ? (
               <div className="text-center py-12 space-y-2">
                 <HelpCircle className="w-10 h-10 text-zinc-700 mx-auto" />
-                <p className="text-zinc-500">Aún no hay preguntas. Sé el primero.</p>
+                <p className="text-zinc-500">
+                  {questionsFilter === "mine"
+                    ? "Aún no has hecho ninguna pregunta."
+                    : questionsFilter === "personal"
+                      ? "Nadie te ha hecho preguntas directas."
+                      : "Aún no hay preguntas. Sé el primero."}
+                </p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -582,70 +686,178 @@ export default function CommunityPage() {
                     {/* Question */}
                     <div className="p-5">
                       <p className="text-base text-white font-medium leading-relaxed">{q.content}</p>
-                      <div className="flex items-center gap-3 mt-3 text-xs text-zinc-500">
+                      <div className="flex flex-wrap items-center gap-3 mt-3 text-xs text-zinc-500">
                         <span>{q.answerCount} {q.answerCount === 1 ? "respuesta" : "respuestas"}</span>
                         <span>{timeAgo(q.createdAt)}</span>
-                        {q.isForMe && (
-                          <span className="text-cyan-400 font-semibold">Para ti</span>
+                        {q.isForMe && <span className="text-cyan-400 font-semibold">Para ti</span>}
+                        {q.answersFull && (
+                          <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-300">
+                            Tope de respuestas alcanzado
+                          </span>
+                        )}
+                        {q.crisisDetected && (
+                          <span className="rounded-full border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-[10px] font-semibold text-red-300">
+                            Derivada a atención profesional
+                          </span>
+                        )}
+                        {q.answerCount === 0 && !q.crisisDetected && (
+                          <span className="rounded-full border border-violet-500/30 bg-violet-500/10 px-2 py-0.5 text-[10px] font-semibold text-violet-300">
+                            Sin respuesta aún
+                          </span>
                         )}
                       </div>
+                      {q.crisisDetected && (
+                        <div className="mt-3 rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-xs text-red-200">
+                          Esta pregunta contiene señales de crisis. Respuestas comunitarias
+                          deshabilitadas. Si estás en crisis, llama al <strong>024</strong>.
+                        </div>
+                      )}
                     </div>
 
                     {/* Answers */}
                     {q.answers.length > 0 && (
                       <div className="border-t border-zinc-800 divide-y divide-zinc-800/50">
-                        {q.answers.map((a) => (
-                          <div key={a.id} className="px-5 py-3 bg-zinc-950/50">
-                            <p className="text-sm text-zinc-300 leading-relaxed">{a.content}</p>
-                            <div className="flex items-center gap-3 mt-2 text-xs text-zinc-600">
-                              <span>{a.author ?? "Anónimo"}</span>
-                              <span>{timeAgo(a.createdAt)}</span>
-                              <button className="inline-flex items-center gap-1 hover:text-fuchsia-400 transition-colors">
-                                <Heart className="w-3 h-3" /> {a.likes}
-                              </button>
+                        {q.answers.map((a) => {
+                          const isTop = q.topAnswerId === a.id && a.helpfulCount > 0;
+                          return (
+                            <div
+                              key={a.id}
+                              className={`px-5 py-3 ${
+                                isTop
+                                  ? "bg-emerald-500/5 border-l-2 border-emerald-500/40"
+                                  : "bg-zinc-950/50"
+                              }`}
+                            >
+                              {isTop && (
+                                <div className="mb-1 inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">
+                                  <CheckCircle2 className="h-3 w-3" /> Más útil
+                                </div>
+                              )}
+                              <p className="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap">
+                                {a.content}
+                              </p>
+                              <div className="flex items-center gap-3 mt-2 text-xs text-zinc-600">
+                                <span>{a.author ?? "Anónimo"}</span>
+                                <span>{timeAgo(a.createdAt)}</span>
+                                <button
+                                  onClick={() => !a.isOwn && void handleVoteHelpful(a.id)}
+                                  disabled={a.isOwn}
+                                  className={`inline-flex items-center gap-1 transition-colors ${
+                                    a.helpfulByMe
+                                      ? "text-fuchsia-400"
+                                      : a.isOwn
+                                        ? "text-zinc-700 cursor-not-allowed"
+                                        : "hover:text-fuchsia-400"
+                                  }`}
+                                  title={a.isOwn ? "No puedes votar tu propia respuesta" : "Me ayudó"}
+                                >
+                                  <Heart
+                                    className={`w-3 h-3 ${a.helpfulByMe ? "fill-fuchsia-400" : ""}`}
+                                  />
+                                  {a.helpfulCount > 0 && <span>{a.helpfulCount}</span>}
+                                  <span className="ml-0.5">me ayudó</span>
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
 
                     {/* Answer form */}
-                    <div className="border-t border-zinc-800 p-4">
-                      {answeringId === q.id ? (
-                        <div className="space-y-2">
-                          <textarea
-                            value={answerText}
-                            onChange={(e) => setAnswerText(e.target.value)}
-                            placeholder="Tu respuesta..."
-                            rows={2}
-                            maxLength={1000}
-                            className="w-full rounded-lg border border-zinc-700 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-zinc-600 resize-none focus:border-violet-500/50 focus:outline-none"
-                          />
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => void handleAnswer(q.id)}
-                              disabled={!answerText.trim() || posting}
-                              className="rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500 disabled:opacity-40"
-                            >
-                              Responder
-                            </button>
-                            <button
-                              onClick={() => { setAnsweringId(null); setAnswerText(""); }}
-                              className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs text-zinc-400 hover:text-white"
-                            >
-                              Cancelar
-                            </button>
+                    {!q.crisisDetected && !q.answersFull && (
+                      <div className="border-t border-zinc-800 p-4">
+                        {answeringId === q.id ? (
+                          <div className="space-y-2">
+                            <textarea
+                              value={answerText}
+                              onChange={(e) => { setAnswerText(e.target.value); setGuardian(null); }}
+                              placeholder="¿Qué pregunta le harías tú?"
+                              rows={3}
+                              maxLength={1000}
+                              className="w-full rounded-lg border border-zinc-700 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-zinc-600 resize-none focus:border-violet-500/50 focus:outline-none"
+                            />
+
+                            {/* Guardian suggestion */}
+                            {guardian && guardian.isPrescriptive && guardian.suggestedReformulation && (
+                              <div className="rounded-lg border border-fuchsia-500/30 bg-fuchsia-500/5 p-3 space-y-2">
+                                <p className="text-[10px] font-semibold uppercase tracking-wider text-fuchsia-300">
+                                  Sugerencia pedagógica
+                                </p>
+                                <p className="text-xs text-zinc-400 italic">
+                                  Parece un consejo directo. ¿Y si lo plantearas como pregunta?
+                                </p>
+                                <p className="text-sm text-white bg-black/40 rounded p-2 whitespace-pre-wrap">
+                                  {guardian.suggestedReformulation}
+                                </p>
+                                <div className="flex flex-wrap gap-2 pt-1">
+                                  <button
+                                    onClick={() =>
+                                      void submitAnswer(q.id, guardian.suggestedReformulation!)
+                                    }
+                                    disabled={posting}
+                                    className="rounded-lg bg-fuchsia-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-fuchsia-500 disabled:opacity-40"
+                                  >
+                                    Publicar reformulada
+                                  </button>
+                                  <button
+                                    onClick={() => void submitAnswer(q.id, answerText)}
+                                    disabled={posting}
+                                    className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs text-zinc-300 hover:text-white"
+                                  >
+                                    Publicar original
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
+                            <div className="flex gap-2 items-center">
+                              {!guardian ? (
+                                <button
+                                  onClick={() => void handleCheckAnswer()}
+                                  disabled={!answerText.trim() || guardianLoading || posting}
+                                  className="rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500 disabled:opacity-40"
+                                >
+                                  {guardianLoading ? "Revisando..." : "Revisar y responder"}
+                                </button>
+                              ) : guardian.isPrescriptive ? null : (
+                                <button
+                                  onClick={() => void submitAnswer(q.id, answerText)}
+                                  disabled={posting}
+                                  className="rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500 disabled:opacity-40"
+                                >
+                                  Publicar
+                                </button>
+                              )}
+                              <button
+                                onClick={() => {
+                                  setAnsweringId(null);
+                                  setAnswerText("");
+                                  setGuardian(null);
+                                }}
+                                className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs text-zinc-400 hover:text-white"
+                              >
+                                Cancelar
+                              </button>
+                              <span className="ml-auto text-[10px] text-zinc-600">
+                                {answerText.length}/1000
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => setAnsweringId(q.id)}
-                          className="text-xs text-violet-400 hover:text-violet-300 font-medium transition-colors"
-                        >
-                          Responder a esta pregunta
-                        </button>
-                      )}
-                    </div>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setAnsweringId(q.id);
+                              setAnswerText("");
+                              setGuardian(null);
+                            }}
+                            className="text-xs text-violet-400 hover:text-violet-300 font-medium transition-colors"
+                          >
+                            Responder con una pregunta
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

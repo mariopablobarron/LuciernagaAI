@@ -2,29 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { resolveIdentity, InvalidSessionTokenError } from "@/lib/auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
+import { areFieldsSafe } from "@/lib/content-safety";
 
 export const dynamic = "force-dynamic";
-
-// ─── Content safety filter ──────────────────────────────────────────────────
-
-const BLOCKED_PATTERNS = [
-  /\b(matar|suicid|autolesion|violar?|viola\b|porn|nazi|terroris|bomb[ae])\b/i,
-  /\b(me quiero morir|quiero matarme|hacerme da[nñ]o)\b/i,
-  /\b(odio a|te voy a|voy a hacerte)\b/i,
-];
-
-function isContentSafe(text: string): boolean {
-  const normalized = text
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/\s+/g, " ")
-    .toLowerCase();
-  return !BLOCKED_PATTERNS.some((p) => p.test(normalized));
-}
-
-function validateAllFields(...fields: (string | null | undefined)[]): boolean {
-  return fields.filter(Boolean).every((f) => isContentSafe(f!));
-}
 
 // ─── GET /api/community/posts ───────────────────────────────────────────────
 
@@ -123,7 +103,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Content safety check
-    if (!validateAllFields(body.feeling, body.blocker, body.step, body.content)) {
+    if (!areFieldsSafe(body.feeling, body.blocker, body.step, body.content)) {
       logInfo("COMMUNITY", "post_blocked_by_filter", { userId: identity.userId, type });
       return NextResponse.json(
         { error: "CONTENT_BLOCKED", message: "Tu mensaje contiene contenido que no podemos publicar. Si estas en crisis, llama al 024." },

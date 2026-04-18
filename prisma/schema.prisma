@@ -100,6 +100,7 @@ model User {
   questionsAsked    AnonQuestion[]  @relation("QuestionsAsked")
   questionsReceived AnonQuestion[]  @relation("QuestionsReceived")
   anonAnswers       AnonAnswer[]
+  anonAnswerVotes   AnonAnswerVote[]
   preferences     UserPreferences?
   trustedContact  TrustedContact?
   supportMessages SupportMessage[]
@@ -1355,18 +1356,24 @@ model CommunityPost {
 /// Consumed by src/app/api/community/report/route.ts — 3 pending reports
 /// auto-hide the post; self_harm reports also page admin via Telegram.
 model CommunityReport {
-  id         String        @id @default(cuid())
-  postId     String
-  reporterId String
-  reason     String        // "harmful" | "self_harm" | "harassment" | "spam" | "other"
-  details    String?
-  status     String        @default("pending") // "pending" | "reviewed" | "dismissed"
-  createdAt  DateTime      @default(now())
-  post       CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  reporter   User          @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  id             String         @id @default(cuid())
+  postId         String?        // nullable — reports can target posts, anon questions or anon answers
+  anonQuestionId String?
+  anonAnswerId   String?
+  reporterId     String
+  reason         String         // "harmful" | "self_harm" | "harassment" | "spam" | "other"
+  details        String?
+  status         String         @default("pending") // "pending" | "reviewed" | "dismissed"
+  createdAt      DateTime       @default(now())
+  post           CommunityPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  anonQuestion   AnonQuestion?  @relation("ReportOnQuestion", fields: [anonQuestionId], references: [id], onDelete: Cascade)
+  anonAnswer     AnonAnswer?    @relation("ReportOnAnswer", fields: [anonAnswerId], references: [id], onDelete: Cascade)
+  reporter       User           @relation(fields: [reporterId], references: [id], onDelete: Cascade)
 
   @@index([reporterId, createdAt])
   @@index([postId, status])
+  @@index([anonQuestionId, status])
+  @@index([anonAnswerId, status])
   @@index([status, createdAt])
 }
 
@@ -1547,34 +1554,54 @@ model LiveSession {
 
 /// Anonymous question asked to the community or to a specific user.
 model AnonQuestion {
-  id          String        @id @default(cuid())
-  content     String        // the question text (max 500)
-  authorId    String?       // null = truly anonymous (not logged in — future)
-  targetId    String?       // null = asked to everyone; set = asked to specific user
-  hidden      Boolean       @default(false) // moderation
-  createdAt   DateTime      @default(now())
-  author      User?         @relation("QuestionsAsked", fields: [authorId], references: [id], onDelete: SetNull)
-  target      User?         @relation("QuestionsReceived", fields: [targetId], references: [id], onDelete: SetNull)
-  answers     AnonAnswer[]
+  id             String            @id @default(cuid())
+  content        String            // the question text (max 500)
+  authorId       String?           // null = truly anonymous (not logged in — future)
+  targetId       String?           // null = asked to everyone; set = asked to specific user
+  hidden         Boolean           @default(false) // moderation
+  crisisDetected Boolean           @default(false) // flagged by content-safety as crisis
+  createdAt      DateTime          @default(now())
+  author         User?             @relation("QuestionsAsked", fields: [authorId], references: [id], onDelete: SetNull)
+  target         User?             @relation("QuestionsReceived", fields: [targetId], references: [id], onDelete: SetNull)
+  answers        AnonAnswer[]
+  reports        CommunityReport[] @relation("ReportOnQuestion")
 
   @@index([targetId, createdAt])
   @@index([hidden, createdAt])
+  @@index([crisisDetected])
+  @@index([targetId, hidden, createdAt])
 }
 
 /// Answer to an anonymous question — can also be anonymous.
 model AnonAnswer {
-  id         String       @id @default(cuid())
+  id         String            @id @default(cuid())
   questionId String
   userId     String
-  content    String       // max 1000
-  anonymous  Boolean      @default(false)
-  likes      Int          @default(0)
-  hidden     Boolean      @default(false)
-  createdAt  DateTime     @default(now())
-  question   AnonQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content    String             // max 1000
+  anonymous  Boolean            @default(false)
+  likes      Int                @default(0)  // kept for back-compat; new votes use AnonAnswerVote
+  hidden     Boolean            @default(false)
+  createdAt  DateTime           @default(now())
+  question   AnonQuestion       @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  votes      AnonAnswerVote[]
+  reports    CommunityReport[]  @relation("ReportOnAnswer")
 
   @@index([questionId, createdAt])
+  @@index([questionId, hidden])
+}
+
+/// "Me ayudó" vote on an answer — one vote per user per answer.
+model AnonAnswerVote {
+  id        String     @id @default(cuid())
+  answerId  String
+  userId    String
+  createdAt DateTime   @default(now())
+  answer    AnonAnswer @relation(fields: [answerId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([answerId, userId])
+  @@index([answerId])
 }
 
 // ─── Push Notifications ─────────────────────────────────────────────────────

@@ -355,15 +355,73 @@ export type UserEmail = {
   subject: string;
   html: string;
   text: string;
+  userId?: string;
+  template?: string;
 };
+
+async function createEmailLog(
+  email: UserEmail,
+): Promise<string | null> {
+  try {
+    const { getPrismaClient } = await import("@/db/prisma");
+    const prisma = getPrismaClient();
+    const row = await prisma.emailLog.create({
+      data: {
+        userId: email.userId,
+        to: email.to,
+        template: email.template ?? "unknown",
+        subject: email.subject,
+        status: "queued",
+      },
+      select: { id: true },
+    });
+    return row.id;
+  } catch {
+    return null;
+  }
+}
+
+async function updateEmailLog(
+  logId: string,
+  patch: {
+    status: "sent" | "failed";
+    providerId?: string | null;
+    errorMessage?: string | null;
+    sentAt?: Date | null;
+  },
+): Promise<void> {
+  try {
+    const { getPrismaClient } = await import("@/db/prisma");
+    const prisma = getPrismaClient();
+    await prisma.emailLog.update({
+      where: { id: logId },
+      data: {
+        status: patch.status,
+        providerId: patch.providerId ?? undefined,
+        errorMessage: patch.errorMessage?.slice(0, 4000) ?? undefined,
+        sentAt: patch.sentAt ?? undefined,
+      },
+    });
+  } catch {
+    // silent — logging failure must not impact send
+  }
+}
 
 export async function sendUserEmail(email: UserEmail): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY?.trim();
   const from = process.env.EMAIL_FROM?.trim() ?? "TresMilMillonesdeLatidos <info@tresmilmillonesdelatidos.es>";
   const baseUrl = process.env.APP_BASE_URL?.trim() ?? "https://tresmilmillonesdelatidos.es";
 
+  const logId = await createEmailLog(email);
+
   if (!apiKey) {
     console.error(`[EMAIL] RESEND_API_KEY not configured — email to ${email.to} not sent`);
+    if (logId) {
+      await updateEmailLog(logId, {
+        status: "failed",
+        errorMessage: "RESEND_API_KEY not configured",
+      });
+    }
     return false;
   }
 
@@ -389,14 +447,43 @@ export async function sendUserEmail(email: UserEmail): Promise<boolean> {
       }),
     });
 
+    const responseText = await res.text().catch(() => "");
+
     if (!res.ok) {
-      const body = await res.text().catch(() => "");
-      console.error(`[EMAIL] Resend API error ${res.status} for ${email.to}: ${body}`);
+      console.error(`[EMAIL] Resend API error ${res.status} for ${email.to}: ${responseText}`);
+      if (logId) {
+        await updateEmailLog(logId, {
+          status: "failed",
+          errorMessage: `${res.status}: ${responseText}`,
+        });
+      }
+      return false;
     }
 
-    return res.ok;
+    let providerId: string | null = null;
+    try {
+      const parsed = responseText ? (JSON.parse(responseText) as { id?: string }) : null;
+      providerId = parsed?.id ?? null;
+    } catch {
+      // ignore parse failures
+    }
+
+    if (logId) {
+      await updateEmailLog(logId, {
+        status: "sent",
+        providerId,
+        sentAt: new Date(),
+      });
+    }
+    return true;
   } catch (err) {
     console.error(`[EMAIL] Failed to send to ${email.to}:`, err);
+    if (logId) {
+      await updateEmailLog(logId, {
+        status: "failed",
+        errorMessage: (err as Error).message,
+      });
+    }
     return false;
   }
 }

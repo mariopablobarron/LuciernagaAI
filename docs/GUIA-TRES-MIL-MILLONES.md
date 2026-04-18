@@ -1,4 +1,4 @@
-# LUCIERNAGA
+# Tres Mil Millones de Latidos
 
 ## Guia completa de la plataforma
 
@@ -24,7 +24,7 @@ Creado por Mario Pablo Sanchez Barron
 ## Parte I — Fundamentos
 
 - [1. Presentacion del fundador](#1-presentacion-del-fundador)
-- [2. Que es Luciernaga](#2-que-es-luciernaga)
+- [2. Que es Tres Mil Millones de Latidos](#2-que-es-luciernaga)
 - [3. Argumentario — Por que existe esta plataforma](#3-argumentario--por-que-existe-esta-plataforma)
 - [4. Principios pedagogicos](#4-principios-pedagogicos)
 
@@ -49,7 +49,7 @@ Creado por Mario Pablo Sanchez Barron
 
 ## Parte III — Guia del Administrador de Organizacion (B2B)
 
-- [21. Que es una organizacion en Luciernaga](#21-que-es-una-organizacion-en-luciernaga)
+- [21. Que es una organizacion en Tres Mil Millones de Latidos](#21-que-es-una-organizacion-en-luciernaga)
 - [22. Panel del OrgAdmin](#22-panel-del-orgadmin)
 - [23. Gestion de usuarios de la organizacion](#23-gestion-de-usuarios-de-la-organizacion)
 - [24. Metricas agregadas](#24-metricas-agregadas)
@@ -70,7 +70,7 @@ Creado por Mario Pablo Sanchez Barron
 
 ## Parte V — Guia de la Psicologa Responsable
 
-- [36. Tu rol en Luciernaga](#36-tu-rol-en-luciernaga)
+- [36. Tu rol en Tres Mil Millones de Latidos](#36-tu-rol-en-luciernaga)
 - [37. Panel clinico — Tu herramienta principal](#37-panel-clinico--tu-herramienta-principal)
 - [38. Sistema de intervenciones](#38-sistema-de-intervenciones)
 - [39. Sistema de deteccion de riesgo](#39-sistema-de-deteccion-de-riesgo)
@@ -104,22 +104,22 @@ Creado por Mario Pablo Sanchez Barron
 
 Mario Pablo Sanchez Barron es el fundador de **Startidea**, una empresa con mas de 15 anos de trayectoria en el desarrollo de productos digitales. A lo largo de su carrera, Mario ha combinado la tecnologia con una vision profundamente humana: la conviccion de que las herramientas digitales deben servir para que las personas se entiendan mejor a si mismas y actuen en consecuencia.
 
-Luciernaga nace de esa interseccion. No es un proyecto tecnologico que busca escalar por escalar. Es la respuesta a una pregunta que Mario se ha hecho durante anos:
+Tres Mil Millones de Latidos nace de esa interseccion. No es un proyecto tecnologico que busca escalar por escalar. Es la respuesta a una pregunta que Mario se ha hecho durante anos:
 
 > *"¿Como ayudo a alguien a dar el primer paso cuando esta bloqueado, sin decirle lo que tiene que hacer?"*
 
 Tras anos trabajando con equipos, clientes y proyectos de todo tipo, Mario identifico un patron recurrente: la mayoria de las personas no necesitan mas informacion ni mas consejos. Necesitan un espacio donde pensar con claridad, sin juicio, y un empujon concreto para actuar hoy — no manana.
 
-Luciernaga es ese espacio.
+Tres Mil Millones de Latidos es ese espacio.
 
 **Sobre Startidea:**
-Fundada hace mas de 15 anos, Startidea es el laboratorio creativo y tecnologico desde el que Mario ha lanzado multiples productos digitales. Su filosofia siempre ha sido la misma: partir de un problema real, construir rapido, iterar con usuarios reales, y no tener miedo a pivotar. Luciernaga es el producto mas ambicioso de Startidea hasta la fecha, porque no resuelve un problema tecnico — resuelve un problema humano.
+Fundada hace mas de 15 anos, Startidea es el laboratorio creativo y tecnologico desde el que Mario ha lanzado multiples productos digitales. Su filosofia siempre ha sido la misma: partir de un problema real, construir rapido, iterar con usuarios reales, y no tener miedo a pivotar. Tres Mil Millones de Latidos es el producto mas ambicioso de Startidea hasta la fecha, porque no resuelve un problema tecnico — resuelve un problema humano.
 
 ---
 
-## 2. Que es Luciernaga
+## 2. Que es Tres Mil Millones de Latidos
 
-Luciernaga es una **plataforma de acompanamiento personal basada en inteligencia artificial**. Funciona como un mentor digital que te ayuda a:
+Tres Mil Millones de Latidos es una **plataforma de acompanamiento personal basada en inteligencia artificial**. Funciona como un mentor digital que te ayuda a:
 
 - **Identificar que te bloquea** — sin rodeos, sin juicio.
 - **Ordenar tus pensamientos** — transformar la niebla mental en claridad.
@@ -137,7 +137,7 @@ No es terapia. No es coaching. No es una app de habitos. Es un espacio de reflex
 
 ### Para quien NO es
 
-- Personas en crisis psiquiatrica aguda (Luciernaga detecta crisis y redirige a profesionales).
+- Personas en crisis psiquiatrica aguda (Tres Mil Millones de Latidos detecta crisis y redirige a profesionales).
 - Personas que buscan un chatbot generico de IA.
 - Personas que quieren que alguien les diga exactamente que hacer.
 
@@ -158,9 +158,9 @@ El bloqueo personal no es un problema de falta de conocimiento. Es un problema d
 
 ### La solucion
 
-Luciernaga ataca estos cuatro problemas de frente:
+Tres Mil Millones de Latidos ataca estos cuatro problemas de frente:
 
-| Problema | Solucion Luciernaga |
+| Problema | Solucion Tres Mil Millones de Latidos |
 |---|---|
 | Falta de claridad | Conversaciones guiadas que te obligan a concretar |
 | Paralisis | Microacciones de 10 minutos: tan pequenas que no puedes decir "no" |
@@ -169,15 +169,15 @@ Luciernaga ataca estos cuatro problemas de frente:
 
 ### Por que IA y no un humano
 
-- **Disponibilidad**: A las 3 de la manana, cuando la ansiedad no te deja dormir, Luciernaga esta ahi.
+- **Disponibilidad**: A las 3 de la manana, cuando la ansiedad no te deja dormir, Tres Mil Millones de Latidos esta ahi.
 - **Sin juicio**: La IA no tiene opiniones sobre tu vida. Solo hace preguntas.
 - **Memoria**: Recuerda cada conversacion, cada patron, cada avance. No tienes que repetirte.
 - **Coste**: Accesible para cualquiera, no solo para quien puede pagar 80€/hora de coaching.
-- **Complemento, no sustituto**: Luciernaga no reemplaza a un terapeuta ni a un coach. Los complementa con un espacio de reflexion diario.
+- **Complemento, no sustituto**: Tres Mil Millones de Latidos no reemplaza a un terapeuta ni a un coach. Los complementa con un espacio de reflexion diario.
 
 ### Diferenciadores clave
 
-1. **Interpelar, no instruir**: Luciernaga no da consejos genericos. Hace preguntas que duelen (en el buen sentido).
+1. **Interpelar, no instruir**: Tres Mil Millones de Latidos no da consejos genericos. Hace preguntas que duelen (en el buen sentido).
 2. **De lo abstracto a lo concreto**: Cada conversacion termina con algo que puedes hacer HOY.
 3. **Patron > sintoma**: Detecta tus patrones de evitacion y te los muestra.
 4. **Cambio desde dentro**: No impone cambio externo. Facilita que el cambio emerja de ti.
@@ -187,7 +187,7 @@ Luciernaga ataca estos cuatro problemas de frente:
 
 ## 4. Principios pedagogicos
 
-Luciernaga se construye sobre un marco pedagogico propio:
+Tres Mil Millones de Latidos se construye sobre un marco pedagogico propio:
 
 ### 4.1 Interpelar antes que instruir
 El mentor no da respuestas. Hace preguntas que obligan a pensar. La pregunta correcta en el momento correcto tiene mas impacto que el mejor consejo.
@@ -202,7 +202,7 @@ Cada interaccion sigue este flujo:
 Empezar siempre por lo inmediato y concreto. No saltar a grandes reflexiones existenciales sin haber resuelto el "que hago hoy".
 
 ### 4.4 Evitar la dependencia
-El objetivo de Luciernaga es que dejes de necesitar Luciernaga. El exito se mide en autonomia, no en tiempo de uso.
+El objetivo de Tres Mil Millones de Latidos es que dejes de necesitar Tres Mil Millones de Latidos. El exito se mide en autonomia, no en tiempo de uso.
 
 ### 4.5 El tono
 - **Directo**: Sin rodeos ni eufemismos innecesarios.
@@ -232,7 +232,7 @@ Tras el registro, recibiras un email de verificacion. Hasta que lo confirmes, ve
 
 ### 5.3 Onboarding: tus primeros 3 mensajes
 
-Luciernaga no te suelta un tutorial de 15 pasos. Te pone a trabajar desde el primer mensaje.
+Tres Mil Millones de Latidos no te suelta un tutorial de 15 pasos. Te pone a trabajar desde el primer mensaje.
 
 **Fase 1 — Apertura (Mensaje 1)**
 El mentor te pregunta: *"¿Que te trae aqui? Describe el problema sin filtros."*
@@ -252,7 +252,7 @@ La barra lateral (Sidebar) es tu centro de control:
 
 ```
 ┌─────────────────────────┐
-│  LUCIERNAGA  [Plan]     │
+│  Tres Mil Millones de Latidos   │
 │  + Nueva conversacion   │
 ├─────────────────────────┤
 │  ◻ Chat                 │
@@ -285,7 +285,7 @@ La barra lateral (Sidebar) es tu centro de control:
 
 ## 6. El chat con tu mentor
 
-El chat es el corazon de Luciernaga. Aqui es donde ocurre la magia.
+El chat es el corazon de Tres Mil Millones de Latidos. Aqui es donde ocurre la magia.
 
 ### 6.1 Como funciona
 
@@ -307,7 +307,7 @@ La pantalla principal organiza tu trabajo en pestanas:
 
 ### 6.3 Deteccion emocional
 
-Luciernaga analiza tu estado emocional en tiempo real y adapta sus respuestas:
+Tres Mil Millones de Latidos analiza tu estado emocional en tiempo real y adapta sus respuestas:
 
 - **Bloqueo**: Cuando detecta que no puedes avanzar, simplifica y propone pasos minimos.
 - **Ansiedad**: Cuando detecta agitacion, baja el ritmo y propone respiracion o grounding.
@@ -354,7 +354,7 @@ Los check-ins crean un mapa emocional a lo largo del tiempo. Despues de unas sem
 
 ### 8.1 Crear una meta
 
-Una meta en Luciernaga no es "ser feliz" ni "mejorar mi vida". Es algo concreto y acotado:
+Una meta en Tres Mil Millones de Latidos no es "ser feliz" ni "mejorar mi vida". Es algo concreto y acotado:
 
 - Bien: "Tener una conversacion honesta con mi jefe sobre mi rol"
 - Mal: "Mejorar mi situacion laboral"
@@ -406,7 +406,7 @@ Un espacio privado para escribir libremente. Sin estructura obligatoria, sin pre
 
 ### 10.1 Que es
 
-Un programa intensivo de 21 dias disenado para romper patrones y generar inercia de cambio. Es la funcion premium mas potente de Luciernaga.
+Un programa intensivo de 21 dias disenado para romper patrones y generar inercia de cambio. Es la funcion premium mas potente de Tres Mil Millones de Latidos.
 
 ### 10.2 Estructura
 
@@ -432,7 +432,7 @@ Disponible desde el boton **Modo Impulso** en la barra lateral. Actualmente incl
 
 ### 11.1 Que son
 
-Para objetivos mas grandes que una simple meta, Luciernaga ofrece Proyectos Personales. Son espacios de trabajo estructurados con un marco propio:
+Para objetivos mas grandes que una simple meta, Tres Mil Millones de Latidos ofrece Proyectos Personales. Son espacios de trabajo estructurados con un marco propio:
 
 ### 11.2 El marco SIAR
 
@@ -490,7 +490,7 @@ Accesibles desde `/app/respirar`. Ejercicios guiados de respiracion vinculados a
 
 ### 14.1 Que son
 
-Luciernaga detecta y registra tus **patrones de evitacion**: las cosas que pospones o rechazas sistematicamente.
+Tres Mil Millones de Latidos detecta y registra tus **patrones de evitacion**: las cosas que pospones o rechazas sistematicamente.
 
 ### 14.2 Tipos
 
@@ -507,7 +507,7 @@ Luciernaga detecta y registra tus **patrones de evitacion**: las cosas que pospo
 
 ## 15. Logros e insignias
 
-Luciernaga celebra tus avances con insignias:
+Tres Mil Millones de Latidos celebra tus avances con insignias:
 
 | Insignia | Criterio |
 |---|---|
@@ -611,15 +611,15 @@ Desde `/app/settings/` puedes gestionar:
 
 ---
 
-## 21. Que es una organizacion en Luciernaga
+## 21. Que es una organizacion en Tres Mil Millones de Latidos
 
-Luciernaga ofrece un modelo B2B donde **empresas, consultorias o centros terapeuticos** pueden ofrecer la plataforma a sus equipos o clientes.
+Tres Mil Millones de Latidos ofrece un modelo B2B donde **empresas, consultorias o centros terapeuticos** pueden ofrecer la plataforma a sus equipos o clientes.
 
 Una organizacion tiene:
 - Un nombre y datos de contacto.
 - Un limite de usuarios (plan contratado).
 - Uno o mas administradores (OrgAdmins).
-- Usuarios asignados que acceden a Luciernaga a traves de la organizacion.
+- Usuarios asignados que acceden a Tres Mil Millones de Latidos a traves de la organizacion.
 
 ---
 
@@ -666,7 +666,7 @@ Los OrgAdmins ven **datos agregados**, nunca individuales (a menos que el rol se
 
 ## 25. Roles de administracion
 
-Luciernaga tiene un sistema granular de roles para el equipo interno:
+Tres Mil Millones de Latidos tiene un sistema granular de roles para el equipo interno:
 
 | Rol | Acceso |
 |---|---|
@@ -844,7 +844,7 @@ El MIDPOINT es el mas delicado. La decision pedagogica es que un buen mentor apa
 El equipo puede enviar un video a un usuario concreto o a un segmento, con dos modalidades de contenido:
 
 - **Texto literal** — el admin escribe exactamente lo que dira el avatar.
-- **Briefing con IA** — el admin escribe un brief ("agradecele su constancia esta semana") y el LLM lo transforma en guion con la voz de Luciernaga, prohibiendo los imperativos huecos.
+- **Briefing con IA** — el admin escribe un brief ("agradecele su constancia esta semana") y el LLM lo transforma en guion con la voz de Tres Mil Millones de Latidos, prohibiendo los imperativos huecos.
 
 Y dos modalidades de coste:
 
@@ -951,6 +951,81 @@ Un uso al mes bien aprovechado vale mas que cuatro al mes diluidos. Si el cap de
 
 ---
 
+## 30C. Atribucion por fuente
+
+**Ruta:** `/admin/marketing` → pestana "Atribucion"
+**Referencia tecnica:** `docs/manual-admin.md` seccion 7C
+
+Dashboard que agrupa signups por `utm_source` y muestra su conversion a Pro. Los UTMs se capturan en el primer load via `UtmCapture.tsx` y se guardan como JSON en `User.source`.
+
+**Tres senales que cambian decisiones de marketing:**
+
+1. **Alta tasa Pro + bajo volumen** → invertir mas.
+2. **Alto volumen + tasa Pro cero** → pausar o cualificar mejor.
+3. **`(direct)` >60%** → el etiquetado UTM no esta bien; todo lo demas son conclusiones con ruido.
+
+Rangos: 7d / 30d / 90d / todo el historico. La tasa Pro esta codificada por color (verde ≥10%, ambar 3-10%, gris <3%).
+
+---
+
+## 30D. Tagging manual de usuarios
+
+**Ruta:** `/admin/marketing` → pestana "Tags"
+**Referencia tecnica:** `docs/manual-admin.md` seccion 7D
+
+Etiquetas manuales (`User.tags: String[]`) para segmentar en casos donde los filtros automaticos no llegan: usuarios beta, VIPs, casos clinicos atendidos, invitados de prensa, etc.
+
+Una vez asignado un tag, es usable como segmento en cualquier broadcast escribiendo `tag:<nombre>`. Se valida automaticamente a minusculas, alfanumerico + guion/guion_bajo, maximo 20 tags por usuario y 40 caracteres por tag.
+
+Casos donde el tagging es mejor que un segmento automatico:
+
+- Usuarios a los que el equipo clinico ya intervino y no quieres re-contactar con campanas de retencion.
+- Cuentas internas (prensa, inversores, familiares del fundador) que deben quedar fuera de metricas generales.
+- Cohorte de un experimento temporal.
+
+---
+
+## 30E. Testimonials publicos
+
+**Ruta:** `/admin/marketing` → pestana "Testimonials"
+**Referencia tecnica:** `docs/manual-admin.md` seccion 7E
+
+Convierte feedback real de usuarios (rating ≥ 4) en testimonios publicos para la landing. El marketing **no escribe testimonios** — solo curate los que ya existen.
+
+Endpoint publico: `GET /api/testimonials` — sin auth, cache 5 minutos, expone solo primer nombre del autor (no email, no apellido). Listo para consumir desde la landing con `fetch()`.
+
+El campo `testimonialOrder` permite forzar orden en la landing (NULL se ordena por fecha desc al final).
+
+Principio: los testimonios mas fuertes no son los que mas elogian el producto — son los que describen un cambio real del usuario con sus propias palabras. Prioriza esos, no las frases genericas de "me encanta Tres Mil Millones de Latidos".
+
+---
+
+## 30F. Programa de referidos
+
+**Ruta:** `/admin/marketing` → pestana "Referidos"
+**Referencia tecnica:** `docs/manual-admin.md` seccion 7F
+
+Dashboard de metricas sobre el sistema de invitaciones **existente**. No crea invitaciones — solo visualiza las que se generan automaticamente cuando un usuario alcanza hitos de gamificacion (`streak_7d`, `streak_30d`, `goal_complete`, `active_30d`).
+
+**Metricas clave:**
+
+- Invitaciones creadas / usadas / pendientes (global + ventanas 7d y 30d).
+- Tasa de conversion (usadas / creadas).
+- Distribucion por razon de generacion (que hitos estan produciendo mas referidos).
+- Retencion referred vs non-referred a D7 y D30 (comparacion de cohortes).
+- Timeline diario de los ultimos 30 dias.
+- Top 20 inviters con conversion individual.
+
+**Lectura recomendada:**
+
+- Si la tasa global es <5%, el problema no es de volumen — es de mensaje de invitacion o de experiencia del invitado.
+- Si una razon concreta concentra el 80% de generadas pero solo el 10% de usadas, esa mecanica esta inflando el contador interno sin traer valor real.
+- Si los referred tienen retencion D7 >20% mayor que los non-referred, el canal esta funcionando bien — invierte en visibilidad para el usuario final (UI de compartir su codigo).
+
+**Limitacion actual:** no hay UI todavia para que el usuario genere y comparta su propio codigo de referido. Eso vendria en otro sprint.
+
+---
+
 ## 31. Uso de LLM y costes
 
 Desde `/admin/llm-usage`:
@@ -1039,7 +1114,7 @@ Desde `/admin/team`:
 
 ---
 
-## 36. Tu rol en Luciernaga
+## 36. Tu rol en Tres Mil Millones de Latidos
 
 ### 36.1 Que es la psicologa responsable
 
@@ -1049,11 +1124,11 @@ La psicologa responsable es la profesional de salud mental que:
 - **Valida** que las respuestas del sistema no traspasen limites terapeuticos.
 - **Interviene** cuando el sistema detecta situaciones de riesgo alto o critico.
 - **Documenta** observaciones clinicas sobre usuarios que requieren seguimiento.
-- **Garantiza** que Luciernaga cumple su compromiso: acompanar sin sustituir atencion profesional.
+- **Garantiza** que Tres Mil Millones de Latidos cumple su compromiso: acompanar sin sustituir atencion profesional.
 
 ### 36.2 Que NO es tu rol
 
-- No eres la terapeuta de los usuarios. Luciernaga no es terapia.
+- No eres la terapeuta de los usuarios. Tres Mil Millones de Latidos no es terapia.
 - No necesitas atender cada conversacion. El sistema filtra y prioriza por ti.
 - No sustituyes al equipo tecnico. Tu foco es la calidad clinica, no la operativa.
 
@@ -1463,7 +1538,7 @@ El sistema de facturacion esta completamente integrado con Stripe:
 Disponible en `/calculadora-latidos`. Una herramienta publica de bienestar que permite calcular y monitorizar la frecuencia cardiaca. Sirve como:
 - Herramienta de valor independiente.
 - Punto de entrada para SEO y captacion.
-- Demostracion de la filosofia de Luciernaga: herramientas utiles y accesibles.
+- Demostracion de la filosofia de Tres Mil Millones de Latidos: herramientas utiles y accesibles.
 
 ---
 ---
@@ -1481,6 +1556,6 @@ Disponible en `/calculadora-latidos`. Una herramienta publica de bienestar que p
 
 ---
 
-*Guia creada para Luciernaga v1.0 — Producto de Startidea*
+*Guia creada para Tres Mil Millones de Latidos v1.0 — Producto de Startidea*
 *Fundador: Mario Pablo Sanchez Barron*
 *Abril 2026*

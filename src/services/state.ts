@@ -256,10 +256,20 @@ export async function activateUserCrisis(
       },
     });
 
+    // Clinical safety: pause any active intensive programmes (Modo Impulso /
+    // UserChallenge) so the user doesn't receive "do this today" pressure
+    // while in crisis. Must be manually resumed from the clinical panel
+    // once the crisis is cleared.
+    const pausedChallenges = await prisma.userChallenge.updateMany({
+      where: { userId, status: "active" },
+      data: { status: "paused" },
+    });
+
     logInfo("STATE", "user_crisis_activated", {
       userId,
       crisisActiveUntil: crisisActiveUntil.toISOString(),
       hours,
+      pausedChallenges: pausedChallenges.count,
     });
     return crisisActiveUntil;
   } catch (error: unknown) {

@@ -3,7 +3,15 @@ import { getPrismaClient } from "@/db/prisma";
 import { PLANS } from "@/lib/plans";
 import { cache } from "@/lib/cache";
 
-const SYNTHETIC_EMAIL_DOMAIN = "session.luciernaga.local";
+// Primary synthetic email domain for anonymous browser sessions.
+// Format: <userId>@<SYNTHETIC_EMAIL_DOMAIN>. Never user-visible.
+const SYNTHETIC_EMAIL_DOMAIN = "session.latidos.local";
+
+// Legacy domain kept for backward compatibility with anonymous users created
+// before the rebrand (2026-04). Any email ending in one of these is still
+// recognized as synthetic. Do NOT remove without a data migration.
+const LEGACY_SYNTHETIC_EMAIL_DOMAINS = ["session.luciernaga.local"] as const;
+
 const ACTIVE_SUBSCRIPTION_STATUSES = new Set(["active", "trialing"]);
 
 // ── Cache TTLs ───────────────────────────────────────────────────────────────
@@ -391,7 +399,9 @@ export function buildSyntheticEmail(userId: string): string {
 }
 
 export function isSyntheticEmail(email: string | null | undefined): boolean {
-  return typeof email === "string" && email.endsWith(`@${SYNTHETIC_EMAIL_DOMAIN}`);
+  if (typeof email !== "string") return false;
+  if (email.endsWith(`@${SYNTHETIC_EMAIL_DOMAIN}`)) return true;
+  return LEGACY_SYNTHETIC_EMAIL_DOMAINS.some((d) => email.endsWith(`@${d}`));
 }
 
 export async function ensureUserAccount(userId: string) {

@@ -1,10 +1,10 @@
 import { RESPONSIBLE_USE_NOTES } from "@/lib/legal";
 import {
-  LUCIERNAGA_IDENTITY_PROMPT,
-  LUCIERNAGA_POWERFUL_QUESTIONS_PROMPT,
-  LUCIERNAGA_PURPOSE_MODEL_PROMPT,
-  LUCIERNAGA_RESPONSE_STRUCTURE_PROMPT,
-} from "@/lib/luciernaga-identity";
+  MENTOR_IDENTITY_PROMPT,
+  MENTOR_POWERFUL_QUESTIONS_PROMPT,
+  MENTOR_PURPOSE_MODEL_PROMPT,
+  MENTOR_RESPONSE_STRUCTURE_PROMPT,
+} from "@/lib/mentor-identity";
 import type { MentorMode } from "@/services/mentor-protocol";
 import type { ConversationalOnboardingContext } from "@/services/onboarding";
 import type { TransformationPhase } from "@/services/transformation";
@@ -83,12 +83,14 @@ type ResponseFinalizationContext = {
   onboarding?: ConversationalOnboardingContext | null;
 };
 
-const BASE_PROMPT = `${LUCIERNAGA_IDENTITY_PROMPT}
-${LUCIERNAGA_PURPOSE_MODEL_PROMPT}
+const BASE_PROMPT = `${MENTOR_IDENTITY_PROMPT}
+${MENTOR_PURPOSE_MODEL_PROMPT}
 
 Estilo: directo, humano, breve (4-6 frases max). Sin tecnicismos, sin motivación vacía. No eres terapia.
-${LUCIERNAGA_RESPONSE_STRUCTURE_PROMPT}
-${LUCIERNAGA_POWERFUL_QUESTIONS_PROMPT}`;
+
+Si el usuario pregunta si esto es terapia o si puedes hacer terapia: responde con claridad que NO lo eres. Eres una guía práctica para ordenar pensamiento y mover a la acción. Si necesita terapia de verdad, sugiérele buscar un profesional en psicología — tu valor es complementario, no sustitutivo. No disfraces esta diferencia.
+${MENTOR_RESPONSE_STRUCTURE_PROMPT}
+${MENTOR_POWERFUL_QUESTIONS_PROMPT}`;
 
 const STATE_GUIDANCE: Record<UserState, string> = {
   neutral: "Estado neutral. Refuerza claridad, propone acción concreta.",

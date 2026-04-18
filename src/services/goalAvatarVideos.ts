@@ -253,11 +253,23 @@ export async function runMidpointScan(): Promise<MidpointScanStats> {
           { preferences: { avatarVideosEnabled: true } },
         ],
         userState: {
-          OR: [
-            { state: { in: ["bloqueo", "ansiedad", "duda"] } },
-            { primaryEmotion: { in: ["tristeza", "ansiedad", "miedo", "frustracion"] } },
-            { energyLevel: "bajo" },
-            { transformationPhase: "bloqueo" },
+          AND: [
+            // Trigger: low emotional state
+            {
+              OR: [
+                { state: { in: ["bloqueo", "ansiedad", "duda"] } },
+                { primaryEmotion: { in: ["tristeza", "ansiedad", "miedo", "frustracion"] } },
+                { energyLevel: "bajo" },
+                { transformationPhase: "bloqueo" },
+              ],
+            },
+            // Clinical safety gate: NEVER deliver MIDPOINT to users in active
+            // crisis or high/critical risk. The avatar video is not a
+            // therapeutic intervention and must not be injected during the
+            // most vulnerable moments. This rule is enforced in code and
+            // reviewed by the responsible clinical psychologist.
+            { riskLevel: { notIn: ["high", "critical"] } },
+            { crisisActive: false },
           ],
         },
       },

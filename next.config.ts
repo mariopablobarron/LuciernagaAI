@@ -140,12 +140,24 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Redirects (example)
+  // Redirects
   async redirects() {
     return [
       {
         source: "/registro",
         destination: "/signup",
+        permanent: true,
+      },
+      {
+        // Renamed 2026-04: /metodo → /como-funciona (more direct for visitors)
+        source: "/metodo",
+        destination: "/como-funciona",
+        permanent: true,
+      },
+      {
+        // Renamed 2026-04: gender-neutral landing for mental health professionals
+        source: "/para-psicologas",
+        destination: "/para-profesionales",
         permanent: true,
       },
     ];

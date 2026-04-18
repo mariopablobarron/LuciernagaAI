@@ -3,7 +3,7 @@
 **Version:** 2.0
 **Fecha:** 10 de abril de 2026
 **Audiencia:** Responsables de HR, psicologos y terapeutas de centros que usan la plataforma
-**Referencia conceptual:** Para entender la filosofia y el marco pedagogico, consulta la [Guia de Luciernaga](GUIA-LUCIERNAGAS.md) (Parte I). Para el detalle clinico completo, consulta la Parte V de la guia.
+**Referencia conceptual:** Para entender la filosofia y el marco pedagogico, consulta la [Guia de Tres Mil Millones de Latidos](GUIA-TRES-MIL-MILLONES.md) (Parte I). Para el detalle clinico completo, consulta la Parte V de la guia.
 
 ---
 

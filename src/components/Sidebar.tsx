@@ -333,6 +333,14 @@ export default function Sidebar({
           <Button asChild type="button" variant={pathname?.startsWith("/app/settings") ? "default" : "outline"} size="sm" className="w-full justify-center text-xs" data-tour="ajustes">
             <Link href="/app/settings">Ajustes</Link>
           </Button>
+
+          {/* Método — always linked so registered users can return to the pedagogical frame */}
+          <Link
+            href="/como-funciona"
+            className="block text-center text-[11px] text-muted-foreground/70 hover:text-violet-300 transition-colors"
+          >
+            Conoce el método
+          </Link>
         </div>
 
         {/* Telegram CTA */}

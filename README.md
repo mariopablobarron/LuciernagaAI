@@ -236,6 +236,6 @@ curl https://tu-dominio.com/api/health
 
 ---
 
-**Repo:** mariopablobarron/LuciernagaAI
+**Repo:** mariopablobarron/Tres Mil Millones de LatidosAI
 **Rama principal:** `main`
 **Última actualización:** 2026-03-30

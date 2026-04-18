@@ -9,7 +9,9 @@ export type MarketingRecipient = {
   name: string | null;
 };
 
-const SYNTHETIC_EMAIL_DOMAIN = "session.luciernaga.local";
+// Kept for endswith checks in this module. isSyntheticEmail in services/user.ts
+// handles both this and the legacy pre-rebrand domain.
+const SYNTHETIC_EMAIL_DOMAIN = "session.latidos.local";
 
 /**
  * Returns users matching a given marketing segment.
@@ -126,7 +128,7 @@ export type SegmentCounts = {
  *
  * When called with a channel argument, returns a single number:
  * - telegram: only users with a non-null telegramId
- * - email:    only users whose email does NOT end in @session.luciernaga.local
+ * - email:    only users whose email does NOT end in a synthetic session domain
  * - all:      total segment size (no channel filter)
  */
 export async function countSegment(segment: SegmentKey): Promise<SegmentCounts>;

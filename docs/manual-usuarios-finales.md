@@ -2,7 +2,7 @@
 
 **Version:** v3.0
 **Fecha:** 10 de abril de 2026
-**Referencia conceptual:** Para entender la filosofia, el argumentario y el marco pedagogico de la plataforma, consulta la [Guia de Luciernaga](GUIA-LUCIERNAGAS.md) (Parte I).
+**Referencia conceptual:** Para entender la filosofia, el argumentario y el marco pedagogico de la plataforma, consulta la [Guia de Tres Mil Millones de Latidos](GUIA-TRES-MIL-MILLONES.md) (Parte I).
 
 ---
 
@@ -331,7 +331,7 @@ La comunidad es un espacio anónimo donde los usuarios comparten reflexiones y a
 
 ## 17. ¿Qué son los logros e insignias?
 
-Luciérnaga celebra tus avances con insignias que se desbloquean automáticamente.
+Tres Mil Millones de Latidos celebra tus avances con insignias que se desbloquean automáticamente.
 
 | Insignia | Cómo se consigue |
 |---|---|

@@ -32,7 +32,7 @@ async function main() {
     process.exit(3);
   }
 
-  const text = `Prueba Telegram Luciernaga OK - ${new Date().toISOString()}`;
+  const text = `Prueba Telegram Tres Mil Millones de Latidos OK - ${new Date().toISOString()}`;
   const sendRes = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },

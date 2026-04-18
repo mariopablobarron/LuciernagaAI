@@ -12,7 +12,7 @@ import { AdminShell } from "@/features/admin/components/AdminShell";
 /*  Types & constants                                                  */
 /* ------------------------------------------------------------------ */
 
-type DocId = "guia" | "usuario" | "organizaciones" | "admin";
+type DocId = "guia" | "usuario" | "organizaciones" | "admin" | "psicologa";
 
 type DocMeta = {
   id: DocId;
@@ -65,6 +65,16 @@ const DOCS: DocMeta[] = [
     bg: "bg-amber-500/10",
     border: "border-amber-500/20",
     audience: "Equipo tecnico y operativo",
+  },
+  {
+    id: "psicologa",
+    title: "Manual para la Psicologa Responsable",
+    subtitle: "Onboarding clínico completo: rol, panel clínico, crisis, intervenciones, videos avatar, revisión previa al lanzamiento",
+    icon: Stethoscope,
+    color: "text-rose-400",
+    bg: "bg-rose-500/10",
+    border: "border-rose-500/20",
+    audience: "Psicologa responsable",
   },
 ];
 

@@ -79,7 +79,7 @@ En Tres Mil Millones de Latidos, el mentor detecta cuando estas en estado de blo
 
 No necesitas mas informacion. Necesitas un primer paso. Y ese paso siempre dura menos de 10 minutos.`,
     tags: ["bloqueo", "emociones", "accion", "psicologia"],
-    authorName: "Equipo Luciernaga",
+    authorName: "Equipo Tres Mil Millones de Latidos",
   },
   {
     slug: "microacciones-el-secreto-para-avanzar-cuando-estas-atascado",
@@ -119,7 +119,7 @@ En Tres Mil Millones de Latidos, cada conversacion con el mentor termina con una
 
 La diferencia entre las personas que avanzan y las que no, rara vez es talento o informacion. Es la capacidad de dar el primer paso. Y el primer paso siempre es mas pequeno de lo que crees.`,
     tags: ["microacciones", "productividad", "habitos", "accion"],
-    authorName: "Equipo Luciernaga",
+    authorName: "Equipo Tres Mil Millones de Latidos",
   },
 ];
 

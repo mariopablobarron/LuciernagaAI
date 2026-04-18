@@ -220,7 +220,11 @@ export async function processScheduledEmails(): Promise<{ sent: number; skipped:
 
   for (const item of pending) {
     // Skip if user has no real email or disabled emails
-    const isSynthetic = item.user.email.endsWith("@session.luciernaga.local");
+    // Accept both current and legacy synthetic session domains to exclude anonymous users
+    const userEmail = item.user.email;
+    const isSynthetic =
+      userEmail.endsWith("@session.latidos.local") ||
+      userEmail.endsWith("@session.luciernaga.local");
     if (isSynthetic || item.user.preferences?.weeklyEmailEnabled === false) {
       await prisma.scheduledEmail.update({ where: { id: item.id }, data: { cancelled: true } });
       skipped++;
@@ -235,10 +239,14 @@ export async function processScheduledEmails(): Promise<{ sent: number; skipped:
       continue;
     }
 
-    const email = builder(item.user.name ?? "");
-    email.to = item.user.email;
+    const emailPayload = builder(item.user.name ?? "");
+    emailPayload.to = userEmail;
 
-    const ok = await sendUserEmail(email);
+    const ok = await sendUserEmail({
+      ...emailPayload,
+      userId: item.userId,
+      template: item.template,
+    });
     if (ok) {
       await prisma.scheduledEmail.update({ where: { id: item.id }, data: { sentAt: now } });
       sent++;

@@ -42,7 +42,7 @@ Click: CREATE
 ```
 Project Settings > Integrations > GitHub
 
-  Repository: mariopablobarron/LuciernagaAI
+  Repository: mariopablobarron/Tres Mil Millones de LatidosAI
   Branch:     main
 
 Click: CONNECT & AUTHORIZE
@@ -57,7 +57,7 @@ Dashboard > + Add Service > Docker
 
 SERVICE DETAILS:
   Source:          GitHub
-  Repository:      mariopablobarron/LuciernagaAI
+  Repository:      mariopablobarron/Tres Mil Millones de LatidosAI
   Branch:          main
   Dockerfile:      ./Dockerfile
   Build Context:   .
@@ -310,7 +310,7 @@ No need to click Deploy again! 🎉
 ## 📚 RESOURCES
 
 - Coolify Docs: https://coolify.io/docs
-- GitHub Repo: https://github.com/mariopablobarron/LuciernagaAI
+- GitHub Repo: https://github.com/mariopablobarron/Tres Mil Millones de LatidosAI
 - OpenRouter: https://openrouter.ai/docs
 - Next.js: https://nextjs.org/docs
 
@@ -338,6 +338,6 @@ You now have a production-grade Next.js app deployed on Coolify! 🎉
 
 ---
 
-**GitHub:** mariopablobarron/LuciernagaAI  
+**GitHub:** mariopablobarron/Tres Mil Millones de LatidosAI  
 **Commit:** 5cf2b2c (latest)  
 **Status:** READY ✅

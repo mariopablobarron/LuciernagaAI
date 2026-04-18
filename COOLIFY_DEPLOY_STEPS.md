@@ -1,6 +1,6 @@
 # 🚀 COOLIFY DEPLOYMENT - STEP BY STEP GUIDE
 
-**Your GitHub:** mariopablobarron/LuciernagaAI  
+**Your GitHub:** mariopablobarron/Tres Mil Millones de LatidosAI  
 **Latest Commit:** 1983f8f (Dockerfile + production files)  
 **Status:** ✅ Ready to deploy
 
@@ -54,7 +54,7 @@ In Coolify Dashboard:
 
 2. Click "Connect to GitHub"
    • Authorize Coolify to access your repos
-   • Select: mariopablobarron/LuciernagaAI
+   • Select: mariopablobarron/Tres Mil Millones de LatidosAI
    • Branch: main
    • Click "Save"
 
@@ -76,7 +76,7 @@ In Coolify Dashboard:
 
 4. Fill in details:
 
-   Repository:        mariopablobarron/LuciernagaAI
+   Repository:        mariopablobarron/Tres Mil Millones de LatidosAI
    Branch:            main
    Dockerfile Path:   ./Dockerfile
    Build Context:     .  (root)

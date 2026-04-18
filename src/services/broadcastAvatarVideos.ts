@@ -134,7 +134,7 @@ async function generateScriptFromBriefing(params: {
   const apiKey = process.env.OPENROUTER_API_KEY?.trim();
   if (!apiKey) throw new Error("OPENROUTER_API_KEY is not configured");
 
-  const systemPrompt = `Eres Luciérnaga, un mentor cálido y lúcido.
+  const systemPrompt = `Eres Tres Mil Millones de Latidos, un mentor cálido y lúcido.
 
 Transforma el siguiente briefing del equipo en un guión hablado para un video del mentor.
 

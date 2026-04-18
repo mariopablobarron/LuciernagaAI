@@ -3,7 +3,7 @@
 **Version:** 3.0
 **Fecha:** 10 de abril de 2026
 **Audiencia:** Administradores del sistema, equipo clinico y responsables B2B
-**Referencia conceptual:** Para la vision general de la plataforma, roles y argumentario, consulta la [Guia de Luciernaga](GUIA-LUCIERNAGAS.md). Para el detalle clinico completo, la Parte V de la guia.
+**Referencia conceptual:** Para la vision general de la plataforma, roles y argumentario, consulta la [Guia de Tres Mil Millones de Latidos](GUIA-TRES-MIL-MILLONES.md). Para el detalle clinico completo, la Parte V de la guia.
 
 ---
 
@@ -390,7 +390,7 @@ Cada goal recibe como maximo un video por fase (`UNIQUE(goalId, phase)` en BD). 
 Dos modos de contenido:
 
 - **Literal**: el admin escribe exactamente lo que dira el avatar (maximo control).
-- **Briefing**: el admin escribe un brief ("agradecele su constancia esta semana") y el LLM genera el guion con la voz de Luciernaga.
+- **Briefing**: el admin escribe un brief ("agradecele su constancia esta semana") y el LLM genera el guion con la voz de Tres Mil Millones de Latidos.
 
 Dos modos de generacion:
 
@@ -476,6 +476,161 @@ El canal broadcast puede degradarse facilmente. Si lo usas para:
 - Felicitaciones en dias de fecha (cumple, navidad, etc.) → mal. Cliche que devalua el resto.
 
 El test mental antes de cada envio: **¿justifica esto que aparezca la cara del fundador en el modal del usuario?** Si dudas, no lo envies. Un uso al mes bien aprovechado vale mas que cuatro al mes diluidos.
+
+---
+
+## 7C. Atribucion por fuente
+
+**Ruta:** `/admin/marketing` → pestana "Atribucion"
+**Permiso:** `marketing:metrics`
+**Endpoint:** `GET /api/admin/marketing/attribution?range=7d|30d|90d|all`
+
+Dashboard que agrupa los signups por su fuente de trafico real (`utm_source`) y muestra la tasa de conversion a Pro de cada canal.
+
+### De donde saca los datos
+
+El campo `User.source` guarda un JSON stringificado con los UTM params al momento del signup (capturado por `UtmCapture.tsx` desde la URL). Este endpoint parsea ese JSON en servidor, agrupa por `utm_source`, y para cada fuente busca el `utm_medium` y `utm_campaign` mas frecuentes.
+
+### Rangos disponibles
+
+7 dias, 30 dias, 90 dias, o todo el historico. El rango filtra solo signups dentro de la ventana — los usuarios Pro contabilizados son los que se registraron en ese rango y siguen activos como Pro hoy.
+
+### Que mostrar al equipo
+
+- **3 KPI cards**: signups en rango, conversiones a Pro, tasa Pro global.
+- **Tabla por fuente**: source, medium, campaign, signups, Pro users, tasa Pro (codificada por color: verde ≥10%, ambar 3-10%, gris <3%), y % del total con barra visual.
+
+### Fuentes especiales
+
+- `(direct)` — signups sin UTMs en la URL. Trafico organico, bookmarks, email typed, dark social.
+- `(unknown)` — JSON UTM presente pero sin `utm_source` completado.
+- `(malformed)` — el JSON de `User.source` no se pudo parsear (usuarios legacy).
+
+### Decisiones que habilita
+
+1. **Alta tasa Pro pero bajo volumen** → invertir mas en ese canal.
+2. **Alto volumen pero tasa Pro cero** → pausar o cualificar mejor.
+3. **`(direct)` >60% del total** → tu estrategia de UTMs no esta bien implementada. Arreglalo antes de sacar conclusiones de los demas canales.
+
+---
+
+## 7D. Tagging manual de usuarios
+
+**Ruta:** `/admin/marketing` → pestana "Tags"
+**Permiso:** `users:tag` (heredado por admin y marketing)
+**Endpoints:** `GET` / `PUT /api/admin/users/[id]/tags`
+
+Permite asignar etiquetas manuales a cualquier usuario para crear segmentos que los filtros automaticos no capturan (ej: "beta", "vip", "churning", "caso_clinico", "hermano_del_fundador"). Una vez asignado un tag, se puede usar como segmento escribiendo `tag:nombre` en cualquier broadcast (Telegram, email, avatar).
+
+### Como se usa
+
+1. Entrar a la pestana Tags, introducir el email del usuario y pulsar "Buscar".
+2. Se muestran los tags actuales como chips con X para borrar.
+3. Escribir un nuevo tag en el input y pulsar Enter para anadirlo.
+4. Desde cualquier panel de broadcast, seleccionar o escribir `tag:<nombre>` como segmento.
+
+### Validacion automatica
+
+- Solo letras, numeros, guion y guion bajo.
+- Maximo 20 tags por usuario.
+- Maximo 40 caracteres por tag.
+- Se normalizan a minusculas.
+- Tags duplicados o invalidos se descartan silenciosamente al guardar.
+
+### Casos de uso reales
+
+- Marcar usuarios que forman parte de un programa beta cerrado y enviarles actualizaciones exclusivas.
+- Tagging de usuarios en crisis que ya han sido atendidos por el equipo clinico, para excluirles de campanas de retencion agresivas.
+- Etiquetar cuentas VIP (prensa, inversores, amigos) para que NO aparezcan en pruebas de broadcast ni metricas generales.
+
+---
+
+## 7E. Testimonials publicos
+
+**Ruta:** `/admin/marketing` → pestana "Testimonials"
+**Permiso:** `marketing:site_content`
+**Endpoints:**
+- `GET / PATCH /api/admin/marketing/testimonials` (admin)
+- `GET /api/testimonials` (publico, sin auth, cache 5 min)
+
+Convierte feedbacks con rating alto en testimonios publicos consumibles por la landing. No hay texto escrito manualmente por marketing — todos los testimonials salen de feedback real de usuarios.
+
+### Criterio de elegibilidad
+
+El panel admin lista feedbacks que cumplen al menos uno de estos:
+- Rating >= 4 estrellas.
+- Ya estan marcados como publicos (por si bajaron despues del toggle).
+
+### Como se publica un testimonial
+
+Un click en el boton "Publicar" togglea el flag `isPublicTestimonial`. Sin paso de confirmacion — es reversible y no dispara nada externo.
+
+### Privacidad
+
+El endpoint publico (`/api/testimonials`) expone solo:
+- El primer nombre del autor (nunca apellido, nunca email).
+- El mensaje de texto.
+- El rating.
+- La fecha de creacion.
+
+### Consumo desde la landing
+
+```tsx
+const res = await fetch(`${process.env.APP_BASE_URL}/api/testimonials`, {
+  next: { revalidate: 300 },
+});
+const { testimonials } = await res.json();
+```
+
+No requiere auth. El cache de 5 minutos reduce la carga si la landing tiene mucho trafico.
+
+### Orden personalizado
+
+El campo `testimonialOrder` (nullable integer) permite forzar un orden en la landing. Los NULL se ordenan al final por fecha descendente. Utilidad: poner los testimonios mas fuertes arriba.
+
+---
+
+## 7F. Programa de referidos (dashboard)
+
+**Ruta:** `/admin/marketing` → pestana "Referidos"
+**Permiso:** `marketing:referrals`
+**Endpoint:** `GET /api/admin/marketing/referrals`
+
+Dashboard de metricas del sistema existente de invitaciones. **No crea nuevas invitaciones** — solo agrega datos de la tabla `Invitation` que ya se genera cuando un usuario alcanza hitos de gamificacion (racha 7d, primer objetivo completado, 30 dias activo, etc.).
+
+### KPIs en cabecera
+
+- Invitaciones creadas totales.
+- Invitaciones usadas totales.
+- Tasa de conversion global (usadas / creadas).
+- Inviters unicos (usuarios distintos que han generado al menos una invitacion).
+
+### Metricas extendidas
+
+- **Pending**: invitaciones creadas pero aun no usadas.
+- **Ventana 7 dias y 30 dias**: generadas y usadas dentro del rango.
+- **Distribucion por razon**: agrupa por el motivo por el que se gano la invitacion (`streak_7d`, `streak_30d`, `goal_complete`, `active_30d`, `manual`). Util para saber que hitos de gamificacion estan generando mas referidos.
+- **Retencion referred vs non-referred**: compara el porcentaje de usuarios que siguen activos a los 7 y 30 dias, separando los que llegaron por referido de los que no. Si los referred tienen retencion >20% mayor, tu programa esta funcionando bien.
+- **Timeline diario (30 dias)**: grafico de generadas y usadas por dia.
+
+### Top inviters
+
+Tabla ordenada por invitaciones usadas (no por creadas), con:
+- Usuario (nombre + email).
+- Invitaciones creadas.
+- Invitaciones usadas.
+- Tasa de conversion individual.
+- `invitesEarned` — el contador interno de gamificacion que suma cuando el usuario gana invitaciones.
+
+### Que mirar
+
+1. Si la tasa de conversion global esta por debajo del 5%, el mensaje de invitacion o el flow del invitado fallan. No es problema de volumen.
+2. Si una razon concreta (ej: `streak_7d`) genera el 80% de las invitaciones pero solo el 10% de las usadas, quiza esa mecanica debe apagarse o rebalancearse.
+3. Si hay 2-3 super-inviters concentrando el volumen, considera un programa VIP para ellos. Si el volumen esta repartido, el sistema es sano organicamente.
+
+### Limitacion actual
+
+No existe todavia UI para que el usuario final vea y comparta su propio codigo de referido. Eso vendria en un proximo sprint (ruta tipo `/account/referral`). Por ahora las invitaciones solo se generan automaticamente por hitos internos.
 
 ---
 

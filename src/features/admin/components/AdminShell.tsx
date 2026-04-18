@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   BarChart3, BookOpen, Building2, FlaskConical, LayoutDashboard, LogOut,
   Megaphone, Menu, Settings, Shield, ShieldCheck, Sparkles, Stethoscope,
-  Users, Webhook, Wrench, X, Database, Activity,
+  StickyNote, Users, Webhook, Wrench, X, Database, Activity,
 } from "lucide-react";
 
 type AdminShellProps = {
@@ -34,6 +34,7 @@ const NAV_LINKS = [
   { href: "/admin/llm-usage", label: "LLM Usage", icon: BarChart3 },
   { href: "/admin/team", label: "Equipo", icon: Shield },
   { href: "/admin/integraciones", label: "Integraciones", icon: Webhook },
+  { href: "/admin/notas", label: "Notas", icon: StickyNote },
   { href: "/admin/settings", label: "Configuración", icon: Settings, matchPrefix: true },
   { href: "/admin/guia", label: "Guía", icon: BookOpen },
 ];

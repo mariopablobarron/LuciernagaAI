@@ -666,6 +666,29 @@ model AdminUser {
   @@index([email])
 }
 
+// ─── Admin internal notes (pending follow-ups, reminders) ─────────────────────
+
+/// Lightweight internal note board visible to any admin. Used to track
+/// pending checks, follow-ups, migrations-to-apply, env-vars-to-verify,
+/// and other things that should not be forgotten between sessions.
+model AdminNote {
+  id         String    @id @default(cuid())
+  title      String
+  body       String?   @db.Text
+  tag        String    @default("general") // "referrals" | "migration" | "env" | "cron" | "ui" | "incident" | "general"
+  priority   String    @default("medium")  // "low" | "medium" | "high"
+  status     String    @default("open")    // "open" | "done"
+  createdBy  String?
+  resolvedBy String?
+  resolvedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([status, createdAt])
+  @@index([tag, status])
+  @@index([priority, status])
+}
+
 // ─── Admin task queue (Telegram → Claude Code) ────────────────────────────────
 
 /// Instructions sent by the admin via Telegram, queued for local execution.

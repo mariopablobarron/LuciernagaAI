@@ -100,6 +100,8 @@ model User {
   questionsReceived         AnonQuestion[]            @relation("QuestionsReceived")
   anonAnswers               AnonAnswer[]
   anonAnswerVotes           AnonAnswerVote[]
+  circleSyncResponses       CircleSyncResponse[]
+  circleSyncEchoes          CircleSyncEcho[]
   preferences               UserPreferences?
   trustedContact            TrustedContact?
   supportMessages           SupportMessage[]
@@ -1509,23 +1511,76 @@ enum CircleRole {
 
 /// A small group (5-8 people) in the same transformation phase.
 model Circle {
-  id          String            @id @default(cuid())
-  name        String
-  phase       CirclePhase
-  maxMembers  Int               @default(8)
-  description String?
-  startsAt    DateTime          @default(now())
-  endsAt      DateTime?
-  isActive    Boolean           @default(true)
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-  members     CircleMember[]
-  posts       CommunityPost[]
-  commitments DailyCommitment[]
-  challenges  CircleChallenge[]
-  sessions    LiveSession[]
+  id            String              @id @default(cuid())
+  name          String
+  phase         CirclePhase
+  maxMembers    Int                 @default(8)
+  description   String?
+  startsAt      DateTime            @default(now())
+  endsAt        DateTime?
+  isActive      Boolean             @default(true)
+  syncEnabled   Boolean             @default(true)
+  syncDayOfWeek Int                 @default(4)
+  syncHour      Int                 @default(20)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  members       CircleMember[]
+  posts         CommunityPost[]
+  commitments   DailyCommitment[]
+  challenges    CircleChallenge[]
+  sessions      LiveSession[]
+  syncSessions  CircleSyncSession[]
 
   @@index([phase, isActive])
+  @@index([syncEnabled, isActive])
+}
+
+model CircleSyncSession {
+  id           String               @id @default(cuid())
+  circleId     String
+  scheduledFor DateTime
+  prompt       String               @db.Text
+  promptSource String
+  status       String               @default("scheduled")
+  openedAt     DateTime?
+  closedAt     DateTime?
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  circle       Circle               @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  responses    CircleSyncResponse[]
+
+  @@unique([circleId, scheduledFor])
+  @@index([status, scheduledFor])
+  @@index([circleId, scheduledFor])
+}
+
+model CircleSyncResponse {
+  id          String            @id @default(cuid())
+  sessionId   String
+  userId      String
+  content     String            @db.Text
+  anonymous   Boolean           @default(true)
+  flagged     Boolean           @default(false)
+  submittedAt DateTime          @default(now())
+  editedAt    DateTime?
+  session     CircleSyncSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  echoes      CircleSyncEcho[]
+
+  @@unique([sessionId, userId])
+  @@index([sessionId, submittedAt])
+}
+
+model CircleSyncEcho {
+  id         String             @id @default(cuid())
+  responseId String
+  userId     String
+  createdAt  DateTime           @default(now())
+  response   CircleSyncResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([responseId, userId])
+  @@index([userId, createdAt])
 }
 
 model CircleMember {

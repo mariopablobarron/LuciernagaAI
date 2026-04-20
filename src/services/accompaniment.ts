@@ -1,5 +1,6 @@
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
+import { markFirstMessageIfNull, tryMarkActivated } from "@/services/activation";
 
 export type PriorityLevel = "high" | "medium" | "low";
 export type TrendDirection = "improving" | "stable" | "worsening";
@@ -396,10 +397,17 @@ export async function buildAccompanimentList(): Promise<
 export async function trackUserMessage(userId: string): Promise<void> {
   const prisma = getPrismaClient();
   try {
-    await prisma.user.update({
+    const updated = await prisma.user.update({
       where: { id: userId },
       data: { lastSeen: new Date(), messageCount: { increment: 1 } },
+      select: { messageCount: true, firstMessageSentAt: true, activatedAt: true },
     });
+    if (!updated.firstMessageSentAt) {
+      void markFirstMessageIfNull(userId);
+    }
+    if (!updated.activatedAt && updated.messageCount >= 3) {
+      void tryMarkActivated(userId);
+    }
   } catch (error: unknown) {
     logError("ACCOMPANIMENT", error, { area: "trackUserMessage", userId });
   }

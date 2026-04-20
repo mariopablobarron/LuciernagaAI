@@ -135,6 +135,12 @@ model User {
   emailVerifyToken          String?
   emailVerifyExpires        DateTime?
   deletedAt                 DateTime? // soft delete — null means active
+  // Activation audit fields — populated on first message, aha moment and
+  // onboarding wizard completion. Reads in /admin/analytics/activacion use
+  // these instead of recomputing from Message + Action every time.
+  firstMessageSentAt        DateTime?
+  activatedAt               DateTime? // aha moment: ≥3 user messages in 72h + ≥1 action completada
+  onboardingCompletedAt     DateTime?
   organizationId            String?
   organization              Organization?             @relation(fields: [organizationId], references: [id])
   classroomId               String?
@@ -147,6 +153,8 @@ model User {
   @@index([organizationId, isActive, lastSeen])
   @@index([classroomId])
   @@index([deletedAt])
+  @@index([activatedAt])
+  @@index([firstMessageSentAt])
 }
 
 model Message {

@@ -7,16 +7,18 @@ import type { NextRequest } from "next/server";
 export const dynamic = "force-dynamic";
 
 /**
- * Aha moment definition:
- *   - ≥3 mensajes del usuario en las primeras 72h desde signup
- *   - Y al menos 1 acción completada en cualquier momento posterior al signup
+ * Aha moment definition (persisted, not recomputed):
+ *   - activatedAt is set by services/activation.ts when the user reaches
+ *     ≥3 user messages AND has completed ≥1 action.
+ *   - Retroactive population for existing rows: /api/cron/backfill-activation.
  *
- * Se calcula por cohorte semanal (últimas 12 semanas). Usuarios con menos de
- * 3 días desde el signup aún no son elegibles para la ventana de mensajes.
+ * This endpoint now reads the flag directly. No more per-request O(users·msgs)
+ * scans, and the 12-week cap is lifted (pass ?weeks=24 or ?weeks=all).
  */
 
 const AHA_MESSAGES_REQUIRED = 3;
 const AHA_WINDOW_HOURS = 72;
+const DEFAULT_WEEKS = 12;
 
 type CohortRow = {
   week: string;
@@ -42,13 +44,25 @@ export async function GET(req: NextRequest) {
     const auth = requireAdminPermission(req, "analytics");
     if (auth instanceof NextResponse) return auth;
 
+    const weeksParam = req.nextUrl.searchParams.get("weeks");
+    const allTime = weeksParam === "all";
+    const weeks = allTime ? null : Math.max(1, Math.min(104, Number(weeksParam) || DEFAULT_WEEKS));
+
     const prisma = getPrismaClient();
     const now = Date.now();
-    const twelveWeeksAgo = new Date(now - 12 * 7 * 86400_000);
+    const cutoff = weeks === null ? null : new Date(now - weeks * 7 * 86400_000);
 
     const users = await prisma.user.findMany({
-      where: { createdAt: { gte: twelveWeeksAgo } },
-      select: { id: true, createdAt: true },
+      where: {
+        deletedAt: null,
+        ...(cutoff ? { createdAt: { gte: cutoff } } : {}),
+      },
+      select: {
+        id: true,
+        createdAt: true,
+        messageCount: true,
+        activatedAt: true,
+      },
     });
 
     if (users.length === 0) {
@@ -57,52 +71,28 @@ export async function GET(req: NextRequest) {
           window_hours: AHA_WINDOW_HOURS,
           messages_required: AHA_MESSAGES_REQUIRED,
           needs_action_completed: true,
+          description: `${AHA_MESSAGES_REQUIRED} mensajes + al menos 1 acción completada`,
+          persisted: true,
         },
         cohorts: [],
         overall: { eligible: 0, activated: 0, rate: null },
         totalUsers: 0,
+        range: allTime ? "all" : `${weeks}w`,
       });
     }
 
     const userIds = users.map((u) => u.id);
 
-    const [messages, completedActions] = await Promise.all([
-      prisma.message.findMany({
-        where: {
-          userId: { in: userIds },
-          role: "user",
-          createdAt: { gte: twelveWeeksAgo },
-        },
-        select: { userId: true, createdAt: true },
-      }),
-      prisma.action.findMany({
-        where: { completed: true, goal: { userId: { in: userIds } } },
-        select: { goal: { select: { userId: true } } },
-      }),
-    ]);
-
-    const messageCountInWindow = new Map<string, number>();
-    for (const user of users) {
-      const windowEnd = user.createdAt.getTime() + AHA_WINDOW_HOURS * 3600_000;
-      messageCountInWindow.set(user.id, 0);
-      void windowEnd;
-    }
-    const userSignup = new Map(users.map((u) => [u.id, u.createdAt.getTime()]));
-
-    for (const msg of messages) {
-      if (!msg.userId) continue;
-      const signupMs = userSignup.get(msg.userId);
-      if (signupMs === undefined) continue;
-      const windowEnd = signupMs + AHA_WINDOW_HOURS * 3600_000;
-      const t = msg.createdAt.getTime();
-      if (t >= signupMs && t <= windowEnd) {
-        messageCountInWindow.set(msg.userId, (messageCountInWindow.get(msg.userId) ?? 0) + 1);
-      }
-    }
-
-    const usersWithCompletedAction = new Set<string>();
-    for (const a of completedActions) {
-      if (a.goal.userId) usersWithCompletedAction.add(a.goal.userId);
+    // Users with ≥1 completed action — needed to compute the "action-only"
+    // breakdown (the flag we already use identifies users that met *both*
+    // conditions).
+    const completedActionRows = await prisma.action.findMany({
+      where: { completed: true, goal: { userId: { in: userIds } } },
+      select: { goal: { select: { userId: true } } },
+    });
+    const withCompletedAction = new Set<string>();
+    for (const a of completedActionRows) {
+      if (a.goal.userId) withCompletedAction.add(a.goal.userId);
     }
 
     const cohortMap = new Map<string, typeof users>();
@@ -124,17 +114,19 @@ export async function GET(req: NextRequest) {
       let actionOnly = 0;
 
       for (const u of cohortUsers) {
-        // Elegible = al menos AHA_WINDOW_HOURS han pasado desde su signup
+        // Eligible = enough time has passed since signup to realistically
+        // reach the threshold. Keeps the metric honest for recent signups.
         const eligibleAt = u.createdAt.getTime() + AHA_WINDOW_HOURS * 3600_000;
         if (now < eligibleAt) continue;
         eligible++;
 
-        const msgs = messageCountInWindow.get(u.id) ?? 0;
-        const reachedMessages = msgs >= AHA_MESSAGES_REQUIRED;
-        const hasAction = usersWithCompletedAction.has(u.id);
-
-        if (reachedMessages && hasAction) activated++;
-        else if (reachedMessages) messagesOnly++;
+        if (u.activatedAt) {
+          activated++;
+          continue;
+        }
+        const reachedMessages = u.messageCount >= AHA_MESSAGES_REQUIRED;
+        const hasAction = withCompletedAction.has(u.id);
+        if (reachedMessages) messagesOnly++;
         else if (hasAction) actionOnly++;
       }
 
@@ -159,7 +151,8 @@ export async function GET(req: NextRequest) {
         window_hours: AHA_WINDOW_HOURS,
         messages_required: AHA_MESSAGES_REQUIRED,
         needs_action_completed: true,
-        description: `${AHA_MESSAGES_REQUIRED} mensajes en ${AHA_WINDOW_HOURS / 24} días + al menos 1 acción completada`,
+        description: `${AHA_MESSAGES_REQUIRED} mensajes + al menos 1 acción completada`,
+        persisted: true,
       },
       cohorts,
       overall: {
@@ -168,6 +161,7 @@ export async function GET(req: NextRequest) {
         rate: overallEligible > 0 ? overallActivated / overallEligible : null,
       },
       totalUsers: users.length,
+      range: allTime ? "all" : `${weeks}w`,
     });
   } catch (error) {
     logError("ANALYTICS_ACTIVATION", error, { action: "get_activation" });

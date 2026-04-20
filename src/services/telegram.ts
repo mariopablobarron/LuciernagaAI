@@ -1,5 +1,6 @@
 import { getPrismaClient } from "@/db/prisma";
 import { buildSyntheticEmail } from "@/services/user";
+import { markFirstMessageIfNull, tryMarkActivated } from "@/services/activation";
 import { logError, logInfo } from "@/lib/logger";
 import { fetchWithTimeout } from "@/lib/fetchWithTimeout";
 
@@ -54,10 +55,17 @@ export async function createTelegramUserWithConsent(telegramChatId: number): Pro
 export async function touchTelegramUser(userId: string): Promise<void> {
   const prisma = getPrismaClient();
   try {
-    await prisma.user.update({
+    const updated = await prisma.user.update({
       where: { id: userId },
       data: { lastSeen: new Date(), messageCount: { increment: 1 } },
+      select: { messageCount: true, firstMessageSentAt: true, activatedAt: true },
     });
+    if (!updated.firstMessageSentAt) {
+      void markFirstMessageIfNull(userId);
+    }
+    if (!updated.activatedAt && updated.messageCount >= 3) {
+      void tryMarkActivated(userId);
+    }
   } catch {
     // Fallback: update only lastSeen if messageCount column is unavailable
     try {

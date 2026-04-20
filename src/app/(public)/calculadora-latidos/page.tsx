@@ -377,7 +377,7 @@ export default function CalculadoraLatidosPage() {
                   </div>
                 </div>
                 <p className="mt-4 text-xs text-zinc-600 text-center">
-                  Tu corazon late {AVG_BPM} veces por minuto sin que se lo pidas. Esa constancia ya la tienes dentro.
+                  Tu corazón late {AVG_BPM} veces por minuto sin que se lo pidas. Esa constancia ya la tienes dentro.
                 </p>
               </div>
             )}
@@ -475,11 +475,11 @@ export default function CalculadoraLatidosPage() {
             {/* CTA */}
             <div className="rounded-2xl border border-fuchsia-500/20 bg-fuchsia-500/5 p-6 text-center space-y-4">
               <p className="text-lg font-bold text-white">
-                Tu corazon ya hace su parte. Ahora te toca a ti.
+                Tu corazón ya hace su parte. Ahora te toca a ti.
               </p>
               <p className="text-sm text-zinc-400 max-w-md mx-auto">
-                Con la misma constancia con la que late tu corazon, puedes avanzar un paso cada dia.
-                Tres Mil Millones de Latidos te ayuda a convertir la intencion en accion.
+                Con la misma constancia con la que late tu corazón, puedes avanzar un paso cada día.
+                Tres Mil Millones de Latidos te ayuda a convertir la intención en acción.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link href="/app" className={COMPONENTS.buttonPrimary}>
@@ -503,13 +503,13 @@ export default function CalculadoraLatidosPage() {
             <div className="grid md:grid-cols-2 gap-6 text-sm leading-relaxed">
               <div className="space-y-2">
                 <p>
-                  Tu corazon late unas <strong className="text-zinc-300">{AVG_BPM} veces por minuto</strong> sin
+                  Tu corazón late unas <strong className="text-zinc-300">{AVG_BPM} veces por minuto</strong> sin
                   que se lo pidas. Son {BEATS_PER_HOUR.toLocaleString("es-ES")} por hora,{" "}
                   {BEATS_PER_DAY.toLocaleString("es-ES")} al dia. Cada uno sostiene todo lo que haces,
                   piensas y sientes.
                 </p>
                 <p>
-                  A lo largo de una vida, el corazon late cerca de{" "}
+                  A lo largo de una vida, el corazón late cerca de{" "}
                   <strong className="text-fuchsia-300">3 mil millones de veces</strong>.
                   No es una cuenta atras — es un recordatorio de lo que ya has construido latido a latido.
                 </p>

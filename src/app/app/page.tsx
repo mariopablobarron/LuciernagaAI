@@ -1963,15 +1963,15 @@ export default function HomePage() {
           <div className="mx-auto max-w-3xl space-y-3">
             <p className="text-xs font-semibold text-zinc-300">Antes de continuar</p>
             <ul className="text-xs text-zinc-400 space-y-1.5 leading-relaxed">
-              <li>• Esta herramienta usa <strong className="text-zinc-300">inteligencia artificial supervisada</strong> por un equipo de psicologos, mentores y coaches.</li>
-              <li>• <strong className="text-amber-400">No sustituye</strong> terapia psicologica, psiquiatrica ni atencion profesional de salud mental.</li>
+              <li>• Esta herramienta usa <strong className="text-zinc-300">inteligencia artificial supervisada</strong> por un equipo de psicólogos, mentores y coaches.</li>
+              <li>• <strong className="text-amber-400">No sustituye</strong> terapia psicológica, psiquiátrica ni atención profesional de salud mental.</li>
               <li>• En caso de crisis o riesgo inmediato, contacta con el <a href="tel:024" className="text-red-400 font-semibold">024</a> o el 112.</li>
               <li>• Tus datos se almacenan de forma segura. Puedes eliminarlos en cualquier momento desde Ajustes.</li>
             </ul>
             <div className="flex items-center justify-between gap-3 pt-1">
               <p className="text-[10px] text-zinc-600">
-                <Link href="/privacy" className="text-violet-400/70 underline underline-offset-2">Politica de privacidad</Link>{" · "}
-                <Link href="/terms" className="text-violet-400/70 underline underline-offset-2">Terminos de uso</Link>
+                <Link href="/privacy" className="text-violet-400/70 underline underline-offset-2">Política de privacidad</Link>{" · "}
+                <Link href="/terms" className="text-violet-400/70 underline underline-offset-2">Términos de uso</Link>
               </p>
               <button
                 onClick={() => {

@@ -1,9 +1,16 @@
 import type { ReactNode } from "react";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import PlatformLayout from "@/components/layout/PlatformLayout";
 import { getUserAccessState } from "@/services/user";
 import { PLANS } from "@/lib/plans";
+
+export const metadata: Metadata = {
+  title: "Modo Impulso — Reto de 21 días",
+  description:
+    "21 días para romper los patrones que te frenan. No es motivación — es estructura, acción y evidencia. Mentoría con IA.",
+};
 
 async function getImpulsoAccess(): Promise<boolean> {
   try {

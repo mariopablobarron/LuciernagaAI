@@ -185,6 +185,38 @@ function Cell({ data }: { data: Row["producto"] }) {
   );
 }
 
+function CardRow({
+  label,
+  data,
+  highlight = false,
+}: {
+  label: string;
+  data: Row["producto"];
+  highlight?: boolean;
+}) {
+  const icon =
+    data.tone === "good" ? (
+      <Check className="shrink-0 w-4 h-4 text-emerald-400" />
+    ) : data.tone === "bad" ? (
+      <XIcon className="shrink-0 w-4 h-4 text-red-400" />
+    ) : data.tone === "warn" ? (
+      <HelpCircle className="shrink-0 w-4 h-4 text-amber-400" />
+    ) : (
+      <span className="shrink-0 w-4 h-4 inline-flex items-center justify-center text-zinc-600">·</span>
+    );
+  return (
+    <div className="flex items-start gap-2.5 rounded-lg bg-zinc-900/60 px-3 py-2">
+      {icon}
+      <div className="min-w-0 flex-1">
+        <p className={`text-[11px] font-semibold uppercase tracking-wide ${highlight ? "text-violet-300" : "text-zinc-500"}`}>
+          {label}
+        </p>
+        <p className="text-sm text-zinc-300 leading-snug mt-0.5">{data.label}</p>
+      </div>
+    </div>
+  );
+}
+
 export default function ComparativaPage() {
   const lastUpdated = "Abril 2026";
 
@@ -230,7 +262,24 @@ export default function ComparativaPage() {
                 Comparativa punto a punto
               </h2>
             </div>
-            <div className="overflow-x-auto">
+
+            {/* Mobile: stacked cards, one per criterio */}
+            <div className="md:hidden divide-y divide-zinc-800">
+              {COMPARISON.map((row) => (
+                <div key={row.criterio} className="px-4 py-4 space-y-2.5">
+                  <p className="text-sm font-bold text-white">{row.criterio}</p>
+                  <div className="space-y-1.5">
+                    <CardRow label="Tres Mil Millones de Latidos" data={row.producto} highlight />
+                    <CardRow label="ChatGPT / Claude" data={row.chatgpt} />
+                    <CardRow label="Terapia tradicional" data={row.terapia} />
+                    <CardRow label="Apps meditación" data={row.meditacion} />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop: table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
                   <tr className="border-b border-zinc-800 text-[11px] uppercase tracking-wide text-zinc-500">

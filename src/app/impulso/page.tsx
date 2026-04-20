@@ -112,10 +112,10 @@ const CHALLENGE_BAR: Record<ChallengeType, string> = {
 
 // ─── Tab type ─────────────────────────────────────────────────────────────────
 
-type TabId = "diagnostico" | "retos" | "insights" | "mensajes";
+type TabId = "diagnóstico" | "retos" | "insights" | "mensajes";
 
 const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
-  { id: "diagnostico", label: "Diagnóstico", icon: Brain },
+  { id: "diagnóstico", label: "Diagnóstico", icon: Brain },
   { id: "retos", label: "Retos", icon: Target },
   { id: "insights", label: "Insights", icon: Zap },
   { id: "mensajes", label: "Mensajes", icon: CalendarDays },
@@ -132,7 +132,7 @@ function Skeleton({ className }: { className?: string }) {
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 export default function ImpulsoPage() {
-  const [activeTab, setActiveTab] = useState<TabId>("diagnostico");
+  const [activeTab, setActiveTab] = useState<TabId>("diagnóstico");
   const [data, setData] = useState<InsightsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -213,24 +213,24 @@ export default function ImpulsoPage() {
               </div>
               <h1 className="text-4xl font-black text-white">Modo Impulso</h1>
               <p className="text-lg text-zinc-400 max-w-lg mx-auto leading-relaxed">
-                21 dias para romper los patrones que te frenan.
-                No es motivacion — es estructura, accion y evidencia.
+                21 días para romper los patrones que te frenan.
+                No es motivación — es estructura, acción y evidencia.
               </p>
             </div>
 
             {/* Why 21 days */}
             <div className="rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-500/5 to-fuchsia-500/5 p-6 sm:p-8 space-y-4">
-              <h2 className="text-lg font-bold text-white">¿Por que 21 dias?</h2>
+              <h2 className="text-lg font-bold text-white">¿Por que 21 días?</h2>
               <div className="space-y-3 text-sm text-zinc-400 leading-relaxed">
                 <p>
-                  La investigacion en psicologia del comportamiento muestra que un habito no se forma en un dia
-                  ni se rompe con una decision. Se necesita <strong className="text-white">repeticion sostenida</strong> en
-                  un entorno con estructura y retroalimentacion.
+                  La investigación en psicología del comportamiento muestra que un hábito no se forma en un día
+                  ni se rompe con una decisión. Se necesita <strong className="text-white">repetición sostenida</strong> en
+                  un entorno con estructura y retroalimentación.
                 </p>
                 <p>
-                  21 dias es el punto donde lo que empezo como esfuerzo consciente empieza a convertirse en
+                  21 días es el punto donde lo que empezó como esfuerzo consciente empieza a convertirse en
                   <strong className="text-white"> inercia positiva</strong>. No es magia — es neuroplasticidad: tu cerebro
-                  crea nuevas conexiones cuando repites una accion con intencion.
+                  crea nuevas conexiones cuando repites una acción con intención.
                 </p>
               </div>
               <div className="grid grid-cols-3 gap-3 pt-2">
@@ -246,22 +246,22 @@ export default function ImpulsoPage() {
                 </div>
                 <div className="text-center p-3 rounded-xl bg-zinc-900/50 border border-zinc-800">
                   <p className="text-2xl font-black text-fuchsia-400">21</p>
-                  <p className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider mt-1">Transformacion</p>
+                  <p className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider mt-1">Transformación</p>
                   <p className="text-[10px] text-zinc-600 mt-0.5">El cambio es tuyo</p>
                 </div>
               </div>
               <p className="text-xs text-zinc-500 italic">
-                No se trata de ser perfecto 21 dias. Se trata de no abandonar cuando fallas en el dia 4.
-                El sistema te acompana para que el dia 5 vuelvas.
+                No se trata de ser perfecto 21 días. Se trata de no abandonar cuando fallas en el día 4.
+                El sistema te acompaña para que el día 5 vuelvas.
               </p>
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
               {[
-                { icon: Brain, color: "text-cyan-400", bg: "bg-cyan-500/10", border: "border-cyan-500/20", title: "Diagnostico", desc: "12 preguntas para identificar tu perfil: alto potencial, bloqueado, ansioso o desmotivado." },
-                { icon: Target, color: "text-violet-400", bg: "bg-violet-500/10", border: "border-violet-500/20", title: "Retos personalizados", desc: "Retos de 3 a 7 dias adaptados a tu perfil. Cada uno rompe un patron especifico." },
-                { icon: Flame, color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20", title: "Check-in diario", desc: "Registra tu avance cada dia. La constancia es lo que genera el cambio, no la intensidad." },
-                { icon: TrendingUp, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20", title: "Insights de comportamiento", desc: "Analisis de tus patrones en ventanas de 14 dias. Ve lo que no ves." },
+                { icon: Brain, color: "text-cyan-400", bg: "bg-cyan-500/10", border: "border-cyan-500/20", title: "Diagnóstico", desc: "12 preguntas para identificar tu perfil: alto potencial, bloqueado, ansioso o desmotivado." },
+                { icon: Target, color: "text-violet-400", bg: "bg-violet-500/10", border: "border-violet-500/20", title: "Retos personalizados", desc: "Retos de 3 a 7 días adaptados a tu perfil. Cada uno rompe un patrón específico." },
+                { icon: Flame, color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20", title: "Check-in diario", desc: "Registra tu avance cada día. La constancia es lo que genera el cambio, no la intensidad." },
+                { icon: TrendingUp, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20", title: "Insights de comportamiento", desc: "Análisis de tus patrones en ventanas de 14 días. Ve lo que no ves." },
               ].map((item) => (
                 <div key={item.title} className={`rounded-xl border ${item.border} ${item.bg} p-5 space-y-2`}>
                   <item.icon className={`w-6 h-6 ${item.color}`} />
@@ -272,14 +272,14 @@ export default function ImpulsoPage() {
             </div>
 
             <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-3">
-              <p className="text-sm font-semibold text-white">¿Como funciona?</p>
+              <p className="text-sm font-semibold text-white">¿Cómo funciona?</p>
               <div className="space-y-2">
                 {[
-                  "Haces el diagnostico (5 min) — identificamos tu punto de partida.",
+                  "Haces el diagnóstico (5 min) — identificamos tu punto de partida.",
                   "Recibes tu primer reto personalizado — adaptado a lo que te bloquea.",
-                  "Cada dia haces check-in — registras si avanzaste y como te sientes.",
-                  "A los 14 dias, el sistema te muestra tus patrones reales.",
-                  "A los 21 dias, lo que empezo como esfuerzo es habito.",
+                  "Cada día haces check-in — registras si avanzaste y cómo te sientes.",
+                  "A los 14 días, el sistema te muestra tus patrones reales.",
+                  "A los 21 días, lo que empezó como esfuerzo es hábito.",
                 ].map((step, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <span className="shrink-0 w-6 h-6 rounded-full bg-violet-500/15 border border-violet-500/30 flex items-center justify-center text-xs font-bold text-violet-300">{i + 1}</span>
@@ -291,11 +291,11 @@ export default function ImpulsoPage() {
 
             <div className="text-center space-y-3">
               <Link
-                href="/impulso/diagnostico"
-                data-tour="impulso-diagnostico"
+                href="/impulso/diagnóstico"
+                data-tour="impulso-diagnóstico"
                 className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-bold text-lg shadow-xl shadow-fuchsia-500/25 hover:from-violet-400 hover:to-fuchsia-400 active:scale-95 transition-all"
               >
-                <Brain className="w-5 h-5" /> Empezar diagnostico
+                <Brain className="w-5 h-5" /> Empezar diagnóstico
               </Link>
               <p className="text-xs text-zinc-600">5 minutos · 12 preguntas · gratuito</p>
             </div>
@@ -310,7 +310,7 @@ export default function ImpulsoPage() {
               Programa
             </p>
             <h1 className="text-3xl font-bold text-white">Impulso</h1>
-            <p className="text-zinc-400 text-sm mt-1">21 dias de accion consistente</p>
+            <p className="text-zinc-400 text-sm mt-1">21 días de acción consistente</p>
           </div>
           <Link
             href="/impulso/checkin"
@@ -421,7 +421,7 @@ export default function ImpulsoPage() {
         {/* ── Tab Content ────────────────────────────────────────── */}
 
         {/* DIAGNÓSTICO */}
-        {activeTab === "diagnostico" && (
+        {activeTab === "diagnóstico" && (
           <div className="space-y-6">
             {loading ? (
               <>
@@ -445,7 +445,7 @@ export default function ImpulsoPage() {
                     y recibir un programa personalizado de 21 días.
                   </p>
                   <Link
-                    href="/impulso/diagnostico"
+                    href="/impulso/diagnóstico"
                     className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-bold text-white bg-linear-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-fuchsia-500/20 text-base"
                   >
                     <Brain className="w-4 h-4" />

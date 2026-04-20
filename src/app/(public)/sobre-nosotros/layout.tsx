@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Sobre nosotros — Tres Mil Millones de Latidos | Mario Pablo Sanchez Barron",
+  title: "Sobre nosotros — Mario Pablo Sanchez Barron",
   description:
-    "Tres Mil Millones de Latidos nace de Startidea, creada por Mario Pablo Sanchez Barron. 15 años de experiencia en innovacion social. Combinamos IA, psicologia del comportamiento y acompanamiento real.",
+    "Tres Mil Millones de Latidos nace de Startidea, creada por Mario Pablo Sanchez Barron. 15 años de experiencia en innovación social. Combinamos IA, psicología del comportamiento y acompañamiento real.",
   alternates: {
     canonical: "https://tresmilmillonesdelatidos.es/sobre-nosotros",
   },
   openGraph: {
     title: "Sobre nosotros — Tres Mil Millones de Latidos",
     description:
-      "Conoce a Mario Pablo Sanchez Barron y Startidea, la agencia detras de Tres Mil Millones de Latidos. 15 años de innovacion social.",
+      "Conoce a Mario Pablo Sanchez Barron y Startidea, la agencia detrás de Tres Mil Millones de Latidos. 15 años de innovación social.",
     type: "article",
     locale: "es_ES",
     siteName: "Tres Mil Millones de Latidos",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Sobre nosotros — Tres Mil Millones de Latidos",
     description:
-      "Mario Pablo Sanchez Barron y Startidea: 15 años de innovacion social. Tres Mil Millones de Latidos: un mentor con IA.",
+      "Mario Pablo Sanchez Barron y Startidea: 15 años de innovación social. Tres Mil Millones de Latidos: un mentor con IA.",
     images: ["/opengraph-image"],
   },
   robots: { index: true, follow: true },

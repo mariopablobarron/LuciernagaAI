@@ -122,7 +122,7 @@ export default function OrgLoginPage() {
         <p className="text-center text-xs text-zinc-600">
           ¿No tienes cuenta?{" "}
           <Link href="/org/registro" className="text-violet-400 hover:text-violet-300">
-            Registra tu organizacion
+            Registra tu organización
           </Link>
         </p>
       </div>

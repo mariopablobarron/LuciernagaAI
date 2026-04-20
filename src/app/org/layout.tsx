@@ -8,7 +8,7 @@ export default function OrgLayout({ children }: { children: ReactNode }) {
         <Link href="/" className="flex items-center gap-1.5 text-zinc-500 hover:text-white transition-colors">
           <span className="text-sm leading-none">💓</span>
           <span className="text-xs font-semibold bg-linear-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
-            Latidos
+            Tres Mil Millones
           </span>
         </Link>
         <span className="text-zinc-700 text-xs">/</span>

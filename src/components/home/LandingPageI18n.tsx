@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useTranslations, useLocale } from 'next-intl';
-import { ArrowRight, Sparkles, Bot, Users, Check, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { ArrowRight, Sparkles, Bot, Users, Check, X, ShieldCheck, Zap, Target } from 'lucide-react';
 import Header from '@/components/home/Header';
 import Footer from '@/components/home/Footer';
 import HeartbeatParticles from '@/components/effects/HeartbeatParticles';
@@ -70,12 +70,22 @@ function ChatMockup() {
 }
 
 const FEATURES_KEYS = ['noJudgment', 'realState', 'concreteAction'] as const;
-const FEATURE_ICONS = ['🎯', '⚡', '✓'];
+const FEATURE_ICONS = [ShieldCheck, Zap, Target] as const;
 const FEATURE_COLORS = [
   { color: 'text-violet-400', bg: 'bg-violet-500/10', border: 'border-violet-500/20' },
   { color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20' },
   { color: 'text-fuchsia-400', bg: 'bg-fuchsia-500/10', border: 'border-fuchsia-500/20' },
 ];
+
+function getInitials(fullName: string): string {
+  return fullName
+    .split(' ')
+    .filter(Boolean)
+    .map((word) => word[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+}
 
 type LandingProps = {
   founderPhotoUrl?: string;
@@ -87,23 +97,12 @@ export default function LandingPageI18n({
   advisorPhotoUrl = null,
 }: LandingProps = {}) {
   const t = useTranslations();
-  const locale = useLocale();
-  const otherLocale = locale === 'es' ? 'en' : 'es';
+  const advisorInitials = getInitials(t('team.advisor.name'));
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
       <HeartbeatParticles />
       <Header />
-
-      {/* Language switcher — hidden on mobile (collides with header actions), shown on md+ */}
-      <div className="hidden md:block absolute top-5 right-72 z-40">
-        <Link
-          href={`/${otherLocale}`}
-          className="px-2.5 py-1 rounded-lg bg-zinc-800/80 border border-zinc-700/50 text-xs font-medium text-zinc-400 hover:text-white hover:border-violet-500/40 transition-all backdrop-blur-sm"
-        >
-          {otherLocale === 'en' ? 'EN' : 'ES'}
-        </Link>
-      </div>
 
       {/* HERO */}
       <section className="relative overflow-hidden">
@@ -205,16 +204,19 @@ export default function LandingPageI18n({
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {FEATURES_KEYS.map((key, i) => (
-              <div key={key} className={`group p-8 rounded-2xl border bg-zinc-900/40 backdrop-blur-sm hover:bg-zinc-900/70 transition-all ${FEATURE_COLORS[i].border}`}>
-                <div className={`w-12 h-12 rounded-xl ${FEATURE_COLORS[i].bg} flex items-center justify-center mb-5 text-xl`}>
-                  {FEATURE_ICONS[i]}
+            {FEATURES_KEYS.map((key, i) => {
+              const Icon = FEATURE_ICONS[i];
+              return (
+                <div key={key} className={`group p-8 rounded-2xl border bg-zinc-900/40 backdrop-blur-sm hover:bg-zinc-900/70 transition-all ${FEATURE_COLORS[i].border}`}>
+                  <div className={`w-12 h-12 rounded-xl ${FEATURE_COLORS[i].bg} flex items-center justify-center mb-5`}>
+                    <Icon className={`w-6 h-6 ${FEATURE_COLORS[i].color}`} aria-hidden="true" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-3">{t(`features.${key}.title`)}</h3>
+                  <p className="text-zinc-300 text-base leading-relaxed">{t(`features.${key}.description`)}</p>
+                  <div className="mt-6 h-0.5 w-0 bg-linear-to-r from-violet-400 to-cyan-400 group-hover:w-full transition-all duration-500" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">{t(`features.${key}.title`)}</h3>
-                <p className="text-zinc-300 text-base leading-relaxed">{t(`features.${key}.description`)}</p>
-                <div className="mt-6 h-0.5 w-0 bg-linear-to-r from-violet-400 to-cyan-400 group-hover:w-full transition-all duration-500" />
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -277,7 +279,6 @@ export default function LandingPageI18n({
                   fill
                   sizes="80px"
                   className="object-cover"
-                  unoptimized
                 />
               </div>
               <div className="flex-1">
@@ -296,12 +297,14 @@ export default function LandingPageI18n({
                     fill
                     sizes="80px"
                     className="object-cover"
-                    unoptimized
                   />
                 </div>
               ) : (
-                <div className="w-20 h-20 rounded-full bg-linear-to-br from-cyan-500 to-violet-500 flex items-center justify-center font-bold text-white text-2xl shrink-0 ring-2 ring-cyan-500/30">
-                  AP
+                <div
+                  aria-label={t('team.advisor.name')}
+                  className="w-20 h-20 rounded-full bg-linear-to-br from-cyan-500 to-violet-500 flex items-center justify-center font-bold text-white text-2xl shrink-0 ring-2 ring-cyan-500/30"
+                >
+                  {advisorInitials}
                 </div>
               )}
               <div className="flex-1">

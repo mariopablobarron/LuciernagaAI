@@ -6,6 +6,7 @@ import { Menu, X, User, Settings, LogOut } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import ClinicalDisclaimer from "@/components/ClinicalDisclaimer";
 import NotificationBell from "@/components/NotificationBell";
+import LocaleSwitcher from "@/components/LocaleSwitcher";
 import { useSession } from "@/lib/useSession";
 
 const NAV = [
@@ -97,6 +98,7 @@ export default function Header() {
 
           {/* CTAs / User area */}
           <div className="hidden md:flex items-center gap-2 shrink-0">
+            <LocaleSwitcher />
             <ClinicalDisclaimer />
             {!sessionLoading && user ? (
               <>
@@ -242,6 +244,12 @@ export default function Header() {
                   </Link>
                 </div>
               )}
+              <div className="mt-3 flex items-center justify-center">
+                <LocaleSwitcher
+                  onNavigate={() => setOpen(false)}
+                  className="px-4 py-2 rounded-lg border border-white/12 text-xs font-semibold tracking-wider text-zinc-400 hover:text-white hover:border-white/20 transition-all"
+                />
+              </div>
             </div>
           </nav>
         </div>

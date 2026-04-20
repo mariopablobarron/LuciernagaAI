@@ -60,3 +60,5 @@ clauditor/
 # Playwright MCP local artifacts
 .playwright-mcp/
 *-snapshot.yml
+mobile-*.png
+mobile-*.jpeg

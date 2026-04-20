@@ -95,8 +95,8 @@ export default function LandingPageI18n({
       <HeartbeatParticles />
       <Header />
 
-      {/* Language switcher — inside header area, not overlapping */}
-      <div className="absolute top-5 right-20 md:right-72 z-40">
+      {/* Language switcher — hidden on mobile (collides with header actions), shown on md+ */}
+      <div className="hidden md:block absolute top-5 right-72 z-40">
         <Link
           href={`/${otherLocale}`}
           className="px-2.5 py-1 rounded-lg bg-zinc-800/80 border border-zinc-700/50 text-xs font-medium text-zinc-400 hover:text-white hover:border-violet-500/40 transition-all backdrop-blur-sm"

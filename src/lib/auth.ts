@@ -1,5 +1,7 @@
 import { createHmac, randomBytes, randomUUID, timingSafeEqual } from "crypto";
 import type { NextRequest, NextResponse } from "next/server";
+import { getPrismaClient } from "@/db/prisma";
+import { cache } from "@/lib/cache";
 import { logError, logInfo } from "@/lib/logger";
 import { ensureUserAccount, linkIdentityToEmail, touchLastSeen } from "@/services/user";
 
@@ -207,10 +209,52 @@ function getTokenFromRequest(req: NextRequest): {
   };
 }
 
+const USER_DISABLED_CACHE_PREFIX = "user:disabled:";
+const USER_DISABLED_CACHE_TTL_MS = 60_000;
+
+type UserDisabledState =
+  | { disabled: false }
+  | { disabled: true; reason: "deleted" | "deactivated" };
+
+async function fetchUserDisabledState(userId: string): Promise<UserDisabledState> {
+  return cache.get(
+    `${USER_DISABLED_CACHE_PREFIX}${userId}`,
+    USER_DISABLED_CACHE_TTL_MS,
+    async (): Promise<UserDisabledState> => {
+      const prisma = getPrismaClient();
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { isActive: true, deletedAt: true },
+      });
+      if (!user) return { disabled: false };
+      if (user.deletedAt) return { disabled: true, reason: "deleted" };
+      if (!user.isActive) return { disabled: true, reason: "deactivated" };
+      return { disabled: false };
+    },
+  );
+}
+
+export function invalidateUserDisabledCache(userId: string): void {
+  cache.invalidate(`${USER_DISABLED_CACHE_PREFIX}${userId}`);
+}
+
 async function finalizeIdentity(
   identity: ResolvedIdentity,
   options: ResolveIdentityOptions
 ): Promise<ResolvedIdentity> {
+  // Reject existing sessions whose account got deactivated or deleted.
+  // Cached 60s to bound DB load; newly-issued tokens from login path are already validated there.
+  if (identity.source === "session" || identity.source === "refreshed") {
+    const state = await fetchUserDisabledState(identity.userId);
+    if (state.disabled) {
+      logInfo("AUTH", "session_rejected_disabled_account", {
+        userId: identity.userId,
+        reason: state.reason,
+      });
+      throw new InvalidSessionTokenError();
+    }
+  }
+
   // On bootstrap (new user), we need the full upsert.
   // On existing sessions, just debounce lastSeen — no DB write per request.
   if (identity.source === "generated") {

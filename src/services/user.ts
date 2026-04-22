@@ -121,6 +121,26 @@ export class IdentityLinkConflictError extends Error {
   }
 }
 
+export class UserAccountDisabledError extends Error {
+  readonly reason: "deactivated" | "deleted";
+  constructor(reason: "deactivated" | "deleted") {
+    super(reason === "deleted" ? "ACCOUNT_DELETED" : "ACCOUNT_DEACTIVATED");
+    this.name = "UserAccountDisabledError";
+    this.reason = reason;
+  }
+}
+
+export async function assertUserAccountUsable(userId: string): Promise<void> {
+  const prisma = getPrismaClient();
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { isActive: true, deletedAt: true },
+  });
+  if (!user) return;
+  if (user.deletedAt) throw new UserAccountDisabledError("deleted");
+  if (!user.isActive) throw new UserAccountDisabledError("deactivated");
+}
+
 function normalizeSyntheticLocalPart(userId: string): string {
   const safeValue = userId
     .trim()

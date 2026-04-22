@@ -12,9 +12,11 @@ import { verifyPassword } from "@/lib/password";
 // due to dual flow (password + anonymous bootstrap)
 import { logError, logInfo } from "@/lib/logger";
 import {
+  assertUserAccountUsable,
   getUserSessionProfile,
   IdentityLinkConflictError,
   normalizeEmail,
+  UserAccountDisabledError,
 } from "@/services/user";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { validateOrigin } from "@/lib/csrf";
@@ -62,7 +64,13 @@ export async function POST(req: NextRequest) {
       const prisma = getPrismaClient();
       const dbUser = await prisma.user.findUnique({
         where: { email: normalizedEmail },
-        select: { id: true, passwordHash: true, emailVerified: true },
+        select: {
+          id: true,
+          passwordHash: true,
+          emailVerified: true,
+          isActive: true,
+          deletedAt: true,
+        },
       });
 
       if (!dbUser?.passwordHash) {
@@ -77,6 +85,21 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
           { success: false, authenticated: false, error: "INVALID_CREDENTIALS" },
           { status: 401 }
+        );
+      }
+
+      if (dbUser.deletedAt || !dbUser.isActive) {
+        logInfo("AUTH", "login_blocked_disabled_account", {
+          userId: dbUser.id,
+          reason: dbUser.deletedAt ? "deleted" : "deactivated",
+        });
+        return NextResponse.json(
+          {
+            success: false,
+            authenticated: false,
+            error: dbUser.deletedAt ? "ACCOUNT_DELETED" : "ACCOUNT_DEACTIVATED",
+          },
+          { status: 403 }
         );
       }
 
@@ -98,6 +121,7 @@ export async function POST(req: NextRequest) {
       email: normalizedEmail,
       name: body.name,
     });
+    await assertUserAccountUsable(identity.userId);
     const user = await getUserSessionProfile(identity.userId);
 
     const response = NextResponse.json({
@@ -132,6 +156,19 @@ export async function POST(req: NextRequest) {
       );
       clearSessionCookie(unauthorized);
       return unauthorized;
+    }
+
+    if (error instanceof UserAccountDisabledError) {
+      const disabled = NextResponse.json(
+        {
+          success: false,
+          authenticated: false,
+          error: error.reason === "deleted" ? "ACCOUNT_DELETED" : "ACCOUNT_DEACTIVATED",
+        },
+        { status: 403 }
+      );
+      clearSessionCookie(disabled);
+      return disabled;
     }
 
     if (error instanceof IdentityLinkConflictError) {

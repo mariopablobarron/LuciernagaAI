@@ -51,8 +51,11 @@ type ListItem = {
   id: string;
   email: string;
   name: string | null;
+  hasAvatar: boolean;
   role: string;
   kind: UserKind;
+  isActive: boolean;
+  deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
   lastSeen: string;
@@ -128,6 +131,7 @@ export async function GET(req: NextRequest) {
     const stateFilter = searchParams.get("state")?.trim() || "all";
     const riskOnly = searchParams.get("risk") === "1";
     const kindFilter = searchParams.get("kind")?.trim() || "all";
+    const includeDeleted = searchParams.get("includeDeleted") === "1";
 
     const page = parsePositiveInt(searchParams.get("page"), 1);
     const pageSize = clamp(parsePositiveInt(searchParams.get("pageSize"), 50), 5, 200);
@@ -168,7 +172,12 @@ export async function GET(req: NextRequest) {
         | { name: { contains: string; mode: "insensitive" } }
       >;
       id?: { in: string[] };
+      deletedAt?: null;
     } = {};
+
+    if (!includeDeleted) {
+      userWhere.deletedAt = null;
+    }
 
     if (query) {
       userWhere.OR = [
@@ -180,6 +189,7 @@ export async function GET(req: NextRequest) {
     // Classify all users once so kindCounts is global and we can filter by kind.
     const classificationNowMs = Date.now();
     const classifyAllUsers = await prisma.user.findMany({
+      where: includeDeleted ? undefined : { deletedAt: null },
       select: { id: true, email: true, name: true, lastSeen: true },
     });
     const kindById = new Map<string, UserKind>();
@@ -233,6 +243,8 @@ export async function GET(req: NextRequest) {
         createdAt: true,
         updatedAt: true,
         lastSeen: true,
+        isActive: true,
+        deletedAt: true,
         avatarData: true,
         _count: {
           select: {
@@ -354,6 +366,8 @@ export async function GET(req: NextRequest) {
         hasAvatar: Boolean(user.avatarData),
         role: user.role,
         kind: kindById.get(user.id) ?? "registered",
+        isActive: user.isActive,
+        deletedAt: user.deletedAt ? user.deletedAt.toISOString() : null,
         createdAt: user.createdAt.toISOString(),
         updatedAt: user.updatedAt.toISOString(),
         lastSeen: user.lastSeen.toISOString(),

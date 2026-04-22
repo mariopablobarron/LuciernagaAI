@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdminPermission, resolveAdminAuth } from "@/lib/admin-auth";
+import { invalidateUserDisabledCache } from "@/lib/auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { withRateLimit } from "@/lib/rate-limit";
@@ -352,14 +353,24 @@ export const PATCH = withRateLimit(
         email?: string;
         role?: string;
         isActive?: boolean;
+        restore?: boolean;
       };
 
-      const { name, email, role, isActive } = body;
+      const { name, email, role, isActive, restore } = body;
 
       // At least one field must be provided
-      if (name === undefined && email === undefined && role === undefined && isActive === undefined) {
+      if (
+        name === undefined &&
+        email === undefined &&
+        role === undefined &&
+        isActive === undefined &&
+        restore === undefined
+      ) {
         return NextResponse.json(
-          { error: "NO_FIELDS", message: "At least one field (name, email, role, isActive) is required." },
+          {
+            error: "NO_FIELDS",
+            message: "At least one field (name, email, role, isActive, restore) is required.",
+          },
           { status: 400 },
         );
       }
@@ -400,6 +411,7 @@ export const PATCH = withRateLimit(
       if (email !== undefined) { data.email = email; fields.push("email"); }
       if (role !== undefined) { data.role = role; fields.push("role"); }
       if (isActive !== undefined) { data.isActive = isActive; fields.push("isActive"); }
+      if (restore === true) { data.deletedAt = null; data.isActive = true; fields.push("restore"); }
 
       const updated = await prisma.user.update({
         where: { id },
@@ -409,10 +421,15 @@ export const PATCH = withRateLimit(
           name: true,
           role: true,
           isActive: true,
+          deletedAt: true,
           updatedAt: true,
         },
         data,
       });
+
+      if (isActive !== undefined || restore === true) {
+        invalidateUserDisabledCache(id);
+      }
 
       logInfo("ADMIN", "user_updated", { userId: id, fields });
 
@@ -448,10 +465,27 @@ export const DELETE = withRateLimit(
 
       const prisma = getPrismaClient();
       const url = new URL(req.url);
-      const hard = url.searchParams.get("hard") === "true";
+      // Back-compat: ?hard=true is equivalent to ?mode=hard
+      const legacyHard = url.searchParams.get("hard") === "true";
+      const rawMode = url.searchParams.get("mode")?.trim().toLowerCase() ?? "";
+      const mode: "deactivate" | "delete" | "hard" = legacyHard
+        ? "hard"
+        : rawMode === "delete" || rawMode === "hard"
+          ? rawMode
+          : "deactivate";
 
-      if (hard) {
-        // Hard delete requires confirmation header
+      const user = await prisma.user.findUnique({
+        where: { id },
+        select: { id: true, isActive: true, deletedAt: true },
+      });
+      if (!user) {
+        return NextResponse.json(
+          { error: "USER_NOT_FOUND", message: "No existe ese usuario." },
+          { status: 404 },
+        );
+      }
+
+      if (mode === "hard") {
         const confirmHeader = req.headers.get("X-Confirm-Delete");
         if (confirmHeader !== "true") {
           return NextResponse.json(
@@ -463,35 +497,26 @@ export const DELETE = withRateLimit(
           );
         }
 
-        // Verify user exists before deleting
-        const user = await prisma.user.findUnique({ where: { id }, select: { id: true } });
-        if (!user) {
-          return NextResponse.json(
-            { error: "USER_NOT_FOUND", message: "No existe ese usuario." },
-            { status: 404 },
-          );
-        }
-
         await prisma.user.delete({ where: { id } });
-
+        invalidateUserDisabledCache(id);
         logInfo("ADMIN", "user_hard_deleted", { userId: id });
-
         return NextResponse.json({ success: true, action: "hard_deleted", userId: id });
       }
 
-      // Soft delete — set isActive: false
-      const user = await prisma.user.findUnique({ where: { id }, select: { id: true } });
-      if (!user) {
-        return NextResponse.json(
-          { error: "USER_NOT_FOUND", message: "No existe ese usuario." },
-          { status: 404 },
-        );
+      if (mode === "delete") {
+        await prisma.user.update({
+          where: { id },
+          data: { deletedAt: new Date(), isActive: false },
+        });
+        invalidateUserDisabledCache(id);
+        logInfo("ADMIN", "user_soft_deleted", { userId: id });
+        return NextResponse.json({ success: true, action: "soft_deleted", userId: id });
       }
 
+      // mode === "deactivate" — login blocked, still visible in listings
       await prisma.user.update({ where: { id }, data: { isActive: false } });
-
+      invalidateUserDisabledCache(id);
       logInfo("ADMIN", "user_deactivated", { userId: id });
-
       return NextResponse.json({ success: true, action: "deactivated", userId: id });
     } catch (error: unknown) {
       logError("ADMIN", error, { route: "DELETE /api/admin/users/[id]" });

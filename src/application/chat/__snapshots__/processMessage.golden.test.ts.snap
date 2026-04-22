@@ -4,6 +4,7 @@ exports[`processMessage — golden masters 01 - mensaje neutral, sin goal, sin c
 {
   "data": {
     "action": "Define una sola accion concreta para hoy y ejecútala.",
+    "actions": [],
     "captureEmail": false,
     "captureEmailMessage": null,
     "conversationId": "conv_1",
@@ -221,6 +222,7 @@ exports[`processMessage — golden masters 05 - goal con acción pendiente, usua
 {
   "data": {
     "action": "Cierra hoy una sola accion visible de tu objetivo activo.",
+    "actions": [],
     "captureEmail": false,
     "captureEmailMessage": null,
     "conversationId": "conv_1",
@@ -345,6 +347,7 @@ exports[`processMessage — golden masters 07 - intent de crear goal → createG
 {
   "data": {
     "action": "Escribir 3 valores que guían tus decisiones.",
+    "actions": [],
     "captureEmail": false,
     "captureEmailMessage": null,
     "conversationId": "conv_1",
@@ -462,6 +465,7 @@ exports[`processMessage — golden masters 09 - último mensaje del día (soft p
 {
   "data": {
     "action": "Cierra hoy una sola accion visible de tu objetivo activo.",
+    "actions": [],
     "captureEmail": false,
     "captureEmailMessage": null,
     "conversationId": "conv_1",
@@ -528,6 +532,7 @@ exports[`processMessage — golden masters 10 - modo stream (jsonMode=false) →
   "kind": "stream",
   "meta": {
     "action": "Define una sola accion concreta para hoy y ejecútala.",
+    "actions": [],
     "captureEmail": false,
     "captureEmailMessage": null,
     "conversationId": "conv_1",

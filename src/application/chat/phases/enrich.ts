@@ -57,6 +57,7 @@ import {
 } from "@/services/state";
 import { describeTransformationPhase, inferTransformationPhase } from "@/services/transformation";
 import { getUserSessionProfile } from "@/services/user";
+import { resolveCommunityCta, type CommunityCtaAction } from "@/services/community-cta";
 import { isCrisisInterventionMessage, isCrisisLevel, mapRiskLevelToCrisisCount } from "./analyze";
 import type { FlowContext } from "./types";
 
@@ -172,6 +173,9 @@ export type EnrichResult = {
   // Conversion & capture
   conversionTrigger: boolean;
   captureEmailRecommended: boolean;
+
+  // Community CTA (null unless recurrent-blocker signal fires)
+  communityCTA: CommunityCtaAction | null;
 };
 
 // ─── Main phase function ──────────────────────────────────────────────────────
@@ -651,6 +655,11 @@ export async function enrichContext(input: EnrichInput): Promise<EnrichResult> {
     emotionalProfile = analyzeEmotionalProfile(message, []);
   }
 
+  // Community CTA — only when DB is available; fails closed on any error.
+  const communityCTA = persistenceAvailable
+    ? await resolveCommunityCta({ userId, crisisMode })
+    : null;
+
   return {
     persistenceAvailable,
     conversationId,
@@ -680,5 +689,6 @@ export async function enrichContext(input: EnrichInput): Promise<EnrichResult> {
     onboardingContext,
     conversionTrigger,
     captureEmailRecommended,
+    communityCTA,
   };
 }

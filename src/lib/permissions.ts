@@ -119,6 +119,16 @@ export const PERMISSIONS: Record<SystemRole, string[]> = {
     "telegram:stats",
     "telegram:tareas",
   ],
+
+  // Mentor/coach — acompaña a usuarios sin acceso a datos clínicos.
+  // Alcance intencionalmente estrecho hasta que exista scoping por asignación
+  // (tabla CoachAssignment pendiente). Hoy users:read es global — NO usar este
+  // rol aún para personas externas a la organización hasta cerrar ese punto.
+  coach: [
+    "dashboard:read",
+    "docs",
+    "tasks",
+  ],
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

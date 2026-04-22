@@ -661,6 +661,7 @@ enum SystemRole {
   support
   content
   ops
+  coach
 }
 
 /// Internal team member with role-based access to the admin panel.

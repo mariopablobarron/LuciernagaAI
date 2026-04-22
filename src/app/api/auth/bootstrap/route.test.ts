@@ -1,3 +1,11 @@
+jest.mock("@/db/prisma", () => ({
+  getPrismaClient: () => ({
+    user: {
+      findUnique: jest.fn().mockResolvedValue({ isActive: true, deletedAt: null }),
+    },
+  }),
+}));
+
 jest.mock("@/services/user", () => ({
   ensureUserAccount: jest.fn().mockResolvedValue({
     id: "usr_mock",

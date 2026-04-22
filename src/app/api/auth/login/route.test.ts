@@ -5,6 +5,15 @@ jest.mock("@/services/user", () => ({
       this.name = "IdentityLinkConflictError";
     }
   },
+  UserAccountDisabledError: class UserAccountDisabledError extends Error {
+    reason: "deleted" | "deactivated";
+    constructor(reason: "deleted" | "deactivated" = "deactivated") {
+      super("USER_ACCOUNT_DISABLED");
+      this.name = "UserAccountDisabledError";
+      this.reason = reason;
+    }
+  },
+  assertUserAccountUsable: jest.fn().mockResolvedValue(undefined),
   normalizeEmail: jest.fn((email: string) => email.trim().toLowerCase()),
   ensureUserAccount: jest.fn().mockResolvedValue({
     id: "usr_login_anon",

@@ -38,7 +38,6 @@ import {
   fetchBrowserSession,
   type BrowserSessionUser,
 } from "@/lib/session-client";
-import { DEFAULT_ONBOARDING_EXAMPLE } from "@/lib/onboarding";
 import { DEFAULT_EMOTIONAL_PROFILE, type EmotionalProfile } from "@/types/emotional-profile";
 import GoalContextBar from "@/components/GoalContextBar";
 import { EmailVerificationBanner } from "@/components/EmailVerificationBanner";
@@ -104,6 +103,7 @@ type ChatApiResponse = {
   continueChat?: boolean;
   conversionTrigger?: boolean;
   conversionType?: "progress";
+  actions?: Array<Record<string, unknown>>;
 };
 
 // ConversationsApiResponse imported from ./chat-utils
@@ -142,7 +142,6 @@ type CheckinApiResponse = {
 
 export default function HomePage() {
   const sfx = useSfx();
-  const starterPrefilledConversationsRef = useRef<Set<string>>(new Set());
   const pendingWaitlistMessageRef = useRef<string | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
@@ -170,6 +169,14 @@ export default function HomePage() {
   const [captureEmailRecommended, setCaptureEmailRecommended] = useState(false);
   const [captureEmailPrompt, setCaptureEmailPrompt] = useState<string | null>(null);
   const [captureDialogOpen, setCaptureDialogOpen] = useState(false);
+  const [communityCta, setCommunityCta] = useState<{
+    kind: "recurrent_blocker";
+    state: string;
+    spaceSlug: string;
+    href: string;
+    label: string;
+    reason: string;
+  } | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
   const [streakDays, setStreakDays] = useState(0);
   const [sessionLoading, setSessionLoading] = useState(true);
@@ -757,22 +764,8 @@ export default function HomePage() {
     };
   }, []);
 
-  useEffect(() => {
-    if (safeConversation.messages.length > 0) {
-      return;
-    }
-
-    if (starterPrefilledConversationsRef.current.has(safeConversation.id)) {
-      return;
-    }
-
-    if (input.trim()) {
-      return;
-    }
-
-    starterPrefilledConversationsRef.current.add(safeConversation.id);
-    setInput(DEFAULT_ONBOARDING_EXAMPLE);
-  }, [input, safeConversation.id, safeConversation.messages.length]);
+  // Input nace vacío. Las sugerencias se ofrecen como botones clicables
+  // en el empty state del chat, no precargadas en el textarea.
 
   useEffect(() => {
     let cancelled = false;
@@ -823,6 +816,7 @@ export default function HomePage() {
     setWorkspaceTab("chat");
     setInput("");
     setError(null);
+    setCommunityCta(null);
     sfx.play("open");
   };
 
@@ -1473,6 +1467,22 @@ export default function HomePage() {
           setCaptureEmailPrompt(null);
         }
 
+        const sseActions = Array.isArray(ssePayload.actions) ? ssePayload.actions : [];
+        const sseCommunityCtaPayload = sseActions.find(
+          (a: unknown): a is Record<string, unknown> =>
+            typeof a === "object" && a !== null && (a as Record<string, unknown>).kind === "recurrent_blocker"
+        );
+        if (sseCommunityCtaPayload) {
+          setCommunityCta({
+            kind: "recurrent_blocker",
+            state: String(sseCommunityCtaPayload.state ?? ""),
+            spaceSlug: String(sseCommunityCtaPayload.spaceSlug ?? ""),
+            href: String(sseCommunityCtaPayload.href ?? "/community"),
+            label: String(sseCommunityCtaPayload.label ?? "Entrar a la comunidad"),
+            reason: String(sseCommunityCtaPayload.reason ?? ""),
+          });
+        }
+
         setConversations((previous) => {
           const next = previous.map((conversation) =>
             conversation.id === currentConversationId
@@ -1630,6 +1640,22 @@ export default function HomePage() {
       } else if (sessionProfile && !sessionProfile.isAnonymous) {
         setCaptureEmailRecommended(false);
         setCaptureEmailPrompt(null);
+      }
+
+      const jsonActions = Array.isArray(payload.actions) ? payload.actions : [];
+      const jsonCommunityCtaPayload = jsonActions.find(
+        (a: unknown): a is Record<string, unknown> =>
+          typeof a === "object" && a !== null && (a as Record<string, unknown>).kind === "recurrent_blocker"
+      );
+      if (jsonCommunityCtaPayload) {
+        setCommunityCta({
+          kind: "recurrent_blocker",
+          state: String(jsonCommunityCtaPayload.state ?? ""),
+          spaceSlug: String(jsonCommunityCtaPayload.spaceSlug ?? ""),
+          href: String(jsonCommunityCtaPayload.href ?? "/community"),
+          label: String(jsonCommunityCtaPayload.label ?? "Entrar a la comunidad"),
+          reason: String(jsonCommunityCtaPayload.reason ?? ""),
+        });
       }
 
       console.info("[CHAT_UI] send_succeeded", {
@@ -1848,6 +1874,8 @@ export default function HomePage() {
                   proactivePrompt={safeConversation.messages.length === 0 ? proactivePrompt : null}
                   onCaptureEmail={handleCaptureEmailInline}
                   onDismissSignupPrompt={handleDismissSignupPrompt}
+                  communityCta={communityCta}
+                  onDismissCommunityCta={() => setCommunityCta(null)}
                 />
               </div>
             }

@@ -84,6 +84,17 @@ export type ChatProps = {
   onCaptureEmail?: (email: string) => Promise<void> | void;
   /** Called when user dismisses the inline signup prompt. */
   onDismissSignupPrompt?: (messageId: string) => void;
+  /** Inline Community CTA triggered by recurrent emotional state. */
+  communityCta?: {
+    kind: "recurrent_blocker";
+    state: string;
+    spaceSlug: string;
+    href: string;
+    label: string;
+    reason: string;
+  } | null;
+  /** Called when the user dismisses the inline Community CTA. */
+  onDismissCommunityCta?: () => void;
 };
 
 // ─── Starter prompts ──────────────────────────────────────────────────────────
@@ -557,6 +568,8 @@ export default function Chat({
   proactivePrompt,
   onCaptureEmail,
   onDismissSignupPrompt,
+  communityCta,
+  onDismissCommunityCta,
 }: ChatProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -851,6 +864,33 @@ export default function Chat({
                     </div>
                     <span className="text-xs text-zinc-600 animate-pulse">Pensando...</span>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Community CTA — shown when mentor detects a recurrent emotional state. */}
+            {!loading && communityCta && (
+              <div className="mx-1 rounded-2xl border border-violet-500/30 bg-gradient-to-br from-violet-500/5 to-fuchsia-500/5 p-4 space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <p className="text-xs text-violet-300 font-semibold uppercase tracking-wide">
+                  Sugerencia del mentor
+                </p>
+                <p className="text-sm text-zinc-200">{communityCta.reason}</p>
+                <div className="flex items-center gap-2 pt-1">
+                  <a
+                    href={communityCta.href}
+                    className="rounded-xl bg-violet-500 hover:bg-violet-400 px-3.5 py-2 text-xs font-semibold text-white transition-colors"
+                  >
+                    {communityCta.label}
+                  </a>
+                  {onDismissCommunityCta && (
+                    <button
+                      type="button"
+                      onClick={onDismissCommunityCta}
+                      className="rounded-xl px-3 py-2 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+                    >
+                      Ahora no
+                    </button>
+                  )}
                 </div>
               </div>
             )}

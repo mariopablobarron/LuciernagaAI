@@ -352,7 +352,7 @@ model AdminSnapshot {
   id          String   @id @default(cuid())
   type        String // "reset" | "manual" | "scheduled"
   label       String? // Optional label (e.g. "Pre-reset 2026-04-07")
-  data        Json // Full snapshot of decisions + insights at time of archive
+  data        Json // ⚠️ deprecated 2026-04-23: se escribe en /api/admin/export pero ningún consumidor lo lee. Conservado para no perder snapshots históricos.
   summary     String? // Human-readable summary of what was archived
   recordCount Int      @default(0) // Total records archived
   createdAt   DateTime @default(now())
@@ -365,7 +365,7 @@ model Event {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   type      String
-  metadata  Json?
+  metadata  Json? // ⚠️ deprecated 2026-04-23: columna sin escritor ni lector en src/. Candidata a DROP en próxima limpieza de schema.
   createdAt DateTime @default(now())
 
   @@index([userId, createdAt])
@@ -476,7 +476,7 @@ model UserProfile {
   disciplinaScore Int
   socialScore     Int
   totalScore      Int
-  rawAnswers      Json
+  rawAnswers      Json // ⚠️ deprecated 2026-04-23: columna sin escritor ni lector en src/. Candidata a DROP en próxima limpieza de schema.
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -969,7 +969,7 @@ model Exercise {
   type             String // "reflection" | "writing" | "action" | "assessment" | "breathing" | "visualization"
   order            Int            @default(0)
   estimatedMinutes Int            @default(10)
-  instructions     Json // Array<{ step: number; title: string; prompt: string; inputType: "text" | "choice" | "scale" | "none" }>
+  instructions     Json // Array<{ step: number; title: string; prompt: string; inputType: "text" | "choice" | "scale" | "none" }>. Se escribe solo desde prisma/seeds/journeys.ts (contenido editorial, no runtime).
   debrief          String?        @db.Text
   tags             String[]       @default([])
   createdAt        DateTime       @default(now())
@@ -1864,7 +1864,7 @@ model CronRunLog {
   durationMs       Int?
   recordsProcessed Int?
   errorMessage     String?   @db.Text
-  metadata         Json?
+  metadata         Json? // ⚠️ deprecated 2026-04-23: columna sin escritor ni lector en src/. Candidata a DROP en próxima limpieza de schema.
 
   @@index([jobName, startedAt])
   @@index([status, startedAt])

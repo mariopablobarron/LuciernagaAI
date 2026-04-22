@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
       select: { messageCount: true, onboardingContext: true },
     });
     if (userForOnboarding && userForOnboarding.messageCount === 0 && userForOnboarding.onboardingContext) {
-      const ctx = userForOnboarding.onboardingContext as unknown as OnboardingPayload;
+      const ctx = userForOnboarding.onboardingContext as OnboardingPayload | null;
       if (ctx?.feeling && ctx?.intent) {
         return NextResponse.json({ prompt: buildOnboardingOpeningMessage(ctx) });
       }

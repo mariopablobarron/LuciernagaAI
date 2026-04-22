@@ -177,7 +177,7 @@ async function loadWelcomeOnboarding(userId: string): Promise<OnboardingPayload 
     select: { messageCount: true, onboardingContext: true },
   });
   if (!user || user.messageCount >= 5) return null;
-  const ctx = user.onboardingContext as unknown as OnboardingPayload | null;
+  const ctx = user.onboardingContext as OnboardingPayload | null;
   if (!ctx || !ctx.feeling || !ctx.intent) return null;
   return ctx;
 }

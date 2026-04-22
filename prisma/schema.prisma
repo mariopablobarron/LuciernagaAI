@@ -127,6 +127,7 @@ model User {
   userBadges                UserBadge[]
   goalAvatarVideos          GoalAvatarVideo[]
   broadcastAvatarDeliveries BroadcastAvatarDelivery[]
+  usageSessions             UsageSession[]
   dailyRoundResponses       DailyRoundResponse[]
   dailyRoundReactions       DailyRoundReaction[]
   dailyRoundMirrors         DailyRoundMirror[]
@@ -370,6 +371,27 @@ model Event {
 
   @@index([userId, createdAt])
   @@index([type, createdAt])
+}
+
+// ── Screen Time interno ──────────────────────────────────────────────────────
+// Sesión de uso de la app. Una fila por "bloque continuo de actividad". El
+// cliente manda heartbeats cada ~30 s; el servidor cierra la sesión al no
+// recibir heartbeats por USAGE_IDLE_MS (90 s). Las siguientes métricas salen
+// de agregar durationMs por usuario/día/superficie.
+model UsageSession {
+  id         String    @id @default(cuid())
+  userId     String
+  startedAt  DateTime  @default(now())
+  lastPingAt DateTime  @default(now())
+  endedAt    DateTime? // null mientras la sesión está viva
+  durationMs Int       @default(0) // acumulado desde el primer heartbeat
+  surface    String    @default("app") // "chat" | "app"
+  userAgent  String?
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, startedAt])
+  @@index([userId, lastPingAt])
+  @@index([endedAt])
 }
 
 model CrisisEvent {

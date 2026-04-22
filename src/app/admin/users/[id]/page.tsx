@@ -11,6 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { AdminPanel } from "@/features/admin/components/AdminPanel";
 import { AdminShell } from "@/features/admin/components/AdminShell";
+import UserUsageSection from "@/components/admin/UserUsageSection";
 
 // ─── Psychologist panel types ──────────────────────────────────────────────────
 
@@ -861,6 +862,8 @@ export default function AdminUserDetailPage() {
               )}
             </div>
           </AdminPanel>
+
+          <UserUsageSection userId={data.user.id} />
 
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
             <Card className="border-zinc-800 bg-zinc-900/50">

@@ -9,6 +9,7 @@ import UtmCapture from "@/components/UtmCapture";
 import CookieConsent from "@/components/CookieConsent";
 import InstallPWA from "@/components/InstallPWA";
 import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
+import UsageTracker from "@/components/UsageTracker";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import TopProgressBar from "@/components/TopProgressBar";
 import { Toaster } from "@/components/ui/sonner";
@@ -227,6 +228,7 @@ export default async function RootLayout({
         <MetaPixel />
         <UtmCapture />
         <ServiceWorkerRegistrar />
+        <UsageTracker />
         <TopProgressBar />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>

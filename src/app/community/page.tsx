@@ -43,7 +43,7 @@ type Session = {
   circle: { id: string; name: string; phase: string } | null;
 };
 
-type Tab = "victories" | "spaces" | "circle" | "questions" | "coaches";
+type Tab = "today" | "circle" | "questions" | "coaches" | "spaces";
 
 type QuestionAnswer = {
   id: string;
@@ -93,7 +93,13 @@ const PHASE_LABELS: Record<string, string> = {
 // ─── Main Component ─────────────────────────────────────────────────────────
 
 export default function CommunityPage() {
-  const [tab, setTab] = useState<Tab>("victories");
+  const [tab, setTab] = useState<Tab>("today");
+  const [stats, setStats] = useState<{
+    members: number;
+    victoriesWeek: number;
+    questionsWeek: number;
+    activeCircles: number;
+  } | null>(null);
   const [victories, setVictories] = useState<Victory[]>([]);
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [spacePosts, setSpacePosts] = useState<Post[]>([]);
@@ -122,7 +128,8 @@ export default function CommunityPage() {
   const fetchData = useCallback(async (t: Tab) => {
     setLoading(true);
     try {
-      if (t === "victories") {
+      if (t === "today") {
+        // Today bundles the Cafetería card + the Victorias feed
         const res = await fetch("/api/community/victories", { credentials: "include" });
         const data = (await res.json()) as { victories: Victory[] };
         setVictories(data.victories ?? []);
@@ -165,6 +172,28 @@ export default function CommunityPage() {
 
   useEffect(() => { void fetchData(tab); }, [tab, fetchData]);
 
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/community/stats", { credentials: "include" });
+        if (!res.ok) return;
+        const data = (await res.json()) as {
+          members: number;
+          victoriesWeek: number;
+          questionsWeek: number;
+          activeCircles: number;
+        };
+        if (!cancelled) setStats(data);
+      } catch {
+        // silent: stats are optional
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   async function loadSpacePosts(spaceId: string) {
     setSelectedSpace(spaceId);
     const res = await fetch(`/api/community/posts?spaceId=${spaceId}`, { credentials: "include" });
@@ -202,7 +231,7 @@ export default function CommunityPage() {
       });
       setPostFeeling("");
       toast.success("Victoria compartida");
-      void fetchData("victories");
+      void fetchData("today");
     } catch { toast.error("Error"); }
     finally { setPosting(false); }
   }
@@ -318,12 +347,12 @@ export default function CommunityPage() {
     void fetchData("questions");
   }
 
-  const TABS: { key: Tab; label: string; icon: React.ReactNode }[] = [
-    { key: "victories", label: "Victorias", icon: <Trophy className="w-4 h-4" /> },
-    { key: "spaces", label: "Espacios", icon: <BookOpen className="w-4 h-4" /> },
-    { key: "circle", label: "Mi Círculo", icon: <Users className="w-4 h-4" /> },
-    { key: "questions", label: "Preguntas", icon: <HelpCircle className="w-4 h-4" /> },
-    { key: "coaches", label: "Sesiones", icon: <Calendar className="w-4 h-4" /> },
+  const TABS: { key: Tab; label: string; hint: string; icon: React.ReactNode }[] = [
+    { key: "today", label: "Hoy", hint: "Ronda del día + tus victorias", icon: <Trophy className="w-4 h-4" /> },
+    { key: "circle", label: "Mi Círculo", hint: "Grupo de 5-8 en tu misma fase", icon: <Users className="w-4 h-4" /> },
+    { key: "questions", label: "Preguntas", hint: "Pregunta anónima a la comunidad", icon: <HelpCircle className="w-4 h-4" /> },
+    { key: "coaches", label: "Sesiones", hint: "Encuentros con profesionales", icon: <Calendar className="w-4 h-4" /> },
+    { key: "spaces", label: "Espacios", hint: "Salas temáticas", icon: <BookOpen className="w-4 h-4" /> },
   ];
 
   return (
@@ -340,23 +369,27 @@ export default function CommunityPage() {
           </div>
         </div>
 
-        {/* Cafeteria CTA */}
-        <Link
-          href="/community/cafeteria"
-          className="group flex items-center justify-between rounded-2xl border border-violet-500/20 bg-gradient-to-r from-violet-500/5 to-fuchsia-500/5 px-5 py-4 transition-all hover:border-violet-500/40 active:scale-[0.98]"
-        >
-          <div className="flex items-center gap-4">
-            <span className="text-3xl">☕</span>
-            <div>
-              <p className="text-sm font-bold text-white">La Cafetería</p>
-              <p className="text-xs text-zinc-400">Una pregunta del día. Respondes y ves cómo la viven los demás.</p>
+        {/* Social proof */}
+        {stats ? (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2">
+              <p className="text-[10px] uppercase tracking-wide text-zinc-500">Miembros</p>
+              <p className="text-lg font-semibold text-white">{stats.members}</p>
+            </div>
+            <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2">
+              <p className="text-[10px] uppercase tracking-wide text-zinc-500">Victorias 7d</p>
+              <p className="text-lg font-semibold text-white">{stats.victoriesWeek}</p>
+            </div>
+            <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2">
+              <p className="text-[10px] uppercase tracking-wide text-zinc-500">Preguntas 7d</p>
+              <p className="text-lg font-semibold text-white">{stats.questionsWeek}</p>
+            </div>
+            <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2">
+              <p className="text-[10px] uppercase tracking-wide text-zinc-500">Círculos activos</p>
+              <p className="text-lg font-semibold text-white">{stats.activeCircles}</p>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 px-2.5 py-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-violet-400" />
-            <span className="text-[10px] font-semibold text-violet-300">Hoy</span>
-          </div>
-        </Link>
+        ) : null}
 
         {/* Confidentiality */}
         <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3">
@@ -367,25 +400,49 @@ export default function CommunityPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex flex-wrap gap-2">
-          {TABS.map((t) => (
-            <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
-              className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all ${
-                tab === t.key
-                  ? "border-violet-500/40 bg-violet-500/15 text-violet-300"
-                  : "border-zinc-700 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200"
-              }`}
-            >
-              {t.icon} {t.label}
-            </button>
-          ))}
+        <div>
+          <div className="flex flex-wrap gap-2">
+            {TABS.map((t) => (
+              <button
+                key={t.key}
+                onClick={() => setTab(t.key)}
+                className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all ${
+                  tab === t.key
+                    ? "border-violet-500/40 bg-violet-500/15 text-violet-300"
+                    : "border-zinc-700 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200"
+                }`}
+              >
+                {t.icon} {t.label}
+              </button>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-zinc-500">
+            {TABS.find((t) => t.key === tab)?.hint}
+          </p>
         </div>
 
-        {/* ── Tab: Victories ───────────────────────────────────────────── */}
-        {tab === "victories" && (
+        {/* ── Tab: Today (Cafetería card + Victorias feed) ─────────────── */}
+        {tab === "today" && (
           <div className="space-y-4">
+            {/* Cafetería — ronda del día */}
+            <Link
+              href="/community/cafeteria"
+              className="block rounded-xl border border-amber-500/30 bg-amber-500/5 p-5 hover:bg-amber-500/10 transition-colors"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">☕</span>
+                  <div>
+                    <p className="text-sm font-semibold text-amber-100">La Cafetería — ronda del día</p>
+                    <p className="text-xs text-amber-300/80">
+                      Una pregunta. Tu respuesta primero, luego ves cómo la viven los demás.
+                    </p>
+                  </div>
+                </div>
+                <span className="text-xs font-semibold text-amber-400">Entrar →</span>
+              </div>
+            </Link>
+
             {/* Post victory */}
             <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-3">
               <p className="text-sm font-semibold text-white">Comparte una victoria</p>

@@ -11,7 +11,11 @@ const SESSION_STORAGE_KEY = "tml_usage_session_id";
 
 function inferSurface(pathname: string | null): "chat" | "app" {
   if (!pathname) return "app";
-  if (pathname.startsWith("/chat") || pathname.startsWith("/app/chat")) return "chat";
+  // /app y /app/conversations/* son superficies de chat (la home de /app
+  // renderiza <Chat/>). El resto (/app/goals, /app/diario, /app/comunidad…)
+  // cae en "app" como herramientas paralelas al mentor.
+  if (pathname === "/app" || pathname.startsWith("/app/conversations")) return "chat";
+  if (pathname.startsWith("/chat")) return "chat";
   return "app";
 }
 

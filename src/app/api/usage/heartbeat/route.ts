@@ -16,6 +16,10 @@ const HEARTBEAT_CAP_MS = 60_000;
 
 const ALLOWED_SURFACES = new Set(["chat", "app"]);
 
+// Roles que NO trackean tiempo de uso — su navegación es interna y
+// distorsionaría métricas de retención y engagement reales.
+const TRACKED_ROLES = new Set(["user", "coach"]);
+
 function sanitizeSurface(raw: unknown): "chat" | "app" {
   if (typeof raw === "string" && ALLOWED_SURFACES.has(raw)) {
     return raw as "chat" | "app";
@@ -42,6 +46,15 @@ export async function POST(req: NextRequest) {
 
     const prisma = getPrismaClient();
     const now = new Date();
+
+    // Filtro server-side: no trackeamos admins/superadmins ni cuentas borradas
+    const actor = await prisma.user.findUnique({
+      where: { id: identity.userId },
+      select: { role: true, deletedAt: true },
+    });
+    if (!actor || actor.deletedAt || !TRACKED_ROLES.has(actor.role)) {
+      return NextResponse.json({ ok: true, skipped: true });
+    }
 
     // Intento de extender sesión existente
     if (sessionId) {

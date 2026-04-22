@@ -67,6 +67,7 @@ type ListItem = {
   profileTitle: string | null;
   streakDays: number;
   engagementScore: number;
+  usageMs7d: number;
   counts: {
     conversations: number;
     messages: number;
@@ -277,6 +278,7 @@ export async function GET(req: NextRequest) {
       crisis7d,
       avoidance7d,
       messages7d,
+      usage7d,
     ] = await Promise.all([
       prisma.userState.findMany({
         where: { userId: { in: userIds } },
@@ -325,6 +327,14 @@ export async function GET(req: NextRequest) {
         },
         _count: { _all: true },
       }),
+      prisma.usageSession.groupBy({
+        by: ["userId"],
+        where: {
+          userId: { in: userIds },
+          startedAt: { gte: sevenDaysAgo },
+        },
+        _sum: { durationMs: true },
+      }),
     ]);
 
     const stateByUser = new Map(states.map((item) => [item.userId, item]));
@@ -347,6 +357,9 @@ export async function GET(req: NextRequest) {
     const messages7dByUser = new Map(
       messages7d.map((item) => [item.userId as string, item._count._all])
     );
+    const usageMs7dByUser = new Map(
+      usage7d.map((item) => [item.userId, item._sum.durationMs ?? 0])
+    );
 
     const items: ListItem[] = users.map((user) => {
       const state = stateByUser.get(user.id);
@@ -358,6 +371,7 @@ export async function GET(req: NextRequest) {
       const msgs7d = messages7dByUser.get(user.id) || 0;
       const avoidance = avoidance7dByUser.get(user.id) || 0;
       const crisisCount = crisis7dByUser.get(user.id) || 0;
+      const usageMs7d = usageMs7dByUser.get(user.id) || 0;
 
       return {
         id: user.id,
@@ -378,6 +392,7 @@ export async function GET(req: NextRequest) {
         subscriptionStatus: subscription?.status || "inactive",
         profileTitle: profile?.profile?.title || null,
         streakDays,
+        usageMs7d,
         engagementScore: computeEngagementScore({
           lastSeenMs: user.lastSeen.getTime(),
           streakDays,

@@ -82,14 +82,31 @@ export default function UsageTracker() {
       }
     };
 
+    // Envío "best-effort" al cerrar/navegar fuera — sendBeacon sobrevive al
+    // teardown de la página. Acorta la última sesión en vez de esperar al
+    // idle timeout de 90 s del servidor.
+    const handlePageHide = () => {
+      if (!sessionIdRef.current) return;
+      const surface = inferSurface(pathnameRef.current);
+      const payload = JSON.stringify({ surface, sessionId: sessionIdRef.current });
+      try {
+        const blob = new Blob([payload], { type: "application/json" });
+        navigator.sendBeacon?.("/api/usage/heartbeat", blob);
+      } catch {
+        /* ignore */
+      }
+    };
+
     void tick();
     timer = setInterval(tick, HEARTBEAT_INTERVAL_MS);
     document.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("pagehide", handlePageHide);
 
     return () => {
       cancelled = true;
       if (timer) clearInterval(timer);
       document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("pagehide", handlePageHide);
     };
   }, [pathname]);
 

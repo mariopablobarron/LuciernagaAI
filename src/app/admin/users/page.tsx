@@ -12,6 +12,7 @@ import {
   ChevronRight,
   Download,
   Flame,
+  Clock,
   Mail,
   MessageCircle,
   RefreshCw,
@@ -48,6 +49,7 @@ type UserItem = {
   profileTitle: string | null;
   streakDays: number;
   engagementScore: number;
+  usageMs7d: number;
   counts: {
     conversations: number;
     messages: number;
@@ -66,7 +68,7 @@ type AdminUsersResponse = {
   kindCounts: Record<UserKind, number>;
 };
 
-type SortKey = "name" | "lastSeen" | "engagementScore" | "streakDays" | "state" | "messages7d";
+type SortKey = "name" | "lastSeen" | "engagementScore" | "streakDays" | "state" | "messages7d" | "usageMs7d";
 type SortDir = "asc" | "desc";
 
 // ─── Config ──────────────────────────────────────────────────────────────────
@@ -100,6 +102,16 @@ const KIND_CONFIG: Record<UserKind, { label: string; style: string }> = {
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function formatUsageMs(ms: number): string {
+  if (!ms || ms < 60_000) return "—";
+  const totalMinutes = Math.round(ms / 60_000);
+  if (totalMinutes < 60) return `${totalMinutes}m`;
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours < 10) return `${hours}h ${minutes}m`;
+  return `${hours}h`;
+}
 
 function timeAgo(value: string): string {
   const now = Date.now();
@@ -285,6 +297,8 @@ export default function AdminUsersPage() {
           return dir * (a.streakDays - b.streakDays);
         case "messages7d":
           return dir * (a.counts.messages7d - b.counts.messages7d);
+        case "usageMs7d":
+          return dir * (a.usageMs7d - b.usageMs7d);
         case "state":
           return dir * a.state.localeCompare(b.state);
         default:
@@ -514,7 +528,7 @@ export default function AdminUsersPage() {
           )}
 
           {/* Table header */}
-          <div className="hidden lg:grid lg:grid-cols-[auto_1.5fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr_0.4fr_auto] gap-3 border-b border-zinc-800 px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+          <div className="hidden lg:grid lg:grid-cols-[auto_1.5fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr_0.5fr_0.4fr_auto] gap-3 border-b border-zinc-800 px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
             <button onClick={toggleSelectAll} className="flex items-center justify-center w-6" title="Seleccionar todos">
               <div className={`h-4 w-4 rounded border transition-colors ${selected.size === users.length && users.length > 0 ? "bg-violet-500 border-violet-500" : "border-zinc-600 hover:border-zinc-400"}`}>
                 {selected.size === users.length && users.length > 0 && <Check className="h-3 w-3 text-white mx-auto" />}
@@ -532,6 +546,9 @@ export default function AdminUsersPage() {
             </button>
             <button onClick={() => handleSort("messages7d")} className="text-left hover:text-zinc-300 transition-colors">
               Msgs 7d <SortIcon col="messages7d" />
+            </button>
+            <button onClick={() => handleSort("usageMs7d")} className="text-left hover:text-zinc-300 transition-colors">
+              Uso 7d <SortIcon col="usageMs7d" />
             </button>
             <button onClick={() => handleSort("streakDays")} className="text-left hover:text-zinc-300 transition-colors">
               Racha <SortIcon col="streakDays" />
@@ -555,7 +572,7 @@ export default function AdminUsersPage() {
                   className="group block transition-colors hover:bg-zinc-800/30"
                 >
                   {/* Desktop row */}
-                  <div className="hidden lg:grid lg:grid-cols-[auto_1.5fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr_0.4fr_auto] items-center gap-3 px-4 py-3">
+                  <div className="hidden lg:grid lg:grid-cols-[auto_1.5fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr_0.5fr_0.4fr_auto] items-center gap-3 px-4 py-3">
                     {/* Checkbox */}
                     <button
                       onClick={(e) => { e.stopPropagation(); toggleSelect(user.id); }}
@@ -630,6 +647,14 @@ export default function AdminUsersPage() {
                       <span className="font-semibold tabular-nums">{user.counts.messages7d}</span>
                     </div>
 
+                    {/* Usage 7d */}
+                    <div className="flex items-center gap-1.5 text-xs text-zinc-400">
+                      <Clock className={`h-3 w-3 ${user.usageMs7d > 0 ? "text-violet-300" : "text-zinc-700"}`} />
+                      <span className={`font-semibold tabular-nums ${user.usageMs7d > 0 ? "text-zinc-300" : "text-zinc-600"}`}>
+                        {formatUsageMs(user.usageMs7d)}
+                      </span>
+                    </div>
+
                     {/* Streak */}
                     <div className="flex items-center gap-1.5 text-xs">
                       <Flame className={`h-3 w-3 ${user.streakDays > 0 ? "text-amber-400" : "text-zinc-700"}`} />
@@ -686,6 +711,7 @@ export default function AdminUsersPage() {
                           <span className={`${KIND_CONFIG[user.kind].style} rounded-full border px-2 py-0.5 text-[10px] font-semibold`}>{KIND_CONFIG[user.kind].label}</span>
                           <span>Eng: <strong className="text-zinc-300">{user.engagementScore}</strong></span>
                           <span>Msgs: <strong className="text-zinc-300">{user.counts.messages7d}</strong></span>
+                          <span>Uso: <strong className={user.usageMs7d > 0 ? "text-violet-300" : "text-zinc-500"}>{formatUsageMs(user.usageMs7d)}</strong></span>
                           <span>Racha: <strong className={user.streakDays > 0 ? "text-amber-300" : "text-zinc-500"}>{user.streakDays}d</strong></span>
                           <span>Visto: {timeAgo(user.lastSeen)}</span>
                         </div>

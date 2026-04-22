@@ -5,6 +5,10 @@ import { getActiveGoalForUser } from "@/services/goals";
 import { buildCoachPrompt } from "@/services/coach";
 import { generateAIResponse } from "@/services/ai";
 import { DEFAULT_EMOTIONAL_PROFILE } from "@/types/emotional-profile";
+import {
+  buildOnboardingOpeningMessage,
+  type OnboardingPayload,
+} from "@/lib/onboarding-archetypes";
 
 const PROACTIVE_INSTRUCTION = `
 Tu tarea en este turno es generar UNA SOLA pregunta proactiva breve (máximo 2 frases) para iniciar o retomar la conversación.
@@ -22,6 +26,19 @@ export async function GET(req: NextRequest) {
   const prisma = getPrismaClient();
 
   try {
+    // Primera sesión tras onboarding: si el usuario acaba de completar /app/inicio
+    // y aún no ha escrito el primer mensaje, devolvemos el arquetipo fijo (sin LLM).
+    const userForOnboarding = await prisma.user.findUnique({
+      where: { id: identity.userId },
+      select: { messageCount: true, onboardingContext: true },
+    });
+    if (userForOnboarding && userForOnboarding.messageCount === 0 && userForOnboarding.onboardingContext) {
+      const ctx = userForOnboarding.onboardingContext as unknown as OnboardingPayload;
+      if (ctx?.feeling && ctx?.intent) {
+        return NextResponse.json({ prompt: buildOnboardingOpeningMessage(ctx) });
+      }
+    }
+
     // Gather user context
     const [userState, activeGoal] = await Promise.all([
       prisma.userState.findUnique({

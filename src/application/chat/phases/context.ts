@@ -15,6 +15,8 @@ import { getUserImpulseProfile } from "@/services/impulse-diagnostic";
 import { listRecentImpulseLogs } from "@/services/impulse-challenges";
 import { buildJourneyPromptBlock } from "@/services/journey-coach-bridge";
 import { buildProjectPromptBlock } from "@/services/project-coach-bridge";
+import { getPrismaClient } from "@/db/prisma";
+import type { OnboardingPayload } from "@/lib/onboarding-archetypes";
 import {
   buildSearchQuery,
   classifyExternalInfoNeed,
@@ -91,11 +93,12 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
     pendingActions: activeGoal?.actions.filter((a) => !a.completed).map((a) => a.description) ?? [],
   });
 
-  const [impulseProfile, impulseLogs, journeyPromptBlock, projectPromptBlock] = await Promise.all([
+  const [impulseProfile, impulseLogs, journeyPromptBlock, projectPromptBlock, welcomeOnboarding] = await Promise.all([
     getUserImpulseProfile(userId).catch(() => null),
     listRecentImpulseLogs(userId, 5).catch(() => []),
     buildJourneyPromptBlock(userId).catch(() => null),
     buildProjectPromptBlock(userId).catch(() => null),
+    loadWelcomeOnboarding(userId).catch(() => null),
   ]);
 
   // ── Action defaults ─────────────────────────────────────────────────────
@@ -129,6 +132,7 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
       critical: false,
     },
     onboarding: onboardingContext,
+    welcomeOnboarding,
     journeyPrompt: journeyPromptBlock,
     projectPrompt: projectPromptBlock,
     access: {
@@ -161,4 +165,19 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
     activeAction,
     defaultAction,
   };
+}
+
+// Lee el contexto de onboarding (/app/inicio) y lo devuelve solo durante los
+// primeros 5 turnos del usuario. Pasado ese umbral, el mentor ya tiene contexto
+// propio y deja de referenciar las respuestas iniciales.
+async function loadWelcomeOnboarding(userId: string): Promise<OnboardingPayload | null> {
+  const prisma = getPrismaClient();
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { messageCount: true, onboardingContext: true },
+  });
+  if (!user || user.messageCount >= 5) return null;
+  const ctx = user.onboardingContext as unknown as OnboardingPayload | null;
+  if (!ctx || !ctx.feeling || !ctx.intent) return null;
+  return ctx;
 }

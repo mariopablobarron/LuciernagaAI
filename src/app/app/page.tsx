@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MessageCircle, Plus, Sparkles } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 import { trackMetaEvent } from "@/lib/meta-pixel";
@@ -186,6 +186,24 @@ export default function HomePage() {
   const [onboardingConsentGiven, setOnboardingConsentGiven] = useState(false);
   const [onboardingConsentSaving, setOnboardingConsentSaving] = useState(false);
   const [onboardingConsentError, setOnboardingConsentError] = useState<string | null>(null);
+
+  // Redirect a /app/inicio si el usuario no ha completado las 3 preguntas iniciales.
+  // Silencioso: si /api/onboarding falla, seguimos con el flujo normal.
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/onboarding", { credentials: "include" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { completed?: boolean } | null) => {
+        if (cancelled || !data) return;
+        if (data.completed === false) {
+          window.location.replace("/app/inicio");
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleUnauthorizedSession = () => {
     setSessionReady(false);
@@ -899,8 +917,74 @@ export default function HomePage() {
     }
   };
 
-  const handleSaveProgress = async () => {
-    const email = saveProgressEmail.trim();
+  const handleCaptureEmailInline = async (email: string): Promise<void> => {
+    if (!sessionReady) {
+      try {
+        await bootstrapSession();
+      } catch {
+        handleUnauthorizedSession();
+        throw new Error("Tu sesión ha expirado. Recarga la página.");
+      }
+    }
+    const session = await captureBrowserEmail({
+      email,
+      sessionId: sessionProfile?.id,
+    });
+    const nextProfile = session.user ?? null;
+    setSessionProfile(nextProfile);
+    if (nextProfile?.email) {
+      setSaveProgressEmail(nextProfile.email);
+    }
+    const nextActiveConversationId = await refreshConversations();
+    if (nextActiveConversationId) {
+      await loadMessages(nextActiveConversationId);
+    }
+    await refreshActiveGoal();
+    setCaptureEmailRecommended(false);
+    setCaptureEmailPrompt(null);
+    setCaptureDialogOpen(false);
+  };
+
+  const maybeInjectSignupPrompt = useCallback((conversationId: string) => {
+    // Respect a 30-minute cool-down after the user dismisses the prompt
+    // so we don't nag them on every new SSE turn.
+    try {
+      const dismissedAt = Number(window.localStorage.getItem("signup_prompt_dismissed_at") ?? 0);
+      if (dismissedAt && Date.now() - dismissedAt < 30 * 60 * 1000) return;
+    } catch { /* storage disabled */ }
+
+    setConversations((previous) =>
+      previous.map((conversation) => {
+        if (conversation.id !== conversationId) return conversation;
+        const alreadyPresent = conversation.messages.some((m) => m.variant === "signup_prompt");
+        if (alreadyPresent) return conversation;
+        const promptMessage: ChatMessage = {
+          id: `signup-prompt-${Date.now()}`,
+          role: "assistant",
+          content: "",
+          variant: "signup_prompt",
+          createdAt: new Date().toISOString(),
+        };
+        return { ...conversation, messages: [...conversation.messages, promptMessage] };
+      }),
+    );
+  }, []);
+
+  const handleDismissSignupPrompt = useCallback((messageId: string) => {
+    try {
+      window.localStorage.setItem("signup_prompt_dismissed_at", String(Date.now()));
+    } catch { /* storage may be disabled */ }
+    setConversations((previous) =>
+      previous.map((conversation) =>
+        conversation.id === activeConversationId
+          ? { ...conversation, messages: conversation.messages.filter((m) => m.id !== messageId) }
+          : conversation,
+      ),
+    );
+  }, [activeConversationId]);
+
+  const handleSaveProgress = async (overrideEmail?: string) => {
+    const email = (overrideEmail ?? saveProgressEmail).trim();
     if (!email || saveProgressLoading) {
       return;
     }
@@ -1382,7 +1466,7 @@ export default function HomePage() {
           setCaptureEmailRecommended(true);
           setCaptureEmailPrompt((ssePayload.captureEmailMessage as string) || null);
           if (sessionProfile?.isAnonymous !== false) {
-            setCaptureDialogOpen(true);
+            maybeInjectSignupPrompt(currentConversationId);
           }
         } else if (sessionProfile && !sessionProfile.isAnonymous) {
           setCaptureEmailRecommended(false);
@@ -1541,7 +1625,7 @@ export default function HomePage() {
         setCaptureEmailRecommended(true);
         setCaptureEmailPrompt(payload.captureEmailMessage || null);
         if (sessionProfile?.isAnonymous !== false) {
-          setCaptureDialogOpen(true);
+          maybeInjectSignupPrompt(resolvedConversationId);
         }
       } else if (sessionProfile && !sessionProfile.isAnonymous) {
         setCaptureEmailRecommended(false);
@@ -1762,6 +1846,8 @@ export default function HomePage() {
                   journalMode={safeConversation.journalMode}
                   onToggleJournal={safeConversation.isDraft ? undefined : handleToggleJournal}
                   proactivePrompt={safeConversation.messages.length === 0 ? proactivePrompt : null}
+                  onCaptureEmail={handleCaptureEmailInline}
+                  onDismissSignupPrompt={handleDismissSignupPrompt}
                 />
               </div>
             }

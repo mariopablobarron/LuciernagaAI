@@ -141,6 +141,7 @@ model User {
   firstMessageSentAt        DateTime?
   activatedAt               DateTime? // aha moment: ≥3 user messages in 72h + ≥1 action completada
   onboardingCompletedAt     DateTime?
+  onboardingContext         Json? // { feeling, timeframe, intent } captured in /app/inicio; injected in first 5 mentor turns
   organizationId            String?
   organization              Organization?             @relation(fields: [organizationId], references: [id])
   classroomId               String?

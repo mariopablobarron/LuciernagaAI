@@ -11,6 +11,10 @@ import type { TransformationPhase } from "@/services/transformation";
 import type { CanonicalUserPlan } from "@/services/user";
 import type { UserState } from "@/domain/types";
 import {
+  buildOnboardingPromptBlock,
+  type OnboardingPayload,
+} from "@/lib/onboarding-archetypes";
+import {
   DEFAULT_EMOTIONAL_PROFILE,
   type DominantPattern,
   type EmotionalProfile,
@@ -72,6 +76,7 @@ export type CoachContext = {
     conversionTrigger?: boolean;
   } | null;
   onboarding?: ConversationalOnboardingContext | null;
+  welcomeOnboarding?: OnboardingPayload | null;
   journeyPrompt?: string | null;
   projectPrompt?: string | null;
 };
@@ -301,6 +306,9 @@ export function buildCoachPrompt(
   const legalGuidance = buildLegalGuidance(context);
   const accessGuidance = buildAccessGuidance(context);
   const onboardingGuidance = buildOnboardingGuidance(context);
+  const welcomeOnboardingGuidance = context.welcomeOnboarding
+    ? buildOnboardingPromptBlock(context.welcomeOnboarding)
+    : "";
   const journeyGuidance = context.journeyPrompt ?? "";
   const projectGuidance = context.projectPrompt ?? "";
 
@@ -363,6 +371,7 @@ No se pudo verificar información externa suficiente. No afirmes datos actuales 
     legalGuidance,
     accessGuidance,
     onboardingGuidance,
+    welcomeOnboardingGuidance,
     journeyGuidance,
     projectGuidance,
   ].filter(Boolean);

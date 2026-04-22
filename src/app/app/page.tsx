@@ -38,6 +38,7 @@ import {
   fetchBrowserSession,
   type BrowserSessionUser,
 } from "@/lib/session-client";
+import { getMentorMode } from "@/lib/onboarding";
 import { DEFAULT_EMOTIONAL_PROFILE, type EmotionalProfile } from "@/types/emotional-profile";
 import GoalContextBar from "@/components/GoalContextBar";
 import { EmailVerificationBanner } from "@/components/EmailVerificationBanner";
@@ -146,6 +147,7 @@ export default function HomePage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [input, setInput] = useState("");
+  const [mentorModeId, setMentorModeId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -826,6 +828,30 @@ export default function HomePage() {
     setError(null);
   };
 
+  const handleSelectMentorMode = (id: string | null) => {
+    setMentorModeId(id);
+    try {
+      if (id) {
+        window.localStorage.setItem("latidos.mentorMode", id);
+      } else {
+        window.localStorage.removeItem("latidos.mentorMode");
+      }
+    } catch {
+      // localStorage not available — in-memory state still works for this session
+    }
+  };
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem("latidos.mentorMode");
+      if (stored && getMentorMode(stored)) {
+        setMentorModeId(stored);
+      }
+    } catch {
+      // no-op
+    }
+  }, []);
+
   const handleSelectConversation = (conversationId: string) => {
     if (!sessionReady) {
       setError("Necesitas una sesión válida para abrir conversaciones.");
@@ -1285,6 +1311,11 @@ export default function HomePage() {
     }
 
     try {
+      const activeMode = getMentorMode(mentorModeId);
+      const messageForBackend = activeMode
+        ? `[Modo de acompañamiento: "${activeMode.label}" — ${activeMode.instruction}]\n\n${trimmed}`
+        : trimmed;
+
       const response = await fetch("/api/chat", {
         method: "POST",
         credentials: "include",
@@ -1293,8 +1324,9 @@ export default function HomePage() {
           "x-response-mode": "json",
         },
         body: JSON.stringify({
-          message: trimmed,
+          message: messageForBackend,
           conversationId: resolvedConversation.isDraft ? undefined : currentConversationId,
+          mentorModeId: activeMode?.id ?? null,
         }),
       });
 
@@ -1876,6 +1908,8 @@ export default function HomePage() {
                   onDismissSignupPrompt={handleDismissSignupPrompt}
                   communityCta={communityCta}
                   onDismissCommunityCta={() => setCommunityCta(null)}
+                  mentorModeId={mentorModeId}
+                  onSelectMentorMode={handleSelectMentorMode}
                 />
               </div>
             }

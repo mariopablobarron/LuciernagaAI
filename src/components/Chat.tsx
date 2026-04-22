@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { VoiceRecorder } from "@/components/ui/voice-recorder";
 import { AudioRecorder } from "@/components/ui/audio-recorder";
+import { MENTOR_MODES, getMentorMode } from "@/lib/onboarding";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -95,6 +96,10 @@ export type ChatProps = {
   } | null;
   /** Called when the user dismisses the inline Community CTA. */
   onDismissCommunityCta?: () => void;
+  /** Id of the currently active mentor mode, or null if none. */
+  mentorModeId?: string | null;
+  /** Called when the user selects a mentor mode. Pass null to clear. */
+  onSelectMentorMode?: (id: string | null) => void;
 };
 
 // ─── Starter prompts ──────────────────────────────────────────────────────────
@@ -570,7 +575,10 @@ export default function Chat({
   onDismissSignupPrompt,
   communityCta,
   onDismissCommunityCta,
+  mentorModeId,
+  onSelectMentorMode,
 }: ChatProps) {
+  const activeMentorMode = getMentorMode(mentorModeId ?? null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -816,6 +824,41 @@ export default function Chat({
                 </button>
               ))}
             </div>
+            {onSelectMentorMode ? (
+              <div className="mt-6 flex w-full max-w-md flex-col items-center">
+                <p className="mb-2 text-xs font-medium uppercase tracking-wide text-zinc-500">
+                  ¿Cómo quieres que te acompañe?
+                </p>
+                <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2">
+                  {MENTOR_MODES.map((mode) => {
+                    const isActive = mentorModeId === mode.id;
+                    return (
+                      <button
+                        key={mode.id}
+                        type="button"
+                        onClick={() => onSelectMentorMode(isActive ? null : mode.id)}
+                        className={`flex items-start gap-2 rounded-xl border px-3 py-2.5 text-left transition active:scale-[0.98] ${
+                          isActive
+                            ? "border-cyan-500/50 bg-cyan-500/10 text-cyan-100"
+                            : "border-zinc-800 bg-zinc-900/60 text-zinc-300 hover:border-zinc-700 hover:bg-zinc-900"
+                        }`}
+                      >
+                        <span className="text-base leading-none">{mode.icon}</span>
+                        <span className="flex flex-col gap-0.5">
+                          <span className="text-xs font-semibold">{mode.label}</span>
+                          <span className="text-[11px] leading-snug text-zinc-500">
+                            {mode.description}
+                          </span>
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="mt-2 text-[10px] text-zinc-600">
+                  Puedes cambiar el modo en cualquier momento.
+                </p>
+              </div>
+            ) : null}
             <div className="mt-5 flex flex-col items-center gap-2 max-w-sm mx-auto">
               <a
                 href="https://t.me/TRESMILMILLONESDELATIDOSBOT"
@@ -958,6 +1001,23 @@ export default function Chat({
 
       {/* ── Input area ──────────────────────────────────────────────────── */}
       <div className="sticky bottom-0 z-10 shrink-0 border-t border-zinc-800/60 bg-zinc-950 px-3 py-3" data-tour="chat-input" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
+        {/* Active mentor mode pill */}
+        {activeMentorMode && onSelectMentorMode ? (
+          <div className="mb-2 flex items-center justify-between gap-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-1.5">
+            <span className="flex items-center gap-2 text-xs text-cyan-100">
+              <span>{activeMentorMode.icon}</span>
+              <span className="font-medium">Modo: {activeMentorMode.label}</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => onSelectMentorMode(null)}
+              aria-label="Quitar modo"
+              className="text-cyan-300/70 transition hover:text-cyan-100"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        ) : null}
         {/* Image preview */}
         {attachedImage && (
           <div className="mb-2 flex items-start gap-2 rounded-xl border border-zinc-800 bg-zinc-900/50 p-2">

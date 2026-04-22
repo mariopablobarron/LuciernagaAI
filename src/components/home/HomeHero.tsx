@@ -84,7 +84,7 @@ export default function HomeHero({
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {ONBOARDING_EXAMPLE_PROMPTS.map((prompt) => (
+          {ONBOARDING_EXAMPLE_PROMPTS.slice(0, 4).map((prompt) => (
             <Button
               key={prompt.label}
               type="button"

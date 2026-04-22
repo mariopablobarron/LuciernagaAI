@@ -3,7 +3,7 @@ import { resolveIdentity, InvalidSessionTokenError } from "@/lib/auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { isContentSafe } from "@/lib/content-safety";
-import { todayInMadrid } from "@/lib/daily-round";
+import { pickPromptForDate, todayInMadrid } from "@/lib/daily-round";
 
 export const dynamic = "force-dynamic";
 
@@ -22,20 +22,15 @@ export async function GET(req: NextRequest) {
     const identity = await resolveIdentity(req);
     const prisma = getPrismaClient();
 
-    const round = await prisma.dailyRound.findUnique({
-      where: { date: todayInMadrid() },
+    // Idempotent: if the cron did not run (or ran in another timezone), make sure
+    // today's round always exists so the Cafetería is never "closed" for the user.
+    const todayDate = todayInMadrid();
+    const round = await prisma.dailyRound.upsert({
+      where: { date: todayDate },
+      create: { date: todayDate, prompt: pickPromptForDate(todayDate) },
+      update: {},
       select: { id: true, prompt: true, date: true },
     });
-
-    if (!round) {
-      return NextResponse.json({
-        round: null,
-        me: { hasResponded: false, response: null },
-        responses: [],
-        allowedEmojis: ALLOWED_EMOJIS,
-        myCircle: await loadMyCircle(identity.userId),
-      });
-    }
 
     const myResponse = await prisma.dailyRoundResponse.findUnique({
       where: { roundId_userId: { roundId: round.id, userId: identity.userId } },

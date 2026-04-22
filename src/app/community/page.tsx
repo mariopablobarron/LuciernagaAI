@@ -437,21 +437,40 @@ export default function CommunityPage() {
         {tab === "spaces" && (
           <div className="space-y-4">
             {!selectedSpace ? (
-              <div className="grid sm:grid-cols-2 gap-3">
-                {spaces.map((s) => (
-                  <button key={s.id} onClick={() => void loadSpacePosts(s.id)}
-                    className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 text-left hover:border-zinc-700 transition-all">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="text-2xl">{s.icon}</span>
-                      <div>
-                        <p className="text-sm font-semibold text-white">{s.name}</p>
-                        <p className="text-xs text-zinc-500">{s.postCount} publicaciones</p>
+              spaces.length === 0 ? (
+                <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 text-center space-y-2">
+                  <BookOpen className="w-10 h-10 text-zinc-700 mx-auto" />
+                  <p className="text-white font-semibold">Todavía no hay espacios abiertos</p>
+                  <p className="text-sm text-zinc-500">
+                    Los espacios son salas temáticas (hábitos, decisiones, pareja, trabajo…) donde cada uno
+                    comparte su paso del día. Los iremos abriendo a medida que la comunidad crezca.
+                  </p>
+                  <a
+                    href="https://t.me/TRESMILMILLONESDELATIDOSBOT"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-lg border border-violet-500/30 bg-violet-500/10 px-3 py-1.5 text-xs font-semibold text-violet-300 hover:bg-violet-500/20 mt-2"
+                  >
+                    Avísame cuando abran
+                  </a>
+                </div>
+              ) : (
+                <div className="grid sm:grid-cols-2 gap-3">
+                  {spaces.map((s) => (
+                    <button key={s.id} onClick={() => void loadSpacePosts(s.id)}
+                      className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 text-left hover:border-zinc-700 transition-all">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-2xl">{s.icon}</span>
+                        <div>
+                          <p className="text-sm font-semibold text-white">{s.name}</p>
+                          <p className="text-xs text-zinc-500">{s.postCount} publicaciones</p>
+                        </div>
                       </div>
-                    </div>
-                    <p className="text-xs text-zinc-400">{s.description}</p>
-                  </button>
-                ))}
-              </div>
+                      <p className="text-xs text-zinc-400">{s.description}</p>
+                    </button>
+                  ))}
+                </div>
+              )
             ) : (
               <div className="space-y-4">
                 <button onClick={() => setSelectedSpace(null)} className="text-sm text-violet-400 hover:text-violet-300">
@@ -506,7 +525,7 @@ export default function CommunityPage() {
                   <p className="text-white font-semibold">Aún no tienes círculo</p>
                   <p className="text-sm text-zinc-500">Únete a un grupo de 5-8 personas en tu misma fase</p>
                 </div>
-                {availableCircles.length > 0 && (
+                {availableCircles.length > 0 ? (
                   <div className="grid sm:grid-cols-2 gap-3">
                     {availableCircles.map((c) => (
                       <div key={c.id} className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-3">
@@ -526,6 +545,24 @@ export default function CommunityPage() {
                         </div>
                       </div>
                     ))}
+                  </div>
+                ) : (
+                  <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 space-y-3 text-center">
+                    <p className="text-sm text-zinc-400">
+                      Ahora mismo no hay círculos con plazas libres. Los abrimos por cohorte,
+                      cuando hay 5-8 personas en la misma fase.
+                    </p>
+                    <a
+                      href="https://t.me/TRESMILMILLONESDELATIDOSBOT"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-xs font-semibold text-white hover:bg-violet-500"
+                    >
+                      <Users className="w-3.5 h-3.5" /> Avísame cuando abra el mío
+                    </a>
+                    <p className="text-[11px] text-zinc-600">
+                      Escríbenos por Telegram con tu nombre y te avisamos.
+                    </p>
                   </div>
                 )}
               </div>

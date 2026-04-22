@@ -4,7 +4,7 @@ import { type ReactNode, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  BarChart3, BookOpen, Building2, Coffee, FlaskConical, LayoutDashboard, LogOut,
+  BarChart3, BellRing, BookOpen, Building2, Coffee, FlaskConical, LayoutDashboard, LogOut,
   Megaphone, Menu, Settings, Shield, ShieldCheck, Sparkles, Stethoscope,
   StickyNote, Users, Webhook, Wrench, X, Database, Activity, FileText, Bell,
 } from "lucide-react";
@@ -33,6 +33,7 @@ const NAV_LINKS = [
   { href: "/admin/audit", label: "Audit Log", icon: Sparkles },
   { href: "/admin/logs", label: "Logs", icon: FileText },
   { href: "/admin/alertas", label: "Alertas", icon: Bell },
+  { href: "/admin/notificaciones", label: "Notificaciones push", icon: BellRing },
   { href: "/admin/llm-usage", label: "LLM Usage", icon: BarChart3 },
   { href: "/admin/team", label: "Equipo", icon: Shield },
   { href: "/admin/integraciones", label: "Integraciones", icon: Webhook },

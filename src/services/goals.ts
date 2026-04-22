@@ -1,4 +1,5 @@
 import { getPrismaClient } from "@/db/prisma";
+import { isChatStarterPick } from "@/lib/onboarding";
 import { dispatchN8nEvent } from "@/lib/n8n";
 import { awardLatidos } from "@/services/latidos";
 import { earnInvite } from "@/services/invites";
@@ -246,6 +247,13 @@ export function detectGoalIntent(message: string): string | null {
     return null;
   }
 
+  // Starter-picks from the chat empty state are EXPLORATORY. Don't materialize
+  // them into a tracked goal/action on the first click — that turns exploration
+  // into an unwanted commitment the user gets chased about.
+  if (isChatStarterPick(message)) {
+    return null;
+  }
+
   return fallbackGoalTitleFromMessage(message);
 }
 
@@ -259,8 +267,17 @@ export function detectAvoidance(message: string): boolean {
   );
 }
 
+function stripGoalPrefix(title: string): string {
+  // Remove the generic "Aclarar y avanzar con " prefix added by fallbackGoalTitleFromMessage
+  // so derived action titles don't compound "Definir X para: Aclarar y avanzar con …".
+  const cleaned = title.replace(/^aclarar y avanzar con\s+/i, "").trim();
+  if (!cleaned) return title;
+  return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+}
+
 function defaultActionsForGoal(goalTitle: string): string[] {
-  const focus = goalTitle.length > 64 ? `${goalTitle.slice(0, 64)}...` : goalTitle;
+  const stripped = stripGoalPrefix(goalTitle);
+  const focus = stripped.length > 64 ? `${stripped.slice(0, 64)}...` : stripped;
 
   const normalized = normalizeText(goalTitle);
   if (/(estudio|examen|universidad|tesis|curso|clase)/.test(normalized)) {

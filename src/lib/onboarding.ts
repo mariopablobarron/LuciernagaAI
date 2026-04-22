@@ -5,6 +5,23 @@ export const ONBOARDING_SUBTITLE =
 
 export const ONBOARDING_STARTER_QUESTION = "¿Qué llevas semanas evitando hacer?";
 
+// Quick-picks mostrados en el empty state del chat. Son prompts EXPLORATORIOS:
+// clicarlos NO debe crear compromisos persistentes (acciones/goals) hasta que
+// el usuario confirme explícitamente en turnos posteriores.
+export const CHAT_STARTER_PICKS = [
+  "Estoy bloqueado y no sé cómo empezar",
+  "Tengo demasiadas cosas y no sé por dónde ir",
+  "Necesito tomar una decisión importante",
+  "Quiero salir de un patrón que se repite",
+];
+
+export function isChatStarterPick(message: string): boolean {
+  const normalized = message.trim().toLowerCase().replace(/[.!?…]+$/g, "");
+  return CHAT_STARTER_PICKS.some(
+    (starter) => starter.toLowerCase() === normalized,
+  );
+}
+
 // Pool de frases interpelativas. Todas en primera persona del usuario, confesionales,
 // sin saludos ni preguntas "menú". El chat NO precarga ninguna en el input — se muestran
 // como sugerencias clicables para que el usuario mantenga agencia.

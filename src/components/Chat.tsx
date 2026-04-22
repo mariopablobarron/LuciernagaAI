@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { VoiceRecorder } from "@/components/ui/voice-recorder";
 import { AudioRecorder } from "@/components/ui/audio-recorder";
-import { MENTOR_MODES, getMentorMode } from "@/lib/onboarding";
+import { CHAT_STARTER_PICKS, MENTOR_MODES, getMentorMode } from "@/lib/onboarding";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -104,12 +104,7 @@ export type ChatProps = {
 
 // ─── Starter prompts ──────────────────────────────────────────────────────────
 
-const STARTERS = [
-  "Estoy bloqueado y no sé cómo empezar",
-  "Tengo demasiadas cosas y no sé por dónde ir",
-  "Necesito tomar una decisión importante",
-  "Quiero salir de un patrón que se repite",
-];
+const STARTERS = CHAT_STARTER_PICKS;
 
 // ─── Simple markdown renderer ─────────────────────────────────────────────────
 // Handles: **bold**, `inline code`, line breaks, and - bullet lists.
@@ -322,7 +317,15 @@ function SignupPromptBubble({
 
 // ─── Message bubble ───────────────────────────────────────────────────────────
 
-function MessageBubble({ message, isStreaming }: { message: ChatMessage; isStreaming: boolean }) {
+function MessageBubble({
+  message,
+  isStreaming,
+  onQuickReply,
+}: {
+  message: ChatMessage;
+  isStreaming: boolean;
+  onQuickReply?: (text: string) => void;
+}) {
   const [copied, setCopied] = useState(false);
   const isUser = message.role === "user";
 
@@ -399,6 +402,31 @@ function MessageBubble({ message, isStreaming }: { message: ChatMessage; isStrea
           <div className="text-sm leading-relaxed text-amber-100">
             {renderMarkdown(message.content)}
           </div>
+          {onQuickReply ? (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              <button
+                type="button"
+                onClick={() => onQuickReply("Ahora no, lo retomo más tarde.")}
+                className="rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[11px] text-amber-100 transition hover:bg-amber-500/20"
+              >
+                Ahora no
+              </button>
+              <button
+                type="button"
+                onClick={() => onQuickReply("Ya no aplica, lo cierro.")}
+                className="rounded-full border border-zinc-700 bg-zinc-900/60 px-3 py-1 text-[11px] text-zinc-300 transition hover:bg-zinc-800"
+              >
+                Ya no aplica
+              </button>
+              <button
+                type="button"
+                onClick={() => onQuickReply("Sí, lo voy a hacer hoy.")}
+                className="rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-[11px] text-cyan-100 transition hover:bg-cyan-500/20"
+              >
+                Sí, lo voy a hacer
+              </button>
+            </div>
+          ) : null}
         </div>
       </div>
     );
@@ -888,6 +916,7 @@ export default function Chat({
                   key={message.id}
                   message={message}
                   isStreaming={streamingMessageId === message.id}
+                  onQuickReply={handleStarterClick}
                 />
               )
             ))}

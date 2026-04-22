@@ -1,6 +1,6 @@
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
-// import { stripe } from "@/lib/stripe"; // Descomenta cuando tengas Stripe configurado
+import { getStripe } from "@/lib/stripe";
 
 /**
  * Ejecuta el Derecho de Supresión (Art. 17 RGPD)
@@ -29,12 +29,22 @@ export async function executeRightToErasure(userId: string): Promise<boolean> {
     // 2. Eliminar datos en Subencargados del Tratamiento (Third-parties)
     if (user.stripeCustomerId) {
       try {
-        // Si usas Stripe, debes eliminar el customer para cumplir con RGPD
-        // await stripe.customers.del(user.stripeCustomerId);
+        const stripe = getStripe();
+        const subs = await stripe.subscriptions.list({
+          customer: user.stripeCustomerId,
+          status: "all",
+          limit: 100,
+        });
+        for (const sub of subs.data) {
+          if (sub.status === "canceled") continue;
+          await stripe.subscriptions.cancel(sub.id);
+          logInfo("GDPR", "Stripe subscription cancelada", { subscriptionId: sub.id });
+        }
+        await stripe.customers.del(user.stripeCustomerId);
         logInfo("GDPR", "Stripe customer eliminado", { customerId: user.stripeCustomerId });
       } catch (stripeError) {
-        // Registramos el error pero continuamos con el borrado local
-        logError("GDPR", stripeError, { area: "stripe_customer_deletion" });
+        // Registramos el error pero continuamos con el borrado local para no bloquear el derecho RGPD.
+        logError("GDPR", stripeError, { area: "stripe_customer_deletion", customerId: user.stripeCustomerId });
       }
     }
 

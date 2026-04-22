@@ -107,7 +107,7 @@ export default function ArchivosPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/app/settings" className="p-2 -ml-2 rounded-lg text-zinc-400 hover:text-white transition-colors">
+            <Link href="/settings" className="p-2 -ml-2 rounded-lg text-zinc-400 hover:text-white transition-colors">
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>

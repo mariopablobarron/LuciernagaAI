@@ -9,26 +9,22 @@ import {
   Camera,
   CheckCircle2,
   Clock,
-  CreditCard,
-  Crown,
-  Download,
   ExternalLink,
   Eye,
   EyeOff,
   Globe,
   Lock,
-  MessageSquare,
   Send,
   Sparkles,
-  Trash2,
   User,
-  X,
-  AlertTriangle,
   HelpCircle,
 } from 'lucide-react';
 import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
 import { resetAllTours } from '@/components/GuidedTour';
 import type { BrowserSessionUser } from '@/lib/session-client';
+import { BillingSection } from '@/components/ui/billing-section';
+import { TrustedContactSection } from '@/components/ui/trusted-contact-section';
+import { PrivacySettings } from '@/components/ui/privacy-settings';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -96,7 +92,6 @@ function Toggle({ checked, onChange, disabled }: { checked: boolean; onChange: (
 
 export default function SettingsPage() {
   const [user, setUser] = useState<BrowserSessionUser | null>(null);
-  const [portalLoading, setPortalLoading] = useState(false);
   const [telegram, setTelegram] = useState<TelegramStatus | null>(null);
   const [prefs, setPrefs] = useState<Preferences | null>(null);
   const [saving, setSaving] = useState(false);
@@ -106,9 +101,6 @@ export default function SettingsPage() {
   const [showPw, setShowPw] = useState(false);
   const [pwLoading, setPwLoading] = useState(false);
   const [pwMsg, setPwMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [isExporting, setIsExporting] = useState<string | null>(null);
-  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   // Profile state
   const [profileName, setProfileName] = useState('');
@@ -120,12 +112,10 @@ export default function SettingsPage() {
   const [profileMsg, setProfileMsg] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const saveMsgTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const exportTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return () => {
       if (saveMsgTimerRef.current) clearTimeout(saveMsgTimerRef.current);
-      if (exportTimerRef.current) clearTimeout(exportTimerRef.current);
     };
   }, []);
 
@@ -230,45 +220,6 @@ export default function SettingsPage() {
     }
   }
 
-  // Export data
-  function handleExport(format: string) {
-    setIsExporting(format);
-    window.location.href = `/api/user/export?format=${format}`;
-    if (exportTimerRef.current) clearTimeout(exportTimerRef.current);
-    exportTimerRef.current = setTimeout(() => setIsExporting(null), 2000);
-  }
-
-  // Delete account
-  async function handleDelete() {
-    setIsDeleting(true);
-    try {
-      const res = await fetch('/api/user/account', { method: 'DELETE', credentials: 'include' });
-      if (res.ok) window.location.href = '/';
-      else alert('Error al eliminar la cuenta.');
-    } catch {
-      alert('Error al eliminar la cuenta.');
-    } finally {
-      setIsDeleting(false);
-    }
-  }
-
-  // Open Stripe portal
-  async function handleManageSubscription() {
-    setPortalLoading(true);
-    try {
-      const res = await fetch('/api/billing/portal', { method: 'POST', credentials: 'include' });
-      const data = (await res.json()) as { url?: string; error?: string };
-      if (res.ok && data.url) {
-        window.location.href = data.url;
-      } else {
-        alert('No se pudo abrir el portal de suscripcion.');
-      }
-    } catch {
-      alert('Error al conectar con el portal de pagos.');
-    } finally {
-      setPortalLoading(false);
-    }
-  }
 
   // Save profile
   async function handleSaveProfile() {
@@ -348,8 +299,6 @@ export default function SettingsPage() {
   };
 
   const avatarSrc = avatarPreview ?? (hasAvatar && user?.id ? `/api/user/avatar/${user.id}?t=${Date.now()}` : null);
-
-  const isPro = user?.plan === 'pro' || user?.plan === 'pro_monthly' || user?.plan === 'pro_annual';
 
   const botUrl = telegram?.botUsername ? `https://t.me/${telegram.botUsername}` : 'https://t.me/';
 
@@ -520,65 +469,11 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* ── Subscription ──────────────────────────────────────────── */}
-        <div className={`${COMPONENTS.card} p-6 space-y-5`}>
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-violet-500/15 flex items-center justify-center">
-              <CreditCard className="w-4 h-4 text-violet-400" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-white">Suscripcion</h2>
-              <p className="text-xs text-zinc-500">Tu plan actual y facturacion</p>
-            </div>
-          </div>
+        {/* ── Subscription (BillingSection modular: plan + consumo + upgrade/portal) ── */}
+        <BillingSection />
 
-          {user ? (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3">
-                <div className="flex items-center gap-3">
-                  <Crown className={`w-5 h-5 ${isPro ? 'text-violet-400' : 'text-zinc-500'}`} />
-                  <div>
-                    <p className="text-sm font-semibold text-white">
-                      {user.planLabel ?? (isPro ? 'Pro' : 'Plan gratuito')}
-                    </p>
-                    <p className="text-xs text-zinc-500">
-                      {isPro ? 'Acceso completo a todas las funciones' : 'Funciones basicas incluidas'}
-                    </p>
-                  </div>
-                </div>
-                {isPro && (
-                  <span className="text-xs font-semibold text-violet-400 bg-violet-500/10 border border-violet-500/30 rounded-full px-2.5 py-0.5">
-                    Activo
-                  </span>
-                )}
-              </div>
-
-              {isPro ? (
-                <button
-                  onClick={handleManageSubscription}
-                  disabled={portalLoading}
-                  className={`${COMPONENTS.buttonSecondary} w-full flex items-center justify-center gap-2`}
-                >
-                  <CreditCard className="w-4 h-4" />
-                  {portalLoading ? 'Abriendo portal...' : 'Gestionar suscripcion'}
-                </button>
-              ) : (
-                <Link
-                  href="/precios"
-                  className={`${COMPONENTS.buttonPrimary} w-full flex items-center justify-center gap-2`}
-                >
-                  <Sparkles className="w-4 h-4" />
-                  Mejorar a Pro
-                </Link>
-              )}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <div className="h-14 rounded-xl bg-zinc-800/50 animate-pulse" />
-              <div className="h-10 rounded-xl bg-zinc-800/50 animate-pulse" />
-            </div>
-          )}
-        </div>
+        {/* ── Trusted contact (RGPD + notificaciones a persona de confianza) ── */}
+        <TrustedContactSection />
 
         {/* ── Notifications ──────────────────────────────────────────── */}
         <div className={`${COMPONENTS.card} p-6 space-y-5`}>
@@ -820,38 +715,6 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* ── Data Export ─────────────────────────────────────────────── */}
-        <div className={`${COMPONENTS.card} p-6 space-y-5`}>
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-violet-500/15 flex items-center justify-center">
-              <Download className="w-4 h-4 text-violet-400" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-white">Tus datos</h2>
-              <p className="text-xs text-zinc-500">Derecho a portabilidad (Art. 20 RGPD)</p>
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button
-              onClick={() => handleExport('csv')}
-              disabled={isExporting !== null}
-              className={`${COMPONENTS.buttonSecondary} flex-1 flex items-center justify-center gap-2`}
-            >
-              {isExporting === 'csv' ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <MessageSquare className="w-4 h-4" />}
-              Historial de Chat (CSV)
-            </button>
-            <button
-              onClick={() => handleExport('json')}
-              disabled={isExporting !== null}
-              className={`${COMPONENTS.buttonSecondary} flex-1 flex items-center justify-center gap-2`}
-            >
-              {isExporting === 'json' ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Download className="w-4 h-4" />}
-              Datos completos (JSON)
-            </button>
-          </div>
-        </div>
-
         {/* ── Help ────────────────────────────────────────────────────── */}
         <div className={`${COMPONENTS.card} p-6 space-y-4`}>
           <div className="flex items-center gap-3">
@@ -871,43 +734,8 @@ export default function SettingsPage() {
           </button>
         </div>
 
-        {/* ── Danger Zone ────────────────────────────────────────────── */}
-        <div className={`${COMPONENTS.card} p-6 space-y-3 border-l-4 border-l-red-500`}>
-          <h2 className="text-lg font-semibold text-red-400">Zona de peligro</h2>
-          <p className="text-sm text-zinc-400">Estas acciones no se pueden deshacer.</p>
-
-          {!showConfirmDelete ? (
-            <button
-              onClick={() => setShowConfirmDelete(true)}
-              className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-lg border border-red-500/50 text-red-400 hover:bg-red-500/10 transition-colors font-semibold"
-            >
-              <Trash2 className="w-4 h-4" />
-              Eliminar mi cuenta y todos mis datos
-            </button>
-          ) : (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-3 text-red-500">
-                <AlertTriangle className="w-5 h-5 shrink-0" />
-                <span className="text-sm font-medium">¿Seguro? Perderás todo tu avance.</span>
-              </div>
-              <div className="flex gap-2 w-full sm:w-auto">
-                <button
-                  onClick={() => setShowConfirmDelete(false)}
-                  className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  className="flex-1 bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
-                >
-                  {isDeleting ? 'Borrando…' : 'Sí, borrar'}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+        {/* ── Privacidad: export de datos + borrado de cuenta ────────── */}
+        <PrivacySettings />
       </div>
     </div>
   );

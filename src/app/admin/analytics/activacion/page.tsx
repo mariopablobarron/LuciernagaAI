@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
-import { ArrowLeft, Flame, MessageSquare, RefreshCw, Target, Zap } from "lucide-react";
+import { ArrowLeft, Database, Flame, MessageSquare, RefreshCw, Target, Zap } from "lucide-react";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 
 type Cohort = {
@@ -42,6 +42,7 @@ export default function ActivacionPage() {
   const router = useRouter();
   const [data, setData] = useState<ActivationData | null>(null);
   const [loading, setLoading] = useState(false);
+  const [backfilling, setBackfilling] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -69,6 +70,47 @@ export default function ActivacionPage() {
     router.replace("/admin/login");
   }
 
+  async function handleBackfill() {
+    if (backfilling) return;
+    const confirmed = window.confirm(
+      "Rellenar retroactivamente firstMessageSentAt, activatedAt y onboardingCompletedAt para usuarios históricos. Es idempotente (seguro de repetir). ¿Continuar?",
+    );
+    if (!confirmed) return;
+    setBackfilling(true);
+    try {
+      const res = await fetch("/api/admin/backfill-activation?limit=5000", {
+        credentials: "include",
+        method: "POST",
+      });
+      if (res.status === 401) {
+        router.replace("/admin/login");
+        return;
+      }
+      if (res.status === 403) {
+        toast.error("Sin permiso (requiere rol admin/ops)");
+        return;
+      }
+      if (!res.ok) throw new Error("backfill_failed");
+      const json = (await res.json()) as {
+        ok: boolean;
+        stats: { firstMessage: number; activated: number; onboarding: number; scanned: number };
+      };
+      const { firstMessage, activated, onboarding, scanned } = json.stats;
+      if (scanned === 0) {
+        toast.success("Nada que rellenar — todos los campos ya estaban poblados");
+      } else {
+        toast.success(
+          `Backfill OK · firstMessage: ${firstMessage} · activated: ${activated} · onboarding: ${onboarding}`,
+        );
+      }
+      await load();
+    } catch {
+      toast.error("Error al ejecutar backfill");
+    } finally {
+      setBackfilling(false);
+    }
+  }
+
   const overallRate = data?.overall.rate ?? null;
 
   return (
@@ -85,14 +127,25 @@ export default function ActivacionPage() {
         >
           <ArrowLeft className="h-4 w-4" /> Volver a analytics
         </Link>
-        <button
-          onClick={() => void load()}
-          disabled={loading}
-          className="flex items-center gap-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
-        >
-          <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-          Refrescar
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => void handleBackfill()}
+            disabled={backfilling}
+            title="Rellena los campos de activación para usuarios históricos. Idempotente."
+            className="flex items-center gap-1.5 rounded-lg border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-200 disabled:opacity-50"
+          >
+            <Database className={`h-3.5 w-3.5 ${backfilling ? "animate-pulse" : ""}`} />
+            {backfilling ? "Ejecutando…" : "Backfill retroactivo"}
+          </button>
+          <button
+            onClick={() => void load()}
+            disabled={loading}
+            className="flex items-center gap-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+            Refrescar
+          </button>
+        </div>
       </div>
 
       {loading && !data ? (

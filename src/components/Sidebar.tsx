@@ -251,7 +251,7 @@ export default function Sidebar({
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Workspace
           </p>
-          <Link href="/app/settings" className="mt-1 block text-sm font-medium text-foreground hover:text-primary transition-colors">
+          <Link href="/settings" className="mt-1 block text-sm font-medium text-foreground hover:text-primary transition-colors">
             {profile.name}
           </Link>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -330,8 +330,8 @@ export default function Sidebar({
           </div>
 
           {/* Settings always accessible */}
-          <Button asChild type="button" variant={pathname?.startsWith("/app/settings") ? "default" : "outline"} size="sm" className="w-full justify-center text-xs" data-tour="ajustes">
-            <Link href="/app/settings">Ajustes</Link>
+          <Button asChild type="button" variant={pathname?.startsWith("/settings") ? "default" : "outline"} size="sm" className="w-full justify-center text-xs" data-tour="ajustes">
+            <Link href="/settings">Ajustes</Link>
           </Button>
 
           {/* Método — always linked so registered users can return to the pedagogical frame */}

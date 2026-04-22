@@ -245,6 +245,48 @@ export async function POST(req: NextRequest) {
         });
         break;
       }
+
+      // ── Customer deletion (Stripe dashboard o nuestro gdpr.ts) ────────────────
+      // Cubre el caso inverso al borrado RGPD local: alguien elimina el customer
+      // desde Stripe y nuestra BD tiene que limpiar stripeCustomerId + degradar
+      // cualquier suscripción viva a cancelada.
+      case 'customer.deleted': {
+        const customer = event.data.object as Stripe.Customer;
+        const prisma = getPrismaClient();
+
+        const user = await prisma.user.findFirst({
+          where: { stripeCustomerId: customer.id },
+          select: { id: true, email: true },
+        });
+
+        if (!user) {
+          logInfo('BILLING', 'customer_deleted_no_local_user', { customerId: customer.id });
+          break;
+        }
+
+        await prisma.subscription.updateMany({
+          where: { userId: user.id, status: { not: 'canceled' } },
+          data: {
+            status: 'canceled',
+            plan: 'free',
+            cancelledAt: new Date(),
+            cancelAtPeriodEnd: false,
+          },
+        });
+
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { stripeCustomerId: null },
+        });
+
+        invalidateUserCache(user.id);
+
+        logInfo('BILLING', 'customer_deleted', { userId: user.id, customerId: customer.id });
+        notifyAdmin(
+          `🗑️ *Customer Stripe eliminado*\nUser: \`${user.email ?? user.id}\`\nCustomer: \`${customer.id}\``,
+        );
+        break;
+      }
     }
   } catch (err) {
     logError('BILLING', err, { eventType: event.type });

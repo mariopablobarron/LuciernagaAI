@@ -2,14 +2,30 @@ import webPush from "web-push";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 
-// ─── VAPID config ────────────────────────────────────────────────────────────
+// ─── VAPID config (lazy init: setVapidDetails runs on first send, not at import time) ──
 
-const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? "";
-const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY ?? "";
-const VAPID_SUBJECT = process.env.APP_BASE_URL ?? "https://tresmilmillonesdelatidos.es";
+const FALLBACK_VAPID_SUBJECT = "mailto:soporte@tresmilmillonesdelatidos.es";
 
-if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
-  webPush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+function resolveVapidSubject(): string {
+  const raw = process.env.VAPID_SUBJECT?.trim() || process.env.APP_BASE_URL?.trim() || "";
+  if (raw.startsWith("https://") || raw.startsWith("mailto:")) return raw;
+  return FALLBACK_VAPID_SUBJECT;
+}
+
+let vapidConfigured = false;
+function ensureVapidConfigured(): boolean {
+  if (vapidConfigured) return true;
+  const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? "";
+  const privateKey = process.env.VAPID_PRIVATE_KEY ?? "";
+  if (!publicKey || !privateKey) return false;
+  try {
+    webPush.setVapidDetails(resolveVapidSubject(), publicKey, privateKey);
+    vapidConfigured = true;
+    return true;
+  } catch (err: unknown) {
+    logError("PUSH", err, { area: "vapid_setup" });
+    return false;
+  }
 }
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -28,6 +44,7 @@ async function sendToSubscription(
   subscription: { endpoint: string; p256dh: string; auth: string; id: string },
   payload: PushPayload,
 ): Promise<boolean> {
+  if (!ensureVapidConfigured()) return false;
   try {
     await webPush.sendNotification(
       {

@@ -135,7 +135,7 @@ const CHECKS: Check[] = [
     category: "integrations",
     run: async () => {
       const key = process.env.HEYGEN_API_KEY?.trim();
-      if (!key) return { status: "warn", detail: "HEYGEN_API_KEY no configurada" };
+      if (!key) return { status: "ok", detail: "No configurada (opcional)" };
       const res = await pingHttp("https://api.heygen.com/v1/user.me", {
         headers: { "x-api-key": key },
       });
@@ -209,7 +209,7 @@ const CHECKS: Check[] = [
         "N8N_ACTION_WEBHOOK",
       ]);
       if (present.length === 0) {
-        return { status: "warn", detail: "Ningún webhook configurado" };
+        return { status: "ok", detail: "No configurado (opcional)" };
       }
       if (missing.length > 0) {
         return { status: "warn", detail: `Faltan: ${missing.join(", ")}` };

@@ -242,7 +242,7 @@ export default function AdminUsersPage() {
     void fetchUsers(controller.signal);
     return () => controller.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
+  }, [page, kindFilter]);
 
   async function handleLogout() {
     try {
@@ -423,7 +423,7 @@ export default function AdminUsersPage() {
           {/* Kind filter */}
           <select
             value={kindFilter}
-            onChange={(e) => { setKindFilter(e.target.value as UserKind | "all"); setTimeout(applyFilters, 0); }}
+            onChange={(e) => { setKindFilter(e.target.value as UserKind | "all"); setPage(1); }}
             className="rounded-xl border border-zinc-700 bg-zinc-900/80 px-3 py-2.5 text-sm text-zinc-300 focus:border-violet-500 focus:outline-none"
           >
             <option value="all">Todos los tipos</option>

@@ -5,7 +5,7 @@
   "scripts": {
     "postinstall": "prisma generate",
     "dev": "next dev",
-    "build": "next build --webpack",
+    "build": "next build",
     "start": "(npx prisma migrate resolve --rolled-back 20260418220000_add_note_coolify_backup_check || true) && npx prisma migrate deploy && (node scripts/seed-superadmin.mjs || true) && next start",
     "lint": "eslint",
     "test": "jest --runInBand",

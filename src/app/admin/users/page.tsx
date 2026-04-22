@@ -28,12 +28,15 @@ import { AdminShell } from "@/features/admin/components/AdminShell";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
+type UserKind = "registered" | "anon-active" | "anon-dormant" | "test" | "team";
+
 type UserItem = {
   id: string;
   email: string;
   name: string | null;
   hasAvatar: boolean;
   role: string;
+  kind: UserKind;
   createdAt: string;
   updatedAt: string;
   lastSeen: string;
@@ -59,7 +62,8 @@ type UserItem = {
 type AdminUsersResponse = {
   items: UserItem[];
   pagination: { page: number; pageSize: number; total: number; totalPages: number };
-  filters: { q: string; state: string; riskOnly: boolean };
+  filters: { q: string; state: string; riskOnly: boolean; kind: string };
+  kindCounts: Record<UserKind, number>;
 };
 
 type SortKey = "name" | "lastSeen" | "engagementScore" | "streakDays" | "state" | "messages7d";
@@ -85,6 +89,14 @@ const RISK_CONFIG: Record<string, { label: string; color: string }> = {
 const PLAN_CONFIG: Record<string, { label: string; style: string }> = {
   pro: { label: "Pro", style: "bg-violet-500/15 text-violet-300 border-violet-500/30" },
   free: { label: "Free", style: "bg-zinc-700/30 text-zinc-400 border-zinc-600/30" },
+};
+
+const KIND_CONFIG: Record<UserKind, { label: string; style: string }> = {
+  registered: { label: "Registrado", style: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" },
+  "anon-active": { label: "Anónimo activo", style: "bg-sky-500/15 text-sky-300 border-sky-500/30" },
+  "anon-dormant": { label: "Anónimo dormido", style: "bg-zinc-700/30 text-zinc-500 border-zinc-600/30" },
+  test: { label: "Prueba", style: "bg-amber-500/15 text-amber-300 border-amber-500/30" },
+  team: { label: "Equipo", style: "bg-violet-500/15 text-violet-300 border-violet-500/30" },
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -126,6 +138,7 @@ export default function AdminUsersPage() {
   const [query, setQuery] = useState("");
   const [stateFilter, setStateFilter] = useState("all");
   const [planFilter, setPlanFilter] = useState("all");
+  const [kindFilter, setKindFilter] = useState<UserKind | "all">("all");
   const [riskOnly, setRiskOnly] = useState(false);
   const [page, setPage] = useState(1);
   const [sortKey, setSortKey] = useState<SortKey>("lastSeen");
@@ -198,6 +211,7 @@ export default function AdminUsersPage() {
     params.set("pageSize", "25");
     if (query.trim()) params.set("q", query.trim());
     if (stateFilter !== "all") params.set("state", stateFilter);
+    if (kindFilter !== "all") params.set("kind", kindFilter);
     if (riskOnly) params.set("risk", "1");
 
     try {
@@ -282,6 +296,8 @@ export default function AdminUsersPage() {
   // KPIs
   const allItems = data?.items ?? [];
   const totalUsers = data?.pagination.total ?? 0;
+  const kindCounts = data?.kindCounts ?? { registered: 0, "anon-active": 0, "anon-dormant": 0, test: 0, team: 0 };
+  const realUsers = kindCounts.registered + kindCounts["anon-active"];
   const withRisk = allItems.filter((u) => u.riskLevel === "high" || u.riskLevel === "critical").length;
   const withCrisis = allItems.filter((u) => u.crisisActive).length;
   const avgEngagement = allItems.length > 0
@@ -316,9 +332,12 @@ export default function AdminUsersPage() {
             <div className="card-surface rounded-xl border border-zinc-800 p-4">
               <div className="flex items-center gap-2 text-xs text-zinc-500">
                 <Users className="h-3.5 w-3.5" />
-                <span className="font-semibold uppercase tracking-wide">Total</span>
+                <span className="font-semibold uppercase tracking-wide">Reales</span>
               </div>
-              <p className="mt-2 text-2xl font-bold text-white">{totalUsers}</p>
+              <p className="mt-2 text-2xl font-bold text-white">{realUsers}</p>
+              <p className="mt-1 text-[10px] text-zinc-600 tabular-nums">
+                {kindCounts.registered} reg · {kindCounts["anon-active"]} anón · {totalUsers} total
+              </p>
             </div>
             <div className="card-surface rounded-xl border border-zinc-800 p-4">
               <div className="flex items-center gap-2 text-xs text-zinc-500">
@@ -399,6 +418,20 @@ export default function AdminUsersPage() {
             <option value="all">Todos los planes</option>
             <option value="pro">Pro</option>
             <option value="free">Free</option>
+          </select>
+
+          {/* Kind filter */}
+          <select
+            value={kindFilter}
+            onChange={(e) => { setKindFilter(e.target.value as UserKind | "all"); setTimeout(applyFilters, 0); }}
+            className="rounded-xl border border-zinc-700 bg-zinc-900/80 px-3 py-2.5 text-sm text-zinc-300 focus:border-violet-500 focus:outline-none"
+          >
+            <option value="all">Todos los tipos</option>
+            <option value="registered">Registrados</option>
+            <option value="anon-active">Anónimos activos</option>
+            <option value="anon-dormant">Anónimos dormidos</option>
+            <option value="test">De prueba</option>
+            <option value="team">Equipo</option>
           </select>
 
           {/* Risk toggle */}
@@ -557,10 +590,16 @@ export default function AdminUsersPage() {
                       </span>
                     </div>
 
-                    {/* Plan + Risk */}
+                    {/* Plan + Kind + Risk */}
                     <div className="flex flex-wrap items-center gap-1.5">
                       <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold ${planCfg.style}`}>
                         {planCfg.label}
+                      </span>
+                      <span
+                        className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold ${KIND_CONFIG[user.kind].style}`}
+                        title={KIND_CONFIG[user.kind].label}
+                      >
+                        {KIND_CONFIG[user.kind].label}
                       </span>
                       {(user.riskLevel === "high" || user.riskLevel === "critical") && (
                         <span className={`text-[10px] font-semibold ${riskCfg.color}`}>
@@ -644,6 +683,7 @@ export default function AdminUsersPage() {
                         </div>
                         <div className="flex flex-wrap gap-3 text-xs text-zinc-500 mt-2">
                           <span className={`${planCfg.style} rounded-full border px-2 py-0.5 text-[10px] font-semibold`}>{planCfg.label}</span>
+                          <span className={`${KIND_CONFIG[user.kind].style} rounded-full border px-2 py-0.5 text-[10px] font-semibold`}>{KIND_CONFIG[user.kind].label}</span>
                           <span>Eng: <strong className="text-zinc-300">{user.engagementScore}</strong></span>
                           <span>Msgs: <strong className="text-zinc-300">{user.counts.messages7d}</strong></span>
                           <span>Racha: <strong className={user.streakDays > 0 ? "text-amber-300" : "text-zinc-500"}>{user.streakDays}d</strong></span>

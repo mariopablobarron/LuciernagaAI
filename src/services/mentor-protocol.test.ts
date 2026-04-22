@@ -35,7 +35,8 @@ describe("mentor protocol", () => {
     expect(mode.validate).toBe(false);
   });
 
-  it("pide email solo cuando hay valor real acumulado", () => {
+  it("pide email solo cuando hay conversación y compromiso reales", () => {
+    // Commitment sin conversación todavía → espera.
     expect(
       shouldAskForEmail({
         isAnonymous: true,
@@ -43,17 +44,29 @@ describe("mentor protocol", () => {
         actionCount: 0,
         conversationMessageCount: 1,
       })
-    ).toBe(true);
+    ).toBe(false);
 
+    // Mucha conversación sin compromiso → espera (no nag por volumen puro).
     expect(
       shouldAskForEmail({
         isAnonymous: true,
         goalCount: 0,
         actionCount: 0,
-        conversationMessageCount: 2,
+        conversationMessageCount: 8,
       })
     ).toBe(false);
 
+    // Conversación + compromiso → pide email.
+    expect(
+      shouldAskForEmail({
+        isAnonymous: true,
+        goalCount: 1,
+        actionCount: 0,
+        conversationMessageCount: 4,
+      })
+    ).toBe(true);
+
+    // Señal explícita de conversión → pide aunque aún no haya conversación.
     expect(
       shouldAskForEmail({
         isAnonymous: true,
@@ -63,5 +76,16 @@ describe("mentor protocol", () => {
         conversionTrigger: true,
       })
     ).toBe(true);
+
+    // Usuario ya registrado → nunca.
+    expect(
+      shouldAskForEmail({
+        isAnonymous: false,
+        goalCount: 5,
+        actionCount: 5,
+        conversationMessageCount: 50,
+        conversionTrigger: true,
+      })
+    ).toBe(false);
   });
 });

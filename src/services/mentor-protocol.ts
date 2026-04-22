@@ -106,10 +106,10 @@ export function shouldAskForEmail(context: EmailCaptureContext): boolean {
     return false;
   }
 
-  return (
-    Boolean(context.conversionTrigger) ||
-    context.goalCount >= 1 ||
-    context.actionCount >= 1 ||
-    context.conversationMessageCount > 3
-  );
+  // Only ask once there is real value to save: an explicit conversion trigger,
+  // or the user has both written enough (>3 msgs) AND committed to something
+  // (goal o action). Evita pedir email a un visitante que apenas ha saludado.
+  if (context.conversionTrigger) return true;
+  const hasCommitment = context.goalCount >= 1 || context.actionCount >= 1;
+  return hasCommitment && context.conversationMessageCount > 3;
 }

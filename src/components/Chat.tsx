@@ -33,7 +33,7 @@ export type ChatMessage = {
   content: string;
   createdAt?: string;
   isError?: boolean;
-  variant?: "action_required" | "crisis";
+  variant?: "action_required" | "crisis" | "signup_prompt";
   meta?: {
     searchUsed?: boolean;
     fallback?: boolean;
@@ -80,6 +80,10 @@ export type ChatProps = {
   onToggleJournal?: () => void;
   /** Proactive context-aware question shown when chat is empty. */
   proactivePrompt?: string | null;
+  /** Called when user submits email from the inline signup prompt. */
+  onCaptureEmail?: (email: string) => Promise<void> | void;
+  /** Called when user dismisses the inline signup prompt. */
+  onDismissSignupPrompt?: (messageId: string) => void;
 };
 
 // ─── Starter prompts ──────────────────────────────────────────────────────────
@@ -201,6 +205,103 @@ function inlineMarkdown(text: string): React.ReactNode[] {
     }
     return part;
   });
+}
+
+// ─── Inline signup prompt ─────────────────────────────────────────────────────
+
+function SignupPromptBubble({
+  message,
+  onSubmit,
+  onDismiss,
+}: {
+  message: ChatMessage;
+  onSubmit?: (email: string) => Promise<void> | void;
+  onDismiss?: (messageId: string) => void;
+}) {
+  const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [done, setDone] = useState(false);
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setError("Revisa el formato del email.");
+      return;
+    }
+    setError(null);
+    setSubmitting(true);
+    try {
+      await onSubmit?.(trimmed);
+      setDone(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo guardar. Prueba otra vez.");
+    } finally {
+      setSubmitting(false);
+    }
+  }, [email, onSubmit]);
+
+  if (done) {
+    return (
+      <div className="flex items-start gap-2.5 px-1">
+        <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 ring-1 ring-emerald-500/30">
+          <Check className="h-3.5 w-3.5 text-emerald-400" />
+        </div>
+        <div className="flex-1 rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-3.5">
+          <p className="text-sm leading-relaxed text-emerald-100">
+            Listo. Tu progreso queda guardado. Podrás volver desde cualquier dispositivo.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-start gap-2.5 px-1">
+      <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-500/20 ring-1 ring-cyan-500/30">
+        <Heart className="h-3.5 w-3.5 text-cyan-400" />
+      </div>
+      <div className="flex-1 rounded-xl border border-cyan-500/30 bg-cyan-950/15 p-3.5">
+        <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-cyan-400">
+          ¿Guardamos este avance?
+        </p>
+        <p className="mb-3 text-sm leading-relaxed text-zinc-200">
+          Has empezado algo importante. Si quieres conservar esta conversación, tu diario y
+          tus próximos pasos, deja tu email. Podrás volver desde cualquier dispositivo.
+        </p>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="tu@email.com"
+            className="flex-1 rounded-lg border border-zinc-700 bg-zinc-900/80 px-3 py-2 text-sm text-zinc-200 placeholder-zinc-600 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
+            disabled={submitting}
+            autoComplete="email"
+            required
+          />
+          <button
+            type="submit"
+            disabled={submitting || !email.trim()}
+            className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-500 disabled:opacity-50"
+          >
+            {submitting ? "Guardando..." : "Guardar mi cuenta"}
+          </button>
+        </form>
+        {error && (
+          <p className="mt-2 text-xs text-red-400">{error}</p>
+        )}
+        <button
+          type="button"
+          onClick={() => onDismiss?.(message.id)}
+          className="mt-2 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+        >
+          No, ahora no
+        </button>
+      </div>
+    </div>
+  );
 }
 
 // ─── Message bubble ───────────────────────────────────────────────────────────
@@ -454,6 +555,8 @@ export default function Chat({
   journalMode = false,
   onToggleJournal,
   proactivePrompt,
+  onCaptureEmail,
+  onDismissSignupPrompt,
 }: ChatProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -717,11 +820,20 @@ export default function Chat({
         ) : (
           <div className="space-y-3 px-3 py-4">
             {messages.map((message) => (
-              <MessageBubble
-                key={message.id}
-                message={message}
-                isStreaming={streamingMessageId === message.id}
-              />
+              message.variant === "signup_prompt" ? (
+                <SignupPromptBubble
+                  key={message.id}
+                  message={message}
+                  onSubmit={onCaptureEmail}
+                  onDismiss={onDismissSignupPrompt}
+                />
+              ) : (
+                <MessageBubble
+                  key={message.id}
+                  message={message}
+                  isStreaming={streamingMessageId === message.id}
+                />
+              )
             ))}
 
             {/* Typing / loading indicator (before assistant responds) */}

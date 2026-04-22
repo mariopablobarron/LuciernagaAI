@@ -2,14 +2,57 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
+import { isSyntheticEmail } from "@/services/user";
 
 export const dynamic = "force-dynamic";
+
+export type UserKind =
+  | "registered"
+  | "anon-active"
+  | "anon-dormant"
+  | "test"
+  | "team";
+
+const TEAM_DOMAINS = ["@startidea.es"];
+const TEAM_EMAILS = new Set([
+  "mariopablobarron@gmail.com",
+  "angelastartidea@gmail.com",
+]);
+const TEST_EMAIL_DOMAINS = ["@yopmail.com", "@mailinator.com", "@example.com", "@example.org", "@test.com"];
+const TEST_PATTERNS = /(^|[._-])(test|debug|demo|qa|dummy|fake)([._-]|\d|$)/i;
+
+function classifyUser(params: {
+  email: string;
+  name: string | null;
+  lastSeenMs: number;
+  nowMs: number;
+}): UserKind {
+  const email = params.email.toLowerCase();
+  const name = (params.name ?? "").toLowerCase();
+
+  if (TEAM_EMAILS.has(email) || TEAM_DOMAINS.some((d) => email.endsWith(d))) {
+    return "team";
+  }
+  if (
+    TEST_EMAIL_DOMAINS.some((d) => email.endsWith(d)) ||
+    TEST_PATTERNS.test(email) ||
+    TEST_PATTERNS.test(name)
+  ) {
+    return "test";
+  }
+  if (isSyntheticEmail(email)) {
+    const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+    return params.nowMs - params.lastSeenMs < sevenDaysMs ? "anon-active" : "anon-dormant";
+  }
+  return "registered";
+}
 
 type ListItem = {
   id: string;
   email: string;
   name: string | null;
   role: string;
+  kind: UserKind;
   createdAt: string;
   updatedAt: string;
   lastSeen: string;
@@ -84,6 +127,7 @@ export async function GET(req: NextRequest) {
     const query = searchParams.get("q")?.trim() || "";
     const stateFilter = searchParams.get("state")?.trim() || "all";
     const riskOnly = searchParams.get("risk") === "1";
+    const kindFilter = searchParams.get("kind")?.trim() || "all";
 
     const page = parsePositiveInt(searchParams.get("page"), 1);
     const pageSize = clamp(parsePositiveInt(searchParams.get("pageSize"), 50), 5, 200);
@@ -112,7 +156,8 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({
           items: [],
           pagination: { page, pageSize, total: 0, totalPages: 0 },
-          filters: { q: query, state: stateFilter, riskOnly },
+          filters: { q: query, state: stateFilter, riskOnly, kind: kindFilter },
+          kindCounts: { registered: 0, "anon-active": 0, "anon-dormant": 0, test: 0, team: 0 },
         });
       }
     }
@@ -132,8 +177,43 @@ export async function GET(req: NextRequest) {
       ];
     }
 
-    if (stateUserIds) {
+    // Classify all users once so kindCounts is global and we can filter by kind.
+    const classificationNowMs = Date.now();
+    const classifyAllUsers = await prisma.user.findMany({
+      select: { id: true, email: true, name: true, lastSeen: true },
+    });
+    const kindById = new Map<string, UserKind>();
+    const kindCounts: Record<UserKind, number> = {
+      registered: 0,
+      "anon-active": 0,
+      "anon-dormant": 0,
+      test: 0,
+      team: 0,
+    };
+    for (const u of classifyAllUsers) {
+      const k = classifyUser({
+        email: u.email,
+        name: u.name,
+        lastSeenMs: u.lastSeen.getTime(),
+        nowMs: classificationNowMs,
+      });
+      kindById.set(u.id, k);
+      kindCounts[k]++;
+    }
+
+    let kindFilterIds: Set<string> | null = null;
+    if (kindFilter !== "all") {
+      kindFilterIds = new Set(
+        classifyAllUsers.filter((u) => kindById.get(u.id) === kindFilter).map((u) => u.id),
+      );
+    }
+
+    if (stateUserIds && kindFilterIds) {
+      userWhere.id = { in: stateUserIds.filter((id) => kindFilterIds!.has(id)) };
+    } else if (stateUserIds) {
       userWhere.id = { in: stateUserIds };
+    } else if (kindFilterIds) {
+      userWhere.id = { in: Array.from(kindFilterIds) };
     }
 
     const total = await prisma.user.count({ where: userWhere });
@@ -169,7 +249,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({
         items: [],
         pagination: { page: safePage, pageSize, total, totalPages },
-        filters: { q: query, state: stateFilter, riskOnly },
+        filters: { q: query, state: stateFilter, riskOnly, kind: kindFilter },
+        kindCounts,
       });
     }
 
@@ -272,6 +353,7 @@ export async function GET(req: NextRequest) {
         name: user.name,
         hasAvatar: Boolean(user.avatarData),
         role: user.role,
+        kind: kindById.get(user.id) ?? "registered",
         createdAt: user.createdAt.toISOString(),
         updatedAt: user.updatedAt.toISOString(),
         lastSeen: user.lastSeen.toISOString(),
@@ -307,7 +389,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       items,
       pagination: { page: safePage, pageSize, total, totalPages },
-      filters: { q: query, state: stateFilter, riskOnly },
+      filters: { q: query, state: stateFilter, riskOnly, kind: kindFilter },
+      kindCounts,
     });
   } catch (error: unknown) {
     logError("ADMIN", error, { route: "/api/admin/users" });

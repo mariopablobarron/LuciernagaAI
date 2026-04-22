@@ -299,7 +299,7 @@ export default function CircleSyncSessionPage() {
             </span>
             <span className="text-xs text-zinc-400">
               <HeartHandshake className="mr-1 inline h-3 w-3 text-rose-400" />
-              {session.echoQuotaRemaining}/5 "te escucho" hoy
+              {session.echoQuotaRemaining}/5 &quot;te escucho&quot; hoy
             </span>
           </div>
         )}

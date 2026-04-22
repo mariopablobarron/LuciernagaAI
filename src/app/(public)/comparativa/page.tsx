@@ -357,7 +357,7 @@ export default function ComparativaPage() {
               genéricos</strong>, no mentores. Responden lo que les pidas: si les pides
               motivación barata, te la dan; si les pides consejo clínico, también (y ahí hay
               un riesgo real). Tres Mil Millones de Latidos tiene un marco pedagógico hardcoded: prohibido dar
-              imperativos huecos como "tú puedes" o "sigue así", obligatorio terminar en
+              imperativos huecos como &quot;tú puedes&quot; o &quot;sigue así&quot;, obligatorio terminar en
               pregunta, y cuando detecta lenguaje de autolesión o ideación suicida,
               <strong className="text-white"> deja de conversar como coach</strong> y deriva
               a recursos de emergencia + alerta al equipo clínico.

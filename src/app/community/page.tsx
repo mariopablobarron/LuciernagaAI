@@ -18,6 +18,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import { toast } from "sonner";
+import AnonymousHint from "@/components/community/AnonymousHint";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -470,7 +471,7 @@ export default function CommunityPage() {
                 className="w-full rounded-lg border border-zinc-700 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-zinc-600 resize-none focus:border-violet-500/50 focus:outline-none"
               />
               <div className="flex justify-between items-center">
-                <p className="text-[10px] text-zinc-600">Anónimo · sin datos de contacto ni enlaces</p>
+                <AnonymousHint />
                 <button onClick={handleVictoryPost} disabled={!postFeeling.trim() || posting}
                   className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-xs font-semibold text-white hover:bg-violet-500 disabled:opacity-40 transition-all">
                   <Trophy className="w-3.5 h-3.5" /> Compartir
@@ -765,7 +766,10 @@ export default function CommunityPage() {
                 className="w-full rounded-lg border border-zinc-700 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-zinc-600 resize-none focus:border-violet-500/50 focus:outline-none"
               />
               <div className="flex justify-between items-center">
-                <p className="text-[10px] text-zinc-600">{questionText.length}/500 · Anónima</p>
+                <div className="space-y-0.5">
+                  <p className="text-[10px] text-zinc-600">{questionText.length}/500 · Anónima</p>
+                  <AnonymousHint />
+                </div>
                 <button
                   onClick={() => void handleAskQuestion()}
                   disabled={!questionText.trim() || posting}
@@ -892,6 +896,7 @@ export default function CommunityPage() {
                               maxLength={1000}
                               className="w-full rounded-lg border border-zinc-700 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-zinc-600 resize-none focus:border-violet-500/50 focus:outline-none"
                             />
+                            <AnonymousHint />
 
                             {/* Guardian suggestion */}
                             {guardian && guardian.isPrescriptive && guardian.suggestedReformulation && (

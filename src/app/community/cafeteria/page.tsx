@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Send, Users, Sparkles, MessageCircleQuestion, Loader2, Flag } from "lucide-react";
 import { toast } from "sonner";
+import AnonymousHint from "@/components/community/AnonymousHint";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -271,6 +272,7 @@ export default function CafeteriaPage() {
                   maxLength={500}
                   className="w-full rounded-xl border border-zinc-700 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-zinc-600 resize-none focus:border-violet-500/50 focus:outline-none"
                 />
+                <AnonymousHint />
                 <div className="flex items-center justify-between gap-3">
                   <button
                     type="button"
@@ -392,6 +394,7 @@ export default function CafeteriaPage() {
                               onKeyDown={(e) => { if (e.key === "Enter" && mirrorText.trim()) void handleMirror(); }}
                               autoFocus
                             />
+                            <AnonymousHint />
                             <div className="flex gap-2">
                               <button
                                 onClick={() => void handleMirror()}

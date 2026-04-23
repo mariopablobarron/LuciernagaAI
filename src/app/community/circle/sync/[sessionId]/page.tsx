@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Clock, Users, Send, HeartHandshake, Lock } from "lucide-react";
+import AnonymousHint from "@/components/community/AnonymousHint";
 
 type Response = {
   id: string;
@@ -259,6 +260,7 @@ export default function CircleSyncSessionPage() {
               rows={5}
               className="w-full resize-none rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:border-violet-500 focus:outline-none disabled:opacity-50"
             />
+            <AnonymousHint />
             <div className="flex flex-wrap items-center justify-between gap-3">
               <label className="inline-flex items-center gap-2 text-xs text-zinc-400">
                 <input

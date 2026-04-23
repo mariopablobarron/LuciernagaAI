@@ -62,6 +62,7 @@ jest.mock("@/services/mentor-protocol", () => ({
     reason: "default",
   }),
   shouldAskForEmail: jest.fn().mockReturnValue(false),
+  shouldAskForName: jest.fn().mockReturnValue(false),
 }));
 
 jest.mock("@/services/onboarding", () => ({

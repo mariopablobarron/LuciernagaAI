@@ -1,4 +1,8 @@
-import { getMentorMode, shouldAskForEmail } from "@/services/mentor-protocol";
+import {
+  getMentorMode,
+  shouldAskForEmail,
+  shouldAskForName,
+} from "@/services/mentor-protocol";
 
 describe("mentor protocol", () => {
   it("detiene la conversación en riesgo alto", () => {
@@ -40,6 +44,7 @@ describe("mentor protocol", () => {
     expect(
       shouldAskForEmail({
         isAnonymous: true,
+        hasName: true,
         goalCount: 1,
         actionCount: 0,
         conversationMessageCount: 1,
@@ -50,6 +55,7 @@ describe("mentor protocol", () => {
     expect(
       shouldAskForEmail({
         isAnonymous: true,
+        hasName: true,
         goalCount: 0,
         actionCount: 0,
         conversationMessageCount: 2,
@@ -60,6 +66,7 @@ describe("mentor protocol", () => {
     expect(
       shouldAskForEmail({
         isAnonymous: true,
+        hasName: true,
         goalCount: 0,
         actionCount: 0,
         conversationMessageCount: 4,
@@ -70,6 +77,7 @@ describe("mentor protocol", () => {
     expect(
       shouldAskForEmail({
         isAnonymous: true,
+        hasName: true,
         goalCount: 0,
         actionCount: 0,
         conversationMessageCount: 1,
@@ -81,11 +89,55 @@ describe("mentor protocol", () => {
     expect(
       shouldAskForEmail({
         isAnonymous: false,
+        hasName: true,
         goalCount: 5,
         actionCount: 5,
         conversationMessageCount: 50,
         conversionTrigger: true,
       })
     ).toBe(false);
+  });
+
+  it("no pide email antes de capturar el nombre", () => {
+    // Mismo caso que antes (conversión + commitment) pero SIN nombre → no pide email.
+    expect(
+      shouldAskForEmail({
+        isAnonymous: true,
+        hasName: false,
+        goalCount: 1,
+        actionCount: 1,
+        conversationMessageCount: 5,
+        conversionTrigger: true,
+      })
+    ).toBe(false);
+  });
+});
+
+describe("shouldAskForName", () => {
+  it("no pide nombre a usuarios ya registrados", () => {
+    expect(
+      shouldAskForName({ isAnonymous: false, hasName: false, conversationMessageCount: 5 })
+    ).toBe(false);
+  });
+
+  it("no pide nombre si el usuario ya tiene uno", () => {
+    expect(
+      shouldAskForName({ isAnonymous: true, hasName: true, conversationMessageCount: 5 })
+    ).toBe(false);
+  });
+
+  it("no pide nombre antes del primer mensaje", () => {
+    expect(
+      shouldAskForName({ isAnonymous: true, hasName: false, conversationMessageCount: 0 })
+    ).toBe(false);
+  });
+
+  it("pide nombre a usuario anónimo sin nombre tras al menos un mensaje", () => {
+    expect(
+      shouldAskForName({ isAnonymous: true, hasName: false, conversationMessageCount: 1 })
+    ).toBe(true);
+    expect(
+      shouldAskForName({ isAnonymous: true, hasName: false, conversationMessageCount: 7 })
+    ).toBe(true);
   });
 });

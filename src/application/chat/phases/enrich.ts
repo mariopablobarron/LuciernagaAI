@@ -43,7 +43,7 @@ import {
   getAvoidanceStreakForUser,
   registerAvoidanceEvent,
 } from "@/services/goals";
-import { getMentorMode, shouldAskForEmail } from "@/services/mentor-protocol";
+import { getMentorMode, shouldAskForEmail, shouldAskForName } from "@/services/mentor-protocol";
 import { getConversationalOnboarding } from "@/services/onboarding";
 import { analyzeEmotionalProfile, updateEmotionalProfile } from "@/services/emotional-model";
 import { type RiskLevel } from "@/services/risk";
@@ -174,6 +174,7 @@ export type EnrichResult = {
   // Conversion & capture
   conversionTrigger: boolean;
   captureEmailRecommended: boolean;
+  captureNameRecommended: boolean;
 
   // Community CTA (null unless a recurrent-blocker or ask-community signal fires)
   communityCTA: CommunityCtaAction | AskCommunityCtaAction | null;
@@ -244,6 +245,7 @@ export async function enrichContext(input: EnrichInput): Promise<EnrichResult> {
     actionGeneratedThisTurn: false,
   });
   let captureEmailRecommended = false;
+  let captureNameRecommended = false;
 
   let actionLockPayload: Record<string, unknown> | null = null;
   let actionLockAssistantMessage: string | null = null;
@@ -615,12 +617,19 @@ export async function enrichContext(input: EnrichInput): Promise<EnrichResult> {
       });
 
       const sessionProfile = await getUserSessionProfile(userId);
+      const hasName = Boolean(sessionProfile.name && sessionProfile.name.trim().length > 0);
       captureEmailRecommended = shouldAskForEmail({
         isAnonymous: sessionProfile.isAnonymous,
+        hasName,
         goalCount: activeGoal ? 1 : 0,
         actionCount: activeGoal?.totalCount ?? 0,
         conversationMessageCount,
         conversionTrigger,
+      });
+      captureNameRecommended = shouldAskForName({
+        isAnonymous: sessionProfile.isAnonymous,
+        hasName,
+        conversationMessageCount,
       });
       await updateUserTransformationPhase(userId, transformationPhase);
 
@@ -696,6 +705,7 @@ export async function enrichContext(input: EnrichInput): Promise<EnrichResult> {
     onboardingContext,
     conversionTrigger,
     captureEmailRecommended,
+    captureNameRecommended,
     communityCTA,
   };
 }

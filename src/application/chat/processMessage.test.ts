@@ -122,6 +122,7 @@ jest.mock("@/services/intent", () => ({
 jest.mock("@/services/mentor-protocol", () => ({
   getMentorMode: jest.fn().mockReturnValue({ mode: "supportive", validate: true, confront: false, pushAction: false, stopConversation: false, reason: "default" }),
   shouldAskForEmail: jest.fn().mockReturnValue(false),
+  shouldAskForName: jest.fn().mockReturnValue(false),
 }));
 
 jest.mock("@/services/onboarding", () => ({

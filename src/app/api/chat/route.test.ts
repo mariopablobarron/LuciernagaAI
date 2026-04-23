@@ -209,7 +209,7 @@ describe("POST /api/chat", () => {
     (getUserSessionProfile as jest.Mock).mockResolvedValue({
       id: "usr_test_1",
       email: "anon@session.luciernaga.local",
-      name: null,
+      name: "Mario",
       role: "user",
       plan: "free",
       planLabel: "Free",
@@ -308,7 +308,7 @@ describe("POST /api/chat", () => {
     (getUserSessionProfile as jest.Mock).mockResolvedValue({
       id: "usr_test_limit",
       email: "anon@session.luciernaga.local",
-      name: null,
+      name: "Mario",
       role: "user",
       plan: "free",
       planLabel: "Free",

@@ -16,6 +16,7 @@ import InsightsPanel from "@/components/InsightsPanel";
 import Sidebar, { type SidebarConversation } from "@/components/Sidebar";
 import { UserInterventionsBanner } from "@/components/UserInterventionsBanner";
 import WeeklyLetterBanner from "@/components/WeeklyLetterBanner";
+import NameCaptureModal from "@/components/NameCaptureModal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -106,6 +107,7 @@ type ChatApiResponse = {
   conversionTrigger?: boolean;
   conversionType?: "progress";
   actions?: Array<Record<string, unknown>>;
+  captureName?: boolean;
 };
 
 // ConversationsApiResponse imported from ./chat-utils
@@ -172,6 +174,7 @@ export default function HomePage() {
   const [captureEmailRecommended, setCaptureEmailRecommended] = useState(false);
   const [captureEmailPrompt, setCaptureEmailPrompt] = useState<string | null>(null);
   const [captureDialogOpen, setCaptureDialogOpen] = useState(false);
+  const [nameCaptureOpen, setNameCaptureOpen] = useState(false);
   const [communityCta, setCommunityCta] = useState<
     | {
         kind: "recurrent_blocker";
@@ -1510,6 +1513,10 @@ export default function HomePage() {
           setCaptureEmailPrompt(null);
         }
 
+        if (ssePayload.captureName === true) {
+          setNameCaptureOpen(true);
+        }
+
         const sseActions = Array.isArray(ssePayload.actions) ? ssePayload.actions : [];
         const sseCommunityCtaPayload = sseActions.find(
           (a: unknown): a is Record<string, unknown> => {
@@ -1697,6 +1704,10 @@ export default function HomePage() {
       } else if (sessionProfile && !sessionProfile.isAnonymous) {
         setCaptureEmailRecommended(false);
         setCaptureEmailPrompt(null);
+      }
+
+      if (payload.captureName === true) {
+        setNameCaptureOpen(true);
       }
 
       const jsonActions = Array.isArray(payload.actions) ? payload.actions : [];
@@ -2188,6 +2199,18 @@ export default function HomePage() {
 
       {/* Tour: only on second visit — first visit should be frictionless */}
       <GuidedTour tourId="app-main" steps={APP_TOUR} delay={3000} />
+
+      {/* Name capture — blocking modal after the first message for anonymous
+          users without a display name. The server returns captureName: true
+          on the chat response when this applies. */}
+      <NameCaptureModal
+        open={nameCaptureOpen}
+        onSaved={(savedName) => {
+          setNameCaptureOpen(false);
+          setSessionProfile((prev) => (prev ? { ...prev, name: savedName } : prev));
+          toast.success(`Encantado, ${savedName}.`);
+        }}
+      />
     </>
   );
 }

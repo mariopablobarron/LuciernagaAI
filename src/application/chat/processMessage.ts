@@ -127,6 +127,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     onboardingContext,
     conversionTrigger,
     captureEmailRecommended,
+    captureNameRecommended,
     communityCTA,
   } = enriched;
   const captureEmailMessage = CAPTURE_EMAIL_PROMPT;
@@ -233,6 +234,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
         conversionType,
         captureEmail: captureEmailRecommended,
         captureEmailMessage: captureEmailRecommended ? captureEmailMessage : null,
+        captureName: captureNameRecommended,
         actions: communityCTA ? [communityCTA] : [],
       },
     };
@@ -304,6 +306,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
         conversionType,
         captureEmail: captureEmailRecommended,
         captureEmailMessage: captureEmailRecommended ? captureEmailMessage : null,
+        captureName: captureNameRecommended,
         actions: communityCTA ? [communityCTA] : [],
       },
     };
@@ -328,6 +331,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     conversionType,
     captureEmail: captureEmailRecommended,
     captureEmailMessage: captureEmailRecommended ? captureEmailMessage : null,
+    captureName: captureNameRecommended,
     actions: communityCTA ? [communityCTA] : [],
   };
 

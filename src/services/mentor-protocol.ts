@@ -27,6 +27,7 @@ export type MentorMode = {
 
 export type EmailCaptureContext = {
   isAnonymous: boolean;
+  hasName: boolean; // true when User.name is a non-empty string
   goalCount: number;
   actionCount: number;
   conversationMessageCount: number;
@@ -106,6 +107,12 @@ export function shouldAskForEmail(context: EmailCaptureContext): boolean {
     return false;
   }
 
+  // No pedimos email hasta que el usuario tenga un nombre. El nombre es
+  // la primera identidad que pedimos; el email queda como paso 2 opcional.
+  if (!context.hasName) {
+    return false;
+  }
+
   // Se pide email cuando hay señal de valor real que merece la pena guardar:
   // - conversionTrigger explícito (soft paywall, action lock, etc.)
   // - compromiso adquirido (goal o action) aunque la sesión sea corta
@@ -116,4 +123,22 @@ export function shouldAskForEmail(context: EmailCaptureContext): boolean {
     context.actionCount >= 1 ||
     context.conversationMessageCount > 3
   );
+}
+
+export type NameCaptureContext = {
+  isAnonymous: boolean;
+  hasName: boolean;
+  conversationMessageCount: number;
+};
+
+/**
+ * True when the UI should block the chat until the user provides a name.
+ * Triggered once the user has sent at least one message — the first message
+ * flows in raw (we don't gate the initial "aha moment"), but before the
+ * second turn we bautize the user.
+ */
+export function shouldAskForName(context: NameCaptureContext): boolean {
+  if (!context.isAnonymous) return false;
+  if (context.hasName) return false;
+  return context.conversationMessageCount >= 1;
 }

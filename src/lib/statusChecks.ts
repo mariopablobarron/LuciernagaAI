@@ -97,18 +97,59 @@ const CHECKS: Check[] = [
     id: "integration.resend",
     name: "Resend (email)",
     category: "integrations",
-    run: async () => {
+    run: async (): Promise<Omit<CheckResult, "id" | "name" | "category" | "latencyMs">> => {
       const key = process.env.RESEND_API_KEY?.trim();
       if (!key) return { status: "fail", detail: "RESEND_API_KEY no configurada" };
-      const res = await pingHttp("https://api.resend.com/domains", {
-        headers: { Authorization: `Bearer ${key}` },
-      });
-      if (res.ok) return { status: "ok", detail: `HTTP ${res.status}` };
-      return {
-        status: "fail",
-        detail: res.error ?? `HTTP ${res.status}`,
-        meta: { httpStatus: res.status },
-      };
+
+      const from = process.env.EMAIL_FROM?.trim() ?? "";
+      // Extrae dominio de "Nombre <user@dominio.com>" o "user@dominio.com"
+      const fromDomain = from.match(/@([^\s>]+)/)?.[1]?.toLowerCase() ?? null;
+
+      try {
+        const res = await fetch("https://api.resend.com/domains", {
+          headers: { Authorization: `Bearer ${key}` },
+          signal: AbortSignal.timeout(5000),
+          cache: "no-store",
+        });
+        if (!res.ok) {
+          return { status: "fail", detail: `HTTP ${res.status}`, meta: { httpStatus: res.status } };
+        }
+        const body = (await res.json().catch(() => null)) as {
+          data?: Array<{ name: string; status: string }>;
+        } | null;
+        const domains = body?.data ?? [];
+        if (domains.length === 0) {
+          return {
+            status: "fail",
+            detail: "API OK pero no hay dominios dados de alta en Resend",
+            meta: { fromDomain, verifiedCount: 0 },
+          };
+        }
+        const verified = domains.filter((d) => d.status === "verified");
+        const verifiedList = verified.map((d) => d.name).join(",");
+        if (!fromDomain) {
+          return {
+            status: "warn",
+            detail: `EMAIL_FROM no configurado · verificados: ${verifiedList || "ninguno"}`,
+            meta: { verified: verifiedList },
+          };
+        }
+        const matches = verified.some((d) => d.name === fromDomain);
+        if (!matches) {
+          return {
+            status: "fail",
+            detail: `EMAIL_FROM usa "${fromDomain}" pero NO está verificado (Resend solo acepta: ${verifiedList || "ninguno"})`,
+            meta: { fromDomain, verified: verifiedList },
+          };
+        }
+        return {
+          status: "ok",
+          detail: `${fromDomain} verificado`,
+          meta: { fromDomain, verified: verifiedList },
+        };
+      } catch (err) {
+        return { status: "fail", detail: (err as Error)?.message ?? "Error consultando Resend" };
+      }
     },
   },
   {

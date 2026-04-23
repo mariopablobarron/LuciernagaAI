@@ -8,6 +8,7 @@ import {
   Activity,
   Brain,
   CheckCircle2,
+  HeartPulse,
   LineChart,
   MessageSquare,
   RefreshCw,
@@ -171,7 +172,13 @@ export default function AdminAnalyticsPage() {
       showSectionNav={false}
     >
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          <Link
+            href="/admin/analytics/health"
+            className="inline-flex items-center gap-2 rounded-lg border border-violet-700/60 bg-violet-600/20 hover:bg-violet-600/30 px-3 py-2 text-xs font-semibold text-violet-200 hover:text-white transition-colors"
+          >
+            <HeartPulse className="h-3.5 w-3.5" /> Health (North Star)
+          </Link>
           <Link
             href="/admin/analytics/retencion"
             className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 px-3 py-2 text-xs font-semibold text-zinc-300 hover:text-white transition-colors"

@@ -124,3 +124,83 @@ Formato por entrada:
   al admin).
 - Webhook Coolify auto-deploy 404 (sigue abierto desde ~11-abr).
 - Branch protection — `staging-check` se bypasea en cada push.
+
+---
+
+## 2026-04-22 — (reconstrucción retrospectiva desde git log)
+
+> Reconstrucción a partir de mensajes de commit. Sin contexto vivido —
+> solo titulares derivados del diff.
+
+### Titulares de la sesión
+- **Onboarding**: 3 pantallas de activación tras signup; mentor habla
+  primero; tarjeta inline de captura de email; badges por tipo en
+  `/admin/users` (`9c7e8f2`, `62b7410`, `580aef9`).
+- **Auditoría 2026-04-22**: cierre de 11 círculos identificados en la
+  revisión (`d9043c9`) — ver `memory/project_open_circles_20260422.md`.
+- **Rol `coach`** añadido al RBAC con permisos mínimos (`b8fd04d`).
+- **DB**: migración de `onboardingContext` como `Json` en `User`
+  (`4df7cd3`).
+- **Infra**: Next.js 16 con Turbopack como default (`93019f5`), init lazy
+  de VAPID para desbloquear el build (`940d54c`).
+- **Push notifications**: panel admin de broadcast (`2b1c1d6`).
+- **Build**: envolver root layout con `NextIntlClientProvider`
+  (`c081a1b`).
+
+---
+
+## 2026-04-20 — (reconstrucción retrospectiva)
+
+### Titulares de la sesión
+- **Activación**: campos de auditoría (`firstMessageSentAt`, `activatedAt`,
+  `onboardingCompletedAt`) persistidos en `User` para no recalcular de
+  mensajes+acciones cada vez (`4a32dff`).
+- **Landing**: `LocaleSwitcher` reutilizable + mejoras de imagen y a11y
+  (`0bc5860`).
+- **Mobile**: SEO de titulos, tildes, tabla responsive y rebrand `/org`
+  (`a206cb7`). Accesibilidad y switcher de idioma desbloqueados en móvil
+  (`7d95e36`).
+
+---
+
+## 2026-04-18 — (reconstrucción retrospectiva)
+
+> Día grande. Se materializan comunidad, rebrand y varias secciones nuevas.
+
+### Titulares de la sesión
+- **Rebrand** "Luciérnaga" → "Tres Mil Millones de Latidos" y config
+  asociada (`1aad287`).
+- **Comunidad — Circle Sync Sessions**: ventanas semanales de co-presencia
+  dentro de un círculo (`b380c8e`).
+- **Comunidad — Q&A con guardarraíles pedagógicos**: preguntas y
+  respuestas anónimas + moderación light (`19c8baa`).
+- **8 páginas públicas nuevas** + componentes SEO (`3b516ec`).
+- **Endpoints + UI**: analytics, alertas, ronda diaria, interventions
+  (`e46b099`). Schema + migraciones + libs para logs, alertas y daily
+  round (`3fab351`).
+- **Timeline unificado de contenido del usuario** en admin + export
+  (`401334c`).
+- **Programa de referidos** con métricas admin (`cb5cfc7`).
+- **`/admin/notas`**: tablero para pendientes y seguimientos (`04fd7b0`).
+- Nota operativa: verificar backup Coolify añadida al tablero
+  (`8390acc`).
+- **Fixes de build** del día (`60dc93b`, `5b0ea2b`, `5b141a3`).
+
+---
+
+## 2026-04-17 — (reconstrucción retrospectiva)
+
+### Titulares de la sesión
+- **Seguridad**: rate limiting en forgot-password; docs de env vars para
+  HeyGen y VAPID (`0c884d9`).
+
+---
+
+## 2026-04-16 — (reconstrucción retrospectiva)
+
+### Titulares de la sesión
+- **Avatar videos (HeyGen)**: feature completa cableada. Refactor del
+  pipeline de `processMessage`. Panel `/admin/status` y docs asociadas
+  (`6de604a`).
+- **Telegram**: notificación de signup enriquecida con detalles del usuario
+  (`73f56ca`).

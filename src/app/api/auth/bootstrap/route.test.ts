@@ -21,10 +21,14 @@ jest.mock("@/services/user", () => ({
 import { NextRequest } from "next/server";
 import { POST } from "./route";
 
+const BROWSER_UA =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
+
 describe("POST /api/auth/bootstrap", () => {
   it("genera sesión y setea cookie cuando no existe", async () => {
     const req = new NextRequest("http://localhost/api/auth/bootstrap", {
       method: "POST",
+      headers: { "user-agent": BROWSER_UA },
     });
 
     const response = await POST(req);
@@ -40,6 +44,7 @@ describe("POST /api/auth/bootstrap", () => {
   it("valida sesión existente sin regenerar cookie", async () => {
     const initialReq = new NextRequest("http://localhost/api/auth/bootstrap", {
       method: "POST",
+      headers: { "user-agent": BROWSER_UA },
     });
     const initialResponse = await POST(initialReq);
     const cookieHeader = initialResponse.headers.get("set-cookie");
@@ -49,6 +54,7 @@ describe("POST /api/auth/bootstrap", () => {
       method: "POST",
       headers: {
         cookie: (cookieHeader || "").split(";")[0],
+        "user-agent": BROWSER_UA,
       },
     });
 

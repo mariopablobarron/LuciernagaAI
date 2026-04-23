@@ -520,7 +520,7 @@ exports[`processMessage — golden masters 09 - último mensaje del día (soft p
     },
     "mentorMode": "supportive",
     "persistenceAvailable": true,
-    "response": "Respuesta IA de prueba. [paywall]",
+    "response": "Respuesta IA de prueba.",
     "searchUsed": false,
     "state": "neutral",
     "success": true,

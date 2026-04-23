@@ -396,8 +396,20 @@ export async function enrichContext(input: EnrichInput): Promise<EnrichResult> {
       });
 
       if (pendingAction) {
-        const completionIntent = detectActionCompletionIntent(message);
-        const postponeIntent = detectActionPostponeIntent(message);
+        // Respuestas cortas típicas al "¿ya completaste? sí o no" — el
+        // detector global no las recogía y el action-lock devolvía la misma
+        // plantilla turno tras turno.
+        const shortReply = message
+          .trim()
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[.!¡¿?…]/g, "")
+          .trim();
+        const shortYes = /^(si|sip|yep|ya|hecho|listo|ok|vale|done|ya esta|ya lo hice)$/.test(shortReply);
+        const shortNo = /^(no|nope|todavia no|aun no|not yet|aun no lo hice|todavia no lo hice)$/.test(shortReply);
+        const completionIntent = shortYes || detectActionCompletionIntent(message);
+        const postponeIntent = (shortNo && !shortYes) || detectActionPostponeIntent(message);
         const refusalIntent = detectActionRefusalIntent(message);
         const sidestepAvoidance = avoidanceDetectedThisTurn && !completionIntent;
 

@@ -493,7 +493,12 @@ export function finalizeResponse(
 ): string {
   let next = response.trim();
 
-  if (!ACTION_CUE_PATTERN.test(next)) {
+  // Solo pegamos una línea de acción cuando el usuario eligió modo confrontativo
+  // y hay una acción pendiente concreta — en el resto de casos confiamos en
+  // que el LLM ya cerró con su voz. Pegar siempre una plantilla delataba IA.
+  const activeAction = context.goal?.activeAction;
+  const confront = context.mentor?.confront ?? false;
+  if (confront && activeAction && !ACTION_CUE_PATTERN.test(next)) {
     next = `${next}\n\n${buildActionLine(context)}`;
   }
 
@@ -517,14 +522,14 @@ export function buildActionRequiredMessage(params: {
   const action = `«${params.actionTitle}»`;
 
   if (avoidanceCount >= 2 || unfinishedActionsCount > 2) {
-    return `Hay algo de antes que seguimos sin cerrar: ${action}. ¿Qué prefieres — retomarlo ahora, aparcarlo para más tarde, o cerrarlo porque ya no aplica?`;
+    return `Hay algo de antes que seguimos sin cerrar: ${action}. ¿Qué prefieres — ya lo hiciste, lo retomas ahora, lo aparcas para más tarde, o lo cerramos porque ya no aplica?`;
   }
 
   if (confront) {
-    return `Dejamos ${action} a medias. ¿Lo retomas hoy, lo aparcas, o lo cerramos?`;
+    return `Dejamos ${action} a medias. ¿Ya lo hiciste, lo retomas hoy, lo aparcas, o lo cerramos?`;
   }
 
-  return `Quedó abierto ${action}. Dime si lo retomas, lo aparcas para luego o lo cerramos — y seguimos por donde quieras.`;
+  return `Quedó abierto ${action}. Dime si ya lo hiciste, si lo retomas, si lo aparcas para luego o si lo cerramos — y seguimos por donde quieras.`;
 }
 
 export const CAPTURE_EMAIL_PROMPT =

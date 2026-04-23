@@ -7,10 +7,7 @@ import { generateAIResponse, streamOpenRouterTokens } from "@/services/ai";
 import { generateImpulseResponse } from "@/services/impulse-ai";
 import { trackSafe } from "@/services/events";
 import {
-  appendCaptureEmailPrompt,
-  appendConversionPrompt,
   finalizeResponse,
-  appendSoftPaywallPrompt,
   buildCoachPrompt,
   CAPTURE_EMAIL_PROMPT,
 } from "@/services/coach";
@@ -268,9 +265,10 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
       }),
       onboarding: onboardingContext,
     });
-    assistantResponse = appendConversionPrompt(assistantResponse, conversionTrigger);
-    assistantResponse = appendSoftPaywallPrompt(assistantResponse, softPaywallPrompt);
-    assistantResponse = appendCaptureEmailPrompt(assistantResponse, captureEmailRecommended);
+    // Los prompts comerciales (conversión / paywall / captura de email) se
+    // devuelven como flags del payload y los renderiza el cliente en UI
+    // separada. No los pegamos al turno del mentor porque hacía que la
+    // respuesta se sintiera como venta dentro de la conversación.
 
     if (persistenceAvailable) {
       try {
@@ -398,9 +396,9 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
         }),
         onboarding: onboardingContext,
       });
-      finalText = appendConversionPrompt(finalText, conversionTrigger);
-      finalText = appendSoftPaywallPrompt(finalText, softPaywallPrompt);
-      finalText = appendCaptureEmailPrompt(finalText, captureEmailRecommended);
+      // Los prompts comerciales se devuelven en los flags del evento `meta`
+      // (conversionTrigger, captureEmail, captureEmailMessage) para que el
+      // cliente los renderice fuera del turno del mentor.
 
       if (finalText !== rawText) {
         send({ type: "replace", content: finalText });

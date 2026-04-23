@@ -271,7 +271,8 @@ describe("POST /api/chat", () => {
     expect(body.success).toBe(true);
     expect(body.conversationId).toBe("conv_1");
     expect(body.response).toContain("Respuesta de prueba");
-    expect(body.response).toContain("No busques entenderlo todo ahora");
+    // La línea de acción se añade solo si hay modo confrontativo + acción
+    // activa. En onboarding seguimos reforzando con una pregunta abierta.
     expect(body.response).toContain("¿Qué estás evitando ahora mismo?");
     expect(body.emotionalProfile.primaryEmotion).toBe("calma");
     expect(body.captureEmail).toBe(false);
@@ -385,9 +386,14 @@ describe("POST /api/chat", () => {
     expect(body.conversionTrigger).toBe(true);
     expect(body.conversionType).toBe("progress");
     expect(body.captureEmail).toBe(true);
-    expect(body.response).toContain("Esto que acabas de definir es importante.");
-    expect(body.response).toContain(
+    // Los prompts comerciales ya no se pegan al turno del mentor; el cliente
+    // los renderiza desde los flags `conversionTrigger` y `captureEmail`.
+    expect(body.response).not.toContain("Esto que acabas de definir es importante.");
+    expect(body.response).not.toContain(
       "Si quieres retomar esto otro día justo donde lo dejamos, déjame tu email y te lo guardo."
+    );
+    expect(body.captureEmailMessage).toContain(
+      "Si quieres retomar esto otro día justo donde lo dejamos"
     );
     expect(generateAIResponse).toHaveBeenCalledWith(
       "Ya lo veo claro",
@@ -745,7 +751,7 @@ describe("POST /api/chat", () => {
       title: "Enviar el borrador al cliente",
     });
     expect(body.message).toBe(
-      'Quedó abierto «Enviar el borrador al cliente». Dime si lo retomas, lo aparcas para luego o lo cerramos — y seguimos por donde quieras.\n\nSi quieres retomar esto otro día justo donde lo dejamos, déjame tu email y te lo guardo.'
+      'Quedó abierto «Enviar el borrador al cliente». Dime si ya lo hiciste, si lo retomas, si lo aparcas para luego o si lo cerramos — y seguimos por donde quieras.\n\nSi quieres retomar esto otro día justo donde lo dejamos, déjame tu email y te lo guardo.'
     );
     expect(generateAIResponse).not.toHaveBeenCalled();
   });
@@ -822,7 +828,7 @@ describe("POST /api/chat", () => {
     });
     expect(body.type).toBe("action_required");
     expect(body.message).toBe(
-      'Hay algo de antes que seguimos sin cerrar: «Enviar el borrador al cliente». ¿Qué prefieres — retomarlo ahora, aparcarlo para más tarde, o cerrarlo porque ya no aplica?\n\nSi quieres retomar esto otro día justo donde lo dejamos, déjame tu email y te lo guardo.'
+      'Hay algo de antes que seguimos sin cerrar: «Enviar el borrador al cliente». ¿Qué prefieres — ya lo hiciste, lo retomas ahora, lo aparcas para más tarde, o lo cerramos porque ya no aplica?\n\nSi quieres retomar esto otro día justo donde lo dejamos, déjame tu email y te lo guardo.'
     );
     expect(generateAIResponse).not.toHaveBeenCalled();
   });
@@ -899,7 +905,8 @@ describe("POST /api/chat", () => {
     });
     expect(body.type).toBe("action_required");
     expect(body.message).toContain("«Enviar el borrador al cliente»");
-    expect(body.message).toContain("retomarlo ahora, aparcarlo para más tarde, o cerrarlo");
+    expect(body.message).toContain("ya lo hiciste");
+    expect(body.message).toContain("lo retomas ahora");
     expect(generateAIResponse).not.toHaveBeenCalled();
   });
 

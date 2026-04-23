@@ -18,7 +18,7 @@ describe("coach prompt identity", () => {
     expect(prompt).toContain("Local → global");
   });
 
-  it("fuerza cierre con acción y pregunta cuando la respuesta queda vacía", () => {
+  it("añade pregunta de cierre cuando la respuesta queda sin interpelar", () => {
     const response = finalizeResponse("Entiendo lo que te pasa.", {
       state: "bloqueo",
       onboarding: {
@@ -30,8 +30,11 @@ describe("coach prompt identity", () => {
       },
     });
 
-    expect(response).toContain("Haz una versión mínima");
+    // Ya no forzamos la línea de acción tipo "Haz una versión mínima…" en
+    // todos los turnos — delataba plantilla. Solo reforzamos con pregunta.
+    expect(response).toContain("Entiendo lo que te pasa.");
     expect(response).toContain("¿Cuál es el paso más pequeño");
+    expect(response).not.toContain("Haz una versión mínima");
   });
 
   it("vuelve más firme el seguimiento cuando hay acción pendiente y confrontación", () => {
@@ -78,7 +81,9 @@ describe("coach prompt identity", () => {
     });
 
     expect(message).toContain("Hay algo de antes que seguimos sin cerrar");
-    expect(message).toContain("retomarlo ahora, aparcarlo para más tarde, o cerrarlo");
+    expect(message).toContain("ya lo hiciste");
+    expect(message).toContain("lo retomas ahora");
+    expect(message).toContain("lo aparcas para más tarde");
   });
 
   it("usa un fallback más activo cuando falla la IA", () => {

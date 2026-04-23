@@ -170,8 +170,12 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
     const isProduction = process.env.NODE_ENV === "production";
     const headers: Record<string, string> = {
       "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache",
+      "Cache-Control": "no-cache, no-transform",
       Connection: "keep-alive",
+      // Desactiva el buffering de Nginx/Coolify para que los chunks lleguen
+      // al cliente según se emiten. Sin esto, un proxy delante agrupa la
+      // respuesta y el usuario ve 9 s de pantalla en blanco + todo de golpe.
+      "X-Accel-Buffering": "no",
     };
     if (identity.shouldSetCookie && identity.sessionToken) {
       headers["Set-Cookie"] =

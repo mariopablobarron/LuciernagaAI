@@ -3,6 +3,7 @@ import { InvalidSessionTokenError, resolveIdentity } from "@/lib/auth";
 import { getPrismaClient } from "@/db/prisma";
 import { invalidateUserCache } from "@/services/user";
 import { logError } from "@/lib/logger";
+import { buildAdminAlert, notifyAdmin } from "@/services/telegram";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30; // allow time for large avatar uploads
@@ -107,6 +108,19 @@ export async function PATCH(req: NextRequest) {
     }
 
     const prisma = getPrismaClient();
+
+    // Capturamos el nombre previo para saber si este PATCH es la primera
+    // vez que el usuario pone un nombre — único caso en que queremos
+    // alertar al admin.
+    const previous = await prisma.user.findUnique({
+      where: { id: identity.userId },
+      select: { name: true },
+    });
+    const firstNameCapture =
+      typeof data.name === "string" &&
+      data.name.length > 0 &&
+      !previous?.name?.trim();
+
     const updated = await prisma.user.update({
       where: { id: identity.userId },
       data,
@@ -114,6 +128,16 @@ export async function PATCH(req: NextRequest) {
     });
 
     invalidateUserCache(identity.userId);
+
+    if (firstNameCapture && typeof data.name === "string") {
+      notifyAdmin(
+        buildAdminAlert({
+          tipo: "name_captured",
+          userId: identity.userId,
+          name: data.name,
+        }),
+      );
+    }
 
     return NextResponse.json({
       success: true,

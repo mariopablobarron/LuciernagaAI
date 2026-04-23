@@ -16,15 +16,22 @@ import { logError, logInfo } from "@/lib/logger";
  *   - onboardingCompletedAt: the in-app wizard (/app) reached its final step.
  */
 
-export async function markFirstMessageIfNull(userId: string): Promise<void> {
+/**
+ * Devuelve true si el UPDATE efectivamente ocurrió — indica que es la
+ * primera vez que este usuario envía un mensaje. Los callers pueden usar
+ * este flag para emitir eventos de "primer mensaje" sin repetirlo.
+ */
+export async function markFirstMessageIfNull(userId: string): Promise<boolean> {
   try {
     const prisma = getPrismaClient();
-    await prisma.user.updateMany({
+    const result = await prisma.user.updateMany({
       where: { id: userId, firstMessageSentAt: null },
       data: { firstMessageSentAt: new Date() },
     });
+    return result.count > 0;
   } catch (err: unknown) {
     logError("ACTIVATION", err, { area: "markFirstMessage", userId });
+    return false;
   }
 }
 

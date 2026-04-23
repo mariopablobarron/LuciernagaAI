@@ -1,7 +1,7 @@
 import { getPrismaClient } from "@/db/prisma";
 import { buildSyntheticEmail } from "@/services/user";
 import { markFirstMessageIfNull, tryMarkActivated } from "@/services/activation";
-import { logError, logInfo } from "@/lib/logger";
+import { logError, logInfo, logWarn } from "@/lib/logger";
 import { fetchWithTimeout } from "@/lib/fetchWithTimeout";
 
 export type TelegramUser = {
@@ -281,12 +281,22 @@ export async function sendAdminDocument(
 /** Shortcut: send a message to the admin chat. */
 export function notifyAdmin(text: string, parseMode: TelegramParseMode = "Markdown"): void {
   const adminChatId = process.env.ADMIN_TELEGRAM_ID?.trim();
-  if (!adminChatId) return;
+  if (!adminChatId) {
+    logWarn("TELEGRAM", "notifyAdmin_skipped_no_chat_id", {
+      reason: "ADMIN_TELEGRAM_ID env var not configured",
+    });
+    return;
+  }
 
   // Use dedicated admin bot if configured, otherwise fall back to main bot
   const adminToken = process.env.TELEGRAM_BOT_TOKEN_ADMIN?.trim();
   const token = adminToken || process.env.TELEGRAM_BOT_TOKEN?.trim();
-  if (!token) return;
+  if (!token) {
+    logWarn("TELEGRAM", "notifyAdmin_skipped_no_token", {
+      reason: "Neither TELEGRAM_BOT_TOKEN_ADMIN nor TELEGRAM_BOT_TOKEN configured",
+    });
+    return;
+  }
 
   void fetchWithTimeout(
     `${TELEGRAM_NOTIFY_BASE}/bot${token}/sendMessage`,
@@ -303,6 +313,8 @@ export function notifyAdmin(text: string, parseMode: TelegramParseMode = "Markdo
 
 type NewUserAlert      = { tipo: "new_user";        userId: string };
 type EmailAlert        = { tipo: "email_captured";  userId: string; email: string };
+type NameAlert         = { tipo: "name_captured";   userId: string; name: string };
+type FirstMessageAlert = { tipo: "first_message";   userId: string; preview: string };
 type StateChangeAlert  = { tipo: "state_change";    userId: string; actionType: string; previousState: string; newState: string };
 type CrisisAlert       = { tipo: "crisis";          userId: string; crisisLevel: string; lastMessage?: string };
 type StreakAlert        = { tipo: "streak_milestone"; userId: string; streakDays: number };
@@ -312,6 +324,8 @@ type CancellationAlert = { tipo: "cancellation";    userId: string; email: strin
 export type AdminAlertInput =
   | NewUserAlert
   | EmailAlert
+  | NameAlert
+  | FirstMessageAlert
   | StateChangeAlert
   | CrisisAlert
   | StreakAlert
@@ -358,6 +372,23 @@ export function buildAdminAlert(input: AdminAlertInput): string {
         `👤 ID: \`${input.userId}\`\n` +
         `📧 *${input.email}*\n` +
         `${userVia(input.userId)}`
+      );
+
+    case "name_captured":
+      return (
+        `🟢🟢🟢 NOMBRE CAPTURADO 🟢🟢🟢\n\n` +
+        `👤 ID: \`${input.userId}\`\n` +
+        `✏️ *${input.name}*\n` +
+        `${userVia(input.userId)}`
+      );
+
+    case "first_message":
+      return (
+        `🟢🟢🟢 PRIMER MENSAJE 🟢🟢🟢\n\n` +
+        `👤 ID: \`${input.userId}\`\n` +
+        `💬 _${input.preview}_\n` +
+        `${userVia(input.userId)}\n` +
+        `🕐 ${new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" })}`
       );
 
     case "state_change": {

@@ -1,5 +1,7 @@
 import { getPrismaClient } from "@/db/prisma";
 import { ensureUserAccount } from "@/services/user";
+import { markFirstMessageIfNull } from "@/services/activation";
+import { buildAdminAlert, notifyAdmin } from "@/services/telegram";
 
 export type ConversationSummary = {
   id: string;
@@ -128,6 +130,23 @@ export async function saveConversationMessage(params: {
       }).catch(() => undefined); // non-fatal if migration not yet applied
     }
   });
+
+  // Primer mensaje real del usuario en la app web → alerta al admin.
+  // Fuera de la transacción para no retener locks. Idempotente: si no
+  // es la primera vez, markFirstMessageIfNull devuelve false.
+  if (params.role === "user" && params.userId && params.content.trim()) {
+    const wasFirst = await markFirstMessageIfNull(params.userId);
+    if (wasFirst) {
+      const preview = params.content.trim().slice(0, 180);
+      notifyAdmin(
+        buildAdminAlert({
+          tipo: "first_message",
+          userId: params.userId,
+          preview,
+        }),
+      );
+    }
+  }
 }
 
 export async function listConversationsForUser(userId: string): Promise<ConversationSummary[]> {

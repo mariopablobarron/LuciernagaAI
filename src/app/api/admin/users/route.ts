@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
@@ -69,6 +70,12 @@ function parsePositiveInt(value: string | null, fallback: number): number {
   return parsed;
 }
 
+function parseDateParam(value: string | null): Date | null {
+  if (!value) return null;
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
@@ -115,6 +122,11 @@ export async function GET(req: NextRequest) {
     const riskOnly = searchParams.get("risk") === "1";
     const kindFilter = searchParams.get("kind")?.trim() || "all";
     const includeDeleted = searchParams.get("includeDeleted") === "1";
+    const planFilter = searchParams.get("plan")?.trim() || "all";
+    const createdFrom = parseDateParam(searchParams.get("createdFrom"));
+    const createdTo = parseDateParam(searchParams.get("createdTo"));
+    const lastSeenFrom = parseDateParam(searchParams.get("lastSeenFrom"));
+    const lastSeenTo = parseDateParam(searchParams.get("lastSeenTo"));
 
     const page = parsePositiveInt(searchParams.get("page"), 1);
     const pageSize = clamp(parsePositiveInt(searchParams.get("pageSize"), 50), 5, 200);
@@ -149,14 +161,7 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    const userWhere: {
-      OR?: Array<
-        | { email: { contains: string; mode: "insensitive" } }
-        | { name: { contains: string; mode: "insensitive" } }
-      >;
-      id?: { in: string[] };
-      deletedAt?: null;
-    } = {};
+    const userWhere: Prisma.UserWhereInput = {};
 
     if (!includeDeleted) {
       userWhere.deletedAt = null;
@@ -167,6 +172,22 @@ export async function GET(req: NextRequest) {
         { email: { contains: query, mode: "insensitive" } },
         { name: { contains: query, mode: "insensitive" } },
       ];
+    }
+
+    if (createdFrom || createdTo) {
+      userWhere.createdAt = {};
+      if (createdFrom) userWhere.createdAt.gte = createdFrom;
+      if (createdTo) userWhere.createdAt.lte = createdTo;
+    }
+
+    if (lastSeenFrom || lastSeenTo) {
+      userWhere.lastSeen = {};
+      if (lastSeenFrom) userWhere.lastSeen.gte = lastSeenFrom;
+      if (lastSeenTo) userWhere.lastSeen.lte = lastSeenTo;
+    }
+
+    if (planFilter === "pro") {
+      userWhere.subscriptions = { some: { plan: "pro", status: "active" as const } };
     }
 
     // Classify all users once so kindCounts is global and we can filter by kind.

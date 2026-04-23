@@ -71,6 +71,67 @@ type AdminUsersResponse = {
 type SortKey = "name" | "lastSeen" | "engagementScore" | "streakDays" | "state" | "messages7d" | "usageMs7d";
 type SortDir = "asc" | "desc";
 
+type SegmentId =
+  | "active-real"
+  | "at-risk"
+  | "dormant-7d"
+  | "no-activation"
+  | "churn-30d"
+  | "pro";
+
+type SegmentPreset = {
+  id: SegmentId;
+  label: string;
+  hint: string;
+  filters: {
+    kind?: UserKind;
+    plan?: "pro" | "free";
+    risk?: boolean;
+    lastSeenToOffsetDays?: number; // lastSeen <= now - N days (dormant/churn)
+    lastSeenFromOffsetDays?: number; // lastSeen >= now - N days (active)
+    createdToOffsetDays?: number; // createdAt <= now - N days (no-activation, churn)
+  };
+};
+
+const SEGMENT_PRESETS: SegmentPreset[] = [
+  {
+    id: "active-real",
+    label: "Activos reales",
+    hint: "Registrados/equipo con actividad en los últimos 7 días",
+    filters: { kind: "registered", lastSeenFromOffsetDays: 7 },
+  },
+  {
+    id: "at-risk",
+    label: "En riesgo",
+    hint: "Riesgo alto/crítico o crisis activa",
+    filters: { risk: true },
+  },
+  {
+    id: "dormant-7d",
+    label: "Dormidos 7d+",
+    hint: "Sin actividad hace más de 7 días",
+    filters: { lastSeenToOffsetDays: 7 },
+  },
+  {
+    id: "no-activation",
+    label: "Sin activación",
+    hint: "Registrados hace >3 días que aún no han escrito",
+    filters: { kind: "registered", createdToOffsetDays: 3 },
+  },
+  {
+    id: "churn-30d",
+    label: "Churn 30d",
+    hint: "Sin actividad hace más de 30 días",
+    filters: { lastSeenToOffsetDays: 30 },
+  },
+  {
+    id: "pro",
+    label: "Pro",
+    hint: "Plan Pro activo",
+    filters: { plan: "pro" },
+  },
+];
+
 // ─── Config ──────────────────────────────────────────────────────────────────
 
 const STATE_CONFIG: Record<string, { label: string; dot: string; bg: string }> = {
@@ -152,6 +213,12 @@ export default function AdminUsersPage() {
   const [planFilter, setPlanFilter] = useState("all");
   const [kindFilter, setKindFilter] = useState<UserKind | "all">("all");
   const [riskOnly, setRiskOnly] = useState(false);
+  const [segment, setSegment] = useState<SegmentId | null>(null);
+  const [createdFrom, setCreatedFrom] = useState("");
+  const [createdTo, setCreatedTo] = useState("");
+  const [lastSeenFrom, setLastSeenFrom] = useState("");
+  const [lastSeenTo, setLastSeenTo] = useState("");
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [sortKey, setSortKey] = useState<SortKey>("lastSeen");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
@@ -225,6 +292,11 @@ export default function AdminUsersPage() {
     if (stateFilter !== "all") params.set("state", stateFilter);
     if (kindFilter !== "all") params.set("kind", kindFilter);
     if (riskOnly) params.set("risk", "1");
+    if (planFilter !== "all") params.set("plan", planFilter);
+    if (createdFrom) params.set("createdFrom", createdFrom);
+    if (createdTo) params.set("createdTo", createdTo);
+    if (lastSeenFrom) params.set("lastSeenFrom", lastSeenFrom);
+    if (lastSeenTo) params.set("lastSeenTo", lastSeenTo);
 
     try {
       const res = await fetch(`/api/admin/users?${params.toString()}`, {
@@ -267,6 +339,41 @@ export default function AdminUsersPage() {
   function applyFilters() {
     setPage(1);
     void fetchUsers();
+  }
+
+  function applySegment(id: SegmentId | null) {
+    const next = id === segment ? null : id;
+    setSegment(next);
+    // Clear all fields that segments control; then apply the preset.
+    setKindFilter("all");
+    setPlanFilter("all");
+    setRiskOnly(false);
+    setCreatedFrom("");
+    setCreatedTo("");
+    setLastSeenFrom("");
+    setLastSeenTo("");
+
+    if (next) {
+      const preset = SEGMENT_PRESETS.find((s) => s.id === next);
+      if (preset) {
+        const now = Date.now();
+        if (preset.filters.kind) setKindFilter(preset.filters.kind);
+        if (preset.filters.plan) setPlanFilter(preset.filters.plan);
+        if (preset.filters.risk) setRiskOnly(true);
+        if (preset.filters.lastSeenFromOffsetDays != null) {
+          setLastSeenFrom(new Date(now - preset.filters.lastSeenFromOffsetDays * 86400000).toISOString());
+        }
+        if (preset.filters.lastSeenToOffsetDays != null) {
+          setLastSeenTo(new Date(now - preset.filters.lastSeenToOffsetDays * 86400000).toISOString());
+        }
+        if (preset.filters.createdToOffsetDays != null) {
+          setCreatedTo(new Date(now - preset.filters.createdToOffsetDays * 86400000).toISOString());
+        }
+      }
+    }
+    setPage(1);
+    // fetchUsers reads state — defer to next tick so the setters above commit.
+    setTimeout(() => void fetchUsers(), 0);
   }
 
   function handleSort(key: SortKey) {
@@ -343,7 +450,15 @@ export default function AdminUsersPage() {
           Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-20" />)
         ) : (
           <>
-            <div className="card-surface rounded-xl border border-zinc-800 p-4">
+            <button
+              type="button"
+              onClick={() => applySegment("active-real")}
+              className={`card-surface rounded-xl border p-4 text-left transition ${
+                segment === "active-real"
+                  ? "border-emerald-500/50 ring-1 ring-emerald-500/30"
+                  : "border-zinc-800 hover:border-zinc-700"
+              }`}
+            >
               <div className="flex items-center gap-2 text-xs text-zinc-500">
                 <Users className="h-3.5 w-3.5" />
                 <span className="font-semibold uppercase tracking-wide">Reales</span>
@@ -352,7 +467,7 @@ export default function AdminUsersPage() {
               <p className="mt-1 text-[10px] text-zinc-600 tabular-nums">
                 {kindCounts.registered} reg · {kindCounts["anon-active"]} anón · {totalUsers} total
               </p>
-            </div>
+            </button>
             <div className="card-surface rounded-xl border border-zinc-800 p-4">
               <div className="flex items-center gap-2 text-xs text-zinc-500">
                 <TrendingUp className="h-3.5 w-3.5" />
@@ -369,28 +484,80 @@ export default function AdminUsersPage() {
                 {avgEngagement}%
               </p>
             </div>
-            <div className="card-surface rounded-xl border border-zinc-800 p-4">
+            <button
+              type="button"
+              onClick={() => applySegment("at-risk")}
+              className={`card-surface rounded-xl border p-4 text-left transition ${
+                segment === "at-risk"
+                  ? "border-amber-500/50 ring-1 ring-amber-500/30"
+                  : "border-zinc-800 hover:border-zinc-700"
+              }`}
+            >
               <div className="flex items-center gap-2 text-xs text-amber-500/70">
                 <AlertTriangle className="h-3.5 w-3.5" />
                 <span className="font-semibold uppercase tracking-wide">Riesgo</span>
               </div>
               <p className="mt-2 text-2xl font-bold text-amber-400">{withRisk}</p>
-            </div>
-            <div className="card-surface rounded-xl border border-zinc-800 p-4">
+            </button>
+            <button
+              type="button"
+              onClick={() => applySegment("at-risk")}
+              className={`card-surface rounded-xl border p-4 text-left transition ${
+                segment === "at-risk"
+                  ? "border-red-500/50 ring-1 ring-red-500/30"
+                  : "border-zinc-800 hover:border-zinc-700"
+              }`}
+            >
               <div className="flex items-center gap-2 text-xs text-red-500/70">
                 <ShieldAlert className="h-3.5 w-3.5" />
                 <span className="font-semibold uppercase tracking-wide">Crisis</span>
               </div>
               <p className="mt-2 text-2xl font-bold text-red-400">{withCrisis}</p>
-            </div>
-            <div className="card-surface rounded-xl border border-zinc-800 p-4">
+            </button>
+            <button
+              type="button"
+              onClick={() => applySegment("pro")}
+              className={`card-surface rounded-xl border p-4 text-left transition ${
+                segment === "pro"
+                  ? "border-violet-500/50 ring-1 ring-violet-500/30"
+                  : "border-zinc-800 hover:border-zinc-700"
+              }`}
+            >
               <div className="flex items-center gap-2 text-xs text-violet-500/70">
                 <Flame className="h-3.5 w-3.5" />
                 <span className="font-semibold uppercase tracking-wide">Pro</span>
               </div>
               <p className="mt-2 text-2xl font-bold text-violet-400">{proUsers}</p>
-            </div>
+            </button>
           </>
+        )}
+      </div>
+
+      {/* ── Segment chips ────────────────────────────────────────── */}
+      <div className="flex flex-wrap gap-2">
+        {SEGMENT_PRESETS.map((s) => (
+          <button
+            key={s.id}
+            type="button"
+            onClick={() => applySegment(s.id)}
+            title={s.hint}
+            className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+              segment === s.id
+                ? "border-violet-500/60 bg-violet-500/20 text-violet-100"
+                : "border-zinc-700 bg-zinc-900/50 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200"
+            }`}
+          >
+            {s.label}
+          </button>
+        ))}
+        {segment && (
+          <button
+            type="button"
+            onClick={() => applySegment(segment)}
+            className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-500 hover:text-zinc-300"
+          >
+            Quitar segmento ✕
+          </button>
         )}
       </div>
 
@@ -475,7 +642,70 @@ export default function AdminUsersPage() {
           >
             <RefreshCw className="h-4 w-4" />
           </button>
+          <a
+            href={`/api/admin/users/export?${new URLSearchParams({
+              ...(query.trim() ? { q: query.trim() } : {}),
+              ...(planFilter !== "all" ? { plan: planFilter } : {}),
+              ...(createdFrom ? { createdFrom } : {}),
+              ...(createdTo ? { createdTo } : {}),
+              ...(lastSeenFrom ? { lastSeenFrom } : {}),
+              ...(lastSeenTo ? { lastSeenTo } : {}),
+            }).toString()}`}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-700 px-3 py-2.5 text-xs text-zinc-300 hover:bg-zinc-800 transition-colors"
+            title="Exportar CSV del filtro actual"
+          >
+            <Download className="h-3.5 w-3.5" /> Exportar filtro
+          </a>
         </div>
+
+        {/* Advanced filters (collapsible) */}
+        <button
+          type="button"
+          onClick={() => setAdvancedOpen((v) => !v)}
+          className="mt-3 text-xs text-zinc-500 hover:text-zinc-300"
+        >
+          {advancedOpen ? "▾ Ocultar filtros avanzados" : "▸ Filtros avanzados"}
+        </button>
+        {advancedOpen && (
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <label className="flex flex-col gap-1 text-xs text-zinc-500">
+              Registrado desde
+              <input
+                type="date"
+                value={createdFrom ? createdFrom.slice(0, 10) : ""}
+                onChange={(e) => setCreatedFrom(e.target.value ? new Date(e.target.value).toISOString() : "")}
+                className="rounded-lg border border-zinc-700 bg-zinc-900/60 px-2 py-1.5 text-sm text-zinc-200"
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-xs text-zinc-500">
+              Registrado hasta
+              <input
+                type="date"
+                value={createdTo ? createdTo.slice(0, 10) : ""}
+                onChange={(e) => setCreatedTo(e.target.value ? new Date(e.target.value).toISOString() : "")}
+                className="rounded-lg border border-zinc-700 bg-zinc-900/60 px-2 py-1.5 text-sm text-zinc-200"
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-xs text-zinc-500">
+              Último acceso desde
+              <input
+                type="date"
+                value={lastSeenFrom ? lastSeenFrom.slice(0, 10) : ""}
+                onChange={(e) => setLastSeenFrom(e.target.value ? new Date(e.target.value).toISOString() : "")}
+                className="rounded-lg border border-zinc-700 bg-zinc-900/60 px-2 py-1.5 text-sm text-zinc-200"
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-xs text-zinc-500">
+              Último acceso hasta
+              <input
+                type="date"
+                value={lastSeenTo ? lastSeenTo.slice(0, 10) : ""}
+                onChange={(e) => setLastSeenTo(e.target.value ? new Date(e.target.value).toISOString() : "")}
+                className="rounded-lg border border-zinc-700 bg-zinc-900/60 px-2 py-1.5 text-sm text-zinc-200"
+              />
+            </label>
+          </div>
+        )}
       </div>
 
       {/* ── Error ───────────────────────────────────────────────── */}

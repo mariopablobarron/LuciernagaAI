@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
+import { buildInternalUserExclusion, shouldExcludeInternal } from "@/lib/internal-users";
 import type { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -52,10 +53,14 @@ export async function GET(req: NextRequest) {
     const now = Date.now();
     const cutoff = weeks === null ? null : new Date(now - weeks * 7 * 86400_000);
 
+    const excludeInternal = shouldExcludeInternal(req);
+    const userIdFilter = await buildInternalUserExclusion({ excludeInternal });
+
     const users = await prisma.user.findMany({
       where: {
         deletedAt: null,
         ...(cutoff ? { createdAt: { gte: cutoff } } : {}),
+        ...(userIdFilter ? { id: userIdFilter } : {}),
       },
       select: {
         id: true,
@@ -162,6 +167,10 @@ export async function GET(req: NextRequest) {
       },
       totalUsers: users.length,
       range: allTime ? "all" : `${weeks}w`,
+      meta: {
+        excludeInternal,
+        internalUserCount: userIdFilter?.notIn.length ?? 0,
+      },
     });
   } catch (error) {
     logError("ANALYTICS_ACTIVATION", error, { action: "get_activation" });

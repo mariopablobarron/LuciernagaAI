@@ -74,10 +74,12 @@ export default function CrmPage() {
   const [search, setSearch] = useState("");
   const [segment, setSegment] = useState("all");
   const [page, setPage] = useState(1);
+  const [includeTeam, setIncludeTeam] = useState(false);
 
   function load() {
     setLoading(true);
     const params = new URLSearchParams({ page: String(page), pageSize: "50", search, segment });
+    if (includeTeam) params.set("includeTeam", "1");
     fetch(`/api/admin/crm?${params}`)
       .then((r) => {
         if (r.status === 401) { router.push("/admin/login"); return null; }
@@ -90,7 +92,7 @@ export default function CrmPage() {
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- legitimate fetch-on-filter-change; setLoading is UI feedback, not derived state
-  useEffect(() => { load(); }, [page, segment]);
+  useEffect(() => { load(); }, [page, segment, includeTeam]);
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -179,6 +181,15 @@ export default function CrmPage() {
               {opt.label}
             </button>
           ))}
+          <label className="inline-flex items-center gap-1.5 text-xs text-zinc-400 cursor-pointer ml-auto pl-2">
+            <input
+              type="checkbox"
+              checked={includeTeam}
+              onChange={(e) => { setIncludeTeam(e.target.checked); setPage(1); }}
+              className="accent-violet-500"
+            />
+            Incluir equipo
+          </label>
         </div>
         <button
           onClick={handleExportCsv}

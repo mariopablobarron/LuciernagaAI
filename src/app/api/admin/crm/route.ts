@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
+import { buildInternalUserExclusion, shouldExcludeInternal } from "@/lib/internal-users";
 
 export const dynamic = "force-dynamic";
 
@@ -26,10 +27,14 @@ export async function GET(req: NextRequest) {
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
+    const excludeInternal = shouldExcludeInternal(req);
+    const userIdFilter = await buildInternalUserExclusion({ excludeInternal });
+
     // Build where clause
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: any = {
       passwordHash: { not: null }, // Only real accounts, not anonymous
+      ...(userIdFilter ? { id: userIdFilter } : {}),
     };
 
     if (search) {
@@ -94,13 +99,18 @@ export async function GET(req: NextRequest) {
       isActive: u.isActive,
     }));
 
-    // Segment counts
+    // Segment counts — apply the same internal filter so the segment badges
+    // match the table.
+    const segBase = {
+      passwordHash: { not: null },
+      ...(userIdFilter ? { id: userIdFilter } : {}),
+    };
     const [totalAll, totalVerified, totalActive7d, totalTelegram, totalWithPhone] = await Promise.all([
-      prisma.user.count({ where: { passwordHash: { not: null } } }),
-      prisma.user.count({ where: { passwordHash: { not: null }, emailVerified: true } }),
-      prisma.user.count({ where: { passwordHash: { not: null }, lastSeen: { gte: sevenDaysAgo } } }),
-      prisma.user.count({ where: { passwordHash: { not: null }, telegramId: { not: null } } }),
-      prisma.user.count({ where: { passwordHash: { not: null }, phone: { not: null } } }),
+      prisma.user.count({ where: segBase }),
+      prisma.user.count({ where: { ...segBase, emailVerified: true } }),
+      prisma.user.count({ where: { ...segBase, lastSeen: { gte: sevenDaysAgo } } }),
+      prisma.user.count({ where: { ...segBase, telegramId: { not: null } } }),
+      prisma.user.count({ where: { ...segBase, phone: { not: null } } }),
     ]);
 
     return NextResponse.json({
@@ -113,6 +123,10 @@ export async function GET(req: NextRequest) {
         active7d: totalActive7d,
         telegram: totalTelegram,
         has_phone: totalWithPhone,
+      },
+      meta: {
+        excludeInternal,
+        internalUserCount: userIdFilter?.notIn.length ?? 0,
       },
     });
   } catch (error) {

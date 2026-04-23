@@ -1,3 +1,5 @@
+import { isTrackingMuted } from "@/lib/tracking-mute";
+
 type GtagFn = (...args: unknown[]) => void;
 
 declare global {
@@ -8,7 +10,8 @@ declare global {
 
 /**
  * Track a custom event via Google Analytics 4 (gtag).
- * No-ops gracefully when GA is not loaded (missing env var, ad-blocker, SSR).
+ * No-ops gracefully when GA is not loaded (missing env var, ad-blocker, SSR)
+ * or when the current session is flagged internal (team/test).
  */
 export function trackEvent(
   eventName: string,
@@ -17,5 +20,6 @@ export function trackEvent(
   if (typeof window === "undefined" || typeof window.gtag !== "function") {
     return;
   }
+  if (isTrackingMuted()) return;
   window.gtag("event", eventName, params);
 }

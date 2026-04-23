@@ -7,6 +7,8 @@
  *   trackMetaEvent("Lead", { content_name: "quiz" });
  */
 
+import { isTrackingMuted } from "@/lib/tracking-mute";
+
 declare global {
   interface Window {
     fbq?: (
@@ -19,7 +21,8 @@ declare global {
 
 /**
  * Fire a Meta Pixel standard or custom event.
- * No-ops gracefully when the pixel is not loaded (e.g. missing env var, ad-blocker).
+ * No-ops gracefully when the pixel is not loaded (e.g. missing env var,
+ * ad-blocker) or when the current session is flagged internal (team/test).
  */
 export function trackMetaEvent(
   eventName: string,
@@ -28,6 +31,7 @@ export function trackMetaEvent(
   if (typeof window === "undefined" || typeof window.fbq !== "function") {
     return;
   }
+  if (isTrackingMuted()) return;
   if (params) {
     window.fbq("track", eventName, params);
   } else {

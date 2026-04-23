@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
+import { buildInternalUserExclusion, shouldExcludeInternal } from "@/lib/internal-users";
 import type { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -45,15 +46,29 @@ export async function GET(req: NextRequest) {
     const twelveWeeksAgo = new Date(Date.now() - 12 * 7 * 86400_000);
     const now = new Date();
 
+    const excludeInternal = shouldExcludeInternal(req);
+    const userIdFilter = await buildInternalUserExclusion({ excludeInternal });
+
     // Get all users created in the last 12 weeks
     const users = await prisma.user.findMany({
-      where: { createdAt: { gte: twelveWeeksAgo } },
+      where: {
+        createdAt: { gte: twelveWeeksAgo },
+        ...(userIdFilter ? { id: userIdFilter } : {}),
+      },
       select: { id: true, createdAt: true },
       orderBy: { createdAt: "asc" },
     });
 
     if (users.length === 0) {
-      return NextResponse.json({ cohorts: [], overall: buildEmptyOverall(), totalUsers: 0 });
+      return NextResponse.json({
+        cohorts: [],
+        overall: buildEmptyOverall(),
+        totalUsers: 0,
+        meta: {
+          excludeInternal,
+          internalUserCount: userIdFilter?.notIn.length ?? 0,
+        },
+      });
     }
 
     const userIds = users.map((u) => u.id);
@@ -146,6 +161,10 @@ export async function GET(req: NextRequest) {
       overall,
       totalUsers: users.length,
       milestones: MILESTONES,
+      meta: {
+        excludeInternal,
+        internalUserCount: userIdFilter?.notIn.length ?? 0,
+      },
     });
   } catch (error) {
     logError("RETENTION", error, { action: "get_cohort_retention" });

@@ -47,11 +47,13 @@ export default function RetencionPage() {
   const router = useRouter();
   const [data, setData] = useState<RetentionData | null>(null);
   const [loading, setLoading] = useState(false);
+  const [includeTeam, setIncludeTeam] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/retention", { credentials: "include" });
+      const qs = includeTeam ? "?includeTeam=1" : "";
+      const res = await fetch(`/api/admin/retention${qs}`, { credentials: "include" });
       if (res.status === 401) {
         router.replace("/admin/login");
         return;
@@ -63,7 +65,7 @@ export default function RetencionPage() {
     } finally {
       setLoading(false);
     }
-  }, [router]);
+  }, [router, includeTeam]);
 
   useEffect(() => {
     void load();
@@ -88,14 +90,25 @@ export default function RetencionPage() {
         >
           <ArrowLeft className="h-4 w-4" /> Volver a analytics
         </Link>
-        <button
-          onClick={() => void load()}
-          disabled={loading}
-          className="flex items-center gap-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
-        >
-          <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-          Refrescar
-        </button>
+        <div className="flex items-center gap-2">
+          <label className="inline-flex items-center gap-1.5 text-xs text-zinc-400 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={includeTeam}
+              onChange={(e) => setIncludeTeam(e.target.checked)}
+              className="accent-violet-500"
+            />
+            Incluir equipo
+          </label>
+          <button
+            onClick={() => void load()}
+            disabled={loading}
+            className="flex items-center gap-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+            Refrescar
+          </button>
+        </div>
       </div>
 
       {loading && !data ? (

@@ -18,6 +18,7 @@ import { UserInterventionsBanner } from "@/components/UserInterventionsBanner";
 import WeeklyLetterBanner from "@/components/WeeklyLetterBanner";
 import NameCaptureModal from "@/components/NameCaptureModal";
 import CommunityForYouBanner from "@/components/CommunityForYouBanner";
+import { setTrackingMutedFromProfile } from "@/lib/tracking-mute";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -169,6 +170,13 @@ export default function HomePage() {
     savedAt: string;
   } | null>(null);
   const [sessionProfile, setSessionProfile] = useState<BrowserSessionUser | null>(null);
+
+  // Mute GA/Meta pixel when the session belongs to the team or a test account.
+  useEffect(() => {
+    setTrackingMutedFromProfile(
+      sessionProfile ? { email: sessionProfile.email, name: sessionProfile.name } : null,
+    );
+  }, [sessionProfile]);
   const [saveProgressEmail, setSaveProgressEmail] = useState("");
   const [saveProgressLoading, setSaveProgressLoading] = useState(false);
   const [saveProgressStatus, setSaveProgressStatus] = useState<string | null>(null);
@@ -421,7 +429,7 @@ export default function HomePage() {
     }
 
     return {
-      message: "Antes de seguir: ¿ya completaste esta acción? Responde sí o no.",
+      message: "¿Ya hiciste este paso? Dime sí, no, o escribe cómo fue.",
       action: {
         id: pendingGoalAction.id,
         title: pendingGoalAction.description,
@@ -1333,7 +1341,6 @@ export default function HomePage() {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          "x-response-mode": "json",
         },
         body: JSON.stringify({
           message: trimmed,

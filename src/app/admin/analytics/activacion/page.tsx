@@ -43,11 +43,13 @@ export default function ActivacionPage() {
   const [data, setData] = useState<ActivationData | null>(null);
   const [loading, setLoading] = useState(false);
   const [backfilling, setBackfilling] = useState(false);
+  const [includeTeam, setIncludeTeam] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/analytics/activation", { credentials: "include" });
+      const qs = includeTeam ? "?includeTeam=1" : "";
+      const res = await fetch(`/api/admin/analytics/activation${qs}`, { credentials: "include" });
       if (res.status === 401) {
         router.replace("/admin/login");
         return;
@@ -59,7 +61,7 @@ export default function ActivacionPage() {
     } finally {
       setLoading(false);
     }
-  }, [router]);
+  }, [router, includeTeam]);
 
   useEffect(() => {
     void load();
@@ -128,6 +130,15 @@ export default function ActivacionPage() {
           <ArrowLeft className="h-4 w-4" /> Volver a analytics
         </Link>
         <div className="flex items-center gap-2">
+          <label className="inline-flex items-center gap-1.5 text-xs text-zinc-400 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={includeTeam}
+              onChange={(e) => setIncludeTeam(e.target.checked)}
+              className="accent-violet-500"
+            />
+            Incluir equipo
+          </label>
           <button
             onClick={() => void handleBackfill()}
             disabled={backfilling}

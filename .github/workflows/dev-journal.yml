@@ -1,0 +1,140 @@
+name: Dev Journal Auto-update
+
+# Genera un entry diario en docs/dev-journal.md leyendo los commits del
+# día anterior. Corre a las 00:30 UTC (01:30 CET / 02:30 CEST). Si ya
+# existe entry para esa fecha (p.ej. lo escribí a mano), hace skip.
+#
+# El commit del bot NO dispara Coolify auto-deploy — coolify-auto-deploy.yml
+# tiene paths-ignore: ['docs/**'].
+
+on:
+  schedule:
+    - cron: "30 0 * * *"
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "YYYY-MM-DD del día a registrar (default: ayer)"
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dev-journal-autoupdate
+  cancel-in-progress: false
+
+jobs:
+  append-entry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve target date
+        id: target
+        run: |
+          if [ -n "${{ inputs.date }}" ]; then
+            DATE="${{ inputs.date }}"
+          else
+            DATE=$(date -u -d "yesterday" +%Y-%m-%d)
+          fi
+          echo "date=$DATE" >> "$GITHUB_OUTPUT"
+
+      - name: Skip if entry already exists
+        id: check
+        run: |
+          DATE="${{ steps.target.outputs.date }}"
+          if grep -q "^## $DATE" docs/dev-journal.md 2>/dev/null; then
+            echo "Entry para $DATE ya existe. Skip."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Collect commits
+        if: steps.check.outputs.skip == 'false'
+        id: commits
+        run: |
+          DATE="${{ steps.target.outputs.date }}"
+          SINCE="${DATE}T00:00:00Z"
+          UNTIL="${DATE}T23:59:59Z"
+          LOG=$(git log --since="$SINCE" --until="$UNTIL" --no-merges \
+            --pretty=format:"%h|%ad|%s" --date=format:"%H:%M" --reverse || true)
+          if [ -z "$LOG" ]; then
+            echo "Sin commits el $DATE — skip."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          COUNT=$(printf "%s\n" "$LOG" | wc -l | tr -d ' ')
+          FIRST=$(printf "%s\n" "$LOG" | head -1 | cut -d'|' -f2)
+          LAST=$(printf "%s\n" "$LOG" | tail -1 | cut -d'|' -f2)
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "first=$FIRST" >> "$GITHUB_OUTPUT"
+          echo "last=$LAST" >> "$GITHUB_OUTPUT"
+          # Persist in file to avoid multi-line output escaping
+          printf "%s\n" "$LOG" > /tmp/commits.txt
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+
+      - name: Build entry
+        if: steps.check.outputs.skip == 'false' && steps.commits.outputs.skip != 'true'
+        run: |
+          DATE="${{ steps.target.outputs.date }}"
+          FIRST="${{ steps.commits.outputs.first }}"
+          LAST="${{ steps.commits.outputs.last }}"
+          COUNT="${{ steps.commits.outputs.count }}"
+
+          {
+            echo ""
+            echo "---"
+            echo ""
+            echo "## $DATE — (generado automáticamente)"
+            echo ""
+            echo "> Entry generado por GitHub Action a las 00:30 UTC del día"
+            echo "> siguiente. $COUNT commits entre $FIRST y $LAST UTC. Titulares"
+            echo "> desde mensaje de commit, sin narrativa ni \"por qué\"."
+            echo ""
+            echo "### Commits por tipo"
+            echo ""
+
+            for TYPE in feat fix refactor test docs chore; do
+              SECTION=$(grep -E "\|${TYPE}(\(|:)" /tmp/commits.txt || true)
+              if [ -n "$SECTION" ]; then
+                case "$TYPE" in
+                  feat) LABEL="Nuevas features";;
+                  fix) LABEL="Fixes";;
+                  refactor) LABEL="Refactors";;
+                  test) LABEL="Tests";;
+                  docs) LABEL="Docs";;
+                  chore) LABEL="Chore";;
+                esac
+                echo "**$LABEL:**"
+                echo ""
+                printf "%s\n" "$SECTION" | while IFS='|' read -r HASH TIME MSG; do
+                  echo "- \`$HASH\` $MSG"
+                done
+                echo ""
+              fi
+            done
+
+            OTHER=$(grep -vE "\|(feat|fix|refactor|test|docs|chore)(\(|:)" /tmp/commits.txt || true)
+            if [ -n "$OTHER" ]; then
+              echo "**Otros:**"
+              echo ""
+              printf "%s\n" "$OTHER" | while IFS='|' read -r HASH TIME MSG; do
+                echo "- \`$HASH\` $MSG"
+              done
+              echo ""
+            fi
+          } >> docs/dev-journal.md
+
+      - name: Commit and push
+        if: steps.check.outputs.skip == 'false' && steps.commits.outputs.skip != 'true'
+        run: |
+          DATE="${{ steps.target.outputs.date }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/dev-journal.md
+          git commit -m "docs(journal): entry automático $DATE [skip ci]"
+          git push

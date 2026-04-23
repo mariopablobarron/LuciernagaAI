@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - main
+    # Evita redeployar cuando el push toca solo documentación. Mantener
+    # sincronizado si añades más caminos "no-deploy".
+    paths-ignore:
+      - "docs/**"
+      - "*.md"
+      - ".github/workflows/dev-journal.yml"
   workflow_dispatch:
 
 concurrency:

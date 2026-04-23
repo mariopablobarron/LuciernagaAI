@@ -921,8 +921,14 @@ export default function HomePage() {
     }
   };
 
+  // Si activeConversationId aún no se ha fijado pero la UI ya muestra la
+  // primera conversación (fallback de activeConversation), tomamos su id.
+  // Sin esto, los handlers hacen early return y los botones parecen muertos.
+  const resolvedActiveConversationId =
+    activeConversationId ?? (safeConversation.isDraft ? null : safeConversation.id);
+
   const handleRateSession = (rating: 1 | -1) => {
-    const id = activeConversationId;
+    const id = resolvedActiveConversationId;
     if (!id) return;
     void fetch(`/api/conversations/${id}`, {
       method: "PATCH",
@@ -933,7 +939,7 @@ export default function HomePage() {
   };
 
   const handleToggleJournal = () => {
-    const id = activeConversationId;
+    const id = resolvedActiveConversationId;
     if (!id) return;
     const current = safeConversation.journalMode;
     setConversations((prev) =>

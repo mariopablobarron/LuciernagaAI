@@ -79,6 +79,29 @@ body {
   --emotion-doubt: oklch(0.65 0.2 280);
   --emotion-clarity: oklch(0.68 0.15 200);
 
+  /* Acento emocional — default al primary (violet). Se sobreescribe con
+     data-emotion="..." en <html>, que coloca EmotionalAccentProvider al
+     leer /api/user/state. Úsalo en botones/CTAs/focus rings que deben
+     reflejar el estado del usuario. */
+  --accent-emotion: var(--primary);
+  --accent-emotion-foreground: var(--primary-foreground);
+}
+
+[data-emotion="bloqueo"] {
+  --accent-emotion: var(--emotion-blocked);
+}
+[data-emotion="ansiedad"] {
+  --accent-emotion: var(--emotion-anxious);
+}
+[data-emotion="duda"] {
+  --accent-emotion: var(--emotion-doubt);
+}
+[data-emotion="claridad"] {
+  --accent-emotion: var(--emotion-clarity);
+}
+
+:root {
+
   /* Señales */
   --signal-warning: oklch(0.72 0.18 50);
   --signal-danger: oklch(0.62 0.22 20);
@@ -122,6 +145,8 @@ body {
   --color-emotion-anxious: var(--emotion-anxious);
   --color-emotion-doubt: var(--emotion-doubt);
   --color-emotion-clarity: var(--emotion-clarity);
+  --color-accent-emotion: var(--accent-emotion);
+  --color-accent-emotion-foreground: var(--accent-emotion-foreground);
   --color-signal-warning: var(--signal-warning);
   --color-signal-danger: var(--signal-danger);
   --color-signal-success: var(--signal-success);

@@ -835,7 +835,7 @@ export default function Chat({
               ¿En qué te puedo ayudar hoy?
             </h3>
             <p className="mb-3 max-w-sm text-xs text-zinc-600 leading-relaxed">
-              No soy un chatbot. No doy consejos genericos. Te hago las preguntas que no te estas haciendo para que veas lo que no estas viendo.
+              Te hago las preguntas que no te estás haciendo, para que veas lo que todavía no estás viendo.
             </p>
             {proactivePrompt ? (
               <button
@@ -1140,7 +1140,8 @@ export default function Chat({
             disabled={loading || (!input.trim() && !attachedImage && !attachedAudio)}
             size="icon"
             aria-label="Enviar mensaje"
-            className="h-11 w-11 shrink-0 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-30"
+            style={{ backgroundColor: "var(--accent-emotion)" }}
+            className="h-11 w-11 shrink-0 rounded-xl text-white hover:opacity-90 transition-opacity disabled:opacity-30"
           >
             <Send className="h-4 w-4" />
           </Button>

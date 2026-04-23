@@ -18,6 +18,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import { toast } from "sonner";
+import { CircleSyncBanner } from "@/components/CircleSyncBanner";
 import AnonymousHint from "@/components/community/AnonymousHint";
 import { useSession } from "@/lib/useSession";
 
@@ -551,6 +552,9 @@ export default function CommunityPage() {
         {/* ── Tab: Today (Cafetería card + Victorias feed) ─────────────── */}
         {tab === "today" && (
           <div className="space-y-4">
+            {/* Sync session banner — silencioso si tu círculo no tiene sesión activa/próxima */}
+            <CircleSyncBanner />
+
             {/* Cafetería — ronda del día */}
             <Link
               href="/community/cafeteria"

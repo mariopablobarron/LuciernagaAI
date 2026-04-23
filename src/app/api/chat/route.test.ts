@@ -745,7 +745,7 @@ describe("POST /api/chat", () => {
       title: "Enviar el borrador al cliente",
     });
     expect(body.message).toBe(
-      'Antes de seguir, cuéntame una cosa: ¿ya hiciste «Enviar el borrador al cliente»? Con un sí o un no me oriento y vemos por dónde seguimos.\n\nSi quieres retomar esto otro día justo donde lo dejamos, déjame tu email y te lo guardo.'
+      'Quedó abierto «Enviar el borrador al cliente». Dime si lo retomas, lo aparcas para luego o lo cerramos — y seguimos por donde quieras.\n\nSi quieres retomar esto otro día justo donde lo dejamos, déjame tu email y te lo guardo.'
     );
     expect(generateAIResponse).not.toHaveBeenCalled();
   });
@@ -822,7 +822,7 @@ describe("POST /api/chat", () => {
     });
     expect(body.type).toBe("action_required");
     expect(body.message).toBe(
-      'Oye, antes de abrir algo nuevo vuelvo a esto porque importa. Se están quedando varios cabos sueltos y no quiero acompañarte a otro frente con este aún en el aire. ¿Hiciste «Enviar el borrador al cliente» o todavía no? Si no, cuéntame a qué hora lo haces hoy.\n\nSi quieres retomar esto otro día justo donde lo dejamos, déjame tu email y te lo guardo.'
+      'Hay algo de antes que seguimos sin cerrar: «Enviar el borrador al cliente». ¿Qué prefieres — retomarlo ahora, aparcarlo para más tarde, o cerrarlo porque ya no aplica?\n\nSi quieres retomar esto otro día justo donde lo dejamos, déjame tu email y te lo guardo.'
     );
     expect(generateAIResponse).not.toHaveBeenCalled();
   });
@@ -898,7 +898,8 @@ describe("POST /api/chat", () => {
       goalTitle: "Cerrar propuesta",
     });
     expect(body.type).toBe("action_required");
-    expect(body.message).toContain("¿Hiciste «Enviar el borrador al cliente»");
+    expect(body.message).toContain("«Enviar el borrador al cliente»");
+    expect(body.message).toContain("retomarlo ahora, aparcarlo para más tarde, o cerrarlo");
     expect(generateAIResponse).not.toHaveBeenCalled();
   });
 

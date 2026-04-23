@@ -77,7 +77,8 @@ describe("coach prompt identity", () => {
       },
     });
 
-    expect(message).toContain("no quiero acompañarte a otro frente");
+    expect(message).toContain("Hay algo de antes que seguimos sin cerrar");
+    expect(message).toContain("retomarlo ahora, aparcarlo para más tarde, o cerrarlo");
   });
 
   it("usa un fallback más activo cuando falla la IA", () => {

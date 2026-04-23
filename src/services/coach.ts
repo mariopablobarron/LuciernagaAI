@@ -517,14 +517,14 @@ export function buildActionRequiredMessage(params: {
   const action = `«${params.actionTitle}»`;
 
   if (avoidanceCount >= 2 || unfinishedActionsCount > 2) {
-    return `Oye, antes de abrir algo nuevo vuelvo a esto porque importa. Se están quedando varios cabos sueltos y no quiero acompañarte a otro frente con este aún en el aire. ¿Hiciste ${action} o todavía no? Si no, cuéntame a qué hora lo haces hoy.`;
+    return `Hay algo de antes que seguimos sin cerrar: ${action}. ¿Qué prefieres — retomarlo ahora, aparcarlo para más tarde, o cerrarlo porque ya no aplica?`;
   }
 
   if (confront) {
-    return `Vamos sin rodeos, porque creo que le estamos dando vueltas: ¿ya hiciste ${action}? Si aún no, dime a qué hora lo cierras hoy.`;
+    return `Dejamos ${action} a medias. ¿Lo retomas hoy, lo aparcas, o lo cerramos?`;
   }
 
-  return `Antes de seguir, cuéntame una cosa: ¿ya hiciste ${action}? Con un sí o un no me oriento y vemos por dónde seguimos.`;
+  return `Quedó abierto ${action}. Dime si lo retomas, lo aparcas para luego o lo cerramos — y seguimos por donde quieras.`;
 }
 
 export const CAPTURE_EMAIL_PROMPT =

@@ -794,12 +794,12 @@ export default function Chat({
       {actionLock && (
         <div className="shrink-0 border-b border-amber-500/20 bg-amber-950/20 px-4 py-2.5">
           <p className="text-xs text-amber-300">
-            <span className="font-semibold">Accion pendiente:</span>{" "}
+            <span className="font-semibold">Hilo abierto:</span>{" "}
             <span className="italic">{actionLock.actionTitle}</span>
           </p>
           <p className="mt-0.5 text-xs text-amber-500/80">{actionLock.message}</p>
           <p className="mt-1 text-[10px] text-amber-600/60">
-            ¿Por que no te dejo cambiar de tema? Porque abrir frentes nuevos sin cerrar los anteriores es el patron que te mantiene bloqueado.
+            Puedes retomarlo, aparcarlo para luego o cerrarlo. Tú decides.
           </p>
         </div>
       )}

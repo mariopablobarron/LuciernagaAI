@@ -985,6 +985,68 @@ export function buildFamilyWinEmail(params: {
 }
 
 /** Sent to the user when a family support message arrives. */
+// ─── Weekly letter — notification only (no sensitive content) ─────────────
+// The actual letter lives in-app. This email just nudges the user to come
+// read it. By design, it contains NO quotes, NO analysis, NO emotional
+// content — only the fact that a letter is waiting.
+
+export function buildWeeklyLetterNotificationEmail(params: {
+  name: string | null;
+  letterId: string;
+  appUrl: string;
+}): Pick<UserEmail, "subject" | "html" | "text"> {
+  const firstName = params.name ? escapeHtml(params.name.trim().split(/\s+/)[0]) : null;
+  const greeting = firstName ? `Hola ${firstName}` : "Hola";
+  const subject = "Tu carta de esta semana está lista";
+  const letterUrl = `${params.appUrl}/app?letter=${encodeURIComponent(params.letterId)}`;
+
+  const text = [
+    `${greeting},`,
+    ``,
+    `El mentor te ha escrito una carta sobre esta semana.`,
+    `Léela en la app cuando tengas un momento:`,
+    letterUrl,
+    ``,
+    `— Tres Mil Millones de Latidos`,
+  ].join("\n");
+
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0a0a0a;font-family:system-ui,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 0">
+    <tr><td align="center">
+      <table width="520" cellpadding="0" cellspacing="0" style="background:#18181b;border-radius:12px;overflow:hidden;border:1px solid #27272a">
+        <tr>
+          <td style="padding:32px;color:#d4d4d8">
+            <p style="margin:0 0 16px;font-size:18px;color:#fff;font-weight:600">${greeting},</p>
+            <p style="margin:0 0 24px;font-size:15px;line-height:1.7;color:#a1a1aa">
+              El mentor te ha escrito una carta sobre esta semana. Cuando tengas un momento, léela en la app.
+            </p>
+            <div style="text-align:center;margin:12px 0 20px">
+              <a href="${letterUrl}" style="display:inline-block;padding:12px 28px;background:#7c3aed;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px">
+                Leer la carta
+              </a>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:14px 32px;border-top:1px solid #27272a">
+            <p style="margin:0;font-size:11px;color:#52525b;line-height:1.5;text-align:center">
+              Recibes este aviso porque tienes activada la carta semanal.
+              Puedes desactivarlo en tus ajustes sin perder la carta.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  return { subject, html, text };
+}
+
 export function buildSupportMessageEmail(params: {
   userEmail: string;
   fromName: string;

@@ -164,6 +164,89 @@ const CHECKS: Check[] = [
     },
   },
   {
+    id: "integration.telegram_webhook",
+    name: "Telegram webhook",
+    category: "integrations",
+    run: async () => {
+      const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
+      if (!token) return { status: "ok", detail: "No configurado (opcional)" };
+
+      try {
+        const r = await fetch(`https://api.telegram.org/bot${token}/getWebhookInfo`, {
+          cache: "no-store",
+          signal: AbortSignal.timeout(5000),
+        });
+        if (!r.ok) {
+          return { status: "fail", detail: `HTTP ${r.status}`, meta: { httpStatus: r.status } };
+        }
+        const body = (await r.json()) as {
+          ok: boolean;
+          result?: {
+            url: string;
+            has_custom_certificate?: boolean;
+            pending_update_count: number;
+            last_error_date?: number;
+            last_error_message?: string;
+            max_connections?: number;
+            ip_address?: string;
+          };
+        };
+        if (!body.ok || !body.result) {
+          return { status: "fail", detail: "Respuesta inesperada de Telegram" };
+        }
+        const { url, pending_update_count, last_error_date, last_error_message } = body.result;
+        if (!url) {
+          return {
+            status: "fail",
+            detail: "Webhook sin registrar — el bot no recibirá mensajes",
+          };
+        }
+        const hasRecentError =
+          last_error_date &&
+          Date.now() / 1000 - last_error_date < 24 * 3600;
+        const secretPresent = Boolean(process.env.TELEGRAM_WEBHOOK_SECRET?.trim());
+        const meta = {
+          url,
+          pending: pending_update_count,
+          secretApplied: secretPresent,
+          lastErrorMessage: last_error_message ?? null,
+          lastErrorAgoSec: last_error_date ? Math.round(Date.now() / 1000 - last_error_date) : null,
+        };
+        if (hasRecentError) {
+          return {
+            status: "warn",
+            detail: `Error reciente: ${last_error_message ?? "desconocido"}`,
+            meta,
+          };
+        }
+        if (!secretPresent) {
+          return {
+            status: "warn",
+            detail: `Registrado · ${pending_update_count} pendientes · SECRET no aplicado`,
+            meta,
+          };
+        }
+        if (pending_update_count > 20) {
+          return {
+            status: "warn",
+            detail: `Registrado · ${pending_update_count} pendientes (backlog)`,
+            meta,
+          };
+        }
+        return {
+          status: "ok",
+          detail: `Registrado · ${pending_update_count} pendientes · secret OK`,
+          meta,
+        };
+      } catch (err) {
+        return {
+          status: "fail",
+          detail: (err as Error)?.message ?? "getWebhookInfo failed",
+        };
+      }
+    },
+  },
+  {
     id: "integration.stripe",
     name: "Stripe",
     category: "integrations",

@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { logError, logInfo } from "@/lib/logger";
-import { notifyAdmin } from "@/services/telegram";
+import { notifyAdmin, sendAdminDocument } from "@/services/telegram";
 import pg from "pg";
 
 export const dynamic = "force-dynamic";
@@ -114,6 +114,33 @@ export async function GET(req: NextRequest) {
     const sizeKb = Math.round(compressed.length / 1024);
 
     logInfo("BACKUP", "backup_created", { filename, sizeKb, tables: tables.length, rows: totalRows });
+
+    // When invoked by cron (?secret=...): upload the file to the admin
+    // Telegram chat instead of streaming it back (cron-job.org discards body).
+    // Manual admin UI invocation still gets the gzipped file as a download.
+    if (hasCronSecret) {
+      const caption = `Backup ${timestamp} — ${sizeKb} KB · ${tables.length} tablas · ${totalRows} filas`;
+      const delivered = await sendAdminDocument(compressed, filename, caption);
+
+      if (!delivered) {
+        notifyAdmin(`❌ Backup generado pero no se pudo subir a Telegram: ${filename} (${sizeKb} KB)`);
+        logError("BACKUP", new Error("telegram_upload_failed"), { filename, sizeKb });
+        return NextResponse.json(
+          { ok: false, error: "telegram_upload_failed", filename, sizeKb },
+          { status: 500 },
+        );
+      }
+
+      return NextResponse.json({
+        ok: true,
+        filename,
+        sizeKb,
+        tables: tables.length,
+        rows: totalRows,
+        deliveredTo: "telegram_admin",
+      });
+    }
+
     notifyAdmin(`✅ Backup completado: ${filename} (${sizeKb} KB, ${tables.length} tablas, ${totalRows} filas)`);
 
     return new Response(new Uint8Array(compressed), {

@@ -201,39 +201,54 @@ export default function CommunityPage() {
     setSpacePosts(data.posts ?? []);
   }
 
+  async function submitPost(payload: Record<string, unknown>, onSuccess: () => void, successText: string) {
+    try {
+      const res = await fetch("/api/community/posts", {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as { message?: string; error?: string } | null;
+        toast.error(data?.message || data?.error || "Error al publicar");
+        return;
+      }
+      onSuccess();
+      toast.success(successText);
+    } catch {
+      toast.error("Error de red");
+    }
+  }
+
   async function handlePost(spaceId?: string) {
     if (!postFeeling.trim()) return;
     setPosting(true);
-    try {
-      await fetch("/api/community/posts", {
-        method: "POST", credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "reflection", feeling: postFeeling, blocker: postBlocker, step: postStep,
-          spaceId: spaceId ?? selectedSpace, circleId: myCircle?.id, anonymous: true,
-        }),
-      });
-      setPostFeeling(""); setPostBlocker(""); setPostStep("");
-      toast.success("Publicado");
-      void fetchData(tab);
-    } catch { toast.error("Error al publicar"); }
-    finally { setPosting(false); }
+    await submitPost(
+      {
+        type: "reflection", feeling: postFeeling, blocker: postBlocker, step: postStep,
+        spaceId: spaceId ?? selectedSpace, circleId: myCircle?.id, anonymous: true,
+      },
+      () => {
+        setPostFeeling(""); setPostBlocker(""); setPostStep("");
+        void fetchData(tab);
+      },
+      "Publicado",
+    );
+    setPosting(false);
   }
 
   async function handleVictoryPost() {
     if (!postFeeling.trim()) return;
     setPosting(true);
-    try {
-      await fetch("/api/community/posts", {
-        method: "POST", credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "victory", content: postFeeling, anonymous: true }),
-      });
-      setPostFeeling("");
-      toast.success("Victoria compartida");
-      void fetchData("today");
-    } catch { toast.error("Error"); }
-    finally { setPosting(false); }
+    await submitPost(
+      { type: "victory", content: postFeeling, anonymous: true },
+      () => {
+        setPostFeeling("");
+        void fetchData("today");
+      },
+      "Victoria compartida",
+    );
+    setPosting(false);
   }
 
   async function handleHeartbeat(postId: string) {
@@ -455,7 +470,7 @@ export default function CommunityPage() {
                 className="w-full rounded-lg border border-zinc-700 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-zinc-600 resize-none focus:border-violet-500/50 focus:outline-none"
               />
               <div className="flex justify-between items-center">
-                <p className="text-[10px] text-zinc-600">Se publica de forma anónima</p>
+                <p className="text-[10px] text-zinc-600">Anónimo · sin datos de contacto ni enlaces</p>
                 <button onClick={handleVictoryPost} disabled={!postFeeling.trim() || posting}
                   className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-xs font-semibold text-white hover:bg-violet-500 disabled:opacity-40 transition-all">
                   <Trophy className="w-3.5 h-3.5" /> Compartir

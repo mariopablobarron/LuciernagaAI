@@ -3,6 +3,7 @@ import { resolveIdentity, InvalidSessionTokenError } from "@/lib/auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { areFieldsSafe } from "@/lib/content-safety";
+import { assertNoPII } from "@/lib/pii-filters";
 
 export const dynamic = "force-dynamic";
 
@@ -107,6 +108,16 @@ export async function POST(req: NextRequest) {
       logInfo("COMMUNITY", "post_blocked_by_filter", { userId: identity.userId, type });
       return NextResponse.json(
         { error: "CONTENT_BLOCKED", message: "Tu mensaje contiene contenido que no podemos publicar. Si estas en crisis, llama al 024." },
+        { status: 422 },
+      );
+    }
+
+    // Filtro PII — rechazamos datos de contacto y enlaces externos
+    const piiError = assertNoPII(body.feeling, body.blocker, body.step, body.content);
+    if (piiError) {
+      logInfo("COMMUNITY", "post_blocked_by_pii", { userId: identity.userId, type, kinds: piiError.kinds });
+      return NextResponse.json(
+        { error: piiError.code, message: piiError.message, kinds: piiError.kinds },
         { status: 422 },
       );
     }

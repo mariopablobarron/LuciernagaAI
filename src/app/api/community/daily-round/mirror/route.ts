@@ -3,6 +3,7 @@ import { resolveIdentity, InvalidSessionTokenError } from "@/lib/auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { isContentSafe } from "@/lib/content-safety";
+import { assertNoPII } from "@/lib/pii-filters";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,15 @@ export async function POST(req: NextRequest) {
       logInfo("COMMUNITY", "mirror_blocked_by_filter", { userId: identity.userId });
       return NextResponse.json(
         { error: "CONTENT_BLOCKED", message: "Tu mensaje contiene contenido que no podemos publicar." },
+        { status: 422 },
+      );
+    }
+
+    const piiMirror = assertNoPII(question);
+    if (piiMirror) {
+      logInfo("COMMUNITY", "mirror_blocked_by_pii", { userId: identity.userId, kinds: piiMirror.kinds });
+      return NextResponse.json(
+        { error: piiMirror.code, message: piiMirror.message, kinds: piiMirror.kinds },
         { status: 422 },
       );
     }

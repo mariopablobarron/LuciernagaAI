@@ -7,6 +7,7 @@ import {
 } from "@/lib/auth";
 import { logError } from "@/lib/logger";
 import { submitResponse } from "@/services/circleSyncSessions";
+import { assertNoPII } from "@/lib/pii-filters";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,14 @@ export async function POST(
       return NextResponse.json(
         { success: false, error: "content required" },
         { status: 400 },
+      );
+    }
+
+    const piiSync = assertNoPII(body.content);
+    if (piiSync) {
+      return NextResponse.json(
+        { success: false, error: piiSync.code, message: piiSync.message, kinds: piiSync.kinds },
+        { status: 422 },
       );
     }
 

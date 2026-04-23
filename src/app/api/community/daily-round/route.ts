@@ -3,6 +3,7 @@ import { resolveIdentity, InvalidSessionTokenError } from "@/lib/auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { isContentSafe } from "@/lib/content-safety";
+import { assertNoPII } from "@/lib/pii-filters";
 import { pickPromptForDate, todayInMadrid } from "@/lib/daily-round";
 
 export const dynamic = "force-dynamic";
@@ -136,6 +137,15 @@ export async function POST(req: NextRequest) {
       logInfo("COMMUNITY", "daily_round_blocked_by_filter", { userId: identity.userId });
       return NextResponse.json(
         { error: "CONTENT_BLOCKED", message: "Tu mensaje contiene contenido que no podemos publicar. Si estás en crisis, llama al 024." },
+        { status: 422 },
+      );
+    }
+
+    const piiRound = assertNoPII(content);
+    if (piiRound) {
+      logInfo("COMMUNITY", "daily_round_blocked_by_pii", { userId: identity.userId, kinds: piiRound.kinds });
+      return NextResponse.json(
+        { error: piiRound.code, message: piiRound.message, kinds: piiRound.kinds },
         { status: 422 },
       );
     }

@@ -6,7 +6,7 @@ import { notifyAdmin } from "@/services/telegram";
 
 export const dynamic = "force-dynamic";
 
-const VALID_REASONS = ["harmful", "self_harm", "harassment", "spam", "other"];
+const VALID_REASONS = ["harmful", "self_harm", "harassment", "spam", "personal_data", "other"];
 const AUTO_HIDE_THRESHOLD = 3;
 const MAX_REPORTS_PER_DAY = 5;
 
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     }
     if (!body.reason || !VALID_REASONS.includes(body.reason)) {
       return NextResponse.json(
-        { error: "reason (harmful|self_harm|harassment|spam|other) requerido" },
+        { error: "reason (harmful|self_harm|harassment|spam|personal_data|other) requerido" },
         { status: 400 },
       );
     }

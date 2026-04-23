@@ -3,6 +3,7 @@ import { resolveIdentity, InvalidSessionTokenError } from "@/lib/auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { isContentSafe, looksLikeCrisis } from "@/lib/content-safety";
+import { assertNoPII } from "@/lib/pii-filters";
 import { awardLatidos } from "@/services/latidos";
 
 export const dynamic = "force-dynamic";
@@ -139,6 +140,19 @@ export async function POST(req: NextRequest) {
         );
       }
 
+      const piiAnswer = assertNoPII(answerText);
+      if (piiAnswer) {
+        logInfo("COMMUNITY", "answer_blocked_by_pii", {
+          userId: identity.userId,
+          questionId: body.answerId,
+          kinds: piiAnswer.kinds,
+        });
+        return NextResponse.json(
+          { error: piiAnswer.code, message: piiAnswer.message, kinds: piiAnswer.kinds },
+          { status: 422 },
+        );
+      }
+
       const question = await prisma.anonQuestion.findUnique({
         where: { id: body.answerId },
         select: { id: true, hidden: true, crisisDetected: true },
@@ -217,6 +231,15 @@ export async function POST(req: NextRequest) {
           message:
             "Tu mensaje contiene contenido que no podemos publicar. Si estás en crisis, llama al 024.",
         },
+        { status: 422 },
+      );
+    }
+
+    const piiQuestion = assertNoPII(questionText);
+    if (piiQuestion) {
+      logInfo("COMMUNITY", "question_blocked_by_pii", { userId: identity.userId, kinds: piiQuestion.kinds });
+      return NextResponse.json(
+        { error: piiQuestion.code, message: piiQuestion.message, kinds: piiQuestion.kinds },
         { status: 422 },
       );
     }

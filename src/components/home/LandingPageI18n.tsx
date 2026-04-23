@@ -148,18 +148,19 @@ export default function LandingPageI18n({
 
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link
-                  href="/signup"
+                  href="/app"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-linear-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-fuchsia-500/25"
                 >
                   {t('hero.cta')} <ArrowRight className="w-4 h-4" />
                 </Link>
-                <button
-                  onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+                <Link
+                  href="/signup"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-zinc-300 border border-zinc-700 hover:border-zinc-500 hover:text-white transition-all"
                 >
                   {t('hero.ctaSecondary')}
-                </button>
+                </Link>
               </div>
+              <p className="text-xs text-zinc-500 -mt-1">{t('hero.noSignup')}</p>
 
               <div className="flex items-center gap-4 pt-2">
                 <div className="flex -space-x-2.5">
@@ -358,12 +359,15 @@ export default function LandingPageI18n({
             </span>
           </h2>
           <p className="text-lg text-zinc-300 leading-relaxed">{t('finalCta.subtitle')}</p>
-          <div className="pt-2">
+          <div className="pt-2 flex flex-col items-center gap-3">
             <Link
-              href="/signup"
+              href="/app"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-white bg-linear-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-fuchsia-500/25 text-lg"
             >
               {t('finalCta.cta')} <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link href="/signup" className="text-sm text-zinc-400 hover:text-zinc-200 underline underline-offset-4">
+              {t('finalCta.ctaSignup')}
             </Link>
           </div>
           <p className="text-xs text-zinc-500">{t('finalCta.disclaimer')}</p>

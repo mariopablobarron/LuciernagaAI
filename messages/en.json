@@ -18,8 +18,9 @@
     "bullet1": "Write what's going on — no filters, no forms",
     "bullet2": "Detects your state and adapts the conversation",
     "bullet3": "Ends with an actionable next step for today",
-    "cta": "Try it free",
-    "ctaSecondary": "See how it works",
+    "cta": "Start writing",
+    "ctaSecondary": "Create an account to save progress",
+    "noSignup": "No signup. No email. Just write.",
     "socialProof": "+200 people",
     "socialProofText": "using it weekly",
     "langNote": "AI mentoring in English. Not a replacement for therapy."
@@ -102,6 +103,7 @@
     "title2": "The ones ahead are still yours.",
     "subtitle": "Three billion heartbeats in a lifetime. How many passed without you feeling them?",
     "cta": "Start beating differently",
+    "ctaSignup": "Or create an account to save your progress",
     "disclaimer": "Does not replace therapy or professional psychological intervention."
   },
   "chatMockup": {

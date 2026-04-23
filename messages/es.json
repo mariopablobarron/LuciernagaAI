@@ -18,8 +18,9 @@
     "bullet1": "Escribes lo que te pasa, sin filtros ni formularios",
     "bullet2": "Detecta tu estado y adapta la conversación",
     "bullet3": "Termina con un siguiente paso accionable hoy",
-    "cta": "Probar ahora gratis",
-    "ctaSecondary": "Ver cómo funciona",
+    "cta": "Empieza a escribir",
+    "ctaSecondary": "Crear cuenta para guardar progreso",
+    "noSignup": "Sin registro. Sin email. Escribe y ya.",
     "socialProof": "+200 personas",
     "socialProofText": "usándolo cada semana",
     "langNote": "Mentoría con IA en español. No sustituye terapia."
@@ -102,6 +103,7 @@
     "title2": "Los que vienen aún son tuyos.",
     "subtitle": "Tres mil millones de latidos en una vida. ¿Cuántos ya pasaron sin sentirlos?",
     "cta": "Empieza a latir diferente",
+    "ctaSignup": "O crea una cuenta para guardar tu progreso",
     "disclaimer": "No sustituye terapia ni intervención psicológica profesional."
   },
   "chatMockup": {

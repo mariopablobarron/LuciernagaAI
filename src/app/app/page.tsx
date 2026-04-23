@@ -15,6 +15,7 @@ import HomeWorkspace, { type WorkspaceTab } from "@/components/home/HomeWorkspac
 import InsightsPanel from "@/components/InsightsPanel";
 import Sidebar, { type SidebarConversation } from "@/components/Sidebar";
 import { UserInterventionsBanner } from "@/components/UserInterventionsBanner";
+import WeeklyLetterBanner from "@/components/WeeklyLetterBanner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -1832,6 +1833,17 @@ export default function HomePage() {
               />
             )}
             <UserInterventionsBanner />
+            <WeeklyLetterBanner
+              initialLetterId={
+                typeof window !== "undefined"
+                  ? new URLSearchParams(window.location.search).get("letter")
+                  : null
+              }
+              onContinueConversation={(suggestedPrompt) => {
+                setInput(suggestedPrompt);
+                setWorkspaceTab("chat");
+              }}
+            />
           </>
         }
         sidebar={

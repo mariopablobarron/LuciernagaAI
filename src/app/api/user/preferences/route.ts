@@ -20,6 +20,8 @@ const PREFERENCES_SELECT = {
   reminderTime: true,
   reminderEnabled: true,
   weeklyEmailEnabled: true,
+  weeklyLetterDisabled: true,
+  weeklyLetterEmailDisabled: true,
   notifyInsights: true,
   notifyGoals: true,
   notifyUpdates: true,
@@ -31,6 +33,8 @@ const DEFAULT_PREFERENCES = {
   reminderTime: null,
   reminderEnabled: true,
   weeklyEmailEnabled: true,
+  weeklyLetterDisabled: false,
+  weeklyLetterEmailDisabled: false,
   notifyInsights: true,
   notifyGoals: true,
   notifyUpdates: false,
@@ -84,7 +88,15 @@ export async function PATCH(req: NextRequest) {
   }
 
   // Boolean fields
-  for (const key of ["reminderEnabled", "weeklyEmailEnabled", "notifyInsights", "notifyGoals", "notifyUpdates"] as const) {
+  for (const key of [
+    "reminderEnabled",
+    "weeklyEmailEnabled",
+    "weeklyLetterDisabled",
+    "weeklyLetterEmailDisabled",
+    "notifyInsights",
+    "notifyGoals",
+    "notifyUpdates",
+  ] as const) {
     if (key in body && typeof body[key] === "boolean") data[key] = body[key];
   }
 

@@ -39,6 +39,8 @@ type Preferences = {
   reminderTime: string | null;
   reminderEnabled: boolean;
   weeklyEmailEnabled: boolean;
+  weeklyLetterDisabled: boolean;
+  weeklyLetterEmailDisabled: boolean;
   notifyInsights: boolean;
   notifyGoals: boolean;
   notifyUpdates: boolean;
@@ -525,6 +527,37 @@ export default function SettingsPage() {
                   <p className="text-xs text-zinc-500">Tu progreso de la semana cada domingo</p>
                 </div>
                 <Toggle checked={prefs.weeklyEmailEnabled} onChange={(v) => updatePref('weeklyEmailEnabled', v)} disabled={saving} />
+              </div>
+
+              {/* Weekly letter — in-app */}
+              <div className="flex items-center justify-between py-3">
+                <div className="pr-4">
+                  <p className="text-sm font-semibold text-white">Carta del domingo</p>
+                  <p className="text-xs text-zinc-500">
+                    Una carta breve del mentor cada domingo con tus propias palabras de la semana.
+                    El contenido siempre está en la app.
+                  </p>
+                </div>
+                <Toggle
+                  checked={!prefs.weeklyLetterDisabled}
+                  onChange={(v) => updatePref('weeklyLetterDisabled', !v)}
+                  disabled={saving}
+                />
+              </div>
+
+              {/* Weekly letter email notification */}
+              <div className="flex items-center justify-between py-3">
+                <div className="pr-4">
+                  <p className="text-sm font-semibold text-white">Aviso por email de la carta</p>
+                  <p className="text-xs text-zinc-500">
+                    Te avisamos cuando la carta esté lista. El email no contiene la carta — solo un enlace.
+                  </p>
+                </div>
+                <Toggle
+                  checked={!prefs.weeklyLetterEmailDisabled}
+                  onChange={(v) => updatePref('weeklyLetterEmailDisabled', !v)}
+                  disabled={saving || prefs.weeklyLetterDisabled}
+                />
               </div>
 
               {/* Insights */}

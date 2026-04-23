@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import AnonymousHint from "@/components/community/AnonymousHint";
+import { useSession } from "@/lib/useSession";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -94,6 +95,7 @@ const PHASE_LABELS: Record<string, string> = {
 // ─── Main Component ─────────────────────────────────────────────────────────
 
 export default function CommunityPage() {
+  const { user, loading: sessionLoading } = useSession();
   const [tab, setTab] = useState<Tab>("today");
   const [stats, setStats] = useState<{
     members: number;
@@ -114,6 +116,9 @@ export default function CommunityPage() {
   const [questionsFilter, setQuestionsFilter] = useState<QuestionsFilter>("community");
   const [questionText, setQuestionText] = useState("");
   const [answerText, setAnswerText] = useState("");
+  const [suggestedQuestion, setSuggestedQuestion] = useState<
+    { id: string; content: string; answerCount: number } | null
+  >(null);
   const [answeringId, setAnsweringId] = useState<string | null>(null);
   const [guardian, setGuardian] = useState<GuardianClassification | null>(null);
   const [guardianLoading, setGuardianLoading] = useState(false);
@@ -171,7 +176,7 @@ export default function CommunityPage() {
     }
   }, [questionsFilter]);
 
-  useEffect(() => { void fetchData(tab); }, [tab, fetchData]);
+  useEffect(() => { if (user) void fetchData(tab); }, [tab, fetchData, user]);
 
   // Deep-link: /community?tab=questions&prefill=<text> arrives from the
   // mentor chat CTA. Select the tab and pre-fill the "pedir ayuda" textarea.
@@ -191,6 +196,7 @@ export default function CommunityPage() {
   }, []);
 
   useEffect(() => {
+    if (!user) return;
     let cancelled = false;
     (async () => {
       try {
@@ -210,7 +216,7 @@ export default function CommunityPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [user]);
 
   async function loadSpacePosts(spaceId: string) {
     setSelectedSpace(spaceId);
@@ -377,7 +383,31 @@ export default function CommunityPage() {
       }
       return;
     }
+    const data = (await res.json().catch(() => ({}))) as {
+      ok?: boolean;
+      voted?: boolean;
+    };
     void fetchData("questions");
+    // Reciprocity loop: only invite to pay it forward when the vote was
+    // added (not when it was toggled off).
+    if (data.voted === true) {
+      void fetchSuggestedQuestion();
+    }
+  }
+
+  async function fetchSuggestedQuestion() {
+    try {
+      const res = await fetch("/api/community/questions/suggested", {
+        credentials: "include",
+      });
+      if (!res.ok) return;
+      const data = (await res.json()) as {
+        question: { id: string; content: string; answerCount: number } | null;
+      };
+      if (data.question) setSuggestedQuestion(data.question);
+    } catch {
+      // silent
+    }
   }
 
   const TABS: { key: Tab; label: string; hint: string; icon: React.ReactNode }[] = [
@@ -387,6 +417,70 @@ export default function CommunityPage() {
     { key: "coaches", label: "Sesiones", hint: "Encuentros con profesionales", icon: <Calendar className="w-4 h-4" /> },
     { key: "spaces", label: "Espacios", hint: "Salas temáticas", icon: <BookOpen className="w-4 h-4" /> },
   ];
+
+  if (!sessionLoading && !user) {
+    return (
+      <div className="min-h-screen bg-zinc-950">
+        <div className="max-w-2xl mx-auto px-4 py-16 space-y-8">
+          <div className="flex items-center gap-4">
+            <Link href="/" className="p-2 rounded-lg text-zinc-400 hover:text-cyan-400 hover:bg-white/5 transition-colors">
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
+            <div>
+              <h1 className="text-2xl font-bold text-white">Comunidad</h1>
+              <p className="text-sm text-zinc-500">Círculos de transformación</p>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-8 space-y-6">
+            <div className="flex items-start gap-4">
+              <div className="shrink-0 w-12 h-12 rounded-xl bg-violet-500/15 border border-violet-500/30 flex items-center justify-center">
+                <Users className="w-6 h-6 text-violet-300" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-xl font-semibold text-white">
+                  La comunidad es para quienes ya tienen cuenta
+                </h2>
+                <p className="text-sm text-zinc-400 leading-relaxed">
+                  Aquí se comparten victorias, dudas y compromisos reales. Para cuidar a quienes escriben,
+                  solo se puede leer y responder con cuenta creada — el chat con el mentor puedes probarlo sin registrarte.
+                </p>
+              </div>
+            </div>
+
+            <ul className="space-y-2 text-sm text-zinc-300">
+              <li className="flex items-center gap-2"><Trophy className="w-4 h-4 text-amber-400" /> Victorias de la semana</li>
+              <li className="flex items-center gap-2"><HelpCircle className="w-4 h-4 text-cyan-400" /> Ayuda mutua entre miembros</li>
+              <li className="flex items-center gap-2"><Users className="w-4 h-4 text-violet-400" /> Círculos de 5-8 personas en tu misma fase</li>
+              <li className="flex items-center gap-2"><Calendar className="w-4 h-4 text-fuchsia-400" /> Sesiones en vivo con profesionales</li>
+            </ul>
+
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <Link
+                href="/signup"
+                className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 bg-linear-to-r from-violet-500 to-fuchsia-500 text-white font-semibold rounded-xl hover:from-violet-400 hover:to-fuchsia-400 transition-all"
+              >
+                Crear cuenta gratis
+              </Link>
+              <Link
+                href="/login"
+                className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 border border-zinc-700 text-white font-semibold rounded-xl hover:bg-zinc-900/50 hover:border-zinc-600 transition-colors"
+              >
+                Ya tengo cuenta
+              </Link>
+            </div>
+
+            <p className="text-xs text-zinc-500 text-center pt-2">
+              ¿Aún no lo has probado?{" "}
+              <Link href="/app" className="text-violet-400 hover:text-violet-300 underline">
+                Entra al chat sin cuenta
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-zinc-950">
@@ -764,6 +858,49 @@ export default function CommunityPage() {
               ))}
             </div>
 
+            {/* Reciprocity card — "pay it forward" after voting helpful. */}
+            {suggestedQuestion && (
+              <div className="rounded-2xl border border-fuchsia-500/30 bg-gradient-to-br from-fuchsia-500/8 to-violet-500/5 p-5 space-y-3 animate-in fade-in slide-in-from-top-2 duration-400">
+                <p className="text-xs uppercase tracking-wider text-fuchsia-300 font-semibold">
+                  La cadena sigue
+                </p>
+                <p className="text-sm text-zinc-200 leading-relaxed">
+                  Otra persona necesita lo que tú necesitaste hace un rato.
+                  <br />
+                  <span className="text-zinc-400 italic">
+                    «{suggestedQuestion.content.slice(0, 160)}{suggestedQuestion.content.length > 160 ? "…" : ""}»
+                  </span>
+                </p>
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAnsweringId(suggestedQuestion.id);
+                      setAnswerText("");
+                      setGuardian(null);
+                      setSuggestedQuestion(null);
+                      // scroll to the specific question
+                      setTimeout(() => {
+                        document
+                          .getElementById(`q-${suggestedQuestion.id}`)
+                          ?.scrollIntoView({ behavior: "smooth", block: "center" });
+                      }, 50);
+                    }}
+                    className="rounded-xl bg-fuchsia-500 hover:bg-fuchsia-400 px-4 py-2 text-xs font-semibold text-white transition-colors"
+                  >
+                    Ayudar ahora
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSuggestedQuestion(null)}
+                    className="rounded-xl px-3 py-2 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+                  >
+                    Ahora no
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Ask — reframed as asking for help in a reciprocity chain */}
             <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-3">
               <p className="text-sm font-semibold text-white flex items-center gap-2">
@@ -814,7 +951,7 @@ export default function CommunityPage() {
             ) : (
               <div className="space-y-4">
                 {questions.map((q) => (
-                  <div key={q.id} className="rounded-xl border border-zinc-800 bg-zinc-900/50 overflow-hidden">
+                  <div key={q.id} id={`q-${q.id}`} className="rounded-xl border border-zinc-800 bg-zinc-900/50 overflow-hidden scroll-mt-6">
                     {/* Question */}
                     <div className="p-5">
                       <p className="text-base text-white font-medium leading-relaxed">{q.content}</p>

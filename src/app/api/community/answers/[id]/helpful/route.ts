@@ -34,10 +34,14 @@ export async function POST(req: NextRequest, ctx: RouteParams) {
     });
 
     let voted: boolean;
+    let isFirstVote = false;
     if (existing) {
       await prisma.anonAnswerVote.delete({ where: { id: existing.id } });
       voted = false;
     } else {
+      // Count votes BEFORE creating this one to detect the first-vote transition.
+      const priorCount = await prisma.anonAnswerVote.count({ where: { answerId } });
+      isFirstVote = priorCount === 0;
       await prisma.anonAnswerVote.create({
         data: { answerId, userId: identity.userId },
       });
@@ -45,7 +49,36 @@ export async function POST(req: NextRequest, ctx: RouteParams) {
     }
 
     const count = await prisma.anonAnswerVote.count({ where: { answerId } });
-    return NextResponse.json({ ok: true, voted, count });
+
+    // On first helpful vote, notify the author (human feedback beyond latidos).
+    // Only once per answer: subsequent votes don't re-notify.
+    if (voted && isFirstVote && answer.userId !== identity.userId) {
+      try {
+        const full = await prisma.anonAnswer.findUnique({
+          where: { id: answerId },
+          select: { questionId: true },
+        });
+        await prisma.notification.create({
+          data: {
+            userId: answer.userId,
+            title: "Tu respuesta ayudó",
+            body: "Alguien ha marcado tu respuesta como útil. Gracias por estar.",
+            url: full?.questionId ? `/community?tab=questions#q-${full.questionId}` : "/community?tab=questions",
+            icon: "🫶",
+            channel: "community",
+          },
+        });
+      } catch (err) {
+        // Never let notification failure break the vote.
+        logError("COMMUNITY", err, {
+          route: "/api/community/answers/[id]/helpful",
+          stage: "notify_first_vote",
+          answerId,
+        });
+      }
+    }
+
+    return NextResponse.json({ ok: true, voted, count, firstVote: isFirstVote });
   } catch (error) {
     if (error instanceof InvalidSessionTokenError) {
       return NextResponse.json({ error: "NOT_AUTHENTICATED" }, { status: 401 });

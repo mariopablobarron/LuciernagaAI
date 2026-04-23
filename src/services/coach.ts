@@ -79,6 +79,10 @@ export type CoachContext = {
   welcomeOnboarding?: OnboardingPayload | null;
   journeyPrompt?: string | null;
   projectPrompt?: string | null;
+  // Modo de acompañamiento elegido por el usuario (Acompáñame, Confróntame,
+  // etc.). Se inyecta en el system prompt sin aparecer nunca en el chat
+  // visible del usuario.
+  accompanimentMode?: { label: string; instruction: string } | null;
 };
 
 type ResponseFinalizationContext = {
@@ -311,6 +315,9 @@ export function buildCoachPrompt(
     : "";
   const journeyGuidance = context.journeyPrompt ?? "";
   const projectGuidance = context.projectPrompt ?? "";
+  const accompanimentGuidance = context.accompanimentMode
+    ? `Modo de acompañamiento elegido por el usuario: "${context.accompanimentMode.label}". ${context.accompanimentMode.instruction}`
+    : "";
 
   const goalContext = context.goal
     ? `
@@ -374,6 +381,7 @@ No se pudo verificar información externa suficiente. No afirmes datos actuales 
     welcomeOnboardingGuidance,
     journeyGuidance,
     projectGuidance,
+    accompanimentGuidance,
   ].filter(Boolean);
 
   return `${sections.join("\n\n")}

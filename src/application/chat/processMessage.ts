@@ -16,6 +16,7 @@ import {
 } from "@/services/coach";
 import { saveConversationMessage } from "@/services/conversation";
 import { buildGoalCoachContext, getActiveGoalForUser } from "@/services/goals";
+import { getMentorMode as getAccompanimentMode } from "@/lib/onboarding";
 
 export interface SessionContext {
   isAnonymous: boolean;
@@ -31,6 +32,7 @@ export interface ProcessMessageInput {
   userId: string;
   message: string;
   conversationId?: string;
+  mentorModeId?: string | null;
   session: SessionContext;
   jsonMode: boolean;
 }
@@ -195,7 +197,18 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     },
   });
 
-  const { coachContext, searchResults, impulseProfile, impulseLogs, activeAction, defaultAction } = ctx;
+  const { coachContext: baseCoachContext, searchResults, impulseProfile, impulseLogs, activeAction, defaultAction } = ctx;
+
+  // Inyectamos el modo de acompañamiento del usuario en el system prompt.
+  // El cliente NO prefija el mensaje con la instrucción, se envía por id en
+  // `mentorModeId` y lo resolvemos aquí. Nunca se muestra al usuario.
+  const accompaniment = getAccompanimentMode(input.mentorModeId ?? null);
+  const coachContext = accompaniment
+    ? {
+        ...baseCoachContext,
+        accompanimentMode: { label: accompaniment.label, instruction: accompaniment.instruction },
+      }
+    : baseCoachContext;
 
   // ── 9. Impulse mode (non-streaming JSON) ──────────────────────────────
   if (impulseProfile) {

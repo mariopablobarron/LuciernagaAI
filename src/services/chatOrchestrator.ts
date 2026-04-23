@@ -32,9 +32,9 @@ function buildHardPaywallMessage(): string {
 
 export async function orchestrateChat(req: NextRequest): Promise<Response> {
   // ── 1. Parse body ───────────────────────────────────────────────────────
-  let body: { message?: string; conversationId?: string };
+  let body: { message?: string; conversationId?: string; mentorModeId?: string | null };
   try {
-    body = (await req.json()) as { message?: string; conversationId?: string };
+    body = (await req.json()) as { message?: string; conversationId?: string; mentorModeId?: string | null };
   } catch (parseError: unknown) {
     logError("CHAT", parseError, { area: "parse_chat_body" });
     return buildErrorResponse("Body inválido en la solicitud", 400, "neutral", "INVALID_BODY");
@@ -152,6 +152,7 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
     userId: identity.userId,
     message,
     conversationId: body.conversationId,
+    mentorModeId: typeof body.mentorModeId === "string" ? body.mentorModeId : null,
     session: {
       isAnonymous: accessState.isAnonymous,
       hasPlan: accessState.hasPlan,

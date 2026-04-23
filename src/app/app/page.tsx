@@ -1327,9 +1327,6 @@ export default function HomePage() {
 
     try {
       const activeMode = getMentorMode(mentorModeId);
-      const messageForBackend = activeMode
-        ? `[Modo de acompañamiento: "${activeMode.label}" — ${activeMode.instruction}]\n\n${trimmed}`
-        : trimmed;
 
       const response = await fetch("/api/chat", {
         method: "POST",
@@ -1339,7 +1336,7 @@ export default function HomePage() {
           "x-response-mode": "json",
         },
         body: JSON.stringify({
-          message: messageForBackend,
+          message: trimmed,
           conversationId: resolvedConversation.isDraft ? undefined : currentConversationId,
           mentorModeId: activeMode?.id ?? null,
         }),

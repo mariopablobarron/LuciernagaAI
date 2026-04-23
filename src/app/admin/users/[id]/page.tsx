@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Brain, Check, ChevronDown, ClipboardList, Mail, MessageSquareText, NotebookPen, Pencil, Power, RefreshCw, ShieldAlert, Target, Trash2 } from "lucide-react";
+import { ArrowLeft, Brain, Check, ChevronDown, ClipboardList, Clock, Download, Mail, MessageSquareText, NotebookPen, Pencil, Power, RefreshCw, Shield, ShieldAlert, Tag, Target, Trash2, UserX } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -182,6 +182,16 @@ export default function AdminUserDetailPage() {
   const [data, setData] = useState<UserDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Tags, audit, GDPR state
+  const [userTags, setUserTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
+  const [tagSuggestions, setTagSuggestions] = useState<Array<{ tag: string; count: number }>>([]);
+  const [tagsSaving, setTagsSaving] = useState(false);
+  const [auditEntries, setAuditEntries] = useState<
+    Array<{ id: string; actorId: string; actorType: string; action: string; metadata: unknown; createdAt: string }>
+  >([]);
+  const [gdprBusy, setGdprBusy] = useState<null | "anonymize">(null);
 
   // Psychologist panel state
   const [notes, setNotes] = useState<ClinicalNote[]>([]);
@@ -411,6 +421,15 @@ export default function AdminUserDetailPage() {
             fetch(`/api/admin/users/${id}/emotional-history?days=30`, { credentials: "include" })
               .then((r) => r.ok ? r.json() as Promise<{ timeline: TimelineEntry[]; crisisMarkers: CrisisMarker[] }> : null)
               .then((d) => { if (d) { setTimeline(d.timeline ?? []); setCrisisMarkers(d.crisisMarkers ?? []); } }),
+            fetch(`/api/admin/users/${id}/tags`, { credentials: "include" })
+              .then((r) => r.ok ? r.json() as Promise<{ tags: string[] }> : null)
+              .then((d) => { if (d) setUserTags(d.tags ?? []); }),
+            fetch(`/api/admin/tags`, { credentials: "include" })
+              .then((r) => r.ok ? r.json() as Promise<{ tags: Array<{ tag: string; count: number }> }> : null)
+              .then((d) => { if (d) setTagSuggestions(d.tags ?? []); }),
+            fetch(`/api/admin/users/${id}/audit`, { credentials: "include" })
+              .then((r) => r.ok ? r.json() as Promise<{ entries: typeof auditEntries }> : null)
+              .then((d) => { if (d) setAuditEntries(d.entries ?? []); }),
           ]);
         }
       } catch (fetchError: unknown) {
@@ -424,6 +443,63 @@ export default function AdminUserDetailPage() {
 
     void fetchDetail();
   }, [params?.id, router]);
+
+  async function saveTags(nextTags: string[]) {
+    if (!params?.id) return;
+    setTagsSaving(true);
+    try {
+      const res = await fetch(`/api/admin/users/${params.id}/tags`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ tags: nextTags }),
+      });
+      const d = (await res.json()) as { tags: string[] };
+      setUserTags(d.tags ?? []);
+    } finally {
+      setTagsSaving(false);
+    }
+  }
+
+  function addTagFromInput() {
+    const raw = tagInput.trim().toLowerCase();
+    if (!raw || userTags.includes(raw) || userTags.length >= 20) {
+      setTagInput("");
+      return;
+    }
+    const cleaned = raw.replace(/[^a-z0-9_-]/g, "").slice(0, 40);
+    if (!cleaned) { setTagInput(""); return; }
+    const next = [...userTags, cleaned];
+    setTagInput("");
+    void saveTags(next);
+  }
+
+  function removeTag(tag: string) {
+    void saveTags(userTags.filter((t) => t !== tag));
+  }
+
+  async function handleAnonymize() {
+    if (!params?.id) return;
+    const confirmed = window.confirm(
+      "¿Anonimizar este usuario? Se reemplazará su email, nombre y datos personales. Los mensajes y métricas se mantienen. ESTO NO SE PUEDE DESHACER.",
+    );
+    if (!confirmed) return;
+    setGdprBusy("anonymize");
+    try {
+      const res = await fetch(`/api/admin/users/${params.id}/anonymize`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "X-Confirm-Anonymize": "true" },
+      });
+      if (!res.ok) throw new Error("ANONYMIZE_FAILED");
+      window.alert("Usuario anonimizado. Recargando ficha.");
+      window.location.reload();
+    } catch {
+      window.alert("No se pudo anonimizar el usuario.");
+    } finally {
+      setGdprBusy(null);
+    }
+  }
 
   async function handleSaveNote() {
     if (!noteInput.trim() || !userId.current) return;
@@ -863,6 +939,142 @@ export default function AdminUserDetailPage() {
               )}
             </div>
           </AdminPanel>
+
+          {/* Tags */}
+          <Card className="border-zinc-800 bg-zinc-900/50">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <Tag className="h-4 w-4 text-violet-400" /> Etiquetas
+              </CardTitle>
+              <CardDescription>Para segmentar y encontrar usuarios. Máx 20.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex flex-wrap gap-2">
+                {userTags.length === 0 ? (
+                  <p className="text-xs text-zinc-500">Sin etiquetas.</p>
+                ) : (
+                  userTags.map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => removeTag(t)}
+                      disabled={tagsSaving}
+                      className="inline-flex items-center gap-1 rounded-full border border-violet-500/30 bg-violet-500/10 px-2.5 py-1 text-xs text-violet-200 hover:bg-violet-500/20"
+                      title="Click para eliminar"
+                    >
+                      {t} <span className="text-violet-400/80">×</span>
+                    </button>
+                  ))
+                )}
+              </div>
+              <div className="flex gap-2">
+                <input
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addTagFromInput())}
+                  placeholder="Nueva etiqueta (minúsculas, guiones)"
+                  list="admin-tag-suggestions"
+                  className="flex-1 rounded-lg border border-zinc-700 bg-zinc-900/60 px-3 py-1.5 text-sm text-zinc-200 placeholder:text-zinc-600"
+                  maxLength={40}
+                />
+                <datalist id="admin-tag-suggestions">
+                  {tagSuggestions
+                    .filter((s) => !userTags.includes(s.tag))
+                    .slice(0, 30)
+                    .map((s) => (
+                      <option key={s.tag} value={s.tag}>{`${s.tag} (${s.count})`}</option>
+                    ))}
+                </datalist>
+                <Button type="button" size="sm" onClick={addTagFromInput} disabled={tagsSaving || !tagInput.trim()}>
+                  Añadir
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Audit timeline */}
+          <Card className="border-zinc-800 bg-zinc-900/50">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-zinc-400" /> Historial de acciones admin
+              </CardTitle>
+              <CardDescription>Últimas 50 acciones sobre este usuario.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {auditEntries.length === 0 ? (
+                <p className="text-sm text-zinc-500">Sin acciones registradas.</p>
+              ) : (
+                <ol className="space-y-2">
+                  {auditEntries.map((entry) => {
+                    const meta = entry.metadata as Record<string, unknown> | null;
+                    const metaSummary = meta
+                      ? Object.entries(meta)
+                          .filter(([, v]) => v !== null && v !== undefined && v !== "")
+                          .map(([k, v]) => `${k}=${String(v).slice(0, 40)}`)
+                          .join(" · ")
+                      : "";
+                    return (
+                      <li key={entry.id} className="flex items-start gap-3 rounded-lg border border-zinc-800 bg-zinc-950/50 px-3 py-2 text-xs">
+                        <span className="shrink-0 font-mono text-zinc-500">
+                          {new Date(entry.createdAt).toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" })}
+                        </span>
+                        <span className="shrink-0 rounded bg-zinc-800 px-1.5 py-0.5 font-semibold text-zinc-300">
+                          {entry.action}
+                        </span>
+                        <span className="flex-1 text-zinc-400">
+                          <span className="text-zinc-200">{entry.actorId}</span>
+                          {metaSummary ? <span className="ml-1 text-zinc-500">· {metaSummary}</span> : null}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ol>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* GDPR */}
+          <Card className="border-red-500/20 bg-red-950/10">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-red-300">
+                <Shield className="h-4 w-4" /> GDPR · Privacidad
+              </CardTitle>
+              <CardDescription className="text-red-300/70">
+                Export (art. 15) · Anonymize / Erase (art. 17). Las 2 últimas no se pueden deshacer.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-2">
+              <a
+                href={`/api/admin/users/${params?.id}/gdpr-export`}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-1.5 text-xs text-zinc-200 hover:bg-zinc-800"
+              >
+                <Download className="h-3.5 w-3.5" /> Export completo (JSON)
+              </a>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAnonymize}
+                disabled={gdprBusy !== null}
+                className="border-amber-500/40 text-amber-300 hover:bg-amber-500/10"
+              >
+                <UserX className="mr-1.5 h-3.5 w-3.5" />
+                {gdprBusy === "anonymize" ? "Anonimizando…" : "Anonymize (conserva métricas)"}
+              </Button>
+              <a
+                href={`/admin/users/${params?.id}#danger`}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/40 px-3 py-1.5 text-xs text-red-300 hover:bg-red-500/10"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.alert(
+                    "Para borrar físicamente (erase total), usa el panel de Acciones → Desactivar usuario, y después confirma el borrado duro desde la herramienta de soporte. Esto evita borrados accidentales desde la ficha.",
+                  );
+                }}
+              >
+                <Trash2 className="h-3.5 w-3.5" /> Erase total (usa flujo seguro)
+              </a>
+            </CardContent>
+          </Card>
 
           <UserUsageSection userId={data.user.id} />
 

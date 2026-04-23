@@ -6,6 +6,17 @@ import { sendWelcomeSequence } from "@/services/telegramOnboarding";
 import { getPrismaClient } from "@/db/prisma";
 import { checkRateLimit } from "@/lib/rate-limit";
 
+// Crawlers/monitoring conocidos. Si cae alguno, respondemos 200 sin crear
+// User en BD. No queremos ensuciar métricas con bots ni disparar alertas
+// a cada ping de UptimeRobot/cron-job.org.
+const BOT_UA_PATTERN =
+  /(bot|crawl|spider|slurp|bingpreview|uptime|pingdom|monitor|curl|wget|go-http|python-requests|headlesschrome|puppeteer|playwright|lighthouse|semrush|ahrefs|mj12|dotbot|duckduck|yandex|baidu|sogou|facebookexternalhit|whatsapp|telegrambot|gptbot|claudebot|anthropic-ai|perplexitybot|ccbot|bytespider)/i;
+
+function isBotUserAgent(ua: string | null): boolean {
+  if (!ua) return true; // sin UA legítimo — tratamos como bot
+  return BOT_UA_PATTERN.test(ua);
+}
+
 async function buildBootstrapResponse(req: NextRequest): Promise<NextResponse> {
   const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
   const rl = checkRateLimit(`bootstrap:ip:${ip}`, 10, 60_000);
@@ -14,6 +25,12 @@ async function buildBootstrapResponse(req: NextRequest): Promise<NextResponse> {
       { ok: false, error: "TOO_MANY_REQUESTS" },
       { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
     );
+  }
+
+  // Short-circuit para crawlers: no creamos User ni emitimos cookie.
+  const ua = req.headers.get("user-agent");
+  if (isBotUserAgent(ua)) {
+    return NextResponse.json({ ok: false, error: "BOT_BLOCKED" }, { status: 200 });
   }
 
   const identity = await bootstrapSessionIdentity(req);
@@ -50,11 +67,13 @@ async function buildBootstrapResponse(req: NextRequest): Promise<NextResponse> {
     shouldSetCookie: identity.shouldSetCookie,
   });
 
-  // New user: notify admin + send Telegram welcome if they came via bot
+  // Nuevo anónimo humano: SÍ alertamos al admin. La herramienta está
+  // pensada para usuarios que entran sin dejar datos; saber cuándo entra
+  // uno es señal útil de producto. Los bots ya se cortaron arriba con el
+  // filtro de User-Agent, así que lo que llega aquí es humano real.
   if (identity.source === "generated") {
     notifyAdmin(buildAdminAlert({ tipo: "new_user", userId: identity.userId }));
 
-    // If the user came from Telegram (tg_ prefix), fire welcome sequence
     if (identity.userId.startsWith("tg_")) {
       const telegramId = identity.userId.replace("tg_", "");
       const prisma = getPrismaClient();

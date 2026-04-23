@@ -292,7 +292,7 @@ export default function CommunityPage() {
         body: JSON.stringify({ content: questionText }),
       });
       setQuestionText("");
-      toast.success("Pregunta publicada");
+      toast.success("Petición publicada. La verá alguien que haya pasado por algo parecido.");
       void fetchData("questions");
     } catch { toast.error("Error al publicar"); }
     finally { setPosting(false); }
@@ -365,7 +365,7 @@ export default function CommunityPage() {
   const TABS: { key: Tab; label: string; hint: string; icon: React.ReactNode }[] = [
     { key: "today", label: "Hoy", hint: "Ronda del día + tus victorias", icon: <Trophy className="w-4 h-4" /> },
     { key: "circle", label: "Mi Círculo", hint: "Grupo de 5-8 en tu misma fase", icon: <Users className="w-4 h-4" /> },
-    { key: "questions", label: "Preguntas", hint: "Pregunta anónima a la comunidad", icon: <HelpCircle className="w-4 h-4" /> },
+    { key: "questions", label: "Ayuda mutua", hint: "Pide ayuda o responde a alguien que lo necesita", icon: <HelpCircle className="w-4 h-4" /> },
     { key: "coaches", label: "Sesiones", hint: "Encuentros con profesionales", icon: <Calendar className="w-4 h-4" /> },
     { key: "spaces", label: "Espacios", hint: "Salas temáticas", icon: <BookOpen className="w-4 h-4" /> },
   ];
@@ -396,7 +396,7 @@ export default function CommunityPage() {
               <p className="text-lg font-semibold text-white">{stats.victoriesWeek}</p>
             </div>
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2">
-              <p className="text-[10px] uppercase tracking-wide text-zinc-500">Preguntas 7d</p>
+              <p className="text-[10px] uppercase tracking-wide text-zinc-500">Ayudas 7d</p>
               <p className="text-lg font-semibold text-white">{stats.questionsWeek}</p>
             </div>
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2">
@@ -728,9 +728,9 @@ export default function CommunityPage() {
             {/* Filter tabs */}
             <div className="flex gap-2">
               {([
-                { key: "community", label: "Comunidad" },
-                { key: "personal", label: "Para ti" },
-                { key: "mine", label: "Mías" },
+                { key: "community", label: "Piden ayuda" },
+                { key: "personal", label: "Te escriben" },
+                { key: "mine", label: "Pedí yo" },
               ] as const).map((f) => (
                 <button
                   key={f.key}
@@ -746,18 +746,20 @@ export default function CommunityPage() {
               ))}
             </div>
 
-            {/* Ask */}
+            {/* Ask — reframed as asking for help in a reciprocity chain */}
             <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-3">
               <p className="text-sm font-semibold text-white flex items-center gap-2">
-                <HelpCircle className="w-4 h-4 text-violet-400" /> Pregunta a la comunidad
+                <HelpCircle className="w-4 h-4 text-violet-400" /> Pide ayuda. Alguien ha pasado por algo parecido.
               </p>
               <p className="text-xs text-zinc-500">
-                Las preguntas son anónimas. Nadie sabe quién pregunta. Las respuestas pueden ser anónimas o con nombre.
+                Tu petición es anónima — nadie sabe quién pide. Quien responde
+                puede hacerlo con nombre o en anónimo. Si otro día ayudas tú,
+                la cadena sigue.
               </p>
               <textarea
                 value={questionText}
                 onChange={(e) => setQuestionText(e.target.value)}
-                placeholder="¿Qué te gustaría preguntar?"
+                placeholder="Cuenta en qué estás atascado o qué duda tienes ahora mismo…"
                 rows={2}
                 maxLength={500}
                 className="w-full rounded-lg border border-zinc-700 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-zinc-600 resize-none focus:border-violet-500/50 focus:outline-none"
@@ -769,23 +771,23 @@ export default function CommunityPage() {
                   disabled={!questionText.trim() || posting}
                   className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-xs font-semibold text-white hover:bg-violet-500 disabled:opacity-40 transition-all"
                 >
-                  <Send className="w-3.5 h-3.5" /> Preguntar
+                  <Send className="w-3.5 h-3.5" /> Pedir ayuda
                 </button>
               </div>
             </div>
 
             {/* Questions list */}
             {loading ? (
-              <p className="text-sm text-zinc-500 text-center py-8">Cargando preguntas...</p>
+              <p className="text-sm text-zinc-500 text-center py-8">Cargando…</p>
             ) : questions.length === 0 ? (
               <div className="text-center py-12 space-y-2">
                 <HelpCircle className="w-10 h-10 text-zinc-700 mx-auto" />
                 <p className="text-zinc-500">
                   {questionsFilter === "mine"
-                    ? "Aún no has hecho ninguna pregunta."
+                    ? "Todavía no has pedido ayuda a la comunidad."
                     : questionsFilter === "personal"
-                      ? "Nadie te ha hecho preguntas directas."
-                      : "Aún no hay preguntas. Sé el primero."}
+                      ? "Nadie te ha escrito directamente todavía."
+                      : "Ahora mismo nadie está pidiendo ayuda. Vuelve pronto para ayudar a alguien."}
                 </p>
               </div>
             ) : (
@@ -796,12 +798,16 @@ export default function CommunityPage() {
                     <div className="p-5">
                       <p className="text-base text-white font-medium leading-relaxed">{q.content}</p>
                       <div className="flex flex-wrap items-center gap-3 mt-3 text-xs text-zinc-500">
-                        <span>{q.answerCount} {q.answerCount === 1 ? "respuesta" : "respuestas"}</span>
+                        <span>
+                          {q.answerCount === 0
+                            ? "Nadie ha respondido aún"
+                            : `${q.answerCount} ${q.answerCount === 1 ? "persona ha ayudado" : "personas han ayudado"}`}
+                        </span>
                         <span>{timeAgo(q.createdAt)}</span>
-                        {q.isForMe && <span className="text-cyan-400 font-semibold">Para ti</span>}
+                        {q.isForMe && <span className="text-cyan-400 font-semibold">Te lo escriben a ti</span>}
                         {q.answersFull && (
                           <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-300">
-                            Tope de respuestas alcanzado
+                            Ya ha recibido muchas ayudas
                           </span>
                         )}
                         {q.crisisDetected && (
@@ -811,7 +817,7 @@ export default function CommunityPage() {
                         )}
                         {q.answerCount === 0 && !q.crisisDetected && (
                           <span className="rounded-full border border-violet-500/30 bg-violet-500/10 px-2 py-0.5 text-[10px] font-semibold text-violet-300">
-                            Sin respuesta aún
+                            Alguien espera ayuda
                           </span>
                         )}
                       </div>
@@ -962,7 +968,7 @@ export default function CommunityPage() {
                             }}
                             className="text-xs text-violet-400 hover:text-violet-300 font-medium transition-colors"
                           >
-                            Responder con una pregunta
+                            Ayudar
                           </button>
                         )}
                       </div>

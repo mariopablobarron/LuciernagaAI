@@ -6,6 +6,7 @@ import { sendUserEmail } from "@/lib/email";
 import { audit } from "@/lib/audit";
 import { withRateLimit } from "@/lib/rate-limit";
 import { isSyntheticEmail } from "@/services/user";
+import { resolveUserIdsFromFilter, type AdminUsersFilter } from "../_shared/resolve-filter";
 
 export const dynamic = "force-dynamic";
 
@@ -29,13 +30,24 @@ export const POST = withRateLimit(
 
       const body = (await req.json()) as {
         userIds?: unknown;
+        filter?: AdminUsersFilter;
         subject?: unknown;
         body?: unknown;
       };
 
-      const userIds = Array.isArray(body.userIds)
-        ? body.userIds.filter((x): x is string => typeof x === "string").slice(0, MAX_USERS)
-        : [];
+      let userIds: string[] = [];
+      let truncated = false;
+      let filterTotal = 0;
+      if (body.filter && typeof body.filter === "object") {
+        const resolved = await resolveUserIdsFromFilter(body.filter);
+        userIds = resolved.userIds;
+        truncated = resolved.truncated;
+        filterTotal = resolved.total;
+      } else if (Array.isArray(body.userIds)) {
+        userIds = body.userIds
+          .filter((x): x is string => typeof x === "string")
+          .slice(0, MAX_USERS);
+      }
       const subject = typeof body.subject === "string" ? body.subject.trim() : "";
       const messageBody = typeof body.body === "string" ? body.body.trim() : "";
 
@@ -99,6 +111,8 @@ export const POST = withRateLimit(
         sent,
         skipped,
         failures: failures.length,
+        truncated,
+        filterTotal,
       });
     } catch (error) {
       logError("ADMIN", error, { route: "POST /api/admin/users/bulk-email" });

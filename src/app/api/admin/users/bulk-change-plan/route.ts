@@ -6,6 +6,7 @@ import { logError, logInfo } from "@/lib/logger";
 import { audit } from "@/lib/audit";
 import { invalidateUserCache } from "@/services/user";
 import { withRateLimit } from "@/lib/rate-limit";
+import { resolveUserIdsFromFilter, type AdminUsersFilter } from "../_shared/resolve-filter";
 
 export const dynamic = "force-dynamic";
 
@@ -23,13 +24,24 @@ export const POST = withRateLimit(
 
       const body = (await req.json()) as {
         userIds?: unknown;
+        filter?: AdminUsersFilter;
         plan?: unknown;
         reason?: unknown;
       };
 
-      const userIds = Array.isArray(body.userIds)
-        ? body.userIds.filter((x): x is string => typeof x === "string").slice(0, MAX_USERS)
-        : [];
+      let userIds: string[] = [];
+      let truncated = false;
+      let filterTotal = 0;
+      if (body.filter && typeof body.filter === "object") {
+        const resolved = await resolveUserIdsFromFilter(body.filter);
+        userIds = resolved.userIds;
+        truncated = resolved.truncated;
+        filterTotal = resolved.total;
+      } else if (Array.isArray(body.userIds)) {
+        userIds = body.userIds
+          .filter((x): x is string => typeof x === "string")
+          .slice(0, MAX_USERS);
+      }
       const plan = typeof body.plan === "string" ? body.plan : "";
       const reason = typeof body.reason === "string" ? body.reason.trim() : "";
 
@@ -89,9 +101,9 @@ export const POST = withRateLimit(
         metadata: { bulk: "change-plan", count: updated, plan, reason },
       });
 
-      logInfo("ADMIN", "bulk_change_plan", { updated, plan, reason });
+      logInfo("ADMIN", "bulk_change_plan", { updated, plan, reason, fromFilter: !!body.filter });
 
-      return NextResponse.json({ success: true, updated, plan });
+      return NextResponse.json({ success: true, updated, plan, truncated, filterTotal });
     } catch (error) {
       logError("ADMIN", error, { route: "POST /api/admin/users/bulk-change-plan" });
       return NextResponse.json({ error: "BULK_PLAN_FAILED" }, { status: 500 });

@@ -225,6 +225,7 @@ export default function AdminUsersPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkAction, setBulkAction] = useState(false);
   const [bulkModal, setBulkModal] = useState<null | "tag" | "plan" | "email">(null);
+  const [bulkScope, setBulkScope] = useState<"selection" | "filter">("selection");
   const [bulkTagAdd, setBulkTagAdd] = useState("");
   const [bulkTagRemove, setBulkTagRemove] = useState("");
   const [bulkPlan, setBulkPlan] = useState<"free" | "pro">("free");
@@ -289,8 +290,25 @@ export default function AdminUsersPage() {
     toast.success(`${selectedUsers.length} usuario(s) exportado(s)`);
   }
 
+  function currentFilterPayload() {
+    return {
+      q: query.trim() || undefined,
+      plan: planFilter !== "all" ? planFilter : undefined,
+      createdFrom: createdFrom || undefined,
+      createdTo: createdTo || undefined,
+      lastSeenFrom: lastSeenFrom || undefined,
+      lastSeenTo: lastSeenTo || undefined,
+    };
+  }
+
+  function bulkTargetPayload() {
+    return bulkScope === "filter"
+      ? { filter: currentFilterPayload() }
+      : { userIds: Array.from(selected) };
+  }
+
   async function handleBulkTag() {
-    if (selected.size === 0) return;
+    if (bulkScope === "selection" && selected.size === 0) return;
     const add = bulkTagAdd
       .split(",")
       .map((t) => t.trim().toLowerCase())
@@ -309,7 +327,7 @@ export default function AdminUsersPage() {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userIds: Array.from(selected), add, remove }),
+        body: JSON.stringify({ ...bulkTargetPayload(), add, remove }),
       });
       const payload = (await res.json().catch(() => ({}))) as { updated?: number };
       if (!res.ok) throw new Error("bulk_tag_failed");
@@ -327,13 +345,15 @@ export default function AdminUsersPage() {
   }
 
   async function handleBulkChangePlan() {
-    if (selected.size === 0) return;
+    if (bulkScope === "selection" && selected.size === 0) return;
     if (bulkPlanReason.trim().length < 10) {
       toast.error("Motivo requerido (mínimo 10 caracteres).");
       return;
     }
+    const scopeLabel =
+      bulkScope === "filter" ? "los usuarios del filtro actual" : `${selected.size} usuario(s)`;
     const confirmed = window.confirm(
-      `¿Cambiar plan de ${selected.size} usuario(s) a ${bulkPlan}?\nEsta acción afecta facturación.`,
+      `¿Cambiar plan de ${scopeLabel} a ${bulkPlan}?\nEsta acción afecta facturación.`,
     );
     if (!confirmed) return;
     setBulkAction(true);
@@ -343,7 +363,7 @@ export default function AdminUsersPage() {
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userIds: Array.from(selected),
+          ...bulkTargetPayload(),
           plan: bulkPlan,
           reason: bulkPlanReason.trim(),
         }),
@@ -363,13 +383,15 @@ export default function AdminUsersPage() {
   }
 
   async function handleBulkEmail() {
-    if (selected.size === 0) return;
+    if (bulkScope === "selection" && selected.size === 0) return;
     if (!bulkEmailSubject.trim() || !bulkEmailBody.trim()) {
       toast.error("Asunto y cuerpo obligatorios.");
       return;
     }
+    const scopeLabel =
+      bulkScope === "filter" ? "los usuarios del filtro actual" : `${selected.size} usuario(s)`;
     const confirmed = window.confirm(
-      `¿Enviar email a ${selected.size} usuario(s)?\nLos anónimos sin email real se saltan automáticamente.`,
+      `¿Enviar email a ${scopeLabel}?\nLos anónimos sin email real se saltan automáticamente.`,
     );
     if (!confirmed) return;
     setBulkAction(true);
@@ -379,7 +401,7 @@ export default function AdminUsersPage() {
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userIds: Array.from(selected),
+          ...bulkTargetPayload(),
           subject: bulkEmailSubject.trim(),
           body: bulkEmailBody.trim(),
         }),
@@ -778,6 +800,22 @@ export default function AdminUsersPage() {
           >
             <Download className="h-3.5 w-3.5" /> Exportar filtro
           </a>
+          <button
+            type="button"
+            onClick={() => { setBulkScope("filter"); setBulkModal("tag"); }}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-violet-500/30 px-3 py-2.5 text-xs text-violet-300 hover:bg-violet-500/10"
+            title="Aplicar tag a todos los del filtro"
+          >
+            Tag ↗
+          </button>
+          <button
+            type="button"
+            onClick={() => { setBulkScope("filter"); setBulkModal("email"); }}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-cyan-500/30 px-3 py-2.5 text-xs text-cyan-300 hover:bg-cyan-500/10"
+            title="Enviar email a todos los del filtro"
+          >
+            Email ↗
+          </button>
         </div>
 
         {/* Advanced filters (collapsible) */}
@@ -1134,15 +1172,51 @@ export default function AdminUsersPage() {
           >
             <div>
               <p className="text-sm font-semibold text-white">
-                {bulkModal === "tag" && `Editar etiquetas · ${selected.size} usuario(s)`}
-                {bulkModal === "plan" && `Cambiar plan · ${selected.size} usuario(s)`}
-                {bulkModal === "email" && `Enviar email · ${selected.size} usuario(s)`}
+                {bulkModal === "tag" && "Editar etiquetas"}
+                {bulkModal === "plan" && "Cambiar plan"}
+                {bulkModal === "email" && "Enviar email"}
               </p>
               <p className="mt-1 text-xs text-zinc-500">
                 {bulkModal === "tag" && "Separa varias etiquetas por coma. Minúsculas, guiones."}
                 {bulkModal === "plan" && "El motivo queda registrado en el audit log. Cambiar a Pro afecta facturación."}
                 {bulkModal === "email" && "Se envía solo a usuarios con email real y activo."}
               </p>
+            </div>
+
+            {/* Scope selector */}
+            <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-2 space-y-2">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Aplicar a</p>
+              <div className="flex gap-2 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setBulkScope("selection")}
+                  disabled={selected.size === 0}
+                  className={`flex-1 rounded-md border px-2.5 py-1.5 transition ${
+                    bulkScope === "selection"
+                      ? "border-violet-500/50 bg-violet-500/10 text-violet-200"
+                      : "border-zinc-700 text-zinc-400 hover:text-zinc-200"
+                  } disabled:opacity-40 disabled:cursor-not-allowed`}
+                >
+                  Selección ({selected.size})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setBulkScope("filter")}
+                  className={`flex-1 rounded-md border px-2.5 py-1.5 transition ${
+                    bulkScope === "filter"
+                      ? "border-violet-500/50 bg-violet-500/10 text-violet-200"
+                      : "border-zinc-700 text-zinc-400 hover:text-zinc-200"
+                  }`}
+                >
+                  Filtro completo (≤ 500)
+                </button>
+              </div>
+              {bulkScope === "filter" && (
+                <p className="text-[11px] text-amber-400/80">
+                  Aplica a todos los usuarios que coincidan con el filtro actual, no solo los de esta página.
+                  Cap de 500 para evitar operaciones incontroladas.
+                </p>
+              )}
             </div>
 
             {bulkModal === "tag" && (

@@ -4,6 +4,7 @@ import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { audit } from "@/lib/audit";
 import { withRateLimit } from "@/lib/rate-limit";
+import { resolveUserIdsFromFilter, type AdminUsersFilter } from "../_shared/resolve-filter";
 
 export const dynamic = "force-dynamic";
 
@@ -35,13 +36,24 @@ export const POST = withRateLimit(
 
       const body = (await req.json()) as {
         userIds?: unknown;
+        filter?: AdminUsersFilter;
         add?: unknown;
         remove?: unknown;
       };
 
-      const userIds = Array.isArray(body.userIds)
-        ? body.userIds.filter((x): x is string => typeof x === "string").slice(0, MAX_USERS)
-        : [];
+      let userIds: string[] = [];
+      let truncated = false;
+      let filterTotal = 0;
+      if (body.filter && typeof body.filter === "object") {
+        const resolved = await resolveUserIdsFromFilter(body.filter);
+        userIds = resolved.userIds;
+        truncated = resolved.truncated;
+        filterTotal = resolved.total;
+      } else if (Array.isArray(body.userIds)) {
+        userIds = body.userIds
+          .filter((x): x is string => typeof x === "string")
+          .slice(0, MAX_USERS);
+      }
       const addTags = normalize(body.add);
       const removeTags = normalize(body.remove);
 
@@ -78,9 +90,16 @@ export const POST = withRateLimit(
         metadata: { bulk: "tag", count: updated, add: addTags, remove: removeTags },
       });
 
-      logInfo("ADMIN", "bulk_tag", { updated, add: addTags, remove: removeTags });
+      logInfo("ADMIN", "bulk_tag", { updated, add: addTags, remove: removeTags, fromFilter: !!body.filter });
 
-      return NextResponse.json({ success: true, updated, add: addTags, remove: removeTags });
+      return NextResponse.json({
+        success: true,
+        updated,
+        add: addTags,
+        remove: removeTags,
+        truncated,
+        filterTotal,
+      });
     } catch (error) {
       logError("ADMIN", error, { route: "POST /api/admin/users/bulk-tag" });
       return NextResponse.json({ error: "BULK_TAG_FAILED" }, { status: 500 });

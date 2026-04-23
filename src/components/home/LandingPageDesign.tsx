@@ -169,20 +169,21 @@ export default function LandingPageDesign() {
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link
-                  href="/signup"
+                  href="/app"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-linear-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-fuchsia-500/25 hover:shadow-fuchsia-500/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
                 >
-                  Empieza gratis <ArrowRight className="w-4 h-4" />
+                  Empieza a escribir <ArrowRight className="w-4 h-4" />
                 </Link>
-                <button
-                  onClick={() =>
-                    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })
-                  }
+                <Link
+                  href="/signup"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-zinc-300 border border-zinc-700 hover:border-zinc-500 hover:text-white hover:bg-zinc-800/50 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
                 >
-                  Ver cómo funciona
-                </button>
+                  Crear cuenta para guardar progreso
+                </Link>
               </div>
+              <p className="text-xs text-zinc-500 -mt-4">
+                Sin registro. Sin email. Escribe y ya.
+              </p>
 
               {/* Social proof */}
               <div className="flex items-center gap-4 pt-2">
@@ -324,12 +325,15 @@ export default function LandingPageDesign() {
           <p className="text-lg text-zinc-300 leading-relaxed">
             Tres mil millones de latidos en una vida. ¿Cuántos ya pasaron sin sentirlos?
           </p>
-          <div className="pt-2">
+          <div className="pt-2 flex flex-col items-center gap-3">
             <Link
-              href="/signup"
+              href="/app"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-white bg-linear-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-fuchsia-500/25 hover:shadow-fuchsia-500/40 text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
             >
               Empieza a latir diferente <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link href="/signup" className="text-sm text-zinc-400 hover:text-zinc-200 underline underline-offset-4">
+              O crea una cuenta para guardar tu progreso
             </Link>
           </div>
           <p className="text-xs text-zinc-500">

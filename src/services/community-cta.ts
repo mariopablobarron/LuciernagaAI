@@ -45,7 +45,7 @@ export async function resolveCommunityCta(params: {
   const now = params.options?.now ?? new Date();
 
   if (crisisMode) return null;
-  if (isCtaInCooldown(userId, now)) return null;
+  if (isCtaInCooldown(userId, "recurrent_blocker", now)) return null;
 
   try {
     const signal = await detectRecurrentState(userId, { now });
@@ -61,7 +61,7 @@ export async function resolveCommunityCta(params: {
     });
     if (!space || !space.isActive) return null;
 
-    markCtaShown(userId, now);
+    markCtaShown(userId, "recurrent_blocker", now);
 
     return {
       kind: "recurrent_blocker",

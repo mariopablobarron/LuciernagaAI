@@ -58,6 +58,7 @@ import {
 import { describeTransformationPhase, inferTransformationPhase } from "@/services/transformation";
 import { getUserSessionProfile } from "@/services/user";
 import { resolveCommunityCta, type CommunityCtaAction } from "@/services/community-cta";
+import { resolveAskCommunityCta, type AskCommunityCtaAction } from "@/services/ask-community-cta";
 import { isCrisisInterventionMessage, isCrisisLevel, mapRiskLevelToCrisisCount } from "./analyze";
 import type { FlowContext } from "./types";
 
@@ -174,8 +175,8 @@ export type EnrichResult = {
   conversionTrigger: boolean;
   captureEmailRecommended: boolean;
 
-  // Community CTA (null unless recurrent-blocker signal fires)
-  communityCTA: CommunityCtaAction | null;
+  // Community CTA (null unless a recurrent-blocker or ask-community signal fires)
+  communityCTA: CommunityCtaAction | AskCommunityCtaAction | null;
 };
 
 // ─── Main phase function ──────────────────────────────────────────────────────
@@ -656,9 +657,15 @@ export async function enrichContext(input: EnrichInput): Promise<EnrichResult> {
   }
 
   // Community CTA — only when DB is available; fails closed on any error.
-  const communityCTA = persistenceAvailable
-    ? await resolveCommunityCta({ userId, crisisMode })
-    : null;
+  // Priority: recurrent-blocker (weekly pattern) over ask-community (per-turn).
+  // Only one CTA per turn to avoid noise in the chat.
+  let communityCTA: CommunityCtaAction | AskCommunityCtaAction | null = null;
+  if (persistenceAvailable) {
+    communityCTA = await resolveCommunityCta({ userId, crisisMode });
+    if (!communityCTA) {
+      communityCTA = resolveAskCommunityCta({ userId, message, crisisMode });
+    }
+  }
 
   return {
     persistenceAvailable,

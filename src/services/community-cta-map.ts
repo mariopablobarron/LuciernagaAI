@@ -25,28 +25,48 @@ export function getCommunityCtaForState(state: UserState): CommunityCtaTarget | 
   return STATE_TO_CTA[state] ?? null;
 }
 
-// ── Cooldown (in-memory, 7 days) ──────────────────────────────────────────
+// ── Cooldown (in-memory, per CTA kind) ────────────────────────────────────
 // Fail-open on process restart: if the server restarts, cooldowns reset and a
 // user may see the CTA a second time. Acceptable for this iteration; move to
 // DB-backed log before heavy rollout if CTR measurement becomes critical.
+//
+// Each kind has its own TTL because they serve different purposes:
+//  - recurrent_blocker: weekly pattern → 7 days
+//  - ask_community:     per-turn hint → 3 days (allow re-surface once the
+//                       user cools off from the first dismissal)
 
-const COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
-const lastShownByUser = new Map<string, number>();
+export type CtaKind = "recurrent_blocker" | "ask_community";
 
-export function isCtaInCooldown(userId: string, now: Date = new Date()): boolean {
-  const last = lastShownByUser.get(userId);
+const COOLDOWN_MS_BY_KIND: Record<CtaKind, number> = {
+  recurrent_blocker: 7 * 24 * 60 * 60 * 1000,
+  ask_community: 3 * 24 * 60 * 60 * 1000,
+};
+
+const lastShownByUserAndKind = new Map<string, number>();
+const keyOf = (userId: string, kind: CtaKind) => `${kind}:${userId}`;
+
+export function isCtaInCooldown(
+  userId: string,
+  kind: CtaKind = "recurrent_blocker",
+  now: Date = new Date(),
+): boolean {
+  const last = lastShownByUserAndKind.get(keyOf(userId, kind));
   if (last === undefined) return false;
-  if (now.getTime() - last >= COOLDOWN_MS) {
-    lastShownByUser.delete(userId);
+  if (now.getTime() - last >= COOLDOWN_MS_BY_KIND[kind]) {
+    lastShownByUserAndKind.delete(keyOf(userId, kind));
     return false;
   }
   return true;
 }
 
-export function markCtaShown(userId: string, now: Date = new Date()): void {
-  lastShownByUser.set(userId, now.getTime());
+export function markCtaShown(
+  userId: string,
+  kind: CtaKind = "recurrent_blocker",
+  now: Date = new Date(),
+): void {
+  lastShownByUserAndKind.set(keyOf(userId, kind), now.getTime());
 }
 
 export function resetCtaCooldownForTests(): void {
-  lastShownByUser.clear();
+  lastShownByUserAndKind.clear();
 }

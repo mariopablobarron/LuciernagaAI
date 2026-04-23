@@ -173,6 +173,23 @@ export default function CommunityPage() {
 
   useEffect(() => { void fetchData(tab); }, [tab, fetchData]);
 
+  // Deep-link: /community?tab=questions&prefill=<text> arrives from the
+  // mentor chat CTA. Select the tab and pre-fill the "pedir ayuda" textarea.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const requestedTab = params.get("tab");
+    const prefill = params.get("prefill");
+    if (requestedTab === "questions") setTab("questions");
+    if (prefill) setQuestionText(prefill);
+    if (requestedTab || prefill) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("tab");
+      url.searchParams.delete("prefill");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     (async () => {

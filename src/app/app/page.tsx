@@ -172,14 +172,24 @@ export default function HomePage() {
   const [captureEmailRecommended, setCaptureEmailRecommended] = useState(false);
   const [captureEmailPrompt, setCaptureEmailPrompt] = useState<string | null>(null);
   const [captureDialogOpen, setCaptureDialogOpen] = useState(false);
-  const [communityCta, setCommunityCta] = useState<{
-    kind: "recurrent_blocker";
-    state: string;
-    spaceSlug: string;
-    href: string;
-    label: string;
-    reason: string;
-  } | null>(null);
+  const [communityCta, setCommunityCta] = useState<
+    | {
+        kind: "recurrent_blocker";
+        state: string;
+        spaceSlug: string;
+        href: string;
+        label: string;
+        reason: string;
+      }
+    | {
+        kind: "ask_community";
+        href: string;
+        label: string;
+        reason: string;
+        suggestedQuestion: string;
+      }
+    | null
+  >(null);
   const [sessionReady, setSessionReady] = useState(false);
   const [streakDays, setStreakDays] = useState(0);
   const [sessionLoading, setSessionLoading] = useState(true);
@@ -1502,18 +1512,32 @@ export default function HomePage() {
 
         const sseActions = Array.isArray(ssePayload.actions) ? ssePayload.actions : [];
         const sseCommunityCtaPayload = sseActions.find(
-          (a: unknown): a is Record<string, unknown> =>
-            typeof a === "object" && a !== null && (a as Record<string, unknown>).kind === "recurrent_blocker"
+          (a: unknown): a is Record<string, unknown> => {
+            if (typeof a !== "object" || a === null) return false;
+            const k = (a as Record<string, unknown>).kind;
+            return k === "recurrent_blocker" || k === "ask_community";
+          },
         );
         if (sseCommunityCtaPayload) {
-          setCommunityCta({
-            kind: "recurrent_blocker",
-            state: String(sseCommunityCtaPayload.state ?? ""),
-            spaceSlug: String(sseCommunityCtaPayload.spaceSlug ?? ""),
-            href: String(sseCommunityCtaPayload.href ?? "/community"),
-            label: String(sseCommunityCtaPayload.label ?? "Entrar a la comunidad"),
-            reason: String(sseCommunityCtaPayload.reason ?? ""),
-          });
+          const kind = String(sseCommunityCtaPayload.kind);
+          if (kind === "ask_community") {
+            setCommunityCta({
+              kind: "ask_community",
+              href: String(sseCommunityCtaPayload.href ?? "/community"),
+              label: String(sseCommunityCtaPayload.label ?? "Llevarlo a la comunidad"),
+              reason: String(sseCommunityCtaPayload.reason ?? ""),
+              suggestedQuestion: String(sseCommunityCtaPayload.suggestedQuestion ?? ""),
+            });
+          } else {
+            setCommunityCta({
+              kind: "recurrent_blocker",
+              state: String(sseCommunityCtaPayload.state ?? ""),
+              spaceSlug: String(sseCommunityCtaPayload.spaceSlug ?? ""),
+              href: String(sseCommunityCtaPayload.href ?? "/community"),
+              label: String(sseCommunityCtaPayload.label ?? "Entrar a la comunidad"),
+              reason: String(sseCommunityCtaPayload.reason ?? ""),
+            });
+          }
         }
 
         setConversations((previous) => {
@@ -1677,18 +1701,32 @@ export default function HomePage() {
 
       const jsonActions = Array.isArray(payload.actions) ? payload.actions : [];
       const jsonCommunityCtaPayload = jsonActions.find(
-        (a: unknown): a is Record<string, unknown> =>
-          typeof a === "object" && a !== null && (a as Record<string, unknown>).kind === "recurrent_blocker"
+        (a: unknown): a is Record<string, unknown> => {
+          if (typeof a !== "object" || a === null) return false;
+          const k = (a as Record<string, unknown>).kind;
+          return k === "recurrent_blocker" || k === "ask_community";
+        },
       );
       if (jsonCommunityCtaPayload) {
-        setCommunityCta({
-          kind: "recurrent_blocker",
-          state: String(jsonCommunityCtaPayload.state ?? ""),
-          spaceSlug: String(jsonCommunityCtaPayload.spaceSlug ?? ""),
-          href: String(jsonCommunityCtaPayload.href ?? "/community"),
-          label: String(jsonCommunityCtaPayload.label ?? "Entrar a la comunidad"),
-          reason: String(jsonCommunityCtaPayload.reason ?? ""),
-        });
+        const kind = String(jsonCommunityCtaPayload.kind);
+        if (kind === "ask_community") {
+          setCommunityCta({
+            kind: "ask_community",
+            href: String(jsonCommunityCtaPayload.href ?? "/community"),
+            label: String(jsonCommunityCtaPayload.label ?? "Llevarlo a la comunidad"),
+            reason: String(jsonCommunityCtaPayload.reason ?? ""),
+            suggestedQuestion: String(jsonCommunityCtaPayload.suggestedQuestion ?? ""),
+          });
+        } else {
+          setCommunityCta({
+            kind: "recurrent_blocker",
+            state: String(jsonCommunityCtaPayload.state ?? ""),
+            spaceSlug: String(jsonCommunityCtaPayload.spaceSlug ?? ""),
+            href: String(jsonCommunityCtaPayload.href ?? "/community"),
+            label: String(jsonCommunityCtaPayload.label ?? "Entrar a la comunidad"),
+            reason: String(jsonCommunityCtaPayload.reason ?? ""),
+          });
+        }
       }
 
       console.info("[CHAT_UI] send_succeeded", {

@@ -85,15 +85,24 @@ export type ChatProps = {
   onCaptureEmail?: (email: string) => Promise<void> | void;
   /** Called when user dismisses the inline signup prompt. */
   onDismissSignupPrompt?: (messageId: string) => void;
-  /** Inline Community CTA triggered by recurrent emotional state. */
-  communityCta?: {
-    kind: "recurrent_blocker";
-    state: string;
-    spaceSlug: string;
-    href: string;
-    label: string;
-    reason: string;
-  } | null;
+  /** Inline Community CTA triggered by the mentor pipeline. */
+  communityCta?:
+    | {
+        kind: "recurrent_blocker";
+        state: string;
+        spaceSlug: string;
+        href: string;
+        label: string;
+        reason: string;
+      }
+    | {
+        kind: "ask_community";
+        href: string;
+        label: string;
+        reason: string;
+        suggestedQuestion: string;
+      }
+    | null;
   /** Called when the user dismisses the inline Community CTA. */
   onDismissCommunityCta?: () => void;
   /** Id of the currently active mentor mode, or null if none. */
@@ -940,11 +949,14 @@ export default function Chat({
               </div>
             )}
 
-            {/* Community CTA — shown when mentor detects a recurrent emotional state. */}
+            {/* Community CTA — shown when mentor detects a recurrent pattern
+                 or a question the community could help with. */}
             {!loading && communityCta && (
               <div className="mx-1 rounded-2xl border border-violet-500/30 bg-gradient-to-br from-violet-500/5 to-fuchsia-500/5 p-4 space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <p className="text-xs text-violet-300 font-semibold uppercase tracking-wide">
-                  Sugerencia del mentor
+                  {communityCta.kind === "ask_community"
+                    ? "¿Y si lo consultas con quienes ya han pasado por ahí?"
+                    : "Sugerencia del mentor"}
                 </p>
                 <p className="text-sm text-zinc-200">{communityCta.reason}</p>
                 <div className="flex items-center gap-2 pt-1">

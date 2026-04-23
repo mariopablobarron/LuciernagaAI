@@ -82,6 +82,9 @@ export type PipelineContext = {
   // Coach context (built in phase 4)
   coachContext: Record<string, unknown> | null;
 
-  // Community CTA (null unless recurrent-blocker signal fires in enrich)
-  communityCTA: import("@/services/community-cta").CommunityCtaAction | null;
+  // Community CTA (null unless a recurrent-blocker or ask-community signal fires)
+  communityCTA:
+    | import("@/services/community-cta").CommunityCtaAction
+    | import("@/services/ask-community-cta").AskCommunityCtaAction
+    | null;
 };

@@ -17,6 +17,7 @@ import Sidebar, { type SidebarConversation } from "@/components/Sidebar";
 import { UserInterventionsBanner } from "@/components/UserInterventionsBanner";
 import WeeklyLetterBanner from "@/components/WeeklyLetterBanner";
 import NameCaptureModal from "@/components/NameCaptureModal";
+import CommunityForYouBanner from "@/components/CommunityForYouBanner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -1893,6 +1894,7 @@ export default function HomePage() {
                 setWorkspaceTab("chat");
               }}
             />
+            <CommunityForYouBanner />
           </>
         }
         sidebar={

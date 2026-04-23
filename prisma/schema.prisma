@@ -128,6 +128,7 @@ model User {
   goalAvatarVideos          GoalAvatarVideo[]
   broadcastAvatarDeliveries BroadcastAvatarDelivery[]
   usageSessions             UsageSession[]
+  weeklyLetters             WeeklyLetter[]
   dailyRoundResponses       DailyRoundResponse[]
   dailyRoundReactions       DailyRoundReaction[]
   dailyRoundMirrors         DailyRoundMirror[]
@@ -394,6 +395,31 @@ model UsageSession {
   @@index([endedAt])
 }
 
+/// Weekly letter from the mentor — a short reflective piece generated each
+/// Sunday from the user's own messages of that week. Lives in-app only; an
+/// optional email notification (no content) can nudge the user to come read it.
+model WeeklyLetter {
+  id              String    @id @default(cuid())
+  userId          String
+  weekStart       DateTime // Monday 00:00 UTC of the covered week
+  weekEnd         DateTime // Sunday 23:59 UTC of the covered week
+  subject         String
+  body            String    @db.Text
+  quotes          Json // textual quotes extracted from the user's messages
+  state           String // dominant UserState in the window
+  published       Boolean   @default(true) // false when generated in dry-run — not shown to user
+  skippedReason   String? // if null and not published → generated but withheld by admin
+  emailNotifiedAt DateTime? // when the email notification was sent (null if not yet or disabled)
+  readAt          DateTime?
+  openedAt        DateTime?
+  createdAt       DateTime  @default(now())
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, weekStart])
+  @@index([userId, readAt])
+  @@index([published, createdAt])
+}
+
 model CrisisEvent {
   id        String   @id @default(cuid())
   userId    String
@@ -658,20 +684,22 @@ model ActionReminder {
 
 /// Per-user app preferences.
 model UserPreferences {
-  id                  String   @id @default(cuid())
-  userId              String   @unique
-  aiTone              String   @default("directo") // "directo" | "socratico" | "calido"
-  reminderTime        String? // "HH:MM" local time for daily check-in nudge
-  reminderEnabled     Boolean  @default(true)
-  weeklyEmailEnabled  Boolean  @default(true)
-  notifyInsights      Boolean  @default(true)
-  notifyGoals         Boolean  @default(true)
-  notifyUpdates       Boolean  @default(false)
-  avatarVideosEnabled Boolean  @default(true) // opt-out for weekly avatar videos
-  timezone            String   @default("Europe/Madrid")
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                        String   @id @default(cuid())
+  userId                    String   @unique
+  aiTone                    String   @default("directo") // "directo" | "socratico" | "calido"
+  reminderTime              String? // "HH:MM" local time for daily check-in nudge
+  reminderEnabled           Boolean  @default(true)
+  weeklyEmailEnabled        Boolean  @default(true)
+  notifyInsights            Boolean  @default(true)
+  notifyGoals               Boolean  @default(true)
+  notifyUpdates             Boolean  @default(false)
+  avatarVideosEnabled       Boolean  @default(true) // opt-out for weekly avatar videos
+  weeklyLetterDisabled      Boolean  @default(false) // opt-out for the in-app weekly letter
+  weeklyLetterEmailDisabled Boolean  @default(false) // opt-out only for the email notification; letter still appears in-app
+  timezone                  String   @default("Europe/Madrid")
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+  user                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // ─── System Admin Users (RBAC) ────────────────────────────────────────────────

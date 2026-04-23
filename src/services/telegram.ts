@@ -234,18 +234,23 @@ export async function sendAdminDocument(
   buffer: Buffer | Uint8Array,
   filename: string,
   caption?: string,
-): Promise<boolean> {
+): Promise<{ ok: boolean; error?: string }> {
   const adminChatId = process.env.ADMIN_TELEGRAM_ID?.trim();
-  if (!adminChatId) return false;
+  if (!adminChatId) {
+    logError("TELEGRAM", new Error("ADMIN_TELEGRAM_ID_missing"), { stage: "sendAdminDocument" });
+    return { ok: false, error: "ADMIN_TELEGRAM_ID not set" };
+  }
 
   const adminToken = process.env.TELEGRAM_BOT_TOKEN_ADMIN?.trim();
   const token = adminToken || process.env.TELEGRAM_BOT_TOKEN?.trim();
-  if (!token) return false;
+  if (!token) {
+    logError("TELEGRAM", new Error("TELEGRAM_BOT_TOKEN_missing"), { stage: "sendAdminDocument" });
+    return { ok: false, error: "TELEGRAM_BOT_TOKEN not set" };
+  }
 
   const form = new FormData();
   form.append("chat_id", adminChatId);
   if (caption) form.append("caption", caption);
-  // Blob + filename keeps compatibility with Node's FormData implementation.
   form.append(
     "document",
     new Blob([new Uint8Array(buffer)], { type: "application/gzip" }),
@@ -256,11 +261,20 @@ export async function sendAdminDocument(
     const res = await fetch(`${TELEGRAM_NOTIFY_BASE}/bot${token}/sendDocument`, {
       method: "POST",
       body: form,
-      // No timeout wrapper — document uploads can be slow; default fetch is fine.
     });
-    return res.ok;
-  } catch {
-    return false;
+    if (res.ok) return { ok: true };
+    const bodyText = await res.text().catch(() => "");
+    const error = `Telegram HTTP ${res.status}: ${bodyText.slice(0, 300)}`;
+    logError("TELEGRAM", new Error(error), {
+      stage: "sendAdminDocument",
+      tokenSource: adminToken ? "admin" : "main",
+      chatIdLength: adminChatId.length,
+    });
+    return { ok: false, error };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : String(err);
+    logError("TELEGRAM", err, { stage: "sendAdminDocument_fetch_threw" });
+    return { ok: false, error };
   }
 }
 

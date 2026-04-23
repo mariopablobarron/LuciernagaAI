@@ -120,13 +120,25 @@ export async function GET(req: NextRequest) {
     // Manual admin UI invocation still gets the gzipped file as a download.
     if (hasCronSecret) {
       const caption = `Backup ${timestamp} — ${sizeKb} KB · ${tables.length} tablas · ${totalRows} filas`;
-      const delivered = await sendAdminDocument(compressed, filename, caption);
+      const delivery = await sendAdminDocument(compressed, filename, caption);
 
-      if (!delivered) {
-        notifyAdmin(`❌ Backup generado pero no se pudo subir a Telegram: ${filename} (${sizeKb} KB)`);
-        logError("BACKUP", new Error("telegram_upload_failed"), { filename, sizeKb });
+      if (!delivery.ok) {
+        notifyAdmin(
+          `❌ Backup generado pero no se pudo subir a Telegram: ${filename} (${sizeKb} KB) — ${delivery.error ?? "unknown"}`,
+        );
+        logError("BACKUP", new Error(delivery.error ?? "telegram_upload_failed"), {
+          filename,
+          sizeKb,
+          stage: "telegram_upload",
+        });
         return NextResponse.json(
-          { ok: false, error: "telegram_upload_failed", filename, sizeKb },
+          {
+            ok: false,
+            error: "telegram_upload_failed",
+            telegramError: delivery.error ?? null,
+            filename,
+            sizeKb,
+          },
           { status: 500 },
         );
       }

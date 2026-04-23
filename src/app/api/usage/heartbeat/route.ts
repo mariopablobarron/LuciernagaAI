@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { resolveIdentity } from "@/lib/auth";
 import { logError } from "@/lib/logger";
+import { isInternalAccount } from "@/lib/team-emails";
 
 export const dynamic = "force-dynamic";
 
@@ -47,12 +48,18 @@ export async function POST(req: NextRequest) {
     const prisma = getPrismaClient();
     const now = new Date();
 
-    // Filtro server-side: no trackeamos admins/superadmins ni cuentas borradas
+    // Filtro server-side: no trackeamos admins/superadmins, cuentas borradas
+    // ni cuentas internas (equipo / prueba) aunque tengan role "user".
     const actor = await prisma.user.findUnique({
       where: { id: identity.userId },
-      select: { role: true, deletedAt: true },
+      select: { role: true, deletedAt: true, email: true, name: true },
     });
-    if (!actor || actor.deletedAt || !TRACKED_ROLES.has(actor.role)) {
+    if (
+      !actor ||
+      actor.deletedAt ||
+      !TRACKED_ROLES.has(actor.role) ||
+      isInternalAccount(actor.email, actor.name)
+    ) {
       return NextResponse.json({ ok: true, skipped: true });
     }
 

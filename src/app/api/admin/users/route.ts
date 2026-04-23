@@ -3,6 +3,7 @@ import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
 import { isSyntheticEmail } from "@/services/user";
+import { isTeamEmail, isTestEmail } from "@/lib/team-emails";
 
 export const dynamic = "force-dynamic";
 
@@ -13,34 +14,15 @@ export type UserKind =
   | "test"
   | "team";
 
-const TEAM_DOMAINS = ["@startidea.es"];
-const TEAM_EMAILS = new Set([
-  "mariopablobarron@gmail.com",
-  "angelastartidea@gmail.com",
-]);
-const TEST_EMAIL_DOMAINS = ["@yopmail.com", "@mailinator.com", "@example.com", "@example.org", "@test.com"];
-const TEST_PATTERNS = /(^|[._-])(test|debug|demo|qa|dummy|fake)([._-]|\d|$)/i;
-
 function classifyUser(params: {
   email: string;
   name: string | null;
   lastSeenMs: number;
   nowMs: number;
 }): UserKind {
-  const email = params.email.toLowerCase();
-  const name = (params.name ?? "").toLowerCase();
-
-  if (TEAM_EMAILS.has(email) || TEAM_DOMAINS.some((d) => email.endsWith(d))) {
-    return "team";
-  }
-  if (
-    TEST_EMAIL_DOMAINS.some((d) => email.endsWith(d)) ||
-    TEST_PATTERNS.test(email) ||
-    TEST_PATTERNS.test(name)
-  ) {
-    return "test";
-  }
-  if (isSyntheticEmail(email)) {
+  if (isTeamEmail(params.email)) return "team";
+  if (isTestEmail(params.email, params.name)) return "test";
+  if (isSyntheticEmail(params.email.toLowerCase())) {
     const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
     return params.nowMs - params.lastSeenMs < sevenDaysMs ? "anon-active" : "anon-dormant";
   }

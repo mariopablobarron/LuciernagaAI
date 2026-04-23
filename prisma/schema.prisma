@@ -128,6 +128,7 @@ model User {
   goalAvatarVideos          GoalAvatarVideo[]
   broadcastAvatarDeliveries BroadcastAvatarDelivery[]
   usageSessions             UsageSession[]
+  adminMessages             AdminMessage[]
   weeklyLetters             WeeklyLetter[]
   dailyRoundResponses       DailyRoundResponse[]
   dailyRoundReactions       DailyRoundReaction[]
@@ -393,6 +394,32 @@ model UsageSession {
   @@index([userId, startedAt])
   @@index([userId, lastPingAt])
   @@index([endedAt])
+}
+
+// ── Mensajes directos admin → usuario ────────────────────────────────────────
+// Superadmin escribe a un usuario desde /admin/users/[id]. Se envía email +
+// Notification in-app (canal "admin"). Estado tipo WhatsApp:
+//   sentAt       → siempre, cuando el admin pulsa enviar.
+//   deliveredAt  → cuando los canales (email, notification) quedan encolados
+//                  OK → 1 tick gris en la UI del admin.
+//   readAt       → cuando el usuario abre la notificación in-app o el pixel
+//                  del email se dispara → 2 ticks verdes.
+model AdminMessage {
+  id             String    @id @default(cuid())
+  userId         String
+  createdByAdmin String? // id opaco del admin emisor (auditoría)
+  subject        String
+  body           String    @db.Text
+  channels       String    @default("in_app,email") // CSV: "in_app" | "email"
+  sentAt         DateTime  @default(now())
+  deliveredAt    DateTime?
+  readAt         DateTime?
+  notificationId String? // id de Notification creada; null si no se pudo
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, sentAt])
+  @@index([createdByAdmin, sentAt])
+  @@index([readAt])
 }
 
 /// Weekly letter from the mentor — a short reflective piece generated each

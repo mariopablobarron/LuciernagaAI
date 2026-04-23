@@ -224,6 +224,13 @@ export default function AdminUsersPage() {
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkAction, setBulkAction] = useState(false);
+  const [bulkModal, setBulkModal] = useState<null | "tag" | "plan" | "email">(null);
+  const [bulkTagAdd, setBulkTagAdd] = useState("");
+  const [bulkTagRemove, setBulkTagRemove] = useState("");
+  const [bulkPlan, setBulkPlan] = useState<"free" | "pro">("free");
+  const [bulkPlanReason, setBulkPlanReason] = useState("");
+  const [bulkEmailSubject, setBulkEmailSubject] = useState("");
+  const [bulkEmailBody, setBulkEmailBody] = useState("");
 
   function toggleSelect(id: string) {
     setSelected((prev) => {
@@ -280,6 +287,121 @@ export default function AdminUsersPage() {
     a.click();
     URL.revokeObjectURL(url);
     toast.success(`${selectedUsers.length} usuario(s) exportado(s)`);
+  }
+
+  async function handleBulkTag() {
+    if (selected.size === 0) return;
+    const add = bulkTagAdd
+      .split(",")
+      .map((t) => t.trim().toLowerCase())
+      .filter(Boolean);
+    const remove = bulkTagRemove
+      .split(",")
+      .map((t) => t.trim().toLowerCase())
+      .filter(Boolean);
+    if (add.length === 0 && remove.length === 0) {
+      toast.error("Añade al menos un tag para añadir o quitar.");
+      return;
+    }
+    setBulkAction(true);
+    try {
+      const res = await fetch("/api/admin/users/bulk-tag", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userIds: Array.from(selected), add, remove }),
+      });
+      const payload = (await res.json().catch(() => ({}))) as { updated?: number };
+      if (!res.ok) throw new Error("bulk_tag_failed");
+      toast.success(`${payload.updated ?? 0} usuario(s) actualizados`);
+      setBulkModal(null);
+      setBulkTagAdd("");
+      setBulkTagRemove("");
+      setSelected(new Set());
+      void fetchUsers();
+    } catch {
+      toast.error("No se pudo aplicar el tag masivo.");
+    } finally {
+      setBulkAction(false);
+    }
+  }
+
+  async function handleBulkChangePlan() {
+    if (selected.size === 0) return;
+    if (bulkPlanReason.trim().length < 10) {
+      toast.error("Motivo requerido (mínimo 10 caracteres).");
+      return;
+    }
+    const confirmed = window.confirm(
+      `¿Cambiar plan de ${selected.size} usuario(s) a ${bulkPlan}?\nEsta acción afecta facturación.`,
+    );
+    if (!confirmed) return;
+    setBulkAction(true);
+    try {
+      const res = await fetch("/api/admin/users/bulk-change-plan", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userIds: Array.from(selected),
+          plan: bulkPlan,
+          reason: bulkPlanReason.trim(),
+        }),
+      });
+      const payload = (await res.json().catch(() => ({}))) as { updated?: number };
+      if (!res.ok) throw new Error("bulk_plan_failed");
+      toast.success(`${payload.updated ?? 0} usuario(s) con plan ${bulkPlan}`);
+      setBulkModal(null);
+      setBulkPlanReason("");
+      setSelected(new Set());
+      void fetchUsers();
+    } catch {
+      toast.error("No se pudo cambiar el plan en masa.");
+    } finally {
+      setBulkAction(false);
+    }
+  }
+
+  async function handleBulkEmail() {
+    if (selected.size === 0) return;
+    if (!bulkEmailSubject.trim() || !bulkEmailBody.trim()) {
+      toast.error("Asunto y cuerpo obligatorios.");
+      return;
+    }
+    const confirmed = window.confirm(
+      `¿Enviar email a ${selected.size} usuario(s)?\nLos anónimos sin email real se saltan automáticamente.`,
+    );
+    if (!confirmed) return;
+    setBulkAction(true);
+    try {
+      const res = await fetch("/api/admin/users/bulk-email", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userIds: Array.from(selected),
+          subject: bulkEmailSubject.trim(),
+          body: bulkEmailBody.trim(),
+        }),
+      });
+      const payload = (await res.json().catch(() => ({}))) as {
+        sent?: number;
+        skipped?: number;
+        failures?: number;
+      };
+      if (!res.ok) throw new Error("bulk_email_failed");
+      toast.success(
+        `Enviados ${payload.sent ?? 0} · Saltados ${payload.skipped ?? 0} · Fallos ${payload.failures ?? 0}`,
+      );
+      setBulkModal(null);
+      setBulkEmailSubject("");
+      setBulkEmailBody("");
+      setSelected(new Set());
+    } catch {
+      toast.error("No se pudo enviar el email en masa.");
+    } finally {
+      setBulkAction(false);
+    }
   }
 
   async function fetchUsers(signal?: AbortSignal) {
@@ -733,12 +855,30 @@ export default function AdminUsersPage() {
               <span className="text-xs font-semibold text-violet-300">
                 {selected.size} seleccionado{selected.size > 1 ? "s" : ""}
               </span>
-              <div className="flex gap-2 ml-auto">
+              <div className="flex flex-wrap gap-2 ml-auto">
                 <button
                   onClick={handleBulkExport}
                   className="flex items-center gap-1.5 rounded-lg border border-zinc-700 px-3 py-1.5 text-xs text-zinc-300 hover:bg-zinc-800 transition-colors"
                 >
                   <Download className="h-3 w-3" /> Exportar CSV
+                </button>
+                <button
+                  onClick={() => setBulkModal("tag")}
+                  className="flex items-center gap-1.5 rounded-lg border border-violet-500/30 px-3 py-1.5 text-xs text-violet-300 hover:bg-violet-500/10 transition-colors"
+                >
+                  Etiquetas
+                </button>
+                <button
+                  onClick={() => setBulkModal("plan")}
+                  className="flex items-center gap-1.5 rounded-lg border border-amber-500/30 px-3 py-1.5 text-xs text-amber-300 hover:bg-amber-500/10 transition-colors"
+                >
+                  Cambiar plan
+                </button>
+                <button
+                  onClick={() => setBulkModal("email")}
+                  className="flex items-center gap-1.5 rounded-lg border border-cyan-500/30 px-3 py-1.5 text-xs text-cyan-300 hover:bg-cyan-500/10 transition-colors"
+                >
+                  Enviar email
                 </button>
                 <button
                   onClick={handleBulkDelete}
@@ -978,6 +1118,125 @@ export default function AdminUsersPage() {
               Siguiente
               <ChevronRight className="h-3.5 w-3.5" />
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk modals */}
+      {bulkModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+          onClick={() => !bulkAction && setBulkModal(null)}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl border border-zinc-700 bg-zinc-950 p-5 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div>
+              <p className="text-sm font-semibold text-white">
+                {bulkModal === "tag" && `Editar etiquetas · ${selected.size} usuario(s)`}
+                {bulkModal === "plan" && `Cambiar plan · ${selected.size} usuario(s)`}
+                {bulkModal === "email" && `Enviar email · ${selected.size} usuario(s)`}
+              </p>
+              <p className="mt-1 text-xs text-zinc-500">
+                {bulkModal === "tag" && "Separa varias etiquetas por coma. Minúsculas, guiones."}
+                {bulkModal === "plan" && "El motivo queda registrado en el audit log. Cambiar a Pro afecta facturación."}
+                {bulkModal === "email" && "Se envía solo a usuarios con email real y activo."}
+              </p>
+            </div>
+
+            {bulkModal === "tag" && (
+              <div className="space-y-3">
+                <label className="block text-xs text-zinc-400">
+                  Añadir
+                  <input
+                    value={bulkTagAdd}
+                    onChange={(e) => setBulkTagAdd(e.target.value)}
+                    placeholder="vip, beta, onboarding"
+                    className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100"
+                  />
+                </label>
+                <label className="block text-xs text-zinc-400">
+                  Quitar
+                  <input
+                    value={bulkTagRemove}
+                    onChange={(e) => setBulkTagRemove(e.target.value)}
+                    placeholder="deprecated, churn"
+                    className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100"
+                  />
+                </label>
+              </div>
+            )}
+
+            {bulkModal === "plan" && (
+              <div className="space-y-3">
+                <label className="block text-xs text-zinc-400">
+                  Plan
+                  <select
+                    value={bulkPlan}
+                    onChange={(e) => setBulkPlan(e.target.value as "free" | "pro")}
+                    className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100"
+                  >
+                    <option value="free">Free</option>
+                    <option value="pro">Pro</option>
+                  </select>
+                </label>
+                <label className="block text-xs text-zinc-400">
+                  Motivo (mín 10 caracteres)
+                  <textarea
+                    value={bulkPlanReason}
+                    onChange={(e) => setBulkPlanReason(e.target.value)}
+                    rows={3}
+                    className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100"
+                  />
+                </label>
+              </div>
+            )}
+
+            {bulkModal === "email" && (
+              <div className="space-y-3">
+                <label className="block text-xs text-zinc-400">
+                  Asunto
+                  <input
+                    value={bulkEmailSubject}
+                    onChange={(e) => setBulkEmailSubject(e.target.value)}
+                    className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100"
+                    maxLength={150}
+                  />
+                </label>
+                <label className="block text-xs text-zinc-400">
+                  Cuerpo
+                  <textarea
+                    value={bulkEmailBody}
+                    onChange={(e) => setBulkEmailBody(e.target.value)}
+                    rows={8}
+                    className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100"
+                    maxLength={5000}
+                  />
+                </label>
+              </div>
+            )}
+
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setBulkModal(null)}
+                disabled={bulkAction}
+                className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs text-zinc-300 hover:bg-zinc-800 disabled:opacity-40"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  if (bulkModal === "tag") void handleBulkTag();
+                  if (bulkModal === "plan") void handleBulkChangePlan();
+                  if (bulkModal === "email") void handleBulkEmail();
+                }}
+                disabled={bulkAction}
+                className="rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500 disabled:opacity-40"
+              >
+                {bulkAction ? "Procesando…" : "Confirmar"}
+              </button>
+            </div>
           </div>
         </div>
       )}

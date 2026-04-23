@@ -94,7 +94,10 @@ function isValidUserId(value: string): boolean {
 }
 
 function createGeneratedUserId(): string {
-  const raw = randomUUID().replace(/-/g, "").slice(0, 24);
+  // 8 bytes = 64 bits of entropy encoded as base64url (11 chars, no padding).
+  // Far beyond any realistic collision risk; keeps admin logs and synthetic
+  // emails readable (total ~28 chars instead of ~52).
+  const raw = randomBytes(8).toString("base64url");
   return `usr_${raw}`;
 }
 

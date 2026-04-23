@@ -32,7 +32,7 @@ describe("listEligibleUsers", () => {
       {
         id: "u1",
         name: "Mario",
-        email: "mario@example.com",
+        email: "persona@correo.com",
         emailVerified: true,
         preferences: { weeklyLetterEmailDisabled: false },
       },
@@ -49,7 +49,7 @@ describe("listEligibleUsers", () => {
       {
         userId: "u1",
         name: "Mario",
-        email: "mario@example.com",
+        email: "persona@correo.com",
         emailVerified: true,
         emailDisabled: false,
       },
@@ -68,7 +68,7 @@ describe("shouldSendNotification", () => {
   const base = {
     userId: "u1",
     name: "Mario",
-    email: "mario@example.com",
+    email: "persona@correo.com",
     emailVerified: true,
     emailDisabled: false,
   };

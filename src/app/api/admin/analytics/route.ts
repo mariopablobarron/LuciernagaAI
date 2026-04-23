@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { withRateLimit } from "@/lib/rate-limit";
+import { buildInternalUserExclusion, shouldExcludeInternal } from "@/lib/internal-users";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,12 @@ export const GET = withRateLimit(async function GET(req: NextRequest) {
   const since = new Date(now.getTime() - daysBack * 24 * 60 * 60 * 1000);
   const since7d = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const since14d = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+
+  // Exclude team/test accounts by default. Admin can opt-in with ?includeTeam=1.
+  const excludeInternal = shouldExcludeInternal(req);
+  const userIdFilter = await buildInternalUserExclusion({ excludeInternal });
+  const userWhereFilter = userIdFilter ? { id: userIdFilter } : {};
+  const userIdScoped = userIdFilter ? { userId: userIdFilter } : {};
 
   // ── Parallel queries ──
   const [
@@ -42,25 +49,25 @@ export const GET = withRateLimit(async function GET(req: NextRequest) {
     actionsTotal,
     actionsCompleted,
   ] = await Promise.all([
-    prisma.user.count(),
-    prisma.user.count({ where: { createdAt: { gte: since7d } } }),
-    prisma.user.count({ where: { createdAt: { gte: since14d, lt: since7d } } }),
-    prisma.message.count({ where: { createdAt: { gte: since7d }, role: "user" } }),
-    prisma.message.count({ where: { createdAt: { gte: since14d, lt: since7d }, role: "user" } }),
-    prisma.dailyCheckin.count({ where: { createdAt: { gte: since7d } } }),
-    prisma.dailyCheckin.count({ where: { createdAt: { gte: since14d, lt: since7d } } }),
-    prisma.user.findMany({ where: { createdAt: { gte: since } }, select: { createdAt: true }, orderBy: { createdAt: "asc" }, take: 50000 }),
-    prisma.message.findMany({ where: { createdAt: { gte: since }, role: "user" }, select: { createdAt: true }, orderBy: { createdAt: "asc" }, take: 50000 }),
-    prisma.dailyCheckin.findMany({ where: { createdAt: { gte: since } }, select: { createdAt: true }, orderBy: { createdAt: "asc" }, take: 50000 }),
-    prisma.conversation.count({ where: { createdAt: { gte: since7d } } }),
-    prisma.conversation.count({ where: { createdAt: { gte: since14d, lt: since7d } } }),
-    prisma.userState.groupBy({ by: ["state"], _count: { state: true } }),
-    prisma.subscription.groupBy({ by: ["plan", "status"], _count: { plan: true } }),
-    prisma.goal.count({ where: { status: "active" } }),
-    prisma.goal.count({ where: { status: "completed" } }),
-    prisma.goal.count({ where: { status: "abandoned" } }),
-    prisma.action.count(),
-    prisma.action.count({ where: { completed: true } }),
+    prisma.user.count({ where: userWhereFilter }),
+    prisma.user.count({ where: { ...userWhereFilter, createdAt: { gte: since7d } } }),
+    prisma.user.count({ where: { ...userWhereFilter, createdAt: { gte: since14d, lt: since7d } } }),
+    prisma.message.count({ where: { ...userIdScoped, createdAt: { gte: since7d }, role: "user" } }),
+    prisma.message.count({ where: { ...userIdScoped, createdAt: { gte: since14d, lt: since7d }, role: "user" } }),
+    prisma.dailyCheckin.count({ where: { ...userIdScoped, createdAt: { gte: since7d } } }),
+    prisma.dailyCheckin.count({ where: { ...userIdScoped, createdAt: { gte: since14d, lt: since7d } } }),
+    prisma.user.findMany({ where: { ...userWhereFilter, createdAt: { gte: since } }, select: { createdAt: true }, orderBy: { createdAt: "asc" }, take: 50000 }),
+    prisma.message.findMany({ where: { ...userIdScoped, createdAt: { gte: since }, role: "user" }, select: { createdAt: true }, orderBy: { createdAt: "asc" }, take: 50000 }),
+    prisma.dailyCheckin.findMany({ where: { ...userIdScoped, createdAt: { gte: since } }, select: { createdAt: true }, orderBy: { createdAt: "asc" }, take: 50000 }),
+    prisma.conversation.count({ where: { ...userIdScoped, createdAt: { gte: since7d } } }),
+    prisma.conversation.count({ where: { ...userIdScoped, createdAt: { gte: since14d, lt: since7d } } }),
+    prisma.userState.groupBy({ by: ["state"], where: userIdScoped, _count: { state: true } }),
+    prisma.subscription.groupBy({ by: ["plan", "status"], where: userIdScoped, _count: { plan: true } }),
+    prisma.goal.count({ where: { ...userIdScoped, status: "active" } }),
+    prisma.goal.count({ where: { ...userIdScoped, status: "completed" } }),
+    prisma.goal.count({ where: { ...userIdScoped, status: "abandoned" } }),
+    prisma.action.count({ where: userIdFilter ? { goal: { userId: userIdFilter } } : {} }),
+    prisma.action.count({ where: { completed: true, ...(userIdFilter ? { goal: { userId: userIdFilter } } : {}) } }),
   ]);
 
   // ── Daily trends (30 days) ──
@@ -103,25 +110,21 @@ export const GET = withRateLimit(async function GET(req: NextRequest) {
   }
 
   // ── Funnel (simplified) ──
-  const usersWithMessage = await prisma.message.findMany({
-    where: { role: "user" },
-    select: { conversationId: true },
-    distinct: ["conversationId"],
-    take: 50000,
-  });
   const usersWithGoal = await prisma.goal.findMany({
+    where: userIdScoped,
     select: { userId: true },
     distinct: ["userId"],
     take: 50000,
   });
   const usersWithCompletedAction = await prisma.action.findMany({
-    where: { completed: true },
+    where: { completed: true, ...(userIdFilter ? { goal: { userId: userIdFilter } } : {}) },
     select: { goal: { select: { userId: true } } },
     take: 50000,
   });
   const uniqueUsersWithCompletedAction = new Set(usersWithCompletedAction.map((a) => a.goal.userId)).size;
 
   const usersWithConvo = await prisma.conversation.findMany({
+    where: userIdScoped,
     select: { userId: true },
     distinct: ["userId"],
     take: 50000,
@@ -152,5 +155,9 @@ export const GET = withRateLimit(async function GET(req: NextRequest) {
       actionCompletionRate: actionsTotal > 0 ? Math.round((actionsCompleted / actionsTotal) * 100) : 0,
     },
     funnel,
+    meta: {
+      excludeInternal,
+      internalUserCount: userIdFilter?.notIn.length ?? 0,
+    },
   });
 }, { limit: 30 });

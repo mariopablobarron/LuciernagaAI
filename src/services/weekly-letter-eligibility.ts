@@ -1,4 +1,5 @@
 import { getPrismaClient } from "@/db/prisma";
+import { isTeamEmail, isTestEmail } from "@/lib/team-emails";
 
 export type WeeklyLetterCandidate = {
   userId: string;
@@ -50,13 +51,15 @@ export async function listEligibleUsers(params: {
     },
   });
 
-  return users.map((u) => ({
-    userId: u.id,
-    name: u.name,
-    email: u.email ?? null,
-    emailVerified: Boolean(u.emailVerified),
-    emailDisabled: Boolean(u.preferences?.weeklyLetterEmailDisabled),
-  }));
+  return users
+    .filter((u) => !isTeamEmail(u.email) && !isTestEmail(u.email, u.name))
+    .map((u) => ({
+      userId: u.id,
+      name: u.name,
+      email: u.email ?? null,
+      emailVerified: Boolean(u.emailVerified),
+      emailDisabled: Boolean(u.preferences?.weeklyLetterEmailDisabled),
+    }));
 }
 
 /**

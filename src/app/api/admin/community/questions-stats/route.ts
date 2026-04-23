@@ -3,6 +3,7 @@ import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { withRateLimit } from "@/lib/rate-limit";
 import { logError } from "@/lib/logger";
+import { buildInternalUserExclusion, shouldExcludeInternal } from "@/lib/internal-users";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +25,14 @@ type WindowStats = {
 async function computeWindow(
   prisma: ReturnType<typeof getPrismaClient>,
   since: Date,
+  userIdFilter: { notIn: string[] } | undefined,
 ): Promise<WindowStats> {
+  // Questions filter by authorId (null = anonymous, always counted).
+  const authorExclude = userIdFilter
+    ? { OR: [{ authorId: null }, { authorId: { notIn: userIdFilter.notIn } }] }
+    : {};
+  const answererExclude = userIdFilter ? { userId: userIdFilter } : {};
+
   const [
     questions,
     answers,
@@ -35,20 +43,20 @@ async function computeWindow(
     distinctAskers,
   ] = await Promise.all([
     prisma.anonQuestion.findMany({
-      where: { createdAt: { gte: since } },
+      where: { ...authorExclude, createdAt: { gte: since } },
       select: { id: true, _count: { select: { answers: true } } },
     }),
-    prisma.anonAnswer.count({ where: { createdAt: { gte: since }, hidden: false } }),
-    prisma.anonQuestion.count({ where: { createdAt: { gte: since }, crisisDetected: true } }),
-    prisma.anonQuestion.count({ where: { createdAt: { gte: since }, hidden: true } }),
-    prisma.anonAnswerVote.count({ where: { createdAt: { gte: since } } }),
+    prisma.anonAnswer.count({ where: { ...answererExclude, createdAt: { gte: since }, hidden: false } }),
+    prisma.anonQuestion.count({ where: { ...authorExclude, createdAt: { gte: since }, crisisDetected: true } }),
+    prisma.anonQuestion.count({ where: { ...authorExclude, createdAt: { gte: since }, hidden: true } }),
+    prisma.anonAnswerVote.count({ where: { ...answererExclude, createdAt: { gte: since } } }),
     prisma.anonAnswer.findMany({
-      where: { createdAt: { gte: since } },
+      where: { ...answererExclude, createdAt: { gte: since } },
       select: { userId: true },
       distinct: ["userId"],
     }),
     prisma.anonQuestion.findMany({
-      where: { createdAt: { gte: since }, authorId: { not: null } },
+      where: { ...authorExclude, createdAt: { gte: since }, authorId: { not: null } },
       select: { authorId: true },
       distinct: ["authorId"],
     }),
@@ -63,6 +71,7 @@ async function computeWindow(
 
   const answersWithVotes = await prisma.anonAnswer.count({
     where: {
+      ...answererExclude,
       createdAt: { gte: since },
       votes: { some: {} },
     },
@@ -95,17 +104,24 @@ export const GET = withRateLimit(async function GET(req: NextRequest) {
     const d7 = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const d30 = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
+    const excludeInternal = shouldExcludeInternal(req);
+    const userIdFilter = await buildInternalUserExclusion({ excludeInternal });
+    const authorExclude = userIdFilter
+      ? { OR: [{ authorId: null }, { authorId: { notIn: userIdFilter.notIn } }] }
+      : {};
+    const answererExclude = userIdFilter ? { userId: userIdFilter } : {};
+
     const [last7d, last30d, totalQuestions, totalAnswers] = await Promise.all([
-      computeWindow(prisma, d7),
-      computeWindow(prisma, d30),
-      prisma.anonQuestion.count(),
-      prisma.anonAnswer.count(),
+      computeWindow(prisma, d7, userIdFilter),
+      computeWindow(prisma, d30, userIdFilter),
+      prisma.anonQuestion.count({ where: authorExclude }),
+      prisma.anonAnswer.count({ where: answererExclude }),
     ]);
 
     // Distribución de respuestas por pregunta (30d) — para ver si la mayoría
     // se queda en 0 o 1. Devolvemos un histograma sencillo.
     const byAnswerCount30d = await prisma.anonQuestion.findMany({
-      where: { createdAt: { gte: d30 } },
+      where: { ...authorExclude, createdAt: { gte: d30 } },
       select: { _count: { select: { answers: true } } },
     });
     const histogram: Record<string, number> = { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 };
@@ -117,7 +133,7 @@ export const GET = withRateLimit(async function GET(req: NextRequest) {
     // Top solidarios (últimos 30d): quiénes más han ayudado.
     const topAnswerers = await prisma.anonAnswer.groupBy({
       by: ["userId"],
-      where: { createdAt: { gte: d30 }, hidden: false },
+      where: { ...answererExclude, createdAt: { gte: d30 }, hidden: false },
       _count: { userId: true },
       orderBy: { _count: { userId: "desc" } },
       take: 10,
@@ -132,6 +148,10 @@ export const GET = withRateLimit(async function GET(req: NextRequest) {
         userId: r.userId,
         answers: r._count.userId,
       })),
+      meta: {
+        excludeInternal,
+        internalUserCount: userIdFilter?.notIn.length ?? 0,
+      },
     });
   } catch (error: unknown) {
     logError("ADMIN", error, { route: "GET /api/admin/community/questions-stats" });

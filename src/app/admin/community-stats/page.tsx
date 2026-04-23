@@ -36,6 +36,7 @@ type StatsResponse = {
   last30d: WindowStats;
   histogram30d: Record<string, number>;
   topAnswerers30d: Array<{ userId: string; answers: number }>;
+  meta?: { excludeInternal: boolean; internalUserCount: number };
 };
 
 function pct(v: number): string {
@@ -142,11 +143,13 @@ export default function CommunityQuestionsStatsPage() {
   const router = useRouter();
   const [data, setData] = useState<StatsResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [includeTeam, setIncludeTeam] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/community/questions-stats", {
+      const qs = includeTeam ? "?includeTeam=1" : "";
+      const res = await fetch(`/api/admin/community/questions-stats${qs}`, {
         credentials: "include",
       });
       if (res.status === 401) {
@@ -160,7 +163,7 @@ export default function CommunityQuestionsStatsPage() {
     } finally {
       setLoading(false);
     }
-  }, [router]);
+  }, [router, includeTeam]);
 
   useEffect(() => {
     void load();
@@ -183,26 +186,50 @@ export default function CommunityQuestionsStatsPage() {
       showSectionNav={false}
     >
       <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
-        <p className="text-xs text-zinc-500">
-          Total histórico:{" "}
-          <span className="font-bold text-white">
-            {data ? data.totals.questions.toLocaleString() : "—"}
-          </span>{" "}
-          preguntas ·{" "}
-          <span className="font-bold text-white">
-            {data ? data.totals.answers.toLocaleString() : "—"}
-          </span>{" "}
-          respuestas.
-        </p>
-        <button
-          type="button"
-          onClick={() => void load()}
-          disabled={loading}
-          className="flex items-center gap-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
-        >
-          <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-          Refrescar
-        </button>
+        <div className="space-y-1">
+          <p className="text-xs text-zinc-500">
+            Total histórico:{" "}
+            <span className="font-bold text-white">
+              {data ? data.totals.questions.toLocaleString() : "—"}
+            </span>{" "}
+            preguntas ·{" "}
+            <span className="font-bold text-white">
+              {data ? data.totals.answers.toLocaleString() : "—"}
+            </span>{" "}
+            respuestas.
+          </p>
+          {data?.meta && (
+            <p className="text-[11px] text-zinc-600">
+              {data.meta.excludeInternal ? (
+                <>
+                  Excluyendo <span className="font-semibold text-zinc-400">{data.meta.internalUserCount}</span> cuentas internas (equipo/test).
+                </>
+              ) : (
+                <>Incluyendo cuentas internas (equipo/test).</>
+              )}
+            </p>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <label className="inline-flex items-center gap-1.5 text-xs text-zinc-400 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={includeTeam}
+              onChange={(e) => setIncludeTeam(e.target.checked)}
+              className="accent-violet-500"
+            />
+            Incluir equipo
+          </label>
+          <button
+            type="button"
+            onClick={() => void load()}
+            disabled={loading}
+            className="flex items-center gap-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+            Refrescar
+          </button>
+        </div>
       </div>
 
       {!data ? (

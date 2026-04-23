@@ -11,6 +11,10 @@ const customJestConfig = {
   globalTeardown: "<rootDir>/jest.teardown.ts",
   openHandlesTimeout: 0,
   forceExit: true,
+  // Some services keep in-process module state (caches, Maps) that can leak
+  // across parallel worker shards and cause flaky failures. The suite is fast
+  // (~5s) so serial execution has negligible cost and is deterministic.
+  maxWorkers: 1,
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
   },

@@ -11,6 +11,7 @@ import { useSession } from "@/lib/useSession";
 
 const NAV = [
   { label: "Chat", href: "/app" },
+  { label: "Comunidad", href: "/community" },
   { label: "Método", href: "/como-funciona" },
   { label: "Comparativa", href: "/comparativa" },
   { label: "Precios", href: "/precios" },

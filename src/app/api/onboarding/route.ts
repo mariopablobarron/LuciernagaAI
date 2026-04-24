@@ -51,7 +51,24 @@ export async function POST(req: NextRequest) {
       feelingCustom?: string | null;
       timeframe?: string;
       intent?: string;
+      skipped?: boolean;
     };
+
+    // Skip path: el usuario eligió "Saltar y hablar ya" en /app/inicio.
+    // Marcamos el onboarding como completo sin contexto. Lectores como
+    // proactive-prompt y phases/context.ts ya tratan ctx sin feeling/intent
+    // como ausente y caen al opening genérico.
+    if (body.skipped === true) {
+      const prisma = getPrismaClient();
+      await prisma.user.update({
+        where: { id: identity.userId },
+        data: {
+          onboardingContext: { skipped: true, completedAt: new Date().toISOString() },
+          onboardingCompletedAt: new Date(),
+        },
+      });
+      return NextResponse.json({ ok: true, skipped: true });
+    }
 
     const feeling = body.feeling as Feeling;
     const timeframe = body.timeframe as Timeframe;

@@ -36,6 +36,7 @@ export default function OnboardingPage() {
   const [timeframe, setTimeframe] = useState<Timeframe | null>(null);
   const [intent, setIntent] = useState<Intent | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [skipping, setSkipping] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -71,10 +72,33 @@ export default function OnboardingPage() {
         return;
       }
       setStep("transition");
-      setTimeout(() => router.replace("/app"), 2400);
+      setTimeout(() => router.replace("/app"), 600);
     } catch {
       setError("Error de red. Inténtalo de nuevo.");
       setSubmitting(false);
+    }
+  }
+
+  async function skipOnboarding() {
+    if (skipping || submitting) return;
+    setSkipping(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/onboarding", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ skipped: true }),
+      });
+      if (!res.ok) {
+        setError("No se pudo saltar. Inténtalo de nuevo.");
+        setSkipping(false);
+        return;
+      }
+      router.replace("/app");
+    } catch {
+      setError("Error de red. Inténtalo de nuevo.");
+      setSkipping(false);
     }
   }
 
@@ -149,6 +173,15 @@ export default function OnboardingPage() {
                 Seguir
               </button>
 
+              <button
+                type="button"
+                onClick={skipOnboarding}
+                disabled={skipping}
+                className="mt-3 w-full rounded-xl px-4 py-2 text-sm text-zinc-500 transition-colors hover:text-zinc-300 disabled:text-zinc-700"
+              >
+                {skipping ? "Abriendo..." : "Saltar y hablar ya"}
+              </button>
+
               <p className="mt-6 text-xs text-zinc-600">
                 Puedes cambiarlo cuando quieras. Esto solo sirve para que la primera conversación no
                 empiece en el aire.
@@ -185,6 +218,15 @@ export default function OnboardingPage() {
               >
                 Seguir
               </button>
+
+              <button
+                type="button"
+                onClick={skipOnboarding}
+                disabled={skipping}
+                className="mt-3 w-full rounded-xl px-4 py-2 text-sm text-zinc-500 transition-colors hover:text-zinc-300 disabled:text-zinc-700"
+              >
+                {skipping ? "Abriendo..." : "Saltar y hablar ya"}
+              </button>
             </section>
           )}
 
@@ -220,6 +262,15 @@ export default function OnboardingPage() {
                 className="mt-10 w-full rounded-xl bg-violet-500 px-4 py-3 font-semibold text-white transition-colors hover:bg-violet-400 disabled:bg-zinc-800 disabled:text-zinc-600"
               >
                 {submitting ? "Empezando..." : "Empezar"}
+              </button>
+
+              <button
+                type="button"
+                onClick={skipOnboarding}
+                disabled={skipping || submitting}
+                className="mt-3 w-full rounded-xl px-4 py-2 text-sm text-zinc-500 transition-colors hover:text-zinc-300 disabled:text-zinc-700"
+              >
+                {skipping ? "Abriendo..." : "Saltar y hablar ya"}
               </button>
             </section>
           )}

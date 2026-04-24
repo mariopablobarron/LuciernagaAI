@@ -83,6 +83,7 @@ model User {
   userChallenges            UserChallenge[]
   dailyLogs                 DailyLog[]
   futureMessages            FutureMessage[]
+  capsules                  Capsule[]
   streak                    Streak?
   clinicalNotes             ClinicalNote[]
   assessments               Assessment[]
@@ -618,6 +619,40 @@ model FutureMessage {
 
   @@index([userId, unlockAt])
   @@index([status, unlockAt])
+}
+
+// ── Cápsula del tiempo ────────────────────────────────────────────────────────
+// "Esto eras hace X días". Dos modos:
+//   - snapshot: payload generado por cron a partir del estado del usuario en T0,
+//                se "abre" en T0+windowDays.
+//   - letter:    texto escrito por el usuario, se entrega en deliverAt.
+// Ambos comparten la misma tabla y la misma pantalla /app/capsulas.
+enum CapsuleKind {
+  snapshot
+  letter
+}
+
+enum CapsuleStatus {
+  pending // creada, deliverAt aún en el futuro
+  ready // deliverAt alcanzado, esperando que el usuario abra
+  delivered // abierta o entregada por email
+  expired // 60 días sin abrir tras ready
+}
+
+model Capsule {
+  id          String        @id @default(cuid())
+  userId      String
+  kind        CapsuleKind
+  status      CapsuleStatus @default(pending)
+  createdAt   DateTime      @default(now())
+  deliverAt   DateTime
+  deliveredAt DateTime?
+  openedAt    DateTime?
+  payload     Json
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status, deliverAt])
+  @@index([deliverAt, status])
 }
 
 model Streak {

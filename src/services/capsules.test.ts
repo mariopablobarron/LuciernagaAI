@@ -2,11 +2,13 @@ const capsuleFindFirstMock = jest.fn();
 const capsuleCreateMock = jest.fn();
 const capsuleFindManyMock = jest.fn();
 const capsuleUpdateMock = jest.fn();
+const capsuleUpdateManyMock = jest.fn();
 const messageCountMock = jest.fn();
 const messageFindManyMock = jest.fn();
 const heartbeatCountMock = jest.fn();
 const userStateFindUniqueMock = jest.fn();
 const goalFindFirstMock = jest.fn();
+const userFindManyMock = jest.fn();
 
 jest.mock("@/db/prisma", () => ({
   getPrismaClient: () => ({
@@ -15,11 +17,13 @@ jest.mock("@/db/prisma", () => ({
       findMany: capsuleFindManyMock,
       create: capsuleCreateMock,
       update: capsuleUpdateMock,
+      updateMany: capsuleUpdateManyMock,
     },
     message: { count: messageCountMock, findMany: messageFindManyMock },
     heartbeat: { count: heartbeatCountMock },
     userState: { findUnique: userStateFindUniqueMock },
     goal: { findFirst: goalFindFirstMock },
+    user: { findMany: userFindManyMock },
   }),
 }));
 
@@ -29,7 +33,12 @@ import {
   InvalidLetterError,
   createLetterForUser,
   createSnapshotForUser,
+  expireStaleCapsules,
+  isEmailDeliverable,
+  listCapsulesDueForDelivery,
   listCapsulesForUser,
+  listSnapshotEligibleUsers,
+  markCapsuleReady,
   openCapsule,
 } from "./capsules";
 
@@ -38,11 +47,13 @@ beforeEach(() => {
   capsuleCreateMock.mockReset();
   capsuleFindManyMock.mockReset();
   capsuleUpdateMock.mockReset();
+  capsuleUpdateManyMock.mockReset();
   messageCountMock.mockReset();
   messageFindManyMock.mockReset();
   heartbeatCountMock.mockReset();
   userStateFindUniqueMock.mockReset();
   goalFindFirstMock.mockReset();
+  userFindManyMock.mockReset();
 });
 
 describe("createSnapshotForUser", () => {
@@ -218,5 +229,129 @@ describe("openCapsule", () => {
     const result = await openCapsule("u1", "c1", { now: NOW });
     expect(capsuleUpdateMock).not.toHaveBeenCalled();
     expect(result.summary.id).toBe("c1");
+  });
+});
+
+describe("listSnapshotEligibleUsers", () => {
+  const NOW = new Date("2026-04-25T10:00:00.000Z");
+
+  it("aplica filtros: activo, lastSeen 90d, ≥5 msgs, sin snapshot reciente", async () => {
+    userFindManyMock.mockResolvedValue([]);
+    await listSnapshotEligibleUsers({ now: NOW, take: 50 });
+    const args = userFindManyMock.mock.calls[0][0];
+    expect(args.where.deletedAt).toBeNull();
+    expect(args.where.isActive).toBe(true);
+    expect(args.where.messageCount).toEqual({ gte: 5 });
+    expect(args.where.capsules.none.kind).toBe("snapshot");
+    expect(args.take).toBe(50);
+    // lastSeen cutoff = NOW - 90d
+    expect(args.where.lastSeen.gte.getTime()).toBe(NOW.getTime() - 90 * 86400000);
+  });
+
+  it("propaga preferences.capsuleEmailDisabled al resultado", async () => {
+    userFindManyMock.mockResolvedValue([
+      {
+        id: "u1",
+        email: "real@correo.com",
+        emailVerified: true,
+        preferences: { capsuleEmailDisabled: true },
+      },
+      {
+        id: "u2",
+        email: "anon@session.luciernaga.local",
+        emailVerified: false,
+        preferences: null,
+      },
+    ]);
+    const result = await listSnapshotEligibleUsers({ now: NOW });
+    expect(result[0]).toEqual({
+      userId: "u1",
+      email: "real@correo.com",
+      emailVerified: true,
+      capsuleEmailDisabled: true,
+    });
+    expect(result[1].capsuleEmailDisabled).toBe(false);
+  });
+});
+
+describe("listCapsulesDueForDelivery", () => {
+  const NOW = new Date("2026-04-25T10:00:00.000Z");
+
+  it("solo trae pending con deliverAt <= now y excluye usuarios borrados", async () => {
+    capsuleFindManyMock.mockResolvedValue([
+      {
+        id: "c1",
+        kind: "letter",
+        user: {
+          id: "u1",
+          email: "real@correo.com",
+          emailVerified: true,
+          deletedAt: null,
+          preferences: { capsuleEmailDisabled: false },
+        },
+      },
+      {
+        id: "c2",
+        kind: "snapshot",
+        user: {
+          id: "u2",
+          email: "borrado@correo.com",
+          emailVerified: true,
+          deletedAt: new Date("2026-04-01"),
+          preferences: null,
+        },
+      },
+    ]);
+
+    const result = await listCapsulesDueForDelivery({ now: NOW });
+    const args = capsuleFindManyMock.mock.calls[0][0];
+    expect(args.where.status).toBe("pending");
+    expect(args.where.deliverAt.lte).toEqual(NOW);
+    expect(result).toHaveLength(1);
+    expect(result[0].capsuleId).toBe("c1");
+  });
+});
+
+describe("markCapsuleReady", () => {
+  it("hace update a ready + deliveredAt=now", async () => {
+    const NOW = new Date("2026-04-25T10:00:00.000Z");
+    capsuleUpdateMock.mockResolvedValue({});
+    await markCapsuleReady("c1", { now: NOW });
+    const args = capsuleUpdateMock.mock.calls[0][0];
+    expect(args.where).toEqual({ id: "c1" });
+    expect(args.data.status).toBe("ready");
+    expect(args.data.deliveredAt).toEqual(NOW);
+  });
+});
+
+describe("expireStaleCapsules", () => {
+  it("expira ready con deliverAt < now-60d y openedAt=null", async () => {
+    const NOW = new Date("2026-04-25T10:00:00.000Z");
+    capsuleUpdateManyMock.mockResolvedValue({ count: 3 });
+    const result = await expireStaleCapsules({ now: NOW });
+    expect(result).toEqual({ expired: 3 });
+    const args = capsuleUpdateManyMock.mock.calls[0][0];
+    expect(args.where.status).toBe("ready");
+    expect(args.where.openedAt).toBeNull();
+    expect(args.where.deliverAt.lt.getTime()).toBe(NOW.getTime() - 60 * 86400000);
+    expect(args.data.status).toBe("expired");
+  });
+});
+
+describe("isEmailDeliverable", () => {
+  const base = { email: "real@correo.com", emailVerified: true, capsuleEmailDisabled: false };
+
+  it("rechaza si email no verificado", () => {
+    expect(isEmailDeliverable({ ...base, emailVerified: false })).toBe(false);
+  });
+  it("rechaza si opt-out", () => {
+    expect(isEmailDeliverable({ ...base, capsuleEmailDisabled: true })).toBe(false);
+  });
+  it("rechaza si email sintético (anónimo)", () => {
+    expect(isEmailDeliverable({ ...base, email: "x@session.luciernaga.local" })).toBe(false);
+    expect(isEmailDeliverable({ ...base, email: "x@session.latidos.local" })).toBe(false);
+  });
+  it("acepta caso normal", () => {
+    expect(isEmailDeliverable(base)).toBe(true);
   });
 });

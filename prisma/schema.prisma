@@ -758,6 +758,7 @@ model UserPreferences {
   avatarVideosEnabled       Boolean  @default(true) // opt-out for weekly avatar videos
   weeklyLetterDisabled      Boolean  @default(false) // opt-out for the in-app weekly letter
   weeklyLetterEmailDisabled Boolean  @default(false) // opt-out only for the email notification; letter still appears in-app
+  capsuleEmailDisabled      Boolean  @default(false) // opt-out for capsule-ready email notification (capsules still appear in-app)
   timezone                  String   @default("Europe/Madrid")
   createdAt                 DateTime @default(now())
   updatedAt                 DateTime @updatedAt

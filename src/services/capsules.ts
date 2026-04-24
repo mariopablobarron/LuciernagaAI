@@ -271,10 +271,174 @@ export async function openCapsule(
   };
 }
 
+// ── Cron: elegibilidad y transiciones de estado ─────────────────────────────
+
+const SNAPSHOT_MIN_USER_MESSAGES = 5; // necesita material para reflejarse
+const SNAPSHOT_MAX_INACTIVITY_DAYS = 90; // no generamos para zombies
+const READY_EXPIRY_DAYS = 60; // ready sin abrir → expired
+
+export type SnapshotEligibleUser = {
+  userId: string;
+  email: string;
+  emailVerified: boolean;
+  capsuleEmailDisabled: boolean;
+};
+
+/**
+ * Devuelve hasta `take` usuarios candidatos a recibir un snapshot HOY.
+ * Criterios:
+ *  - No borrado, no cuenta de prueba.
+ *  - lastSeen dentro de los últimos 90 días.
+ *  - Al menos 5 mensajes del usuario (algo que reflejarle).
+ *  - NO tiene un snapshot creado en los últimos windowDays (evita duplicar).
+ */
+export async function listSnapshotEligibleUsers(options: {
+  now?: Date;
+  windowDays?: number;
+  take?: number;
+} = {}): Promise<SnapshotEligibleUser[]> {
+  const prisma = getPrismaClient();
+  const now = options.now ?? new Date();
+  const windowDays = options.windowDays ?? SNAPSHOT_WINDOW_DAYS;
+  const take = options.take ?? 200;
+
+  const inactivityCutoff = new Date(now.getTime() - SNAPSHOT_MAX_INACTIVITY_DAYS * 86400000);
+  const lastWindowCutoff = new Date(now.getTime() - windowDays * 86400000);
+
+  const users = await prisma.user.findMany({
+    where: {
+      deletedAt: null,
+      isActive: true,
+      lastSeen: { gte: inactivityCutoff },
+      messageCount: { gte: SNAPSHOT_MIN_USER_MESSAGES },
+      capsules: {
+        none: {
+          kind: "snapshot",
+          createdAt: { gte: lastWindowCutoff },
+        },
+      },
+    },
+    select: {
+      id: true,
+      email: true,
+      emailVerified: true,
+      preferences: { select: { capsuleEmailDisabled: true } },
+    },
+    take,
+    orderBy: { lastSeen: "desc" },
+  });
+
+  return users.map((u) => ({
+    userId: u.id,
+    email: u.email,
+    emailVerified: u.emailVerified,
+    capsuleEmailDisabled: u.preferences?.capsuleEmailDisabled ?? false,
+  }));
+}
+
+export type DeliverableCapsule = {
+  capsuleId: string;
+  userId: string;
+  kind: CapsuleKind;
+  email: string;
+  emailVerified: boolean;
+  capsuleEmailDisabled: boolean;
+};
+
+/**
+ * Devuelve cápsulas que ya han alcanzado deliverAt y siguen en pending.
+ * NO modifica estado; el cron es quien decide marcar como ready y enviar email.
+ */
+export async function listCapsulesDueForDelivery(options: {
+  now?: Date;
+  take?: number;
+} = {}): Promise<DeliverableCapsule[]> {
+  const prisma = getPrismaClient();
+  const now = options.now ?? new Date();
+  const take = options.take ?? 200;
+
+  const rows = await prisma.capsule.findMany({
+    where: {
+      status: "pending",
+      deliverAt: { lte: now },
+    },
+    select: {
+      id: true,
+      kind: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          emailVerified: true,
+          deletedAt: true,
+          preferences: { select: { capsuleEmailDisabled: true } },
+        },
+      },
+    },
+    orderBy: { deliverAt: "asc" },
+    take,
+  });
+
+  return rows
+    .filter((r) => r.user.deletedAt === null)
+    .map((r) => ({
+      capsuleId: r.id,
+      userId: r.user.id,
+      kind: r.kind,
+      email: r.user.email,
+      emailVerified: r.user.emailVerified,
+      capsuleEmailDisabled: r.user.preferences?.capsuleEmailDisabled ?? false,
+    }));
+}
+
+export async function markCapsuleReady(capsuleId: string, options: { now?: Date } = {}): Promise<void> {
+  const prisma = getPrismaClient();
+  const now = options.now ?? new Date();
+  await prisma.capsule.update({
+    where: { id: capsuleId },
+    data: { status: "ready", deliveredAt: now },
+  });
+}
+
+/**
+ * Marca como expired las cápsulas en estado ready cuyo deliverAt fue hace
+ * más de READY_EXPIRY_DAYS y nunca se abrieron.
+ */
+export async function expireStaleCapsules(options: { now?: Date } = {}): Promise<{ expired: number }> {
+  const prisma = getPrismaClient();
+  const now = options.now ?? new Date();
+  const cutoff = new Date(now.getTime() - READY_EXPIRY_DAYS * 86400000);
+
+  const result = await prisma.capsule.updateMany({
+    where: {
+      status: "ready",
+      openedAt: null,
+      deliverAt: { lt: cutoff },
+    },
+    data: { status: "expired" },
+  });
+  return { expired: result.count };
+}
+
+export function isEmailDeliverable(user: {
+  email: string;
+  emailVerified: boolean;
+  capsuleEmailDisabled: boolean;
+}): boolean {
+  if (!user.emailVerified) return false;
+  if (user.capsuleEmailDisabled) return false;
+  if (user.email.endsWith("@session.latidos.local")) return false;
+  if (user.email.endsWith("@session.luciernaga.local")) return false;
+  return true;
+}
+
 // Constantes exportadas para que API y UI compartan validación.
 export const CAPSULE_LIMITS = {
   SNAPSHOT_WINDOW_DAYS,
   LETTER_MIN_DAYS,
   LETTER_MAX_DAYS,
   LETTER_MAX_CHARS,
+  SNAPSHOT_MIN_USER_MESSAGES,
+  SNAPSHOT_MAX_INACTIVITY_DAYS,
+  READY_EXPIRY_DAYS,
 } as const;

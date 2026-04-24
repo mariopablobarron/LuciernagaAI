@@ -18,6 +18,7 @@ import { UserInterventionsBanner } from "@/components/UserInterventionsBanner";
 import WeeklyLetterBanner from "@/components/WeeklyLetterBanner";
 import NameCaptureModal from "@/components/NameCaptureModal";
 import CommunityForYouBanner from "@/components/CommunityForYouBanner";
+import CapsuleBanner from "@/components/CapsuleBanner";
 import { setTrackingMutedFromProfile } from "@/lib/tracking-mute";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -1885,6 +1886,7 @@ export default function HomePage() {
               }}
             />
             <CommunityForYouBanner />
+            <CapsuleBanner />
           </>
         }
         sidebar={

@@ -207,10 +207,13 @@ export async function listMessagesForConversation(params: {
     return null;
   }
 
+  // La conversación ya fue validada por userId arriba; los mensajes pertenecen
+  // al dueño de la conversación por integridad. Filtrar por userId aquí oculta
+  // mensajes legítimos si hay inconsistencia transitoria tras un merge anónimo
+  // → identificado (ver moveUserOwnedRecords en services/user.ts).
   const messages = await prisma.message.findMany({
     where: {
       conversationId: params.conversationId,
-      userId: params.userId,
     },
     orderBy: { createdAt: "asc" },
     select: {

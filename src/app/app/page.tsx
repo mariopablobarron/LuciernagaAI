@@ -510,16 +510,21 @@ export default function HomePage() {
     }));
 
     setConversations((previous) =>
-      previous.map((conversation) =>
-        conversation.id === conversationId
-          ? {
-              ...conversation,
-              messages: nextMessages,
-              messageCount: nextMessages.length,
-              hasLoadedMessages: true,
-            }
-          : conversation
-      )
+      previous.map((conversation) => {
+        if (conversation.id !== conversationId) return conversation;
+        // Si el API devuelve vacío pero teníamos mensajes en memoria, no
+        // sobreescribimos. Cubre inconsistencias transitorias (cookie aún
+        // no propagada tras capture-email/merge) que borrarían el chat.
+        if (nextMessages.length === 0 && conversation.messages.length > 0) {
+          return { ...conversation, hasLoadedMessages: true };
+        }
+        return {
+          ...conversation,
+          messages: nextMessages,
+          messageCount: nextMessages.length,
+          hasLoadedMessages: true,
+        };
+      })
     );
   };
 
@@ -984,7 +989,9 @@ export default function HomePage() {
     if (nextProfile?.email) {
       setSaveProgressEmail(nextProfile.email);
     }
-    const nextActiveConversationId = await refreshConversations();
+    const nextActiveConversationId = await refreshConversations(
+      activeConversationId ?? undefined,
+    );
     if (nextActiveConversationId) {
       await loadMessages(nextActiveConversationId);
     }
@@ -1063,7 +1070,9 @@ export default function HomePage() {
         setSaveProgressEmail(nextProfile.email);
       }
 
-      const nextActiveConversationId = await refreshConversations();
+      const nextActiveConversationId = await refreshConversations(
+        activeConversationId ?? undefined,
+      );
       if (nextActiveConversationId) {
         await loadMessages(nextActiveConversationId);
       }

@@ -5,7 +5,7 @@ import EmotionalAccentProvider from "@/components/EmotionalAccentProvider";
 
 export default function AppRootLayout({ children }: { children: ReactNode }) {
   return (
-    <PlatformLayout>
+    <PlatformLayout hideFooter>
       <EmotionalAccentProvider />
       {children}
       <FeedbackWidget />

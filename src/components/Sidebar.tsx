@@ -266,10 +266,18 @@ export default function Sidebar({
         {/* ── Progressive unlock roadmap ──────────────────────────────── */}
         <div className="rounded-2xl border border-border bg-muted/30 p-3 space-y-3" data-tour="nav-buttons">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            <p
+              className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+              title="Funciones desbloqueadas: el camino se va abriendo segun usas la app (racha, dias activos, etc)"
+            >
               Tu camino
             </p>
-            <Badge variant="secondary" className="rounded-full px-2 py-0.5 text-[10px]">
+            <Badge
+              variant="secondary"
+              className="rounded-full px-2 py-0.5 text-[10px]"
+              title={`${unlockedCount} de ${totalFeatures} funciones desbloqueadas`}
+              aria-label={`${unlockedCount} de ${totalFeatures} funciones desbloqueadas`}
+            >
               {unlockedCount}/{totalFeatures}
             </Badge>
           </div>

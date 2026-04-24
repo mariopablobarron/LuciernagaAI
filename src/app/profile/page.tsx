@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Mail, Zap, Flame, Edit2 } from 'lucide-react';
 import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
 import type { BrowserSessionUser } from '@/lib/session-client';
+import { BillingSection } from '@/components/ui/billing-section';
 
 type StateData = {
   streakDays: number;
@@ -112,7 +113,16 @@ export default function ProfilePage() {
                   </>
                 ) : (
                   <>
-                    <h2 className={`${TYPOGRAPHY.h2} text-white`}>{user?.name ?? 'Usuario'}</h2>
+                    {user?.name ? (
+                      <h2 className={`${TYPOGRAPHY.h2} text-white`}>{user.name}</h2>
+                    ) : (
+                      <Link
+                        href="/settings"
+                        className={`${TYPOGRAPHY.h2} text-zinc-400 hover:text-white transition-colors underline decoration-dotted underline-offset-4`}
+                      >
+                        Sin nombre — define uno
+                      </Link>
+                    )}
                     <p className="text-zinc-400 capitalize">{user?.planLabel ?? 'Plan gratuito'}</p>
                     {user?.bio && <p className="text-sm text-zinc-500 mt-1">{user.bio}</p>}
                   </>
@@ -155,8 +165,9 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Statistics */}
-        <div className={`${LAYOUTS.gridThreeCol}`}>
+        {/* Statistics — eliminado "Mensajes hoy" tras quitar el cap diario.
+            El recuento ya no aporta información accionable. */}
+        <div className={`${LAYOUTS.gridTwoCol}`}>
           <div className={`${COMPONENTS.card} text-center space-y-2 p-6`}>
             {loading ? (
               <Skeleton className="h-10 w-16 mx-auto" />
@@ -166,17 +177,7 @@ export default function ProfilePage() {
                 <p className="text-3xl font-bold text-amber-400">{stateData?.streakDays ?? 0}</p>
               </div>
             )}
-            <p className="text-sm text-zinc-400">Racha actual</p>
-          </div>
-          <div className={`${COMPONENTS.card} text-center space-y-2 p-6`}>
-            {loading ? (
-              <Skeleton className="h-10 w-16 mx-auto" />
-            ) : (
-              <p className="text-3xl font-bold text-violet-400">
-                {user?.messagesUsedToday ?? 0}
-              </p>
-            )}
-            <p className="text-sm text-zinc-400">Mensajes hoy</p>
+            <p className="text-sm text-zinc-400">Racha actual (días)</p>
           </div>
           <div className={`${COMPONENTS.card} text-center space-y-2 p-6`}>
             {loading ? (
@@ -189,6 +190,9 @@ export default function ProfilePage() {
             <p className="text-sm text-zinc-400">Estado actual</p>
           </div>
         </div>
+
+        {/* Plan / Suscripción */}
+        <BillingSection />
 
         {/* Account Actions */}
         <div className={`${COMPONENTS.card} p-6 space-y-3`}>

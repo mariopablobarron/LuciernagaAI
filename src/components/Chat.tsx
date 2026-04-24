@@ -1113,28 +1113,32 @@ export default function Chat({
             onTranscript={(text) => handleInputChange(input ? `${input} ${text}` : text)}
             disabled={loading}
           />
-          <AudioRecorder
-            onAudioReady={(base64, dur) => { setAttachedAudio(base64); setAudioDuration(dur); }}
-            disabled={loading}
-          />
-          <input
-            ref={imageInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleImageAttach}
-          />
-          <Button
-            type="button"
-            onClick={() => imageInputRef.current?.click()}
-            disabled={loading}
-            size="icon"
-            variant="ghost"
-            aria-label="Adjuntar imagen"
-            className="h-11 w-11 shrink-0 rounded-xl text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 disabled:opacity-30"
-          >
-            <ImagePlus className="h-4 w-4" />
-          </Button>
+          {/* AudioRecorder y adjuntar imagen ocultos en mobile: liberan ~88px
+              de ancho para que el textarea no quede minusculo en iPhone. */}
+          <div className="hidden sm:contents">
+            <AudioRecorder
+              onAudioReady={(base64, dur) => { setAttachedAudio(base64); setAudioDuration(dur); }}
+              disabled={loading}
+            />
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageAttach}
+            />
+            <Button
+              type="button"
+              onClick={() => imageInputRef.current?.click()}
+              disabled={loading}
+              size="icon"
+              variant="ghost"
+              aria-label="Adjuntar imagen"
+              className="h-11 w-11 shrink-0 rounded-xl text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 disabled:opacity-30"
+            >
+              <ImagePlus className="h-4 w-4" />
+            </Button>
+          </div>
           <Button
             onClick={handleSendWithAttachments}
             disabled={loading || (!input.trim() && !attachedImage && !attachedAudio)}
@@ -1183,7 +1187,14 @@ export default function Chat({
           )}
         </div>
         <p className="mt-1.5 text-center text-[10px] text-zinc-700">
-          IA supervisada por psicologos, mentores y coaches · No sustituye atencion clinica · <a href="tel:024" className="text-red-500/60 hover:text-red-400">Crisis: 024</a>
+          IA supervisada por psicologos, mentores y coaches · No sustituye atencion clinica ·{" "}
+          <a
+            href="tel:024"
+            aria-label="Llamar al 024, linea de crisis"
+            className="inline-flex items-center gap-1 text-red-400 hover:text-red-300 underline decoration-red-400/40 hover:decoration-red-300 underline-offset-2 font-medium"
+          >
+            🚨 Crisis: llamar al 024
+          </a>
         </p>
       </div>
     </div>

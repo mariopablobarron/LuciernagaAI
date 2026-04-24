@@ -149,7 +149,7 @@ export default function HomeWorkspace({
 }: HomeWorkspaceProps) {
   const accountLabel = sessionProfile?.isAnonymous
     ? "Cuenta anónima"
-    : sessionProfile?.email || "Pendiente de vincular";
+    : sessionProfile?.name || "Sin nombre — añádelo en Ajustes";
 
   return (
     <Tabs

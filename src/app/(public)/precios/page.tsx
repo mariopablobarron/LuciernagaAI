@@ -39,8 +39,8 @@ const PRO_FEATURES = [
 ];
 
 const FUTURE_PRICE = [
-  { plan: 'Free', price: '0 euros/mes', features: 'Acceso basico: 10 conversaciones/mes, 20 mensajes/conversacion' },
-  { plan: 'Pro', price: '9 euros/mes', features: 'Todo ilimitado + Modo Impulso + retos + insights' },
+  { plan: 'Free', price: '0 euros/mes', features: 'Conversaciones sin limite con el mentor IA. Sin cap diario.' },
+  { plan: 'Pro', price: '9 euros/mes', features: 'Continuidad cross-device, memoria persistente, Modo Impulso y prioridad' },
   { plan: 'Pro anual', price: '79 euros/año', features: 'Mismo que Pro, ahorrando 2 meses' },
 ];
 
@@ -119,8 +119,9 @@ export default function PreciosPage() {
               para que la herramienta sea mejor para ti y para los que vengan despues.
             </p>
             <p className="text-sm text-zinc-300 leading-relaxed">
-              Cuando termine la fase MVP, podras seguir con el plan gratuito
-              o elegir Pro a su precio regular. Sin sorpresas.
+              Cuando termine la fase MVP, el plan gratuito mantendra el chat
+              sin limite. Pro sera para quien quiera continuidad cross-device,
+              memoria persistente entre sesiones y Modo Impulso. Sin sorpresas.
             </p>
           </div>
         </div>
@@ -167,7 +168,7 @@ export default function PreciosPage() {
           },
           {
             q: 'Que pasa cuando termine el MVP?',
-            a: 'Podras seguir usando el plan gratuito (con limites) o elegir Pro a su precio regular. Los usuarios que participaron en el MVP tendran condiciones especiales como agradecimiento.',
+            a: 'Podras seguir usando el plan gratuito con chat sin limite, o elegir Pro a su precio regular para extras (continuidad cross-device, memoria persistente, Modo Impulso). Los usuarios MVP tendran condiciones especiales.',
           },
           {
             q: 'Tres Mil Millones de Latidos reemplaza a un psicologo?',

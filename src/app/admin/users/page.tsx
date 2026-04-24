@@ -453,8 +453,16 @@ export default function AdminUsersPage() {
         router.replace("/admin/login?next=/admin/users");
         return;
       }
-      const payload = (await res.json().catch(() => null)) as AdminUsersResponse | null;
+      const payload = (await res.json().catch(() => null)) as
+        | (AdminUsersResponse & { requiredPermission?: string; error?: string })
+        | null;
       if (signal?.aborted) return;
+      if (res.status === 403) {
+        const required = payload?.requiredPermission || "users:read";
+        throw new Error(
+          `Tu rol no tiene permiso "${required}". Pide a un superadmin que actualice tu rol (admin, support o clinical para ver usuarios).`,
+        );
+      }
       if (!res.ok || !payload) throw new Error("No se pudo cargar el listado.");
       setData(payload);
     } catch (e: unknown) {

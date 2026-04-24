@@ -132,6 +132,16 @@ export default function AdminPage() {
           return null;
         }
 
+        if (res.status === 403) {
+          const required =
+            (payload as { requiredPermission?: string } | null)?.requiredPermission ||
+            "insights:read";
+          setDegraded(
+            `Tu rol no tiene permiso "${required}". Pide a un superadmin que actualice tu rol (admin, clinical u ops para ver insights).`,
+          );
+          return null;
+        }
+
         if (!payload || typeof payload !== "object") {
           if (!res.ok) {
             throw new Error("No se pudieron cargar los insights.");

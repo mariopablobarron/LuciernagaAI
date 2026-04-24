@@ -61,6 +61,15 @@ export type CoachContext = {
     summary: string;
     hesitationDetected?: boolean;
     trend?: "mejor" | "igual" | "peor" | string;
+    // Memoria persistente entre conversaciones (últimos 7 días). Da continuidad
+    // real al mentor cuando el usuario vuelve tras días.
+    weeklyPattern?: {
+      daysSinceLastSession: number | null;
+      dominantStateLast7d: string | null;
+      avoidanceCountLast7d: number;
+      crisisEventsLast7d: number;
+      conversationCountLast7d: number;
+    } | null;
   } | null;
   flow?: {
     currentIntent: string;
@@ -283,6 +292,26 @@ function buildContinuityGuidance(context: CoachContext): string {
         ? "Tendencia negativa — el usuario lleva empeorando. Sé más directo y propón una acción mínima."
         : "";
 
+  const weekly = continuity.weeklyPattern;
+  const weeklyBlock = weekly
+    ? [
+        weekly.daysSinceLastSession !== null && weekly.daysSinceLastSession >= 1
+          ? `- Vuelve tras ${weekly.daysSinceLastSession} día(s). Reconócelo brevemente sin sermón.`
+          : "",
+        weekly.dominantStateLast7d
+          ? `- Estado dominante últimos 7 días: ${weekly.dominantStateLast7d}.`
+          : "",
+        weekly.avoidanceCountLast7d >= 2
+          ? `- Patrón: ${weekly.avoidanceCountLast7d} evitaciones en 7 días — confronta sin suavizar.`
+          : "",
+        weekly.crisisEventsLast7d > 0
+          ? `- Hubo ${weekly.crisisEventsLast7d} evento(s) de riesgo esta semana — tono contenido.`
+          : "",
+      ]
+        .filter(Boolean)
+        .join("\n")
+    : "";
+
   return `Continuidad conversacional disponible:
 - Resumen previo: ${continuity.summary}
 - Último objetivo: ${continuity.lastGoal ?? "No registrado"}
@@ -290,6 +319,7 @@ function buildContinuityGuidance(context: CoachContext): string {
 - Estado emocional previo: ${continuity.emotionalState}
 ${trendLabel ? `- ${trendLabel}` : ""}
 ${continuity.hesitationDetected ? "- Hubo señales recientes de evitación o postergación." : ""}
+${weeklyBlock}
 
 Reglas de continuidad obligatorias:
 - Si existe contexto previo, referencia explícitamente ese contexto en la respuesta.

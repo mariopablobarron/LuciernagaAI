@@ -93,6 +93,13 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
     pendingActions: activeGoal?.actions.filter((a) => !a.completed).map((a) => a.description) ?? [],
   });
 
+  // ── Memoria persistente entre conversaciones (últimos 7 días) ───────────
+  // Da continuidad real al mentor: cuántos días lleva fuera, estado dominante,
+  // evitaciones repetidas, eventos de crisis. Tolera fallos: si la query peta,
+  // weeklyPattern queda en null y la continuidad sigue funcionando con el
+  // resumen corto habitual.
+  const weeklyPattern = await loadWeeklyPattern(userId).catch(() => null);
+
   const [impulseProfile, impulseLogs, journeyPromptBlock, projectPromptBlock, welcomeOnboarding] = await Promise.all([
     getUserImpulseProfile(userId).catch(() => null),
     listRecentImpulseLogs(userId, 5).catch(() => []),
@@ -117,6 +124,7 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
       ...conversationContext,
       hesitationDetected: goalAvoidanceCount > 0 || avoidanceDetectedThisTurn,
       trend: emotionalProfile.progressTrend,
+      weeklyPattern,
     },
     flow: {
       currentIntent: flowContext.currentIntent,
@@ -180,4 +188,63 @@ async function loadWelcomeOnboarding(userId: string): Promise<OnboardingPayload 
   const ctx = user.onboardingContext as OnboardingPayload | null;
   if (!ctx || !ctx.feeling || !ctx.intent) return null;
   return ctx;
+}
+
+// Memoria persistente entre conversaciones (últimos 7 días). Se inyecta en el
+// system prompt para que el mentor "recuerde" patrones del usuario al volver
+// tras días, en vez de empezar cada conversación de cero.
+async function loadWeeklyPattern(userId: string): Promise<{
+  daysSinceLastSession: number | null;
+  dominantStateLast7d: string | null;
+  avoidanceCountLast7d: number;
+  crisisEventsLast7d: number;
+  conversationCountLast7d: number;
+} | null> {
+  const prisma = getPrismaClient();
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  const [previousMessage, conversations, avoidanceCount, crisisCount, recentMessages] =
+    await Promise.all([
+      prisma.message.findFirst({
+        where: { userId, role: "user" },
+        orderBy: { createdAt: "desc" },
+        skip: 1,
+        select: { createdAt: true },
+      }),
+      prisma.conversation.count({
+        where: { userId, updatedAt: { gte: sevenDaysAgo } },
+      }),
+      prisma.avoidanceEvent.count({
+        where: { userId, createdAt: { gte: sevenDaysAgo } },
+      }),
+      prisma.crisisEvent.count({
+        where: { userId, createdAt: { gte: sevenDaysAgo } },
+      }),
+      prisma.message.findMany({
+        where: { userId, role: "user", createdAt: { gte: sevenDaysAgo } },
+        select: { content: true },
+        take: 60,
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
+
+  let daysSinceLastSession: number | null = null;
+  if (previousMessage) {
+    const ms = Date.now() - previousMessage.createdAt.getTime();
+    daysSinceLastSession = Math.floor(ms / (24 * 60 * 60 * 1000));
+  }
+
+  let dominantStateLast7d: string | null = null;
+  if (recentMessages.length > 0) {
+    const { getDominantState } = await import("@/services/state");
+    dominantStateLast7d = getDominantState(recentMessages.map((m) => m.content));
+  }
+
+  return {
+    daysSinceLastSession,
+    dominantStateLast7d,
+    avoidanceCountLast7d: avoidanceCount,
+    crisisEventsLast7d: crisisCount,
+    conversationCountLast7d: conversations,
+  };
 }

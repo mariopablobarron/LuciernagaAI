@@ -151,31 +151,22 @@ function normalizeSyntheticLocalPart(userId: string): string {
   return safeValue || "anon";
 }
 
-function shouldDisableFreePlanLimit(): boolean {
-  const explicitUnlimited = process.env.FREE_PLAN_UNLIMITED === "true";
-  return explicitUnlimited || process.env.NODE_ENV !== "production";
-}
-
 function buildAccessState(params: {
   plan: CanonicalUserPlan;
   hasPlan: boolean;
   subscriptionStatus: string;
   messagesUsedToday: number;
 }): UserAccessState {
-  const noLimitForTesting = shouldDisableFreePlanLimit();
-  const messageLimitPerDay = params.hasPlan || noLimitForTesting ? null : FREE_PLAN_MESSAGE_LIMIT;
-  const messagesRemainingToday = params.hasPlan
-    ? null
-    : Math.max(0, FREE_PLAN_MESSAGE_LIMIT - params.messagesUsedToday);
-
+  // Free e ilimitado: el chat ya no tiene tope diario. Pro se diferencia por
+  // extras (Modo Impulso, continuidad, prioridad), no por desbloquear cap.
   return {
     plan: params.plan,
     planLabel: getPlanLabel(params.plan),
     subscriptionStatus: params.subscriptionStatus,
     hasPlan: params.hasPlan,
     messagesUsedToday: params.messagesUsedToday,
-    messagesRemainingToday: messageLimitPerDay === null ? null : messagesRemainingToday,
-    messageLimitPerDay,
+    messagesRemainingToday: null,
+    messageLimitPerDay: null,
   };
 }
 

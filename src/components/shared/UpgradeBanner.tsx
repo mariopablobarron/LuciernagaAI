@@ -12,7 +12,7 @@ export default function UpgradeBanner({ message }: Props) {
       <div className="flex items-center gap-3">
         <Zap className="w-4 h-4 text-violet-400 shrink-0" />
         <p className="text-sm text-zinc-300">
-          {message ?? 'Actualiza a Pro y desbloquea conversaciones ilimitadas, Modo Impulso y más.'}
+          {message ?? 'Pro: continuidad cross-device, memoria persistente entre sesiones y Modo Impulso.'}
         </p>
       </div>
       <Link

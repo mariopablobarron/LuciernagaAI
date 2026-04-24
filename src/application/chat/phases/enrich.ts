@@ -306,9 +306,11 @@ export async function enrichContext(input: EnrichInput): Promise<EnrichResult> {
     try {
       const msgs = await listMessagesForConversation({ userId, conversationId });
       if (msgs && msgs.length > 1) {
+        // Ventana ampliada de 8 a 16 mensajes (~8 vueltas) para que el mentor
+        // mantenga continuidad real en conversaciones largas sin perder foco.
         conversationHistory = msgs
           .slice(0, -1)
-          .slice(-8)
+          .slice(-16)
           .map((m) => ({ role: m.role, content: m.content }));
       }
     } catch {

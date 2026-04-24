@@ -299,7 +299,10 @@ describe("POST /api/chat", () => {
     );
   });
 
-  it("bloquea el chat cuando el plan free alcanza el limite diario", async () => {
+  it("ya no bloquea por limite diario: el chat es ilimitado para todos", async () => {
+    // El cap diario se elimino en abril 2026. Pro se diferencia ahora por
+    // extras (continuidad cross-device, memoria, Modo Impulso), no por
+    // desbloquear cap. Este test garantiza que NO se restaura el bloqueo.
     (resolveIdentity as jest.Mock).mockReturnValue({
       userId: "usr_test_limit",
       source: "session",
@@ -316,29 +319,40 @@ describe("POST /api/chat", () => {
       subscriptionStatus: "free",
       hasPlan: false,
       isAnonymous: true,
-      messagesUsedToday: 10,
-      messagesRemainingToday: 0,
-      messageLimitPerDay: 10,
+      messagesUsedToday: 999,
+      messagesRemainingToday: null,
+      messageLimitPerDay: null,
+    });
+    (checkRateLimit as jest.Mock).mockReturnValue({
+      allowed: true,
+      retryAfterSeconds: 0,
+      limit: 10,
+      remaining: 9,
+    });
+    (ensureUserSession as jest.Mock).mockResolvedValue(undefined);
+    (resolveConversationForUser as jest.Mock).mockResolvedValue({
+      id: "conv_unlimited_1",
+      title: "Nueva conversación",
+    });
+    (getActiveGoalForUser as jest.Mock).mockResolvedValue(null);
+    (saveConversationMessage as jest.Mock).mockResolvedValue(undefined);
+    (generateAIResponse as jest.Mock).mockResolvedValue({
+      response: "Sigamos.",
+      fallback: false,
     });
 
     const req = new NextRequest("http://localhost/api/chat", {
       method: "POST",
       body: JSON.stringify({ message: "Quiero seguir trabajando" }),
-      headers: {
-        "content-type": "application/json",
-      },
+      headers: { "content-type": "application/json" },
     });
 
     const response = await POST(req);
     const body = await response.json();
 
-    expect(response.status).toBe(403);
-    expect(body.success).toBe(false);
-    expect(body.code).toBe("PLAN_LIMIT_REACHED");
-    expect(body.response).toContain("No es falta de claridad.");
-    expect(body.response).toContain("¿Quieres sostener este avance con continuidad real?");
-    expect(checkRateLimit).not.toHaveBeenCalled();
-    expect(saveConversationMessage).not.toHaveBeenCalled();
+    expect(response.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(body.code).not.toBe("PLAN_LIMIT_REACHED");
   });
 
   it("marca conversionTrigger cuando detecta claridad", async () => {
@@ -402,7 +416,8 @@ describe("POST /api/chat", () => {
       expect.objectContaining({
         access: expect.objectContaining({
           userPlan: "free",
-          remainingMessages: 9,
+          // Chat ilimitado: remainingMessages siempre null (sin cap diario).
+          remainingMessages: null,
           hasActiveGoal: false,
           conversionTrigger: true,
         }),

@@ -10,9 +10,7 @@ import { checkRateLimit } from "@/lib/rate-limit";
 import { getErrorMessage } from "@/lib/utils";
 import { getUserSessionProfile, isSyntheticEmail } from "@/services/user";
 import { processMessage } from "@/application/chat/processMessage";
-import { PAYWALL_MESSAGE } from "@/services/coach";
 import type { UserState } from "@/domain/types";
-import { FREE_LIMIT_MESSAGE } from "@/lib/plans";
 
 export function buildErrorResponse(
   message: string,
@@ -24,10 +22,6 @@ export function buildErrorResponse(
     { success: false, error: message, code, response: message, state },
     { status }
   );
-}
-
-function buildHardPaywallMessage(): string {
-  return PAYWALL_MESSAGE;
 }
 
 export async function orchestrateChat(req: NextRequest): Promise<Response> {
@@ -83,29 +77,9 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
   }
 
   // ── 4. Plan limit ────────────────────────────────────────────────────────
-  if (
-    !accessState.hasPlan &&
-    accessState.messageLimitPerDay !== null &&
-    accessState.messagesUsedToday >= accessState.messageLimitPerDay
-  ) {
-    const hardPaywallMessage = buildHardPaywallMessage();
-    const res = NextResponse.json(
-      {
-        success: false,
-        error: `${hardPaywallMessage}\n\n${FREE_LIMIT_MESSAGE}`,
-        response: `${hardPaywallMessage}\n\n${FREE_LIMIT_MESSAGE}`,
-        state: "neutral",
-        code: "PLAN_LIMIT_REACHED",
-        plan: accessState.planLabel,
-        subscriptionStatus: accessState.subscriptionStatus,
-        messagesUsedToday: accessState.messagesUsedToday,
-        messageLimitPerDay: accessState.messageLimitPerDay,
-      },
-      { status: 403 }
-    );
-    if (identity.shouldSetCookie) attachSessionCookie(res, identity.sessionToken);
-    return res;
-  }
+  // El chat es ilimitado para todos. Pro se diferencia por extras (continuidad
+  // cross-device, memoria persistente, Modo Impulso, prioridad), no por cap.
+  // El bloqueo PLAN_LIMIT_REACHED se eliminó en abril 2026.
 
   // ── 5. Rate limit ────────────────────────────────────────────────────────
   const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";

@@ -106,13 +106,11 @@ function normalizePlanDescription(sessionProfile: BrowserSessionUser | null): st
     return "Sesión iniciándose. El progreso y el plan se sincronizarán cuando la identidad esté lista.";
   }
 
-  if (sessionProfile.messageLimitPerDay == null) {
-    return "Sin límite diario y con continuidad completa de conversaciones, objetivos y acciones.";
+  if (sessionProfile.hasPlan) {
+    return "Continuidad completa entre dispositivos, memoria persistente y Modo Impulso desbloqueado.";
   }
 
-  return `Te quedan ${sessionProfile.messagesRemainingToday ?? 0} de ${
-    sessionProfile.messageLimitPerDay
-  } mensajes hoy en el plan ${sessionProfile.planLabel}.`;
+  return `Conversa sin límite. Plan ${sessionProfile.planLabel}: cuando quieras continuidad cross-device y Modo Impulso, Pro lo desbloquea.`;
 }
 
 function statusVariant(value: string): "secondary" | "success" | "warning" {
@@ -348,15 +346,10 @@ export default function HomeWorkspace({
                       {sessionProfile.subscriptionStatus}
                     </Badge>
                   ) : null}
-                  {sessionProfile?.messageLimitPerDay != null ? (
-                    <Badge variant="warning" className="rounded-full px-3 py-1">
-                      {sessionProfile.messagesUsedToday}/{sessionProfile.messageLimitPerDay} hoy
-                    </Badge>
-                  ) : null}
                 </div>
 
                 {sessionProfile?.plan === "free" && (
-                  <UpgradeBanner message="Actualiza a Pro y desbloquea conversaciones ilimitadas, Modo Impulso y más." />
+                  <UpgradeBanner message="Pro: continuidad entre dispositivos, memoria persistente entre sesiones y Modo Impulso." />
                 )}
 
                 {(captureEmailRecommended ||

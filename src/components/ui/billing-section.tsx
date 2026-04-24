@@ -86,11 +86,6 @@ export function BillingSection() {
             Plan actual:{" "}
             <span className="font-medium text-zinc-200">{status?.planLabel ?? "—"}</span>
           </p>
-          {status?.messageLimitPerDay != null && (
-            <p className="text-xs text-zinc-500 mt-1">
-              {status.messagesUsedToday} / {status.messageLimitPerDay} mensajes hoy
-            </p>
-          )}
         </div>
       </header>
 
@@ -147,7 +142,7 @@ export function BillingSection() {
       ) : (
         <div className="space-y-4">
           <p className="text-sm text-zinc-300">
-            Desbloquea conversaciones sin límite, acceso a la comunidad y más funciones.
+            Pro: continuidad cross-device, memoria persistente entre sesiones y Modo Impulso.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

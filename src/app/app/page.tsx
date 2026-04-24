@@ -437,49 +437,20 @@ export default function HomePage() {
     };
   }, [actionLock, pendingGoalAction, safeConversation.state]);
 
-  const nearPlanLimit = useMemo(() => {
-    if (!sessionProfile || sessionProfile.hasPlan || sessionProfile.messageLimitPerDay == null) {
-      return false;
-    }
-
-    return (sessionProfile.messagesRemainingToday ?? 0) <= 2;
-  }, [sessionProfile]);
-
-  const limitReached = useMemo(() => {
-    if (!sessionProfile || sessionProfile.hasPlan || sessionProfile.messageLimitPerDay == null) {
-      return false;
-    }
-
-    return (sessionProfile.messagesRemainingToday ?? 0) <= 0;
-  }, [sessionProfile]);
-
+  // El chat es ilimitado: ya no hay nearPlanLimit ni limitReached. La CTA de
+  // Pro aparece sólo cuando hay valor real detectado (conversionTrigger), no
+  // por presión de tope diario.
   const showUpgradeCta = useMemo(() => {
     if (!sessionProfile || sessionProfile.hasPlan) {
       return false;
     }
-
-    return safeConversation.conversionTrigger || nearPlanLimit || limitReached;
-  }, [limitReached, nearPlanLimit, safeConversation.conversionTrigger, sessionProfile]);
+    return safeConversation.conversionTrigger;
+  }, [safeConversation.conversionTrigger, sessionProfile]);
 
   const upgradeCopy = useMemo(() => {
-    if (!showUpgradeCta) {
-      return null;
-    }
-
-    if (limitReached) {
-      return "Has tocado el límite del plan Free. Pro mantiene el hilo, evita cortes y te acompaña sin límite diario.";
-    }
-
-    if (safeConversation.conversionTrigger) {
-      return "Aquí ya hubo valor real: claridad, objetivo o una acción concreta. Pro sirve para sostener ese avance y no perderlo entre sesiones.";
-    }
-
-    if (nearPlanLimit) {
-      return "Estás cerca del límite diario. Si quieres continuidad sin perder ritmo, Pro es el paso natural.";
-    }
-
-    return null;
-  }, [limitReached, nearPlanLimit, safeConversation.conversionTrigger, showUpgradeCta]);
+    if (!showUpgradeCta) return null;
+    return "Aquí ya hubo valor real: claridad, objetivo o una acción concreta. Pro lo sostiene entre sesiones y desbloquea Modo Impulso.";
+  }, [showUpgradeCta]);
 
   const loadMessages = async (conversationId: string): Promise<void> => {
     const response = await fetch(

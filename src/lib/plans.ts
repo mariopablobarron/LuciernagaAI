@@ -5,8 +5,8 @@ export const PLANS = {
     name: 'Gratis',
     price: 0,
     limits: {
-      conversationsPerMonth: 10,
-      messagesPerConversation: 20,
+      conversationsPerMonth: Infinity,
+      messagesPerConversation: Infinity,
       impulsoEnabled: false,
       diagnosticoEnabled: true,
     },
@@ -25,7 +25,9 @@ export const PLANS = {
   },
 } as const;
 
-export const FREE_LIMIT_MESSAGE = 'Has alcanzado el límite del plan gratuito. Actualiza a Pro para conversaciones ilimitadas.';
+// Conservado por compatibilidad con call sites antiguos. Ya no se muestra
+// porque el chat es ilimitado en free; Pro se diferencia por extras.
+export const FREE_LIMIT_MESSAGE = '';
 
 /** Stripe price IDs — set these env vars in Coolify */
 export function getStripePriceId(plan: 'pro_monthly' | 'pro_annual'): string {

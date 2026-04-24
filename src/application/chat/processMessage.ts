@@ -79,13 +79,10 @@ function serializeFlow(flow: {
 export async function processMessage(input: ProcessMessageInput): Promise<ProcessMessageResult> {
   const { userId, message, session, jsonMode } = input;
 
-  const remainingMessagesAfterTurn =
-    session.messageLimitPerDay === null
-      ? null
-      : Math.max(0, session.messageLimitPerDay - (session.messagesUsedToday + 1));
-
-  const softPaywallActive =
-    !session.hasPlan && remainingMessagesAfterTurn !== null && remainingMessagesAfterTurn <= 2;
+  // Free es ilimitado: no hay soft paywall ni recuento de "mensajes que quedan".
+  // Pro se vende por extras (continuidad, memoria, Modo Impulso), no por cap.
+  const remainingMessagesAfterTurn = null;
+  const softPaywallActive = false;
 
   // ── 1. Quick synchronous analysis (Phase 1: Analyze) ────────────────────
   const analysis = await analyzeMessage(userId, message);

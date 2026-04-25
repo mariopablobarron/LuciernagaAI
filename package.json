@@ -31,6 +31,7 @@
     "docs:commands:update": "node scripts/auto-update-commands-doc.mjs",
     "docs:commands:check": "node scripts/auto-update-commands-doc.mjs --check",
     "migrate:deploy": "prisma migrate deploy",
+    "legal:notices": "node scripts/generate-third-party-notices.mjs",
     "backup:daily": "bash scripts/db-backup-daily.sh",
     "backup:restore:latest": "gunzip -c ./backups/db/latest.sql.gz | psql \"$DATABASE_URL\"",
     "translate": "node scripts/translate.mjs"

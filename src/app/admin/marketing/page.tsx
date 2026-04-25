@@ -65,7 +65,35 @@ type FeedbackSummary = {
   byType: { type: string; count: number }[];
 };
 
-type Tab = "telegram" | "email" | "metrics" | "feedback" | "atribucion" | "tagging" | "testimonials" | "referidos" | "trackers";
+type Tab = "telegram" | "email" | "metrics" | "feedback" | "atribucion" | "tagging" | "testimonials" | "referidos" | "trackers" | "plantillas";
+
+type EmailTemplateStats = {
+  total: number;
+  delivered: number;
+  failed: number;
+  bounced: number;
+  queued: number;
+  other: number;
+  lastSentAt: string | null;
+  lastError: string | null;
+};
+
+type EmailTemplateRow = {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  trigger: string;
+  builderFn?: string;
+  stats: EmailTemplateStats;
+};
+
+type EmailTemplatesPayload = {
+  categories: Record<string, string>;
+  templates: EmailTemplateRow[];
+  unknownTemplates: EmailTemplateRow[];
+  totals: { cataloged: number; uncataloged: number };
+};
 
 type TrackerStatus = {
   id: "ga4" | "meta_pixel" | "inspectlet";
@@ -294,6 +322,10 @@ export default function MarketingPage() {
   const [trackers, setTrackers] = useState<TrackerStatus[] | null>(null);
   const [trackersLoading, setTrackersLoading] = useState(false);
 
+  // Email templates state
+  const [templates, setTemplates] = useState<EmailTemplatesPayload | null>(null);
+  const [templatesLoading, setTemplatesLoading] = useState(false);
+
   // Custom trackers (DB-driven, no redeploy)
   type CustomTrackerRow = {
     id: string;
@@ -450,6 +482,23 @@ export default function MarketingPage() {
       })
       .finally(() => setReferralsLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  // ── Email templates loader ───────────────────────────────────────────────
+
+  useEffect(() => {
+    if (activeTab !== "plantillas") return;
+    setTemplatesLoading(true);
+    fetch("/api/admin/marketing/email-templates", { credentials: "include" })
+      .then(async (res) => {
+        if (!checkAuth(res)) return null;
+        if (!res.ok) return null;
+        return (await res.json()) as EmailTemplatesPayload;
+      })
+      .then((p) => {
+        if (p) setTemplates(p);
+      })
+      .finally(() => setTemplatesLoading(false));
   }, [activeTab]);
 
   // ── Trackers loader ──────────────────────────────────────────────────────
@@ -760,6 +809,7 @@ export default function MarketingPage() {
     { key: "testimonials", label: "Testimonials", icon: <Star className="h-3.5 w-3.5" /> },
     { key: "referidos", label: "Referidos", icon: <Users className="h-3.5 w-3.5" /> },
     { key: "trackers", label: "Trackers", icon: <Eye className="h-3.5 w-3.5" /> },
+    { key: "plantillas", label: "Plantillas", icon: <Mail className="h-3.5 w-3.5" /> },
   ];
 
   return (
@@ -2080,6 +2130,148 @@ export default function MarketingPage() {
               <li>
                 Cada tracker solo carga si el usuario aceptó cookies. La aceptación
                 se guarda en su navegador y <strong className="text-white">no se reporta al servidor</strong>.
+              </li>
+            </ul>
+          </AdminPanel>
+        </>
+      )}
+
+      {/* ── Tab: Plantillas de email ─────────────────────────────────────────── */}
+      {activeTab === "plantillas" && (
+        <>
+          <AdminPanel
+            title="Plantillas de email"
+            tooltip="Inventario de los emails que envía el sistema (manual o automático), con métricas reales."
+          >
+            <p className="text-xs text-zinc-500 mb-4">
+              Cada plantilla muestra cuántas veces se ha intentado enviar y cuántos llegaron.
+              Los <strong className="text-amber-300">errores</strong> en rojo indican fallos a investigar.
+              {templates && templates.totals.uncataloged > 0 && (
+                <> Hay <strong className="text-amber-300">{templates.totals.uncataloged}</strong> plantilla(s) detectadas en logs sin catalogar.</>
+              )}
+            </p>
+
+            {templatesLoading && !templates ? (
+              <p className="text-sm text-zinc-500">Cargando…</p>
+            ) : !templates ? (
+              <p className="text-sm text-zinc-500">No se pudieron cargar las plantillas.</p>
+            ) : (
+              <div className="space-y-6">
+                {Object.entries(templates.categories).map(([catKey, catLabel]) => {
+                  const catTemplates = templates.templates.filter((t) => t.category === catKey);
+                  if (catTemplates.length === 0) return null;
+                  return (
+                    <div key={catKey}>
+                      <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-400 mb-2">
+                        {catLabel}
+                      </h3>
+                      <div className="space-y-2">
+                        {catTemplates.map((t) => (
+                          <div
+                            key={t.id}
+                            className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4"
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="font-semibold text-white text-sm">{t.name}</span>
+                                  <span className="text-[10px] font-mono text-zinc-500">{t.id}</span>
+                                </div>
+                                <p className="text-xs text-zinc-400 mt-1">{t.description}</p>
+                                <p className="text-[11px] text-zinc-500 mt-1.5">
+                                  <strong className="text-zinc-400">Cuándo:</strong> {t.trigger}
+                                </p>
+                                {t.builderFn && (
+                                  <p className="text-[11px] text-zinc-500 mt-0.5 font-mono">
+                                    {t.builderFn}() en src/lib/email.ts
+                                  </p>
+                                )}
+                              </div>
+                              <div className="shrink-0 grid grid-cols-3 gap-2 text-center text-[11px]">
+                                <div>
+                                  <div className="font-bold text-white">{t.stats.total}</div>
+                                  <div className="text-zinc-500">total</div>
+                                </div>
+                                <div>
+                                  <div className="font-bold text-emerald-300">{t.stats.delivered}</div>
+                                  <div className="text-zinc-500">enviados</div>
+                                </div>
+                                <div>
+                                  <div className={`font-bold ${t.stats.failed > 0 ? "text-red-400" : "text-zinc-500"}`}>{t.stats.failed}</div>
+                                  <div className="text-zinc-500">fallidos</div>
+                                </div>
+                              </div>
+                            </div>
+                            {t.stats.lastSentAt && (
+                              <div className="mt-3 pt-3 border-t border-zinc-800 text-[11px] text-zinc-500 flex flex-wrap gap-x-4 gap-y-1">
+                                <span>Último envío: <span className="text-zinc-300">{new Date(t.stats.lastSentAt).toLocaleString("es-ES")}</span></span>
+                                {t.stats.bounced > 0 && <span>Bounced: <span className="text-amber-300">{t.stats.bounced}</span></span>}
+                                {t.stats.queued > 0 && <span>En cola: <span className="text-cyan-300">{t.stats.queued}</span></span>}
+                              </div>
+                            )}
+                            {t.stats.lastError && (
+                              <div className="mt-2 rounded-lg border border-red-500/30 bg-red-500/5 px-3 py-2 text-[11px] text-red-300 font-mono break-all">
+                                {t.stats.lastError.slice(0, 200)}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {templates.unknownTemplates.length > 0 && (
+                  <div>
+                    <h3 className="text-xs font-semibold uppercase tracking-wide text-amber-300 mb-2">
+                      Sin catalogar (detectadas en logs)
+                    </h3>
+                    <div className="space-y-2">
+                      {templates.unknownTemplates.map((t) => (
+                        <div key={t.id} className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0 flex-1">
+                              <span className="font-semibold text-white text-sm">{t.name}</span>
+                              <p className="text-xs text-zinc-400 mt-1">{t.description}</p>
+                            </div>
+                            <div className="shrink-0 grid grid-cols-3 gap-2 text-center text-[11px]">
+                              <div>
+                                <div className="font-bold text-white">{t.stats.total}</div>
+                                <div className="text-zinc-500">total</div>
+                              </div>
+                              <div>
+                                <div className="font-bold text-emerald-300">{t.stats.delivered}</div>
+                                <div className="text-zinc-500">enviados</div>
+                              </div>
+                              <div>
+                                <div className={`font-bold ${t.stats.failed > 0 ? "text-red-400" : "text-zinc-500"}`}>{t.stats.failed}</div>
+                                <div className="text-zinc-500">fallidos</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </AdminPanel>
+
+          <AdminPanel title="Cómo gestionarlo (Fase 1)" tooltip="Esta vista es de solo lectura. La edición sin redeploy llegará en Fase 2.">
+            <ul className="text-xs text-zinc-400 space-y-2 list-disc list-inside">
+              <li>
+                Para <strong className="text-white">cambiar el contenido</strong> de una plantilla hoy: editar la función correspondiente en{" "}
+                <code className="text-violet-300">src/lib/email.ts</code> y desplegar.
+              </li>
+              <li>
+                Para <strong className="text-white">probar un envío manual</strong>: usa la pestaña <em>Email</em> (broadcast a un segmento) o el botón &quot;Enviar email&quot; en la ficha de un usuario.
+              </li>
+              <li>
+                Las plantillas con <span className="text-red-400 font-semibold">fallidos &gt; 0</span> indican algo a revisar — abre el último error para diagnosticar.
+              </li>
+              <li>
+                <strong className="text-white">Roadmap:</strong> Fase 2 moverá las plantillas a base de datos, permitirá editarlas desde aquí con preview, send-test con destinatario, versiones y rollback.
               </li>
             </ul>
           </AdminPanel>

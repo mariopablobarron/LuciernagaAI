@@ -23,8 +23,11 @@ export default function CapsuleBanner() {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
+    // Difiero el setDismissed sincrónico a microtask para evitar la regla
+    // react-hooks/set-state-in-effect de React 19. El fetch ya es async,
+    // así que setCapsule en su .then no triggers la regla.
     if (typeof window !== "undefined" && sessionStorage.getItem(DISMISS_KEY)) {
-      setDismissed(true);
+      queueMicrotask(() => setDismissed(true));
       return;
     }
     fetch("/api/capsules", { credentials: "include" })

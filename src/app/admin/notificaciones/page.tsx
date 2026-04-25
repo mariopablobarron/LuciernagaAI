@@ -208,6 +208,8 @@ export default function NotificacionesPage() {
               </div>
             </div>
 
+            <PushPreview title={title} body={body} url={url} audience={audience} />
+
             <div className="flex justify-end pt-2">
               <button
                 onClick={handleSend}
@@ -222,5 +224,88 @@ export default function NotificacionesPage() {
         </AdminPanel>
       </div>
     </AdminShell>
+  );
+}
+
+// ── Push preview ──────────────────────────────────────────────────────────────
+
+function PushPreview({
+  title,
+  body,
+  url,
+  audience,
+}: {
+  title: string;
+  body: string;
+  url: string;
+  audience: Audience;
+}) {
+  const displayTitle = title.trim() || "Tu título aquí";
+  const displayBody = body.trim() || "Tu mensaje aparecerá aquí. Escribe arriba para previsualizar.";
+  const isPlaceholder = !title.trim() && !body.trim();
+
+  return (
+    <div className="rounded-xl border border-zinc-800 bg-zinc-950/50 p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+          Vista previa
+        </p>
+        <p className="text-[10px] text-zinc-600">Estilo iOS · ahora</p>
+      </div>
+
+      <div className="rounded-2xl bg-zinc-200/95 backdrop-blur-md p-3 shadow-lg">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-fuchsia-500 to-violet-600 flex items-center justify-center text-lg shrink-0">
+            💓
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-zinc-700 truncate">
+                Tres Mil Millones de Latidos
+              </span>
+              <span className="text-[10px] text-zinc-500 shrink-0">ahora</span>
+            </div>
+            <p
+              className={`text-sm font-semibold leading-tight ${
+                isPlaceholder ? "text-zinc-400" : "text-zinc-900"
+              } break-words`}
+            >
+              {displayTitle}
+            </p>
+            <p
+              className={`text-[13px] leading-snug mt-0.5 ${
+                isPlaceholder ? "text-zinc-400 italic" : "text-zinc-700"
+              } break-words line-clamp-3`}
+            >
+              {displayBody}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-1 text-[11px] text-zinc-500">
+        {url.trim() && (
+          <p>
+            🔗 Al pulsar abre: <code className="text-zinc-300 bg-zinc-900 px-1.5 py-0.5 rounded">{url.trim()}</code>
+          </p>
+        )}
+        <p>
+          📣 Audiencia:{" "}
+          <span className="text-zinc-300 font-medium">
+            {audience === "subscribed" ? "Suscritos a push" : "Todos los usuarios activos"}
+          </span>
+        </p>
+        {title.length > 50 && (
+          <p className="text-amber-400">
+            ⚠️ Título largo ({title.length}/80) — algunos dispositivos lo cortarán.
+          </p>
+        )}
+        {body.length > 178 && (
+          <p className="text-amber-400">
+            ⚠️ Mensaje largo ({body.length}/240) — Android suele cortar a ~178 chars sin expandir.
+          </p>
+        )}
+      </div>
+    </div>
   );
 }

@@ -298,12 +298,28 @@ async function updateEmailLog(
   }
 }
 
+// Resend acepta dos formatos válidos para `from`:
+//   1. email@example.com
+//   2. Name <email@example.com>
+// Coolify v3 a veces envuelve los values con comillas simples/dobles cuando
+// contienen `<>` o espacios — y a veces lo hace en capas (p.ej. `"'X'"`).
+// Pelamos cualquier combo de comillas/whitespace exteriores y, si el resultado
+// no matchea el formato esperado, usamos el default seguro y dejamos warning.
+const DEFAULT_EMAIL_FROM = "Tres Mil Millones de Latidos <info@tresmilmillonesdelatidos.es>";
+const EMAIL_FROM_RE = /^([^<>@]+\s+<\s*[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+\s*>|[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+)$/;
+
+function resolveEmailFrom(): string {
+  const raw = (process.env.EMAIL_FROM ?? DEFAULT_EMAIL_FROM).trim();
+  // Pelar comillas/espacios exteriores en cualquier orden ('"X"', "'X'", `"X"`...)
+  const peeled = raw.replace(/^[\s'"`]+|[\s'"`]+$/g, "").trim();
+  if (EMAIL_FROM_RE.test(peeled)) return peeled;
+  console.warn(`[EMAIL] EMAIL_FROM has invalid format (raw="${raw}", peeled="${peeled}") — falling back to default`);
+  return DEFAULT_EMAIL_FROM;
+}
+
 export async function sendUserEmail(email: UserEmail): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY?.trim();
-  // Coolify v3 envuelve algunos values con comillas simples si contienen <> o espacios.
-  // Stripeamos comillas envolventes para que Resend no rechace el From con 422.
-  const from = (process.env.EMAIL_FROM?.trim() ?? "TresMilMillonesdeLatidos <info@tresmilmillonesdelatidos.es>")
-    .replace(/^['"]|['"]$/g, "");
+  const from = resolveEmailFrom();
   const baseUrl = process.env.APP_BASE_URL?.trim() ?? "https://tresmilmillonesdelatidos.es";
 
   const logId = await createEmailLog(email);

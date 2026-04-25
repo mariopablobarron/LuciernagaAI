@@ -75,6 +75,7 @@ export default function AccessibilityWidget() {
         ref={buttonRef}
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Cerrar panel de accesibilidad" : "Abrir panel de accesibilidad"}
+        title={open ? "Cerrar panel de accesibilidad" : "Accesibilidad: tamaño de texto, contraste y movimiento"}
         aria-expanded={open}
         aria-controls="a11y-panel"
         className="fixed bottom-36 sm:bottom-20 left-4 z-[9998] flex items-center justify-center w-11 h-11 rounded-full bg-violet-600/90 hover:bg-violet-500 text-white shadow-lg shadow-violet-500/25 backdrop-blur-sm transition-all focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"

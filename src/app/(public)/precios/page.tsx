@@ -4,13 +4,13 @@ import { Check, Gift, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Precios — Tres Mil Millones de Latidos',
-  description: 'Tres Mil Millones de Latidos: acceso completo gratuito durante la fase MVP. Registrate y accede a mentoria con IA, check-ins, diario, Modo Impulso y mas. Sin tarjeta de credito.',
+  description: 'Tres Mil Millones de Latidos: acceso completo gratuito durante la fase MVP. Regístrate y accede a mentoría con IA, check-ins, diario, Modo Impulso y más. Sin tarjeta de crédito.',
   alternates: {
     canonical: 'https://tresmilmillonesdelatidos.es/precios',
   },
   openGraph: {
     title: 'Precios — Tres Mil Millones de Latidos',
-    description: 'Fase MVP: acceso Pro gratuito. Mentoria con IA, check-ins, diario y Modo Impulso. Sin coste.',
+    description: 'Fase MVP: acceso Pro gratuito. Mentoría con IA, check-ins, diario y Modo Impulso. Sin coste.',
     type: 'website',
     locale: 'es_ES',
     siteName: 'Tres Mil Millones de Latidos',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Precios — Tres Mil Millones de Latidos',
-    description: 'Mentoria con IA gratis durante el MVP. Sin tarjeta de credito.',
+    description: 'Mentoría con IA gratis durante el MVP. Sin tarjeta de crédito.',
     images: ['/opengraph-image'],
   },
   robots: { index: true, follow: true },
@@ -28,18 +28,18 @@ export const metadata: Metadata = {
 const PRO_FEATURES = [
   'Conversaciones ilimitadas con el coach IA',
   'Mensajes ilimitados',
-  'Modo Impulso completo — 21 dias de transformacion',
-  'Diagnosticos avanzados y retos personalizados',
+  'Modo Impulso completo — 21 días de transformación',
+  'Diagnósticos avanzados y retos personalizados',
   'Insights semanales de comportamiento',
   'Check-in diario con racha',
-  'Mapa de patrones de evitacion',
+  'Mapa de patrones de evitación',
   'Historial de conversaciones completo',
   'Bot de Telegram integrado',
   'Portal para personas de confianza',
 ];
 
 const FUTURE_PRICE = [
-  { plan: 'Free', price: '0 euros/mes', features: 'Conversaciones sin limite con el mentor IA. Sin cap diario.' },
+  { plan: 'Free', price: '0 euros/mes', features: 'Conversaciones sin límite con el mentor IA. Sin cap diario.' },
   { plan: 'Pro', price: '9 euros/mes', features: 'Continuidad cross-device, memoria persistente, Modo Impulso y prioridad' },
   { plan: 'Pro anual', price: '79 euros/año', features: 'Mismo que Pro, ahorrando 2 meses' },
 ];
@@ -94,8 +94,8 @@ export default function PreciosPage() {
             Crear cuenta gratuita <ArrowRight className="w-5 h-5" />
           </Link>
           <p className="text-xs text-zinc-600 text-center mt-3">
-            Al registrarte accedes automaticamente al plan Pro completo.
-            No se te pedira tarjeta de credito.
+            Al registrarte accedes automáticamente al plan Pro completo.
+            No se te pedirá tarjeta de crédito.
           </p>
         </div>
       </div>
@@ -105,22 +105,22 @@ export default function PreciosPage() {
         <div className="flex items-start gap-3">
           <span className="text-2xl">🧪</span>
           <div className="space-y-3">
-            <h3 className="text-lg font-bold text-white">Por que es gratis (y hasta cuando)</h3>
+            <h3 className="text-lg font-bold text-white">Por qué es gratis (y hasta cuándo)</h3>
             <p className="text-sm text-zinc-300 leading-relaxed">
-              Tres Mil Millones de Latidos esta en fase de producto minimo viable.
-              Funciona, pero todavia esta aprendiendo. Y para aprender necesita
-              personas reales usandolo de verdad — no betas cerradas ni demos
+              Tres Mil Millones de Latidos está en fase de producto mínimo viable.
+              Funciona, pero todavía está aprendiendo. Y para aprender necesita
+              personas reales usándolo de verdad — no betas cerradas ni demos
               que nadie toca.
             </p>
             <p className="text-sm text-zinc-300 leading-relaxed">
-              Durante estos 6 meses (hasta octubre 2026), todo el plan Pro esta abierto
+              Durante estos 6 meses (hasta octubre 2026), todo el plan Pro está abierto
               sin coste. A cambio, tus interacciones nos ayudan a mejorar el producto.
               No vendemos tus datos. No los compartimos. Los usamos, anonimizados,
-              para que la herramienta sea mejor para ti y para los que vengan despues.
+              para que la herramienta sea mejor para ti y para los que vengan después.
             </p>
             <p className="text-sm text-zinc-300 leading-relaxed">
-              Cuando termine la fase MVP, el plan gratuito mantendra el chat
-              sin limite. Pro sera para quien quiera continuidad cross-device,
+              Cuando termine la fase MVP, el plan gratuito mantendrá el chat
+              sin límite. Pro será para quien quiera continuidad cross-device,
               memoria persistente entre sesiones y Modo Impulso. Sin sorpresas.
             </p>
           </div>
@@ -131,8 +131,8 @@ export default function PreciosPage() {
       <div className="space-y-4">
         <h2 className="text-xl font-bold text-center">Precios tras la fase MVP</h2>
         <p className="text-sm text-zinc-500 text-center max-w-md mx-auto">
-          Estos seran los precios cuando termine el periodo de acceso abierto.
-          Los usuarios MVP tendran condiciones especiales.
+          Estos serán los precios cuando termine el período de acceso abierto.
+          Los usuarios MVP tendrán condiciones especiales.
         </p>
         <div className="grid sm:grid-cols-3 gap-4 pt-2">
           {FUTURE_PRICE.map((p) => (
@@ -144,10 +144,10 @@ export default function PreciosPage() {
           ))}
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-6 space-y-3 max-w-lg mx-auto">
-          <p className="text-sm font-semibold text-white text-center">¿Por que existe el plan Pro?</p>
+          <p className="text-sm font-semibold text-white text-center">¿Por qué existe el plan Pro?</p>
           <p className="text-xs text-zinc-400 leading-relaxed text-center">
-            El cambio real no ocurre en una conversacion — ocurre cuando mantienes el hilo durante semanas.
-            La continuidad es lo que transforma una idea en un habito. Pro existe para que no pierdas
+            El cambio real no ocurre en una conversación — ocurre cuando mantienes el hilo durante semanas.
+            La continuidad es lo que transforma una idea en un hábito. Pro existe para que no pierdas
             ese hilo: conversaciones ilimitadas, seguimiento de acciones, y un mentor que recuerda
             tu historia completa.
           </p>
@@ -159,24 +159,24 @@ export default function PreciosPage() {
         <h2 className="text-xl font-bold text-center mb-6">Preguntas frecuentes</h2>
         {[
           {
-            q: 'Es realmente gratis?',
-            a: 'Si. Durante la fase MVP (hasta octubre 2026) no se cobra nada. No necesitas tarjeta de credito. Solo registrarte con tu email.',
+            q: '¿Es realmente gratis?',
+            a: 'Sí. Durante la fase MVP (hasta octubre 2026) no se cobra nada. No necesitas tarjeta de crédito. Solo registrarte con tu email.',
           },
           {
-            q: 'Que pasa con mis datos?',
+            q: '¿Qué pasa con mis datos?',
             a: 'Tus conversaciones y datos emocionales se procesan de forma anonimizada para mejorar el producto. Nunca se venden ni comparten con terceros. Puedes borrar todo en cualquier momento desde Ajustes.',
           },
           {
-            q: 'Que pasa cuando termine el MVP?',
-            a: 'Podras seguir usando el plan gratuito con chat sin limite, o elegir Pro a su precio regular para extras (continuidad cross-device, memoria persistente, Modo Impulso). Los usuarios MVP tendran condiciones especiales.',
+            q: '¿Qué pasa cuando termine el MVP?',
+            a: 'Podrás seguir usando el plan gratuito con chat sin límite, o elegir Pro a su precio regular para extras (continuidad cross-device, memoria persistente, Modo Impulso). Los usuarios MVP tendrán condiciones especiales.',
           },
           {
-            q: 'Tres Mil Millones de Latidos reemplaza a un psicologo?',
-            a: 'No. Es una herramienta de mentoria conversacional con IA. Ayuda a ordenar ideas y pasar a la accion, pero no sustituye terapia profesional. En caso de crisis, conecta con el 024.',
+            q: '¿Tres Mil Millones de Latidos reemplaza a un psicólogo?',
+            a: 'No. Es una herramienta de mentoría conversacional con IA. Ayuda a ordenar ideas y pasar a la acción, pero no sustituye terapia profesional. En caso de crisis, conecta con el 024.',
           },
           {
-            q: 'Puedo usarlo desde el movil?',
-            a: 'Si. La web esta optimizada para movil y puedes anadirla a tu pantalla de inicio. Tambien puedes usar el bot de Telegram para conversar directamente desde ahi.',
+            q: '¿Puedo usarlo desde el móvil?',
+            a: 'Sí. La web está optimizada para móvil y puedes añadirla a tu pantalla de inicio. También puedes usar el bot de Telegram para conversar directamente desde ahí.',
           },
         ].map(({ q, a }) => (
           <div key={q} className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">

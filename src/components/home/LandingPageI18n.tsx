@@ -249,10 +249,20 @@ export default function LandingPageI18n({
       {/* TICKER ───────────────────────────────────── */}
       <section className="relative isolate py-5 border-y border-zinc-800/60 overflow-hidden bg-zinc-950">
         <div className="flex ticker-scroll whitespace-nowrap">
-          {[...tickerItems, ...tickerItems].map((item, i) => (
+          {tickerItems.map((item, i) => (
             <span
-              key={i}
+              key={`a-${i}`}
               className="inline-flex items-center gap-6 px-8 text-[11px] uppercase tracking-[0.3em] text-zinc-400"
+            >
+              {item}
+              <span className="inline-block w-1 h-1 rounded-full bg-violet-400" />
+            </span>
+          ))}
+          {tickerItems.map((item, i) => (
+            <span
+              key={`b-${i}`}
+              aria-hidden="true"
+              className="motion-reduce:hidden inline-flex items-center gap-6 px-8 text-[11px] uppercase tracking-[0.3em] text-zinc-400"
             >
               {item}
               <span className="inline-block w-1 h-1 rounded-full bg-violet-400" />

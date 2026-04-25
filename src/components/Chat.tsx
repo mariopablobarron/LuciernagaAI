@@ -7,18 +7,35 @@ import {
   BookOpen,
   Check,
   Copy,
+  Ear,
+  Eye,
+  GitBranch,
   Heart,
   ImagePlus,
+  type LucideIcon,
   Mic,
   Phone,
+  Repeat,
   Send,
   Shield,
   Sparkles,
+  Target,
   ThumbsDown,
   ThumbsUp,
   X,
   Zap,
 } from "lucide-react";
+
+// Mapa de iconos para los modos de acompañamiento (definidos en lib/onboarding.ts).
+// Centralizar aquí evita que la capa lib dependa de lucide-react.
+const MENTOR_MODE_ICONS: Record<string, LucideIcon> = {
+  Target,
+  Eye,
+  Zap,
+  GitBranch,
+  Repeat,
+  Ear,
+};
 import { Button } from "@/components/ui/button";
 
 import { Textarea } from "@/components/ui/textarea";
@@ -869,6 +886,7 @@ export default function Chat({
                 <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2">
                   {MENTOR_MODES.map((mode) => {
                     const isActive = mentorModeId === mode.id;
+                    const Icon = MENTOR_MODE_ICONS[mode.icon] ?? Sparkles;
                     return (
                       <button
                         key={mode.id}
@@ -880,7 +898,7 @@ export default function Chat({
                             : "border-zinc-800 bg-zinc-900/60 text-zinc-300 hover:border-zinc-700 hover:bg-zinc-900"
                         }`}
                       >
-                        <span className="text-base leading-none">{mode.icon}</span>
+                        <Icon className={`h-4 w-4 shrink-0 mt-0.5 ${isActive ? "text-cyan-400" : "text-zinc-400"}`} aria-hidden />
                         <span className="flex flex-col gap-0.5">
                           <span className="text-xs font-semibold">{mode.label}</span>
                           <span className="text-[11px] leading-snug text-zinc-500">

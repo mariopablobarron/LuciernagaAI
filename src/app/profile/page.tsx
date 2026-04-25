@@ -16,11 +16,18 @@ function Skeleton({ className }: { className?: string }) {
   return <div className={`animate-pulse bg-zinc-800/60 rounded-xl ${className ?? ''}`} />;
 }
 
-function initials(name: string | null | undefined): string {
-  if (!name) return '?';
-  const parts = name.trim().split(' ').filter(Boolean);
-  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-  return parts[0].slice(0, 2).toUpperCase();
+function initials(name: string | null | undefined, emailFallback?: string | null): string {
+  if (name && name.trim()) {
+    const parts = name.trim().split(' ').filter(Boolean);
+    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+  if (emailFallback && emailFallback.trim()) {
+    const local = emailFallback.split('@')[0] || '';
+    const cleaned = local.replace(/[^a-z0-9]/gi, '');
+    if (cleaned) return cleaned.slice(0, 2).toUpperCase();
+  }
+  return '·';
 }
 
 const STATE_LABEL: Record<string, string> = {
@@ -35,6 +42,10 @@ export default function ProfilePage() {
   const [user, setUser] = useState<BrowserSessionUser | null>(null);
   const [stateData, setStateData] = useState<StateData | null>(null);
   const [loading, setLoading] = useState(true);
+  // hasPhoto: el endpoint /api/user/avatar/{id} responde con la imagen del
+  // usuario o un placeholder. Si carga OK -> tiene foto y no nudgeamos.
+  // Si onError dispara, asumimos sin foto y mostramos CTA para subirla.
+  const [hasPhoto, setHasPhoto] = useState<boolean | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -97,12 +108,13 @@ export default function ProfilePage() {
                   <img
                     src={`/api/user/avatar/${user.id}`}
                     alt={user?.name ?? 'Avatar'}
-                    className="w-20 h-20 rounded-full object-cover border-2 border-zinc-700"
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextElementSibling as HTMLElement)?.classList.remove('hidden'); }}
+                    className={`w-20 h-20 rounded-full object-cover border-2 border-zinc-700 ${hasPhoto === false ? 'hidden' : ''}`}
+                    onLoad={() => setHasPhoto(true)}
+                    onError={() => setHasPhoto(false)}
                   />
                 ) : null}
-                <div className={`w-20 h-20 rounded-full bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-2xl font-bold text-white ${!loading && user?.id ? 'hidden' : ''}`}>
-                  {loading ? '…' : initials(user?.name)}
+                <div className={`w-20 h-20 rounded-full bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-2xl font-bold text-white ${hasPhoto === true && !loading ? 'hidden' : ''}`}>
+                  {loading ? '…' : initials(user?.name, user?.email)}
                 </div>
               </div>
               <div className="space-y-1">
@@ -137,6 +149,20 @@ export default function ProfilePage() {
               Editar
             </Link>
           </div>
+
+          {/* Nudge para subir foto: aparece SOLO si confirmamos que no la tiene
+              (hasPhoto === false). Mientras carga (null) no mostramos nada. */}
+          {!loading && hasPhoto === false && (
+            <Link
+              href="/settings"
+              className="block rounded-xl border border-violet-500/30 bg-violet-500/5 px-4 py-3 text-sm hover:bg-violet-500/10 transition-colors"
+            >
+              <span className="font-semibold text-violet-300">Sube una foto · </span>
+              <span className="text-zinc-400">
+                Tu mentor te acompaña mejor cuando te ve como persona, no como sesión.
+              </span>
+            </Link>
+          )}
 
           {/* Info Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6 border-t border-zinc-800">

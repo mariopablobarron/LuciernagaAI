@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -94,7 +93,6 @@ export default function Sidebar({
   onDeleteConversation,
 }: SidebarProps) {
   const pathname = usePathname();
-  const [logoSrc, setLogoSrc] = useState("/logo-startidea.png");
 
   // ── Progressive unlock system ──────────────────────────────────────────────
   const [daysSinceSignup] = useState(() => {
@@ -226,16 +224,13 @@ export default function Sidebar({
     <aside className="flex h-full flex-col rounded-3xl border border-border/80 bg-card/95 p-4 shadow-sm">
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-3">
-          <Link href="/app" className="inline-flex items-center">
-            <Image
-              src={logoSrc}
-              alt="Startidea"
-              width={140}
-              height={40}
-              className="h-8 w-auto sm:h-10"
-              priority
-              onError={() => setLogoSrc("/placeholder.png")}
-            />
+          <Link href="/app" className="inline-flex items-center gap-2 text-foreground hover:text-primary transition-colors">
+            <span className="text-xl leading-none">💓</span>
+            <span className="font-bold text-sm leading-tight">
+              Tres Mil
+              <br className="lg:hidden" />
+              <span className="lg:ml-1">Millones</span>
+            </span>
           </Link>
           <div className="flex items-center gap-2">
             <Badge variant="secondary" className="rounded-full px-2.5 py-1 gap-1">
@@ -818,6 +813,20 @@ export default function Sidebar({
           onClose={() => setShowShareStory(false)}
         />
       )}
+
+      {/* Atribución sutil — el producto es Tres Mil Millones de Latidos pero
+          en el fondo se reconoce que es proyecto de Startidea sin saturar la UI. */}
+      <p className="mt-auto pt-3 text-center text-[10px] text-muted-foreground/60">
+        un proyecto de{" "}
+        <a
+          href="https://startidea.es"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-foreground/80 transition-colors underline decoration-dotted underline-offset-2"
+        >
+          Startidea
+        </a>
+      </p>
     </aside>
   );
 }

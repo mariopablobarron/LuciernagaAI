@@ -72,10 +72,13 @@ export type MentorMode = {
   instruction: string;
 };
 
+// icon es el nombre de un componente Lucide; el render lo resuelve a JSX.
+// Usamos un set lineal monocromo coherente con el resto de la UI en lugar
+// de emojis sueltos que se ven incoherentes entre plataformas.
 export const MENTOR_MODES: MentorMode[] = [
   {
     id: "concretar",
-    icon: "🎯",
+    icon: "Target",
     label: "Aterriza algo concreto",
     description: "Tengo una idea vaga y quiero salir con 1-3 pasos reales.",
     instruction:
@@ -83,7 +86,7 @@ export const MENTOR_MODES: MentorMode[] = [
   },
   {
     id: "espejo",
-    icon: "🪞",
+    icon: "Eye",
     label: "Devuélveme el reflejo",
     description: "No quiero consejos. Quiero ver lo que digo desde fuera.",
     instruction:
@@ -91,7 +94,7 @@ export const MENTOR_MODES: MentorMode[] = [
   },
   {
     id: "confrontar",
-    icon: "🧭",
+    icon: "Zap",
     label: "Confróntame",
     description: "No me dores la píldora. Dime lo que no quiero oír.",
     instruction:
@@ -99,7 +102,7 @@ export const MENTOR_MODES: MentorMode[] = [
   },
   {
     id: "decidir",
-    icon: "🔨",
+    icon: "GitBranch",
     label: "Ayúdame a decidir",
     description: "Quiero cerrar el chat con una decisión, no con más opciones.",
     instruction:
@@ -107,7 +110,7 @@ export const MENTOR_MODES: MentorMode[] = [
   },
   {
     id: "patron",
-    icon: "🔁",
+    icon: "Repeat",
     label: "Sácame del patrón",
     description: "Llevo repitiendo lo mismo y quiero entender por qué.",
     instruction:
@@ -115,7 +118,7 @@ export const MENTOR_MODES: MentorMode[] = [
   },
   {
     id: "escuchar",
-    icon: "🫥",
+    icon: "Ear",
     label: "Solo escúchame",
     description: "No quiero ir a ninguna parte. Solo necesito soltar.",
     instruction:

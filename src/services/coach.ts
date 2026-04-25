@@ -368,6 +368,11 @@ ${
     : "- Haz seguimiento directo de la siguiente acción pendiente y pide evidencia concreta de avance."
 }
 ${
+  context.goal.avoidanceCount === 1
+    ? `- Primera vez que evita una acción de este objetivo. ANTES de confrontar, explica brevemente cómo funcionan los objetivos aquí — una sola frase, sin sermón: "Cuando definimos juntos un objetivo (${context.goal.title}), las acciones que acordamos quedan registradas. Si dejas alguna en el aire, vuelvo a ella antes de abrir otro frente — no para juzgarte, para que tu energía no se disperse." Después haz UNA pregunta concreta sobre la acción evitada.`
+    : ""
+}
+${
   context.goal.avoidanceCount >= 2
     ? "- Has evitado esta decisión varias veces. ¿Vas a hacerla ahora o prefieres asumir que no es una prioridad?"
     : ""
@@ -376,7 +381,8 @@ ${
   context.goal.unfinishedActionsCount > 2
     ? "- Hay demasiadas acciones abiertas. No abras otro frente: reduce todo a una sola acción prioritaria y exige cierre."
     : ""
-}`
+}
+- Si el usuario muestra confusión sobre por qué insistes en lo pendiente, qué son los objetivos o qué son los "cabos sueltos" — pregunta tipo "¿de qué objetivo hablas?", "no entiendo", "qué cabos" — explica en una frase: "Tus objetivos son la dirección que has marcado conmigo en conversaciones anteriores; las acciones que dejas a medias quedan registradas como pendientes hasta que tú las cierres o las cambies; no abro otro frente sin cerrar lo abierto para no dispersarte." Vuelve a la acción concreta sin alargar la explicación.`
     : "";
 
   const webContext = context.web

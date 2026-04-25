@@ -3,6 +3,7 @@ import { getPrismaClient } from "@/db/prisma";
 import { answerCallbackQuery, editTelegramMessage } from "./telegram-utils";
 import { triggerForceRedeploy } from "./coolify-api";
 import { buildUserSearchMessage } from "./user-search";
+import { buildCronLogsMessage, retryCronJob } from "./cron-watchdog";
 
 export type CallbackContext = {
   callbackId: string;
@@ -74,6 +75,41 @@ export async function handleCallbackQuery(ctx: CallbackContext): Promise<void> {
     await answerCallbackQuery(ctx.callbackId, "Buscando…");
     const reply = await buildUserSearchMessage(rest[0]);
     await editTelegramMessage(ctx.chatId, ctx.messageId, reply);
+    return;
+  }
+
+  if (action === "cron" && sub === "logs" && rest[0]) {
+    await answerCallbackQuery(ctx.callbackId, "Cargando…");
+    const reply = await buildCronLogsMessage(rest[0]);
+    await editTelegramMessage(ctx.chatId, ctx.messageId, reply);
+    return;
+  }
+
+  if (action === "cron" && sub === "retry" && rest[0]) {
+    const jobName = rest[0];
+    await answerCallbackQuery(ctx.callbackId, "Reintentando…");
+    await editTelegramMessage(ctx.chatId, ctx.messageId, `🔄 Reintentando \`${jobName}\`…\n_${fmtNow()}_`);
+    const result = await retryCronJob(jobName);
+    if (result.ok) {
+      await editTelegramMessage(
+        ctx.chatId,
+        ctx.messageId,
+        [
+          `✅ *Reintento OK*: \`${jobName}\``,
+          "",
+          `HTTP ${result.httpStatus}`,
+          result.bodyPreview ? `\n\`\`\`\n${result.bodyPreview}\n\`\`\`` : "",
+          `_${fmtNow()}_`,
+        ].join("\n")
+      );
+    } else {
+      await editTelegramMessage(
+        ctx.chatId,
+        ctx.messageId,
+        `❌ *Reintento falló*: \`${jobName}\`\n\nHTTP ${result.httpStatus ?? "—"}\n${result.error ?? result.bodyPreview ?? ""}\n_${fmtNow()}_`
+      );
+    }
+    logInfo("CALLBACK", "cron_retry", { jobName, ok: result.ok });
     return;
   }
 

@@ -8,6 +8,23 @@ export const dynamic = "force-dynamic";
 const TRIGGER_ID_RE = /^trig_[A-Za-z0-9]+$/;
 const PROMPT_SUMMARY_MAX = 500;
 
+/**
+ * Auto-register check: a Claude Code agent that just created a routine via
+ * /schedule can POST to this endpoint with the shared secret to catalog it
+ * without an admin browser session. Constant-time compare avoids timing leaks.
+ */
+function isAutoRegisterRequest(req: NextRequest): boolean {
+  const secret = process.env.ROUTINES_REGISTER_SECRET?.trim();
+  if (!secret) return false;
+  const header = req.headers.get("x-admin-secret")?.trim();
+  if (!header || header.length !== secret.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < secret.length; i++) {
+    mismatch |= secret.charCodeAt(i) ^ header.charCodeAt(i);
+  }
+  return mismatch === 0;
+}
+
 // GET /api/admin/routines?status=scheduled|ran|cancelled|all
 export async function GET(req: NextRequest) {
   const auth = requireAdminPermission(req, "operations");
@@ -48,9 +65,17 @@ export async function GET(req: NextRequest) {
 }
 
 // POST /api/admin/routines  body: { triggerId, name, purpose?, scheduledFor?, cronExpression?, promptSummary, model?, repo? }
+//
+// Two auth modes:
+//  - Admin browser session (requireAdminPermission)
+//  - Header `X-Admin-Secret: <ROUTINES_REGISTER_SECRET>` for auto-registration
+//    by a Claude Code agent that just created a routine via /schedule.
 export async function POST(req: NextRequest) {
-  const auth = requireAdminPermission(req, "operations");
-  if (auth instanceof NextResponse) return auth;
+  const autoRegister = isAutoRegisterRequest(req);
+  if (!autoRegister) {
+    const auth = requireAdminPermission(req, "operations");
+    if (auth instanceof NextResponse) return auth;
+  }
 
   try {
     const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;
@@ -94,7 +119,11 @@ export async function POST(req: NextRequest) {
         status: "scheduled",
       },
     });
-    logInfo("ADMIN_ROUTINES", "routine_registered", { id: created.id, triggerId });
+    logInfo("ADMIN_ROUTINES", "routine_registered", {
+      id: created.id,
+      triggerId,
+      via: autoRegister ? "auto" : "admin",
+    });
     return NextResponse.json({ routine: created });
   } catch (error) {
     if (error instanceof Error && error.message.includes("Unique constraint")) {

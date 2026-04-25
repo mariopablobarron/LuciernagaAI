@@ -6,6 +6,16 @@ const createNextIntlPlugin = require("next-intl/plugin");
 
 const isDev = process.env.NODE_ENV === "development";
 
+// Build version: SHA del commit (si Coolify lo expone) o timestamp como fallback.
+// Se inyecta como NEXT_PUBLIC_BUILD_VERSION para que el cliente pueda detectar
+// nuevas versiones desplegadas y mostrar banner "recargar".
+const BUILD_VERSION =
+  process.env.GIT_SHA ||
+  process.env.SOURCE_COMMIT ||
+  process.env.COOLIFY_GIT_COMMIT_SHA ||
+  `t${Date.now()}`;
+process.env.NEXT_PUBLIC_BUILD_VERSION = BUILD_VERSION;
+
 const cspDirectives = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net${isDev ? " 'unsafe-eval'" : ""}`,
@@ -26,6 +36,9 @@ const nextConfig: NextConfig = {
   // ============================================
   // PRODUCTION OPTIMIZATIONS
   // ============================================
+
+  // Build ID consistente con BUILD_VERSION (usado por banner "nueva versión")
+  generateBuildId: async () => BUILD_VERSION,
 
   // Disable React strict mode in production (performance)
   reactStrictMode: isDev,

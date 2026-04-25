@@ -21,6 +21,7 @@ import {
   Video,
   Eye,
   ExternalLink,
+  RefreshCw,
 } from "lucide-react";
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -337,6 +338,9 @@ export default function MarketingPage() {
   // Email templates state
   const [templates, setTemplates] = useState<EmailTemplatesPayload | null>(null);
   const [templatesLoading, setTemplatesLoading] = useState(false);
+
+  // Cache purge state
+  const [purgingCache, setPurgingCache] = useState(false);
   const [previewOpen, setPreviewOpen] = useState<string | null>(null);
   const [preview, setPreview] = useState<TemplatePreview | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -557,6 +561,28 @@ export default function MarketingPage() {
     setSendTestOpen(null);
     setSendTestStatus(null);
   }, []);
+
+  const purgeCache = useCallback(async () => {
+    if (purgingCache) return;
+    setPurgingCache(true);
+    try {
+      const res = await fetch("/api/admin/cache/purge", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!checkAuth(res)) return;
+      const json = (await res.json()) as { ok: boolean; elapsedMs?: number; note?: string; message?: string };
+      if (json.ok) {
+        toast.success(`Caché del servidor purgada (${json.elapsedMs}ms). Recarga la página con Cmd+Shift+R si quieres ver los cambios ya.`);
+      } else {
+        toast.error(json.message ?? "Falló al purgar caché.");
+      }
+    } catch {
+      toast.error("Error de red al purgar caché.");
+    } finally {
+      setPurgingCache(false);
+    }
+  }, [purgingCache]);
 
   const submitSendTest = useCallback(async () => {
     if (!sendTestOpen) return;
@@ -923,6 +949,16 @@ export default function MarketingPage() {
           Contenido del equipo
           <ArrowRight className="h-3 w-3" />
         </Link>
+        <button
+          type="button"
+          onClick={() => void purgeCache()}
+          disabled={purgingCache}
+          title="Purga el cache server-side de Next.js. NO limpia el cache del navegador del usuario — eso requiere hard-reload (Cmd+Shift+R)."
+          className="inline-flex items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-xs font-semibold text-amber-200 hover:bg-amber-500/20 transition-colors disabled:opacity-50"
+        >
+          <RefreshCw className={`h-3.5 w-3.5 ${purgingCache ? "animate-spin" : ""}`} />
+          {purgingCache ? "Purgando…" : "Purgar caché"}
+        </button>
       </div>
 
       {/* Tab bar */}

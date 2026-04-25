@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdminPermission } from "@/lib/admin-auth";
+import { adminJson } from "@/lib/admin-response";
 import { buildPreview } from "@/lib/email-templates-preview";
 import { EMAIL_TEMPLATE_BY_ID } from "@/lib/email-templates-catalog";
 
@@ -19,7 +20,7 @@ export async function GET(
   const preview = buildPreview(id, { appUrl, to: "preview@example.com" });
 
   if (!preview) {
-    return NextResponse.json(
+    return adminJson(
       {
         ok: false,
         error: "PREVIEW_UNAVAILABLE",
@@ -31,7 +32,7 @@ export async function GET(
     );
   }
 
-  return NextResponse.json({
+  return adminJson({
     ok: true,
     template: meta ? { id: meta.id, name: meta.name, description: meta.description } : { id, name: id, description: "" },
     subject: preview.subject,

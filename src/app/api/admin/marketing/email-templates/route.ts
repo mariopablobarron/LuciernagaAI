@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdminPermission } from "@/lib/admin-auth";
+import { adminJson } from "@/lib/admin-response";
 import { getPrismaClient } from "@/db/prisma";
 import { EMAIL_TEMPLATES, EMAIL_TEMPLATE_BY_ID, CATEGORY_LABELS, type EmailTemplateMeta } from "@/lib/email-templates-catalog";
 import { PREVIEW_REGISTRY } from "@/lib/email-templates-preview";
@@ -108,7 +109,7 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  return NextResponse.json({
+  return adminJson({
     categories: CATEGORY_LABELS,
     templates: knownTemplates,
     unknownTemplates,

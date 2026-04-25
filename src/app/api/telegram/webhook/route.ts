@@ -23,6 +23,7 @@ import { DEFAULT_EMOTIONAL_PROFILE } from "@/types/emotional-profile";
 import { getPrismaClient } from "@/db/prisma";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { fetchWithTimeout } from "@/lib/fetchWithTimeout";
+import { buildWeeklyLetterSummaryMessage } from "@/lib/weekly-letter-summary";
 
 // ---- Telegram types ----
 
@@ -583,8 +584,100 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
+    // ---- Admin notes (bandeja de notas rápidas; solo admin) ----
+    // Acepta: "/nota <texto>", "/notas", "/nota_hecha <id>", o mensaje que empiece por 📝
+    // Reutiliza el modelo AdminNote (tablón admin). Tag del mensaje (#cron, #env…) se
+    // valida contra el set oficial; si no coincide, cae a "general".
+    const VALID_NOTE_TAGS = new Set(["general", "referrals", "migration", "env", "cron", "ui", "incident"]);
+    const isNoteCommand =
+      isAdmin(chatId) &&
+      (text === "/notas" ||
+        text.startsWith("/nota ") ||
+        text.startsWith("/nota_hecha ") ||
+        text.startsWith("📝"));
+    if (isNoteCommand) {
+      try {
+        const prisma = getPrismaClient();
+        if (text === "/notas") {
+          const notes = await prisma.adminNote.findMany({
+            where: { status: "open" },
+            orderBy: { createdAt: "desc" },
+            take: 10,
+          });
+          if (notes.length === 0) {
+            await sendTelegramMessage(chatId, "📭 No hay notas pendientes.");
+          } else {
+            const body = notes
+              .map((n) => {
+                const when = new Date(n.createdAt).toLocaleString("es-ES", {
+                  timeZone: "Europe/Madrid",
+                  day: "2-digit",
+                  month: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                });
+                const preview = n.title.length > 140 ? `${n.title.slice(0, 137)}...` : n.title;
+                return `• \`${n.id.slice(-6)}\` ${when} · #${n.tag} — ${preview}`;
+              })
+              .join("\n");
+            await sendTelegramMessage(
+              chatId,
+              `📒 *Notas pendientes (${notes.length})*\n\n${body}\n\n_Marca como hecha con /nota_hecha <id6>_`
+            );
+          }
+        } else if (text.startsWith("/nota_hecha ")) {
+          const suffix = text.slice("/nota_hecha ".length).trim();
+          const match = await prisma.adminNote.findFirst({
+            where: { id: { endsWith: suffix }, status: "open" },
+            orderBy: { createdAt: "desc" },
+          });
+          if (!match) {
+            await sendTelegramMessage(chatId, `No encuentro una nota pendiente con id terminado en "${suffix}".`);
+          } else {
+            await prisma.adminNote.update({
+              where: { id: match.id },
+              data: { status: "done", resolvedAt: new Date(), resolvedBy: "telegram_admin" },
+            });
+            await sendTelegramMessage(chatId, `✅ Nota \`${match.id.slice(-6)}\` marcada como hecha.`);
+          }
+        } else {
+          // /nota <texto> ó 📝 <texto>
+          const raw = text.startsWith("/nota ")
+            ? text.slice("/nota ".length).trim()
+            : text.replace(/^📝\s*/u, "").trim();
+          if (!raw) {
+            await sendTelegramMessage(chatId, "Escribe el contenido después de /nota o del 📝.");
+          } else {
+            const tagMatch = raw.match(/#(\w[\w-]*)/);
+            const tag = tagMatch && VALID_NOTE_TAGS.has(tagMatch[1]) ? tagMatch[1] : "general";
+            // Primer párrafo (o primeros 200 chars) como título; resto al body.
+            const firstLineBreak = raw.indexOf("\n");
+            let title = firstLineBreak === -1 ? raw : raw.slice(0, firstLineBreak).trim();
+            let body: string | null =
+              firstLineBreak === -1 ? null : raw.slice(firstLineBreak + 1).trim() || null;
+            if (title.length > 200) {
+              const overflow = title.slice(200);
+              title = title.slice(0, 200);
+              body = body ? `${overflow}\n\n${body}` : overflow;
+            }
+            const created = await prisma.adminNote.create({
+              data: { title, body, tag, priority: "medium", createdBy: "telegram_admin" },
+            });
+            await sendTelegramMessage(
+              chatId,
+              `📝 Nota guardada \`${created.id.slice(-6)}\` · #${tag}`
+            );
+          }
+        }
+      } catch (err: unknown) {
+        logError("TELEGRAM", err, { area: "admin_notes", command: text });
+        await sendTelegramMessage(chatId, "Error al guardar/leer la nota.");
+      }
+      return NextResponse.json({ ok: true });
+    }
+
     // ---- Admin commands (only respond to ADMIN_TELEGRAM_ID) ----
-    const adminCommands = ["/stats", "/usuarios", "/crisis", "/retencion", "/tareas", "/ayuda"];
+    const adminCommands = ["/stats", "/usuarios", "/crisis", "/retencion", "/tareas", "/ayuda", "/cartas"];
     if (adminCommands.includes(text) || text.startsWith("/hecho")) {
       if (!isAdmin(chatId)) {
         await sendTelegramMessage(chatId, "⛔ Comando no disponible.");
@@ -602,6 +695,8 @@ export async function POST(req: NextRequest) {
           reply = await buildRetentionMessage();
         } else if (text === "/tareas") {
           reply = await buildTasksMessage();
+        } else if (text === "/cartas") {
+          reply = await buildWeeklyLetterSummaryMessage();
         } else if (text === "/ayuda") {
           reply = [
             "🛠 *Comandos admin*",
@@ -611,6 +706,12 @@ export async function POST(req: NextRequest) {
             "/retencion — métricas de retención",
             "/estado — distribución emocional",
             "/tareas — tareas pendientes antiguas",
+            "/cartas — resumen weekly-letter (último cron + acumulado)",
+            "",
+            "📒 *Bandeja de notas*",
+            "/nota <texto> — guarda una nota (o empieza con 📝)",
+            "/notas — lista pendientes (últimas 10)",
+            "/nota_hecha <id6> — marca como trabajada",
             "",
             "💬 *Mensaje libre* → co-piloto IA con contexto completo del producto, métricas, código y arquitectura.",
             "",

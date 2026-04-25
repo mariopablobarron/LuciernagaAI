@@ -294,6 +294,26 @@ export default function MarketingPage() {
   const [trackers, setTrackers] = useState<TrackerStatus[] | null>(null);
   const [trackersLoading, setTrackersLoading] = useState(false);
 
+  // Custom trackers (DB-driven, no redeploy)
+  type CustomTrackerRow = {
+    id: string;
+    provider: "hotjar" | "clarity" | "plausible" | "posthog";
+    name: string;
+    identifier: string;
+    apiHost: string | null;
+    notes: string | null;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+  };
+  const [customTrackers, setCustomTrackers] = useState<CustomTrackerRow[] | null>(null);
+  const [newProvider, setNewProvider] = useState<CustomTrackerRow["provider"]>("hotjar");
+  const [newName, setNewName] = useState("");
+  const [newIdentifier, setNewIdentifier] = useState("");
+  const [newApiHost, setNewApiHost] = useState("");
+  const [newNotes, setNewNotes] = useState("");
+  const [savingNew, setSavingNew] = useState(false);
+
   // ── Auth guard helper ──────────────────────────────────────────────────────
 
   function checkAuth(res: Response): boolean {
@@ -448,8 +468,88 @@ export default function MarketingPage() {
         if (t) setTrackers(t);
       })
       .finally(() => setTrackersLoading(false));
+
+    // Custom trackers — DB-driven, no redeploy
+    fetch("/api/admin/marketing/trackers/custom", { credentials: "include" })
+      .then(async (res) => {
+        if (!checkAuth(res)) return null;
+        if (!res.ok) return null;
+        const json = (await res.json()) as { trackers: CustomTrackerRow[] };
+        return json.trackers;
+      })
+      .then((t) => { if (t) setCustomTrackers(t); });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
+
+  // ── Custom tracker handlers ──────────────────────────────────────────────
+
+  async function reloadCustomTrackers() {
+    const res = await fetch("/api/admin/marketing/trackers/custom", { credentials: "include" });
+    if (!checkAuth(res) || !res.ok) return;
+    const json = (await res.json()) as { trackers: CustomTrackerRow[] };
+    setCustomTrackers(json.trackers);
+  }
+
+  async function handleCreateTracker() {
+    if (!newName.trim() || !newIdentifier.trim()) {
+      toast.error("Nombre e identificador son obligatorios");
+      return;
+    }
+    setSavingNew(true);
+    try {
+      const res = await fetch("/api/admin/marketing/trackers/custom", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          provider: newProvider,
+          name: newName.trim(),
+          identifier: newIdentifier.trim(),
+          apiHost: newApiHost.trim() || null,
+          notes: newNotes.trim() || null,
+        }),
+      });
+      if (!checkAuth(res)) return;
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(`Error: ${data.error ?? "no creado"}`);
+        return;
+      }
+      toast.success("Tracker añadido. Activo tras consent del usuario.");
+      setNewName(""); setNewIdentifier(""); setNewApiHost(""); setNewNotes("");
+      void reloadCustomTrackers();
+    } finally {
+      setSavingNew(false);
+    }
+  }
+
+  async function handleToggleTracker(id: string, isActive: boolean) {
+    const res = await fetch(`/api/admin/marketing/trackers/custom/${id}`, {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isActive: !isActive }),
+    });
+    if (!checkAuth(res) || !res.ok) {
+      toast.error("No se pudo actualizar");
+      return;
+    }
+    void reloadCustomTrackers();
+  }
+
+  async function handleDeleteTracker(id: string) {
+    if (!confirm("¿Eliminar este tracker? El script dejará de cargarse.")) return;
+    const res = await fetch(`/api/admin/marketing/trackers/custom/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    if (!checkAuth(res) || !res.ok) {
+      toast.error("No se pudo eliminar");
+      return;
+    }
+    toast.success("Tracker eliminado");
+    void reloadCustomTrackers();
+  }
 
   // ── Tagging handlers ──────────────────────────────────────────────────────
 
@@ -1827,20 +1927,159 @@ export default function MarketingPage() {
             )}
           </AdminPanel>
 
-          <AdminPanel title="Cómo gestionarlo" tooltip="Operativa básica para activar, desactivar o auditar trackers">
+          <AdminPanel title="Trackers personalizados" tooltip="Añadir Hotjar / Clarity / Plausible / PostHog desde aquí — sin redeploy">
+            <p className="text-xs text-zinc-500 mb-4">
+              Estos trackers se gestionan desde la base de datos. Activar / desactivar / añadir es <strong className="text-white">instantáneo</strong> — no requiere cambios en variables de entorno ni redeploy.
+              Solo se cargan tras consent de cookies, igual que los principales.
+            </p>
+
+            {/* Add form */}
+            <div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-4 mb-4 space-y-3">
+              <p className="text-sm font-semibold text-white">Añadir nuevo tracker</p>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] uppercase font-semibold text-zinc-400 mb-1">Proveedor</label>
+                  <select
+                    value={newProvider}
+                    onChange={(e) => setNewProvider(e.target.value as typeof newProvider)}
+                    className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white"
+                  >
+                    <option value="hotjar">Hotjar (siteId)</option>
+                    <option value="clarity">Microsoft Clarity (projectId)</option>
+                    <option value="plausible">Plausible (domain)</option>
+                    <option value="posthog">PostHog (projectKey)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] uppercase font-semibold text-zinc-400 mb-1">Nombre interno</label>
+                  <input
+                    type="text"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    placeholder="ej. Hotjar producción"
+                    maxLength={80}
+                    className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white placeholder:text-zinc-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] uppercase font-semibold text-zinc-400 mb-1">
+                    Identificador
+                    {newProvider === "hotjar" && " (siteId numérico)"}
+                    {newProvider === "clarity" && " (projectId)"}
+                    {newProvider === "plausible" && " (tu dominio, ej. tresmilmillonesdelatidos.es)"}
+                    {newProvider === "posthog" && " (projectKey, empieza por phc_)"}
+                  </label>
+                  <input
+                    type="text"
+                    value={newIdentifier}
+                    onChange={(e) => setNewIdentifier(e.target.value)}
+                    maxLength={200}
+                    className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white placeholder:text-zinc-600 font-mono"
+                  />
+                </div>
+                {(newProvider === "plausible" || newProvider === "posthog") && (
+                  <div>
+                    <label className="block text-[11px] uppercase font-semibold text-zinc-400 mb-1">
+                      API host (opcional)
+                      {newProvider === "plausible" && " — para Plausible self-hosted"}
+                      {newProvider === "posthog" && " — default https://us.i.posthog.com"}
+                    </label>
+                    <input
+                      type="text"
+                      value={newApiHost}
+                      onChange={(e) => setNewApiHost(e.target.value)}
+                      placeholder="https://..."
+                      maxLength={200}
+                      className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white placeholder:text-zinc-600 font-mono"
+                    />
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="block text-[11px] uppercase font-semibold text-zinc-400 mb-1">Notas (opcional)</label>
+                <input
+                  type="text"
+                  value={newNotes}
+                  onChange={(e) => setNewNotes(e.target.value)}
+                  maxLength={500}
+                  placeholder="Para qué lo usamos, fechas..."
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white placeholder:text-zinc-600"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => void handleCreateTracker()}
+                disabled={savingNew || !newName.trim() || !newIdentifier.trim()}
+                className="inline-flex items-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-500 px-4 py-2 text-sm font-bold text-white disabled:opacity-40"
+              >
+                {savingNew ? "Añadiendo…" : "Añadir tracker"}
+              </button>
+            </div>
+
+            {/* List */}
+            {customTrackers === null ? (
+              <p className="text-sm text-zinc-500">Cargando…</p>
+            ) : customTrackers.length === 0 ? (
+              <p className="text-sm text-zinc-500">No hay trackers personalizados todavía.</p>
+            ) : (
+              <div className="space-y-3">
+                {customTrackers.map((t) => (
+                  <div key={t.id} className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-semibold text-white text-sm">{t.name}</span>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 font-mono uppercase">{t.provider}</span>
+                          {t.isActive ? (
+                            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
+                              <CheckCircle2 className="h-3 w-3" /> activo
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 rounded-full border border-zinc-600 bg-zinc-800 px-2 py-0.5 text-[10px] font-semibold text-zinc-400">
+                              pausado
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-1 text-[11px] text-zinc-500 font-mono">id: <span className="text-cyan-300">{t.identifier}</span>{t.apiHost ? <span className="ml-3"><span className="text-zinc-600">apiHost:</span> {t.apiHost}</span> : null}</p>
+                        {t.notes && <p className="mt-1 text-xs text-zinc-400">{t.notes}</p>}
+                      </div>
+                      <div className="flex flex-col gap-1.5 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => void handleToggleTracker(t.id, t.isActive)}
+                          className="rounded-lg border border-zinc-700 bg-zinc-800/60 px-3 py-1.5 text-xs font-semibold text-zinc-200 hover:border-zinc-600 hover:text-white"
+                        >
+                          {t.isActive ? "Pausar" : "Activar"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void handleDeleteTracker(t.id)}
+                          className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-300 hover:bg-red-500/20"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </AdminPanel>
+
+          <AdminPanel title="Cómo gestionarlo" tooltip="Operativa básica">
             <ul className="text-xs text-zinc-400 space-y-2 list-disc list-inside">
               <li>
-                Para <strong className="text-white">activar o desactivar</strong> un tracker en producción: cambiar
-                su variable de entorno en Coolify y volver a desplegar. No requiere tocar código.
+                Los <strong className="text-white">trackers principales</strong> (GA4, Meta, Inspectlet) requieren cambiar
+                la env var en Coolify + redeploy. Son los que el front carga sin pasar por DB.
+              </li>
+              <li>
+                Los <strong className="text-white">trackers personalizados</strong> (Hotjar, Clarity, Plausible, PostHog) se
+                añaden desde el formulario de arriba. Se activan en el siguiente refresco del navegador del usuario,
+                tras consent de cookies. No requieren redeploy.
               </li>
               <li>
                 Cada tracker solo carga si el usuario aceptó cookies. La aceptación
-                se guarda en su navegador y <strong className="text-white">no se reporta al servidor</strong>,
-                así que no podemos mostrar aquí el % de aceptación.
-              </li>
-              <li>
-                Para <strong className="text-white">añadir un nuevo proveedor</strong> (Hotjar, Clarity, PostHog, etc.):
-                pídelo al equipo técnico — se añade en un único componente centralizado.
+                se guarda en su navegador y <strong className="text-white">no se reporta al servidor</strong>.
               </li>
             </ul>
           </AdminPanel>

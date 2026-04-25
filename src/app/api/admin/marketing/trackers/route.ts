@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
       configured: Boolean(inspectlet),
       identifier: inspectlet,
       envVar: "NEXT_PUBLIC_INSPECTLET_WID",
-      dashboardUrl: "https://app.inspectlet.com/dashboard",
+      dashboardUrl: "https://www.inspectlet.com/dashboard/",
     },
   ];
 

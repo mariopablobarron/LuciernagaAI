@@ -2034,3 +2034,21 @@ model AlertRule {
 
   @@index([enabled, level])
 }
+
+/// Marketing tracker added at runtime from the admin panel — no redeploy needed.
+/// Loaded by the public client only after cookie consent. Providers supported:
+/// hotjar, clarity, plausible, posthog. The 3 original trackers (GA4, Meta,
+/// Inspectlet) remain hardcoded behind NEXT_PUBLIC_ env vars.
+model CustomTracker {
+  id         String   @id @default(cuid())
+  provider   String // "hotjar" | "clarity" | "plausible" | "posthog"
+  name       String // human label shown in admin
+  identifier String // siteId / projectId / domain / projectKey (depending on provider)
+  apiHost    String? // posthog: api host (default https://us.i.posthog.com); plausible: optional self-hosted host
+  isActive   Boolean  @default(true)
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([isActive, provider])
+}

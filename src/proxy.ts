@@ -44,6 +44,13 @@ export function proxy(request: NextRequest) {
       return NextResponse.next();
     }
 
+    // Diagnostic endpoint for the auto-register secret. Reveals only metadata
+    // (length, whether quotes were peeled) — never the value itself. Public
+    // so we can debug auth from outside without an admin session.
+    if (pathname === "/api/admin/routines/diag" && request.method === "GET") {
+      return NextResponse.next();
+    }
+
     const auth = resolveAdminAuth(request);
     if (auth.authenticated) {
       return NextResponse.next();

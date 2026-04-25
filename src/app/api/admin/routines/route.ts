@@ -12,11 +12,21 @@ const PROMPT_SUMMARY_MAX = 500;
  * Auto-register check: a Claude Code agent that just created a routine via
  * /schedule can POST to this endpoint with the shared secret to catalog it
  * without an admin browser session. Constant-time compare avoids timing leaks.
+ *
+ * Coolify v3 sometimes wraps env values with single/double quotes. We strip
+ * any combination of surrounding whitespace and quotes from the env value
+ * before comparing, so the secret doesn't have to match the literal raw value
+ * Coolify stored.
  */
+function unwrapEnv(raw: string | undefined): string {
+  if (!raw) return "";
+  return raw.replace(/^[\s'"`]+|[\s'"`]+$/g, "");
+}
+
 function isAutoRegisterRequest(req: NextRequest): boolean {
-  const secret = process.env.ROUTINES_REGISTER_SECRET?.trim();
+  const secret = unwrapEnv(process.env.ROUTINES_REGISTER_SECRET);
   if (!secret) return false;
-  const header = req.headers.get("x-admin-secret")?.trim();
+  const header = unwrapEnv(req.headers.get("x-admin-secret") ?? undefined);
   if (!header || header.length !== secret.length) return false;
   let mismatch = 0;
   for (let i = 0; i < secret.length; i++) {

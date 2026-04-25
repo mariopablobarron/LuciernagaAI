@@ -2035,6 +2035,32 @@ model AlertRule {
   @@index([enabled, level])
 }
 
+/// Local catalog of remote Claude Code routines created via /schedule.
+/// We don't manage the routine itself (claude.ai owns lifecycle) — we keep a
+/// pointer + metadata so admins can see what's been scheduled, why, and pin
+/// the result (PR url, notes) without leaving /admin.
+model ScheduledAgent {
+  id             String    @id @default(cuid())
+  /// claude.ai trigger id — opaque external identifier, e.g. "trig_013N8djs..."
+  triggerId      String    @unique
+  name           String
+  purpose        String? // human description of what the agent should achieve
+  scheduledFor   DateTime? // set for one-shot routines
+  cronExpression String? // set for recurring routines
+  promptSummary  String    @db.Text // first ~500 chars of the prompt
+  model          String?
+  repo           String?
+  status         String    @default("scheduled") // scheduled | ran | cancelled
+  resultUrl      String? // PR or issue url left by the agent after running
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  completedAt    DateTime?
+
+  @@index([status, scheduledFor])
+  @@index([status, createdAt])
+}
+
 /// Marketing tracker added at runtime from the admin panel — no redeploy needed.
 /// Loaded by the public client only after cookie consent. Providers supported:
 /// hotjar, clarity, plausible, posthog. The 3 original trackers (GA4, Meta,

@@ -1,6 +1,6 @@
 // Tests unitarios del diff (planDiff). No tocan red ni cron-job.org.
 
-import { planDiff, redactPlan } from "./cronSync";
+import { findDuplicateJobs, planDiff, redactPlan } from "./cronSync";
 import {
   buildJobTitle,
   buildJobUrl,
@@ -212,6 +212,95 @@ describe("planDiff — combinado", () => {
     const plan = planDiff([sampleCron, second, third], remote, OPTIONS);
     const types = plan.map((a) => a.type).sort();
     expect(types).toEqual(["create", "delete", "noop", "update"]);
+  });
+});
+
+describe("findDuplicateJobs", () => {
+  const managed: ManagedCron[] = [sampleCron, sampleCronWithParams];
+
+  it("encuentra jobs sin prefijo cuyo path coincide con uno managed", () => {
+    const remote = [
+      {
+        jobId: 100,
+        enabled: true,
+        title: "Capsule Snapshot (manual)",
+        url: "https://tresmilmillonesdelatidos.es/api/cron/capsule-snapshot?secret=X",
+        schedule: sampleCron.schedule,
+      },
+    ];
+    const dups = findDuplicateJobs(managed, remote);
+    expect(dups).toHaveLength(1);
+    expect(dups[0].jobId).toBe(100);
+    expect(dups[0].matchedName).toBe("capsule-snapshot");
+  });
+
+  it("ignora jobs CON prefijo [mw-sync] (esos son los gestionados)", () => {
+    const remote = [
+      {
+        jobId: 200,
+        enabled: true,
+        title: "[mw-sync] capsule-snapshot — algo",
+        url: "https://tresmilmillonesdelatidos.es/api/cron/capsule-snapshot?secret=X",
+        schedule: sampleCron.schedule,
+      },
+    ];
+    expect(findDuplicateJobs(managed, remote)).toHaveLength(0);
+  });
+
+  it("requiere coincidencia EXACTA de params cuando el managed tiene params", () => {
+    const remote = [
+      // mismo path pero kind distinto → NO es duplicado
+      {
+        jobId: 300,
+        enabled: true,
+        title: "Otro reporte",
+        url: "https://tresmilmillonesdelatidos.es/api/cron/admin-report?kind=usage-monthly&secret=X",
+        schedule: sampleCron.schedule,
+      },
+    ];
+    // sampleCronWithParams tiene kind=health-daily; el remoto tiene kind=usage-monthly
+    expect(findDuplicateJobs(managed, remote)).toHaveLength(0);
+  });
+
+  it("identifica duplicado cuando params COINCIDEN exactamente", () => {
+    const remote = [
+      {
+        jobId: 400,
+        enabled: true,
+        title: "Health daily (manual)",
+        url: "https://tresmilmillonesdelatidos.es/api/cron/admin-report?kind=health-daily&secret=X",
+        schedule: sampleCron.schedule,
+      },
+    ];
+    const dups = findDuplicateJobs(managed, remote);
+    expect(dups).toHaveLength(1);
+    expect(dups[0].matchedName).toBe("admin-report-health");
+  });
+
+  it("ignora jobs cuyo path NO coincide con ningún managed", () => {
+    const remote = [
+      {
+        jobId: 500,
+        enabled: true,
+        title: "Otro cron interno",
+        url: "https://tresmilmillonesdelatidos.es/api/cron/24h-nudge?secret=X",
+        schedule: sampleCron.schedule,
+      },
+    ];
+    expect(findDuplicateJobs(managed, remote)).toHaveLength(0);
+  });
+
+  it("ignora URLs malformadas", () => {
+    const remote = [
+      {
+        jobId: 600,
+        enabled: true,
+        title: "Sin URL bien formada",
+        url: "not-a-url",
+        schedule: sampleCron.schedule,
+      },
+    ];
+    expect(findDuplicateJobs(managed, remote)).toHaveLength(0);
   });
 });
 

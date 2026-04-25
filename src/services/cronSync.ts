@@ -272,6 +272,102 @@ export async function syncCrons(options: SyncOptions = {}): Promise<SyncResult> 
   return { plan, applied: true, errors };
 }
 
+// ── Limpieza de duplicados antiguos ─────────────────────────────────────────
+// Identifica jobs en cron-job.org que NO tienen el prefijo [mw-sync] pero
+// cuya URL apunta a uno de los paths gestionados. Son crons que el usuario
+// (o yo, antes de tener sync) creó a mano y ahora son redundantes.
+
+export type DuplicateJob = {
+  jobId: number;
+  title: string;
+  url: string;
+  matchedPath: string; // qué path managed se solapa
+  matchedName: string; // qué managed name corresponde
+};
+
+export function findDuplicateJobs(
+  managed: ManagedCron[],
+  remote: RemoteJobListItem[],
+): DuplicateJob[] {
+  const duplicates: DuplicateJob[] = [];
+
+  for (const job of remote) {
+    // Sólo nos interesan jobs SIN prefijo gestionado.
+    if (extractManagedName(job.title) !== null) continue;
+
+    // ¿La URL del job remoto apunta a uno de los paths managed?
+    let url: URL;
+    try {
+      url = new URL(job.url);
+    } catch {
+      continue;
+    }
+
+    for (const cron of managed) {
+      if (url.pathname !== cron.path) continue;
+
+      // Si el cron managed tiene params (ej. kind=health-daily), exigimos
+      // que el job remoto los tenga TODOS iguales. Si no, son crons
+      // distintos sobre el mismo endpoint y no es un duplicado.
+      if (cron.params) {
+        const paramsMatch = Object.entries(cron.params).every(
+          ([k, v]) => url.searchParams.get(k) === v,
+        );
+        if (!paramsMatch) continue;
+      }
+
+      duplicates.push({
+        jobId: job.jobId,
+        title: job.title,
+        url: job.url,
+        matchedPath: cron.path,
+        matchedName: cron.name,
+      });
+      break;
+    }
+  }
+
+  return duplicates;
+}
+
+export type CleanupDuplicatesResult = {
+  duplicates: DuplicateJob[];
+  applied: boolean;
+  deleted: number;
+  errors: Array<{ jobId: number; title: string; error: string }>;
+};
+
+export async function cleanupDuplicateJobs(options: { dryRun?: boolean } = {}): Promise<CleanupDuplicatesResult> {
+  const { apiKey } = getConfig();
+  const remote = await listAllJobs(apiKey);
+  const duplicates = findDuplicateJobs(MANAGED_CRONS, remote);
+
+  if (options.dryRun || duplicates.length === 0) {
+    return { duplicates, applied: false, deleted: 0, errors: [] };
+  }
+
+  const errors: CleanupDuplicatesResult["errors"] = [];
+  let deleted = 0;
+  let mutated = false;
+
+  for (const dup of duplicates) {
+    try {
+      if (mutated) await sleep(APPLY_THROTTLE_MS);
+      await deleteJob(apiKey, dup.jobId);
+      mutated = true;
+      deleted++;
+    } catch (err) {
+      errors.push({
+        jobId: dup.jobId,
+        title: dup.title,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }
+
+  return { duplicates, applied: true, deleted, errors };
+}
+
 /**
  * Para tests / scripts ad-hoc: redacta la URL de un plan eliminando
  * el secret antes de logarlo.

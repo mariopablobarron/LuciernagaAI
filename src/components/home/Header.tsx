@@ -57,8 +57,8 @@ export default function Header() {
         <div className="flex h-16 items-center justify-between gap-6">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 shrink-0">
-            <span className="text-xl leading-none">💓</span>
+          <Link href="/" className="flex items-center gap-2 shrink-0 group">
+            <span className="text-xl leading-none transition-transform group-hover:scale-110">💓</span>
             <span className="text-sm font-bold bg-linear-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
               Tres Mil Millones<span className="hidden lg:inline"> de Latidos</span>
             </span>

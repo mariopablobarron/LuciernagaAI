@@ -157,6 +157,7 @@ body {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
+  --font-serif: var(--font-serif), "Iowan Old Style", "Apple Garamond", Georgia, serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -529,6 +530,44 @@ body {
 
   .hb-pulse {
     animation: hb-pulse ease-in-out infinite;
+  }
+
+  /* ── Editorial cinematic ──────────────────────────────────────── */
+  @keyframes vignette-breathe {
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 0.85; }
+  }
+  @keyframes ticker-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes shimmer-amber {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(212,165,116,0); }
+    50% { box-shadow: 0 0 32px 4px rgba(212,165,116,0.45); }
+  }
+  .vignette-breathe { animation: vignette-breathe 4.4s ease-in-out infinite; }
+  .ticker-scroll { animation: ticker-scroll 40s linear infinite; }
+  .glow-pulse { animation: glow-pulse 3.6s ease-in-out infinite; }
+  .text-shimmer-amber {
+    background: linear-gradient(90deg, #D4A574 0%, #F5EEE4 25%, #E04E3A 50%, #F5EEE4 75%, #D4A574 100%);
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: shimmer-amber 6s linear infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .vignette-breathe,
+    .ticker-scroll,
+    .glow-pulse,
+    .text-shimmer-amber {
+      animation: none;
+    }
   }
 }
 

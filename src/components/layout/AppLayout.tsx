@@ -30,20 +30,25 @@ export default function AppLayout({
   return (
     <div className="px-3 py-4 text-zinc-100 sm:px-4 lg:px-6">
       <div className="mx-auto w-full max-w-screen-2xl space-y-4">
+        {/* Botón hamburguesa móvil — independiente del header. Antes solo se
+            renderizaba dentro del header opcional, dejando el sidebar
+            inaccesible en /app (que no usa title). */}
+        {sidebar ? (
+          <button
+            onClick={() => setSidebarOpen((v) => !v)}
+            className="xl:hidden inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-zinc-800 bg-zinc-900/60 text-zinc-300 hover:text-white hover:border-zinc-700 transition-colors text-sm"
+            aria-label={sidebarOpen ? "Cerrar panel lateral" : "Abrir panel lateral"}
+            aria-expanded={sidebarOpen}
+            aria-controls="app-sidebar"
+          >
+            <Menu className="w-4 h-4" />
+            <span>Menú</span>
+          </button>
+        ) : null}
+
         {title || subtitle || summary ? (
           <header className="card-surface rounded-2xl border border-zinc-800 p-4 sm:p-5">
             <div className="flex items-start gap-3">
-              {sidebar ? (
-                <button
-                  onClick={() => setSidebarOpen((v) => !v)}
-                  className="xl:hidden mt-1 p-2 -ml-1 rounded-lg border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700 transition-colors"
-                  aria-label={sidebarOpen ? "Cerrar panel lateral" : "Abrir panel lateral"}
-                  aria-expanded={sidebarOpen}
-                  aria-controls="app-sidebar"
-                >
-                  <Menu className="w-5 h-5" />
-                </button>
-              ) : null}
               <div className="flex-1 min-w-0">
                 {title ? (
                   <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">{title}</h1>

@@ -147,33 +147,37 @@ const jsonLd = {
       url: "https://tresmilmillonesdelatidos.es/sobre-nosotros",
     },
     {
-      "@type": "SoftwareApplication",
+      // Multi-type: SoftwareApplication + WebApplication mejora elegibilidad
+      // para rich results (HealthApplication category + browserRequirements
+      // específicos de WebApplication).
+      "@type": ["SoftwareApplication", "WebApplication"],
       "@id": "https://tresmilmillonesdelatidos.es/#app",
       name: "Tres Mil Millones de Latidos",
       url: "https://tresmilmillonesdelatidos.es",
       applicationCategory: "HealthApplication",
       operatingSystem: "Web, Telegram",
+      browserRequirements: "Requires JavaScript. Requires HTML5.",
       offers: [
         {
           "@type": "Offer",
           price: "0",
           priceCurrency: "EUR",
           name: "Free",
-          description: "10 conversaciones al mes, check-in diario, objetivos y acciones.",
+          description: "Conversaciones sin límite con el mentor IA. Check-in diario, objetivos y acciones. Sin tarjeta.",
         },
         {
           "@type": "Offer",
           price: "9",
           priceCurrency: "EUR",
           name: "Pro",
-          description: "Conversaciones ilimitadas, Modo Impulso 21 dias, retos personalizados y journeys completos.",
+          description: "Continuidad cross-device, memoria persistente entre sesiones, Modo Impulso y prioridad.",
         },
       ],
       provider: { "@id": "https://tresmilmillonesdelatidos.es/#organization" },
       author: { "@id": "https://tresmilmillonesdelatidos.es/#founder" },
       inLanguage: ["es", "en"],
       description:
-        "Tres Mil Millones de Latidos es una plataforma de mentoría con inteligencia artificial. Detecta tu estado emocional y te guia a la accion concreta con microacciones de 10 minutos.",
+        "Tres Mil Millones de Latidos es una plataforma de mentoría con inteligencia artificial. Detecta tu estado emocional y te guía a la acción concreta con microacciones de 10 minutos.",
     },
     {
       "@type": "WebSite",

@@ -77,7 +77,7 @@ export default function AccessibilityWidget() {
         aria-label={open ? "Cerrar panel de accesibilidad" : "Abrir panel de accesibilidad"}
         aria-expanded={open}
         aria-controls="a11y-panel"
-        className="fixed bottom-20 left-4 z-[9998] flex items-center justify-center w-11 h-11 rounded-full bg-violet-600/90 hover:bg-violet-500 text-white shadow-lg shadow-violet-500/25 backdrop-blur-sm transition-all focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
+        className="fixed bottom-36 sm:bottom-20 left-4 z-[9998] flex items-center justify-center w-11 h-11 rounded-full bg-violet-600/90 hover:bg-violet-500 text-white shadow-lg shadow-violet-500/25 backdrop-blur-sm transition-all focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
       >
         <Accessibility className="w-5 h-5" />
         {activeCount > 0 && (
@@ -95,7 +95,7 @@ export default function AccessibilityWidget() {
           role="dialog"
           aria-label="Opciones de accesibilidad"
           aria-modal="true"
-          className="fixed bottom-32 left-4 right-4 sm:right-auto z-[9998] sm:w-80 max-h-[70vh] overflow-y-auto rounded-2xl border border-zinc-700 bg-zinc-900 shadow-2xl shadow-black/40"
+          className="fixed bottom-48 sm:bottom-32 left-4 right-4 sm:right-auto z-[9998] sm:w-80 max-h-[70vh] overflow-y-auto rounded-2xl border border-zinc-700 bg-zinc-900 shadow-2xl shadow-black/40"
         >
           {/* Header */}
           <div className="sticky top-0 bg-zinc-900 border-b border-zinc-800 px-5 py-4 flex items-center justify-between">

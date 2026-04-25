@@ -176,7 +176,7 @@ export default function CookieConsent() {
     return (
       <button
         onClick={() => setShowPrefs(true)}
-        className="fixed bottom-4 left-4 z-40 rounded-full border border-zinc-700/50 bg-zinc-800/80 p-3 min-h-11 min-w-11 flex items-center justify-center text-zinc-500 backdrop-blur-sm transition-all hover:border-zinc-600 hover:text-zinc-300"
+        className="fixed bottom-20 sm:bottom-4 left-4 z-40 rounded-full border border-zinc-700/50 bg-zinc-800/80 p-3 min-h-11 min-w-11 flex items-center justify-center text-zinc-500 backdrop-blur-sm transition-all hover:border-zinc-600 hover:text-zinc-300"
         title="Preferencias de cookies"
       >
         <Cookie className="h-4 w-4" />

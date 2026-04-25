@@ -33,6 +33,17 @@ export function proxy(request: NextRequest) {
       return NextResponse.next();
     }
 
+    // Auto-register endpoint: lets a Claude Code agent POST a routine after
+    // /schedule using a shared secret. The handler validates X-Admin-Secret
+    // in constant time; we just let the request through.
+    if (
+      pathname === "/api/admin/routines" &&
+      request.method === "POST" &&
+      request.headers.get("x-admin-secret")
+    ) {
+      return NextResponse.next();
+    }
+
     const auth = resolveAdminAuth(request);
     if (auth.authenticated) {
       return NextResponse.next();

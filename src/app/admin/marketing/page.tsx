@@ -74,7 +74,6 @@ type TrackerStatus = {
   configured: boolean;
   identifier: string | null;
   envVar: string;
-  consentRequired: true;
   dashboardUrl: string;
 };
 
@@ -1764,10 +1763,10 @@ export default function MarketingPage() {
       {/* ── Tab: Trackers ───────────────────────────────────────────────────── */}
       {activeTab === "trackers" && (
         <>
-          <AdminPanel title="Pixels y trackers" tooltip="Estado de los scripts de terceros que cargan en el front">
+          <AdminPanel title="Trackers y píxeles" tooltip="Estado de los scripts de terceros que cargan en el front">
             <p className="text-xs text-zinc-500 mb-4">
-              Configurados vía variables de entorno. Cada tracker respeta el consentimiento de cookies del usuario antes de cargar.
-              La <strong className="text-white">data agregada</strong> vive en cada dashboard externo — usa los enlaces de abajo.
+              Cada tracker se activa con su variable de entorno y solo carga si el usuario aceptó cookies.
+              Los <strong className="text-white">datos</strong> viven en el dashboard externo de cada plataforma — abre el enlace correspondiente para verlos.
             </p>
 
             {trackersLoading && !trackers ? (
@@ -1790,7 +1789,7 @@ export default function MarketingPage() {
                               <CheckCircle2 className="h-3 w-3" /> activo
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 rounded-full border border-zinc-700 bg-zinc-800/50 px-2 py-0.5 text-[10px] font-semibold text-zinc-400">
+                            <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-300">
                               <XCircle className="h-3 w-3" /> sin configurar
                             </span>
                           )}
@@ -1808,7 +1807,7 @@ export default function MarketingPage() {
                             </span>
                           )}
                           <span className="inline-flex items-center gap-1 text-amber-400">
-                            🍪 requiere consent
+                            🍪 sólo con consentimiento
                           </span>
                         </div>
                       </div>
@@ -1818,7 +1817,7 @@ export default function MarketingPage() {
                         rel="noopener noreferrer"
                         className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-zinc-700 bg-zinc-800/60 px-3 py-2 text-xs font-semibold text-zinc-200 hover:border-zinc-600 hover:text-white transition-colors"
                       >
-                        Dashboard
+                        Abrir panel
                         <ExternalLink className="h-3 w-3" />
                       </a>
                     </div>
@@ -1828,22 +1827,20 @@ export default function MarketingPage() {
             )}
           </AdminPanel>
 
-          <AdminPanel title="Notas operativas" tooltip="Detalles que no caben en el panel anterior">
+          <AdminPanel title="Cómo gestionarlo" tooltip="Operativa básica para activar, desactivar o auditar trackers">
             <ul className="text-xs text-zinc-400 space-y-2 list-disc list-inside">
               <li>
-                Para añadir un nuevo tracker: crear el componente cliente en{" "}
-                <code className="text-violet-300">src/components/</code> (gated por <code>cookie_consent</code>) y añadirlo al
-                agregador <code className="text-violet-300">ThirdPartyScripts.tsx</code>.
+                Para <strong className="text-white">activar o desactivar</strong> un tracker en producción: cambiar
+                su variable de entorno en Coolify y volver a desplegar. No requiere tocar código.
               </li>
               <li>
-                Para desactivar un tracker en producción sin tocar código: borrar la variable de entorno en Coolify.
+                Cada tracker solo carga si el usuario aceptó cookies. La aceptación
+                se guarda en su navegador y <strong className="text-white">no se reporta al servidor</strong>,
+                así que no podemos mostrar aquí el % de aceptación.
               </li>
               <li>
-                Las métricas de aceptación de cookies viven solo en el navegador (<code>localStorage.cookie_consent</code>);
-                no se reportan al servidor para minimizar tracking secundario.
-              </li>
-              <li>
-                Inspectlet WID por defecto: <code className="text-cyan-300">1417203707</code> (override con <code>NEXT_PUBLIC_INSPECTLET_WID</code>).
+                Para <strong className="text-white">añadir un nuevo proveedor</strong> (Hotjar, Clarity, PostHog, etc.):
+                pídelo al equipo técnico — se añade en un único componente centralizado.
               </li>
             </ul>
           </AdminPanel>

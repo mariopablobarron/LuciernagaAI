@@ -10,7 +10,6 @@ type TrackerStatus = {
   configured: boolean;
   identifier: string | null;
   envVar: string;
-  consentRequired: true;
   dashboardUrl: string;
 };
 
@@ -26,35 +25,30 @@ export async function GET(req: NextRequest) {
     {
       id: "ga4",
       name: "Google Analytics 4",
-      description: "Eventos, conversiones, audiencias.",
+      description: "Eventos, conversiones y audiencias.",
       configured: Boolean(ga),
       identifier: ga,
       envVar: "NEXT_PUBLIC_GA_MEASUREMENT_ID",
-      consentRequired: true,
-      dashboardUrl: ga
-        ? `https://analytics.google.com/analytics/web/#/p${ga.replace(/^G-/, "")}/reports/intelligenthome`
-        : "https://analytics.google.com",
+      dashboardUrl: "https://analytics.google.com/",
     },
     {
       id: "meta_pixel",
-      name: "Meta (Facebook) Pixel",
-      description: "Conversiones para Facebook/Instagram Ads.",
+      name: "Meta Pixel",
+      description: "Conversiones para Facebook e Instagram Ads.",
       configured: Boolean(meta),
       identifier: meta,
       envVar: "NEXT_PUBLIC_META_PIXEL_ID",
-      consentRequired: true,
       dashboardUrl: meta
-        ? `https://business.facebook.com/events_manager2/list/pixel/${meta}`
+        ? `https://business.facebook.com/events_manager2/list/dataset/${meta}/overview`
         : "https://business.facebook.com/events_manager",
     },
     {
       id: "inspectlet",
       name: "Inspectlet",
-      description: "Session replay + heatmaps + rage clicks.",
+      description: "Grabación de sesiones, mapas de calor y rage clicks.",
       configured: Boolean(inspectlet),
       identifier: inspectlet,
       envVar: "NEXT_PUBLIC_INSPECTLET_WID",
-      consentRequired: true,
       dashboardUrl: "https://app.inspectlet.com/dashboard",
     },
   ];

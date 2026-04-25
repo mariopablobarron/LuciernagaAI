@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
+import { calcLlmBudget } from "@/lib/admin-tg/llm-budget";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -185,8 +186,10 @@ export async function GET(req: NextRequest) {
     }));
 
     const recommendations = buildRecommendations(bySource);
+    const budget = await calcLlmBudget();
 
     return NextResponse.json({
+      budget,
       summary: {
         last7d: {
           requests: summary7d._count.id,

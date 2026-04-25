@@ -70,7 +70,19 @@ type LogRow = {
   response: string;
 };
 
+type Budget = {
+  monthlyUsd: number;
+  spentMtdUsd: number;
+  projectedMonthUsd: number;
+  daysElapsed: number;
+  daysInMonth: number;
+  percentSpent: number;
+  percentProjected: number;
+  level: "ok" | "warn" | "critical";
+};
+
 type LlmUsageData = {
+  budget?: Budget;
   summary: { last7d: PeriodSummary; last30d: PeriodSummary; allTime: PeriodSummary };
   byModel: ModelRow[];
   bySource: SourceRow[];
@@ -132,7 +144,7 @@ export default function LlmUsagePage() {
   if (error) return <main className="min-h-screen bg-zinc-950 p-6 text-white">{error}</main>;
   if (!data)  return <main className="min-h-screen bg-zinc-950 p-6 text-zinc-500">Cargando uso LLM...</main>;
 
-  const { summary, byModel, bySource, topConsumers, recommendations, latestLogs } = data;
+  const { summary, byModel, bySource, topConsumers, recommendations, latestLogs, budget } = data;
 
   return (
     <AdminShell
@@ -140,6 +152,9 @@ export default function LlmUsagePage() {
       subtitle="Tokens, coste, top consumers y eficiencia de prompts por source."
       onLogout={handleLogout}
     >
+
+      {/* ── Budget mensual ── */}
+      {budget && <BudgetPanel b={budget} />}
 
       {/* ── Recomendaciones de optimización ── */}
       {recommendations.length > 0 && (
@@ -363,5 +378,67 @@ export default function LlmUsagePage() {
       </AdminPanel>
 
     </AdminShell>
+  );
+}
+
+// ── Budget panel ──────────────────────────────────────────────────────────────
+
+function BudgetPanel({ b }: { b: Budget }) {
+  const spentColor = b.percentSpent >= 100 ? "bg-rose-500" : b.percentSpent >= 70 ? "bg-amber-500" : "bg-emerald-500";
+  const projColor = b.percentProjected >= 100 ? "bg-rose-500" : b.percentProjected >= 70 ? "bg-amber-500" : "bg-emerald-500";
+  const headIcon = b.level === "critical" ? "🔴" : b.level === "warn" ? "🟠" : "🟢";
+
+  const headDescription =
+    b.level === "critical" && b.spentMtdUsd >= b.monthlyUsd
+      ? "🚨 Budget mensual SUPERADO."
+      : b.level === "critical"
+        ? "🚨 La proyección al fin de mes supera el budget. Optimiza prompts o sube el techo."
+        : b.level === "warn"
+          ? "⚠️ A este ritmo te acercas al límite del budget mensual."
+          : "Consumo dentro del presupuesto.";
+
+  return (
+    <AdminPanel
+      id="budget"
+      title={`${headIcon} Budget LLM`}
+      description={headDescription}
+    >
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
+          <p className="text-[11px] uppercase tracking-wide text-zinc-500">Budget mensual</p>
+          <p className="mt-1 text-xl font-bold text-white">${b.monthlyUsd.toFixed(2)}</p>
+          <p className="mt-1 text-[11px] text-zinc-500">
+            Día {Math.ceil(b.daysElapsed)} de {b.daysInMonth}
+          </p>
+        </div>
+
+        <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
+          <p className="text-[11px] uppercase tracking-wide text-zinc-500">Gastado este mes</p>
+          <p className="mt-1 text-xl font-bold text-white">${b.spentMtdUsd.toFixed(2)}</p>
+          <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-zinc-800">
+            <div
+              className={`h-full ${spentColor} transition-all`}
+              style={{ width: `${Math.min(100, b.percentSpent)}%` }}
+            />
+          </div>
+          <p className="mt-1 text-[11px] text-zinc-500">{b.percentSpent.toFixed(0)}% del budget</p>
+        </div>
+
+        <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
+          <p className="text-[11px] uppercase tracking-wide text-zinc-500">Proyección a fin de mes</p>
+          <p className="mt-1 text-xl font-bold text-white">${b.projectedMonthUsd.toFixed(2)}</p>
+          <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-zinc-800">
+            <div
+              className={`h-full ${projColor} transition-all`}
+              style={{ width: `${Math.min(100, b.percentProjected)}%` }}
+            />
+          </div>
+          <p className="mt-1 text-[11px] text-zinc-500">{b.percentProjected.toFixed(0)}% del budget</p>
+        </div>
+      </div>
+      <p className="mt-3 text-[11px] text-zinc-500">
+        Configura el budget en <code className="rounded bg-zinc-900 px-1.5 py-0.5">LLM_MONTHLY_BUDGET_USD</code> (env). Default: $200.
+      </p>
+    </AdminPanel>
   );
 }

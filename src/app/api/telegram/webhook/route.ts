@@ -29,6 +29,8 @@ import { buildLlmCostMessage } from "@/lib/admin-tg/llm-cost-summary";
 import { buildUserSearchMessage } from "@/lib/admin-tg/user-search";
 import { buildRevenueMessage } from "@/lib/admin-tg/revenue-summary";
 import { buildHealthMessage } from "@/lib/admin-tg/health-summary";
+import { handleCallbackQuery, isAdminFrom } from "@/lib/admin-tg/callback-router";
+import { sendTelegramWithButtons } from "@/lib/admin-tg/telegram-utils";
 
 // ---- Telegram types ----
 
@@ -39,9 +41,17 @@ interface TelegramMessage {
   text?: string;
 }
 
+interface TelegramCallbackQuery {
+  id: string;
+  from: { id: number };
+  message?: { chat: { id: number }; message_id: number };
+  data?: string;
+}
+
 interface TelegramUpdate {
   update_id: number;
   message?: TelegramMessage;
+  callback_query?: TelegramCallbackQuery;
 }
 
 // ---- Constants ----
@@ -488,6 +498,23 @@ export async function POST(req: NextRequest) {
 
   try {
     const update = (await req.json()) as TelegramUpdate;
+
+    // ---- callback_query (botones inline) ----
+    if (update.callback_query) {
+      const cb = update.callback_query;
+      if (cb.message && cb.data) {
+        await handleCallbackQuery({
+          callbackId: cb.id,
+          chatId: cb.message.chat.id,
+          messageId: cb.message.message_id,
+          fromId: cb.from.id,
+          data: cb.data,
+          isAdmin: isAdminFrom(cb.from.id),
+        });
+      }
+      return NextResponse.json({ ok: true });
+    }
+
     const message = update.message;
 
     // Ignore non-text updates silently
@@ -682,6 +709,25 @@ export async function POST(req: NextRequest) {
     }
 
     // ---- Admin commands (only respond to ADMIN_TELEGRAM_ID) ----
+    // ---- /redeploy (admin) — confirmación con botones inline ----
+    if (text === "/redeploy") {
+      if (!isAdmin(chatId)) {
+        await sendTelegramMessage(chatId, "⛔ Comando no disponible.");
+        return NextResponse.json({ ok: true });
+      }
+      await sendTelegramWithButtons(
+        chatId,
+        "🚀 *Confirmar Force Redeploy de luciernaga-ai*\n\nEsto disparará un build inmediato en Coolify.",
+        [
+          [
+            { text: "✅ Sí, redeploy", callback_data: "redeploy:confirm" },
+            { text: "❌ Cancelar", callback_data: "redeploy:cancel" },
+          ],
+        ]
+      );
+      return NextResponse.json({ ok: true });
+    }
+
     const adminCommands = ["/stats", "/usuarios", "/crisis", "/retencion", "/tareas", "/ayuda", "/cartas", "/deploy", "/llm", "/ingresos", "/salud"];
     if (
       adminCommands.includes(text) ||
@@ -731,6 +777,7 @@ export async function POST(req: NextRequest) {
             "",
             "🔧 *Operaciones*",
             "/deploy — HEAD de main (commit, autor, fecha)",
+            "/redeploy — Force Redeploy en Coolify (con confirmación)",
             "/salud — checks rápidos: DB, crons, errores, negocio (24h)",
             "/llm — gasto LLM hoy / 7d / 30d + top modelos",
             "",

@@ -273,7 +273,19 @@ export async function sendAdminUserAlert(params: {
     await fetchWithTimeout(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: adminChatId, text, parse_mode: "Markdown" }),
+      body: JSON.stringify({
+        chat_id: adminChatId,
+        text,
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [
+            [
+              { text: "👁 Ver usuario", callback_data: `user:show:${params.userId}` },
+              { text: "✅ Marcar atendido", callback_data: `crisis:ack:${params.userId}` },
+            ],
+          ],
+        },
+      }),
     });
   } catch (error) {
     logError("ALERTS", error, { area: "sendAdminUserAlert" });

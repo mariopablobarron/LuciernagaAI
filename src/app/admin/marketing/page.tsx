@@ -19,6 +19,8 @@ import {
   CheckCircle2,
   XCircle,
   Video,
+  Eye,
+  ExternalLink,
 } from "lucide-react";
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -63,7 +65,18 @@ type FeedbackSummary = {
   byType: { type: string; count: number }[];
 };
 
-type Tab = "telegram" | "email" | "metrics" | "feedback" | "atribucion" | "tagging" | "testimonials" | "referidos";
+type Tab = "telegram" | "email" | "metrics" | "feedback" | "atribucion" | "tagging" | "testimonials" | "referidos" | "trackers";
+
+type TrackerStatus = {
+  id: "ga4" | "meta_pixel" | "inspectlet";
+  name: string;
+  description: string;
+  configured: boolean;
+  identifier: string | null;
+  envVar: string;
+  consentRequired: true;
+  dashboardUrl: string;
+};
 
 type AttributionRow = {
   source: string;
@@ -278,6 +291,10 @@ export default function MarketingPage() {
   const [referrals, setReferrals] = useState<ReferralSummary | null>(null);
   const [referralsLoading, setReferralsLoading] = useState(false);
 
+  // Trackers state
+  const [trackers, setTrackers] = useState<TrackerStatus[] | null>(null);
+  const [trackersLoading, setTrackersLoading] = useState(false);
+
   // ── Auth guard helper ──────────────────────────────────────────────────────
 
   function checkAuth(res: Response): boolean {
@@ -413,6 +430,25 @@ export default function MarketingPage() {
         if (s) setReferrals(s);
       })
       .finally(() => setReferralsLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  // ── Trackers loader ──────────────────────────────────────────────────────
+
+  useEffect(() => {
+    if (activeTab !== "trackers") return;
+    setTrackersLoading(true);
+    fetch("/api/admin/marketing/trackers", { credentials: "include" })
+      .then(async (res) => {
+        if (!checkAuth(res)) return null;
+        if (!res.ok) return null;
+        const json = (await res.json()) as { trackers: TrackerStatus[] };
+        return json.trackers;
+      })
+      .then((t) => {
+        if (t) setTrackers(t);
+      })
+      .finally(() => setTrackersLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
@@ -624,6 +660,7 @@ export default function MarketingPage() {
     { key: "tagging", label: "Tags", icon: <Users className="h-3.5 w-3.5" /> },
     { key: "testimonials", label: "Testimonials", icon: <Star className="h-3.5 w-3.5" /> },
     { key: "referidos", label: "Referidos", icon: <Users className="h-3.5 w-3.5" /> },
+    { key: "trackers", label: "Trackers", icon: <Eye className="h-3.5 w-3.5" /> },
   ];
 
   return (
@@ -1721,6 +1758,95 @@ export default function MarketingPage() {
               </AdminPanel>
             </>
           )}
+        </>
+      )}
+
+      {/* ── Tab: Trackers ───────────────────────────────────────────────────── */}
+      {activeTab === "trackers" && (
+        <>
+          <AdminPanel title="Pixels y trackers" tooltip="Estado de los scripts de terceros que cargan en el front">
+            <p className="text-xs text-zinc-500 mb-4">
+              Configurados vía variables de entorno. Cada tracker respeta el consentimiento de cookies del usuario antes de cargar.
+              La <strong className="text-white">data agregada</strong> vive en cada dashboard externo — usa los enlaces de abajo.
+            </p>
+
+            {trackersLoading && !trackers ? (
+              <p className="text-sm text-zinc-500">Cargando…</p>
+            ) : !trackers ? (
+              <p className="text-sm text-zinc-500">No se pudieron cargar los trackers.</p>
+            ) : (
+              <div className="space-y-3">
+                {trackers.map((t) => (
+                  <div
+                    key={t.id}
+                    className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-white text-sm">{t.name}</span>
+                          {t.configured ? (
+                            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
+                              <CheckCircle2 className="h-3 w-3" /> activo
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 rounded-full border border-zinc-700 bg-zinc-800/50 px-2 py-0.5 text-[10px] font-semibold text-zinc-400">
+                              <XCircle className="h-3 w-3" /> sin configurar
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-1 text-xs text-zinc-500">{t.description}</p>
+                        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-zinc-500">
+                          <span>
+                            <span className="text-zinc-600">env:</span>{" "}
+                            <code className="text-violet-300">{t.envVar}</code>
+                          </span>
+                          {t.identifier && (
+                            <span>
+                              <span className="text-zinc-600">id:</span>{" "}
+                              <code className="text-cyan-300">{t.identifier}</code>
+                            </span>
+                          )}
+                          <span className="inline-flex items-center gap-1 text-amber-400">
+                            🍪 requiere consent
+                          </span>
+                        </div>
+                      </div>
+                      <a
+                        href={t.dashboardUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-zinc-700 bg-zinc-800/60 px-3 py-2 text-xs font-semibold text-zinc-200 hover:border-zinc-600 hover:text-white transition-colors"
+                      >
+                        Dashboard
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </AdminPanel>
+
+          <AdminPanel title="Notas operativas" tooltip="Detalles que no caben en el panel anterior">
+            <ul className="text-xs text-zinc-400 space-y-2 list-disc list-inside">
+              <li>
+                Para añadir un nuevo tracker: crear el componente cliente en{" "}
+                <code className="text-violet-300">src/components/</code> (gated por <code>cookie_consent</code>) y añadirlo al
+                agregador <code className="text-violet-300">ThirdPartyScripts.tsx</code>.
+              </li>
+              <li>
+                Para desactivar un tracker en producción sin tocar código: borrar la variable de entorno en Coolify.
+              </li>
+              <li>
+                Las métricas de aceptación de cookies viven solo en el navegador (<code>localStorage.cookie_consent</code>);
+                no se reportan al servidor para minimizar tracking secundario.
+              </li>
+              <li>
+                Inspectlet WID por defecto: <code className="text-cyan-300">1417203707</code> (override con <code>NEXT_PUBLIC_INSPECTLET_WID</code>).
+              </li>
+            </ul>
+          </AdminPanel>
         </>
       )}
     </AdminShell>

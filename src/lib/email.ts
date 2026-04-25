@@ -183,116 +183,58 @@ export function buildHeartbeatEmail(params: {
     `— Tres Mil Millones de Latidos`,
   ].join("\n");
 
-  const html = `<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#0a0a0a;font-family:system-ui,-apple-system,sans-serif">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 0">
-    <tr><td align="center">
-      <table width="560" cellpadding="0" cellspacing="0" style="background:#18181b;border-radius:12px;overflow:hidden;border:1px solid #27272a">
-        <tr><td style="background:linear-gradient(135deg,#7c3aed,#ec4899);padding:28px 32px">
-          <p style="margin:0;font-size:22px;font-weight:800;color:#fff">💓 Tu informe de latidos</p>
-          <p style="margin:8px 0 0;font-size:14px;color:rgba(255,255,255,0.8)">Un recuento de todo lo que ya has vivido</p>
-        </td></tr>
-
-        <tr><td style="padding:32px">
-          <p style="margin:0 0 8px;font-size:13px;color:#71717a;text-transform:uppercase;letter-spacing:0.15em;font-weight:600">Latidos acumulados</p>
-          <p style="margin:0 0 24px;font-size:36px;font-weight:800;background:linear-gradient(135deg,#c084fc,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent">${fmtBeats(beats)}</p>
-
-          <p style="margin:0 0 20px;font-size:15px;color:#a1a1aa;line-height:1.6">
-            Tu corazon ha latido <strong style="color:#e4e4e7">${fmtBeats(beats)} veces</strong> para traerte hasta aqui.
-            Cada uno sostuvo una decision, un momento de duda, un paso adelante.
-          </p>
-
-          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px">
-            <tr>
-              <td width="50%" style="padding:8px">
-                <div style="background:#7c3aed10;border:1px solid #7c3aed30;border-radius:10px;padding:16px;text-align:center">
-                  <p style="margin:0;font-size:24px;font-weight:700;color:#c4b5fd">${days.toLocaleString("es-ES")}</p>
-                  <p style="margin:4px 0 0;font-size:12px;color:#71717a">amaneceres vividos</p>
-                </div>
-              </td>
-              <td width="50%" style="padding:8px">
-                <div style="background:#ec489910;border:1px solid #ec489930;border-radius:10px;padding:16px;text-align:center">
-                  <p style="margin:0;font-size:24px;font-weight:700;color:#f9a8d4">${songs.toLocaleString("es-ES")}</p>
-                  <p style="margin:4px 0 0;font-size:12px;color:#71717a">canciones que cabrian</p>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td width="50%" style="padding:8px">
-                <div style="background:#06b6d410;border:1px solid #06b6d430;border-radius:10px;padding:16px;text-align:center">
-                  <p style="margin:0;font-size:24px;font-weight:700;color:#67e8f9">${hours.toLocaleString("es-ES")}</p>
-                  <p style="margin:4px 0 0;font-size:12px;color:#71717a">horas de experiencia</p>
-                </div>
-              </td>
-              <td width="50%" style="padding:8px">
-                <div style="background:#10b98110;border:1px solid #10b98130;border-radius:10px;padding:16px;text-align:center">
-                  <p style="margin:0;font-size:24px;font-weight:700;color:#6ee7b7">${hugs.toLocaleString("es-ES")}</p>
-                  <p style="margin:4px 0 0;font-size:12px;color:#71717a">abrazos posibles</p>
-                </div>
-              </td>
-            </tr>
-          </table>
-
-          <div style="background:#27272a;border-radius:10px;padding:20px;margin:0 0 24px">
-            <p style="margin:0 0 12px;font-size:16px;font-weight:700;color:#fff">No son numeros — son tu historia</p>
-            <p style="margin:0 0 8px;font-size:14px;color:#a1a1aa;line-height:1.6">
-              Detras de cada latido hubo decisiones que tomaste, miedos que enfrentaste y dias que simplemente aguantaste.
-              Eso es fuerza real — no la del gimnasio, sino la que sostiene todo lo demas.
+  const body = `
+            <p style="margin:0 0 8px;font-size:13px;color:#71717a;text-transform:uppercase;letter-spacing:0.15em;font-weight:600">Tu informe de latidos</p>
+            <p style="margin:0 0 24px;font-size:36px;font-weight:800;background:linear-gradient(135deg,#c084fc,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1">${fmtBeats(beats)}</p>
+            <p style="margin:0 0 24px;font-size:15px;color:#a1a1aa;line-height:1.7">
+              Tu corazón ha latido <strong style="color:#e4e4e7">${fmtBeats(beats)} veces</strong> para traerte hasta aquí. Cada uno sostuvo una decisión, un momento de duda, un paso adelante.
             </p>
-            <p style="margin:0;font-size:14px;color:#a1a1aa;line-height:1.6">
-              Tu corazon tiene la constancia. Solo falta que tu le des una direccion.
-            </p>
-          </div>
-
-          <p style="margin:0 0 16px;font-size:15px;color:#e4e4e7;font-weight:600">El primer paso no tiene que ser grande — solo tiene que ser tuyo.</p>
-
-          <a href="${appUrl}/app" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;font-weight:700;font-size:15px;text-decoration:none;border-radius:10px">Dar mi primer paso</a>
-        </td></tr>
-
-        <!-- Marketing block -->
-        <tr><td style="padding:0 32px 32px;border-top:1px solid #27272a">
-          <div style="margin-top:24px;background:#0a0a0a;border:1px solid #27272a;border-radius:10px;padding:24px;text-align:center">
-            <p style="margin:0 0 8px;font-size:16px;font-weight:700;color:#fff">Convierte intencion en accion</p>
-            <p style="margin:0 0 16px;font-size:13px;color:#a1a1aa;line-height:1.5">
-              Un mentor con IA que detecta tu estado emocional y te guia a pasos concretos.<br>
-              Objetivos, check-ins diarios, retos de 21 dias y seguimiento continuo.
-            </p>
-            <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 16px">
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px">
               <tr>
-                <td style="padding:4px 8px;text-align:center">
-                  <p style="margin:0;font-size:11px;color:#71717a">Chat con IA</p>
-                  <p style="margin:2px 0 0;font-size:13px;color:#c4b5fd;font-weight:600">Ilimitado</p>
+                <td width="50%" style="padding:6px">
+                  <div style="background:#7c3aed10;border:1px solid #7c3aed30;border-radius:10px;padding:16px;text-align:center">
+                    <p style="margin:0;font-size:22px;font-weight:700;color:#c4b5fd">${days.toLocaleString("es-ES")}</p>
+                    <p style="margin:4px 0 0;font-size:11px;color:#71717a">amaneceres vividos</p>
+                  </div>
                 </td>
-                <td style="padding:4px 8px;text-align:center">
-                  <p style="margin:0;font-size:11px;color:#71717a">Check-in diario</p>
-                  <p style="margin:2px 0 0;font-size:13px;color:#c4b5fd;font-weight:600">30 seg</p>
+                <td width="50%" style="padding:6px">
+                  <div style="background:#ec489910;border:1px solid #ec489930;border-radius:10px;padding:16px;text-align:center">
+                    <p style="margin:0;font-size:22px;font-weight:700;color:#f9a8d4">${songs.toLocaleString("es-ES")}</p>
+                    <p style="margin:4px 0 0;font-size:11px;color:#71717a">canciones que caben</p>
+                  </div>
                 </td>
-                <td style="padding:4px 8px;text-align:center">
-                  <p style="margin:0;font-size:11px;color:#71717a">Modo Impulso</p>
-                  <p style="margin:2px 0 0;font-size:13px;color:#c4b5fd;font-weight:600">21 dias</p>
+              </tr>
+              <tr>
+                <td width="50%" style="padding:6px">
+                  <div style="background:#06b6d410;border:1px solid #06b6d430;border-radius:10px;padding:16px;text-align:center">
+                    <p style="margin:0;font-size:22px;font-weight:700;color:#67e8f9">${hours.toLocaleString("es-ES")}</p>
+                    <p style="margin:4px 0 0;font-size:11px;color:#71717a">horas de experiencia</p>
+                  </div>
+                </td>
+                <td width="50%" style="padding:6px">
+                  <div style="background:#10b98110;border:1px solid #10b98130;border-radius:10px;padding:16px;text-align:center">
+                    <p style="margin:0;font-size:22px;font-weight:700;color:#6ee7b7">${hugs.toLocaleString("es-ES")}</p>
+                    <p style="margin:4px 0 0;font-size:11px;color:#71717a">abrazos posibles</p>
+                  </div>
                 </td>
               </tr>
             </table>
-            <a href="${appUrl}/signup?utm_source=calculator&utm_medium=email&utm_campaign=heartbeat_report" style="display:inline-block;padding:12px 28px;background:#fff;color:#18181b;font-weight:700;font-size:14px;text-decoration:none;border-radius:8px">Crear cuenta gratis</a>
-            <p style="margin:12px 0 0;font-size:11px;color:#52525b">
-              Ya tienes cuenta? <a href="${appUrl}/login" style="color:#c4b5fd;text-decoration:underline">Inicia sesion</a>
-            </p>
-          </div>
-        </td></tr>
+            <div style="background:#27272a;border-radius:10px;padding:20px;margin:0 0 16px">
+              <p style="margin:0 0 8px;font-size:18px;font-weight:700;color:#fff">No son números — son tu historia</p>
+              <p style="margin:0;font-size:15px;color:#a1a1aa;line-height:1.6">
+                Detrás de cada latido hubo decisiones que tomaste, miedos que enfrentaste y días que simplemente aguantaste. Tu corazón tiene la constancia. Solo falta que tú le des una dirección.
+              </p>
+            </div>
+            <p style="margin:0;font-size:15px;color:#e4e4e7;font-weight:600">El primer paso no tiene que ser grande — solo tiene que ser tuyo.</p>`;
 
-        <tr><td style="padding:0 32px 24px">
-          <p style="margin:0;font-size:11px;color:#52525b;line-height:1.5">
-            Tres Mil Millones de Latidos — mentoria conversacional con IA.<br>
-            Este informe se genero desde la calculadora de latidos.
-          </p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+  const html = baseLayout({
+    theme: "dark",
+    header: "branded",
+    footer: "product",
+    body,
+    cta: { href: `${appUrl}/app`, label: "Dar mi primer paso" },
+    footerNote: "Este informe se generó desde la calculadora de latidos.",
+  });
 
   return { to, subject, html, text };
 }
@@ -454,51 +396,24 @@ export function buildReminderEmail(params: {
     `¿Qué está pasando? Vuelve cuando puedas.\n\n` +
     `${appUrl}`;
 
-  const html = `<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f9f9f7;font-family:system-ui,sans-serif">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9f9f7;padding:40px 0">
-    <tr><td align="center">
-      <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)">
-        <tr>
-          <td style="background:#1a1a1a;padding:24px 32px">
-            <span style="color:#f5c518;font-size:20px;font-weight:700;letter-spacing:-0.5px">Tres Mil Millones de Latidos</span>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:32px">
-            <p style="margin:0 0 8px;font-size:14px;color:#888">Han pasado 24 horas</p>
-            <h1 style="margin:0 0 24px;font-size:22px;font-weight:700;color:#111;line-height:1.3">
-              Tienes algo pendiente
-            </h1>
-            <p style="margin:0 0 8px;font-size:14px;color:#555;font-weight:600;text-transform:uppercase;letter-spacing:.5px">
-              Lo que dijiste que harías
-            </p>
-            <div style="background:#f5f5f0;border-left:3px solid #f5c518;border-radius:4px;padding:14px 16px;margin-bottom:28px">
-              <p style="margin:0;font-size:16px;color:#222;line-height:1.5">${escapeHtml(pendingAction)}</p>
+  const body = `
+            <p style="margin:0 0 8px;font-size:13px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Han pasado 24 horas</p>
+            <h1 style="margin:0 0 20px;font-size:22px;font-weight:700;color:#111;line-height:1.3;letter-spacing:-0.3px">Tienes algo pendiente</h1>
+            <p style="margin:0 0 8px;font-size:13px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Lo que dijiste que harías</p>
+            <div style="background:#fef9e7;border-left:3px solid #f5c518;border-radius:4px;padding:14px 16px;margin:0 0 24px">
+              <p style="margin:0;font-size:18px;color:#222;line-height:1.5">${escapeHtml(pendingAction)}</p>
             </div>
-            <p style="margin:0 0 24px;font-size:15px;color:#444;line-height:1.6">
+            <p style="margin:0;font-size:15px;color:#444;line-height:1.6">
               ¿Qué está pasando? Puede que necesites ajustar la acción, o simplemente retomar.
-            </p>
-            <a href="${appUrl}" style="display:inline-block;background:#1a1a1a;color:#f5c518;text-decoration:none;padding:12px 24px;border-radius:6px;font-size:15px;font-weight:600">
-              Volver ahora →
-            </a>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:20px 32px;border-top:1px solid #eee">
-            <p style="margin:0;font-size:12px;color:#999;line-height:1.5">
-              Tres Mil Millones de Latidos acompaña — no obliga. Si no es el momento, está bien.<br>
-              Para dejar de recibir estos emails, responde "baja" a este correo.
-            </p>
-          </td>
-        </tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+            </p>`;
+
+  const html = baseLayout({
+    theme: "light",
+    header: "branded",
+    footer: "product",
+    body,
+    cta: { href: appUrl, label: "Volver ahora" },
+  });
 
   return { subject, html, text };
 }
@@ -543,56 +458,30 @@ export function buildWaitlistWelcomeEmail(params: {
     `Este servicio acompaña — no sustituye ayuda profesional.`,
   ].join("\n");
 
-  const html = `<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#0a0a0a;font-family:system-ui,sans-serif">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 0">
-    <tr><td align="center">
-      <table width="560" cellpadding="0" cellspacing="0" style="background:#18181b;border-radius:12px;overflow:hidden;border:1px solid #27272a">
-        <tr>
-          <td style="background:linear-gradient(135deg,#7c3aed 0%,#d946ef 100%);padding:28px 32px">
-            <span style="color:#fff;font-size:20px;font-weight:700;letter-spacing:-0.5px">Tres Mil Millones de Latidos</span>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:32px;color:#d4d4d8">
+  const body = `
             <p style="margin:0 0 20px;font-size:18px;color:#fff;font-weight:600">${greeting},</p>
-            <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#a1a1aa">
-              Ya diste el primer paso. Respondiste tres preguntas que la mayoría evita.
-              Eso dice algo de ti.
+            <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#a1a1aa">
+              Ya diste el primer paso. Respondiste tres preguntas que la mayoría evita. Eso dice algo de ti.
             </p>
-            <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#a1a1aa">
-              Tres Mil Millones de Latidos no es otra app de productividad. Es un espacio para
-              ordenar lo que sientes, nombrar lo que te frena y avanzar con acción concreta.
+            <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#a1a1aa">
+              Tres Mil Millones de Latidos no es otra app de productividad. Es un espacio para ordenar lo que sientes, nombrar lo que te frena y avanzar con acción concreta.
             </p>
             <div style="background:#27272a;border-left:3px solid #d946ef;border-radius:4px;padding:16px 20px;margin:24px 0">
               <p style="margin:0;font-size:15px;color:#e4e4e7;line-height:1.6;font-weight:500">
                 El siguiente paso: crea tu cuenta y empieza tu primera conversación.
               </p>
             </div>
-            <div style="text-align:center;margin:28px 0">
-              <a href="${signupUrl}" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#7c3aed,#d946ef);color:#fff;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px">
-                Crear mi cuenta
-              </a>
-            </div>
-            <p style="margin:0;font-size:14px;line-height:1.6;color:#71717a">
+            <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#71717a">
               Sin rodeos. Sin consejos genéricos. Solo tú y la claridad que necesitas.
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:16px 32px;border-top:1px solid #27272a">
-            <p style="margin:0;font-size:11px;color:#52525b;text-align:center">
-              Tres Mil Millones de Latidos acompaña — no sustituye ayuda profesional.
-            </p>
-          </td>
-        </tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+            </p>`;
+
+  const html = baseLayout({
+    theme: "dark",
+    header: "branded",
+    footer: "product",
+    body,
+    cta: { href: signupUrl, label: "Crear mi cuenta" },
+  });
 
   return { to, subject, html, text };
 }
@@ -626,56 +515,24 @@ export function buildWelcomeEmail(params: {
     `Cada latido cuenta. Y este es el primero.`,
   ].join("\n");
 
-  const html = `<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#0a0a0a;font-family:system-ui,sans-serif">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 0">
-    <tr><td align="center">
-      <table width="560" cellpadding="0" cellspacing="0" style="background:#18181b;border-radius:12px;overflow:hidden;border:1px solid #27272a">
-        <tr>
-          <td style="background:linear-gradient(135deg,#7c3aed 0%,#d946ef 100%);padding:28px 32px">
-            <span style="color:#fff;font-size:20px;font-weight:700;letter-spacing:-0.5px">Tres Mil Millones de Latidos</span>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:32px;color:#d4d4d8">
-            <p style="margin:0 0 20px;font-size:22px;color:#fff;font-weight:700">${greeting},</p>
-            <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#a1a1aa">
-              Has dado el primer paso. La mayoría no llega aquí.
-            </p>
-            <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#a1a1aa">
-              Esto no es una app que te dice qué hacer. Es un espacio que te pregunta lo que nadie
-              te pregunta — para que veas lo que no estás viendo.
+  const body = `
+            <p style="margin:0 0 20px;font-size:22px;color:#fff;font-weight:700;letter-spacing:-0.3px">${greeting},</p>
+            <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#a1a1aa">Has dado el primer paso. La mayoría no llega aquí.</p>
+            <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#a1a1aa">
+              Esto no es una app que te dice qué hacer. Es un espacio que te pregunta lo que nadie te pregunta — para que veas lo que no estás viendo.
             </p>
             <div style="background:#27272a;border-left:3px solid #d946ef;border-radius:4px;padding:16px 20px;margin:24px 0">
-              <p style="margin:0;font-size:16px;color:#e4e4e7;line-height:1.6">
-                No necesitas tenerlo claro.<br>
-                Solo necesitas empezar por lo que sientes hoy.
-              </p>
+              <p style="margin:0;font-size:18px;color:#e4e4e7;line-height:1.6">No necesitas tenerlo claro.<br>Solo necesitas empezar por lo que sientes hoy.</p>
             </div>
-            <div style="text-align:center;margin:28px 0">
-              <a href="${appUrl}/app" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#7c3aed,#d946ef);color:#fff;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px">
-                Mi primer latido
-              </a>
-            </div>
-            <p style="margin:0;font-size:14px;line-height:1.6;color:#71717a;text-align:center">
-              Cada latido cuenta. Y este es el primero.
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:16px 32px;border-top:1px solid #27272a">
-            <p style="margin:0;font-size:11px;color:#52525b;text-align:center">
-              Tres Mil Millones de Latidos acompaña — no sustituye ayuda profesional.
-            </p>
-          </td>
-        </tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+            <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#71717a;text-align:center">Cada latido cuenta. Y este es el primero.</p>`;
+
+  const html = baseLayout({
+    theme: "dark",
+    header: "branded",
+    footer: "product",
+    body,
+    cta: { href: `${appUrl}/app`, label: "Mi primer latido" },
+  });
 
   return { subject, html, text };
 }
@@ -706,50 +563,21 @@ export function build24hNudgeEmail(params: {
     `A veces volver es solo abrir la puerta y decir "hoy estoy así".`,
   ].join("\n");
 
-  const html = `<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#0a0a0a;font-family:system-ui,sans-serif">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 0">
-    <tr><td align="center">
-      <table width="560" cellpadding="0" cellspacing="0" style="background:#18181b;border-radius:12px;overflow:hidden;border:1px solid #27272a">
-        <tr>
-          <td style="background:linear-gradient(135deg,#7c3aed 0%,#d946ef 100%);padding:24px 32px">
-            <span style="color:#fff;font-size:18px;font-weight:700">Tres Mil Millones de Latidos</span>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:32px;color:#d4d4d8">
-            <p style="margin:0 0 20px;font-size:20px;color:#fff;font-weight:700">${greeting},</p>
+  const body = `
+            <p style="margin:0 0 20px;font-size:22px;color:#fff;font-weight:700;letter-spacing:-0.3px">${greeting},</p>
+            <p style="margin:0 0 8px;font-size:15px;line-height:1.7;color:#a1a1aa">Ayer diste un paso. Hoy toca el segundo.</p>
             <p style="margin:0 0 8px;font-size:15px;line-height:1.7;color:#a1a1aa">
-              Ayer diste un paso. Hoy toca el segundo.
+              No necesitas una hora. No necesitas tenerlo claro. Solo necesitas escribir una frase sobre cómo estás ahora mismo.
             </p>
-            <p style="margin:0 0 24px;font-size:15px;line-height:1.7;color:#a1a1aa">
-              No necesitas una hora. No necesitas tenerlo claro. Solo necesitas escribir una frase
-              sobre cómo estás ahora mismo.
-            </p>
-            <div style="text-align:center;margin:24px 0">
-              <a href="${appUrl}/app" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#7c3aed,#d946ef);color:#fff;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px">
-                Segundo latido
-              </a>
-            </div>
-            <p style="margin:0;font-size:14px;line-height:1.6;color:#71717a;text-align:center;font-style:italic">
-              A veces volver es solo abrir la puerta y decir "hoy estoy así".
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:16px 32px;border-top:1px solid #27272a">
-            <p style="margin:0;font-size:11px;color:#52525b;text-align:center">
-              No sustituye terapia profesional. <a href="${appUrl}/settings" style="color:#71717a">Dejar de recibir estos emails</a>
-            </p>
-          </td>
-        </tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+            <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#71717a;text-align:center;font-style:italic">A veces volver es solo abrir la puerta y decir "hoy estoy así".</p>`;
+
+  const html = baseLayout({
+    theme: "dark",
+    header: "branded",
+    footer: "product",
+    body,
+    cta: { href: `${appUrl}/app`, label: "Segundo latido" },
+  });
 
   return { subject, html, text };
 }
@@ -795,52 +623,22 @@ export function build7dNudgeEmail(params: {
     `No hace falta una respuesta larga. Solo una frase nueva.`,
   ].join("\n");
 
-  const html = `<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#0a0a0a;font-family:system-ui,sans-serif">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 0">
-    <tr><td align="center">
-      <table width="560" cellpadding="0" cellspacing="0" style="background:#18181b;border-radius:12px;overflow:hidden;border:1px solid #27272a">
-        <tr>
-          <td style="background:linear-gradient(135deg,#7c3aed 0%,#d946ef 100%);padding:24px 32px">
-            <span style="color:#fff;font-size:18px;font-weight:700">Tres Mil Millones de Latidos</span>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:32px;color:#d4d4d8">
-            <p style="margin:0 0 20px;font-size:20px;color:#fff;font-weight:700">${greeting},</p>
-            <p style="margin:0 0 16px;font-size:14px;line-height:1.7;color:#a1a1aa">
-              Hace una semana escribiste:
-            </p>
-            <blockquote style="margin:0 0 24px;padding:16px 20px;border-left:3px solid #a78bfa;background:#0a0a0a;border-radius:6px;font-family:Georgia,serif;font-size:16px;line-height:1.6;color:#e4e4e7;font-style:italic">
+  const body = `
+            <p style="margin:0 0 20px;font-size:22px;color:#fff;font-weight:700;letter-spacing:-0.3px">${greeting},</p>
+            <p style="margin:0 0 12px;font-size:13px;line-height:1.5;color:#a1a1aa">Hace una semana escribiste:</p>
+            <blockquote style="margin:0 0 20px;padding:16px 20px;border-left:3px solid #a78bfa;background:#0a0a0a;border-radius:6px;font-family:Georgia,serif;font-size:18px;line-height:1.6;color:#e4e4e7;font-style:italic">
               &laquo;${safePhrase}&raquo;
             </blockquote>
-            <p style="margin:0 0 24px;font-size:18px;line-height:1.6;color:#fff;font-weight:600">
-              ¿Sigue ahí?
-            </p>
-            <div style="text-align:center;margin:24px 0">
-              <a href="${appUrl}/app" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#7c3aed,#d946ef);color:#fff;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px">
-                Escribir una frase nueva
-              </a>
-            </div>
-            <p style="margin:0;font-size:14px;line-height:1.6;color:#71717a;text-align:center;font-style:italic">
-              No hace falta una respuesta larga. Solo una frase nueva.
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:16px 32px;border-top:1px solid #27272a">
-            <p style="margin:0;font-size:11px;color:#52525b;text-align:center">
-              No sustituye terapia profesional. <a href="${appUrl}/settings" style="color:#71717a">Dejar de recibir estos emails</a>
-            </p>
-          </td>
-        </tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+            <p style="margin:0;font-size:18px;line-height:1.6;color:#fff;font-weight:600">¿Sigue ahí?</p>
+            <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#71717a;text-align:center;font-style:italic">No hace falta una respuesta larga. Solo una frase nueva.</p>`;
+
+  const html = baseLayout({
+    theme: "dark",
+    header: "branded",
+    footer: "product",
+    body,
+    cta: { href: `${appUrl}/app`, label: "Escribir una frase nueva" },
+  });
 
   return { subject, html, text };
 }
@@ -848,29 +646,16 @@ export function build7dNudgeEmail(params: {
 // ─── Family / trusted contact emails ──────────────────────────────────────────
 
 function familyLayout(title: string, body: string, cta?: { href: string; label: string }): string {
-  return `<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f9f9f7;font-family:system-ui,sans-serif">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9f9f7;padding:40px 0">
-    <tr><td align="center">
-      <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)">
-        <tr><td style="background:#1a1a1a;padding:20px 32px">
-          <span style="color:#f5c518;font-size:18px;font-weight:700">Tres Mil Millones de Latidos</span>
-          <span style="color:#888;font-size:12px;margin-left:8px">— red de apoyo</span>
-        </td></tr>
-        <tr><td style="padding:32px">
-          <h1 style="margin:0 0 20px;font-size:20px;font-weight:700;color:#111;line-height:1.3">${title}</h1>
-          ${body}
-          ${cta ? `<p style="margin:28px 0 0"><a href="${cta.href}" style="display:inline-block;background:#1a1a1a;color:#f5c518;text-decoration:none;padding:12px 24px;border-radius:6px;font-size:14px;font-weight:600">${cta.label} →</a></p>` : ""}
-        </td></tr>
-        <tr><td style="padding:16px 32px;border-top:1px solid #eee">
-          <p style="margin:0;font-size:11px;color:#aaa">Este mensaje es confidencial. No lo reenvíes sin permiso del usuario.</p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body></html>`;
+  const composedBody = `
+            <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#111;line-height:1.3;letter-spacing:-0.3px">${title}</h1>
+            ${body}`;
+  return baseLayout({
+    theme: "light",
+    header: "family",
+    footer: "private",
+    body: composedBody,
+    cta,
+  });
 }
 
 const RELATION_GUIDANCE: Record<string, { role: string; doThis: string; dontDoThis: string }> = {
@@ -1053,39 +838,20 @@ export function buildWeeklyLetterNotificationEmail(params: {
     `— Tres Mil Millones de Latidos`,
   ].join("\n");
 
-  const html = `<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#0a0a0a;font-family:system-ui,sans-serif">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 0">
-    <tr><td align="center">
-      <table width="520" cellpadding="0" cellspacing="0" style="background:#18181b;border-radius:12px;overflow:hidden;border:1px solid #27272a">
-        <tr>
-          <td style="padding:32px;color:#d4d4d8">
+  const body = `
             <p style="margin:0 0 16px;font-size:18px;color:#fff;font-weight:600">${greeting},</p>
-            <p style="margin:0 0 24px;font-size:15px;line-height:1.7;color:#a1a1aa">
+            <p style="margin:0;font-size:15px;line-height:1.7;color:#a1a1aa">
               El mentor te ha escrito una carta sobre esta semana. Cuando tengas un momento, léela en la app.
-            </p>
-            <div style="text-align:center;margin:12px 0 20px">
-              <a href="${letterUrl}" style="display:inline-block;padding:12px 28px;background:#7c3aed;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px">
-                Leer la carta
-              </a>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:14px 32px;border-top:1px solid #27272a">
-            <p style="margin:0;font-size:11px;color:#52525b;line-height:1.5;text-align:center">
-              Recibes este aviso porque tienes activada la carta semanal.
-              Puedes desactivarlo en tus ajustes sin perder la carta.
-            </p>
-          </td>
-        </tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+            </p>`;
+
+  const html = baseLayout({
+    theme: "dark",
+    header: "branded",
+    footer: "product",
+    body,
+    cta: { href: letterUrl, label: "Leer la carta" },
+    footerNote: "Recibes este aviso porque tienes activada la carta semanal.",
+  });
 
   return { subject, html, text };
 }
@@ -1113,26 +879,15 @@ export function buildSupportMessageEmail(params: {
 // ─── Circles v2 ──────────────────────────────────────────────────────────────
 
 function circleLayout(subject: string, body: string, cta: { href: string; label: string }): string {
-  return `<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#0a0a0a;font-family:system-ui,sans-serif">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 0">
-    <tr><td align="center">
-      <table width="520" cellpadding="0" cellspacing="0" style="background:#18181b;border-radius:12px;overflow:hidden;border:1px solid #27272a">
-        <tr><td style="padding:32px;color:#d4d4d8">${body}
-          <div style="text-align:center;margin:24px 0 4px">
-            <a href="${cta.href}" style="display:inline-block;padding:12px 28px;background:#7c3aed;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px">${escapeHtml(cta.label)}</a>
-          </div>
-        </td></tr>
-        <tr><td style="padding:14px 32px;border-top:1px solid #27272a">
-          <p style="margin:0;font-size:11px;color:#52525b;line-height:1.5;text-align:center">${escapeHtml(subject)} — Tres Mil Millones de Latidos.</p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+  return baseLayout({
+    theme: "dark",
+    header: "branded",
+    footer: "product",
+    width: 560,
+    body,
+    cta,
+    footerNote: subject,
+  });
 }
 
 export function buildCirclePulseOpenedEmail(params: {

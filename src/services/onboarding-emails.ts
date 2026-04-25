@@ -1,5 +1,6 @@
 import { getPrismaClient } from "@/db/prisma";
 import { sendUserEmail, type UserEmail } from "@/lib/email";
+import { baseLayout, ctaButton as unifiedCtaButton } from "@/lib/email-layout";
 import { getDailyQuote } from "@/lib/daily-quotes";
 import { logError, logInfo } from "@/lib/logger";
 
@@ -8,34 +9,16 @@ import { logError, logInfo } from "@/lib/logger";
 const APP_URL = process.env.APP_BASE_URL || "https://tresmilmillonesdelatidos.es";
 
 function emailShell(content: string): string {
-  return `<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#0a0a0a;font-family:system-ui,-apple-system,sans-serif">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 0">
-    <tr><td align="center">
-      <table width="560" cellpadding="0" cellspacing="0" style="background:#18181b;border-radius:12px;overflow:hidden;border:1px solid #27272a">
-        <tr><td style="background:linear-gradient(135deg,#7c3aed,#ec4899);padding:24px 32px">
-          <p style="margin:0;font-size:20px;font-weight:700;color:#fff">💓 Tres Mil Millones de Latidos</p>
-        </td></tr>
-        <tr><td style="padding:32px">
-          ${content}
-        </td></tr>
-        <tr><td style="padding:0 32px 24px;border-top:1px solid #27272a">
-          <p style="margin:16px 0 0;font-size:11px;color:#71717a;line-height:1.5">
-            Este email es parte de tu proceso en Tres Mil Millones de Latidos.
-            Si no quieres recibirlos, puedes desactivarlos en Ajustes.
-          </p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+  return baseLayout({
+    theme: "dark",
+    header: "branded",
+    footer: "product",
+    body: content,
+  });
 }
 
 function ctaButton(text: string, url: string): string {
-  return `<a href="${url}" style="display:inline-block;margin:16px 0;padding:14px 32px;background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;font-weight:700;font-size:15px;text-decoration:none;border-radius:10px">${text}</a>`;
+  return unifiedCtaButton(url, text, "dark");
 }
 
 type TemplateBuilder = (name: string) => UserEmail & { textOnly: string };

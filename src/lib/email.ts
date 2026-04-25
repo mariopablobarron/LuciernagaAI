@@ -1157,3 +1157,127 @@ export function buildSupportMessageEmail(params: {
   const text = `${fromName} te ha enviado un mensaje:\n\n"${content}"\n\nVer en la app: ${appUrl}`;
   return { subject, html: familyLayout(subject, body, { href: appUrl, label: "Ver en la app" }), text };
 }
+
+// ─── Circles v2 ──────────────────────────────────────────────────────────────
+
+function circleLayout(subject: string, body: string, cta: { href: string; label: string }): string {
+  return `<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0a0a0a;font-family:system-ui,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 0">
+    <tr><td align="center">
+      <table width="520" cellpadding="0" cellspacing="0" style="background:#18181b;border-radius:12px;overflow:hidden;border:1px solid #27272a">
+        <tr><td style="padding:32px;color:#d4d4d8">${body}
+          <div style="text-align:center;margin:24px 0 4px">
+            <a href="${cta.href}" style="display:inline-block;padding:12px 28px;background:#7c3aed;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px">${escapeHtml(cta.label)}</a>
+          </div>
+        </td></tr>
+        <tr><td style="padding:14px 32px;border-top:1px solid #27272a">
+          <p style="margin:0;font-size:11px;color:#52525b;line-height:1.5;text-align:center">${escapeHtml(subject)} — Tres Mil Millones de Latidos.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
+export function buildCirclePulseOpenedEmail(params: {
+  name: string | null;
+  prompt: string;
+  weekEnd: Date;
+  appUrl: string;
+}): Pick<UserEmail, "subject" | "html" | "text"> {
+  const firstName = params.name ? escapeHtml(params.name.trim().split(/\s+/)[0]) : null;
+  const greeting = firstName ? `Hola ${firstName}` : "Hola";
+  const subject = "Hay un nuevo pulso en tu círculo";
+  const url = `${params.appUrl}/community?tab=circle`;
+  const closeDate = params.weekEnd.toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "short" });
+
+  const text = [
+    `${greeting},`,
+    ``,
+    `Hay un pulso abierto en tu círculo:`,
+    ``,
+    `«${params.prompt}»`,
+    ``,
+    `Tienes hasta el ${closeDate} para responder cuando quieras.`,
+    `${url}`,
+    ``,
+    `— Tres Mil Millones de Latidos`,
+  ].join("\n");
+
+  const body = `<p style="margin:0 0 16px;font-size:18px;color:#fff;font-weight:600">${greeting},</p>
+<p style="margin:0 0 12px;font-size:15px;line-height:1.7;color:#a1a1aa">Hay un pulso abierto en tu círculo. Responde cuando quieras antes del ${escapeHtml(closeDate)}.</p>
+<blockquote style="margin:0 0 16px;padding:14px 18px;border-left:3px solid #06b6d4;background:#0e7490/10;color:#e4e4e7;font-style:italic;border-radius:4px;background-color:rgba(6,182,212,0.08)">${escapeHtml(params.prompt)}</blockquote>
+<p style="margin:0 0 4px;font-size:13px;color:#71717a">Tu respuesta desbloquea las del resto del círculo.</p>`;
+
+  return { subject, html: circleLayout(subject, body, { href: url, label: "Responder al pulso" }), text };
+}
+
+export function buildMentorReflectionEmail(params: {
+  name: string | null;
+  prompt: string;
+  appUrl: string;
+}): Pick<UserEmail, "subject" | "html" | "text"> {
+  const firstName = params.name ? escapeHtml(params.name.trim().split(/\s+/)[0]) : null;
+  const greeting = firstName ? `Hola ${firstName}` : "Hola";
+  const subject = "Tienes una devolución privada del mentor";
+  const url = `${params.appUrl}/community?tab=circle`;
+
+  const text = [
+    `${greeting},`,
+    ``,
+    `El mentor te ha dejado una devolución privada sobre lo que se compartió en el último pulso del círculo.`,
+    `Pregunta de la semana: «${params.prompt}»`,
+    ``,
+    `Léela en la app: ${url}`,
+    ``,
+    `— Tres Mil Millones de Latidos`,
+  ].join("\n");
+
+  const body = `<p style="margin:0 0 16px;font-size:18px;color:#fff;font-weight:600">${greeting},</p>
+<p style="margin:0 0 12px;font-size:15px;line-height:1.7;color:#a1a1aa">El mentor te ha dejado una devolución privada sobre el último pulso del círculo. Solo tú la ves.</p>
+<blockquote style="margin:0 0 4px;padding:14px 18px;border-left:3px solid #f59e0b;color:#e4e4e7;font-style:italic;border-radius:4px;background-color:rgba(245,158,11,0.08)">${escapeHtml(params.prompt)}</blockquote>`;
+
+  return { subject, html: circleLayout(subject, body, { href: url, label: "Leer la devolución" }), text };
+}
+
+export function buildCircleClosingLetterEmail(params: {
+  name: string | null;
+  circleName: string;
+  reason: string;
+  body: string;
+  appUrl: string;
+}): Pick<UserEmail, "subject" | "html" | "text"> {
+  const firstName = params.name ? escapeHtml(params.name.trim().split(/\s+/)[0]) : null;
+  const greeting = firstName ? `Hola ${firstName}` : "Hola";
+  const reasonLabel: Record<string, string> = {
+    cycle_end: "El ciclo de seis semanas termina",
+    drift: "Tu fase ha cambiado",
+    left: "Has salido del círculo",
+    removed: "El círculo cierra",
+  };
+  const subject = `Carta de cierre — ${params.circleName}`;
+  const url = `${params.appUrl}/community/cartas`;
+
+  const text = [
+    `${greeting},`,
+    ``,
+    `${reasonLabel[params.reason] ?? "Tu paso por el círculo termina"}.`,
+    ``,
+    params.body,
+    ``,
+    `Esta carta queda archivada en tu perfil: ${url}`,
+    ``,
+    `— Tres Mil Millones de Latidos`,
+  ].join("\n");
+
+  const html = `<p style="margin:0 0 8px;font-size:18px;color:#fff;font-weight:600">${greeting},</p>
+<p style="margin:0 0 16px;font-size:13px;color:#a78bfa;text-transform:uppercase;letter-spacing:0.05em;font-weight:600">${escapeHtml(reasonLabel[params.reason] ?? "Cierre")}</p>
+<div style="margin:0 0 16px;padding:14px 18px;background:rgba(124,58,237,0.06);border-left:3px solid #7c3aed;border-radius:4px;color:#e4e4e7;font-size:15px;line-height:1.7;white-space:pre-wrap">${escapeHtml(params.body)}</div>
+<p style="margin:0;font-size:13px;color:#71717a">Esta carta queda archivada en tu perfil. Lo que dijiste y lo que callaste sigue siendo tuyo.</p>`;
+
+  return { subject, html: circleLayout(subject, html, { href: url, label: "Ver mis cartas" }), text };
+}

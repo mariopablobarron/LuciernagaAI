@@ -18,8 +18,8 @@ import {
   BookOpen,
 } from "lucide-react";
 import { toast } from "sonner";
-import { CircleSyncBanner } from "@/components/CircleSyncBanner";
 import AnonymousHint from "@/components/community/AnonymousHint";
+import { CircleHubV2 } from "@/components/community/CircleHubV2";
 import { useSession } from "@/lib/useSession";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -32,12 +32,12 @@ type Post = {
   author: { name: string } | null; isOwn: boolean; heartbeats: number; createdAt: string;
 };
 type CircleData = {
-  id: string; name: string; phase: string; description: string | null;
+  id: string; name: string; matchPattern: string; matchEmotion: string; description: string | null;
   myRole: string; members: Array<{ id: string; name: string | null; role: string; isMe: boolean }>;
   memberCount: number; maxMembers: number;
-  currentChallenge: { title: string; description: string | null } | null;
+  cycleEndsAt: string | null;
 };
-type AvailableCircle = { id: string; name: string; phase: string; description: string | null; members: number; maxMembers: number };
+type AvailableCircle = { id: string; name: string; description: string | null; members: number; maxMembers: number };
 type Commitment = { id: string; text: string; completed: boolean; author: string | null; isOwn: boolean };
 type Session = {
   id: string; title: string; description: string | null; hostName: string;
@@ -87,11 +87,6 @@ function timeAgo(iso: string): string {
   if (d < 1440) return `hace ${Math.floor(d / 60)}h`;
   return `hace ${Math.floor(d / 1440)}d`;
 }
-
-const PHASE_LABELS: Record<string, string> = {
-  bloqueo: "Bloqueo", exploracion: "Exploración", decision: "Decisión",
-  accion: "Acción", consistencia: "Consistencia",
-};
 
 // ─── Main Component ─────────────────────────────────────────────────────────
 
@@ -283,16 +278,6 @@ export default function CommunityPage() {
       body: JSON.stringify({ postId }),
     });
     void fetchData(tab);
-  }
-
-  async function handleJoinCircle(circleId: string) {
-    await fetch("/api/community/circles", {
-      method: "POST", credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ circleId }),
-    });
-    toast.success("Te has unido al círculo");
-    void fetchData("circle");
   }
 
   async function handleCommitment() {
@@ -552,9 +537,6 @@ export default function CommunityPage() {
         {/* ── Tab: Today (Cafetería card + Victorias feed) ─────────────── */}
         {tab === "today" && (
           <div className="space-y-4">
-            {/* Sync session banner — silencioso si tu círculo no tiene sesión activa/próxima */}
-            <CircleSyncBanner />
-
             {/* Cafetería — ronda del día */}
             <Link
               href="/community/cafeteria"
@@ -702,141 +684,7 @@ export default function CommunityPage() {
         )}
 
         {/* ── Tab: Circle ──────────────────────────────────────────────── */}
-        {tab === "circle" && (
-          <div className="space-y-4">
-            {loading ? (
-              <p className="text-sm text-zinc-500 text-center py-8">Cargando...</p>
-            ) : !myCircle ? (
-              <div className="space-y-4">
-                <div className="text-center py-8 space-y-2">
-                  <Users className="w-10 h-10 text-zinc-700 mx-auto" />
-                  <p className="text-white font-semibold">Aún no tienes círculo</p>
-                  <p className="text-sm text-zinc-500">Únete a un grupo de 5-8 personas en tu misma fase</p>
-                </div>
-                {availableCircles.length > 0 ? (
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    {availableCircles.map((c) => (
-                      <div key={c.id} className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-3">
-                        <div>
-                          <p className="text-sm font-semibold text-white">{c.name}</p>
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-300 border border-violet-500/30">
-                            {PHASE_LABELS[c.phase] ?? c.phase}
-                          </span>
-                        </div>
-                        {c.description && <p className="text-xs text-zinc-400">{c.description}</p>}
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-zinc-500">{c.members}/{c.maxMembers} personas</span>
-                          <button onClick={() => void handleJoinCircle(c.id)}
-                            className="rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500 transition-all">
-                            Unirme
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 space-y-3 text-center">
-                    <p className="text-sm text-zinc-400">
-                      Ahora mismo no hay círculos con plazas libres. Los abrimos por cohorte,
-                      cuando hay 5-8 personas en la misma fase.
-                    </p>
-                    <a
-                      href="https://t.me/TRESMILMILLONESDELATIDOSBOT"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-xs font-semibold text-white hover:bg-violet-500"
-                    >
-                      <Users className="w-3.5 h-3.5" /> Avísame cuando abra el mío
-                    </a>
-                    <p className="text-[11px] text-zinc-600">
-                      Escríbenos por Telegram con tu nombre y te avisamos.
-                    </p>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {/* Circle header */}
-                <div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <p className="text-lg font-bold text-white">{myCircle.name}</p>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-300">
-                        {PHASE_LABELS[myCircle.phase] ?? myCircle.phase}
-                      </span>
-                    </div>
-                    <p className="text-xs text-zinc-500">{myCircle.memberCount}/{myCircle.maxMembers}</p>
-                  </div>
-                  {/* Members */}
-                  <div className="flex flex-wrap gap-2">
-                    {myCircle.members.map((m) => (
-                      <span key={m.id} className={`text-xs px-2 py-1 rounded-full border ${
-                        m.isMe ? "border-cyan-500/30 bg-cyan-500/10 text-cyan-300" : "border-zinc-700 text-zinc-400"
-                      }`}>
-                        {m.name ?? "Anónimo"} {m.role !== "member" && `(${m.role})`}
-                      </span>
-                    ))}
-                  </div>
-                  {/* Challenge */}
-                  {myCircle.currentChallenge && (
-                    <div className="mt-4 rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
-                      <p className="text-xs font-semibold text-amber-300 flex items-center gap-1">
-                        <Target className="w-3 h-3" /> Reto de la semana
-                      </p>
-                      <p className="text-sm text-white mt-1">{myCircle.currentChallenge.title}</p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Daily commitment */}
-                <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-3">
-                  <p className="text-sm font-semibold text-white flex items-center gap-2">
-                    <Flame className="w-4 h-4 text-orange-400" /> Compromiso de hoy
-                  </p>
-                  <div className="flex gap-2">
-                    <input value={commitText} onChange={(e) => setCommitText(e.target.value)}
-                      placeholder="Hoy voy a..."
-                      className="flex-1 rounded-lg border border-zinc-700 bg-black/40 px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-violet-500/50 focus:outline-none" />
-                    <button onClick={() => void handleCommitment()} disabled={!commitText.trim()}
-                      className="rounded-lg bg-violet-600 px-3 py-2 text-xs font-semibold text-white hover:bg-violet-500 disabled:opacity-40">
-                      <Send className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                  {commitments.map((c) => (
-                    <div key={c.id} className="flex items-center gap-2 text-sm">
-                      <CheckCircle2 className={`w-4 h-4 shrink-0 ${c.completed ? "text-emerald-400" : "text-zinc-600"}`} />
-                      <span className={c.completed ? "text-zinc-500 line-through" : "text-zinc-300"}>{c.text}</span>
-                      <span className="text-[10px] text-zinc-600 ml-auto">{c.author}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Circle posts */}
-                <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-3">
-                  <p className="text-sm font-semibold text-white flex items-center gap-2">
-                    <MessageCircle className="w-4 h-4 text-cyan-400" /> Tablón del círculo
-                  </p>
-                  {circlePosts.length === 0 ? (
-                    <p className="text-xs text-zinc-500 py-4 text-center">Aún no hay publicaciones en tu círculo.</p>
-                  ) : circlePosts.map((p) => (
-                    <div key={p.id} className="rounded-lg border border-zinc-800 bg-zinc-950 p-3 space-y-1">
-                      {p.feeling && <p className="text-sm text-zinc-300">{p.feeling}</p>}
-                      {p.blocker && <p className="text-xs text-zinc-500 italic">{p.blocker}</p>}
-                      {p.step && <p className="text-xs text-cyan-400">{p.step}</p>}
-                      <div className="flex items-center justify-between pt-1">
-                        <button onClick={() => void handleHeartbeat(p.id)}
-                          className="inline-flex items-center gap-1 text-xs text-zinc-500 hover:text-fuchsia-400">
-                          <Heart className="w-3 h-3" /> {p.heartbeats}
-                        </button>
-                        <p className="text-[10px] text-zinc-600">{p.anonymous ? "Anónimo" : p.author?.name} · {timeAgo(p.createdAt)}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+        {tab === "circle" && <CircleHubV2 />}
 
         {/* ── Tab: Questions (ask.fm style) ────────────────────────────── */}
         {tab === "questions" && (

@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
         meetingUrl: true,
         isOpen: true,
         status: true,
-        circle: { select: { id: true, name: true, phase: true } },
+        circle: { select: { id: true, name: true, matchPattern: true, matchEmotion: true } },
       },
     });
 

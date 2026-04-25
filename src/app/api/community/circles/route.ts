@@ -20,10 +20,6 @@ export async function GET(req: NextRequest) {
               where: { leftAt: null },
               include: { user: { select: { id: true, name: true } } },
             },
-            challenges: {
-              orderBy: { weekStart: "desc" },
-              take: 1,
-            },
             _count: { select: { members: { where: { leftAt: null } } } },
           },
         },
@@ -31,31 +27,9 @@ export async function GET(req: NextRequest) {
     });
 
     if (!membership) {
-      // List available circles to join
-      const available = await prisma.circle.findMany({
-        where: { isActive: true },
-        select: {
-          id: true,
-          name: true,
-          phase: true,
-          description: true,
-          maxMembers: true,
-          _count: { select: { members: { where: { leftAt: null } } } },
-        },
-      });
-
-      const open = available.filter((c) => c._count.members < c.maxMembers);
-      return NextResponse.json({
-        myCircle: null,
-        available: open.map((c) => ({
-          id: c.id,
-          name: c.name,
-          phase: c.phase,
-          description: c.description,
-          members: c._count.members,
-          maxMembers: c.maxMembers,
-        })),
-      });
+      // No self-serve listing in v2 — circles are formed by pattern-based matchmaking,
+      // not browsed. Return empty available list; matchmaking service places users.
+      return NextResponse.json({ myCircle: null, available: [] });
     }
 
     const circle = membership.circle;
@@ -63,7 +37,8 @@ export async function GET(req: NextRequest) {
       myCircle: {
         id: circle.id,
         name: circle.name,
-        phase: circle.phase,
+        matchPattern: circle.matchPattern,
+        matchEmotion: circle.matchEmotion,
         description: circle.description,
         myRole: membership.role,
         members: circle.members.map((m) => ({
@@ -74,7 +49,7 @@ export async function GET(req: NextRequest) {
         })),
         memberCount: circle._count.members,
         maxMembers: circle.maxMembers,
-        currentChallenge: circle.challenges[0] ?? null,
+        cycleEndsAt: circle.cycleEndsAt?.toISOString() ?? null,
       },
       available: [],
     });
@@ -90,7 +65,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const identity = await resolveIdentity(req);
-    const { circleId, action } = (await req.json()) as { circleId?: string; action?: string };
+    const { action } = (await req.json()) as { action?: string };
 
     const prisma = getPrismaClient();
 
@@ -102,40 +77,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, action: "left" });
     }
 
-    if (!circleId) {
-      return NextResponse.json({ error: "CIRCLE_ID_REQUIRED" }, { status: 400 });
-    }
-
-    // Check if already in a circle
-    const existing = await prisma.circleMember.findFirst({
-      where: { userId: identity.userId, leftAt: null },
-    });
-    if (existing) {
-      return NextResponse.json({ error: "ALREADY_IN_CIRCLE" }, { status: 409 });
-    }
-
-    // Check if circle has space
-    const circle = await prisma.circle.findUnique({
-      where: { id: circleId },
-      include: { _count: { select: { members: { where: { leftAt: null } } } } },
-    });
-    if (!circle || !circle.isActive) {
-      return NextResponse.json({ error: "CIRCLE_NOT_FOUND" }, { status: 404 });
-    }
-    if (circle._count.members >= circle.maxMembers) {
-      return NextResponse.json({ error: "CIRCLE_FULL" }, { status: 409 });
-    }
-
-    await prisma.circleMember.create({
-      data: { circleId, userId: identity.userId },
-    });
-
-    return NextResponse.json({ success: true, action: "joined" });
+    return NextResponse.json(
+      { error: "JOIN_NOT_ALLOWED", message: "Circle membership is assigned by matchmaking, not requested." },
+      { status: 400 },
+    );
   } catch (error) {
     if (error instanceof InvalidSessionTokenError) {
       return NextResponse.json({ error: "NOT_AUTHENTICATED" }, { status: 401 });
     }
     logError("COMMUNITY", error, { route: "/api/community/circles", method: "POST" });
-    return NextResponse.json({ error: "JOIN_FAILED" }, { status: 500 });
+    return NextResponse.json({ error: "LEAVE_FAILED" }, { status: 500 });
   }
 }

@@ -101,8 +101,9 @@ model User {
   questionsReceived         AnonQuestion[]            @relation("QuestionsReceived")
   anonAnswers               AnonAnswer[]
   anonAnswerVotes           AnonAnswerVote[]
-  circleSyncResponses       CircleSyncResponse[]
-  circleSyncEchoes          CircleSyncEcho[]
+  circlePulseResponses      CirclePulseResponse[]
+  mentorReflections         MentorReflection[]
+  circleClosingLetters      CircleClosingLetter[]
   preferences               UserPreferences?
   trustedContact            TrustedContact?
   supportMessages           SupportMessage[]
@@ -1632,78 +1633,90 @@ enum CircleRole {
   psychologist
 }
 
-/// A small group (5-8 people) in the same transformation phase.
+/// A small async group of 4 people sharing the same emotional pattern recently.
+/// Lifecycle: 6-week cycle, then closing letter + re-matching.
 model Circle {
-  id            String              @id @default(cuid())
+  id            String                @id @default(cuid())
   name          String
-  phase         CirclePhase
-  maxMembers    Int                 @default(8)
+  matchPattern  String // dominantPattern that grouped these members
+  matchEmotion  String // primaryEmotion that grouped these members
+  maxMembers    Int                   @default(4)
   description   String?
-  startsAt      DateTime            @default(now())
-  endsAt        DateTime?
-  isActive      Boolean             @default(true)
-  syncEnabled   Boolean             @default(true)
-  syncDayOfWeek Int                 @default(4)
-  syncHour      Int                 @default(20)
-  createdAt     DateTime            @default(now())
-  updatedAt     DateTime            @updatedAt
+  startsAt      DateTime              @default(now())
+  cycleEndsAt   DateTime? // when the 6-week cycle closes and members get a closing letter
+  isActive      Boolean               @default(true)
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
   members       CircleMember[]
   posts         CommunityPost[]
   commitments   DailyCommitment[]
-  challenges    CircleChallenge[]
   sessions      LiveSession[]
-  syncSessions  CircleSyncSession[]
+  pulses        CirclePulse[]
+  closingLetters CircleClosingLetter[]
 
-  @@index([phase, isActive])
-  @@index([syncEnabled, isActive])
+  @@index([isActive, cycleEndsAt])
+  @@index([matchPattern, matchEmotion, isActive])
 }
 
-model CircleSyncSession {
-  id           String               @id @default(cuid())
+/// Weekly asynchronous prompt for the circle — open for 7 days, then auto-closed.
+model CirclePulse {
+  id           String                @id @default(cuid())
   circleId     String
-  scheduledFor DateTime
-  prompt       String               @db.Text
-  promptSource String
-  status       String               @default("scheduled")
-  openedAt     DateTime?
+  prompt       String                @db.Text
+  promptSource String // "emergent" | "manual" | "welcome"
+  weekStart    DateTime // Monday 00:00 UTC of the covered week
+  weekEnd      DateTime // Sunday 23:59 UTC of the covered week
+  status       String                @default("open") // "open" | "closed"
+  openedAt     DateTime              @default(now())
   closedAt     DateTime?
-  createdAt    DateTime             @default(now())
-  updatedAt    DateTime             @updatedAt
-  circle       Circle               @relation(fields: [circleId], references: [id], onDelete: Cascade)
-  responses    CircleSyncResponse[]
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  circle       Circle                @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  responses    CirclePulseResponse[]
+  reflections  MentorReflection[]
 
-  @@unique([circleId, scheduledFor])
-  @@index([status, scheduledFor])
-  @@index([circleId, scheduledFor])
+  @@unique([circleId, weekStart])
+  @@index([status, weekEnd])
+  @@index([circleId, weekStart])
 }
 
-model CircleSyncResponse {
-  id          String            @id @default(cuid())
-  sessionId   String
+/// One asynchronous response from a member to a CirclePulse.
+model CirclePulseResponse {
+  id          String      @id @default(cuid())
+  pulseId     String
   userId      String
-  content     String            @db.Text
-  anonymous   Boolean           @default(true)
-  flagged     Boolean           @default(false)
-  submittedAt DateTime          @default(now())
+  content     String      @db.Text
+  anonymous   Boolean     @default(true)
+  flagged     Boolean     @default(false)
+  submittedAt DateTime    @default(now())
   editedAt    DateTime?
-  session     CircleSyncSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  echoes      CircleSyncEcho[]
+  pulse       CirclePulse @relation(fields: [pulseId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([sessionId, userId])
-  @@index([sessionId, submittedAt])
+  @@unique([pulseId, userId])
+  @@index([pulseId, submittedAt])
+  @@index([userId, submittedAt])
 }
 
-model CircleSyncEcho {
-  id         String             @id @default(cuid())
-  responseId String
-  userId     String
-  createdAt  DateTime           @default(now())
-  response   CircleSyncResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
-  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+/// Mentor-generated private reflection delivered to one member after a Pulse closes.
+/// Reflects what from the group's responses resonates with this specific user's case.
+/// Replaces the old peer "echo" mechanic.
+model MentorReflection {
+  id           String      @id @default(cuid())
+  pulseId      String
+  userId       String
+  content      String      @db.Text
+  source       String // "auto" | "approved" — admin must approve before publishedAt is set
+  generatedAt  DateTime    @default(now())
+  approvedAt   DateTime?
+  publishedAt  DateTime?
+  readAt       DateTime?
+  pulse        CirclePulse @relation(fields: [pulseId], references: [id], onDelete: Cascade)
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([responseId, userId])
-  @@index([userId, createdAt])
+  @@unique([pulseId, userId])
+  @@index([userId, publishedAt])
+  @@index([approvedAt])
 }
 
 model CircleMember {
@@ -1720,18 +1733,21 @@ model CircleMember {
   @@index([userId])
 }
 
-/// Weekly challenge set by the coach for the whole circle.
-model CircleChallenge {
+/// Generated when a member exits a circle (cycle end, drift, voluntary leave).
+/// Synthesises what they said and what the group reflected back. Stored permanently.
+model CircleClosingLetter {
   id          String   @id @default(cuid())
   circleId    String
-  title       String
-  description String?
-  weekStart   DateTime
-  weekEnd     DateTime
-  createdAt   DateTime @default(now())
+  userId      String
+  reason      String // "cycle_end" | "drift" | "left" | "removed"
+  body        String   @db.Text
+  generatedAt DateTime @default(now())
+  deliveredAt DateTime?
   circle      Circle   @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([circleId, weekStart])
+  @@index([userId, generatedAt])
+  @@index([circleId, generatedAt])
 }
 
 // ─── Community: Spaces ───────────────────────────────────────────────────────

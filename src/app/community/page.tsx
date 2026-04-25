@@ -118,6 +118,7 @@ export default function CommunityPage() {
   const [answeringId, setAnsweringId] = useState<string | null>(null);
   const [guardian, setGuardian] = useState<GuardianClassification | null>(null);
   const [guardianLoading, setGuardianLoading] = useState(false);
+  const [guardianBlocked, setGuardianBlocked] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Post form state
@@ -312,6 +313,7 @@ export default function CommunityPage() {
     if (!answerText.trim()) return;
     setGuardianLoading(true);
     setGuardian(null);
+    setGuardianBlocked(null);
     try {
       const res = await fetch("/api/community/questions/check-answer", {
         method: "POST",
@@ -320,14 +322,21 @@ export default function CommunityPage() {
         body: JSON.stringify({ content: answerText }),
       });
       if (res.status === 422) {
-        toast.error("Tu respuesta contiene contenido que no podemos publicar.");
+        setGuardianBlocked("Tu mensaje fue marcado por el filtro de seguridad. Si crees que es un falso positivo, puedes publicarlo de todas formas o ajustar el texto.");
+        return;
+      }
+      if (res.status === 429) {
+        setGuardianBlocked("Has hecho muchos chequeos en poco tiempo. Puedes publicar de todas formas o esperar unos minutos.");
+        return;
+      }
+      if (!res.ok) {
+        setGuardianBlocked("No pudimos revisar tu respuesta ahora mismo. Puedes publicar de todas formas.");
         return;
       }
       const data = (await res.json()) as { classification: GuardianClassification | null };
       setGuardian(data.classification ?? null);
     } catch {
-      // Guardian is best-effort; if it fails, allow publishing anyway.
-      setGuardian(null);
+      setGuardianBlocked("Hubo un fallo al revisar tu respuesta. Puedes publicar de todas formas.");
     } finally {
       setGuardianLoading(false);
     }
@@ -350,6 +359,7 @@ export default function CommunityPage() {
       setAnswerText("");
       setAnsweringId(null);
       setGuardian(null);
+      setGuardianBlocked(null);
       toast.success("Respuesta publicada");
       void fetchData("questions");
     } finally {
@@ -896,7 +906,7 @@ export default function CommunityPage() {
                           <div className="space-y-2">
                             <textarea
                               value={answerText}
-                              onChange={(e) => { setAnswerText(e.target.value); setGuardian(null); }}
+                              onChange={(e) => { setAnswerText(e.target.value); setGuardian(null); setGuardianBlocked(null); }}
                               placeholder="¿Qué pregunta le harías tú?"
                               rows={3}
                               maxLength={1000}
@@ -904,7 +914,7 @@ export default function CommunityPage() {
                             />
                             <AnonymousHint />
 
-                            {/* Guardian suggestion */}
+                            {/* Guardian suggestion (prescriptive + reformulation) */}
                             {guardian && guardian.isPrescriptive && guardian.suggestedReformulation && (
                               <div className="rounded-lg border border-fuchsia-500/30 bg-fuchsia-500/5 p-3 space-y-2">
                                 <p className="text-[10px] font-semibold uppercase tracking-wider text-fuchsia-300">
@@ -937,8 +947,24 @@ export default function CommunityPage() {
                               </div>
                             )}
 
+                            {/* Guardian prescriptive but no reformulation available */}
+                            {guardian && guardian.isPrescriptive && !guardian.suggestedReformulation && (
+                              <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-1">
+                                <p className="text-xs text-amber-200">
+                                  Tu mensaje suena directivo. No pudimos generar una alternativa, pero puedes publicarlo si lo crees adecuado.
+                                </p>
+                              </div>
+                            )}
+
+                            {/* Guardian blocked (rate limit, content blocked, network error...) */}
+                            {guardianBlocked && (
+                              <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+                                <p className="text-xs text-amber-200">{guardianBlocked}</p>
+                              </div>
+                            )}
+
                             <div className="flex gap-2 items-center">
-                              {!guardian ? (
+                              {!guardian && !guardianBlocked ? (
                                 <button
                                   onClick={() => void handleCheckAnswer()}
                                   disabled={!answerText.trim() || guardianLoading || posting}
@@ -946,13 +972,13 @@ export default function CommunityPage() {
                                 >
                                   {guardianLoading ? "Revisando..." : "Revisar y responder"}
                                 </button>
-                              ) : guardian.isPrescriptive ? null : (
+                              ) : guardian && guardian.isPrescriptive && guardian.suggestedReformulation ? null : (
                                 <button
                                   onClick={() => void submitAnswer(q.id, answerText)}
-                                  disabled={posting}
+                                  disabled={posting || !answerText.trim()}
                                   className="rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500 disabled:opacity-40"
                                 >
-                                  Publicar
+                                  {guardianBlocked || (guardian && guardian.isPrescriptive) ? "Publicar de todas formas" : "Publicar"}
                                 </button>
                               )}
                               <button
@@ -960,6 +986,7 @@ export default function CommunityPage() {
                                   setAnsweringId(null);
                                   setAnswerText("");
                                   setGuardian(null);
+                                  setGuardianBlocked(null);
                                 }}
                                 className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs text-zinc-400 hover:text-white"
                               >

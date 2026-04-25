@@ -1,5 +1,7 @@
 // Transactional email sending for user-facing messages
 
+import { baseLayout } from "@/lib/email-layout";
+
 export type QuizState = "bloqueo" | "ansiedad" | "duda" | "claridad" | "neutral";
 
 const QUIZ_STATE_CONTENT: Record<
@@ -61,58 +63,27 @@ export function buildQuizLeadEmail(params: {
     `Tres Mil Millones de Latidos te ayuda a hacer seguimiento de tu estado y avanzar con conversaciones orientadas a acción.\n\n` +
     `Empieza gratis → ${appUrl}`;
 
-  const html = `<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f9f9f7;font-family:system-ui,sans-serif">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9f9f7;padding:40px 0">
-    <tr><td align="center">
-      <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)">
-        <tr>
-          <td style="background:#1a1a1a;padding:24px 32px">
-            <span style="color:#818cf8;font-size:20px;font-weight:700;letter-spacing:-0.5px">Tres Mil Millones de Latidos</span>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:32px">
-            <p style="margin:0 0 8px;font-size:14px;color:#888">Tu resultado del test</p>
-            <h1 style="margin:0 0 4px;font-size:26px">${escapeHtml(content.emoji)}</h1>
-            <h2 style="margin:0 0 24px;font-size:20px;font-weight:700;color:#111;line-height:1.3">
-              ${escapeHtml(content.label)}
-            </h2>
-            <p style="margin:0 0 24px;font-size:15px;color:#444;line-height:1.6;font-style:italic">
-              "${escapeHtml(content.headline)}"
-            </p>
-            <div style="background:#eef2ff;border-left:3px solid #6366f1;border-radius:4px;padding:14px 16px;margin-bottom:28px">
-              <p style="margin:0 0 6px;font-size:11px;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:.5px">
-                Tu acción para ahora
-              </p>
-              <p style="margin:0;font-size:15px;color:#1e1b4b;line-height:1.6;font-weight:500">
-                ${escapeHtml(content.action)}
-              </p>
+  const body = `
+            <p style="margin:0 0 8px;font-size:13px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Tu resultado del test</p>
+            <p style="margin:0 0 4px;font-size:32px;line-height:1">${escapeHtml(content.emoji)}</p>
+            <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#111;line-height:1.3;letter-spacing:-0.3px">${escapeHtml(content.label)}</h1>
+            <p style="margin:0 0 24px;font-size:15px;color:#444;line-height:1.6;font-style:italic">"${escapeHtml(content.headline)}"</p>
+            <div style="background:#f5f3ff;border-left:3px solid #7c3aed;border-radius:4px;padding:14px 16px;margin-bottom:24px">
+              <p style="margin:0 0 6px;font-size:11px;color:#7c3aed;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Tu acción para ahora</p>
+              <p style="margin:0;font-size:15px;color:#1e1b4b;line-height:1.6;font-weight:500">${escapeHtml(content.action)}</p>
             </div>
-            <p style="margin:0 0 24px;font-size:14px;color:#555;line-height:1.6">
+            <p style="margin:0;font-size:15px;color:#444;line-height:1.6">
               Tres Mil Millones de Latidos detecta tu estado en cada conversación y te orienta a la acción concreta.
               Sin consejos genéricos. Sin rodeos.
-            </p>
-            <a href="${appUrl}" style="display:inline-block;background:#6366f1;color:#fff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;font-weight:600">
-              Empezar gratis →
-            </a>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:20px 32px;border-top:1px solid #eee">
-            <p style="margin:0;font-size:12px;color:#999;line-height:1.5">
-              Tres Mil Millones de Latidos acompaña — no sustituye ayuda profesional.<br>
-              Para darte de baja, responde &quot;baja&quot; a este correo.
-            </p>
-          </td>
-        </tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+            </p>`;
+
+  const html = baseLayout({
+    theme: "light",
+    header: "branded",
+    footer: "product",
+    body,
+    cta: { href: appUrl, label: "Empezar gratis" },
+  });
 
   return { to, subject, html, text };
 }
@@ -136,44 +107,22 @@ export function buildVerificationEmail(params: {
     `El enlace caduca en 24 horas.\n\n` +
     `Si no te has registrado, ignora este mensaje.`;
 
-  const html = `<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f9f9f7;font-family:system-ui,sans-serif">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9f9f7;padding:40px 0">
-    <tr><td align="center">
-      <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)">
-        <tr>
-          <td style="background:#1a1a1a;padding:24px 32px">
-            <span style="color:#818cf8;font-size:20px;font-weight:700;letter-spacing:-0.5px">Tres Mil Millones de Latidos</span>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:32px">
-            <p style="margin:0 0 16px;font-size:16px;color:#111;font-weight:600">${greeting},</p>
-            <p style="margin:0 0 24px;font-size:15px;color:#444;line-height:1.6">
+  const body = `
+            <p style="margin:0 0 16px;font-size:18px;color:#111;font-weight:600">${greeting},</p>
+            <p style="margin:0 0 8px;font-size:15px;color:#444;line-height:1.6">
               Gracias por registrarte. Solo necesitas verificar tu email para empezar.
             </p>
-            <p style="text-align:center;margin:0 0 24px">
-              <a href="${verifyUrl}" style="display:inline-block;background:#6366f1;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:15px;font-weight:600">
-                Verificar mi email
-              </a>
-            </p>
-            <p style="margin:0 0 8px;font-size:13px;color:#888;line-height:1.5">
+            <p style="margin:24px 0 0;font-size:13px;color:#888;line-height:1.5">
               El enlace caduca en 24 horas. Si no te has registrado, ignora este mensaje.
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:16px 32px;border-top:1px solid #eee">
-            <p style="margin:0;font-size:11px;color:#aaa">Tres Mil Millones de Latidos — mentoria conversacional con IA</p>
-          </td>
-        </tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+            </p>`;
+
+  const html = baseLayout({
+    theme: "light",
+    header: "branded",
+    footer: "product",
+    body,
+    cta: { href: verifyUrl, label: "Verificar mi email" },
+  });
 
   return { to, subject, html, text };
 }

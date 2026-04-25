@@ -802,6 +802,97 @@ export function build24hNudgeEmail(params: {
   return { subject, html, text };
 }
 
+/**
+ * Email "reactivación específica" enviado a los 7 días.
+ *
+ * A diferencia del 24h-nudge (que dispara para messageCount=0), este se manda
+ * a usuarios que YA escribieron al menos un mensaje y llevan 6-8 días sin
+ * volver. Devuelve la última frase que ESCRIBIÓ EL USUARIO (no la del mentor)
+ * como gancho concreto, no genérico.
+ */
+export function build7dNudgeEmail(params: {
+  name: string | null;
+  lastUserPhrase: string;
+  appUrl: string;
+}): Pick<UserEmail, "subject" | "html" | "text"> {
+  const { name, appUrl } = params;
+  const firstName = name ? escapeHtml(name.trim().split(/\s+/)[0]) : null;
+  const greeting = firstName ?? "Hola";
+
+  // Truncamos a 140 caracteres para que entre cómodo en el email; sin punto
+  // final si la frase ya termina en signo.
+  const trimmed = params.lastUserPhrase.trim().replace(/\s+/g, " ");
+  const phrase = trimmed.length > 140 ? `${trimmed.slice(0, 137)}...` : trimmed;
+  const safePhrase = escapeHtml(phrase);
+
+  const subject = firstName
+    ? `${firstName}, lo último que dijiste`
+    : "Lo último que dijiste";
+
+  const text = [
+    `${greeting},`,
+    ``,
+    `Hace una semana escribiste:`,
+    ``,
+    `«${phrase}»`,
+    ``,
+    `¿Sigue ahí?`,
+    ``,
+    `${appUrl}/app`,
+    ``,
+    `No hace falta una respuesta larga. Solo una frase nueva.`,
+  ].join("\n");
+
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0a0a0a;font-family:system-ui,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 0">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#18181b;border-radius:12px;overflow:hidden;border:1px solid #27272a">
+        <tr>
+          <td style="background:linear-gradient(135deg,#7c3aed 0%,#d946ef 100%);padding:24px 32px">
+            <span style="color:#fff;font-size:18px;font-weight:700">Tres Mil Millones de Latidos</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:32px;color:#d4d4d8">
+            <p style="margin:0 0 20px;font-size:20px;color:#fff;font-weight:700">${greeting},</p>
+            <p style="margin:0 0 16px;font-size:14px;line-height:1.7;color:#a1a1aa">
+              Hace una semana escribiste:
+            </p>
+            <blockquote style="margin:0 0 24px;padding:16px 20px;border-left:3px solid #a78bfa;background:#0a0a0a;border-radius:6px;font-family:Georgia,serif;font-size:16px;line-height:1.6;color:#e4e4e7;font-style:italic">
+              &laquo;${safePhrase}&raquo;
+            </blockquote>
+            <p style="margin:0 0 24px;font-size:18px;line-height:1.6;color:#fff;font-weight:600">
+              ¿Sigue ahí?
+            </p>
+            <div style="text-align:center;margin:24px 0">
+              <a href="${appUrl}/app" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#7c3aed,#d946ef);color:#fff;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px">
+                Escribir una frase nueva
+              </a>
+            </div>
+            <p style="margin:0;font-size:14px;line-height:1.6;color:#71717a;text-align:center;font-style:italic">
+              No hace falta una respuesta larga. Solo una frase nueva.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:16px 32px;border-top:1px solid #27272a">
+            <p style="margin:0;font-size:11px;color:#52525b;text-align:center">
+              No sustituye terapia profesional. <a href="${appUrl}/settings" style="color:#71717a">Dejar de recibir estos emails</a>
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  return { subject, html, text };
+}
+
 // ─── Family / trusted contact emails ──────────────────────────────────────────
 
 function familyLayout(title: string, body: string, cta?: { href: string; label: string }): string {

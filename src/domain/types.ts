@@ -18,7 +18,8 @@ export type EventType =
   | "USER_ONBOARDED"
   | "CHECKIN_SUBMITTED"
   | "PROFILE_COMPLETED"
-  | "TRANSITIONAL_VOID_DETECTED";
+  | "TRANSITIONAL_VOID_DETECTED"
+  | "NUDGE_7D_SENT";
 
 export type DecisionType =
   | "ESCALAR_CRISIS"

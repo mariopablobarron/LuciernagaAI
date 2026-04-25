@@ -1,10 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { ThemeProvider } from "@/components/theme-provider";
-import Analytics from "@/components/Analytics";
-import MetaPixel from "@/components/MetaPixel";
+import ThirdPartyScripts from "@/components/ThirdPartyScripts";
 import UtmCapture from "@/components/UtmCapture";
 import CookieConsent from "@/components/CookieConsent";
 import InstallPWA from "@/components/InstallPWA";
@@ -28,6 +27,13 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const fraunces = Fraunces({
+  variable: "--font-serif",
+  subsets: ["latin"],
+  display: "swap",
+  axes: ["opsz", "SOFT"],
 });
 
 function getMetadataBase(): URL {
@@ -208,7 +214,7 @@ export default async function RootLayout({
     <html
       lang={locale}
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
       <head>
         <script
@@ -228,8 +234,7 @@ export default async function RootLayout({
           Saltar al contenido principal
         </a>
 
-        <Analytics />
-        <MetaPixel />
+        <ThirdPartyScripts />
         <UtmCapture />
         <ServiceWorkerRegistrar />
         <UsageTracker />

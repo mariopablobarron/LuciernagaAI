@@ -61,3 +61,10 @@ clauditor/
 *-snapshot.yml
 mobile-*.png
 mobile-*.jpeg
+
+# Session debug screenshots (Playwright/manual)
+admin-*.png
+coolify-*.png
+code-server-*.png
+github-*.png
+verify-*.png

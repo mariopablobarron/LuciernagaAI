@@ -107,6 +107,20 @@ export const MANAGED_CRONS: ManagedCron[] = [
     enabled: true,
   },
   {
+    name: "circle-pulses",
+    description: "Círculos v2 · abre pulses semanales y cierra los expirados (genera reflexiones)",
+    path: "/api/cron/circle-pulses",
+    schedule: dailyAt(9, 30),
+    enabled: true,
+  },
+  {
+    name: "circle-matchmaking",
+    description: "Círculos v2 · cierra ciclos vencidos y forma nuevos círculos por patrón",
+    path: "/api/cron/circle-matchmaking",
+    schedule: weeklyAt(1, 6), // lunes 06:00
+    enabled: true,
+  },
+  {
     name: "7d-nudge",
     description: "Reactivación específica con la última frase del usuario a los 7 días",
     path: "/api/cron/7d-nudge",

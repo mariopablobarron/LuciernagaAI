@@ -409,7 +409,10 @@ async function updateEmailLog(
 
 export async function sendUserEmail(email: UserEmail): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY?.trim();
-  const from = process.env.EMAIL_FROM?.trim() ?? "TresMilMillonesdeLatidos <info@tresmilmillonesdelatidos.es>";
+  // Coolify v3 envuelve algunos values con comillas simples si contienen <> o espacios.
+  // Stripeamos comillas envolventes para que Resend no rechace el From con 422.
+  const from = (process.env.EMAIL_FROM?.trim() ?? "TresMilMillonesdeLatidos <info@tresmilmillonesdelatidos.es>")
+    .replace(/^['"]|['"]$/g, "");
   const baseUrl = process.env.APP_BASE_URL?.trim() ?? "https://tresmilmillonesdelatidos.es";
 
   const logId = await createEmailLog(email);

@@ -3,7 +3,9 @@ import { logError } from "@/lib/logger";
 
 const TELEGRAM_API = "https://api.telegram.org";
 
-export type InlineButton = { text: string; callback_data: string };
+export type InlineButton =
+  | { text: string; callback_data: string }
+  | { text: string; url: string };
 
 function token(): string | null {
   return process.env.TELEGRAM_BOT_TOKEN?.trim() || null;

@@ -1,7 +1,6 @@
 import { logInfo, logWarn } from "@/lib/logger";
 import { getPrismaClient } from "@/db/prisma";
 import { answerCallbackQuery, editTelegramMessage } from "./telegram-utils";
-import { triggerForceRedeploy } from "./coolify-api";
 import { buildUserSearchMessage } from "./user-search";
 import { buildCronLogsMessage, retryCronJob } from "./cron-watchdog";
 
@@ -23,10 +22,10 @@ const fmtNow = () =>
  * Router de callback_query del bot Telegram.
  * Formato de data: "<action>:<param1>[:<param2>]"
  * Acciones soportadas:
- *   - redeploy:confirm     → dispara Force Redeploy en Coolify
- *   - redeploy:cancel      → cancela
  *   - user:show:<userId>   → responde con ficha del usuario
  *   - crisis:ack:<userId>  → marca crisis como atendida (log + edit)
+ *   - cron:logs:<jobName>  → últimos runs del cron
+ *   - cron:retry:<jobName> → reintenta el cron disparando su endpoint
  */
 export async function handleCallbackQuery(ctx: CallbackContext): Promise<void> {
   if (!ctx.isAdmin) {
@@ -35,41 +34,6 @@ export async function handleCallbackQuery(ctx: CallbackContext): Promise<void> {
   }
 
   const [action, sub, ...rest] = ctx.data.split(":");
-
-  if (action === "redeploy") {
-    if (sub === "cancel") {
-      await editTelegramMessage(ctx.chatId, ctx.messageId, `❌ Redeploy cancelado.\n_${fmtNow()}_`);
-      await answerCallbackQuery(ctx.callbackId, "Cancelado");
-      return;
-    }
-    if (sub === "confirm") {
-      await answerCallbackQuery(ctx.callbackId, "Disparando…");
-      await editTelegramMessage(ctx.chatId, ctx.messageId, `⏳ Disparando Force Redeploy…\n_${fmtNow()}_`);
-      const result = await triggerForceRedeploy();
-      if (result.ok) {
-        await editTelegramMessage(
-          ctx.chatId,
-          ctx.messageId,
-          [
-            `🚀 *Force Redeploy disparado*`,
-            "",
-            result.deploymentId ? `Deployment ID: \`${result.deploymentId}\`` : "Deployment encolado.",
-            `_${fmtNow()}_`,
-            "",
-            `Sigue el progreso: http://72.61.195.108:3000/applications/cmnc4qjph0006p2a3ggmfdflz/logs/build`,
-          ].join("\n")
-        );
-      } else {
-        await editTelegramMessage(
-          ctx.chatId,
-          ctx.messageId,
-          `❌ *No se pudo disparar el redeploy*\n\n${result.error}`
-        );
-      }
-      logInfo("CALLBACK", "redeploy", { ok: result.ok });
-      return;
-    }
-  }
 
   if (action === "user" && sub === "show" && rest[0]) {
     await answerCallbackQuery(ctx.callbackId, "Buscando…");

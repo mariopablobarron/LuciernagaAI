@@ -46,6 +46,12 @@ type UserDetailResponse = {
     createdAt: string;
     updatedAt: string;
     lastSeen: string;
+    telegramId: string | null;
+    invitesEarned: number;
+    firstMessageSentAt: string | null;
+    activatedAt: string | null;
+    onboardingCompletedAt: string | null;
+    onboardingContext: { feeling?: string; timeframe?: string; intent?: string } | null;
     counts: {
       conversations: number;
       messages: number;
@@ -56,7 +62,9 @@ type UserDetailResponse = {
   };
   state: null | {
     state: string;
+    systemState: string;
     transformationPhase: string;
+    mood: string | null;
     primaryEmotion: string;
     dominantPattern: string;
     focusArea: string;
@@ -66,6 +74,9 @@ type UserDetailResponse = {
     crisisActive: boolean;
     crisisActivatedAt: string | null;
     crisisActiveUntil: string | null;
+    dialogueIntent: string;
+    dialogueStep: number;
+    dialogueFlow: string | null;
     updatedAt: string;
   };
   profile: null | {
@@ -675,6 +686,66 @@ export default function AdminUserDetailPage() {
             </CardContent>
           </Card>
 
+          {/* ── ACTIVACIÓN Y ONBOARDING ───────────────────────────────── */}
+          <Card className="border-zinc-800 bg-zinc-900/50">
+            <CardHeader className="pb-3">
+              <CardTitle>Activación y onboarding</CardTitle>
+              <CardDescription>Hitos del journey: primera entrada, AHA moment, captación.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 text-sm">
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                <div className="rounded-xl border border-zinc-800 bg-zinc-800/35 px-3 py-2">
+                  <p className="text-xs text-zinc-500">Primer mensaje</p>
+                  <p className="font-semibold text-white">{formatDate(data.user.firstMessageSentAt)}</p>
+                </div>
+                <div className="rounded-xl border border-zinc-800 bg-zinc-800/35 px-3 py-2">
+                  <p className="text-xs text-zinc-500">AHA (activado)</p>
+                  <p className={`font-semibold ${data.user.activatedAt ? "text-emerald-400" : "text-zinc-500"}`}>
+                    {data.user.activatedAt ? formatDate(data.user.activatedAt) : "Sin activar"}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-zinc-800 bg-zinc-800/35 px-3 py-2">
+                  <p className="text-xs text-zinc-500">Onboarding completo</p>
+                  <p className={`font-semibold ${data.user.onboardingCompletedAt ? "text-emerald-400" : "text-zinc-500"}`}>
+                    {data.user.onboardingCompletedAt ? formatDate(data.user.onboardingCompletedAt) : "Pendiente"}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-zinc-800 bg-zinc-800/35 px-3 py-2">
+                  <p className="text-xs text-zinc-500">Referrals (invitesEarned)</p>
+                  <p className="font-semibold text-white">{data.user.invitesEarned}</p>
+                </div>
+              </div>
+
+              {data.user.telegramId ? (
+                <p className="text-zinc-500">
+                  Telegram ID: <span className="font-mono text-zinc-300">{data.user.telegramId}</span>
+                </p>
+              ) : null}
+
+              {data.user.onboardingContext ? (
+                <div className="rounded-xl border border-zinc-800 bg-zinc-800/35 p-3">
+                  <p className="mb-2 text-xs font-medium text-zinc-400">Contexto inicial (de /app/inicio)</p>
+                  <div className="grid grid-cols-1 gap-2 text-sm md:grid-cols-3">
+                    <p className="text-zinc-300">
+                      <span className="text-zinc-500">Sentir:</span>{" "}
+                      {data.user.onboardingContext.feeling || "—"}
+                    </p>
+                    <p className="text-zinc-300">
+                      <span className="text-zinc-500">Plazo:</span>{" "}
+                      {data.user.onboardingContext.timeframe || "—"}
+                    </p>
+                    <p className="text-zinc-300">
+                      <span className="text-zinc-500">Intención:</span>{" "}
+                      {data.user.onboardingContext.intent || "—"}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-zinc-500">Sin contexto de onboarding capturado.</p>
+              )}
+            </CardContent>
+          </Card>
+
           {/* ── ADMIN ACTIONS ────────────────────────────────────────── */}
           <AdminPanel title="Acciones de administrador" description="Gestionar datos, plan, acceso y comunicaciones del usuario.">
             {/* ── 1. Edit User Info ── */}
@@ -1093,6 +1164,7 @@ export default function AdminUserDetailPage() {
                   <>
                     <div className="flex flex-wrap gap-2">
                       <Badge variant="secondary">Estado {data.state.state}</Badge>
+                      <Badge variant="secondary">Sistema {data.state.systemState}</Badge>
                       <Badge variant="secondary">Fase {data.state.transformationPhase}</Badge>
                       <Badge variant="secondary">Riesgo {data.state.riskLevel}</Badge>
                     </div>
@@ -1106,7 +1178,25 @@ export default function AdminUserDetailPage() {
                     <p className="text-zinc-500">
                       Nivel de energía: {data.state.energyLevel}
                     </p>
+                    {data.state.mood ? (
+                      <p className="text-zinc-500">Ánimo declarado: {data.state.mood}</p>
+                    ) : null}
                     <p className="text-zinc-500">Tendencia: {data.state.progressTrend}</p>
+                    <div className="rounded-lg border border-zinc-800 bg-zinc-800/30 px-3 py-2">
+                      <p className="text-xs font-medium text-zinc-400">Diálogo activo</p>
+                      <p className="mt-1 text-zinc-500">
+                        Intención: <span className="text-zinc-300">{data.state.dialogueIntent}</span> ·
+                        {" "}Paso: <span className="text-zinc-300">{data.state.dialogueStep}</span>
+                        {data.state.dialogueFlow ? (
+                          <> · Flujo: <span className="text-zinc-300">{data.state.dialogueFlow}</span></>
+                        ) : null}
+                      </p>
+                    </div>
+                    {data.state.crisisActive && data.state.crisisActiveUntil ? (
+                      <p className="text-red-400">
+                        Crisis activa hasta: {formatDate(data.state.crisisActiveUntil)}
+                      </p>
+                    ) : null}
                     <p className="text-zinc-500">
                       Actualizado: {formatDate(data.state.updatedAt)}
                     </p>

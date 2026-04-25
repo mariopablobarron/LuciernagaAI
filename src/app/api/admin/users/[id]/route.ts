@@ -48,6 +48,12 @@ export async function GET(req: NextRequest, { params }: Params) {
         createdAt: true,
         updatedAt: true,
         lastSeen: true,
+        telegramId: true,
+        invitesEarned: true,
+        firstMessageSentAt: true,
+        activatedAt: true,
+        onboardingCompletedAt: true,
+        onboardingContext: true,
         _count: {
           select: {
             conversations: true,
@@ -211,12 +217,20 @@ export async function GET(req: NextRequest, { params }: Params) {
         createdAt: user.createdAt.toISOString(),
         updatedAt: user.updatedAt.toISOString(),
         lastSeen: user.lastSeen.toISOString(),
+        telegramId: user.telegramId,
+        invitesEarned: user.invitesEarned,
+        firstMessageSentAt: user.firstMessageSentAt?.toISOString() || null,
+        activatedAt: user.activatedAt?.toISOString() || null,
+        onboardingCompletedAt: user.onboardingCompletedAt?.toISOString() || null,
+        onboardingContext: user.onboardingContext,
         counts: user._count,
       },
       state: state
         ? {
             state: state.state,
+            systemState: state.systemState,
             transformationPhase: state.transformationPhase,
+            mood: state.mood,
             primaryEmotion: state.primaryEmotion,
             dominantPattern: state.dominantPattern,
             focusArea: state.focusArea,
@@ -226,6 +240,9 @@ export async function GET(req: NextRequest, { params }: Params) {
             crisisActive: state.crisisActive,
             crisisActivatedAt: state.crisisActivatedAt?.toISOString() || null,
             crisisActiveUntil: state.crisisActiveUntil?.toISOString() || null,
+            dialogueIntent: state.dialogueIntent,
+            dialogueStep: state.dialogueStep,
+            dialogueFlow: state.dialogueFlow,
             updatedAt: state.updatedAt.toISOString(),
           }
         : null,

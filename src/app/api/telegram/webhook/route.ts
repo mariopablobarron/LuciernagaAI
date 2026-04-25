@@ -709,7 +709,9 @@ export async function POST(req: NextRequest) {
     }
 
     // ---- Admin commands (only respond to ADMIN_TELEGRAM_ID) ----
-    // ---- /redeploy (admin) — confirmación con botones inline ----
+    // ---- /redeploy (admin) — abre Coolify para confirmar manualmente ----
+    // Coolify v3 no expone API tokens, así que el bot redirige al panel donde
+    // el admin (con sesión Coolify activa) hace click en Force Redeploy.
     if (text === "/redeploy") {
       if (!isAdmin(chatId)) {
         await sendTelegramMessage(chatId, "⛔ Comando no disponible.");
@@ -717,11 +719,13 @@ export async function POST(req: NextRequest) {
       }
       await sendTelegramWithButtons(
         chatId,
-        "🚀 *Confirmar Force Redeploy de luciernaga-ai*\n\nEsto disparará un build inmediato en Coolify.",
+        "🚀 *Force Redeploy luciernaga-ai*\n\nCoolify v3 no permite disparar builds desde API. Abre el panel y pulsa *Force Redeploy* arriba a la derecha.",
         [
           [
-            { text: "✅ Sí, redeploy", callback_data: "redeploy:confirm" },
-            { text: "❌ Cancelar", callback_data: "redeploy:cancel" },
+            {
+              text: "🔧 Abrir panel Coolify",
+              url: "http://72.61.195.108:3000/applications/cmnc4qjph0006p2a3ggmfdflz",
+            },
           ],
         ]
       );

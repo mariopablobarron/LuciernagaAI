@@ -200,6 +200,12 @@ export default function AdminAnalyticsPage() {
           >
             <Search className="h-3.5 w-3.5" /> Explorar eventos
           </Link>
+          <Link
+            href="/admin/analytics/animo"
+            className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 px-3 py-2 text-xs font-semibold text-zinc-300 hover:text-white transition-colors"
+          >
+            <Brain className="h-3.5 w-3.5" /> Ánimo e impulso
+          </Link>
         </div>
         <div className="flex items-center gap-2">
           <label className="inline-flex items-center gap-1.5 text-xs text-zinc-400 cursor-pointer">

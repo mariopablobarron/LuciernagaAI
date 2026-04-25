@@ -85,7 +85,19 @@ type EmailTemplateRow = {
   category: string;
   trigger: string;
   builderFn?: string;
+  previewable: boolean;
   stats: EmailTemplateStats;
+};
+
+type TemplatePreview = {
+  ok: boolean;
+  template?: { id: string; name: string; description: string };
+  subject?: string;
+  html?: string;
+  text?: string;
+  note?: string;
+  error?: string;
+  message?: string;
 };
 
 type EmailTemplatesPayload = {
@@ -325,6 +337,14 @@ export default function MarketingPage() {
   // Email templates state
   const [templates, setTemplates] = useState<EmailTemplatesPayload | null>(null);
   const [templatesLoading, setTemplatesLoading] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState<string | null>(null);
+  const [preview, setPreview] = useState<TemplatePreview | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewMode, setPreviewMode] = useState<"html" | "text">("html");
+  const [sendTestOpen, setSendTestOpen] = useState<{ id: string; name: string } | null>(null);
+  const [sendTestEmail, setSendTestEmail] = useState("");
+  const [sendTestStatus, setSendTestStatus] = useState<{ ok: boolean; message: string } | null>(null);
+  const [sendTestSending, setSendTestSending] = useState(false);
 
   // Custom trackers (DB-driven, no redeploy)
   type CustomTrackerRow = {
@@ -500,6 +520,72 @@ export default function MarketingPage() {
       })
       .finally(() => setTemplatesLoading(false));
   }, [activeTab]);
+
+  // ── Preview / send-test handlers ─────────────────────────────────────────
+
+  const openPreview = useCallback(async (templateId: string) => {
+    setPreviewOpen(templateId);
+    setPreview(null);
+    setPreviewMode("html");
+    setPreviewLoading(true);
+    try {
+      const res = await fetch(`/api/admin/marketing/email-templates/${encodeURIComponent(templateId)}/preview`, {
+        credentials: "include",
+      });
+      if (!checkAuth(res)) return;
+      const json = (await res.json()) as TemplatePreview;
+      setPreview(json);
+    } catch {
+      setPreview({ ok: false, error: "FETCH_FAILED", message: "No se pudo cargar el preview." });
+    } finally {
+      setPreviewLoading(false);
+    }
+  }, []);
+
+  const closePreview = useCallback(() => {
+    setPreviewOpen(null);
+    setPreview(null);
+  }, []);
+
+  const openSendTest = useCallback((id: string, name: string) => {
+    setSendTestOpen({ id, name });
+    setSendTestEmail("");
+    setSendTestStatus(null);
+  }, []);
+
+  const closeSendTest = useCallback(() => {
+    setSendTestOpen(null);
+    setSendTestStatus(null);
+  }, []);
+
+  const submitSendTest = useCallback(async () => {
+    if (!sendTestOpen) return;
+    const trimmed = sendTestEmail.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setSendTestStatus({ ok: false, message: "Email no válido." });
+      return;
+    }
+    setSendTestSending(true);
+    setSendTestStatus(null);
+    try {
+      const res = await fetch(`/api/admin/marketing/email-templates/${encodeURIComponent(sendTestOpen.id)}/send-test`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to: trimmed }),
+      });
+      const json = (await res.json()) as { ok: boolean; message?: string; error?: string };
+      if (json.ok) {
+        setSendTestStatus({ ok: true, message: `Enviado a ${trimmed}. Mira tu bandeja en 30s.` });
+      } else {
+        setSendTestStatus({ ok: false, message: json.message ?? json.error ?? "Falló el envío." });
+      }
+    } catch {
+      setSendTestStatus({ ok: false, message: "Error de red." });
+    } finally {
+      setSendTestSending(false);
+    }
+  }, [sendTestOpen, sendTestEmail]);
 
   // ── Trackers loader ──────────────────────────────────────────────────────
 
@@ -2214,6 +2300,30 @@ export default function MarketingPage() {
                                 {t.stats.lastError.slice(0, 200)}
                               </div>
                             )}
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              {t.previewable ? (
+                                <>
+                                  <button
+                                    type="button"
+                                    onClick={() => void openPreview(t.id)}
+                                    className="inline-flex items-center gap-1.5 rounded-lg border border-violet-500/40 bg-violet-500/10 px-3 py-1.5 text-xs font-semibold text-violet-200 hover:bg-violet-500/20"
+                                  >
+                                    <Eye className="h-3 w-3" /> Ver diseño
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => openSendTest(t.id, t.name)}
+                                    className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/20"
+                                  >
+                                    <Send className="h-3 w-3" /> Enviar prueba
+                                  </button>
+                                </>
+                              ) : (
+                                <span className="text-[11px] text-zinc-600 italic">
+                                  Preview no disponible (plantilla no centralizada en src/lib/email.ts)
+                                </span>
+                              )}
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -2258,24 +2368,145 @@ export default function MarketingPage() {
             )}
           </AdminPanel>
 
-          <AdminPanel title="Cómo gestionarlo (Fase 1)" tooltip="Esta vista es de solo lectura. La edición sin redeploy llegará en Fase 2.">
+          <AdminPanel title="Cómo gestionarlo (Fase 1)" tooltip="Esta vista permite ver el diseño y mandar pruebas. La edición sin redeploy llegará en Fase 2.">
             <ul className="text-xs text-zinc-400 space-y-2 list-disc list-inside">
               <li>
-                Para <strong className="text-white">cambiar el contenido</strong> de una plantilla hoy: editar la función correspondiente en{" "}
-                <code className="text-violet-300">src/lib/email.ts</code> y desplegar.
+                Para <strong className="text-white">ver el diseño</strong> de una plantilla: pulsa &quot;Ver diseño&quot;. Se renderiza con datos mock — el real puede variar según el usuario.
               </li>
               <li>
-                Para <strong className="text-white">probar un envío manual</strong>: usa la pestaña <em>Email</em> (broadcast a un segmento) o el botón &quot;Enviar email&quot; en la ficha de un usuario.
+                Para <strong className="text-white">mandar una prueba</strong>: pulsa &quot;Enviar prueba&quot; e introduce un email. Llega como <code className="text-violet-300">[TEST] {"{asunto}"}</code>.
+              </li>
+              <li>
+                Para <strong className="text-white">cambiar el contenido</strong> hoy: editar la función correspondiente en{" "}
+                <code className="text-violet-300">src/lib/email.ts</code> y desplegar (Fase 2 permitirá editarlo desde aquí sin redeploy).
               </li>
               <li>
                 Las plantillas con <span className="text-red-400 font-semibold">fallidos &gt; 0</span> indican algo a revisar — abre el último error para diagnosticar.
               </li>
-              <li>
-                <strong className="text-white">Roadmap:</strong> Fase 2 moverá las plantillas a base de datos, permitirá editarlas desde aquí con preview, send-test con destinatario, versiones y rollback.
-              </li>
             </ul>
           </AdminPanel>
         </>
+      )}
+
+      {/* ── Modal: Preview de plantilla ─────────────────────────────────────── */}
+      {previewOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          onClick={closePreview}
+        >
+          <div
+            className="relative w-full max-w-4xl max-h-[90vh] flex flex-col rounded-2xl border border-zinc-800 bg-zinc-950 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between gap-3 border-b border-zinc-800 px-5 py-3">
+              <div className="min-w-0">
+                <h3 className="text-sm font-semibold text-white">
+                  {preview?.template?.name ?? previewOpen}
+                </h3>
+                {preview?.subject && (
+                  <p className="text-xs text-zinc-400 truncate"><strong>Asunto:</strong> {preview.subject}</p>
+                )}
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="flex rounded-lg border border-zinc-700 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setPreviewMode("html")}
+                    className={`px-3 py-1 text-[11px] font-semibold ${previewMode === "html" ? "bg-violet-500/20 text-violet-200" : "text-zinc-400 hover:text-zinc-200"}`}
+                  >
+                    HTML
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewMode("text")}
+                    className={`px-3 py-1 text-[11px] font-semibold ${previewMode === "text" ? "bg-violet-500/20 text-violet-200" : "text-zinc-400 hover:text-zinc-200"}`}
+                  >
+                    Texto
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  onClick={closePreview}
+                  className="rounded-lg border border-zinc-700 px-3 py-1 text-xs text-zinc-300 hover:border-zinc-500 hover:text-white"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+            <div className="flex-1 overflow-auto bg-zinc-100">
+              {previewLoading ? (
+                <div className="p-8 text-center text-sm text-zinc-500">Cargando…</div>
+              ) : !preview?.ok ? (
+                <div className="p-8 text-center text-sm text-red-600">
+                  {preview?.message ?? "No se pudo renderizar la plantilla."}
+                </div>
+              ) : previewMode === "html" ? (
+                <iframe
+                  title="Email preview"
+                  srcDoc={preview.html ?? ""}
+                  sandbox=""
+                  className="w-full h-[70vh] bg-white border-0"
+                />
+              ) : (
+                <pre className="whitespace-pre-wrap p-5 text-xs text-zinc-800 font-mono">{preview.text ?? ""}</pre>
+              )}
+            </div>
+            {preview?.note && (
+              <div className="border-t border-zinc-800 px-5 py-2 text-[11px] text-zinc-500">
+                ℹ️ {preview.note}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal: Enviar prueba ────────────────────────────────────────────── */}
+      {sendTestOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          onClick={closeSendTest}
+        >
+          <div
+            className="relative w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-sm font-semibold text-white">Enviar prueba · {sendTestOpen.name}</h3>
+            <p className="mt-1 text-xs text-zinc-400">
+              Renderizamos la plantilla con datos mock y te la mandamos. El asunto llegará prefijado con <code className="text-violet-300">[TEST]</code>.
+            </p>
+            <input
+              type="email"
+              value={sendTestEmail}
+              onChange={(e) => setSendTestEmail(e.target.value)}
+              placeholder="tu-email@ejemplo.com"
+              className="mt-4 w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-white focus:border-violet-500 focus:outline-none"
+              autoFocus
+            />
+            {sendTestStatus && (
+              <p className={`mt-3 text-xs ${sendTestStatus.ok ? "text-emerald-300" : "text-red-300"}`}>
+                {sendTestStatus.message}
+              </p>
+            )}
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={closeSendTest}
+                className="rounded-xl border border-zinc-700 px-4 py-2 text-xs font-semibold text-zinc-300 hover:border-zinc-500 hover:text-white"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => void submitSendTest()}
+                disabled={sendTestSending || !sendTestEmail.trim()}
+                className="inline-flex items-center gap-2 rounded-xl border border-violet-500/40 bg-violet-500/15 px-4 py-2 text-xs font-semibold text-violet-200 hover:bg-violet-500/25 disabled:opacity-50"
+              >
+                <Send className="h-3 w-3" />
+                {sendTestSending ? "Enviando…" : "Enviar"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </AdminShell>
   );

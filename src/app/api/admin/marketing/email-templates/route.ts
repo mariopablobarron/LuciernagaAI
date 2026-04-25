@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { EMAIL_TEMPLATES, EMAIL_TEMPLATE_BY_ID, CATEGORY_LABELS, type EmailTemplateMeta } from "@/lib/email-templates-catalog";
+import { PREVIEW_REGISTRY } from "@/lib/email-templates-preview";
 
 export const dynamic = "force-dynamic";
 
 type TemplateRow = EmailTemplateMeta & {
+  previewable: boolean;
   stats: {
     total: number;
     delivered: number;
@@ -74,8 +76,11 @@ export async function GET(req: NextRequest) {
     stats.lastError = errorMap.get(template) ?? null;
   }
 
+  const previewableIds = new Set(Object.keys(PREVIEW_REGISTRY));
+
   const knownTemplates: TemplateRow[] = EMAIL_TEMPLATES.map((meta) => ({
     ...meta,
+    previewable: previewableIds.has(meta.id),
     stats: statsByTemplate.get(meta.id) ?? {
       total: 0,
       delivered: 0,
@@ -98,6 +103,7 @@ export async function GET(req: NextRequest) {
       description: "Plantilla detectada en EmailLog pero no catalogada. Añadirla al catálogo.",
       category: "admin",
       trigger: "Desconocido — revisar código.",
+      previewable: false,
       stats,
     });
   }

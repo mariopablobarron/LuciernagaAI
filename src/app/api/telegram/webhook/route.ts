@@ -24,6 +24,11 @@ import { getPrismaClient } from "@/db/prisma";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { fetchWithTimeout } from "@/lib/fetchWithTimeout";
 import { buildWeeklyLetterSummaryMessage } from "@/lib/weekly-letter-summary";
+import { buildDeployMessage } from "@/lib/admin-tg/deploy-info";
+import { buildLlmCostMessage } from "@/lib/admin-tg/llm-cost-summary";
+import { buildUserSearchMessage } from "@/lib/admin-tg/user-search";
+import { buildRevenueMessage } from "@/lib/admin-tg/revenue-summary";
+import { buildHealthMessage } from "@/lib/admin-tg/health-summary";
 
 // ---- Telegram types ----
 
@@ -677,8 +682,13 @@ export async function POST(req: NextRequest) {
     }
 
     // ---- Admin commands (only respond to ADMIN_TELEGRAM_ID) ----
-    const adminCommands = ["/stats", "/usuarios", "/crisis", "/retencion", "/tareas", "/ayuda", "/cartas"];
-    if (adminCommands.includes(text) || text.startsWith("/hecho")) {
+    const adminCommands = ["/stats", "/usuarios", "/crisis", "/retencion", "/tareas", "/ayuda", "/cartas", "/deploy", "/llm", "/ingresos", "/salud"];
+    if (
+      adminCommands.includes(text) ||
+      text.startsWith("/hecho") ||
+      text === "/buscar" ||
+      text.startsWith("/buscar ")
+    ) {
       if (!isAdmin(chatId)) {
         await sendTelegramMessage(chatId, "⛔ Comando no disponible.");
         return NextResponse.json({ ok: true });
@@ -697,6 +707,17 @@ export async function POST(req: NextRequest) {
           reply = await buildTasksMessage();
         } else if (text === "/cartas") {
           reply = await buildWeeklyLetterSummaryMessage();
+        } else if (text === "/deploy") {
+          reply = await buildDeployMessage();
+        } else if (text === "/llm") {
+          reply = await buildLlmCostMessage();
+        } else if (text === "/ingresos") {
+          reply = await buildRevenueMessage();
+        } else if (text === "/salud") {
+          reply = await buildHealthMessage();
+        } else if (text === "/buscar" || text.startsWith("/buscar ")) {
+          const q = text === "/buscar" ? "" : text.slice("/buscar ".length).trim();
+          reply = await buildUserSearchMessage(q);
         } else if (text === "/ayuda") {
           reply = [
             "🛠 *Comandos admin*",
@@ -707,6 +728,15 @@ export async function POST(req: NextRequest) {
             "/estado — distribución emocional",
             "/tareas — tareas pendientes antiguas",
             "/cartas — resumen weekly-letter (último cron + acumulado)",
+            "",
+            "🔧 *Operaciones*",
+            "/deploy — HEAD de main (commit, autor, fecha)",
+            "/salud — checks rápidos: DB, crons, errores, negocio (24h)",
+            "/llm — gasto LLM hoy / 7d / 30d + top modelos",
+            "",
+            "💼 *Negocio*",
+            "/ingresos — MRR, suscripciones activas, churn",
+            "/buscar <email_o_id> — busca un usuario y resume su estado",
             "",
             "📒 *Bandeja de notas*",
             "/nota <texto> — guarda una nota (o empieza con 📝)",

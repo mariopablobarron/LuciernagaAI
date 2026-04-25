@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Mail, X } from "lucide-react";
 
@@ -71,11 +72,19 @@ export default function WeeklyLetterBanner({
   }, []);
 
   useEffect(() => {
+    // Las llamadas se difieren a una microtask para no encadenar setState
+    // sincrónico desde dentro del effect (regla react-hooks/set-state-in-effect
+    // de React 19). Comportamiento idéntico, pero el setState ocurre en el
+    // siguiente tick.
     if (initialLetterId && !openedRef.current) {
       openedRef.current = true;
-      void fetchById(initialLetterId);
+      queueMicrotask(() => {
+        void fetchById(initialLetterId);
+      });
     } else {
-      void fetchPending();
+      queueMicrotask(() => {
+        void fetchPending();
+      });
     }
   }, [initialLetterId, fetchPending, fetchById]);
 
@@ -189,13 +198,13 @@ export default function WeeklyLetterBanner({
               >
                 Seguir la conversación
               </button>
-              <a
+              <Link
                 href="/app/diario"
                 onClick={() => void markRead()}
                 className="rounded-xl border border-zinc-700 hover:border-zinc-600 px-5 py-2.5 text-sm font-semibold text-zinc-200 transition-colors"
               >
                 Abrir el diario
-              </a>
+              </Link>
               <button
                 type="button"
                 onClick={handleClose}

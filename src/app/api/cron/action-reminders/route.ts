@@ -1,12 +1,15 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { sendTelegramNotification } from "@/services/telegram";
+import { sendPushToUser } from "@/lib/web-push";
 import { logError, logInfo } from "@/lib/logger";
 import { sendAutomatedAlert } from "@/lib/alerts";
 
 // GET /api/cron/action-reminders?secret=CRON_SECRET
-// Run once per hour. Sends at most 1 Telegram reminder per user per day,
-// respecting the user's preferred reminderTime ("HH:MM"). Default: 09:00.
+// Run once per hour. Sends at most 1 reminder per user per day, respetando
+// reminderTime preferido (default 09:00 UTC). Multi-canal: Telegram (si
+// telegramId) y Web Push (si tiene push subscriptions). Si tiene ambos,
+// llegan ambos canales — son complementarios, no excluyentes.
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const secret = url.searchParams.get("secret");
@@ -26,8 +29,10 @@ export async function GET(req: NextRequest) {
       include: {
         user: {
           select: {
+            id: true,
             telegramId: true,
             preferences: { select: { reminderTime: true } },
+            _count: { select: { pushSubscriptions: true } },
           },
         },
       },
@@ -35,11 +40,19 @@ export async function GET(req: NextRequest) {
 
     let sent = 0;
     let skipped = 0;
+    let telegramCount = 0;
+    let pushCount = 0;
     const sentUserIds = new Set<string>();
 
     for (const reminder of due) {
       const telegramId = reminder.user.telegramId;
-      if (!telegramId) continue;
+      const hasPush = reminder.user._count.pushSubscriptions > 0;
+
+      // Skip si no tiene NINGÚN canal de notificación
+      if (!telegramId && !hasPush) {
+        skipped++;
+        continue;
+      }
 
       // Enforce 1 reminder per user per day
       if (sentUserIds.has(reminder.userId)) {
@@ -60,13 +73,31 @@ export async function GET(req: NextRequest) {
         continue;
       }
 
-      const text =
-        `⏰ *Recordatorio diario*\n\n` +
-        `Tienes una acción pendiente:\n\n` +
-        `_${reminder.actionText}_\n\n` +
-        `¿Ya lo hiciste? Abre la app y cuéntame.`;
+      // Telegram (si tiene)
+      if (telegramId) {
+        const text =
+          `⏰ *Recordatorio diario*\n\n` +
+          `Tienes una acción pendiente:\n\n` +
+          `_${reminder.actionText}_\n\n` +
+          `¿Ya lo hiciste? Abre la app y cuéntame.`;
+        sendTelegramNotification(telegramId, text);
+        telegramCount++;
+      }
 
-      sendTelegramNotification(telegramId, text);
+      // Web Push (si tiene subscriptions)
+      if (hasPush) {
+        await sendPushToUser(reminder.userId, {
+          title: "Tu acción sigue ahí",
+          body: reminder.actionText.length > 120
+            ? `${reminder.actionText.slice(0, 117)}…`
+            : reminder.actionText,
+          url: "/app",
+          icon: "/icon-192.png",
+          channel: "action_reminder",
+        }).catch((err) => logError("PUSH", err, { area: "action_reminder", userId: reminder.userId }));
+        pushCount++;
+      }
+
       sentUserIds.add(reminder.userId);
       sent++;
 
@@ -76,8 +107,21 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    logInfo("CRON", "action_reminders_sent", { total: due.length, sent, skipped });
-    return NextResponse.json({ ok: true, processed: due.length, sent, skipped });
+    logInfo("CRON", "action_reminders_sent", {
+      total: due.length,
+      sent,
+      skipped,
+      telegramCount,
+      pushCount,
+    });
+    return NextResponse.json({
+      ok: true,
+      processed: due.length,
+      sent,
+      skipped,
+      telegramCount,
+      pushCount,
+    });
   } catch (error) {
     logError("CRON", error, { action: "action_reminders_failed" });
     sendAutomatedAlert({ type: "critical", title: "Cron falló: action-reminders", message: error instanceof Error ? error.message : "Error desconocido" }).catch(() => {});

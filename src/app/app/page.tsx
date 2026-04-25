@@ -1098,7 +1098,39 @@ export default function HomePage() {
       sfx.play("success");
       confettiBurst();
       trackEvent("action_completed", { actionId });
-      toast.success("Acción completada");
+      // Toast con acción "Compartir": growth orgánico — al acabar una
+      // microacción, ofrecemos compartir un OG dinámico generado al vuelo.
+      const completedActionTitle =
+        activeGoal?.actions.find((a) => a.id === actionId)?.description ||
+        "Hoy he dado un paso real";
+      toast.success("Acción completada", {
+        action: {
+          label: "Compartir",
+          onClick: () => {
+            trackEvent("share_achievement_clicked", { kind: "action_completed", source: "toast" });
+            const params = new URLSearchParams({
+              title: completedActionTitle.length > 100
+                ? `${completedActionTitle.slice(0, 97)}…`
+                : completedActionTitle,
+              kind: "action_completed",
+            });
+            const url = `${window.location.origin}/share?${params.toString()}`;
+            if (navigator.share) {
+              void navigator.share({
+                title: "Tres Mil Millones de Latidos",
+                text: completedActionTitle,
+                url,
+              }).catch(() => undefined);
+            } else {
+              void navigator.clipboard.writeText(url).then(() => {
+                toast.success("Enlace copiado", { duration: 2000 });
+              }).catch(() => {
+                window.prompt("Copia este enlace:", url);
+              });
+            }
+          },
+        },
+      });
       // Show mirror moment after completing an action
       setMirrorMoment({ type: "action_done", context: "tu acción" });
       const nextGoal = payload.goal || null;

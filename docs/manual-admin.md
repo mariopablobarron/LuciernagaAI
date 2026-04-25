@@ -214,8 +214,24 @@ Cada rol tiene una lista de permisos especificos (ej. `users:read`, `users:updat
 | LLM Usage | `/admin/llm-usage` | Consumo de tokens y costes IA | superadmin, ops |
 | Operaciones | `/admin/operaciones` | Estado del sistema, cron jobs, backups | superadmin, ops |
 | Configuracion | `/admin/settings` | Configuracion general del sistema | superadmin |
+| Notificaciones push | `/admin/notificaciones` | Broadcast push a suscritos / activos. Incluye **vista previa visual estilo iOS en vivo** mientras escribes (avisos en ámbar si título >50 chars o body >178 chars) | superadmin, admin |
+| Notas (bandeja) | `/admin/notas` | Bandeja unificada con notas guardadas desde el bot Telegram (`/nota`) | superadmin, admin |
+| Routines (agentes) | `/admin/routines` | Catálogo de agentes/cron jobs programados con su descripción y estado | superadmin, ops |
+| Status sistema | `/admin/status` | Healthchecks ejecutados en vivo (DB, migraciones, Resend, Telegram, integraciones, etc.) | superadmin, ops |
+| Comunidad — círculos | `/admin/community/circles` | Lista de círculos activos, miembros, fase | superadmin, content, support |
+| Comunidad — salud | `/admin/community/health` | Métricas de la comunidad (engagement, abandono, riesgo) | superadmin, content |
+| Comunidad — reflexiones | `/admin/community/reflections` | Reflexiones publicadas, moderación | superadmin, content |
+| Analytics — Ánimo e impulso | `/admin/analytics/animo` | Tendencia diaria de DailyLog, drop alerts (caídas de momentum por usuario) | superadmin, analytics |
 
 > El panel clinico (`/admin-clinical`) usa la misma sesion que el resto del admin — no requiere login separado.
+
+### Pestañas dentro de `/admin/marketing`
+
+| Pestaña | Qué hace |
+|---|---|
+| Métricas / Atribución / Testimonials / Referidos / Equipo | Lo de siempre — campañas, tagging, fuentes |
+| **Plantillas de email** (Fase 1, read-only) | Catálogo de las 17+ plantillas que envía el sistema con métricas reales del `EmailLog` (entregados/fallidos/último envío). Modal de **vista previa HTML** con datos sample + botón **"Enviar prueba"** a un email arbitrario |
+| **Trackers personalizados** | Snippets de tracking (Inspectlet, GA4, etc.) que se inyectan en `<head>` sin redeploy. Activar/desactivar y editar desde aquí |
 
 ---
 
@@ -792,6 +808,28 @@ Se envia automaticamente cada semana. Tambien puede dispararse manualmente desde
 
 Se envia cuando se crea una intervencion desde el panel clinico.
 
+#### Cron failed (cron-watchdog)
+
+Cada 20 min (`:04 :24 :44`) el watchdog escanea `CronRunLog` últimas 6h. Por cada cron con `status=failed` que NO haya sido alertado todavía (dedup vía `SystemLog tag=CRON_FAILED_ALERTED` con runId), envía mensaje al admin con el nombre del cron, fecha, error truncado y dos botones inline:
+
+- **📋 Ver últimos runs** — muestra los últimos 8 runs del cron (status, duración, error)
+- **🔄 Reintentar** — llama `GET /api/cron/<jobName>?secret=...` y reporta resultado
+
+#### Resumen semanal de cartas (weekly-letter-summary)
+
+Cada lunes a las 09:03 Madrid, llega un resumen del cron `weekly-letter` que corrió el domingo: estado del último run, duración, cartas generadas + acumulado en BD (total, con email enviado, generadas en últimos 8 días). También disparable a demanda con el comando `/cartas`.
+
+#### Alerta de presupuesto LLM (llm-budget-alert)
+
+Cada día a las 09:33 Madrid se chequea el gasto LLM mensual. Si la proyección a fin de mes supera el 70% (warn) o el 100% (critical) del `LLM_MONTHLY_BUDGET_USD`, envía alerta con detalle. Dedup diario por nivel.
+
+#### Alertas de usuario en riesgo con botones inline
+
+Cuando se dispara `sendAdminUserAlert` (estado `riesgo` o `ansiedad`, palabras clave de crisis, etc.), el mensaje incluye dos botones inline:
+
+- **👁 Ver usuario** — equivale a `/buscar <userId>`, devuelve ficha breve
+- **✅ Marcar atendido** — registra `SystemLog tag=CRISIS_ACK` (no toca `UserState.crisisActive`)
+
 ### Origen de los mensajes — donde esta el codigo
 
 | Notificacion | Archivo |
@@ -818,7 +856,7 @@ El constructor de mensajes admin esta centralizado en src/services/telegram.ts �
 
 Cuando escribes al bot desde el chat configurado como `ADMIN_TELEGRAM_ID`, tienes acceso a comandos exclusivos.
 
-### Comandos admin
+### Comandos de métricas y gestión diaria
 
 | Comando | Que muestra |
 |---|---|
@@ -829,10 +867,50 @@ Cuando escribes al bot desde el chat configurado como `ADMIN_TELEGRAM_ID`, tiene
 | `/retencion` | Usuarios totales, activos esta semana, rachas activas |
 | `/estado` | Distribucion emocional actual de todos los usuarios |
 | `/tareas` | Cola de `AdminTask` con estado `pending` |
+| `/cartas` | Resumen del cron `weekly-letter`: último run + acumulado en BD (total, con email enviado, generadas en 8 días) |
+
+### Comandos de operaciones
+
+| Comando | Que hace |
+|---|---|
+| `/deploy` | HEAD actual de `main` en GitHub (commit, autor, fecha). Avisa de que Coolify v3 no auto-despliega |
+| `/redeploy` | Envía botón inline con enlace al panel de Coolify para hacer Force Redeploy desde móvil con un click (Coolify v3 no expone API tokens) |
+| `/salud` | Dashboard 24h: DB ping, último run de cada cron + nº failed, errores SystemLog, signups, mensajes, suscripciones activas, crisis abiertas |
+| `/llm` | Gasto LLM hoy / 7d / 30d con tokens y top 3 modelos por coste |
+
+### Comandos de negocio y soporte
+
+| Comando | Que muestra |
+|---|---|
+| `/ingresos` | MRR estimado (USD), suscripciones activas, nuevas y churn 7d/30d, distribución por plan |
+| `/buscar <email_o_id>` | Ficha breve de un usuario: plan, estado emocional, mensajes, último visto, crisis activa |
+
+### Bandeja de notas
+
+| Comando | Accion |
+|---|---|
+| `/nota <texto>` | Guarda una nota (también acepta mensajes que empiecen con 📝) |
+| `/notas` | Lista las últimas 10 notas pendientes |
+| `/nota_hecha <id6>` | Marca una nota como trabajada |
+| `/hecho <id6>` | Alias de `/nota_hecha` |
+
+### Botones inline (callback_query)
+
+Algunos mensajes del bot incluyen **botones inline** que disparan acciones sin escribir comandos:
+
+- **Alerta de crisis** (`sendAdminUserAlert`): cada vez que un usuario activa el flow de crisis o entra en estado riesgo/ansiedad, el admin recibe alerta con dos botones:
+  - `👁 Ver usuario` → equivale a `/buscar <userId>`
+  - `✅ Marcar atendido` → registra `SystemLog tag=CRISIS_ACK` (no toca `UserState.crisisActive`; usar el panel admin para acciones de seguimiento)
+- **Cron failed** (cron-watchdog): cuando un cron falla, alerta con:
+  - `📋 Ver últimos runs` → últimos 8 runs del cron con status, duración, error
+  - `🔄 Reintentar` → llama `GET /api/cron/<jobName>?secret=...` y reporta resultado
+
+> Si los botones no responden, comprueba que el webhook de Telegram tiene `allowed_updates` configurado con `["message", "callback_query"]`. Verificar con:
+> `curl https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getWebhookInfo`
 
 ### Modo IA libre
 
-Cualquier mensaje que no sea un comando activa el modo IA directa: el bot consulta la IA con contexto del sistema (metricas actuales) y responde.
+Cualquier mensaje que no sea un comando activa el modo IA directa: el bot consulta la IA con contexto profundo del producto (métricas, código, arquitectura) y responde.
 
 ### Comandos para usuarios regulares
 
@@ -886,11 +964,55 @@ El plan Pro incluye 7 dias de prueba gratuita.
 
 ---
 
+## 14B. LLM Usage y control de presupuesto
+
+**Ruta:** `/admin/llm-usage`
+
+Muestra el consumo de tokens, coste estimado y eficiencia de prompts agrupados por modelo, source y usuario.
+
+### Panel de Budget mensual
+
+Arriba del todo, 3 tarjetas con código de color:
+
+- **Budget mensual** — leído de `LLM_MONTHLY_BUDGET_USD` (default $200 si no está)
+- **Gastado MTD** (mes-en-curso) con barra: verde / ámbar al 70% / rojo al 100%
+- **Proyección a fin de mes** — extrapola por días transcurridos del mes con la misma escala de color
+
+El icono del header (🟢/🟠/🔴) refleja el peor de los dos porcentajes.
+
+### Alerta automática a Telegram
+
+El cron `/api/cron/llm-budget-alert` corre cada día a las 09:33 Madrid (cron-job.org `jobId 7526285`). Si la **proyección mensual** supera el 70% (warn) o el 100% (critical), envía mensaje al `ADMIN_TELEGRAM_ID` con detalle (gastado MTD, proyección, día del mes). **Dedup diario por nivel** vía `SystemLog tag=LLM_BUDGET_ALERTED`: máximo un mensaje por día por nivel.
+
+### Otras secciones del panel
+
+- **Resumen 7d / 30d / all-time** con requests, tokens, coste y latencia media
+- **Top consumers** (usuarios con más tokens consumidos all-time)
+- **Eficiencia por source** con ratio completion/prompt (verde ≥0.30, ámbar ≥0.15, rojo <0.15) — identifica system prompts desproporcionadamente largos
+- **Por modelo** (coste y latencia)
+- **Recomendaciones automáticas** detectadas por heurística
+- **Latest logs** con prompt + response truncados a 200 chars
+
+---
+
+## 14C. Service Worker y caché del cliente
+
+La app web registra un Service Worker (`latidos-v1`) que cachea assets para que el PWA funcione offline parcialmente. Esto puede causar dos efectos a vigilar:
+
+- **Tras un Force Redeploy con un endpoint nuevo**, las pestañas que ya tienen el SW antiguo pueden devolver **404 falsos** al endpoint nuevo durante un rato, hasta que el SW expire o el usuario recargue duro.
+- **Banner "nueva versión disponible"** (commit `f84ca71`): la app detecta el cambio de versión y muestra al usuario un banner con botón **Recargar** para que actualice manualmente sin perder estado.
+
+Si después de un redeploy un usuario ve algo raro: pedirle que pulse el banner o haga `Cmd+Shift+R` (`Ctrl+Shift+R` en Windows). Si nada de eso funciona y necesitas forzar limpieza para todos: hay endpoint admin de **purga de caché** (commit `201ab62`).
+
+---
+
 ## 15. Cron jobs automaticos
 
 Todos los cron jobs requieren el parametro `?secret=CRON_SECRET`.
 
-| Ruta | Descripcion | Frecuencia recomendada |
+### Crons funcionales
+
+| Ruta | Descripcion | Frecuencia |
 |---|---|---|
 | `/api/cron/24h-nudge` | Nudge a usuarios nuevos inactivos tras 24h | Diaria |
 | `/api/cron/action-reminders` | Recordatorios de acciones pendientes via Telegram | Diaria |
@@ -902,6 +1024,16 @@ Todos los cron jobs requieren el parametro `?secret=CRON_SECRET`.
 | `/api/cron/user-weekly-review` | Revision semanal proactiva por usuario | Semanal |
 | `/api/cron/weekly-inactive-reminder` | Re-engagement de usuarios inactivos | Semanal |
 | `/api/cron/weekly-summary` | Resumen semanal enviado por Telegram al admin | Semanal |
+| `/api/cron/weekly-letter` | Genera carta semanal personalizada para cada usuario elegible y notifica por email | Domingo 19:00 Europe/Madrid (cron-job.org `7525565`) |
+| `/api/cron/weekly-letter-summary` | Envía resumen del último run de `weekly-letter` al `ADMIN_TELEGRAM_ID` | Lunes 09:03 Madrid (one-shot, autoexpira) — también disparable a demanda con `/cartas` |
+| `/api/cron/cron-watchdog` | Escanea `CronRunLog` últimas 6h, detecta runs `status=failed` sin alertar y manda Telegram con botones inline `[Ver últimos runs][Reintentar]`. Dedup vía `SystemLog tag=CRON_FAILED_ALERTED` con runId | Cada 20 min `:04 :24 :44` (`7525709`) |
+| `/api/cron/llm-budget-alert` | Alerta a Telegram si gastado o proyección LLM mensual supera 70% (warn) o 100% (critical) | Diaria 09:33 Madrid (`7526285`) |
+
+### Crons diagnósticos (no scheduled, llamados ad-hoc)
+
+| Ruta | Para qué |
+|---|---|
+| `/api/cron/diag-migrations` | Devuelve `_prisma_migrations` con summary `{ total, ok, pending, rolledBack }` y detalle de pending y rolled-back (logs hasta 1500 chars). Útil para diagnosticar el check `db.migrations` |
 
 ---
 
@@ -930,10 +1062,18 @@ Todos los cron jobs requieren el parametro `?secret=CRON_SECRET`.
 | Variable | Descripcion |
 |---|---|
 | `ADMIN_AUTH_SECRET` | Secreto independiente para sesiones admin. Si no se configura, usa `AUTH_TOKEN_SECRET` |
-| `TELEGRAM_WEBHOOK_SECRET` | Token para verificar webhooks de Telegram |
+| `TELEGRAM_WEBHOOK_SECRET` | Token para verificar webhooks de Telegram. Debe coincidir con el `secret_token` registrado en `setWebhook`; si no coinciden, todos los updates entrantes reciben 401 |
 | `FREE_PLAN_UNLIMITED` | Desactiva limites del plan gratuito |
 | `RESEND_API_KEY` | Clave de Resend para emails transaccionales |
-| `EMAIL_FROM` | Direccion de remitente de emails |
+| `EMAIL_FROM` | Direccion de remitente de emails. **Importante:** en Coolify v3 envuelve el valor entre comillas simples si tiene `<>` o espacios (`'TresMilMillones <noreply@dominio.es>'`), o Resend rechaza con 422 |
+| `LLM_MONTHLY_BUDGET_USD` | Presupuesto mensual para alertas del cron `llm-budget-alert`. Default `200` si no se configura |
+| `CRONJOB_ORG_API_KEY` | API key de cron-job.org. Permite que el bot Telegram cree/edite jobs externos. Solo si quieres automatizar la creación de crons desde el código |
+| `BETTERSTACK_SOURCE_TOKEN` | Token para enviar logs estructurados a BetterStack/Logtail |
+| `SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` | Sentry para seguimiento de errores |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Google Analytics 4 measurement ID |
+| `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST` | PostHog product analytics |
+| `NEXT_PUBLIC_SENTRY_DSN` | Sentry frontend |
+| `VAPID_PRIVATE_KEY`, `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_SUBJECT` | Web Push para notificaciones del navegador |
 
 ### Como obtener el ADMIN_TELEGRAM_ID
 

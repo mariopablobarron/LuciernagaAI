@@ -115,7 +115,11 @@ const CHECKS: Check[] = [
           return { status: "fail", detail: `HTTP ${res.status}`, meta: { httpStatus: res.status } };
         }
         const body = (await res.json().catch(() => null)) as {
-          data?: Array<{ name: string; status: string }>;
+          data?: Array<{
+            name: string;
+            status: string;
+            capabilities?: { sending?: string; receiving?: string };
+          }>;
         } | null;
         const domains = body?.data ?? [];
         if (domains.length === 0) {
@@ -125,27 +129,37 @@ const CHECKS: Check[] = [
             meta: { fromDomain, verifiedCount: 0 },
           };
         }
-        const verified = domains.filter((d) => d.status === "verified");
-        const verifiedList = verified.map((d) => d.name).join(",");
+        // Acepta como "envío OK" tanto "verified" como "partially_verified" si capabilities.sending=enabled
+        const sendable = domains.filter(
+          (d) => d.status === "verified" || (d.status === "partially_verified" && d.capabilities?.sending === "enabled"),
+        );
+        const sendableList = sendable.map((d) => d.name).join(",");
         if (!fromDomain) {
           return {
             status: "warn",
-            detail: `EMAIL_FROM no configurado · verificados: ${verifiedList || "ninguno"}`,
-            meta: { verified: verifiedList },
+            detail: `EMAIL_FROM no configurado · envío habilitado en: ${sendableList || "ninguno"}`,
+            meta: { sendable: sendableList },
           };
         }
-        const matches = verified.some((d) => d.name === fromDomain);
-        if (!matches) {
+        const match = sendable.find((d) => d.name === fromDomain);
+        if (!match) {
           return {
             status: "fail",
-            detail: `EMAIL_FROM usa "${fromDomain}" pero NO está verificado (Resend solo acepta: ${verifiedList || "ninguno"})`,
-            meta: { fromDomain, verified: verifiedList },
+            detail: `EMAIL_FROM usa "${fromDomain}" pero el envío NO está habilitado (sendable: ${sendableList || "ninguno"})`,
+            meta: { fromDomain, sendable: sendableList },
+          };
+        }
+        if (match.status === "partially_verified") {
+          return {
+            status: "warn",
+            detail: `${fromDomain} envía OK pero verificación parcial — revisa DMARC/tracking en Resend`,
+            meta: { fromDomain, status: match.status },
           };
         }
         return {
           status: "ok",
           detail: `${fromDomain} verificado`,
-          meta: { fromDomain, verified: verifiedList },
+          meta: { fromDomain, status: match.status },
         };
       } catch (err) {
         return { status: "fail", detail: (err as Error)?.message ?? "Error consultando Resend" };

@@ -21,6 +21,13 @@ import {
 
 const API_BASE = "https://api.cron-job.org";
 const REQUEST_TIMEOUT_S = 30;
+// cron-job.org devuelve 429 si pegamos varios PUT seguidos sin pausa.
+// 150 ms entre acciones es suficiente para 7-10 jobs sin disparar rate limit.
+const APPLY_THROTTLE_MS = 150;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export class CronSyncConfigError extends Error {
   constructor(public missing: string[]) {
@@ -240,15 +247,23 @@ export async function syncCrons(options: SyncOptions = {}): Promise<SyncResult> 
   }
 
   const errors: SyncResult["errors"] = [];
+  let mutated = false;
   for (const action of plan) {
     try {
       if (action.type === "create") {
+        if (mutated) await sleep(APPLY_THROTTLE_MS);
         await createJob(apiKey, buildJobPayload(action.cron, action.url, action.title));
+        mutated = true;
       } else if (action.type === "update") {
+        if (mutated) await sleep(APPLY_THROTTLE_MS);
         await patchJob(apiKey, action.jobId, buildJobPayload(action.cron, action.url, action.title));
+        mutated = true;
       } else if (action.type === "delete") {
+        if (mutated) await sleep(APPLY_THROTTLE_MS);
         await deleteJob(apiKey, action.jobId);
+        mutated = true;
       }
+      // noops no consumen rate limit (no tocan API).
     } catch (err) {
       errors.push({ action, error: err instanceof Error ? err.message : String(err) });
     }

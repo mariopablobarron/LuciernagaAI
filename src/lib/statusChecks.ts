@@ -75,20 +75,30 @@ const CHECKS: Check[] = [
     category: "infra",
     run: async () => {
       const prisma = getPrismaClient();
+      // Cuenta solo migraciones realmente "a medio aplicar" — excluye rolled_back
+      // (esas son cicatrices históricas que prisma migrate deploy ya ignora).
       const rows = await withTimeout(
-        prisma.$queryRawUnsafe<Array<{ count: bigint }>>(
-          `SELECT COUNT(*)::bigint AS count FROM "_prisma_migrations" WHERE finished_at IS NULL`,
+        prisma.$queryRawUnsafe<Array<{ pending: bigint; rolled_back: bigint }>>(
+          `SELECT
+             COUNT(*) FILTER (WHERE finished_at IS NULL AND rolled_back_at IS NULL)::bigint AS pending,
+             COUNT(*) FILTER (WHERE rolled_back_at IS NOT NULL)::bigint AS rolled_back
+           FROM "_prisma_migrations"`,
         ),
       );
-      const pending = Number(rows[0]?.count ?? 0);
+      const pending = Number(rows[0]?.pending ?? 0);
+      const rolledBack = Number(rows[0]?.rolled_back ?? 0);
+      const meta: Record<string, string | number | boolean | null> = { pending, rolledBack };
       if (pending > 0) {
         return {
           status: "fail",
-          detail: `${pending} migraciones pendientes`,
-          meta: { pending },
+          detail: `${pending} migraciones a medio aplicar — riesgo de bloqueo en próximo arranque`,
+          meta,
         };
       }
-      return { status: "ok", detail: "Todas aplicadas" };
+      const detail = rolledBack > 0
+        ? `Todas aplicadas (${rolledBack} rolled-back históricas, sin riesgo)`
+        : "Todas aplicadas";
+      return { status: "ok", detail, meta };
     },
   },
 

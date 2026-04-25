@@ -12,7 +12,7 @@ const cspDirectives = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' https://cdn.jsdelivr.net",
-  `connect-src 'self' https://openrouter.ai https://*.sentry.io https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://www.facebook.com https://accounts.google.com https://oauth2.googleapis.com${isDev ? " ws://localhost:3000 ws://127.0.0.1:3000" : ""}`,
+  `connect-src 'self' https://openrouter.ai https://*.sentry.io https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://www.facebook.com https://accounts.google.com https://oauth2.googleapis.com https://eu.i.posthog.com https://us.i.posthog.com${isDev ? " ws://localhost:3000 ws://127.0.0.1:3000" : ""}`,
   "frame-ancestors 'none'",
   "form-action 'self' https://accounts.google.com",
   "base-uri 'self'",

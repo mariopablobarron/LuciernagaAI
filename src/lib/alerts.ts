@@ -127,7 +127,7 @@ async function sendEmail(alert: Alert): Promise<void> {
 
   const text = `${alert.title}\n\n${alert.message}${alert.metric ? `\n\n${alert.metric}: ${alert.value}` : ""}`;
 
-  await sendUserEmail({ to: toEmail, subject, html, text }).catch((err) =>
+  await sendUserEmail({ to: toEmail, subject, html, text, template: "admin_alert" }).catch((err) =>
     logError("ALERTS", err, { area: "sendEmail_resend" })
   );
 }

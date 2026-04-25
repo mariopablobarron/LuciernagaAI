@@ -200,6 +200,29 @@ export const EMAIL_TEMPLATES: EmailTemplateMeta[] = [
     trigger: "Respuesta admin desde panel de soporte.",
     builderFn: "buildSupportMessageEmail",
   },
+  {
+    id: "waitlist_welcome",
+    name: "Waitlist · bienvenida",
+    description: "Confirmación de inscripción a la lista de espera.",
+    category: "lifecycle",
+    trigger: "Al apuntarse desde el formulario público de waitlist.",
+    builderFn: "buildWaitlistWelcomeEmail",
+  },
+  {
+    id: "quiz_lead",
+    name: "Quiz · diagnóstico",
+    description: "Resultado del test público con la acción concreta para hoy.",
+    category: "lifecycle",
+    trigger: "Al completar el test desde la página /test.",
+    builderFn: "buildQuizLeadEmail",
+  },
+  {
+    id: "admin_alert",
+    name: "Alerta operativa al admin",
+    description: "Aviso interno por email cuando salta una alerta crítica.",
+    category: "admin",
+    trigger: "Servicio de alertas (lib/alerts.ts) sobre eventos críticos.",
+  },
 ];
 
 export const EMAIL_TEMPLATE_BY_ID: Record<string, EmailTemplateMeta> = Object.fromEntries(

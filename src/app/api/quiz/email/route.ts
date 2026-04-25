@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       appUrl,
     });
 
-    const sent = await sendUserEmail(email);
+    const sent = await sendUserEmail({ ...email, template: "quiz_lead" });
 
     logInfo("QUIZ", "quiz_lead_email_sent", { email: body.email, state: body.state, sent });
 

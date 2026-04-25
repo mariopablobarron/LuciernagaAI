@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     logInfo("WAITLIST", "entry_created", { id: entry.id, email: emailLower, ...(utm && { utm }) });
 
     const appUrl = process.env.APP_BASE_URL ?? "http://localhost:3000";
-    sendUserEmail(buildWaitlistWelcomeEmail({ to: emailLower, appUrl })).catch(
+    sendUserEmail({ ...buildWaitlistWelcomeEmail({ to: emailLower, appUrl }), template: "waitlist_welcome" }).catch(
       (e) => logError("WAITLIST", e, { action: "send_waitlist_welcome_email", email: emailLower }),
     );
 

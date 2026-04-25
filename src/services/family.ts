@@ -48,7 +48,7 @@ export async function notifyTrustedContactOnCrisis(userId: string): Promise<void
     portalUrl: url,
     appBaseUrl: APP_BASE_URL,
   });
-  void sendUserEmail({ to: contact.email, ...emailPayload });
+  void sendUserEmail({ to: contact.email, userId, template: "family_crisis", ...emailPayload });
 
   // Telegram notification (if contact has a telegramId stored as phone field with @ prefix)
   if (contact.phone?.startsWith("@") || /^\d{6,}$/.test(contact.phone ?? "")) {
@@ -91,7 +91,7 @@ export async function notifyTrustedContactOnWin(
     winNote,
     portalUrl: url,
   });
-  void sendUserEmail({ to: contact.email, ...emailPayload });
+  void sendUserEmail({ to: contact.email, userId, template: "family_win", ...emailPayload });
 
   await prisma.trustedContact.update({
     where: { id: contact.id },
@@ -125,7 +125,7 @@ export async function sendFamilyInviteEmail(
     portalUrl: url,
   });
 
-  const sent = await sendUserEmail({ to: contact.email, ...emailPayload });
+  const sent = await sendUserEmail({ to: contact.email, userId: contact.userId, template: "family_invite", ...emailPayload });
 
   await prisma.trustedContact.update({
     where: { id: contact.id },
@@ -159,7 +159,7 @@ export async function deliverSupportMessage(messageId: string): Promise<void> {
     content: msg.content,
     appUrl: `${APP_BASE_URL}/app`,
   });
-  void sendUserEmail({ to: msg.user.email, ...emailPayload });
+  void sendUserEmail({ to: msg.user.email, userId: msg.userId, template: "support_message", ...emailPayload });
 
   logInfo("FAMILY", "support_message_delivered", { messageId, userId: msg.userId });
 }
@@ -219,7 +219,7 @@ export async function checkInactiveUsers(): Promise<InactivityResult> {
       portalUrl: url,
     });
 
-    void sendUserEmail({ to: contact.email, ...emailPayload });
+    void sendUserEmail({ to: contact.email, userId: user.id, template: "family_inactivity", ...emailPayload });
 
     await prisma.trustedContact.update({
       where: { id: contact.id },

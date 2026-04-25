@@ -154,7 +154,7 @@ export async function sendEmailReminder(user: EmailReminderUser): Promise<void> 
   const appUrl = process.env.APP_BASE_URL ?? "https://tresmilmillonesdelatidos.es";
   const template = buildReminderEmail({ pendingAction: user.pendingAction, appUrl });
 
-  const sent = await sendUserEmail({ to: user.email, ...template });
+  const sent = await sendUserEmail({ to: user.email, userId: user.id, template: "reminder", ...template });
 
   if (sent) {
     logInfo("REMINDERS", "email_reminder_sent", { userId: user.id, email: user.email });

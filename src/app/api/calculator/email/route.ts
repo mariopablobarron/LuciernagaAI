@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   const appUrl = process.env.APP_BASE_URL ?? "https://tresmilmillonesdelatidos.es";
   const heartbeatEmail = buildHeartbeatEmail({ to: email, beats, appUrl });
 
-  const ok = await sendUserEmail(heartbeatEmail);
+  const ok = await sendUserEmail({ ...heartbeatEmail, template: "heartbeat" });
   if (!ok) {
     logError("CALCULATOR", new Error("Failed to send heartbeat email"), { email });
     return NextResponse.json({ error: "No se pudo enviar" }, { status: 500 });

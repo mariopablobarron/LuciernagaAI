@@ -5,6 +5,7 @@ import { buildAdminAlert, notifyAdmin } from "@/services/telegram";
 import { sendWelcomeSequence } from "@/services/telegramOnboarding";
 import { getPrismaClient } from "@/db/prisma";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { getRequestContext, formatDevice, maskIp } from "@/lib/request-info";
 
 // Crawlers/monitoring conocidos. Si cae alguno, respondemos 200 sin crear
 // User en BD. No queremos ensuciar métricas con bots ni disparar alertas
@@ -72,7 +73,21 @@ async function buildBootstrapResponse(req: NextRequest): Promise<NextResponse> {
   // uno es señal útil de producto. Los bots ya se cortaron arriba con el
   // filtro de User-Agent, así que lo que llega aquí es humano real.
   if (identity.source === "generated") {
-    notifyAdmin(buildAdminAlert({ tipo: "new_user", userId: identity.userId }));
+    const reqCtx = getRequestContext(req);
+    notifyAdmin(
+      buildAdminAlert({
+        tipo: "new_user",
+        userId: identity.userId,
+        ctx: {
+          device: formatDevice(reqCtx.ua),
+          language: reqCtx.language,
+          referer: reqCtx.referer,
+          country: reqCtx.country,
+          city: reqCtx.city,
+          ip: maskIp(reqCtx.ip),
+        },
+      })
+    );
 
     if (identity.userId.startsWith("tg_")) {
       const telegramId = identity.userId.replace("tg_", "");

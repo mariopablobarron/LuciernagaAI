@@ -4,6 +4,7 @@ import { getPrismaClient } from "@/db/prisma";
 import { invalidateUserCache } from "@/services/user";
 import { logError } from "@/lib/logger";
 import { buildAdminAlert, notifyAdmin } from "@/services/telegram";
+import { getRequestContext, formatDevice, maskIp } from "@/lib/request-info";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30; // allow time for large avatar uploads
@@ -130,11 +131,20 @@ export async function PATCH(req: NextRequest) {
     invalidateUserCache(identity.userId);
 
     if (firstNameCapture && typeof data.name === "string") {
+      const reqCtx = getRequestContext(req);
       notifyAdmin(
         buildAdminAlert({
           tipo: "name_captured",
           userId: identity.userId,
           name: data.name,
+          ctx: {
+            device: formatDevice(reqCtx.ua),
+            language: reqCtx.language,
+            referer: reqCtx.referer,
+            country: reqCtx.country,
+            city: reqCtx.city,
+            ip: maskIp(reqCtx.ip),
+          },
         }),
       );
     }

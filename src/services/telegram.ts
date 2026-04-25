@@ -311,10 +311,19 @@ export function notifyAdmin(text: string, parseMode: TelegramParseMode = "Markdo
 
 // ─── Admin alert builder ──────────────────────────────────────────────────────
 
-type NewUserAlert      = { tipo: "new_user";        userId: string };
-type EmailAlert        = { tipo: "email_captured";  userId: string; email: string };
-type NameAlert         = { tipo: "name_captured";   userId: string; name: string };
-type FirstMessageAlert = { tipo: "first_message";   userId: string; preview: string };
+export type RequestSnapshot = {
+  device?: string;        // "📱 iOS 17.2 · Safari 17"
+  language?: string | null;     // "es-ES"
+  referer?: string | null;      // "google.com" o "tresmilmillonesdelatidos.es/"
+  country?: string | null;      // "ES"
+  city?: string | null;         // "Madrid"
+  ip?: string;            // "81.45.x.x" (enmascarada)
+};
+
+type NewUserAlert      = { tipo: "new_user";        userId: string; ctx?: RequestSnapshot };
+type EmailAlert        = { tipo: "email_captured";  userId: string; email: string; ctx?: RequestSnapshot };
+type NameAlert         = { tipo: "name_captured";   userId: string; name: string; ctx?: RequestSnapshot };
+type FirstMessageAlert = { tipo: "first_message";   userId: string; preview: string; ctx?: RequestSnapshot };
 type StateChangeAlert  = { tipo: "state_change";    userId: string; actionType: string; previousState: string; newState: string };
 type CrisisAlert       = { tipo: "crisis";          userId: string; crisisLevel: string; lastMessage?: string };
 type StreakAlert        = { tipo: "streak_milestone"; userId: string; streakDays: number };
@@ -344,6 +353,18 @@ function userVia(userId: string): string {
   return userId.startsWith("tg_") ? "_Vía: Telegram_" : "_Vía: App web_";
 }
 
+function renderCtx(ctx?: RequestSnapshot): string {
+  if (!ctx) return "";
+  const lines: string[] = [];
+  if (ctx.device) lines.push(ctx.device);
+  const place = [ctx.city, ctx.country].filter(Boolean).join(", ");
+  if (place) lines.push(`📍 ${place}`);
+  if (ctx.ip) lines.push(`🌐 IP: \`${ctx.ip}\``);
+  if (ctx.language) lines.push(`🗣 ${ctx.language}`);
+  if (ctx.referer) lines.push(`🔗 ${ctx.referer}`);
+  return lines.length ? "\n" + lines.join("\n") : "";
+}
+
 /**
  * Builds a Markdown-formatted admin notification with visual color coding.
  *
@@ -363,7 +384,8 @@ export function buildAdminAlert(input: AdminAlertInput): string {
         `🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢\n\n` +
         `👤 ID: \`${input.userId}\`\n` +
         `${userVia(input.userId)}\n` +
-        `🕐 ${new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" })}`
+        `🕐 ${new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" })}` +
+        renderCtx(input.ctx)
       );
 
     case "email_captured":
@@ -371,7 +393,8 @@ export function buildAdminAlert(input: AdminAlertInput): string {
         `🟢🟢🟢 EMAIL CAPTURADO 🟢🟢🟢\n\n` +
         `👤 ID: \`${input.userId}\`\n` +
         `📧 *${input.email}*\n` +
-        `${userVia(input.userId)}`
+        `${userVia(input.userId)}` +
+        renderCtx(input.ctx)
       );
 
     case "name_captured":
@@ -379,7 +402,8 @@ export function buildAdminAlert(input: AdminAlertInput): string {
         `🟢🟢🟢 NOMBRE CAPTURADO 🟢🟢🟢\n\n` +
         `👤 ID: \`${input.userId}\`\n` +
         `✏️ *${input.name}*\n` +
-        `${userVia(input.userId)}`
+        `${userVia(input.userId)}` +
+        renderCtx(input.ctx)
       );
 
     case "first_message":
@@ -388,7 +412,8 @@ export function buildAdminAlert(input: AdminAlertInput): string {
         `👤 ID: \`${input.userId}\`\n` +
         `💬 _${input.preview}_\n` +
         `${userVia(input.userId)}\n` +
-        `🕐 ${new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" })}`
+        `🕐 ${new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" })}` +
+        renderCtx(input.ctx)
       );
 
     case "state_change": {

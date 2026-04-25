@@ -15,6 +15,7 @@ import {
 } from "@/services/user";
 import { buildAdminAlert, notifyAdmin } from "@/services/telegram";
 import { triggerWelcomeAvatarVideoAsync } from "@/services/welcomeAvatarVideo";
+import { getRequestContext, formatDevice, maskIp } from "@/lib/request-info";
 
 type CaptureEmailBody = {
   email?: string;
@@ -97,11 +98,20 @@ export async function POST(req: NextRequest) {
       email: user.email,
     });
 
+    const reqCtx = getRequestContext(req);
     notifyAdmin(
       buildAdminAlert({
         tipo: "email_captured",
         userId: linkedIdentity.userId,
         email: normalizeEmail(rawEmail),
+        ctx: {
+          device: formatDevice(reqCtx.ua),
+          language: reqCtx.language,
+          referer: reqCtx.referer,
+          country: reqCtx.country,
+          city: reqCtx.city,
+          ip: maskIp(reqCtx.ip),
+        },
       })
     );
 

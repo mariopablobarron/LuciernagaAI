@@ -72,6 +72,9 @@ posthog-*.png
 resend-*.png
 trackers-*.png
 verify-*.png
+chat-*.png
+prod-*.png
+trafico-*.png
 
 # Eval outputs (run-counselling-bench.ts y similares)
 eval/results/

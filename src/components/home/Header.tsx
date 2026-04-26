@@ -127,7 +127,7 @@ export default function Header() {
                           <User className="w-4 h-4 text-zinc-500" /> Perfil
                         </Link>
                         <Link href="/dashboard" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/6 transition-colors">
-                          <BarChart3 className="w-4 h-4 text-zinc-500" /> Mi progreso
+                          <BarChart3 className="w-4 h-4 text-zinc-500" /> Mi acompañamiento
                         </Link>
                         <Link href="/settings" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/6 transition-colors">
                           <Settings className="w-4 h-4 text-zinc-500" /> Ajustes
@@ -224,7 +224,7 @@ export default function Header() {
                     <User className="w-4 h-4 text-zinc-500" /> Perfil
                   </Link>
                   <Link href="/dashboard" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm text-zinc-300 hover:text-white hover:bg-white/6">
-                    <BarChart3 className="w-4 h-4 text-zinc-500" /> Mi progreso
+                    <BarChart3 className="w-4 h-4 text-zinc-500" /> Mi acompañamiento
                   </Link>
                   <Link href="/settings" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm text-zinc-300 hover:text-white hover:bg-white/6">
                     <Settings className="w-4 h-4 text-zinc-500" /> Ajustes

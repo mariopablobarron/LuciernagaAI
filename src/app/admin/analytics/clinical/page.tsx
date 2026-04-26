@@ -56,6 +56,22 @@ type ClinicalMetrics = {
     completed: number;
     abandoned: number;
   };
+  personalization?: {
+    enneagram: {
+      completions: number;
+      eligibleForReturn: number;
+      returnedD7: number;
+      returnPctD7: number | null;
+    };
+    teamLetter: {
+      requests: number;
+      eligibleForReturn: number;
+      returnedD7: number;
+      returnPctD7: number | null;
+      conversionPct: number | null;
+      note: string;
+    };
+  };
 };
 
 function pctColor(pct: number | null, goodAbove: number, warnAbove: number): string {
@@ -275,6 +291,77 @@ export default function AdminClinicalMetricsPage() {
               </div>
             </div>
           </section>
+
+          {/* Personalización: Eneagrama y Carta del equipo */}
+          {data.personalization ? (
+            <section className="rounded-2xl border border-fuchsia-500/30 bg-fuchsia-500/5 p-5 space-y-4">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-fuchsia-300" />
+                <h2 className="text-sm font-semibold text-white">Personalización · retención D7</h2>
+              </div>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                Hipótesis: completar el test del Eneagrama o pedir una carta humana del equipo
+                aumenta la probabilidad de volver. Comparar el % de retorno D7 contra el baseline
+                global de la app indica si la inversión paga.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="rounded-xl border border-zinc-800 bg-zinc-950/50 p-4 space-y-2">
+                  <p className="text-[11px] uppercase font-semibold text-fuchsia-300 tracking-wider">
+                    Test del Eneagrama
+                  </p>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-bold text-white">
+                      {data.personalization.enneagram.completions}
+                    </span>
+                    <span className="text-xs text-zinc-500">tests completados</span>
+                  </div>
+                  <div className="flex items-baseline gap-2 pt-1">
+                    <span className={`text-xl font-bold ${pctColor(data.personalization.enneagram.returnPctD7, 50, 30)}`}>
+                      {data.personalization.enneagram.returnPctD7 === null
+                        ? "—"
+                        : `${data.personalization.enneagram.returnPctD7}%`}
+                    </span>
+                    <span className="text-xs text-zinc-500">
+                      vuelven en 7d ({data.personalization.enneagram.returnedD7}/{data.personalization.enneagram.eligibleForReturn})
+                    </span>
+                  </div>
+                </div>
+                <div className="rounded-xl border border-zinc-800 bg-zinc-950/50 p-4 space-y-2">
+                  <p className="text-[11px] uppercase font-semibold text-fuchsia-300 tracking-wider">
+                    Carta del equipo
+                  </p>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-bold text-white">
+                      {data.personalization.teamLetter.requests}
+                    </span>
+                    <span className="text-xs text-zinc-500">solicitudes</span>
+                  </div>
+                  <div className="flex items-baseline gap-2 pt-1">
+                    <span className={`text-xl font-bold ${pctColor(data.personalization.teamLetter.returnPctD7, 50, 30)}`}>
+                      {data.personalization.teamLetter.returnPctD7 === null
+                        ? "—"
+                        : `${data.personalization.teamLetter.returnPctD7}%`}
+                    </span>
+                    <span className="text-xs text-zinc-500">
+                      vuelven en 7d ({data.personalization.teamLetter.returnedD7}/{data.personalization.teamLetter.eligibleForReturn})
+                    </span>
+                  </div>
+                  <p className="text-xs text-zinc-500 pt-1">
+                    Conversión:{" "}
+                    <span className="font-bold text-zinc-300">
+                      {data.personalization.teamLetter.conversionPct === null
+                        ? "—"
+                        : `${data.personalization.teamLetter.conversionPct}%`}
+                    </span>{" "}
+                    de usuarios activos piden carta.
+                  </p>
+                </div>
+              </div>
+              <p className="text-xs text-zinc-500 leading-relaxed">
+                {data.personalization.teamLetter.note}
+              </p>
+            </section>
+          ) : null}
 
           {/* Caveat clínico */}
           <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 text-xs text-amber-200 leading-relaxed">

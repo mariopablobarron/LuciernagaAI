@@ -9,6 +9,7 @@ import { getPrismaClient } from "@/lib/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { isSyntheticEmail, normalizeEmail } from "@/services/user";
 import { buildAdminAlert, notifyAdmin } from "@/services/telegram";
+import { trackSafe } from "@/services/events";
 
 type Body = {
   email?: string;
@@ -134,6 +135,21 @@ export async function POST(req: NextRequest) {
     userId: user.id,
     requestId: created.id,
     wasAnonymous: userIsAnonymous,
+  });
+
+  // Tracking de retención: cruzamos quién pide carta del equipo contra
+  // quién vuelve en los siguientes días. Métrica clave para validar la
+  // hipótesis de que la promesa humana mejora la vuelta del primer día.
+  void trackSafe({
+    userId: user.id,
+    type: "TEAM_LETTER_REQUESTED",
+    metadata: {
+      requestId: created.id,
+      wasAnonymous: userIsAnonymous,
+      messageCount: user.messageCount,
+      dominantPattern: user.userState?.dominantPattern ?? null,
+      enneagramType: latestEnneagram?.dominantType ?? null,
+    },
   });
 
   notifyAdmin(

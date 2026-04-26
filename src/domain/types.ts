@@ -19,7 +19,9 @@ export type EventType =
   | "CHECKIN_SUBMITTED"
   | "PROFILE_COMPLETED"
   | "TRANSITIONAL_VOID_DETECTED"
-  | "NUDGE_7D_SENT";
+  | "NUDGE_7D_SENT"
+  | "ENNEAGRAM_COMPLETED"
+  | "TEAM_LETTER_REQUESTED";
 
 export type DecisionType =
   | "ESCALAR_CRISIS"

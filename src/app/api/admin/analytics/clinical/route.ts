@@ -150,6 +150,64 @@ export async function GET(req: NextRequest) {
       crisisByLevel[event.level] = (crisisByLevel[event.level] ?? 0) + 1;
     }
 
+    // ── 8. Personalización: Eneagrama y Carta del equipo ─────────────────
+    // Hipótesis a validar: completar el test del eneagrama o pedir una carta
+    // humana del equipo mejoran retención día-7. Sin estos KPIs es opinión;
+    // con ellos es decisión informada.
+    const [enneagramEvents, teamLetterEvents] = await Promise.all([
+      prisma.event.findMany({
+        where: { type: "ENNEAGRAM_COMPLETED", createdAt: { gte: since } },
+        select: { userId: true, createdAt: true },
+      }),
+      prisma.event.findMany({
+        where: { type: "TEAM_LETTER_REQUESTED", createdAt: { gte: since } },
+        select: { userId: true, createdAt: true },
+      }),
+    ]);
+
+    // Retención D7: ¿el user envió MESSAGE_SENT en [evento, evento+7d]?
+    // Excluimos eventos cuyo +7d todavía no ha pasado para no falsear hacia abajo.
+    async function computeReturnRate(
+      events: Array<{ userId: string; createdAt: Date }>
+    ): Promise<{ eligible: number; returned: number; pct: number | null }> {
+      const eligible = events.filter((e) => e.createdAt.getTime() + seven <= now.getTime());
+      if (eligible.length === 0) return { eligible: 0, returned: 0, pct: null };
+      let returned = 0;
+      for (const ev of eligible) {
+        const sevenAfter = new Date(ev.createdAt.getTime() + seven);
+        const hit = await prisma.event.findFirst({
+          where: {
+            userId: ev.userId,
+            type: "MESSAGE_SENT",
+            createdAt: { gt: ev.createdAt, lte: sevenAfter },
+          },
+          select: { id: true },
+        });
+        if (hit) returned += 1;
+      }
+      return { eligible: eligible.length, returned, pct: Math.round((returned / eligible.length) * 100) };
+    }
+
+    const [enneagramReturn, teamLetterReturn] = await Promise.all([
+      computeReturnRate(enneagramEvents),
+      computeReturnRate(teamLetterEvents),
+    ]);
+
+    // Conversion: de quienes alcanzaron ≥3 mensajes (CTA visible),
+    // ¿qué % terminó pidiendo carta? Estimación: distinct userIds con
+    // MESSAGE_SENT en la ventana, asumiendo que la mayoría llegó a 3 turnos.
+    // Métrica gruesa pero útil para detectar caídas.
+    const distinctSenders = await prisma.event.findMany({
+      where: { type: "MESSAGE_SENT", createdAt: { gte: since } },
+      select: { userId: true },
+      distinct: ["userId"],
+    });
+    const distinctTeamLetterRequesters = new Set(teamLetterEvents.map((e) => e.userId)).size;
+    const teamLetterConversionPct =
+      distinctSenders.length === 0
+        ? null
+        : Math.round((distinctTeamLetterRequesters / distinctSenders.length) * 100);
+
     return NextResponse.json({
       generatedAt: now.toISOString(),
       windowDays: days,
@@ -185,6 +243,23 @@ export async function GET(req: NextRequest) {
         created: goalsCreated,
         completed: goalsCompleted,
         abandoned: goalsAbandoned,
+      },
+      personalization: {
+        enneagram: {
+          completions: enneagramEvents.length,
+          eligibleForReturn: enneagramReturn.eligible,
+          returnedD7: enneagramReturn.returned,
+          returnPctD7: enneagramReturn.pct,
+        },
+        teamLetter: {
+          requests: teamLetterEvents.length,
+          eligibleForReturn: teamLetterReturn.eligible,
+          returnedD7: teamLetterReturn.returned,
+          returnPctD7: teamLetterReturn.pct,
+          conversionPct: teamLetterConversionPct,
+          note:
+            "conversionPct: % de usuarios con MESSAGE_SENT en la ventana que terminaron pidiendo carta. Estimación gruesa.",
+        },
       },
     });
   } catch (error) {

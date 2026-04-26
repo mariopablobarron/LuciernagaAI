@@ -7,6 +7,7 @@ import {
 } from "@/lib/auth";
 import { getPrismaClient } from "@/lib/prisma";
 import { logError, logInfo } from "@/lib/logger";
+import { trackSafe } from "@/services/events";
 import {
   ENNEAGRAM_ITEMS,
   scoreEnneagram,
@@ -80,6 +81,20 @@ export async function POST(req: NextRequest) {
       dominantType: result.dominantType,
       wing: result.wing,
       answered: answeredCount,
+    });
+
+    // Tracking de retención: queremos cruzar quién hace el test contra quién
+    // vuelve en los siguientes 7-30 días. La metadata mínima nos basta para
+    // los KPIs de /admin/analytics/clinical.
+    void trackSafe({
+      userId: identity.userId,
+      type: "ENNEAGRAM_COMPLETED",
+      metadata: {
+        assessmentId: created.id,
+        dominantType: result.dominantType,
+        wing: result.wing,
+        answered: answeredCount,
+      },
     });
 
     const res = NextResponse.json({

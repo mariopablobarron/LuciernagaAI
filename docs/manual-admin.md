@@ -1028,6 +1028,7 @@ Todos los cron jobs requieren el parametro `?secret=CRON_SECRET`.
 | `/api/cron/weekly-letter-summary` | Envía resumen del último run de `weekly-letter` al `ADMIN_TELEGRAM_ID` | Lunes 09:03 Madrid (one-shot, autoexpira) — también disparable a demanda con `/cartas` |
 | `/api/cron/cron-watchdog` | Escanea `CronRunLog` últimas 6h, detecta runs `status=failed` sin alertar y manda Telegram con botones inline `[Ver últimos runs][Reintentar]`. Dedup vía `SystemLog tag=CRON_FAILED_ALERTED` con runId | Cada 20 min `:04 :24 :44` (`7525709`) |
 | `/api/cron/llm-budget-alert` | Alerta a Telegram si gastado o proyección LLM mensual supera 70% (warn) o 100% (critical) | Diaria 09:33 Madrid (`7526285`) |
+| `/api/cron/db-backup-daily` | Dispara `scripts/db-backup-daily.sh` (vuelco `pg_dump` al volumen `/app/backups`). Requiere `pg_dump` instalado en el contenedor y volumen montado. Configurar disparo externo en cron-job.org | Diaria (programar en cron-job.org) |
 
 ### Crons diagnósticos (no scheduled, llamados ad-hoc)
 
@@ -1069,6 +1070,7 @@ Todos los cron jobs requieren el parametro `?secret=CRON_SECRET`.
 | `LLM_MONTHLY_BUDGET_USD` | Presupuesto mensual para alertas del cron `llm-budget-alert`. Default `200` si no se configura |
 | `CRONJOB_ORG_API_KEY` | API key de cron-job.org. Permite que el bot Telegram cree/edite jobs externos. Solo si quieres automatizar la creación de crons desde el código |
 | `BETTERSTACK_SOURCE_TOKEN` | Token para enviar logs estructurados a BetterStack/Logtail |
+| `HELICONE_API_KEY` | Activa observabilidad LLM opcional. Si está presente, el chat principal pasa por el proxy `https://openrouter.helicone.ai/api/v1/chat/completions` y cada llamada aparece en el dashboard de Helicone. Sin la variable, las llamadas van directas a OpenRouter sin diferencia funcional |
 | `SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` | Sentry para seguimiento de errores |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Google Analytics 4 measurement ID |
 | `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST` | PostHog product analytics |

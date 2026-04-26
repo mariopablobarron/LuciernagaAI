@@ -145,7 +145,7 @@ Para evaluar lo que vas a supervisar, tienes que haber vivido lo que el usuario 
   - Check-ins.
   - Notas clínicas previas.
   - Eventos de crisis registrados.
-  - Assessments completados.
+  - Assessments completados. Para el test del Eneagrama ahora se guardan también las **respuestas crudas** de las 90 preguntas y aparecen en una tabla colapsable dentro de `/admin/users/[id]`. Útil para contextualizar el resultado o detectar patrones de respuesta. Si el usuario declaró su tipo sin hacer el test (atajo «Ya conozco mi tipo»), verás un badge "Declarado" en lugar de las respuestas.
 - **Escribir notas clínicas** sobre ese usuario (endpoint disponible en `/api/admin/clinical-notes/[userId]`; la UI dedicada dentro del panel de detalle se añadirá en próxima iteración).
 - **Crear intervenciones** dirigidas al usuario — **con UI integrada en el detalle del usuario**. El usuario las ve en un banner al abrir la app y las puede marcar como "Entendido".
 - **Exportar PDF** con el historial completo para trasladarlo a un terapeuta externo si se deriva.

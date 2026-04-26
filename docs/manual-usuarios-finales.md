@@ -43,12 +43,13 @@ Hay tres formas de crear una cuenta:
 1. Entra en la web de Tres Mil Millones de Latidos.
 2. Haz clic en «Registrarse».
 3. Introduce tu email y crea una contraseña.
-4. Verifica tu email (recibirás un enlace de confirmación).
+4. Marca la casilla aceptando los Términos y la Política de Privacidad (versión actual: 1.1).
+5. Verifica tu email (recibirás un enlace de confirmación).
 
 **Opcion B — Google:**
 1. Haz clic en «Continuar con Google».
 2. Selecciona tu cuenta de Google.
-3. Listo, tu cuenta se crea automáticamente.
+3. Si es tu primer acceso, te llevamos a una pantalla para aceptar los Términos y la Política de Privacidad antes de entrar al app. Es una sola vez.
 
 **Opcion C — Empezar sin cuenta:**
 1. Ve a «Unirse» para empezar de forma anónima.
@@ -189,6 +190,13 @@ Desde la landing puedes hacer un test rápido y gratuito para identificar tu est
 - **Neutral:** sin un estado dominante definido
 
 El resultado se guarda en tu perfil y puedes recibir un email con los detalles y tu primer paso de acción.
+
+### Test del Eneagrama
+
+En `/profile/eneagrama` puedes hacer un test más profundo (90 preguntas) para identificar tu eneatipo. Tus respuestas individuales se guardan junto con el resultado, lo que nos permite afinar la interpretación con el tiempo.
+
+- Si ya conoces tu tipo, usa el botón «Ya conozco mi tipo» para declararlo sin responder las 90 preguntas.
+- Puedes borrar tu test en cualquier momento desde el botón «Borrar mi test» en la misma página (ejerces así tu derecho de borrado sobre estos datos).
 
 ---
 
@@ -413,9 +421,10 @@ En Ajustes puedes configurar:
 - **Contraseña:** cambiar tu contraseña actual
 - **Telegram:** vincular o desvincular tu cuenta
 - **Accesibilidad:** ajustes visuales (ver sección 20)
-- **Consentimiento:** gestión de tus datos y permisos
+- **Consentimiento:** gestión de tus datos y permisos. Verás la versión que aceptaste y la fecha; si publicamos una versión nueva, aparece un botón «Aceptar la versión X.X» para actualizarla en un clic.
 - **Cookies:** preferencias de cookies
 - **Exportar datos:** descarga toda tu información en JSON (datos completos) o CSV (historial de chat)
+- **Eliminar cuenta:** borrado completo de tu cuenta y datos asociados
 
 ---
 

@@ -4,6 +4,7 @@ import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { audit } from "@/lib/audit";
 import { sendUserEmail } from "@/lib/email";
+import { baseLayout } from "@/lib/email-layout";
 import { isSyntheticEmail } from "@/services/user";
 
 export const dynamic = "force-dynamic";
@@ -27,30 +28,31 @@ function escapeHtml(s: string): string {
     .replace(/'/g, "&#39;");
 }
 
-function renderEmailHtml(params: {
+export function renderEmailHtml(params: {
   subject: string;
   body: string;
-  trackingPixelUrl: string;
+  trackingPixelUrl?: string;
   openUrl: string;
 }): string {
   const paragraphs = params.body
     .split(/\n{2,}/)
-    .map((p) => `<p style="margin:0 0 16px;line-height:1.6;color:#18181b;">${escapeHtml(p).replace(/\n/g, "<br/>")}</p>`)
+    .map((p) => `<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#444">${escapeHtml(p).replace(/\n/g, "<br/>")}</p>`)
     .join("");
-  return `<!DOCTYPE html>
-<html><head><meta charset="utf-8"/><title>${escapeHtml(params.subject)}</title></head>
-<body style="margin:0;background:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  <div style="max-width:560px;margin:32px auto;padding:32px;background:#fff;border-radius:12px;border:1px solid #e4e4e7;">
-    <div style="font-size:12px;color:#71717a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Mensaje del equipo · Tres Mil Millones de Latidos</div>
-    <h1 style="font-size:20px;margin:0 0 20px;color:#09090b;">${escapeHtml(params.subject)}</h1>
-    ${paragraphs}
-    <div style="margin-top:24px;">
-      <a href="${params.openUrl}" style="display:inline-block;padding:10px 18px;background:#7c3aed;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;">Ver en la app</a>
-    </div>
-    <p style="margin-top:32px;font-size:12px;color:#a1a1aa;">Has recibido este mensaje porque tienes una cuenta en Tres Mil Millones de Latidos.</p>
-  </div>
-  <img src="${params.trackingPixelUrl}" alt="" width="1" height="1" style="display:none;"/>
-</body></html>`;
+  const trackingPixel = params.trackingPixelUrl
+    ? `<img src="${params.trackingPixelUrl}" alt="" width="1" height="1" style="display:none;"/>`
+    : "";
+  const composedBody = `
+            <p style="margin:0 0 8px;font-size:13px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Mensaje del equipo</p>
+            <h1 style="margin:0 0 20px;font-size:22px;font-weight:700;color:#111;line-height:1.3;letter-spacing:-0.3px">${escapeHtml(params.subject)}</h1>
+            ${paragraphs}
+            ${trackingPixel}`;
+  return baseLayout({
+    theme: "light",
+    header: "branded",
+    footer: "product",
+    body: composedBody,
+    cta: { href: params.openUrl, label: "Ver en la app" },
+  });
 }
 
 export async function POST(req: NextRequest, { params }: Params) {

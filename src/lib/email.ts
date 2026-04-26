@@ -127,6 +127,44 @@ export function buildVerificationEmail(params: {
   return { to, subject, html, text };
 }
 
+// ─── Password reset ──────────────────────────────────────────────────────────
+
+export function buildPasswordResetEmail(params: {
+  to: string;
+  resetUrl: string;
+  name?: string | null;
+}): UserEmail {
+  const { to, resetUrl, name } = params;
+  const greeting = name ? `Hola ${escapeHtml(name)}` : "Hola";
+
+  const subject = "Recupera tu acceso";
+
+  const text =
+    `${greeting},\n\n` +
+    `Recibimos una petición para restablecer tu contraseña.\n\n` +
+    `Haz clic en el enlace (válido 1 hora):\n${resetUrl}\n\n` +
+    `Si no pediste esto, ignora este mensaje.`;
+
+  const body = `
+            <p style="margin:0 0 16px;font-size:18px;color:#111;font-weight:600">${greeting},</p>
+            <p style="margin:0 0 8px;font-size:15px;color:#444;line-height:1.6">
+              Recibimos una petición para restablecer la contraseña de tu cuenta.
+            </p>
+            <p style="margin:24px 0 0;font-size:13px;color:#888;line-height:1.5">
+              El enlace caduca en 1 hora. Si no pediste esto, ignora este correo.
+            </p>`;
+
+  const html = baseLayout({
+    theme: "light",
+    header: "branded",
+    footer: "product",
+    body,
+    cta: { href: resetUrl, label: "Restablecer contraseña" },
+  });
+
+  return { to, subject, html, text };
+}
+
 // ─── Heartbeat Calculator Email ──────────────────────────────────────────────
 
 const AVG_BPM = 72;

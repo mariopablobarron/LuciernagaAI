@@ -138,6 +138,25 @@ const TEMPLATES: Record<string, TemplateBuilder> = {
   },
 };
 
+/**
+ * Renderiza una plantilla onboarding/quiz_followup para el panel admin
+ * de preview. NO envía nada, solo devuelve subject/html/text con los
+ * mismos datos que producirían un envío real (con `name` mock).
+ *
+ * Lanza si el id no existe en TEMPLATES — caller decide qué hacer.
+ */
+export function buildOnboardingPreviewEmail(
+  templateId: keyof typeof TEMPLATES | string,
+  name: string,
+): { subject: string; html: string; text: string } {
+  const builder = TEMPLATES[templateId as keyof typeof TEMPLATES];
+  if (!builder) {
+    throw new Error(`Onboarding template "${templateId}" no existe en TEMPLATES`);
+  }
+  const built = builder(name);
+  return { subject: built.subject, html: built.html, text: built.text };
+}
+
 // ─── Schedule onboarding sequence ────────────────────────────────────────────
 
 export async function scheduleOnboardingEmails(userId: string): Promise<void> {

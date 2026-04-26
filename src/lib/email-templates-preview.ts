@@ -11,6 +11,7 @@
 import type { UserEmail } from "@/lib/email";
 import {
   buildVerificationEmail,
+  buildPasswordResetEmail,
   buildWelcomeEmail,
   build24hNudgeEmail,
   build7dNudgeEmail,
@@ -26,6 +27,9 @@ import {
   buildFamilyInactivityEmail,
   buildFamilyWinEmail,
 } from "@/lib/email";
+import { buildOnboardingPreviewEmail } from "@/services/onboarding-emails";
+import { buildWeeklyInactiveReminderEmail } from "@/app/api/cron/weekly-inactive-reminder/route";
+import { renderEmailHtml as renderAdminMessageHtml } from "@/app/api/admin/users/[id]/messages/route";
 
 type PreviewOutput = Pick<UserEmail, "subject" | "html" | "text">;
 type PreviewBuilder = (ctx: { appUrl: string; to: string }) => PreviewOutput;
@@ -39,6 +43,43 @@ export const PREVIEW_REGISTRY: Record<string, PreviewBuilder> = {
       verifyUrl: `${appUrl}/api/auth/verify-email?token=preview-token-1234`,
       name: MOCK_NAME,
     }),
+
+  password_reset: ({ appUrl, to }) =>
+    buildPasswordResetEmail({
+      to,
+      resetUrl: `${appUrl}/reset-password?token=preview-reset-token-1234`,
+      name: MOCK_NAME,
+    }),
+
+  onboarding_day1: () => buildOnboardingPreviewEmail("onboarding_day1", MOCK_NAME),
+  onboarding_day3: () => buildOnboardingPreviewEmail("onboarding_day3", MOCK_NAME),
+  onboarding_day7: () => buildOnboardingPreviewEmail("onboarding_day7", MOCK_NAME),
+  quiz_followup_day3: () => buildOnboardingPreviewEmail("quiz_followup_day3", MOCK_NAME),
+
+  weekly_inactive: () =>
+    buildWeeklyInactiveReminderEmail({
+      name: MOCK_NAME,
+      daysSinceLastSeen: 9,
+      lastGoalTitle: "Encontrar 30 minutos al día para escribir",
+      streakDays: 5,
+    }),
+
+  admin_message: ({ appUrl }) => {
+    const subject = "Una nota personal de tu mentor";
+    const adminBody =
+      "Mario, he estado revisando tu última semana y quería decirte algo en persona.\n\n" +
+      "Lo que estás haciendo no es poco. Cinco días de seguimiento honesto cuando estás cansado vale más que veinte cuando todo va bien. Solo quería que lo supieras.\n\n" +
+      "Cualquier cosa que necesites, escríbeme aquí mismo.";
+    return {
+      subject,
+      html: renderAdminMessageHtml({
+        subject,
+        body: adminBody,
+        openUrl: `${appUrl}/app/mensajes/preview-msg-id`,
+      }),
+      text: `${subject}\n\n${adminBody}\n\nAbrir en la app: ${appUrl}/app/mensajes/preview-msg-id`,
+    };
+  },
 
   welcome: ({ appUrl }) =>
     buildWelcomeEmail({ name: MOCK_NAME, appUrl }),

@@ -1,8 +1,8 @@
-// Smoke tests del email builder del 7d-nudge.
+// Smoke tests de email builders (7d-nudge, password_reset, verification).
 // build24hNudgeEmail no se testea aquí porque ya está en producción y no
 // queremos cambiar comportamiento existente sin tests previos.
 
-import { build7dNudgeEmail } from "./email";
+import { build7dNudgeEmail, buildPasswordResetEmail, buildVerificationEmail } from "./email";
 
 describe("build7dNudgeEmail", () => {
   const APP_URL = "https://tresmilmillonesdelatidos.es";
@@ -80,5 +80,97 @@ describe("build7dNudgeEmail", () => {
     });
     expect(email.text).toContain("hola mundo adiós");
     expect(email.text).not.toContain("hola    mundo");
+  });
+});
+
+describe("buildPasswordResetEmail", () => {
+  const APP_URL = "https://tresmilmillonesdelatidos.es";
+
+  it("usa el subject 'Recupera tu acceso'", () => {
+    const email = buildPasswordResetEmail({
+      to: "user@example.com",
+      resetUrl: `${APP_URL}/reset-password?token=abc`,
+      name: "Mario",
+    });
+    expect(email.subject).toBe("Recupera tu acceso");
+  });
+
+  it("incluye el resetUrl como CTA", () => {
+    const url = `${APP_URL}/reset-password?token=xyz123`;
+    const email = buildPasswordResetEmail({ to: "u@x.com", resetUrl: url, name: null });
+    expect(email.html).toContain(url);
+    expect(email.text).toContain(url);
+  });
+
+  it("personaliza el saludo con el nombre", () => {
+    const email = buildPasswordResetEmail({
+      to: "u@x.com",
+      resetUrl: `${APP_URL}/r?t=1`,
+      name: "Lucía",
+    });
+    expect(email.text).toContain("Hola Lucía");
+    expect(email.html).toContain("Hola Lucía");
+  });
+
+  it("usa saludo genérico si no hay nombre", () => {
+    const email = buildPasswordResetEmail({
+      to: "u@x.com",
+      resetUrl: `${APP_URL}/r?t=1`,
+      name: null,
+    });
+    expect(email.text).toContain("Hola,");
+    expect(email.html).toContain("Hola,");
+    expect(email.text).not.toMatch(/Hola \w/);
+  });
+
+  it("menciona la caducidad de 1 hora", () => {
+    const email = buildPasswordResetEmail({
+      to: "u@x.com",
+      resetUrl: `${APP_URL}/r?t=1`,
+      name: null,
+    });
+    expect(email.text).toMatch(/válido 1 hora/i);
+    expect(email.html).toMatch(/caduca en 1 hora/i);
+  });
+
+  it("incluye footer estándar (acompaña — no sustituye)", () => {
+    const email = buildPasswordResetEmail({
+      to: "u@x.com",
+      resetUrl: `${APP_URL}/r?t=1`,
+      name: null,
+    });
+    expect(email.html).toContain("acompaña");
+    expect(email.html).toContain("no sustituye");
+  });
+});
+
+describe("buildVerificationEmail", () => {
+  const APP_URL = "https://tresmilmillonesdelatidos.es";
+
+  it("usa subject estándar con marca", () => {
+    const email = buildVerificationEmail({
+      to: "u@x.com",
+      verifyUrl: `${APP_URL}/verify?t=1`,
+    });
+    expect(email.subject).toBe("Verifica tu email — Tres Mil Millones de Latidos");
+  });
+
+  it("incluye el verifyUrl en CTA", () => {
+    const url = `${APP_URL}/api/auth/verify-email?token=tok123`;
+    const email = buildVerificationEmail({ to: "u@x.com", verifyUrl: url });
+    expect(email.html).toContain(url);
+    expect(email.text).toContain(url);
+  });
+
+  it("escapa el nombre para evitar HTML injection", () => {
+    const email = buildVerificationEmail({
+      to: "u@x.com",
+      verifyUrl: `${APP_URL}/v?t=1`,
+      name: "<script>alert('xss')</script>",
+    });
+    // El html no debe contener el tag script ejecutable
+    expect(email.html).not.toContain("<script>alert");
+    // Sí debe contener la versión escapada
+    expect(email.html).toContain("&lt;script&gt;");
   });
 });

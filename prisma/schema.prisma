@@ -186,6 +186,11 @@ model Message {
   role           String       @default("user") // "user" | "assistant"
   content        String
   createdAt      DateTime     @default(now())
+  /// Embedding semántico (text-embedding-3-small, 1536 dims). Vacío hasta que
+  /// el cron `/api/cron/embed-pending-messages` lo rellene. Sin pgvector:
+  /// Float[] nativo + coseno calculado en aplicación.
+  embedding      Float[]      @default([])
+  embeddedAt     DateTime?
   user           User?        @relation("UserMessages", fields: [userId], references: [id], onDelete: Cascade)
   conversation   Conversation @relation("ConversationMessages", fields: [conversationId], references: [id], onDelete: Cascade)
 

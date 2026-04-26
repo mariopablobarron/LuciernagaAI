@@ -126,6 +126,18 @@ export type CoachContext = {
   // Modula el TONO y el tipo de pregunta del mentor — nunca se etiqueta al
   // usuario explícitamente con su tipo a menos que él lo mencione.
   enneagramType?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | null;
+  // Mensajes pasados del usuario semánticamente similares al actual.
+  // Top-3 con score coseno >= 0.55, calculados por src/services/semanticMemory.ts.
+  // Permite al mentor reconocer patrones recurrentes ("ya hablamos de esto…")
+  // sin obligarle a hacerlo explícito.
+  semanticMemory?: {
+    echoes: Array<{
+      content: string;
+      role: "user" | "assistant";
+      daysAgo: number;
+      score: number;
+    }>;
+  } | null;
 };
 
 type ResponseFinalizationContext = {
@@ -464,6 +476,16 @@ export function buildCoachPrompt(
   const conversationSummaryGuidance = context.conversationSummary
     ? `Resumen de la conversación hasta ahora (turnos anteriores a los visibles abajo, úsalo para recordar nombres, decisiones y arcos): ${context.conversationSummary}`
     : "";
+
+  // Memoria semántica: mensajes históricos del usuario parecidos al actual.
+  // Pasivo — el mentor decide si los referencia o no. NO obligar a citar.
+  const semanticMemoryGuidance = context.semanticMemory && context.semanticMemory.echoes.length > 0
+    ? `Mensajes pasados del usuario semánticamente cercanos al actual (de otras conversaciones; puedes reconocer el patrón si encaja, sin nombrar literalmente que "lo dijo antes"):
+${context.semanticMemory.echoes
+  .map((e) => `- (hace ${e.daysAgo}d, ${e.role === "user" ? "él/ella" : "tú"}): "${e.content}"`)
+  .join("\n")}
+Úsalo para reconocer recurrencias o cerrar arcos. NO siempre toca mencionarlo: si no aporta, ignóralo.`
+    : "";
   const welcomeOnboardingGuidance = context.welcomeOnboarding
     ? buildOnboardingPromptBlock(context.welcomeOnboarding)
     : "";
@@ -552,6 +574,7 @@ No se pudo verificar información externa suficiente. No afirmes datos actuales 
     enneagramGuidance,
     extendedIntentGuidance,
     conversationSummaryGuidance,
+    semanticMemoryGuidance,
     transformationGuidance,
     legalGuidance,
     accessGuidance,

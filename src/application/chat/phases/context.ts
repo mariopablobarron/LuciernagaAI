@@ -16,6 +16,7 @@ import { listRecentImpulseLogs } from "@/services/impulse-challenges";
 import { buildJourneyPromptBlock } from "@/services/journey-coach-bridge";
 import { buildProjectPromptBlock } from "@/services/project-coach-bridge";
 import { detectExtendedIntents } from "@/services/extendedIntents";
+import { findSimilarMessages } from "@/services/semanticMemory";
 import { getPrismaClient } from "@/db/prisma";
 import type { OnboardingPayload } from "@/lib/onboarding-archetypes";
 import {
@@ -145,6 +146,16 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
       ? userPrefs.genderForm
       : null;
 
+  // ── Memoria semántica (mensajes pasados similares) ──────────────────────
+  // Top-3 mensajes históricos del usuario semánticamente cercanos al actual.
+  // Solo si OPENAI_API_KEY existe; si no, devuelve [] silencioso. Usa últimos
+  // 500 mensajes embebidos del usuario, calcula coseno en memoria. Excluye
+  // los últimos 5 min para no repetir el contexto vivo.
+  const semanticEchoes = await findSimilarMessages(userId, message, {
+    topK: 3,
+    excludeConversationId: input.conversationId,
+  });
+
   // ── Action defaults ─────────────────────────────────────────────────────
   const activeAction = getFirstPendingAction(activeGoal);
   const defaultAction = activeGoal
@@ -198,6 +209,16 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
         : null,
     extendedIntent: detectExtendedIntents(message),
     conversationSummary: input.conversationSummary ?? null,
+    semanticMemory: semanticEchoes.length > 0
+      ? {
+          echoes: semanticEchoes.map((m) => ({
+            content: m.content.slice(0, 280),
+            role: m.role,
+            daysAgo: Math.max(0, Math.floor((Date.now() - m.createdAt.getTime()) / 86400000)),
+            score: Number(m.score.toFixed(3)),
+          })),
+        }
+      : null,
   };
 
   logInfo("AI", "openrouter_call_requested", {

@@ -98,6 +98,11 @@ export type CoachContext = {
   // - "neutral" / null → evita conjugaciones de género ("estás teniendo un momento difícil")
   // Se carga desde UserPreferences.genderForm.
   userGender?: "feminine" | "masculine" | "neutral" | null;
+  // Reformulación contextual del mensaje cuando el original era ambiguo
+  // (referencias tipo "eso", "y por qué", etc.). Se inyecta en el system
+  // prompt como pista para resolver pronombres referenciales sin pisar el
+  // mensaje original que ve el usuario. Generada en phases/reformulate.ts.
+  contextualInterpretation?: string | null;
 };
 
 type ResponseFinalizationContext = {
@@ -368,6 +373,13 @@ export function buildCoachPrompt(
     ? `Modo de acompañamiento elegido por el usuario: "${context.accompanimentMode.label}". ${context.accompanimentMode.instruction}`
     : "";
 
+  // Pista contextual cuando el mensaje original era ambiguo (referencias
+  // pronominales, "y por qué?", "lo que dije antes"). NO sustituye al
+  // mensaje del usuario — es una interpretación complementaria.
+  const contextualInterpretationGuidance = context.contextualInterpretation
+    ? `\n\nInterpretación contextual del último mensaje del usuario (úsala solo si te ayuda a entender la referencia; el mensaje original sigue siendo la fuente de verdad):\n"${context.contextualInterpretation}"`
+    : "";
+
   const goalContext = context.goal
     ? `
 
@@ -439,6 +451,7 @@ No se pudo verificar información externa suficiente. No afirmes datos actuales 
     journeyGuidance,
     projectGuidance,
     accompanimentGuidance,
+    contextualInterpretationGuidance,
   ].filter(Boolean);
 
   return `${sections.join("\n\n")}

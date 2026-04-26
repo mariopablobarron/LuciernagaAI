@@ -2,6 +2,7 @@ import { analyzeMessage } from "./phases/analyze";
 import { enrichContext } from "./phases/enrich";
 import { buildContext } from "./phases/context";
 import { interceptActionLock, interceptCrisis, interceptTransitionalVoid } from "./phases/intercept";
+import { reformulateMessage } from "./phases/reformulate";
 import { logError, logInfo } from "@/lib/logger";
 import { generateAIResponse, streamOpenRouterTokens } from "@/services/ai";
 import { generateImpulseResponse } from "@/services/impulse-ai";
@@ -180,6 +181,17 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     void autoDetectAndSaveGender({ userId, message }).catch(() => {});
   }
 
+  // ── 6.5. History-aware reformulation (mensajes ambiguos) ───────────────
+  // Si el mensaje del usuario es corto/ambiguo (referencias tipo "eso",
+  // "y por qué"), pedimos al LLM una versión autocontenida que se inyecta
+  // como pista en el system prompt. Fire-and-forget seguro: si falla,
+  // seguimos con el flujo normal.
+  const reformulation = await reformulateMessage({
+    message,
+    history: conversationHistory,
+    userId,
+  });
+
   // ── 7-8. Build context (Phase 4: Context) ─────────────────────────────
   const ctx = await buildContext({
     userId,
@@ -209,12 +221,15 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
   // El cliente NO prefija el mensaje con la instrucción, se envía por id en
   // `mentorModeId` y lo resolvemos aquí. Nunca se muestra al usuario.
   const accompaniment = getAccompanimentMode(input.mentorModeId ?? null);
-  const coachContext = accompaniment
-    ? {
-        ...baseCoachContext,
-        accompanimentMode: { label: accompaniment.label, instruction: accompaniment.instruction },
-      }
-    : baseCoachContext;
+  const coachContext = {
+    ...baseCoachContext,
+    ...(accompaniment
+      ? { accompanimentMode: { label: accompaniment.label, instruction: accompaniment.instruction } }
+      : {}),
+    ...(reformulation.reformulated && reformulation.standalone
+      ? { contextualInterpretation: reformulation.standalone }
+      : {}),
+  };
 
   // ── 9. Impulse mode (non-streaming JSON) ──────────────────────────────
   if (impulseProfile) {

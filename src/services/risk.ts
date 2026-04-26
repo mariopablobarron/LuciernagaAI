@@ -60,24 +60,74 @@ type CrisisEventDelegate = {
   >;
 };
 
+// Patrones de detección de riesgo. La sensibilidad es ALTA por diseño:
+// preferimos falsos positivos (alerta innecesaria) a falsos negativos
+// (perder un caso real). En mental health la asimetría justifica el trade-off.
+//
+// IMPORTANTE para futuras ediciones:
+// - Texto se normaliza con normalizeText() (lowercase + strip de tildes).
+//   Por eso las regex NO usan tildes ni mayúsculas.
+// - Cubrir variantes: typos comunes (kero/kiero), inglés básico (mucho usuario
+//   escribe "kill myself" o "i wanna die"), conjugaciones (singular/plural,
+//   m/f), eufemismos clínicamente conocidos.
+// - Los patrones se evalúan en orden CRITICAL → HIGH → MEDIUM y se devuelve
+//   el primero que matchee. Si dudas dónde meter algo nuevo, prefiere subir el
+//   nivel (high es seguro; low se le escapa al intercept).
+
 const CRITICAL_PATTERNS: RegExp[] = [
-  /\b(me quiero matar|quiero matarme|quiero morir|no quiero vivir)\b/,
-  /\b(suicid(a|io)|autolesion|autolesionarme|hacerme daño|hacerme dano)\b/,
-  /\b(matar a alguien|hacer daño a otros|hacer dano a otros)\b/,
-  /\b(esta noche termino todo|hoy termino todo|me voy a quitar la vida)\b/,
+  // Intencionalidad explícita (ES)
+  /\b(me quiero matar|me kiero matar|kero matarme|quiero matarme|quiero morir|kero morir|no quiero vivir|no kiero vivir)\b/,
+  /\b(voy a matarme|me voy a matar|me mato|me matare)\b/,
+  /\b(suicid(a|io|arme|armi)|autolesion|autolesionarme|hacerme dano|hacerme daño)\b/,
+  /\b(matar a alguien|matarlos a todos|hacer dano a otros|hacer daño a otros)\b/,
+  // Inminencia / temporalidad concreta
+  /\b(esta noche termino todo|hoy termino todo|hoy acabo con todo|esta noche acabo con todo)\b/,
+  /\b(me voy a quitar la vida|me quito la vida|me voy a quitar de en medio)\b/,
+  /\b(voy a acabar con (todo|mi vida|esto|conmigo))\b/,
+  /\b(acabar conmigo|acabar con mi vida|terminar con mi vida|terminar con todo ya)\b/,
+  // Plan / método concreto (instrumentalidad)
+  /\b(tengo (las |el )?(pastillas|cuchillo|cuerda|pistola|navaja) (lista|listas|listo|preparada|preparado))\b/,
+  /\b(ya tengo (decidido|el plan|todo planeado|fecha))\b/,
+  /\b(tomar(e)? una decision final|hacer lo que tengo que hacer)\b/,
+  // Inglés básico (usuarios bilingües / mensajes mixtos)
+  /\b(kill myself|killing myself|i wanna die|i want to die|end my life|ending my life|commit suicide)\b/,
+  /\b(suicide note|suicide plan|i'?m going to end it|suicidal thoughts|suicidal ideation|thinking about suicide|suicide tonight|suicide today)\b/,
 ];
 
 const HIGH_PATTERNS: RegExp[] = [
-  /\b(no puedo más|no puedo mas|no aguanto|estoy al límite|estoy al limite)\b/,
-  /\b(todo da igual|nada tiene sentido|no tiene sentido seguir)\b/,
-  /\b(quiero desaparecer|me quiero ir para siempre)\b/,
-  /\b(me odio|odio mi vida)\b/,
+  // Desesperanza profunda
+  /\b(no puedo mas|no puedo más|no aguanto mas|no aguanto más|no aguanto nada|estoy al limite|estoy al límite)\b/,
+  /\b(todo da igual|nada tiene sentido|no tiene sentido seguir|no le encuentro sentido a nada)\b/,
+  /\b(no merece la pena (seguir|vivir)|no vale la pena (seguir|vivir|nada)|para que (seguir|vivir|levantarme))\b/,
+  /\b(ya nada (importa|tiene valor)|nada (vale|sirve) ya|nada me llena)\b/,
+  // Ideación pasiva (no querer estar, eufemismos clínicos comunes)
+  /\b(quiero desaparecer|me quiero (ir|marchar) para siempre|quiero irme para siempre)\b/,
+  /\b(ojala no (despertara|despierte|estuviera) (manana|mañana|aqui|aquí))\b/,
+  /\b(no me importaria no (estar|despertar|seguir))\b/,
+  /\b(seria mejor (no haber nacido|estar muerto|que no existiera|si yo no estuviera|para todos si yo))\b/,
+  /\b(no quiero seguir (aqui|aquí|asi|así|viviendo|vivo|sintiendo esto))\b/,
+  /\b(quiero que (esto|todo) termine ya)\b/,
+  /\b(a veces pienso en (desaparecer|no estar|quitarme))\b/,
+  // Auto-rechazo intenso
+  /\b(me odio|odio mi vida|odio existir|odio ser yo)\b/,
+  /\b(soy una carga|soy un estorbo|el mundo (estaria|estaría) mejor sin mi|todos estarian mejor sin mi)\b/,
+  // Estados de "muerto en vida"
+  /\b(estoy roto[a]? por dentro|muerto en vida|estoy muerto[a]? por dentro|me siento vacio[a]? del todo)\b/,
+  /\b(estoy harto[a]? de (la vida|todo|seguir|existir|vivir))\b/,
+  /\b(dolor (insoportable|inaguantable|intolerable))\b/,
+  // Inglés básico
+  /\b(can'?t go on|can'?t take it anymore|nothing matters|i hate my life|i hate myself|i'?m broken inside)\b/,
 ];
 
 const MEDIUM_PATTERNS: RegExp[] = [
-  /\b(me siento hundid[oa]|estoy muy mal|me sobrepasa)\b/,
-  /\b(ansiedad muy fuerte|ataque de ansiedad|panico)\b/,
-  /\b(no veo salida|estoy desbordad[oa]|me siento roto)\b/,
+  /\b(me siento hundid[oa]|estoy muy mal|estoy fatal|me sobrepasa|me supera todo)\b/,
+  /\b(ansiedad muy fuerte|ataque de ansiedad|ataque de panico|panico)\b/,
+  /\b(no veo (salida|luz)|estoy desbordad[oa]|me siento rot[oa])\b/,
+  /\b(siento que me ahogo|me asfixia (todo|esto|la vida)|no puedo respirar)\b/,
+  /\b(lloro sin parar|llevo dias llorando|no paro de llorar)\b/,
+  /\bno (como|duermo)( nada| bien| apenas| casi nada)?\s+(hace|desde|desde hace)\s+(dias|días|semanas|meses)\b/,
+  /\b(me siento vacio[a]?|tengo miedo de mi mismo[a]?|tengo miedo de hacer algo)\b/,
+  // Dependencia emocional patológica
   /\b(no puedo vivir sin (el|ella|ti)|sin (el|ella|ti) no soy nada)\b/,
   /\b(dependo completamente de|necesito que (me quiera|este conmigo|no me deje))\b/,
   /\b(si me deja me muero|sin (el|ella) no tengo sentido)\b/,

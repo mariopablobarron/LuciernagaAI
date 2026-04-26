@@ -155,6 +155,14 @@ export async function interceptActionLock(input: InterceptInput): Promise<Interc
 export async function interceptCrisis(input: InterceptInput): Promise<InterceptResult> {
   if (!input.crisisMode) return { intercepted: false };
 
+  // BUMPING INTENCIONAL: si crisisMode es true (señal de crisis activada por
+  // CUALQUIER fuente — risk.ts regex, palabras safety en webhook telegram,
+  // crisisActiveUntil persistente, etc.) y el riskLevel local es < high,
+  // forzamos a "high" para garantizar respuesta de contención y CORTAR el flow
+  // normal (continueChat=false). Asimetría intencional: preferimos falso
+  // positivo de severidad antes que dejar a un usuario en crisis con respuesta
+  // tipo "low/medium" que sigue el chat normal. Si en el futuro queremos modo
+  // intermedio (Operational Emergency Mode), el cambio va aquí.
   const containmentLevel: RiskLevel = input.riskLevel === "high" || input.riskLevel === "critical"
     ? input.riskLevel
     : "high";

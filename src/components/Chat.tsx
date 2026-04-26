@@ -40,6 +40,7 @@ import { Button } from "@/components/ui/button";
 
 import { Textarea } from "@/components/ui/textarea";
 import { VoiceRecorder } from "@/components/ui/voice-recorder";
+import { TeamLetterCta } from "@/components/TeamLetterCta";
 import { AudioRecorder } from "@/components/ui/audio-recorder";
 import { SpeakButton } from "@/components/ui/speak-button";
 import { CHAT_STARTER_PICKS, MENTOR_MODES, getMentorMode } from "@/lib/onboarding";
@@ -136,6 +137,11 @@ export type ChatProps = {
   }>;
   /** Called when the user taps a chip with kind="complete". */
   onCompletePendingAction?: () => void;
+  /** Habilita el CTA de "carta del equipo". Se muestra tras 3 turnos del user. */
+  teamLetter?: {
+    isAnonymous: boolean;
+    defaultEmail?: string;
+  };
 };
 
 // ─── Starter prompts ──────────────────────────────────────────────────────────
@@ -646,6 +652,7 @@ export default function Chat({
   onSelectMentorMode,
   suggestedActions,
   onCompletePendingAction,
+  teamLetter,
 }: ChatProps) {
   const activeMentorMode = getMentorMode(mentorModeId ?? null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -1017,6 +1024,20 @@ export default function Chat({
                   </button>
                 ))}
               </div>
+            )}
+
+            {/* Team-letter CTA — tras 3+ turnos del user, ofrece una carta humana
+                 personalizada del equipo. Razón de retención del primer día. */}
+            {!loading && !streamingMessageId && teamLetter && (
+              <TeamLetterCta
+                userTurnsCount={messages.filter((m) => m.role === "user").length}
+                isAnonymous={teamLetter.isAnonymous}
+                defaultEmail={teamLetter.defaultEmail}
+                lastUserMessage={
+                  [...messages].reverse().find((m) => m.role === "user")?.content
+                }
+                conversationId={conversationId}
+              />
             )}
 
             {/* Community CTA — shown when mentor detects a recurrent pattern

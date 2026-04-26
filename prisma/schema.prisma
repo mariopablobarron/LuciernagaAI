@@ -141,6 +141,7 @@ model User {
   usageSessions             UsageSession[]
   adminMessages             AdminMessage[]
   weeklyLetters             WeeklyLetter[]
+  teamLetterRequests        TeamLetterRequest[]
   dailyRoundResponses       DailyRoundResponse[]
   dailyRoundReactions       DailyRoundReaction[]
   dailyRoundMirrors         DailyRoundMirror[]
@@ -2087,4 +2088,27 @@ model CustomTracker {
   updatedAt  DateTime @updatedAt
 
   @@index([isActive, provider])
+}
+
+/// Solicitud de "carta humana" del equipo. Aparece como CTA en el chat tras
+/// 3 turnos del usuario para dar un motivo tangible de volver: alguien del
+/// equipo lee tu hilo y te escribe una recomendación personal por email.
+/// El admin la responde manualmente desde /admin/team-letters.
+model TeamLetterRequest {
+  id            String    @id @default(cuid())
+  userId        String
+  email         String // snapshot al momento de pedirla (puede que user.email cambie)
+  status        String    @default("pending") // "pending" | "sent" | "rejected"
+  /// Snapshot del contexto al pedirla: dominantPattern, primeros mensajes,
+  /// onboardingContext, latidos, messageCount. Lo guardamos al momento porque
+  /// la conversación puede evolucionar antes de que el equipo escriba.
+  context       Json?
+  requestedAt   DateTime  @default(now())
+  sentAt        DateTime?
+  sentByAdminId String?
+  notes         String? // borrador interno o notas del admin
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status, requestedAt])
+  @@index([userId, requestedAt])
 }

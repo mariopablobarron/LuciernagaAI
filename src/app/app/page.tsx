@@ -2016,6 +2016,14 @@ export default function HomePage() {
                       ? () => void handleToggleAction(pendingGoalAction.id, true)
                       : undefined
                   }
+                  teamLetter={
+                    sessionProfile
+                      ? {
+                          isAnonymous: sessionProfile.isAnonymous,
+                          defaultEmail: sessionProfile.isAnonymous ? undefined : sessionProfile.email,
+                        }
+                      : undefined
+                  }
                 />
               </div>
             }

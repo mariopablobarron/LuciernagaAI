@@ -329,6 +329,7 @@ type CrisisAlert       = { tipo: "crisis";          userId: string; crisisLevel:
 type StreakAlert        = { tipo: "streak_milestone"; userId: string; streakDays: number };
 type PaymentAlert      = { tipo: "payment";         userId: string; email: string; plan: string; status: string; amount: string };
 type CancellationAlert = { tipo: "cancellation";    userId: string; email: string; subscriptionId: string };
+type TeamLetterAlert   = { tipo: "team_letter_request"; userId: string; email: string; dominantPattern?: string | null; lastMessage?: string };
 
 export type AdminAlertInput =
   | NewUserAlert
@@ -339,7 +340,8 @@ export type AdminAlertInput =
   | CrisisAlert
   | StreakAlert
   | PaymentAlert
-  | CancellationAlert;
+  | CancellationAlert
+  | TeamLetterAlert;
 
 // Human-readable labels for explore action types
 const ACTION_LABELS: Record<string, string> = {
@@ -476,6 +478,20 @@ export function buildAdminAlert(input: AdminAlertInput): string {
         `👤 \`${input.userId}\`\n` +
         `🔑 Sub: \`${input.subscriptionId}\`\n` +
         `🕐 ${new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" })}`
+      );
+
+    case "team_letter_request":
+      return (
+        `💌💌💌💌💌💌💌💌💌💌\n` +
+        `*CARTA DEL EQUIPO SOLICITADA*\n` +
+        `💌💌💌💌💌💌💌💌💌💌\n\n` +
+        `📧 *${input.email}*\n` +
+        `👤 \`${input.userId}\`\n` +
+        (input.dominantPattern ? `🧩 Patrón: *${input.dominantPattern}*\n` : "") +
+        (input.lastMessage ? `💬 _"${input.lastMessage.slice(0, 140)}"_\n` : "") +
+        `${userVia(input.userId)}\n` +
+        `🕐 ${new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" })}\n` +
+        `\n_Responde desde /admin/team-letters_`
       );
   }
 }

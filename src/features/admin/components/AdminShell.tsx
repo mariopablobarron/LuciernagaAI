@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BarChart3, BellRing, Bot, BookOpen, Building2, CircleDot, Coffee, FlaskConical, LayoutDashboard, LogOut,
-  Megaphone, Menu, Settings, Shield, ShieldCheck, Sparkles, Stethoscope,
+  Mail, Megaphone, Menu, Settings, Shield, ShieldCheck, Sparkles, Stethoscope,
   StickyNote, Users, Webhook, Wrench, X, Database, Activity, FileText, Bell,
 } from "lucide-react";
 
@@ -30,6 +30,7 @@ const NAV_LINKS = [
   { href: "/admin/organizations", label: "Organizaciones", icon: Building2 },
   { href: "/admin-clinical", label: "Panel clínico", icon: Stethoscope, matchPrefix: true },
   { href: "/admin/operaciones", label: "Operaciones", icon: Wrench },
+  { href: "/admin/team-letters", label: "Cartas del equipo", icon: Mail, matchPrefix: true },
   { href: "/admin/routines", label: "Agentes programados", icon: Bot },
   { href: "/admin/status", label: "Estado sistema", icon: Activity },
   { href: "/admin/audit", label: "Audit Log", icon: Sparkles },

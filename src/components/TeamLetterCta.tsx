@@ -42,6 +42,9 @@ export function TeamLetterCta({
   const [error, setError] = useState<string | null>(null);
 
   // Solo decidimos visibilidad en cliente para no parpadear durante hidratación.
+  // Si la conversación ya tiene una solicitud confirmada en una sesión anterior,
+  // NO volvemos a mostrar el banner verde — sólo lo enseñamos justo después de
+  // confirmar para dar feedback inmediato y luego se auto-oculta.
   useEffect(() => {
     if (!conversationId) return;
     if (userTurnsCount < MIN_TURNS) return;
@@ -49,7 +52,6 @@ export function TeamLetterCta({
       const flag = localStorage.getItem(STORAGE_PREFIX + conversationId);
       if (flag === "dismissed" || flag === "sent") {
         setHidden(true);
-        if (flag === "sent") setDone(true);
       } else {
         setHidden(false);
       }
@@ -57,6 +59,19 @@ export function TeamLetterCta({
       setHidden(false);
     }
   }, [conversationId, userTurnsCount]);
+
+  // Auto-ocultar el banner verde "Anotado…" tras 6 s para que no quede pegado
+  // en cada turno posterior del chat (bug visual: el usuario percibía que el
+  // mensaje "volvía a salir" en cada respuesta, cuando en realidad nunca se
+  // había desmontado).
+  useEffect(() => {
+    if (!done) return;
+    const t = setTimeout(() => {
+      setDone(false);
+      setHidden(true);
+    }, 6000);
+    return () => clearTimeout(t);
+  }, [done]);
 
   const persist = useCallback(
     (state: "dismissed" | "sent") => {

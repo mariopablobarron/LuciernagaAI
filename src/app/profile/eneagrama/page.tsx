@@ -255,6 +255,9 @@ export default function EnneagramPage() {
             style={{ width: `${progress}%` }}
           />
         </div>
+        <p className="mt-2 text-[11px] text-zinc-500">
+          Tu progreso se guarda automáticamente en este dispositivo. Puedes cerrar y volver cuando quieras.
+        </p>
       </div>
 
       <ol className="space-y-5">

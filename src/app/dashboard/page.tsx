@@ -10,13 +10,12 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
-  Trophy,
   MessageCircle,
   Sparkles,
   Target,
 } from "lucide-react";
 import type { UserState } from "@/domain/types";
-import Milestones from "@/components/Milestones";
+import TuCamino from "@/components/TuCamino";
 import RealityLens from "@/components/effects/RealityLens";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -176,7 +175,7 @@ export default function DashboardPage() {
         {/* ── Header ───────────────────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-white">Tu progreso</h1>
+            <h1 className="text-3xl font-bold text-white">Tu acompañamiento</h1>
             <p className="text-zinc-500 text-sm capitalize mt-0.5">{today}</p>
           </div>
           <Link
@@ -189,9 +188,9 @@ export default function DashboardPage() {
         </div>
 
         {/* ── Metrics Row ──────────────────────────────────────────── */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {loading ? (
-            Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24" />)
+            Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24" />)
           ) : (
             <>
               {/* State */}
@@ -207,55 +206,22 @@ export default function DashboardPage() {
                 <p className="text-[10px] text-zinc-600 leading-snug mt-1">Tu estado cambia segun lo que escribes. El mentor adapta su tono y sus preguntas a como estas.</p>
               </div>
 
-              {/* Streak ring */}
+              {/* Constancia — espejo, no meta */}
               <div className="card-surface p-4 space-y-2">
-                <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide">Racha</p>
-                <div className="flex items-center gap-3">
-                  <div className="relative w-12 h-12 shrink-0">
-                    <svg className="w-12 h-12 -rotate-90" viewBox="0 0 48 48">
-                      <circle cx="24" cy="24" r="20" fill="none" stroke="#27272a" strokeWidth="4" />
-                      <circle
-                        cx="24" cy="24" r="20" fill="none"
-                        stroke="url(#streakGrad)"
-                        strokeWidth="4"
-                        strokeLinecap="round"
-                        strokeDasharray={`${2 * Math.PI * 20}`}
-                        strokeDashoffset={`${2 * Math.PI * 20 * (1 - Math.min((stateData?.streakDays ?? 0), 21) / 21)}`}
-                        className="transition-all duration-700"
-                      />
-                      <defs>
-                        <linearGradient id="streakGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                          <stop offset="0%" stopColor="#f59e0b" />
-                          <stop offset="100%" stopColor="#f97316" />
-                        </linearGradient>
-                      </defs>
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-xs font-bold text-white">{stateData?.streakDays ?? 0}</span>
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-white">{stateData?.streakDays ?? 0} días</p>
-                    <p className="text-xs text-zinc-600">meta: 21</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Progress */}
-              <div className="card-surface p-4 space-y-2">
-                <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide">Progreso</p>
-                <p className="text-2xl font-bold bg-linear-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                  {stateData?.progress ?? 0}%
+                <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide">Constancia</p>
+                <p className="text-sm text-zinc-300 leading-snug">
+                  {(stateData?.streakDays ?? 0) === 0
+                    ? "Aún no has vuelto este mes."
+                    : (stateData?.streakDays ?? 0) === 1
+                    ? "Has vuelto un día."
+                    : `Has vuelto ${stateData?.streakDays} días.`}
                 </p>
-                <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-linear-to-r from-violet-500 to-fuchsia-500 transition-all"
-                    style={{ width: `${stateData?.progress ?? 0}%` }}
-                  />
-                </div>
+                <p className="text-[11px] text-zinc-600 leading-snug">
+                  No hay racha que mantener. Vuelve cuando lo necesites.
+                </p>
               </div>
 
-              {/* Trend */}
+              {/* Tendencia */}
               <div className="card-surface p-4 space-y-2">
                 <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide">Tendencia</p>
                 <div className="flex items-center gap-2">
@@ -266,9 +232,6 @@ export default function DashboardPage() {
                 </div>
                 <p className="text-xs text-zinc-600">{stateData?.primaryEmotion ?? "—"}</p>
               </div>
-
-              {/* Milestones */}
-              <Milestones streakDays={stateData?.streakDays ?? 0} messageCount={0} />
             </>
           )}
         </div>
@@ -350,11 +313,14 @@ export default function DashboardPage() {
               )}
             </div>
 
-            {/* Recent Wins */}
+            {/* Tu camino — hitos del journey, sin números ni metas */}
+            <TuCamino />
+
+            {/* Notas del usuario — momentos que él mismo eligió guardar */}
             <div className="card-surface p-6 space-y-5">
               <div className="flex items-center gap-2">
-                <Trophy className="w-4 h-4 text-amber-400" />
-                <h2 className="font-bold text-white">Logros recientes</h2>
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <h2 className="font-bold text-white">Lo que has querido guardar</h2>
               </div>
 
               {loading ? (
@@ -366,8 +332,8 @@ export default function DashboardPage() {
               ) : wins.length === 0 ? (
                 <div className="flex flex-col items-center py-6 space-y-2 text-center">
                   <Sparkles className="w-7 h-7 text-amber-500/30" />
-                  <p className="text-zinc-500 text-sm">Aún no has registrado logros.</p>
-                  <p className="text-xs text-zinc-600">Cuéntale a Tres Mil Millones de Latidos cuando completes algo.</p>
+                  <p className="text-zinc-500 text-sm">Aún no has guardado nada aquí.</p>
+                  <p className="text-xs text-zinc-600">Cuando algo merezca quedarse, cuéntaselo al chat.</p>
                 </div>
               ) : (
                 <div className="space-y-2">

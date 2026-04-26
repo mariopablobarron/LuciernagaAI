@@ -122,6 +122,15 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
     req.headers.get("x-response-mode") === "json" ||
     req.nextUrl.searchParams.get("responseMode") === "json";
 
+  // Detect country from edge proxy headers (Cloudflare / Vercel) so crisis
+  // responses can route to the right local hotlines (024 ES, 988 US, 188 BR, etc.)
+  const countryHeader =
+    req.headers.get("cf-ipcountry") ??
+    req.headers.get("x-vercel-ip-country") ??
+    req.headers.get("x-country");
+  const countryCode =
+    countryHeader && /^[A-Za-z]{2}$/.test(countryHeader) ? countryHeader.toUpperCase() : null;
+
   const result = await processMessage({
     userId: identity.userId,
     message,
@@ -137,6 +146,7 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
       subscriptionStatus: accessState.subscriptionStatus,
     },
     jsonMode,
+    countryCode,
   });
 
   // ── 7. Return ──────────────────────────────────────────────────────────

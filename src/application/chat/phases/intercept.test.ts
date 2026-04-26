@@ -226,12 +226,12 @@ describe("interceptCrisis", () => {
     expect(result.data.systemState).toBe("CRISIS");
     expect(result.data.crisis).toBe(true);
     expect(result.data.riskLevel).toBe("high");
-    expect(getCrisisResponse).toHaveBeenCalledWith("high");
+    expect(getCrisisResponse).toHaveBeenCalledWith("high", null);
   });
 
   it("uses critical containment when risk is critical", async () => {
     const result = await interceptCrisis(makeInput({ crisisMode: true, riskLevel: "critical" }));
-    expect(getCrisisResponse).toHaveBeenCalledWith("critical");
+    expect(getCrisisResponse).toHaveBeenCalledWith("critical", null);
     if (!result.intercepted) throw new Error("unreachable");
     expect(result.data.riskLevel).toBe("critical");
     expect(result.data.detectedRiskLevel).toBe("critical");
@@ -241,7 +241,7 @@ describe("interceptCrisis", () => {
     const result = await interceptCrisis(
       makeInput({ crisisMode: true, crisisSource: "active_state", riskLevel: "low" })
     );
-    expect(getCrisisResponse).toHaveBeenCalledWith("high");
+    expect(getCrisisResponse).toHaveBeenCalledWith("high", null);
     if (!result.intercepted) throw new Error("unreachable");
     expect(result.data.riskLevel).toBe("high");
     expect(result.data.detectedRiskLevel).toBe("low");

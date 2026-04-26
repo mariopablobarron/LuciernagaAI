@@ -34,6 +34,8 @@ export interface ProcessMessageInput {
   mentorModeId?: string | null;
   session: SessionContext;
   jsonMode: boolean;
+  /** ISO 3166-1 alpha-2 country code from edge proxy headers (cf-ipcountry / x-vercel-ip-country). */
+  countryCode?: string | null;
 }
 
 export type ProcessMessageResult =
@@ -79,7 +81,7 @@ function serializeFlow(flow: {
 // ─── main use case ─────────────────────────────────────────────────────────
 
 export async function processMessage(input: ProcessMessageInput): Promise<ProcessMessageResult> {
-  const { userId, message, session, jsonMode } = input;
+  const { userId, message, session, jsonMode, countryCode } = input;
 
   // Free es ilimitado: no hay soft paywall ni recuento de "mensajes que quedan".
   // Pro se vende por extras (continuidad, memoria, Modo Impulso), no por cap.
@@ -153,6 +155,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     domainState,
     domainDecision,
     activeGoal,
+    countryCode: countryCode ?? null,
   };
 
   const lockResult = await interceptActionLock(interceptInput);

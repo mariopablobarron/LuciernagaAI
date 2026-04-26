@@ -98,6 +98,10 @@ export type InterceptInput = {
   captureEmailRecommended: boolean;
   captureEmailMessage: string;
 
+  // Country code (ISO 3166-1 alpha-2) detected from edge proxy headers,
+  // used to route crisis hotlines to local resources (024 ES / 988 US / 188 BR…).
+  countryCode?: string | null;
+
   // Transitional void
   domainState: SystemState;
   domainDecision: DomainDecision;
@@ -155,7 +159,7 @@ export async function interceptCrisis(input: InterceptInput): Promise<InterceptR
     ? input.riskLevel
     : "high";
 
-  const crisisPayload = getCrisisResponse(containmentLevel);
+  const crisisPayload = getCrisisResponse(containmentLevel, input.countryCode ?? null);
 
   await registerCrisisEvent({
     userId: input.userId,

@@ -771,6 +771,11 @@ model UserPreferences {
   weeklyLetterDisabled      Boolean  @default(false) // opt-out for the in-app weekly letter
   weeklyLetterEmailDisabled Boolean  @default(false) // opt-out only for the email notification; letter still appears in-app
   capsuleEmailDisabled      Boolean  @default(false) // opt-out for capsule-ready email notification (capsules still appear in-app)
+  /// Opt-out de la memoria semántica (ecos por similitud sobre DailyLogs y
+  /// resúmenes pasados). Si TRUE, el coach NUNCA inyecta pastEchoes en el
+  /// system prompt para este usuario, aunque la feature esté activa global.
+  /// Default: false (memoria semántica respetando los filtros del helper).
+  semanticMemoryOptOut       Boolean  @default(false)
   genderForm                String? // 'feminine' | 'masculine' | 'neutral' | null. NULL = el coach usa lenguaje neutro (sin conjugaciones de género)
   timezone                  String   @default("Europe/Madrid")
   createdAt                 DateTime @default(now())

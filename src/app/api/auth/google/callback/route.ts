@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
     // Find existing user by googleId or email
     let user = await prisma.user.findFirst({
       where: { OR: [{ googleId: profile.id }, { email }] },
-      select: { id: true, googleId: true, email: true },
+      select: { id: true, googleId: true, email: true, consentGiven: true, consentVersion: true },
     });
 
     if (user) {
@@ -54,27 +54,34 @@ export async function GET(req: NextRequest) {
         });
       }
     } else {
-      // Create new user
-      user = await prisma.user.create({
+      // Create new user — sin consentGiven, lo capturamos en /signup/consent
+      // antes de dejar entrar a /app. Google verifica el email por nosotros,
+      // pero el consentimiento legal no se puede asumir.
+      const created = await prisma.user.create({
         data: {
           email,
           name: profile.name,
           googleId: profile.id,
-          emailVerified: true, // Google email is verified by Google
+          emailVerified: true,
         },
-        select: { id: true, googleId: true, email: true },
+        select: { id: true, googleId: true, email: true, consentGiven: true, consentVersion: true },
       });
+      user = created;
       logInfo("AUTH", "google_signup", { userId: user.id, email });
       triggerWelcomeAvatarVideoAsync(user.id);
     }
 
     const token = issueSessionToken(user.id);
-    const res = NextResponse.redirect(`${baseUrl}/app`);
+    // Si no ha aceptado el consent (o aceptó una versión antigua), antes de
+    // entrar al app le forzamos el flujo de aceptación. /signup/consent
+    // muestra el checkbox y al confirmar redirige a /app.
+    const needsConsent = !user.consentGiven;
+    const redirectPath = needsConsent ? "/signup/consent?from=google" : "/app";
+    const res = NextResponse.redirect(`${baseUrl}${redirectPath}`);
     attachSessionCookie(res, token);
-    // Clear the OAuth state cookie
     res.cookies.delete("google_oauth_state");
 
-    logInfo("AUTH", "google_login", { userId: user.id, email });
+    logInfo("AUTH", "google_login", { userId: user.id, email, needsConsent });
     return res;
   } catch (err) {
     logError("AUTH", err, { route: "/api/auth/google/callback" });

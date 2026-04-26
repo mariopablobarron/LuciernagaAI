@@ -25,7 +25,8 @@ interface OpenRouterStreamChunk {
   choices?: Array<{ delta?: { content?: string }; finish_reason?: string | null }>;
 }
 
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+import { getOpenRouterChatUrl, getOpenRouterHeaders } from "@/lib/openrouter";
+
 const OPENROUTER_MODEL = "anthropic/claude-sonnet-4-6";
 const REQUEST_TIMEOUT_MS = 25000;
 type AIErrorType = "missing_config" | "provider_failure" | "unknown";
@@ -127,12 +128,11 @@ async function requestOpenRouter(
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
       response = await fetchWithTimeout(
-        OPENROUTER_URL,
+        getOpenRouterChatUrl(),
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${apiKey}`,
-            "Content-Type": "application/json",
+            ...getOpenRouterHeaders(apiKey, { userId: opts.userId, feature: "main_chat_stream" }),
             "HTTP-Referer": process.env.APP_BASE_URL ?? "http://localhost:3000",
             "X-Title": "mentor-web",
           },
@@ -321,12 +321,11 @@ export async function generateImpulseResponse(input: ImpulseResponseInput): Prom
 
   try {
     const res = await fetchWithTimeout(
-      OPENROUTER_URL,
+      getOpenRouterChatUrl(),
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
+          ...getOpenRouterHeaders(apiKey, { feature: "impulse" }),
           "HTTP-Referer": process.env.APP_BASE_URL ?? "http://localhost:3000",
           "X-Title": "mentor-web-impulso",
         },
@@ -383,12 +382,11 @@ export async function* streamOpenRouterTokens(
   let res: Response;
   try {
     res = await fetchWithTimeout(
-      OPENROUTER_URL,
+      getOpenRouterChatUrl(),
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
+          ...getOpenRouterHeaders(apiKey, { feature: "stream_tokens" }),
           "HTTP-Referer": process.env.APP_BASE_URL ?? "http://localhost:3000",
           "X-Title": "mentor-web",
         },

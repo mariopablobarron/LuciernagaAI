@@ -48,6 +48,8 @@ export type ContextInput = {
   goalAvoidanceCount: number;
   avoidanceDetectedThisTurn: boolean;
   conversionTrigger: boolean;
+  /** Resumen acumulado de mensajes antiguos (LangChain SummaryBufferMemory). */
+  conversationSummary?: string | null;
   session: { userPlan: string; remainingMessages: number | null; hasActiveGoal: boolean };
 };
 
@@ -176,6 +178,7 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
       : null,
     userGender,
     extendedIntent: detectExtendedIntents(message),
+    conversationSummary: input.conversationSummary ?? null,
   };
 
   logInfo("AI", "openrouter_call_requested", {

@@ -44,6 +44,15 @@ model Conversation {
   title          String    @default("Nueva conversación")
   rating         Int? // 1 = helpful, -1 = not helpful
   journalMode    Boolean   @default(false) // silent / no AI responses
+  /// Progressive summary of older messages (LangChain SummaryBufferMemory pattern):
+  /// when a conversation grows past ~20 messages, oldest are condensed into 2-3
+  /// sentences captured here. The last K messages stay verbatim for immediacy.
+  /// Lets the mentor remember decisions / names / arcs from turn 3 even at turn 50,
+  /// without bloating the system prompt.
+  summarySoFar             String?  @db.Text
+  /// Highest message ID already covered by summarySoFar. Lets us re-summarize only
+  /// the delta when new messages fall outside the verbatim window.
+  summarizedUpToMessageId  String?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   messageRecords Message[] @relation("ConversationMessages")

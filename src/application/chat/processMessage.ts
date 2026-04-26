@@ -110,6 +110,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
   const {
     conversationId,
     conversationHistory,
+    conversationSummary,
     emotionalProfile,
     crisisMode,
     crisisSource,
@@ -208,6 +209,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     goalAvoidanceCount,
     avoidanceDetectedThisTurn,
     conversionTrigger,
+    conversationSummary,
     session: {
       userPlan: session.userPlan,
       remainingMessages: remainingMessagesAfterTurn,

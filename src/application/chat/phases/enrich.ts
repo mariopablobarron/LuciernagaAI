@@ -28,6 +28,7 @@ import {
   resolveConversationForUser,
   saveConversationMessage,
 } from "@/services/conversation";
+import { loadHistoryWithProgressiveSummary } from "@/services/conversation-summarizer";
 import { upsertDailyImpulseLog } from "@/services/impulse-challenges";
 import {
   countPendingActions,
@@ -137,6 +138,7 @@ export type EnrichResult = {
   persistenceAvailable: boolean;
   conversationId: string;
   conversationHistory: Array<{ role: "user" | "assistant"; content: string }>;
+  conversationSummary: string | null;
   conversationMessageCount: number;
   emotionalProfile: ReturnType<typeof analyzeEmotionalProfile>;
 
@@ -203,6 +205,7 @@ export async function enrichContext(input: EnrichInput): Promise<EnrichResult> {
 
   let persistenceAvailable = true;
   let conversationHistory: Array<{ role: "user" | "assistant"; content: string }> = [];
+  let conversationSummary: string | null = null;
   let activeGoal: Awaited<ReturnType<typeof getActiveGoalForUser>> | null = null;
   let conversationId = conversationIdHint?.trim() || `tmp_${Date.now()}`;
   let conversationMessageCount = 0;
@@ -304,15 +307,12 @@ export async function enrichContext(input: EnrichInput): Promise<EnrichResult> {
     logInfo("DB", "message_saved", { userId, conversationId, role: "user" });
 
     try {
-      const msgs = await listMessagesForConversation({ userId, conversationId });
-      if (msgs && msgs.length > 1) {
-        // Ventana ampliada de 8 a 16 mensajes (~8 vueltas) para que el mentor
-        // mantenga continuidad real en conversaciones largas sin perder foco.
-        conversationHistory = msgs
-          .slice(0, -1)
-          .slice(-16)
-          .map((m) => ({ role: m.role, content: m.content }));
-      }
+      // Histórico literal últimos 16 mensajes + resumen acumulado de los más
+      // antiguos (LangChain SummaryBufferMemory). Si la conversación es corta
+      // (<22 mensajes) el summary es null y el histórico devuelve los literales.
+      const ctx = await loadHistoryWithProgressiveSummary({ userId, conversationId });
+      conversationHistory = ctx.recentHistory;
+      conversationSummary = ctx.summarySoFar;
     } catch {
       // history is optional; continue without it
     }
@@ -714,6 +714,7 @@ export async function enrichContext(input: EnrichInput): Promise<EnrichResult> {
     persistenceAvailable,
     conversationId,
     conversationHistory,
+    conversationSummary,
     conversationMessageCount,
     emotionalProfile,
     crisisMode,

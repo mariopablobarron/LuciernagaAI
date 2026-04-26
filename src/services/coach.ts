@@ -112,6 +112,10 @@ export type CoachContext = {
     mildIdeation: boolean;
     gratitudeClosure: boolean;
   } | null;
+  // Resumen acumulado de mensajes antiguos que se salen de la ventana literal
+  // (LangChain SummaryBufferMemory). Permite al mentor recordar nombres,
+  // decisiones y arcos de turnos muy anteriores al actual.
+  conversationSummary?: string | null;
 };
 
 type ResponseFinalizationContext = {
@@ -127,12 +131,6 @@ ${MENTOR_PURPOSE_MODEL_PROMPT}
 Estilo: directo, humano, breve (4-6 frases max). Sin tecnicismos, sin motivación vacía. No eres terapia.
 
 Si el usuario pregunta si esto es terapia o si puedes hacer terapia: responde con claridad que NO lo eres. Eres una guía práctica para ordenar pensamiento y mover a la acción. Si necesita terapia de verdad, sugiérele buscar un profesional en psicología — tu valor es complementario, no sustitutivo. No disfraces esta diferencia.
-
-REGLAS DE FORMATO (no negociables):
-- NUNCA uses headers Markdown ni labels como **Reflejo:**, **Porqué:**, **Acción:**, **Pregunta:**, **Validación:**, **Microacción:** ni similares. Esa estructura es interna a tu razonamiento — al usuario llega como conversación natural, NO como lista etiquetada de coaching.
-- UNA sola pregunta de cierre. NO dos. NO tres. Si tienes varias dudas, elige la más interpeladora y descarta el resto. La acción concreta NO cuenta como pregunta.
-- Negrita escasa, solo para destacar UNA frase clave (la pregunta o la acción). No más.
-- Párrafos cortos separados por línea en blanco. No bullets numerados.
 ${MENTOR_RESPONSE_STRUCTURE_PROMPT}
 ${MENTOR_POWERFUL_QUESTIONS_PROMPT}`;
 
@@ -407,6 +405,9 @@ export function buildCoachPrompt(
   const onboardingGuidance = buildOnboardingGuidance(context);
   const genderGuidance = buildGenderGuidance(context);
   const extendedIntentGuidance = buildExtendedIntentGuidance(context);
+  const conversationSummaryGuidance = context.conversationSummary
+    ? `Resumen de la conversación hasta ahora (turnos anteriores a los visibles abajo, úsalo para recordar nombres, decisiones y arcos): ${context.conversationSummary}`
+    : "";
   const welcomeOnboardingGuidance = context.welcomeOnboarding
     ? buildOnboardingPromptBlock(context.welcomeOnboarding)
     : "";
@@ -487,6 +488,7 @@ No se pudo verificar información externa suficiente. No afirmes datos actuales 
     mentorProtocolGuidance,
     genderGuidance,
     extendedIntentGuidance,
+    conversationSummaryGuidance,
     transformationGuidance,
     legalGuidance,
     accessGuidance,

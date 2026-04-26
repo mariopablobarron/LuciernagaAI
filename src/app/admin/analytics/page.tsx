@@ -206,6 +206,12 @@ export default function AdminAnalyticsPage() {
           >
             <Brain className="h-3.5 w-3.5" /> Ánimo e impulso
           </Link>
+          <Link
+            href="/admin/analytics/clinical"
+            className="inline-flex items-center gap-2 rounded-lg border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 px-3 py-2 text-xs font-semibold text-rose-300 hover:text-white transition-colors"
+          >
+            <Activity className="h-3.5 w-3.5" /> Métricas clínicas
+          </Link>
         </div>
         <div className="flex items-center gap-2">
           <label className="inline-flex items-center gap-1.5 text-xs text-zinc-400 cursor-pointer">

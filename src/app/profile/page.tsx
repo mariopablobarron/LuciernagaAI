@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Mail, Zap, Flame, Edit2 } from 'lucide-react';
+import { ArrowLeft, Mail, Zap, Flame, Edit2, Sparkles } from 'lucide-react';
 import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
 import type { BrowserSessionUser } from '@/lib/session-client';
 import { BillingSection } from '@/components/ui/billing-section';
@@ -219,6 +219,26 @@ export default function ProfilePage() {
 
         {/* Plan / Suscripción */}
         <BillingSection />
+
+        {/* Adaptar el acompañamiento */}
+        <div className={`${COMPONENTS.card} p-6 space-y-3`}>
+          <h3 className="font-semibold text-white">Adaptar el acompañamiento</h3>
+          <p className="text-sm text-zinc-400 leading-relaxed">
+            Tests y preferencias para que el mentor entienda mejor cómo funcionas tú.
+          </p>
+          <Link
+            href="/profile/eneagrama"
+            className="flex items-center gap-3 rounded-xl border border-fuchsia-500/30 bg-fuchsia-500/5 hover:bg-fuchsia-500/10 px-4 py-3 transition-colors"
+          >
+            <Sparkles className="w-5 h-5 text-fuchsia-300 shrink-0" aria-hidden="true" />
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-white">Test del Eneagrama</p>
+              <p className="text-xs text-zinc-400">
+                90 frases · 10-12 min · ajusta el tono y las preguntas del mentor a tu tipo
+              </p>
+            </div>
+          </Link>
+        </div>
 
         {/* Account Actions */}
         <div className={`${COMPONENTS.card} p-6 space-y-3`}>

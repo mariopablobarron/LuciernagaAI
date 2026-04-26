@@ -131,7 +131,7 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
     return null;
   });
 
-  const [impulseProfile, impulseLogs, journeyPromptBlock, projectPromptBlock, welcomeOnboarding, userPrefs] = await Promise.all([
+  const [impulseProfile, impulseLogs, journeyPromptBlock, projectPromptBlock, welcomeOnboarding, userPrefs, enneagramLatest] = await Promise.all([
     getUserImpulseProfile(userId).catch(() => null),
     listRecentImpulseLogs(userId, 5).catch(() => []),
     buildJourneyPromptBlock(userId).catch(() => null),
@@ -144,6 +144,19 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
         return await client.userPreferences.findUnique({
           where: { userId },
           select: { genderForm: true },
+        });
+      } catch {
+        return null;
+      }
+    })(),
+    (async (): Promise<{ dominantType: number } | null> => {
+      try {
+        const client = getPrismaClient();
+        if (!client?.enneagramAssessment?.findFirst) return null;
+        return await client.enneagramAssessment.findFirst({
+          where: { userId },
+          orderBy: { completedAt: "desc" },
+          select: { dominantType: true },
         });
       } catch {
         return null;
@@ -205,6 +218,12 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
       ? { query: searchQuery, usage: "practical_decision" as const, results: searchResults }
       : null,
     userGender,
+    enneagramType:
+      enneagramLatest?.dominantType &&
+      enneagramLatest.dominantType >= 1 &&
+      enneagramLatest.dominantType <= 9
+        ? (enneagramLatest.dominantType as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)
+        : null,
     extendedIntent: detectExtendedIntents(message),
     conversationSummary: input.conversationSummary ?? null,
     pastEchoes,

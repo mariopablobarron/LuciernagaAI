@@ -134,6 +134,10 @@ export type CoachContext = {
     daysAgo: number;
     similarity: number;
   }> | null;
+  // Tipo del Eneagrama (1..9) si el usuario completó el test en /profile/eneagrama.
+  // Modula el TONO y el tipo de pregunta del mentor — nunca se etiqueta al
+  // usuario explícitamente con su tipo a menos que él lo mencione.
+  enneagramType?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | null;
 };
 
 type ResponseFinalizationContext = {
@@ -432,6 +436,29 @@ function buildGenderGuidance(context: CoachContext): string {
   return "Forma gramatical: NO conoces el género de la persona usuaria. EVITA conjugaciones de género en adjetivos y participios. Reformula con frases neutras: en vez de \"estás cansado/a\" usa \"estás en un momento de cansancio\"; en vez de \"te has quedado bloqueado/a\" usa \"te has quedado en bloqueo\"; en vez de \"tú mismo/a\" usa \"tú\". Si necesitas expresar un estado, prefiere sustantivos (cansancio, bloqueo, claridad) sobre adjetivos conjugados.";
 }
 
+/**
+ * Guidance al mentor según el tipo del Eneagrama del usuario. NO se etiqueta
+ * al usuario con su tipo en el chat (a menos que él lo mencione) — es una
+ * pista interna para ajustar tono y preguntas.
+ */
+const ENNEAGRAM_GUIDANCE: Record<1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9, string> = {
+  1: 'Tipo 1 (perfeccionista). Evita el tono normativo o "deberías" — ya se exige bastante. Valida explícitamente que está bien dejar algo imperfecto antes de proponer acción.',
+  2: "Tipo 2 (ayudador). Devuelve siempre la atención hacia él/ella: tiende a hablar de los demás. Pregunta por sus propias necesidades sin asumir que ya las conoce.",
+  3: 'Tipo 3 (triunfador). Evita reforzar la lógica de "más logros". Bajo las metas suele haber miedo a la imagen — invita explícitamente a la pausa o a mostrar algo no resuelto.',
+  4: 'Tipo 4 (individualista). Reconoce la profundidad de su experiencia sin reflejarla solo como problema. Evita arreglar la melancolía; pregunta qué le dice esa emoción, no cómo eliminarla.',
+  5: "Tipo 5 (investigador). Da espacio. Evita preguntas que pidan emoción inmediata; entra primero por análisis o información, y deja que la emoción aparezca cuando se sienta seguro/a.",
+  6: "Tipo 6 (leal/escéptico). Da certezas explícitas en tu razonamiento — necesita ver el porqué. Reconoce sus dudas como inteligencia, no como bloqueo. Evita decisiones improvisadas.",
+  7: "Tipo 7 (entusiasta). Tiende a saltar a la siguiente cosa para evitar el malestar. Sostén el tema actual con suavidad antes de explorar nuevas posibilidades.",
+  8: "Tipo 8 (desafiador). Habla directo, sin rodeos ni cuidados excesivos — los lee como condescendencia. Pero invita explícitamente a la vulnerabilidad cuando aparezca cansancio.",
+  9: 'Tipo 9 (pacificador). Suele diluir lo suyo bajo lo que prefieren los demás. Pregunta directamente "¿qué quieres TÚ?" y resiste si responde con "lo que sea". Sin presión, pero sin diluirte tú también.',
+};
+
+function buildEnneagramGuidance(context: CoachContext): string {
+  const t = context.enneagramType;
+  if (!t) return "";
+  return `Perfil del usuario (Eneagrama, no mencionar la etiqueta al usuario): ${ENNEAGRAM_GUIDANCE[t]}`;
+}
+
 function buildExtendedIntentGuidance(context: CoachContext): string {
   const i = context.extendedIntent;
   if (!i || (!i.grief && !i.mildIdeation && !i.gratitudeClosure)) return "";
@@ -475,6 +502,7 @@ export function buildCoachPrompt(
   const onboardingGuidance = buildOnboardingGuidance(context);
   const genderGuidance = buildGenderGuidance(context);
   const extendedIntentGuidance = buildExtendedIntentGuidance(context);
+  const enneagramGuidance = buildEnneagramGuidance(context);
   const conversationSummaryGuidance = context.conversationSummary
     ? `Resumen de la conversación hasta ahora (turnos anteriores a los visibles abajo, úsalo para recordar nombres, decisiones y arcos): ${context.conversationSummary}`
     : "";
@@ -563,6 +591,7 @@ No se pudo verificar información externa suficiente. No afirmes datos actuales 
     empatheticResponseGuidance,
     mentorProtocolGuidance,
     genderGuidance,
+    enneagramGuidance,
     extendedIntentGuidance,
     conversationSummaryGuidance,
     transformationGuidance,

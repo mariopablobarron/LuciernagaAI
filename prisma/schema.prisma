@@ -142,6 +142,7 @@ model User {
   adminMessages             AdminMessage[]
   weeklyLetters             WeeklyLetter[]
   teamLetterRequests        TeamLetterRequest[]
+  enneagramAssessments      EnneagramAssessment[]
   dailyRoundResponses       DailyRoundResponse[]
   dailyRoundReactions       DailyRoundReaction[]
   dailyRoundMirrors         DailyRoundMirror[]
@@ -2088,6 +2089,28 @@ model CustomTracker {
   updatedAt  DateTime @updatedAt
 
   @@index([isActive, provider])
+}
+
+/// Resultado del test del Eneagrama (OEPS — Open Enneagram of Personality
+/// Scales, openpsychometrics.org). 90 ítems Likert 1-5 → score por tipo (1..9).
+/// Se usa para adaptar el tono del mentor: tipo 1 evita normativa, tipo 6
+/// quiere certezas explícitas, etc. El usuario puede repetirlo cuando quiera.
+model EnneagramAssessment {
+  id             String   @id @default(cuid())
+  userId         String
+  /// JSON: { type1: 0-40, type2: 0-40, ..., type9: 0-40 } sumas crudas.
+  scoresByType   Json
+  /// 1..9 — el tipo con score más alto. Si hay empate, el menor índice gana.
+  dominantType   Int
+  /// 1..9 — segundo tipo más alto, vecino del dominante (típicamente).
+  /// Null si la diferencia con el 3º es despreciable.
+  wing           Int?
+  /// Versión del cuestionario (por si calibramos en el futuro).
+  testVersion    String   @default("oeps-90-v1")
+  completedAt    DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, completedAt])
 }
 
 /// Solicitud de "carta humana" del equipo. Aparece como CTA en el chat tras

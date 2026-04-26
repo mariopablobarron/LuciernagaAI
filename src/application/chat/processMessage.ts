@@ -14,6 +14,7 @@ import {
 import { saveConversationMessage } from "@/services/conversation";
 import { buildGoalCoachContext, getActiveGoalForUser } from "@/services/goals";
 import { getMentorMode as getAccompanimentMode } from "@/lib/onboarding";
+import { autoDetectAndSaveGender } from "@/services/gender-detector";
 
 export interface SessionContext {
   isAnonymous: boolean;
@@ -166,6 +167,13 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
   if (!process.env.OPENROUTER_API_KEY?.trim()) {
     logError("AI", new Error("Missing OPENROUTER_API_KEY"), { route: "/api/chat" });
     throw new Error("MISSING_OPENROUTER_API_KEY");
+  }
+
+  // ── Detector pasivo de género gramatical (Fase D) ─────────────────────
+  // Solo autosetea si el usuario NO tiene preferencia ya elegida en /settings.
+  // Fire-and-forget: si detecta algo, surte efecto en el SIGUIENTE turno.
+  if (!session.isAnonymous) {
+    void autoDetectAndSaveGender({ userId, message }).catch(() => {});
   }
 
   // ── 7-8. Build context (Phase 4: Context) ─────────────────────────────

@@ -157,8 +157,9 @@ Si el usuario pregunta si esto es terapia o si puedes hacer terapia: responde co
 REGLAS DE FORMATO (no negociables):
 - NUNCA uses headers Markdown ni labels como **Reflejo:**, **Porqué:**, **Acción:**, **Pregunta:**, **Validación:**, **Microacción:** ni similares. Esa estructura es interna a tu razonamiento — al usuario llega como conversación natural, NO como lista etiquetada de coaching.
 - UNA sola pregunta de cierre. NO dos. NO tres. Si tienes varias dudas, elige la más interpeladora y descarta el resto. La acción concreta NO cuenta como pregunta.
-- Negrita escasa, solo para destacar UNA frase clave. No más.
+- NUNCA uses **negrita** ni *cursiva* en la conversación. Sin Markdown visual. La fuerza de la frase tiene que estar en las palabras, no en el formato. Una conversación humana no se subraya.
 - Párrafos cortos separados por línea en blanco. No bullets numerados.
+- Propón SIEMPRE una acción concreta y pequeña para hoy ("escribe una frase…", "manda el mensaje…", "pon una alarma a las…"). NUNCA generalidades como "trabaja en ti", "practica autocuidado", "explora tus emociones".
 
 EJEMPLO de qué NO hacer (jerga visible, dos preguntas):
 "**Reflejo:** Llevas mucho encima — escuela, trabajo, hijos.
@@ -755,6 +756,13 @@ export function sanitizeCoachResponse(text: string): string {
 
   // 2) Si quedó "**:** " huérfano (label vacío tras sustitución) o doble espacio
   out = out.replace(/\*\*\s*:\s*\*\*/g, "");
+
+  // 2b) Strip TODA negrita suelta — el modelo abusa de "**frase iluminada**" como
+  //     pseudo-header de insight, lo que rompe la naturalidad conversacional.
+  //     Conserva el contenido, sólo quita los marcadores. Mismo trato a cursiva
+  //     `*foo*` (excluye listas: requiere texto sin saltos dentro).
+  out = out.replace(/\*\*([^*\n][^*]*?)\*\*/g, "$1");
+  out = out.replace(/(?<![*\w])\*([^*\n]+?)\*(?!\w)/g, "$1");
 
   // 3) Pares de preguntas consecutivas (sin newline entre ellas): "¿...? ¿...?"
   //    Solo aplicamos si la PRIMERA empieza con ¿ — así no rompemos texto que

@@ -163,4 +163,20 @@ describe("sanitizeCoachResponse", () => {
     const out = sanitizeCoachResponse("Hola.\n\n\n\nQué tal.");
     expect(out).toBe("Hola.\n\nQué tal.");
   });
+
+  it("elimina negrita suelta usada como pseudo-header de insight", () => {
+    const input = "Lo que describes es duro.\n\n**El miedo no es al caos sino a no saber quién eres.**\n\n¿Qué te asusta concretamente?";
+    const out = sanitizeCoachResponse(input);
+    expect(out).toBe("Lo que describes es duro.\n\nEl miedo no es al caos sino a no saber quién eres.\n\n¿Qué te asusta concretamente?");
+  });
+
+  it("elimina negrita inline en medio de frase", () => {
+    const out = sanitizeCoachResponse("Eso no es **solo** cansancio, es agotamiento.");
+    expect(out).toBe("Eso no es solo cansancio, es agotamiento.");
+  });
+
+  it("elimina cursiva con asterisco simple", () => {
+    const out = sanitizeCoachResponse("Eso es *exactamente* lo que pasa.");
+    expect(out).toBe("Eso es exactamente lo que pasa.");
+  });
 });

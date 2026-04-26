@@ -397,6 +397,25 @@ export async function enrichContext(input: EnrichInput): Promise<EnrichResult> {
         progressTrend: emotionalProfile.progressTrend,
       });
 
+      // Bypass del action-lock cuando (a) el usuario expresa confusión o
+      // protesta sobre que el sistema le insiste en lo mismo, o (b) el lock
+      // ya se mostró en los 2 últimos turnos del assistant. Sin esto, el
+      // sistema reproducía la misma plantilla turno tras turno aunque el
+      // usuario respondiera con sustancia diferente. El LLM tiene guidance
+      // en coach.ts (línea ~385) para explicar el sistema y volver a la
+      // acción concreta de forma orgánica.
+      const userProtestsLock = /(\bya respond|ya est[aá] (definido|claro|hecho|dicho)|no s[eé] por qu[eé] me preg|por qu[eé] me preg|me pides.*(volver|inicio)|ha dicho que seguimos|me estoy repit|me repito|ya te dije|ya lo dije|estoy respondi|no me escucha|estamos en bucle|no hay di[aá]logo|esto no es (un di[aá]logo|conversaci[oó]n))/i.test(
+        message,
+      );
+      const recentAssistantMessages = conversationHistory
+        .filter((m) => m.role === "assistant")
+        .slice(-2);
+      const lockTemplateRepeated = recentAssistantMessages.length >= 2 &&
+        recentAssistantMessages.every((m) =>
+          /lo aparcas|lo retomas|qued[oó] abierto|seguimos sin cerrar|dejamos «/i.test(m.content),
+        );
+      const lockBypass = userProtestsLock || lockTemplateRepeated;
+
       if (pendingAction) {
         // Respuestas cortas típicas al "¿ya completaste? sí o no" — el
         // detector global no las recogía y el action-lock devolvía la misma
@@ -483,7 +502,7 @@ export async function enrichContext(input: EnrichInput): Promise<EnrichResult> {
             });
           }
 
-          if (!shouldBypassActionLock(state)) {
+          if (!shouldBypassActionLock(state) && !lockBypass) {
             await trackSafe({
               userId,
               type: "AVOIDANCE_DETECTED",
@@ -523,7 +542,8 @@ export async function enrichContext(input: EnrichInput): Promise<EnrichResult> {
         !actionCompletedThisTurn &&
         !actionLockPayload &&
         pendingAction &&
-        !shouldBypassActionLock(state)
+        !shouldBypassActionLock(state) &&
+        !lockBypass
       ) {
         actionLockAssistantMessage = buildActionRequiredMessage({
           actionTitle: pendingAction.description,

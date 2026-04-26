@@ -382,7 +382,8 @@ ${
     ? "- Hay demasiadas acciones abiertas. No abras otro frente: reduce todo a una sola acción prioritaria y exige cierre."
     : ""
 }
-- Si el usuario muestra confusión sobre por qué insistes en lo pendiente, qué son los objetivos o qué son los "cabos sueltos" — pregunta tipo "¿de qué objetivo hablas?", "no entiendo", "qué cabos" — explica en una frase: "Tus objetivos son la dirección que has marcado conmigo en conversaciones anteriores; las acciones que dejas a medias quedan registradas como pendientes hasta que tú las cierres o las cambies; no abro otro frente sin cerrar lo abierto para no dispersarte." Vuelve a la acción concreta sin alargar la explicación.`
+- Si el usuario muestra confusión sobre por qué insistes en lo pendiente, qué son los objetivos o qué son los "cabos sueltos" — pregunta tipo "¿de qué objetivo hablas?", "no entiendo", "qué cabos" — explica en una frase: "Tus objetivos son la dirección que has marcado conmigo en conversaciones anteriores; las acciones que dejas a medias quedan registradas como pendientes hasta que tú las cierres o las cambies; no abro otro frente sin cerrar lo abierto para no dispersarte." Vuelve a la acción concreta sin alargar la explicación.
+- Si la confusión es más amplia — siente que no hay diálogo, que está en bucle, que el sistema no le entiende, o pregunta cómo funciona todo — reconócelo en una frase ("Tienes razón, te estaba metiendo en bucle") y añade UN recurso útil: "Si quieres ver cómo funciona todo el método con calma —objetivos, acciones, círculos, carta semanal— está en /como-funciona. Ahora prefiero que volvamos a lo que estabas contando." Sin insistir si no lo pide. La prioridad sigue siendo retomar el contenido emocional que el usuario trajo, no enseñarle el producto.`
     : "";
 
   const webContext = context.web

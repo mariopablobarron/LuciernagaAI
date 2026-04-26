@@ -51,6 +51,17 @@ export function proxy(request: NextRequest) {
       return NextResponse.next();
     }
 
+    // Stats endpoint for the emotion-nlp shadow window. Same X-Admin-Secret
+    // bypass pattern as /api/admin/routines so a remote Claude Code agent can
+    // query it. The handler validates the secret in constant time.
+    if (
+      pathname === "/api/admin/emotion-nlp-stats" &&
+      request.method === "GET" &&
+      request.headers.get("x-admin-secret")
+    ) {
+      return NextResponse.next();
+    }
+
     const auth = resolveAdminAuth(request);
     if (auth.authenticated) {
       return NextResponse.next();

@@ -41,6 +41,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { VoiceRecorder } from "@/components/ui/voice-recorder";
 import { AudioRecorder } from "@/components/ui/audio-recorder";
+import { SpeakButton } from "@/components/ui/speak-button";
 import { CHAT_STARTER_PICKS, MENTOR_MODES, getMentorMode } from "@/lib/onboarding";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -530,17 +531,20 @@ function MessageBubble({
             {message.createdAt && (
               <p className="mt-0.5 text-[10px] text-zinc-600">{formatMsgTime(message.createdAt)}</p>
             )}
-            <button
-              onClick={() => void handleCopy()}
-              aria-label={copied ? "Copiado" : "Copiar respuesta"}
-              className="absolute -right-10 top-0 p-2 opacity-0 transition-opacity group-hover:opacity-100"
-            >
-              {copied ? (
-                <Check className="h-3.5 w-3.5 text-emerald-400" />
-              ) : (
-                <Copy className="h-3.5 w-3.5 text-zinc-600 hover:text-zinc-400" />
-              )}
-            </button>
+            <div className="absolute -right-10 top-0 flex flex-col gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+              <button
+                onClick={() => void handleCopy()}
+                aria-label={copied ? "Copiado" : "Copiar respuesta"}
+                className="p-2"
+              >
+                {copied ? (
+                  <Check className="h-3.5 w-3.5 text-emerald-400" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5 text-zinc-600 hover:text-zinc-400" />
+                )}
+              </button>
+              <SpeakButton text={message.content} className="p-2" />
+            </div>
           </>
         )}
       </div>

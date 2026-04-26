@@ -210,6 +210,12 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     avoidanceDetectedThisTurn,
     conversionTrigger,
     conversationSummary,
+    // Memoria semántica (PR2): la query óptima es la versión autocontenida
+    // si reformulate disparó; si no, el mensaje literal. Anonymous y crisis
+    // se cortocircuitan dentro de loadSemanticEchoes.
+    queryHint: reformulation.standalone ?? null,
+    isAnonymous: session.isAnonymous,
+    crisisMode,
     session: {
       userPlan: session.userPlan,
       remainingMessages: remainingMessagesAfterTurn,

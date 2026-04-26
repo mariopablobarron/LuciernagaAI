@@ -47,6 +47,14 @@ jest.mock("@/services/search", () => ({
   searchWeb: jest.fn().mockResolvedValue([]),
 }));
 
+jest.mock("@/services/embeddings", () => ({
+  embed: jest.fn(),
+}));
+
+jest.mock("@/services/semantic-memory", () => ({
+  retrieveSemanticMemory: jest.fn(),
+}));
+
 import { buildContext, type ContextInput } from "./context";
 import { buildGoalCoachContext, getFirstPendingAction } from "@/services/goals";
 import { getUserImpulseProfile } from "@/services/impulse-diagnostic";
@@ -343,5 +351,112 @@ describe("buildContext — parallel fetches", () => {
     (buildJourneyPromptBlock as jest.Mock).mockRejectedValue(new Error("journey error"));
     const result = await buildContext(makeInput());
     expect(result.coachContext.journeyPrompt).toBeNull();
+  });
+});
+
+// ─── Semantic memory (PR2) ───────────────────────────────────────────────────
+
+import { embed } from "@/services/embeddings";
+import { retrieveSemanticMemory } from "@/services/semantic-memory";
+
+describe("buildContext — semantic memory", () => {
+  const ORIGINAL_FLAG = process.env.SEMANTIC_MEMORY_ENABLED;
+  const ORIGINAL_KEY = process.env.OPENAI_API_KEY;
+
+  beforeEach(() => {
+    process.env.SEMANTIC_MEMORY_ENABLED = "true";
+    process.env.OPENAI_API_KEY = "sk-test";
+    (embed as jest.Mock).mockResolvedValue(new Array(1536).fill(0.1));
+    (retrieveSemanticMemory as jest.Mock).mockResolvedValue([]);
+  });
+
+  afterAll(() => {
+    if (ORIGINAL_FLAG === undefined) delete process.env.SEMANTIC_MEMORY_ENABLED;
+    else process.env.SEMANTIC_MEMORY_ENABLED = ORIGINAL_FLAG;
+    if (ORIGINAL_KEY === undefined) delete process.env.OPENAI_API_KEY;
+    else process.env.OPENAI_API_KEY = ORIGINAL_KEY;
+  });
+
+  it("pastEchoes is null when feature flag is off", async () => {
+    process.env.SEMANTIC_MEMORY_ENABLED = "false";
+    const result = await buildContext(makeInput());
+    expect(result.coachContext.pastEchoes).toBeNull();
+    expect(embed).not.toHaveBeenCalled();
+    expect(retrieveSemanticMemory).not.toHaveBeenCalled();
+  });
+
+  it("pastEchoes is null when OPENAI_API_KEY is missing", async () => {
+    delete process.env.OPENAI_API_KEY;
+    const result = await buildContext(makeInput());
+    expect(result.coachContext.pastEchoes).toBeNull();
+    expect(embed).not.toHaveBeenCalled();
+  });
+
+  it("pastEchoes is null for anonymous users (anonymous-first)", async () => {
+    const result = await buildContext(makeInput({ isAnonymous: true }));
+    expect(result.coachContext.pastEchoes).toBeNull();
+    expect(embed).not.toHaveBeenCalled();
+  });
+
+  it("pastEchoes is null when crisis mode is active", async () => {
+    const result = await buildContext(makeInput({ crisisMode: true }));
+    expect(result.coachContext.pastEchoes).toBeNull();
+    expect(embed).not.toHaveBeenCalled();
+  });
+
+  it("pastEchoes is null when retrieve returns no hits", async () => {
+    (retrieveSemanticMemory as jest.Mock).mockResolvedValue([]);
+    const result = await buildContext(makeInput());
+    expect(result.coachContext.pastEchoes).toBeNull();
+  });
+
+  it("maps hits to pastEchoes with daysAgo and source", async () => {
+    const fiveDaysAgo = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
+    (retrieveSemanticMemory as jest.Mock).mockResolvedValue([
+      {
+        id: "sm_1",
+        source: "daily_log",
+        sourceId: "dl_1",
+        content: "Hoy me sentí bloqueado de nuevo, igual que la semana pasada.",
+        metadata: null,
+        similarity: 0.85,
+        createdAt: fiveDaysAgo,
+      },
+    ]);
+
+    const result = await buildContext(makeInput({ message: "vuelvo a estar bloqueado" }));
+    const echoes = result.coachContext.pastEchoes as Array<{
+      source: string;
+      gist: string;
+      daysAgo: number;
+      similarity: number;
+    }>;
+    expect(echoes).toHaveLength(1);
+    expect(echoes[0].source).toBe("daily_log");
+    expect(echoes[0].daysAgo).toBe(5);
+    expect(echoes[0].similarity).toBeCloseTo(0.85, 2);
+    expect(echoes[0].gist).toContain("bloqueado");
+  });
+
+  it("uses queryHint when provided instead of raw message", async () => {
+    await buildContext(makeInput({ message: "y por qué", queryHint: "por qué evito tomar la decisión" }));
+    expect(embed).toHaveBeenCalledWith("por qué evito tomar la decisión");
+  });
+
+  it("falls back to message when queryHint is empty", async () => {
+    await buildContext(makeInput({ message: "estoy agotado del trabajo", queryHint: "  " }));
+    expect(embed).toHaveBeenCalledWith("estoy agotado del trabajo");
+  });
+
+  it("returns null when embed throws (graceful degradation)", async () => {
+    (embed as jest.Mock).mockRejectedValue(new Error("OpenAI down"));
+    const result = await buildContext(makeInput());
+    expect(result.coachContext.pastEchoes).toBeNull();
+  });
+
+  it("returns null when retrieveSemanticMemory throws", async () => {
+    (retrieveSemanticMemory as jest.Mock).mockRejectedValue(new Error("pgvector error"));
+    const result = await buildContext(makeInput());
+    expect(result.coachContext.pastEchoes).toBeNull();
   });
 });

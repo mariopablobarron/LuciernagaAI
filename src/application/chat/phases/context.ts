@@ -10,6 +10,8 @@
 
 import { logError, logInfo } from "@/lib/logger";
 import { buildConversationContext } from "@/services/state";
+import { embed } from "@/services/embeddings";
+import { retrieveSemanticMemory } from "@/services/semantic-memory";
 import { buildGoalCoachContext, getFirstPendingAction } from "@/services/goals";
 import { getUserImpulseProfile } from "@/services/impulse-diagnostic";
 import { listRecentImpulseLogs } from "@/services/impulse-challenges";
@@ -50,6 +52,16 @@ export type ContextInput = {
   conversionTrigger: boolean;
   /** Resumen acumulado de mensajes antiguos (LangChain SummaryBufferMemory). */
   conversationSummary?: string | null;
+  /**
+   * Versión autocontenida del mensaje (de phases/reformulate.ts) para usar
+   * como query del retrieve semántico cuando el original es ambiguo. Si no
+   * se pasa, caemos a `message`.
+   */
+  queryHint?: string | null;
+  /** Anonymous-first: usuarios anónimos no acceden a memoria semántica. */
+  isAnonymous?: boolean;
+  /** Crisis activa → bypass del retrieve para no resurfar episodios pasados. */
+  crisisMode?: boolean;
   session: { userPlan: string; remainingMessages: number | null; hasActiveGoal: boolean };
 };
 
@@ -102,6 +114,22 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
   // weeklyPattern queda en null y la continuidad sigue funcionando con el
   // resumen corto habitual.
   const weeklyPattern = await loadWeeklyPattern(userId).catch(() => null);
+
+  // ── Memoria semántica (PR2) ──────────────────────────────────────────────
+  // Recupera material destilado del pasado (DailyLogs, resúmenes de
+  // conversaciones cerradas) por similitud con el mensaje actual. Skip total
+  // para anónimos, crisis activa, o si el feature flag está apagado.
+  // Tolera fallos: si OpenAI o pgvector petan, pastEchoes queda en null y
+  // el chat sigue exactamente como antes.
+  const pastEchoes = await loadSemanticEchoes({
+    userId,
+    query: input.queryHint?.trim() || message,
+    isAnonymous: input.isAnonymous ?? false,
+    crisisMode: input.crisisMode ?? false,
+  }).catch((err) => {
+    logError("SEMANTIC_MEMORY", err, { stage: "retrieve", userId });
+    return null;
+  });
 
   const [impulseProfile, impulseLogs, journeyPromptBlock, projectPromptBlock, welcomeOnboarding, userPrefs] = await Promise.all([
     getUserImpulseProfile(userId).catch(() => null),
@@ -179,6 +207,7 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
     userGender,
     extendedIntent: detectExtendedIntents(message),
     conversationSummary: input.conversationSummary ?? null,
+    pastEchoes,
   };
 
   logInfo("AI", "openrouter_call_requested", {
@@ -274,4 +303,51 @@ async function loadWeeklyPattern(userId: string): Promise<{
     crisisEventsLast7d: crisisCount,
     conversationCountLast7d: conversations,
   };
+}
+
+// ─── Memoria semántica (lectura) ─────────────────────────────────────────────
+// Convierte el mensaje del usuario en embedding y recupera top-K hits
+// similares de SemanticMemory. Devuelve null si está desactivada o no hay
+// hits relevantes — el caller filtra por null para no inyectar la sección.
+//
+// Reglas de bypass:
+// - SEMANTIC_MEMORY_ENABLED !== "true" → off (escotilla por env)
+// - OPENAI_API_KEY ausente → off silencioso (caller cae al chat sin memoria)
+// - isAnonymous → off (anonymous-first: la memoria es valor de upgrade)
+// - crisisMode → off (no resurfar episodios de crisis pasados por similitud)
+async function loadSemanticEchoes(params: {
+  userId: string;
+  query: string;
+  isAnonymous: boolean;
+  crisisMode: boolean;
+}): Promise<Array<{
+  source: "daily_log" | "conversation_summary" | "insight";
+  gist: string;
+  daysAgo: number;
+  similarity: number;
+}> | null> {
+  if (process.env.SEMANTIC_MEMORY_ENABLED?.trim() !== "true") return null;
+  if (!process.env.OPENAI_API_KEY?.trim()) return null;
+  if (params.isAnonymous) return null;
+  if (params.crisisMode) return null;
+  if (!params.query || params.query.trim().length < 4) return null;
+
+  const queryVec = await embed(params.query);
+  const hits = await retrieveSemanticMemory({
+    userId: params.userId,
+    embedding: queryVec,
+    topK: 3,
+    minSimilarity: 0.78,
+    maxAgeDays: 90,
+  });
+
+  if (hits.length === 0) return null;
+
+  const now = Date.now();
+  return hits.map((h) => ({
+    source: h.source,
+    gist: h.content,
+    daysAgo: Math.max(0, Math.floor((now - h.createdAt.getTime()) / (24 * 60 * 60 * 1000))),
+    similarity: h.similarity,
+  }));
 }

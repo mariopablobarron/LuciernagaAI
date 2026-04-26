@@ -122,6 +122,18 @@ export type CoachContext = {
   // hacer el usuario en el chat, el dominio dice de qué área habla.
   // Generado en services/domain.ts. NO se menciona literalmente al usuario.
   problemDomain?: import("./domain").ProblemDomain;
+  // Ecos semánticos de material destilado pasado (DailyLogs, resúmenes de
+  // conversaciones cerradas) recuperados por similitud con el mensaje actual.
+  // Permite al mentor detectar patrones longitudinales sin recitar la historia.
+  // Generados en phases/context.ts → loadSemanticEchoes (PR2 de memoria
+  // semántica). Solo se inyectan si hay hits por encima de un umbral de
+  // similitud y la conversación no es anónima ni crisis.
+  pastEchoes?: Array<{
+    source: "daily_log" | "conversation_summary" | "insight";
+    gist: string;
+    daysAgo: number;
+    similarity: number;
+  }> | null;
 };
 
 type ResponseFinalizationContext = {
@@ -378,6 +390,36 @@ Reglas de continuidad obligatorias:
 - Mantén continuidad entre turnos, evitando respuestas aisladas.`;
 }
 
+function buildPastEchoesGuidance(context: CoachContext): string {
+  const echoes = context.pastEchoes;
+  if (!echoes || echoes.length === 0) return "";
+
+  const lines = echoes.map((e) => {
+    const when = e.daysAgo === 0
+      ? "hoy mismo"
+      : e.daysAgo === 1
+        ? "ayer"
+        : `hace ${e.daysAgo} día(s)`;
+    const label = e.source === "daily_log"
+      ? "registro de diario"
+      : e.source === "conversation_summary"
+        ? "conversación previa"
+        : "reflexión";
+    // Recortamos para no inflar el prompt.
+    const gist = e.gist.length > 220 ? e.gist.slice(0, 217) + "…" : e.gist;
+    return `- ${when} (${label}): ${gist}`;
+  });
+
+  return `Ecos pasados relacionados con lo que el usuario plantea ahora (recuperados por similitud, no por recencia):
+${lines.join("\n")}
+
+Reglas para usar estos ecos:
+- NO los cites textualmente ni digas "el día tal escribiste...". El usuario no recuerda exactamente lo que puso y sentirse vigilado rompe la confianza.
+- Úsalos solo si refuerzan UNA pregunta concreta sobre el patrón ("¿esto es la misma sensación que tuviste hace unos días o algo distinto?").
+- Si el eco contradice lo que dice ahora, no lo confrontes — pregunta con curiosidad, no con prueba.
+- Si no aportan a la respuesta de este turno, ignóralos. Mejor silencio que invasión.`;
+}
+
 function buildGenderGuidance(context: CoachContext): string {
   const g = context.userGender;
   if (g === "feminine") {
@@ -427,6 +469,7 @@ export function buildCoachPrompt(
   const transformationGuidance = buildTransformationGuidance(context);
   const flowGuidance = buildFlowGuidance(context);
   const continuityGuidance = buildContinuityGuidance(context);
+  const pastEchoesGuidance = buildPastEchoesGuidance(context);
   const legalGuidance = buildLegalGuidance(context);
   const accessGuidance = buildAccessGuidance(context);
   const onboardingGuidance = buildOnboardingGuidance(context);
@@ -545,6 +588,12 @@ ${
   continuityGuidance
     ? `
 ${continuityGuidance}`
+    : ""
+}
+${
+  pastEchoesGuidance
+    ? `
+${pastEchoesGuidance}`
     : ""
 }
 ${goalContext}

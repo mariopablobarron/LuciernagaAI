@@ -6,7 +6,7 @@
     "postinstall": "prisma generate",
     "dev": "next dev",
     "build": "next build",
-    "start": "(npx prisma migrate resolve --rolled-back 20260418220000_add_note_coolify_backup_check || true) && npx prisma migrate deploy && (node scripts/seed-superadmin.mjs || true) && next start",
+    "start": "(npx prisma migrate resolve --rolled-back 20260418220000_add_note_coolify_backup_check || true) && (npx prisma migrate resolve --rolled-back 20260427120000_add_semantic_memory || true) && (npx prisma migrate resolve --rolled-back 20260427130000_add_semantic_memory_opt_out || true) && npx prisma migrate deploy && (node scripts/seed-superadmin.mjs || true) && next start",
     "lint": "eslint",
     "test": "jest --runInBand",
     "test:watch": "jest --watch",

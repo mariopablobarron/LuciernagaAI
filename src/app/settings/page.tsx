@@ -46,7 +46,6 @@ type Preferences = {
   notifyUpdates: boolean;
   genderForm: "feminine" | "masculine" | "neutral" | null;
   timezone: string;
-  semanticMemoryOptOut: boolean;
 };
 
 const GENDER_FORMS = [
@@ -509,24 +508,6 @@ export default function SettingsPage() {
                 Quitar preferencia (volver a sin definir)
               </button>
             )}
-          </div>
-
-          {/* Memoria del coach entre días — opt-out */}
-          <div className="flex items-center justify-between py-3 border-t border-zinc-800/60 mt-2 pt-5">
-            <div className="pr-4">
-              <p className="text-sm font-semibold text-white">Memoria entre días</p>
-              <p className="text-xs text-zinc-500 mt-1 leading-relaxed">
-                El coach puede recordar patrones tuyos de días anteriores cuando tienen
-                relación con lo que estás contando ahora. Nunca cita textualmente lo que
-                escribiste — solo lo usa para preguntarte mejor. Si lo prefieres, puedes
-                desactivarlo y cada conversación empezará en blanco.
-              </p>
-            </div>
-            <Toggle
-              checked={!prefs?.semanticMemoryOptOut}
-              onChange={(v) => updatePref('semanticMemoryOptOut', !v)}
-              disabled={saving}
-            />
           </div>
         </div>
 

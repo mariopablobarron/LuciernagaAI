@@ -59,7 +59,6 @@ export async function GET(req: NextRequest) {
       assessments,
       preferences,
       dailyLogs,
-      semanticMemory,
     ] = await Promise.all([
       prisma.user.findUnique({
         where: { id: userId },
@@ -128,26 +127,6 @@ export async function GET(req: NextRequest) {
         where: { userId },
         orderBy: { createdAt: "asc" },
       }),
-      // Memoria semántica (PR4): tabla gestionada por SQL raw, no por Prisma
-      // model. Excluimos el campo `embedding` — es un vector binario sin
-      // valor de lectura para el usuario y solo infla el dump. Si la tabla
-      // aún no existe (migración no aplicada), devolvemos array vacío.
-      prisma
-        .$queryRawUnsafe<Array<{
-          id: string;
-          source: string;
-          sourceId: string;
-          content: string;
-          metadata: unknown;
-          createdAt: Date;
-        }>>(
-          `SELECT "id", "source", "sourceId", "content", "metadata", "createdAt"
-           FROM "SemanticMemory"
-           WHERE "userId" = $1
-           ORDER BY "createdAt" ASC`,
-          userId,
-        )
-        .catch(() => [] as Array<unknown>),
     ]);
 
     if (!user) {
@@ -168,7 +147,6 @@ export async function GET(req: NextRequest) {
       crisisEvents,
       personalProjects,
       assessments,
-      semanticMemory,
     };
 
     return new Response(JSON.stringify(data, null, 2), {

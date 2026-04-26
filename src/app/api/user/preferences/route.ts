@@ -28,7 +28,6 @@ const PREFERENCES_SELECT = {
   notifyUpdates: true,
   genderForm: true,
   timezone: true,
-  semanticMemoryOptOut: true,
 } as const;
 
 const DEFAULT_PREFERENCES = {
@@ -43,7 +42,6 @@ const DEFAULT_PREFERENCES = {
   notifyUpdates: false,
   genderForm: null,
   timezone: "Europe/Madrid",
-  semanticMemoryOptOut: false,
 };
 
 // GET /api/user/preferences
@@ -110,7 +108,6 @@ export async function PATCH(req: NextRequest) {
     "notifyInsights",
     "notifyGoals",
     "notifyUpdates",
-    "semanticMemoryOptOut",
   ] as const) {
     if (key in body && typeof body[key] === "boolean") data[key] = body[key];
   }

@@ -24,7 +24,7 @@ export default function LandingPage() {
             </h1>
           </div>
           <p className="text-lg text-zinc-400 leading-relaxed max-w-lg">
-            Un equipo de psicologos, mentores y coaches que usa inteligencia artificial para acompanarte a pasar de la paralisis a la accion. La IA es la herramienta — el seguimiento es humano.
+            Un mentor con inteligencia artificial supervisado por una psicóloga responsable. Te acompaña a pasar de la parálisis a la acción, con la opción de pedir una carta humana del equipo cuando quieras un mensaje personal.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <Link

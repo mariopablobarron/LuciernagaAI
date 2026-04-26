@@ -133,7 +133,7 @@ const COMPARISON: Row[] = [
   },
   {
     criterio: "Comunidad entre pares",
-    producto: { label: "Sí — círculos de 5-8 personas + sesiones sincrónicas semanales", tone: "good" },
+    producto: { label: "Sí — círculos de 4 personas, asíncronos, ciclos de 6 semanas, emparejados por patrón emocional", tone: "good" },
     chatgpt: { label: "No", tone: "bad" },
     terapia: { label: "Opcional — terapia grupal", tone: "warn" },
     meditacion: { label: "Foros ligeros en algunas apps", tone: "warn" },

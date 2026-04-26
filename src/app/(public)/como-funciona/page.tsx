@@ -170,6 +170,45 @@ export default function MetodoPage() {
           </div>
         </div>
 
+        {/* Adaptar el acompañamiento */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-fuchsia-500/10 border border-fuchsia-500/20 flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-fuchsia-300" />
+            </div>
+            <h2 className="text-2xl font-bold text-white">Adaptar el acompañamiento a ti</h2>
+          </div>
+          <p className="text-zinc-400 leading-relaxed">
+            El mentor por defecto ya se adapta a tu estado emocional, tu patrón dominante y la fase
+            en la que estás. Si quieres ir un paso más allá, hay dos opciones — opcionales — para
+            ajustar la experiencia a cómo funcionas tú.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="rounded-xl border border-fuchsia-500/30 bg-fuchsia-500/5 p-5 space-y-2">
+              <p className="text-base font-bold text-white">Test del Eneagrama</p>
+              <p className="text-sm text-zinc-400 leading-relaxed">
+                90 frases en 10-12 minutos. El mentor ajusta su tono y sus preguntas a tu tipo:
+                con un perfeccionista evita el «deberías», con quien tiende a evitar conflicto
+                pregunta directo qué quieres tú. No te etiqueta en el chat. Está en tu perfil.
+              </p>
+              <Link
+                href="/profile/eneagrama"
+                className="inline-flex items-center gap-1 text-sm text-fuchsia-300 hover:text-fuchsia-200 pt-1"
+              >
+                Hacer el test <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+            <div className="rounded-xl border border-violet-500/30 bg-violet-500/5 p-5 space-y-2">
+              <p className="text-base font-bold text-white">Carta humana del equipo</p>
+              <p className="text-sm text-zinc-400 leading-relaxed">
+                Tras unos turnos en el chat aparece un ofrecimiento: si quieres, alguien del equipo
+                lee tu hilo y te escribe una nota personal a tu email en los siguientes días. La
+                firma una persona real — no la IA. Es opcional y la pides desde el propio chat.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Qué NO hacemos */}
         <div className="space-y-6">
           <div className="flex items-center gap-3">

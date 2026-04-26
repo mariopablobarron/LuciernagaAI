@@ -65,8 +65,16 @@ const GROUPS: { title: string; items: Qa[] }[] = [
         a: 'Sí. Mantiene tu contexto entre sesiones: tus objetivos abiertos, los patrones que detecta, lo que ha funcionado y lo que has evitado. No te hace repetir tu historia cada vez.',
       },
       {
+        q: '¿Qué es el test del Eneagrama y para qué sirve?',
+        a: 'Un cuestionario opcional de 90 frases (10-12 minutos) en /profile/eneagrama. Lo usamos solo para una cosa: ajustar el tono y las preguntas del mentor a cómo funcionas tú. Si tu tipo es perfeccionista, evita el "deberías"; si tienes tendencia a evitar conflictos, te pregunta más directo qué quieres TÚ. No te etiqueta en el chat, no se lo cuenta a nadie. Puedes repetirlo cuando quieras.',
+      },
+      {
         q: '¿Qué es la carta semanal?',
         a: 'Una vez por semana el mentor te escribe una carta corta sobre lo que ha visto en ti — citando frases textuales tuyas — y termina con una sola pregunta para la semana siguiente. Llega por email si lo activas; si no, queda en la app.',
+      },
+      {
+        q: '¿Qué es la "carta del equipo"?',
+        a: 'Distinta de la carta semanal. Tras unos cuantos turnos en el chat aparece un ofrecimiento: si quieres, alguien del equipo lee tu hilo y te escribe una nota personal a tu email en los siguientes días. Es opcional, no automática, y la firma una persona real — no la IA. Sirve cuando quieres una mirada humana sobre algo concreto que estás trabajando.',
       },
       {
         q: '¿Hay ejercicios o solo conversación?',

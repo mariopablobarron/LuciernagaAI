@@ -173,6 +173,25 @@ type UserDetailResponse = {
       difficulty: number;
     };
   }>;
+  enneagram: null | {
+    id: string;
+    dominantType: number;
+    wing: number | null;
+    scoresByType: Record<string, number>;
+    completedAt: string;
+  };
+};
+
+const ENNEAGRAM_TYPE_NAMES: Record<number, string> = {
+  1: "El reformador",
+  2: "El ayudador",
+  3: "El triunfador",
+  4: "El individualista",
+  5: "El investigador",
+  6: "El leal",
+  7: "El entusiasta",
+  8: "El desafiador",
+  9: "El pacificador",
 };
 
 function formatDate(value: string | null): string {
@@ -1202,6 +1221,24 @@ export default function AdminUserDetailPage() {
                     </p>
                   </>
                 )}
+
+                <div className="rounded-xl border border-fuchsia-500/30 bg-fuchsia-500/5 px-3 py-3 mt-3">
+                  <p className="text-sm font-medium text-fuchsia-200">Eneagrama</p>
+                  {data.enneagram ? (
+                    <div className="mt-1 space-y-1 text-zinc-400">
+                      <p>
+                        Tipo <span className="font-bold text-white">{data.enneagram.dominantType}</span> ·{" "}
+                        <span className="text-zinc-200">{ENNEAGRAM_TYPE_NAMES[data.enneagram.dominantType] ?? "—"}</span>
+                        {data.enneagram.wing ? <> · ala <span className="text-white">{data.enneagram.wing}</span></> : null}
+                      </p>
+                      <p className="text-xs text-zinc-500">
+                        Hecho el {formatDate(data.enneagram.completedAt)}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="mt-1 text-zinc-500">Sin test realizado.</p>
+                  )}
+                </div>
               </CardContent>
             </Card>
 

@@ -87,6 +87,7 @@ export async function GET(req: NextRequest, { params }: Params) {
       recentCrisisEvents,
       recentAvoidanceEvents,
       challenges,
+      enneagram,
     ] = await Promise.all([
       prisma.userState.findUnique({ where: { userId: id } }),
       prisma.userProfile.findUnique({
@@ -205,6 +206,11 @@ export async function GET(req: NextRequest, { params }: Params) {
           },
         },
         orderBy: { updatedAt: "desc" },
+      }),
+      prisma.enneagramAssessment.findFirst({
+        where: { userId: id },
+        orderBy: { completedAt: "desc" },
+        select: { id: true, dominantType: true, wing: true, scoresByType: true, completedAt: true },
       }),
     ]);
 
@@ -337,6 +343,15 @@ export async function GET(req: NextRequest, { params }: Params) {
         endsAt: item.endsAt?.toISOString() || null,
         challenge: item.challenge,
       })),
+      enneagram: enneagram
+        ? {
+            id: enneagram.id,
+            dominantType: enneagram.dominantType,
+            wing: enneagram.wing,
+            scoresByType: enneagram.scoresByType,
+            completedAt: enneagram.completedAt.toISOString(),
+          }
+        : null,
     });
   } catch (error: unknown) {
     logError("ADMIN", error, { route: "/api/admin/users/[id]" });

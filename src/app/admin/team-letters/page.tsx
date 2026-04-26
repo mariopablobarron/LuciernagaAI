@@ -13,8 +13,21 @@ type LetterContext = {
   dominantPattern?: string | null;
   primaryEmotion?: string | null;
   onboardingContext?: { feeling?: string; intent?: string; timeframe?: string } | null;
+  enneagram?: { dominantType: number; wing: number | null; completedAt: string } | null;
   submittedAt?: string;
 } | null;
+
+const ENNEAGRAM_NAMES_SHORT: Record<number, string> = {
+  1: "reformador",
+  2: "ayudador",
+  3: "triunfador",
+  4: "individualista",
+  5: "investigador",
+  6: "leal",
+  7: "entusiasta",
+  8: "desafiador",
+  9: "pacificador",
+};
 
 type Letter = {
   id: string;
@@ -192,6 +205,12 @@ export default function AdminTeamLettersPage() {
                       <li>Mensajes: <span className="font-bold text-white">{ctx?.messageCount ?? "—"}</span></li>
                       <li>Patrón: <span className="font-bold text-white">{ctx?.dominantPattern ?? "—"}</span></li>
                       <li>Emoción: <span className="font-bold text-white">{ctx?.primaryEmotion ?? "—"}</span></li>
+                      {ctx?.enneagram ? (
+                        <li>Eneagrama: <span className="font-bold text-fuchsia-300">
+                          tipo {ctx.enneagram.dominantType} · {ENNEAGRAM_NAMES_SHORT[ctx.enneagram.dominantType] ?? "—"}
+                          {ctx.enneagram.wing ? ` · ala ${ctx.enneagram.wing}` : ""}
+                        </span></li>
+                      ) : null}
                       {ctx?.onboardingContext?.feeling ? (
                         <li>Onboarding: <span className="text-zinc-400">{ctx.onboardingContext.feeling} · {ctx.onboardingContext.intent}</span></li>
                       ) : null}

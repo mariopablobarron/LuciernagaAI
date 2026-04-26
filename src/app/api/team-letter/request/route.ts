@@ -45,17 +45,24 @@ export async function POST(req: NextRequest) {
   }
 
   const prisma = getPrismaClient();
-  const user = await prisma.user.findUnique({
-    where: { id: identity.userId },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      messageCount: true,
-      onboardingContext: true,
-      userState: { select: { dominantPattern: true, primaryEmotion: true } },
-    },
-  });
+  const [user, latestEnneagram] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: identity.userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        messageCount: true,
+        onboardingContext: true,
+        userState: { select: { dominantPattern: true, primaryEmotion: true } },
+      },
+    }),
+    prisma.enneagramAssessment.findFirst({
+      where: { userId: identity.userId },
+      orderBy: { completedAt: "desc" },
+      select: { dominantType: true, wing: true, completedAt: true },
+    }),
+  ]);
 
   if (!user) {
     return NextResponse.json({ success: false, error: "USER_NOT_FOUND" }, { status: 404 });
@@ -104,6 +111,13 @@ export async function POST(req: NextRequest) {
     dominantPattern: user.userState?.dominantPattern ?? null,
     primaryEmotion: user.userState?.primaryEmotion ?? null,
     onboardingContext: user.onboardingContext ?? null,
+    enneagram: latestEnneagram
+      ? {
+          dominantType: latestEnneagram.dominantType,
+          wing: latestEnneagram.wing,
+          completedAt: latestEnneagram.completedAt.toISOString(),
+        }
+      : null,
     submittedAt: new Date().toISOString(),
   };
 

@@ -1943,6 +1943,7 @@ export default function HomePage() {
             onAdminLogout={handleAdminLogout}
             onRenameConversation={handleRenameConversation}
             onDeleteConversation={handleDeleteConversation}
+            onToggleAction={handleToggleAction}
           />
         }
         main={

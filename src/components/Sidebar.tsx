@@ -67,6 +67,7 @@ type SidebarProps = {
   onAdminLogout: () => Promise<void> | void;
   onRenameConversation?: (id: string, title: string) => Promise<void> | void;
   onDeleteConversation?: (id: string) => Promise<void> | void;
+  onToggleAction?: (actionId: string, completed: boolean) => void;
 };
 
 function formatRelativeDate(isoDate: string): string {
@@ -91,6 +92,7 @@ export default function Sidebar({
   onAdminLogout,
   onRenameConversation,
   onDeleteConversation,
+  onToggleAction,
 }: SidebarProps) {
   const pathname = usePathname();
 
@@ -622,15 +624,33 @@ export default function Sidebar({
                 </div>
                 <div className="mt-3 space-y-2">
                   {activeGoal.actions.slice(0, 3).map((action) => (
-                    <div
+                    <button
                       key={action.id}
-                      className="flex items-start gap-2 rounded-xl border border-border bg-background/80 px-3 py-2 text-sm"
+                      type="button"
+                      onClick={() => onToggleAction?.(action.id, !action.completed)}
+                      disabled={!onToggleAction}
+                      title={
+                        action.completed
+                          ? "Marcar como pendiente otra vez"
+                          : "Marcar como hecha"
+                      }
+                      className={`flex items-start gap-2 w-full text-left rounded-xl border border-border bg-background/80 px-3 py-2 text-sm transition-colors ${
+                        onToggleAction
+                          ? "hover:border-signal-success/40 hover:bg-signal-success/5 cursor-pointer"
+                          : "cursor-default"
+                      }`}
                     >
                       <span
-                        className={`mt-1 inline-block h-2.5 w-2.5 rounded-full ${
-                          action.completed ? "bg-signal-success" : "bg-signal-warning"
+                        className={`mt-0.5 inline-flex items-center justify-center h-4 w-4 rounded-full border-2 shrink-0 transition-colors ${
+                          action.completed
+                            ? "bg-signal-success border-signal-success"
+                            : "border-zinc-500"
                         }`}
-                      />
+                      >
+                        {action.completed && (
+                          <Check className="h-2.5 w-2.5 text-white" />
+                        )}
+                      </span>
                       <span
                         className={
                           action.completed
@@ -640,7 +660,7 @@ export default function Sidebar({
                       >
                         {action.description}
                       </span>
-                    </div>
+                    </button>
                   ))}
                 </div>
                 {actionLock ? (

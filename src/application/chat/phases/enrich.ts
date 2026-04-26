@@ -47,6 +47,7 @@ import {
 import { getMentorMode, shouldAskForEmail, shouldAskForName } from "@/services/mentor-protocol";
 import { getConversationalOnboarding } from "@/services/onboarding";
 import { analyzeEmotionalProfile, updateEmotionalProfile } from "@/services/emotional-model";
+import { detectEmotionNlp } from "@/services/emotion-nlp";
 import { type RiskLevel } from "@/services/risk";
 import {
   activateUserCrisis,
@@ -345,6 +346,25 @@ export async function enrichContext(input: EnrichInput): Promise<EnrichResult> {
         stage: "update_emotional_profile",
       });
     }
+
+    // Fase observabilidad: ejecutar detector NLP en paralelo (fire-and-forget)
+    // para comparar mapeo vs keywords. No altera el perfil aún.
+    void detectEmotionNlp(message)
+      .then((nlp) => {
+        if (!nlp) return;
+        logInfo("EMOTION_NLP", "shadow_compare", {
+          userId,
+          conversationId,
+          keywordEmotion: emotionalProfile.primaryEmotion,
+          nlpRawLabel: nlp.rawLabel,
+          nlpRawScore: Number(nlp.rawScore.toFixed(3)),
+          nlpMapped: nlp.mappedEmotion,
+          agree: nlp.mappedEmotion === emotionalProfile.primaryEmotion,
+        });
+      })
+      .catch(() => {
+        // detectEmotionNlp ya loguea sus propios errores; nada que hacer aquí.
+      });
 
     await upsertDailyImpulseLog({
       userId,

@@ -74,11 +74,14 @@ function rangeToInterval(r: Range): string {
 
 export async function fetchUtmBreakdown(cfg: PosthogConfig, range: Range): Promise<UtmRow[] | null> {
   const interval = rangeToInterval(range);
+  // Preferimos el UTM de la visita actual (properties.utm_*) sobre el inicial
+  // para reflejar campañas re-compartidas. Caen al $initial cuando la URL
+  // del pageview no trae UTM (visitas internas dentro de la sesión).
   const query = `
     SELECT
-      coalesce(properties.\$initial_utm_source, '(direct)') AS source,
-      coalesce(properties.\$initial_utm_medium, '(none)') AS medium,
-      coalesce(properties.\$initial_utm_campaign, '(none)') AS campaign,
+      coalesce(nullIf(properties.utm_source, ''), properties.\$initial_utm_source, '(direct)') AS source,
+      coalesce(nullIf(properties.utm_medium, ''), properties.\$initial_utm_medium, '(none)') AS medium,
+      coalesce(nullIf(properties.utm_campaign, ''), properties.\$initial_utm_campaign, '(none)') AS campaign,
       uniq(person_id) AS visitors,
       count() AS pageviews
     FROM events
@@ -104,11 +107,12 @@ export async function fetchUtmDaily(
   const conds: string[] = [`event = '\$pageview'`, `timestamp > now() - INTERVAL ${interval}`];
   if (filter.source) {
     const safe = filter.source.replace(/'/g, "''");
-    conds.push(`properties.\$initial_utm_source = '${safe}'`);
+    // Cubre visitas con UTM en URL actual o atribución inicial
+    conds.push(`(properties.utm_source = '${safe}' OR properties.\$initial_utm_source = '${safe}')`);
   }
   if (filter.campaign) {
     const safe = filter.campaign.replace(/'/g, "''");
-    conds.push(`properties.\$initial_utm_campaign = '${safe}'`);
+    conds.push(`(properties.utm_campaign = '${safe}' OR properties.\$initial_utm_campaign = '${safe}')`);
   }
   const query = `
     SELECT

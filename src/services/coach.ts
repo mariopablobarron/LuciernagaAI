@@ -21,6 +21,7 @@ import {
   type EnergyLevel,
   type PrimaryEmotion,
 } from "@/types/emotional-profile";
+import { buildDomainGuidance } from "@/services/domain";
 
 export type CoachGoalContext = {
   title: string;
@@ -116,6 +117,11 @@ export type CoachContext = {
   // (LangChain SummaryBufferMemory). Permite al mentor recordar nombres,
   // decisiones y arcos de turnos muy anteriores al actual.
   conversationSummary?: string | null;
+  // Dominio causal detectado (relacional, work, health, financial, etc.).
+  // Eje complementario al intent conversacional: el intent dice qué quiere
+  // hacer el usuario en el chat, el dominio dice de qué área habla.
+  // Generado en services/domain.ts. NO se menciona literalmente al usuario.
+  problemDomain?: import("./domain").ProblemDomain;
 };
 
 type ResponseFinalizationContext = {
@@ -424,6 +430,12 @@ export function buildCoachPrompt(
     ? `\n\nInterpretación contextual del último mensaje del usuario (úsala solo si te ayuda a entender la referencia; el mensaje original sigue siendo la fuente de verdad):\n"${context.contextualInterpretation}"`
     : "";
 
+  // Dominio causal del problema (relacional, work, health, etc.) — adapta
+  // registro y recursos sin nombrar la etiqueta al usuario.
+  const domainGuidance = context.problemDomain
+    ? `\n\n${buildDomainGuidance(context.problemDomain)}`
+    : "";
+
   const goalContext = context.goal
     ? `
 
@@ -498,6 +510,7 @@ No se pudo verificar información externa suficiente. No afirmes datos actuales 
     projectGuidance,
     accompanimentGuidance,
     contextualInterpretationGuidance,
+    domainGuidance,
   ].filter(Boolean);
 
   return `${sections.join("\n\n")}

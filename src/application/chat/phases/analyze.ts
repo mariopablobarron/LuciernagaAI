@@ -10,6 +10,7 @@ import type { UserState } from "@/domain/types";
 import { detectUserState } from "@/services/state";
 import { detectRiskLevel, type RiskLevel } from "@/services/risk";
 import { detectIntent } from "@/services/intent";
+import { detectDomain, type ProblemDomain } from "@/services/domain";
 import { runFlow, hydrateDialogueState, persistDialogueState } from "@/services/flows";
 import { logInfo } from "@/lib/logger";
 
@@ -78,6 +79,7 @@ export type AnalyzeResult = {
   state: UserState;
   tvSignals: { confusionScore: number; identityShift: boolean; directionClarity: number };
   detectedIntent: string;
+  detectedDomain: ProblemDomain;
   riskLevel: RiskLevel;
   crisisMode: boolean;
   crisisSource: "detected" | "active_state" | "none";
@@ -99,6 +101,7 @@ export async function analyzeMessage(
   const state = detectUserState(message);
   const tvSignals = detectTransitionalVoidSignals(message);
   const detectedIntent = detectIntent(message);
+  const detectedDomain = detectDomain(message);
   const riskLevel = detectRiskLevel(message);
 
   const dialogueState = await hydrateDialogueState(userId);
@@ -115,6 +118,7 @@ export async function analyzeMessage(
     userId,
     state,
     intent: detectedIntent,
+    domain: detectedDomain,
     activeFlow: flowContext.activeFlow,
     flowStep: flowContext.currentStep,
     messageLength: message.length,
@@ -125,6 +129,7 @@ export async function analyzeMessage(
     state,
     tvSignals,
     detectedIntent,
+    detectedDomain,
     riskLevel,
     crisisMode,
     crisisSource: crisisMode ? "detected" : "none",

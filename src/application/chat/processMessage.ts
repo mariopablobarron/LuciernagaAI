@@ -91,7 +91,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
 
   // ── 1. Quick synchronous analysis (Phase 1: Analyze) ────────────────────
   const analysis = await analyzeMessage(userId, message);
-  const { state, tvSignals, detectedIntent, riskLevel, flowContext } = analysis;
+  const { state, tvSignals, detectedIntent, detectedDomain, riskLevel, flowContext } = analysis;
   const enriched = await enrichContext({
     userId,
     message,
@@ -231,6 +231,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     ...(reformulation.reformulated && reformulation.standalone
       ? { contextualInterpretation: reformulation.standalone }
       : {}),
+    ...(detectedDomain ? { problemDomain: detectedDomain } : {}),
   };
 
   // ── 9. Impulse mode (non-streaming JSON) ──────────────────────────────

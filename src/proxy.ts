@@ -62,6 +62,19 @@ export function proxy(request: NextRequest) {
       return NextResponse.next();
     }
 
+    // Cron health and backup status endpoints — same X-Admin-Secret bypass
+    // pattern. Allow remote auditing of cron last-run + backup recency
+    // without an admin session. Each handler re-validates the secret in
+    // constant time.
+    if (
+      (pathname === "/api/admin/cron-health" ||
+        pathname === "/api/admin/backup-status") &&
+      request.method === "GET" &&
+      request.headers.get("x-admin-secret")
+    ) {
+      return NextResponse.next();
+    }
+
     const auth = resolveAdminAuth(request);
     if (auth.authenticated) {
       return NextResponse.next();

@@ -10,11 +10,14 @@ import { trackMetaEvent } from '@/lib/meta-pixel';
 import { getUtmParams } from '@/lib/utm';
 import { useSfx } from '@/lib/useSfx';
 import { confettiCelebration } from '@/lib/confetti';
+import { CURRENT_CONSENT_VERSION } from '@/lib/legal';
 
 const ERROR_MESSAGES: Record<string, string> = {
   EMAIL_INVALID: 'El email no es válido.',
   EMAIL_TAKEN: 'Ya existe una cuenta con ese email.',
   PASSWORD_TOO_SHORT: 'La contraseña debe tener al menos 8 caracteres.',
+  CONSENT_REQUIRED: 'Tienes que aceptar los Términos y la Privacidad para crear la cuenta.',
+  CONSENT_VERSION_MISMATCH: 'Los Términos se han actualizado. Recarga la página y vuelve a aceptar.',
   SIGNUP_FAILED: 'Error al crear la cuenta. Inténtalo de nuevo.',
 };
 
@@ -42,6 +45,7 @@ function SignupForm() {
   }, [searchParams]);
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [consentAccepted, setConsentAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [signedUp, setSignedUp] = useState(false);
@@ -51,6 +55,10 @@ function SignupForm() {
     setError('');
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden.');
+      return;
+    }
+    if (!consentAccepted) {
+      setError(ERROR_MESSAGES.CONSENT_REQUIRED);
       return;
     }
     setLoading(true);
@@ -65,7 +73,17 @@ function SignupForm() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ name, email, phone: phone || undefined, password, utm, orgInviteCode, inviteCode }),
+        body: JSON.stringify({
+          name,
+          email,
+          phone: phone || undefined,
+          password,
+          utm,
+          orgInviteCode,
+          inviteCode,
+          consentAccepted: true,
+          consentVersion: CURRENT_CONSENT_VERSION,
+        }),
       });
       const data = (await res.json()) as { success: boolean; error?: string; telegramLink?: string };
       if (!res.ok || !data.success) {
@@ -238,19 +256,25 @@ function SignupForm() {
               confidencial y puedes eliminarlos en cualquier momento.
             </p>
             <label className="flex items-start gap-3 cursor-pointer">
-              <input type="checkbox" required className="rounded border-zinc-700 bg-zinc-900 mt-0.5" />
+              <input
+                type="checkbox"
+                required
+                checked={consentAccepted}
+                onChange={(e) => setConsentAccepted(e.target.checked)}
+                className="rounded border-zinc-700 bg-zinc-900 mt-0.5"
+              />
               <span className="text-sm text-zinc-400">
                 Acepto los{' '}
-                <Link href="/terms" className="text-cyan-400 hover:text-cyan-300">Términos</Link>
+                <Link href="/terms" target="_blank" className="text-cyan-400 hover:text-cyan-300 underline underline-offset-2">Términos</Link>
                 {' '}y la{' '}
-                <Link href="/privacy" className="text-cyan-400 hover:text-cyan-300">Privacidad</Link>
-                {' '}y entiendo que es un producto en fase de pruebas
+                <Link href="/privacy" target="_blank" className="text-cyan-400 hover:text-cyan-300 underline underline-offset-2">Privacidad</Link>
+                {' '}(versión {CURRENT_CONSENT_VERSION}) y entiendo que es un producto en fase de pruebas que no sustituye a un profesional de salud mental.
               </span>
             </label>
           </div>
 
           <button
-            type="submit" disabled={loading}
+            type="submit" disabled={loading || !consentAccepted}
             className={`${COMPONENTS.buttonPrimary} w-full py-3 text-base disabled:opacity-60 disabled:cursor-not-allowed`}
           >
             {loading ? 'Creando cuenta…' : 'Crear cuenta'}

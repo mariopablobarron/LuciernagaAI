@@ -16,6 +16,7 @@ import { triggerWelcomeAvatarVideoAsync } from "@/services/welcomeAvatarVideo";
 import { bindInviteToUser } from "@/services/invites";
 import { awardLatidos } from "@/services/latidos";
 import { trackSafe } from "@/services/events";
+import { CURRENT_CONSENT_VERSION } from "@/lib/legal";
 
 type UtmParams = {
   utm_source?: string;
@@ -33,6 +34,11 @@ type SignupBody = {
   utm?: UtmParams;
   orgInviteCode?: string;
   inviteCode?: string;
+  /// Aceptación explícita de Términos+Privacidad. Obligatorio.
+  consentAccepted?: boolean;
+  /// Versión del texto que vio y aceptó el usuario en el cliente. Se valida
+  /// contra CURRENT_CONSENT_VERSION para no aceptar versiones antiguas.
+  consentVersion?: string;
 };
 
 function isValidEmail(e: string) {
@@ -69,6 +75,17 @@ export async function POST(req: NextRequest) {
     if (password.length < 8) {
       return NextResponse.json({ success: false, error: "PASSWORD_TOO_SHORT" }, { status: 400 });
     }
+
+    // Consentimiento explícito y vigente. El frontend tiene un checkbox
+    // `required`, pero validamos en servidor porque los clientes no son
+    // confiables (puedes mandar JSON directo sin pasar por el form).
+    if (body.consentAccepted !== true) {
+      return NextResponse.json({ success: false, error: "CONSENT_REQUIRED" }, { status: 400 });
+    }
+    if (body.consentVersion !== CURRENT_CONSENT_VERSION) {
+      return NextResponse.json({ success: false, error: "CONSENT_VERSION_MISMATCH" }, { status: 400 });
+    }
+    const consentAt = new Date();
 
     const prisma = getPrismaClient();
 
@@ -123,6 +140,9 @@ export async function POST(req: NextRequest) {
             phone,
             emailVerifyToken: verifyToken,
             emailVerifyExpires: verifyExpires,
+            consentGiven: true,
+            consentAt,
+            consentVersion: CURRENT_CONSENT_VERSION,
             ...(orgId && { organizationId: orgId }),
           },
         });
@@ -141,6 +161,9 @@ export async function POST(req: NextRequest) {
           emailVerifyToken: verifyToken,
           emailVerifyExpires: verifyExpires,
           source: utmSource,
+          consentGiven: true,
+          consentAt,
+          consentVersion: CURRENT_CONSENT_VERSION,
           ...(orgId && { organizationId: orgId }),
         },
       });

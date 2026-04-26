@@ -77,6 +77,11 @@ model User {
   stripeCustomerId          String?                   @unique
   consentGiven              Boolean                   @default(false)
   consentAt                 DateTime?
+  /// Versión del texto de Términos+Privacidad aceptada por el usuario en el
+  /// momento del registro. Nullable para users anteriores a esta columna.
+  /// Cuando publiquemos un texto nuevo, comparamos contra CURRENT_CONSENT_VERSION
+  /// y pedimos re-aceptar al usuario antes de seguir.
+  consentVersion            String?
   source                    String?
   isActive                  Boolean                   @default(true)
   latidos                   Int                       @default(0)

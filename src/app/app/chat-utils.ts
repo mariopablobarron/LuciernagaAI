@@ -31,6 +31,12 @@ export type Conversation = {
   conversionTrigger: boolean;
   conversionType: string | null;
   journalMode: boolean;
+  suggestedActions?: Array<{
+    id: string;
+    label: string;
+    prompt: string;
+    kind: "send" | "complete";
+  }>;
 };
 
 export type ActiveGoal = {

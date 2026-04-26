@@ -111,6 +111,12 @@ type ChatApiResponse = {
   conversionType?: "progress";
   actions?: Array<Record<string, unknown>>;
   captureName?: boolean;
+  suggestedActions?: Array<{
+    id: string;
+    label: string;
+    prompt: string;
+    kind: "send" | "complete";
+  }>;
 };
 
 // ConversationsApiResponse imported from ./chat-utils
@@ -1591,6 +1597,9 @@ export default function HomePage() {
                   flow: sseNextFlow,
                   conversionTrigger: sseConversionTrigger,
                   conversionType: sseConversionType,
+                  suggestedActions: Array.isArray(ssePayload.suggestedActions)
+                    ? ssePayload.suggestedActions
+                    : conversation.suggestedActions,
                   messages: conversation.messages.map((msg) =>
                     msg.id === streamMsgId
                       ? {
@@ -1791,6 +1800,9 @@ export default function HomePage() {
                 conversionType,
                 messageCount: conversation.messageCount + 1,
                 messages: [...conversation.messages, assistantMessage],
+                suggestedActions: Array.isArray(payload.suggestedActions)
+                  ? payload.suggestedActions
+                  : conversation.suggestedActions,
               }
             : conversation
         );
@@ -1998,6 +2010,12 @@ export default function HomePage() {
                   onDismissCommunityCta={() => setCommunityCta(null)}
                   mentorModeId={mentorModeId}
                   onSelectMentorMode={handleSelectMentorMode}
+                  suggestedActions={safeConversation.suggestedActions}
+                  onCompletePendingAction={
+                    pendingGoalAction
+                      ? () => void handleToggleAction(pendingGoalAction.id, true)
+                      : undefined
+                  }
                 />
               </div>
             }

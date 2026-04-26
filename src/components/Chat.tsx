@@ -127,6 +127,15 @@ export type ChatProps = {
   mentorModeId?: string | null;
   /** Called when the user selects a mentor mode. Pass null to clear. */
   onSelectMentorMode?: (id: string | null) => void;
+  /** Suggested actions / chips post-respuesta (deterministas según patrón). */
+  suggestedActions?: Array<{
+    id: string;
+    label: string;
+    prompt: string;
+    kind: "send" | "complete";
+  }>;
+  /** Called when the user taps a chip with kind="complete". */
+  onCompletePendingAction?: () => void;
 };
 
 // ─── Starter prompts ──────────────────────────────────────────────────────────
@@ -635,6 +644,8 @@ export default function Chat({
   onDismissCommunityCta,
   mentorModeId,
   onSelectMentorMode,
+  suggestedActions,
+  onCompletePendingAction,
 }: ChatProps) {
   const activeMentorMode = getMentorMode(mentorModeId ?? null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -968,6 +979,43 @@ export default function Chat({
                     <span className="text-xs text-zinc-600 animate-pulse">Pensando...</span>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Suggested action chips — only after assistant has finished
+                 responding and we have suggestions. Reduce cognitive load
+                 ("¿qué pregunto ahora?") and reinforce the method. */}
+            {!loading && !streamingMessageId && suggestedActions && suggestedActions.length > 0 &&
+             messages.length > 0 && messages[messages.length - 1]?.role === "assistant" && (
+              <div
+                className="flex flex-wrap gap-2 px-1 pt-1 animate-in fade-in slide-in-from-bottom-1 duration-300"
+                role="group"
+                aria-label="Sugerencias para continuar"
+              >
+                {suggestedActions.map((chip) => (
+                  <button
+                    key={chip.id}
+                    type="button"
+                    onClick={() => {
+                      if (chip.kind === "complete") {
+                        onCompletePendingAction?.();
+                      } else {
+                        // Inject prompt into input for the user to send (gives
+                        // them a chance to edit before submitting). If they
+                        // want one-tap send, they just press the send button.
+                        const setter = setInput ?? onInputChange;
+                        setter?.(chip.prompt);
+                      }
+                    }}
+                    className={
+                      chip.kind === "complete"
+                        ? "inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/20 transition-colors"
+                        : "inline-flex items-center rounded-full border border-violet-500/30 bg-violet-500/5 px-3 py-1.5 text-xs text-violet-200 hover:bg-violet-500/15 hover:border-violet-400/50 transition-colors"
+                    }
+                  >
+                    {chip.label}
+                  </button>
+                ))}
               </div>
             )}
 

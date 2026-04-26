@@ -13,6 +13,7 @@ import {
 } from "@/services/coach";
 import { saveConversationMessage } from "@/services/conversation";
 import { buildGoalCoachContext, getActiveGoalForUser } from "@/services/goals";
+import { generateSuggestedActions } from "@/services/suggestedActions";
 import { getMentorMode as getAccompanimentMode } from "@/lib/onboarding";
 import { autoDetectAndSaveGender } from "@/services/gender-detector";
 
@@ -251,6 +252,10 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
         captureEmailMessage: captureEmailRecommended ? captureEmailMessage : null,
         captureName: captureNameRecommended,
         actions: communityCTA ? [communityCTA] : [],
+        suggestedActions: generateSuggestedActions({
+          dominantPattern: emotionalProfile?.dominantPattern,
+          hasPendingActions: (activeGoal?.actions.some((a) => !a.completed)) ?? false,
+        }),
       },
     };
   }
@@ -324,6 +329,10 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
         captureEmailMessage: captureEmailRecommended ? captureEmailMessage : null,
         captureName: captureNameRecommended,
         actions: communityCTA ? [communityCTA] : [],
+        suggestedActions: generateSuggestedActions({
+          dominantPattern: emotionalProfile?.dominantPattern,
+          hasPendingActions: (activeGoal?.actions.some((a) => !a.completed)) ?? false,
+        }),
       },
     };
   }
@@ -349,6 +358,10 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     captureEmailMessage: captureEmailRecommended ? captureEmailMessage : null,
     captureName: captureNameRecommended,
     actions: communityCTA ? [communityCTA] : [],
+    suggestedActions: generateSuggestedActions({
+      dominantPattern: emotionalProfile?.dominantPattern,
+      hasPendingActions: (activeGoal?.actions.some((a) => !a.completed)) ?? false,
+    }),
   };
 
   const streamUserId = userId;

@@ -3,6 +3,7 @@ import { getPrismaClient } from "@/db/prisma";
 import { resolveIdentity, InvalidSessionTokenError } from "@/lib/auth";
 
 const VALID_TONES = ["directo", "socratico", "calido"] as const;
+const VALID_GENDERS = ["feminine", "masculine", "neutral"] as const;
 const VALID_TIMEZONES = [
   "Europe/Madrid",
   "Europe/London",
@@ -25,6 +26,7 @@ const PREFERENCES_SELECT = {
   notifyInsights: true,
   notifyGoals: true,
   notifyUpdates: true,
+  genderForm: true,
   timezone: true,
 } as const;
 
@@ -38,6 +40,7 @@ const DEFAULT_PREFERENCES = {
   notifyInsights: true,
   notifyGoals: true,
   notifyUpdates: false,
+  genderForm: null,
   timezone: "Europe/Madrid",
 };
 
@@ -82,6 +85,15 @@ export async function PATCH(req: NextRequest) {
     data.aiTone = body.aiTone;
   if (body.timezone && VALID_TIMEZONES.includes(body.timezone as typeof VALID_TIMEZONES[number]))
     data.timezone = body.timezone;
+  // genderForm: feminine | masculine | neutral, o null para "no especificado"
+  if ("genderForm" in body) {
+    const g = body.genderForm;
+    if (g === null || g === undefined) {
+      data.genderForm = null;
+    } else if (typeof g === "string" && VALID_GENDERS.includes(g as typeof VALID_GENDERS[number])) {
+      data.genderForm = g;
+    }
+  }
   if ("reminderTime" in body) {
     const rt = body.reminderTime;
     data.reminderTime = typeof rt === "string" && /^\d{2}:\d{2}$/.test(rt) ? rt : null;

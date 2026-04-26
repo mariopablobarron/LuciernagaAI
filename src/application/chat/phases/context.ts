@@ -100,13 +100,34 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
   // resumen corto habitual.
   const weeklyPattern = await loadWeeklyPattern(userId).catch(() => null);
 
-  const [impulseProfile, impulseLogs, journeyPromptBlock, projectPromptBlock, welcomeOnboarding] = await Promise.all([
+  const [impulseProfile, impulseLogs, journeyPromptBlock, projectPromptBlock, welcomeOnboarding, userPrefs] = await Promise.all([
     getUserImpulseProfile(userId).catch(() => null),
     listRecentImpulseLogs(userId, 5).catch(() => []),
     buildJourneyPromptBlock(userId).catch(() => null),
     buildProjectPromptBlock(userId).catch(() => null),
     loadWelcomeOnboarding(userId).catch(() => null),
+    (async (): Promise<{ genderForm: string | null } | null> => {
+      try {
+        const client = getPrismaClient();
+        if (!client?.userPreferences?.findUnique) return null;
+        return await client.userPreferences.findUnique({
+          where: { userId },
+          select: { genderForm: true },
+        });
+      } catch {
+        return null;
+      }
+    })(),
   ]);
+
+  // Forma gramatical preferida (feminine | masculine | neutral | null).
+  // null/desconocido se trata como "neutral" en el coach prompt.
+  const userGender =
+    userPrefs?.genderForm === "feminine" ||
+    userPrefs?.genderForm === "masculine" ||
+    userPrefs?.genderForm === "neutral"
+      ? userPrefs.genderForm
+      : null;
 
   // ── Action defaults ─────────────────────────────────────────────────────
   const activeAction = getFirstPendingAction(activeGoal);
@@ -152,6 +173,7 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
     web: searchQuery
       ? { query: searchQuery, usage: "practical_decision" as const, results: searchResults }
       : null,
+    userGender,
   };
 
   logInfo("AI", "openrouter_call_requested", {

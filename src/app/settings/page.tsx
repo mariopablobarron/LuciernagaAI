@@ -44,8 +44,15 @@ type Preferences = {
   notifyInsights: boolean;
   notifyGoals: boolean;
   notifyUpdates: boolean;
+  genderForm: "feminine" | "masculine" | "neutral" | null;
   timezone: string;
 };
+
+const GENDER_FORMS = [
+  { value: 'feminine', label: 'Femenino', desc: '"estás cansada"' },
+  { value: 'masculine', label: 'Masculino', desc: '"estás cansado"' },
+  { value: 'neutral', label: 'Neutro', desc: 'Sin conjugaciones de género ("estás en un momento de cansancio")' },
+] as const;
 
 type PasswordForm = { current: string; next: string; confirm: string };
 
@@ -468,6 +475,39 @@ export default function SettingsPage() {
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="space-y-2 mt-6">
+            <p className="text-sm font-medium text-zinc-300">¿Cómo prefieres que te hablemos?</p>
+            <p className="text-[11px] text-zinc-500">
+              Define la conjugación gramatical del mentor cuando se dirige a ti. Puedes cambiarlo cuando quieras.
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {GENDER_FORMS.map((g) => (
+                <button
+                  key={g.value}
+                  onClick={() => updatePref('genderForm', g.value)}
+                  disabled={saving}
+                  className={`p-3 rounded-xl border text-left transition-all ${
+                    prefs?.genderForm === g.value
+                      ? 'border-violet-500/60 bg-violet-500/10'
+                      : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700'
+                  }`}
+                >
+                  <p className="text-sm font-semibold text-white">{g.label}</p>
+                  <p className="text-[11px] text-zinc-500 mt-0.5">{g.desc}</p>
+                </button>
+              ))}
+            </div>
+            {prefs?.genderForm && (
+              <button
+                onClick={() => updatePref('genderForm', null)}
+                disabled={saving}
+                className="text-[11px] text-zinc-500 hover:text-zinc-300 underline mt-1"
+              >
+                Quitar preferencia (volver a sin definir)
+              </button>
+            )}
           </div>
         </div>
 

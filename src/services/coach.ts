@@ -92,6 +92,12 @@ export type CoachContext = {
   // etc.). Se inyecta en el system prompt sin aparecer nunca en el chat
   // visible del usuario.
   accompanimentMode?: { label: string; instruction: string } | null;
+  // Forma gramatical preferida para dirigirse al usuario.
+  // - "feminine"  → conjuga en femenino ("estás cansada")
+  // - "masculine" → conjuga en masculino ("estás cansado")
+  // - "neutral" / null → evita conjugaciones de género ("estás teniendo un momento difícil")
+  // Se carga desde UserPreferences.genderForm.
+  userGender?: "feminine" | "masculine" | "neutral" | null;
 };
 
 type ResponseFinalizationContext = {
@@ -327,6 +333,18 @@ Reglas de continuidad obligatorias:
 - Mantén continuidad entre turnos, evitando respuestas aisladas.`;
 }
 
+function buildGenderGuidance(context: CoachContext): string {
+  const g = context.userGender;
+  if (g === "feminine") {
+    return "Forma gramatical: la persona usuaria prefiere que te dirijas a ella en FEMENINO. Conjuga adjetivos y participios en femenino (\"estás cansada\", \"te has quedado bloqueada\", \"tú misma\").";
+  }
+  if (g === "masculine") {
+    return "Forma gramatical: la persona usuaria prefiere que te dirijas a él en MASCULINO. Conjuga adjetivos y participios en masculino (\"estás cansado\", \"te has quedado bloqueado\", \"tú mismo\").";
+  }
+  // neutral o null
+  return "Forma gramatical: NO conoces el género de la persona usuaria. EVITA conjugaciones de género en adjetivos y participios. Reformula con frases neutras: en vez de \"estás cansado/a\" usa \"estás en un momento de cansancio\"; en vez de \"te has quedado bloqueado/a\" usa \"te has quedado en bloqueo\"; en vez de \"tú mismo/a\" usa \"tú\". Si necesitas expresar un estado, prefiere sustantivos (cansancio, bloqueo, claridad) sobre adjetivos conjugados.";
+}
+
 export function buildCoachPrompt(
   userState: UserState,
   emotionalProfile: EmotionalProfile = DEFAULT_EMOTIONAL_PROFILE,
@@ -340,6 +358,7 @@ export function buildCoachPrompt(
   const legalGuidance = buildLegalGuidance(context);
   const accessGuidance = buildAccessGuidance(context);
   const onboardingGuidance = buildOnboardingGuidance(context);
+  const genderGuidance = buildGenderGuidance(context);
   const welcomeOnboardingGuidance = context.welcomeOnboarding
     ? buildOnboardingPromptBlock(context.welcomeOnboarding)
     : "";
@@ -411,6 +430,7 @@ No se pudo verificar información externa suficiente. No afirmes datos actuales 
     `Adaptación: ${EMOTION_GUIDANCE[emotionalProfile.primaryEmotion]} ${PATTERN_GUIDANCE[emotionalProfile.dominantPattern]} ${ENERGY_GUIDANCE[emotionalProfile.energyLevel]}`,
     empatheticResponseGuidance,
     mentorProtocolGuidance,
+    genderGuidance,
     transformationGuidance,
     legalGuidance,
     accessGuidance,

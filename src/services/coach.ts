@@ -103,6 +103,15 @@ export type CoachContext = {
   // prompt como pista para resolver pronombres referenciales sin pisar el
   // mensaje original que ve el usuario. Generada en phases/reformulate.ts.
   contextualInterpretation?: string | null;
+  // Intents extendidos detectados en el mensaje del usuario. Modulan el TONO
+  // del mentor sin interceptar el flow normal del chat. La detección de
+  // crisis activa (ideación suicida real, autolesión) sigue viviendo en
+  // risk.ts y se ejecuta antes que el LLM.
+  extendedIntent?: {
+    grief: boolean;
+    mildIdeation: boolean;
+    gratitudeClosure: boolean;
+  } | null;
 };
 
 type ResponseFinalizationContext = {
@@ -350,6 +359,33 @@ function buildGenderGuidance(context: CoachContext): string {
   return "Forma gramatical: NO conoces el género de la persona usuaria. EVITA conjugaciones de género en adjetivos y participios. Reformula con frases neutras: en vez de \"estás cansado/a\" usa \"estás en un momento de cansancio\"; en vez de \"te has quedado bloqueado/a\" usa \"te has quedado en bloqueo\"; en vez de \"tú mismo/a\" usa \"tú\". Si necesitas expresar un estado, prefiere sustantivos (cansancio, bloqueo, claridad) sobre adjetivos conjugados.";
 }
 
+function buildExtendedIntentGuidance(context: CoachContext): string {
+  const i = context.extendedIntent;
+  if (!i || (!i.grief && !i.mildIdeation && !i.gratitudeClosure)) return "";
+
+  const lines: string[] = ["Señales adicionales detectadas en el último mensaje del usuario:"];
+
+  if (i.grief) {
+    lines.push(
+      `- DUELO/PÉRDIDA detectado. Antes de proponer cualquier acción, RECONOCE la pérdida en concreto (sin generalismos como "lo siento mucho"). El duelo no se ordena ni se resuelve con tareas. Pregunta sólo si necesita hablar de esa pérdida hoy o si prefiere mover el foco a otra cosa. NO empujes acción en este turno aunque haya objetivo abierto.`,
+    );
+  }
+
+  if (i.mildIdeation) {
+    lines.push(
+      `- IDEACIÓN LEVE / MALESTAR PROFUNDO no clínico. NO actives protocolo de crisis (eso ya lo hace el sistema cuando aplica). Pero ajusta el tono: pisa suave, valida el peso de lo que está sintiendo sin dramatizar ni minimizar, no propongas acción inmediata. Pregunta UNA cosa concreta sobre cómo está ahora mismo (no sobre el futuro). Si la persona desliza señales más fuertes en su respuesta, prioriza seguridad sobre coaching.`,
+    );
+  }
+
+  if (i.gratitudeClosure) {
+    lines.push(
+      `- GRATITUD / CIERRE POSITIVO. La persona quiere terminar la sesión bien. NO interpretes como problema ni busques nuevas aristas. Acepta el cierre con calidez breve (sin empalagar), reconoce un detalle concreto de lo trabajado hoy, y deja una sola línea de continuidad para la próxima vez ("la próxima vez que vuelvas, retomamos X si quieres"). NO propongas más acciones en este turno.`,
+    );
+  }
+
+  return lines.join("\n");
+}
+
 export function buildCoachPrompt(
   userState: UserState,
   emotionalProfile: EmotionalProfile = DEFAULT_EMOTIONAL_PROFILE,
@@ -364,6 +400,7 @@ export function buildCoachPrompt(
   const accessGuidance = buildAccessGuidance(context);
   const onboardingGuidance = buildOnboardingGuidance(context);
   const genderGuidance = buildGenderGuidance(context);
+  const extendedIntentGuidance = buildExtendedIntentGuidance(context);
   const welcomeOnboardingGuidance = context.welcomeOnboarding
     ? buildOnboardingPromptBlock(context.welcomeOnboarding)
     : "";
@@ -443,6 +480,7 @@ No se pudo verificar información externa suficiente. No afirmes datos actuales 
     empatheticResponseGuidance,
     mentorProtocolGuidance,
     genderGuidance,
+    extendedIntentGuidance,
     transformationGuidance,
     legalGuidance,
     accessGuidance,

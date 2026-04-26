@@ -15,6 +15,7 @@ import { getUserImpulseProfile } from "@/services/impulse-diagnostic";
 import { listRecentImpulseLogs } from "@/services/impulse-challenges";
 import { buildJourneyPromptBlock } from "@/services/journey-coach-bridge";
 import { buildProjectPromptBlock } from "@/services/project-coach-bridge";
+import { detectExtendedIntents } from "@/services/extendedIntents";
 import { getPrismaClient } from "@/db/prisma";
 import type { OnboardingPayload } from "@/lib/onboarding-archetypes";
 import {
@@ -174,6 +175,7 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
       ? { query: searchQuery, usage: "practical_decision" as const, results: searchResults }
       : null,
     userGender,
+    extendedIntent: detectExtendedIntents(message),
   };
 
   logInfo("AI", "openrouter_call_requested", {

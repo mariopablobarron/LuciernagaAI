@@ -137,6 +137,27 @@ ${MENTOR_PURPOSE_MODEL_PROMPT}
 Estilo: directo, humano, breve (4-6 frases max). Sin tecnicismos, sin motivación vacía. No eres terapia.
 
 Si el usuario pregunta si esto es terapia o si puedes hacer terapia: responde con claridad que NO lo eres. Eres una guía práctica para ordenar pensamiento y mover a la acción. Si necesita terapia de verdad, sugiérele buscar un profesional en psicología — tu valor es complementario, no sustitutivo. No disfraces esta diferencia.
+
+REGLAS DE FORMATO (no negociables):
+- NUNCA uses headers Markdown ni labels como **Reflejo:**, **Porqué:**, **Acción:**, **Pregunta:**, **Validación:**, **Microacción:** ni similares. Esa estructura es interna a tu razonamiento — al usuario llega como conversación natural, NO como lista etiquetada de coaching.
+- UNA sola pregunta de cierre. NO dos. NO tres. Si tienes varias dudas, elige la más interpeladora y descarta el resto. La acción concreta NO cuenta como pregunta.
+- Negrita escasa, solo para destacar UNA frase clave. No más.
+- Párrafos cortos separados por línea en blanco. No bullets numerados.
+
+EJEMPLO de qué NO hacer (jerga visible, dos preguntas):
+"**Reflejo:** Llevas mucho encima — escuela, trabajo, hijos.
+**Porqué:** Detrás del cansancio veo que mides el sufrimiento ajeno con tu vara.
+**Pregunta:** ¿Qué necesitarías recibir para dejar esa cuenta?
+**Acción:** La próxima vez que sientas frustración, pausa dos segundos. ¿Qué cambia para ti cuando tu historia no está en el centro?"
+
+EJEMPLO correcto (mismo contenido, conversación natural, una sola pregunta final):
+"Llevas mucho encima — escuela, trabajo, hijos. Y cuando alguien a tu lado se queja de algo que a ti te parece menor, la frustración tiene sentido.
+
+Detrás de eso no es solo cansancio. Es que cuando nadie valida lo que cargas, empiezas a medir el sufrimiento ajeno con tu propio esfuerzo como vara — y eso convierte la amistad en una competencia que nadie ganó.
+
+La próxima vez que sientas esa frustración, pausa dos segundos antes de reaccionar.
+
+¿Qué necesitarías recibir tú para dejar de llevar esa cuenta?"
 ${MENTOR_RESPONSE_STRUCTURE_PROMPT}
 ${MENTOR_POWERFUL_QUESTIONS_PROMPT}`;
 
@@ -616,11 +637,70 @@ function buildQuestion(context: ResponseFinalizationContext): string {
   return "¿Qué pequeño paso puedes dar hoy?";
 }
 
+/**
+ * Sanitiza la respuesta del LLM para garantizar el formato pactado en BASE_PROMPT,
+ * incluso cuando el modelo desobedece (Claude tiene prior fuerte hacia headers
+ * en counseling). Cambios:
+ *   1. Elimina headers Markdown tipo **Reflejo:** **Porqué:** **Acción:** etc.
+ *      manteniendo el contenido del párrafo.
+ *   2. Si hay dos preguntas consecutivas separadas por espacio o guion (?. ¿..?),
+ *      conserva solo la última (la más cercana al cierre suele ser la principal).
+ *
+ * Diseño conservador: NO elimina preguntas separadas por párrafos completos
+ * (pueden ser preguntas socráticas internas legítimas).
+ */
+const HEADER_LABELS = [
+  "Reflejo",
+  "Porqué",
+  "Por qué",
+  "Acción para hoy",
+  "Acción posible",
+  "Acción",
+  "Pregunta que abre",
+  "Pregunta",
+  "Reconocimiento",
+  "Validación",
+  "Microacción",
+  "Paso \\d+",
+  "Step \\d+",
+];
+const HEADER_PATTERN = new RegExp(
+  `\\*\\*\\s*(${HEADER_LABELS.join("|")})\\s*[:.]?\\s*\\*\\*\\s*`,
+  "gi",
+);
+
+export function sanitizeCoachResponse(text: string): string {
+  let out = text;
+
+  // 1) Strip headers tipo **Reflejo:**, **Porqué:**, etc.
+  out = out.replace(HEADER_PATTERN, "");
+
+  // 2) Si quedó "**:** " huérfano (label vacío tras sustitución) o doble espacio
+  out = out.replace(/\*\*\s*:\s*\*\*/g, "");
+
+  // 3) Pares de preguntas consecutivas (sin newline entre ellas): "¿...? ¿...?"
+  //    Solo aplicamos si la PRIMERA empieza con ¿ — así no rompemos texto que
+  //    contiene otras frases. Repetimos hasta que no queden más pares (cubre 3+).
+  let prev = "";
+  while (prev !== out) {
+    prev = out;
+    out = out.replace(
+      /¿[^?¿\n]+\?\s*[—–-]?\s*(¿[^?¿\n]+\?)/g,
+      (_match, secondQ) => secondQ,
+    );
+  }
+
+  // 4) Limpieza espacios duplicados / saltos triples
+  out = out.replace(/\n{3,}/g, "\n\n").replace(/[ \t]{2,}/g, " ");
+
+  return out.trim();
+}
+
 export function finalizeResponse(
   response: string,
   context: ResponseFinalizationContext
 ): string {
-  let next = response.trim();
+  let next = sanitizeCoachResponse(response.trim());
 
   // Solo pegamos una línea de acción cuando el usuario eligió modo confrontativo
   // y hay una acción pendiente concreta — en el resto de casos confiamos en

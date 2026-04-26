@@ -94,3 +94,73 @@ describe("coach prompt identity", () => {
     expect(buildFallbackResponse("claridad")).toContain("paso más concreto");
   });
 });
+
+import { sanitizeCoachResponse } from "@/services/coach";
+
+describe("sanitizeCoachResponse", () => {
+  it("strips headers Markdown tipo **Reflejo:**", () => {
+    const out = sanitizeCoachResponse("**Reflejo:** Lo que describes es duro.");
+    expect(out).toBe("Lo que describes es duro.");
+  });
+
+  it("strips múltiples headers en una respuesta", () => {
+    const input = `**Reflejo:** Llevas mucho.
+
+**Porqué:** Detrás del cansancio veo agotamiento.
+
+**Pregunta:** ¿Qué necesitas?`;
+    const out = sanitizeCoachResponse(input);
+    expect(out).not.toContain("**Reflejo:**");
+    expect(out).not.toContain("**Porqué:**");
+    expect(out).not.toContain("**Pregunta:**");
+    expect(out).toContain("Llevas mucho");
+    expect(out).toContain("Detrás del cansancio");
+    expect(out).toContain("¿Qué necesitas?");
+  });
+
+  it("strips variantes con punto y sin punto", () => {
+    expect(sanitizeCoachResponse("**Acción.** Haz X.")).toBe("Haz X.");
+    expect(sanitizeCoachResponse("**Acción** Haz X.")).toBe("Haz X.");
+    expect(sanitizeCoachResponse("**Acción para hoy:** Haz X.")).toBe("Haz X.");
+    expect(sanitizeCoachResponse("**Acción posible:** Haz X.")).toBe("Haz X.");
+    expect(sanitizeCoachResponse("**Microacción:** Pausa 5 min.")).toBe("Pausa 5 min.");
+  });
+
+  it("trunca dos preguntas consecutivas a la última", () => {
+    const out = sanitizeCoachResponse("¿Qué sientes? ¿Qué harías ahora?");
+    expect(out).toBe("¿Qué harías ahora?");
+  });
+
+  it("trunca tres preguntas consecutivas a la última", () => {
+    const out = sanitizeCoachResponse("¿A? ¿B? ¿C?");
+    expect(out).toBe("¿C?");
+  });
+
+  it("conserva preguntas separadas por párrafos", () => {
+    const input = "Detrás de eso hay miedo.\n\n¿Es eso lo que sientes?\n\nLa próxima vez que pase, pausa.\n\n¿Qué necesitarías recibir tú?";
+    const out = sanitizeCoachResponse(input);
+    // Ambas preguntas deben sobrevivir porque están en párrafos distintos
+    expect(out).toContain("¿Es eso lo que sientes?");
+    expect(out).toContain("¿Qué necesitarías recibir tú?");
+  });
+
+  it("trunca pregunta unida con guion", () => {
+    const out = sanitizeCoachResponse("¿Qué sientes? — ¿Qué harías?");
+    expect(out).toBe("¿Qué harías?");
+  });
+
+  it("no toca respuestas con UNA sola pregunta", () => {
+    const input = "Lo que describes me dice que cargas mucho. ¿Qué necesitas?";
+    expect(sanitizeCoachResponse(input)).toBe(input);
+  });
+
+  it("no toca respuestas sin headers ni preguntas", () => {
+    const input = "Estoy contigo. Vamos paso a paso.";
+    expect(sanitizeCoachResponse(input)).toBe(input);
+  });
+
+  it("limpia saltos de línea triples y espacios duplicados", () => {
+    const out = sanitizeCoachResponse("Hola.\n\n\n\nQué tal.");
+    expect(out).toBe("Hola.\n\nQué tal.");
+  });
+});

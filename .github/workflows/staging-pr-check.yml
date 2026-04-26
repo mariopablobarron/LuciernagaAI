@@ -9,6 +9,12 @@ on:
       - synchronize
       - reopened
       - ready_for_review
+  # También en push directo a main: en este flow Mario commitea directo,
+  # sin PR. Si el rule de branch protection exige `staging-check`, sin
+  # este trigger el check nunca se generaba y aparecía el warning de bypass.
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 concurrency:

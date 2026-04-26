@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X, User, Settings, LogOut } from "lucide-react";
+import { Menu, X, User, Settings, LogOut, BarChart3 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import ClinicalDisclaimer from "@/components/ClinicalDisclaimer";
 import NotificationBell from "@/components/NotificationBell";
@@ -126,6 +126,9 @@ export default function Header() {
                         <Link href="/profile" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/6 transition-colors">
                           <User className="w-4 h-4 text-zinc-500" /> Perfil
                         </Link>
+                        <Link href="/dashboard" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/6 transition-colors">
+                          <BarChart3 className="w-4 h-4 text-zinc-500" /> Mi progreso
+                        </Link>
                         <Link href="/settings" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/6 transition-colors">
                           <Settings className="w-4 h-4 text-zinc-500" /> Ajustes
                         </Link>
@@ -219,6 +222,9 @@ export default function Header() {
                   </div>
                   <Link href="/profile" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm text-zinc-300 hover:text-white hover:bg-white/6">
                     <User className="w-4 h-4 text-zinc-500" /> Perfil
+                  </Link>
+                  <Link href="/dashboard" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm text-zinc-300 hover:text-white hover:bg-white/6">
+                    <BarChart3 className="w-4 h-4 text-zinc-500" /> Mi progreso
                   </Link>
                   <Link href="/settings" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm text-zinc-300 hover:text-white hover:bg-white/6">
                     <Settings className="w-4 h-4 text-zinc-500" /> Ajustes

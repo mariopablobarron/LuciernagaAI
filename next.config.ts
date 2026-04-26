@@ -18,11 +18,11 @@ process.env.NEXT_PUBLIC_BUILD_VERSION = BUILD_VERSION;
 
 const cspDirectives = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net https://eu-assets.i.posthog.com https://us-assets.i.posthog.com${isDev ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net https://eu-assets.i.posthog.com https://us-assets.i.posthog.com https://cdn.inspectlet.com${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' https://cdn.jsdelivr.net",
-  `connect-src 'self' https://openrouter.ai https://*.sentry.io https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://www.facebook.com https://accounts.google.com https://oauth2.googleapis.com https://eu.i.posthog.com https://us.i.posthog.com${isDev ? " ws://localhost:3000 ws://127.0.0.1:3000" : ""}`,
+  `connect-src 'self' https://openrouter.ai https://*.sentry.io https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://www.facebook.com https://accounts.google.com https://oauth2.googleapis.com https://eu.i.posthog.com https://us.i.posthog.com https://hn.inspectlet.com${isDev ? " ws://localhost:3000 ws://127.0.0.1:3000" : ""}`,
   "frame-ancestors 'none'",
   "form-action 'self' https://accounts.google.com",
   "base-uri 'self'",

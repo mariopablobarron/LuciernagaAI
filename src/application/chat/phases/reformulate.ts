@@ -19,7 +19,7 @@ import { logError, logInfo } from "@/lib/logger";
 
 const REFORMULATION_MODEL =
   process.env.OPENROUTER_REFORMULATION_MODEL?.trim() ||
-  "google/gemini-flash-1.5";
+  "google/gemini-2.5-flash-lite";
 
 const SYSTEM_PROMPT =
   "Reformula el mensaje del usuario en una versión autocontenida usando el historial. " +

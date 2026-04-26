@@ -15,6 +15,7 @@
     "test:e2e:ui": "playwright test --ui",
     "eval:bench": "tsx eval/run-counselling-bench.ts",
     "eval:bench:quick": "tsx eval/run-counselling-bench.ts --limit 10",
+    "eval:judge": "tsx eval/judge-counselling.ts",
     "system-check": "bash scripts/system-check.sh",
     "hardening:auto": "node scripts/auto-update-hardening-board.mjs",
     "format": "prettier --write .",

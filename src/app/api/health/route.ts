@@ -14,6 +14,8 @@ type HealthResponse = {
     database: CheckStatus;
     env: CheckStatus;
     missingVars: string[];
+    migrations: CheckStatus;
+    failedMigrations: string[];
   };
   memory: {
     heapUsedMb: number;
@@ -35,6 +37,23 @@ async function checkDatabase(): Promise<CheckStatus> {
     return "ok";
   } catch {
     return "down";
+  }
+}
+
+async function checkMigrations(): Promise<{ status: CheckStatus; failed: string[] }> {
+  try {
+    const prisma = getPrismaClient();
+    const rows = await prisma.$queryRaw<{ migration_name: string }[]>`
+      SELECT migration_name
+      FROM "_prisma_migrations"
+      WHERE finished_at IS NULL
+        AND rolled_back_at IS NULL
+        AND started_at IS NOT NULL
+    `;
+    const failed = rows.map((r) => r.migration_name);
+    return { status: failed.length === 0 ? "ok" : "down", failed };
+  } catch {
+    return { status: "down", failed: [] };
   }
 }
 
@@ -63,13 +82,18 @@ export async function GET(): Promise<NextResponse<HealthResponse>> {
     "health:check",
     HEALTH_CACHE_TTL_MS,
     async () => {
-      const [dbStatus, envCheck] = await Promise.all([
+      const [dbStatus, envCheck, migrationsCheck] = await Promise.all([
         checkDatabase(),
         Promise.resolve(checkEnv()),
+        checkMigrations(),
       ]);
 
       const overallStatus: CheckStatus =
-        dbStatus === "down" ? "down" : envCheck.status === "degraded" ? "degraded" : "ok";
+        dbStatus === "down" || migrationsCheck.status === "down"
+          ? "down"
+          : envCheck.status === "degraded"
+          ? "degraded"
+          : "ok";
 
       return {
         status: overallStatus,
@@ -79,6 +103,8 @@ export async function GET(): Promise<NextResponse<HealthResponse>> {
           database: dbStatus,
           env: envCheck.status,
           missingVars: envCheck.missing,
+          migrations: migrationsCheck.status,
+          failedMigrations: migrationsCheck.failed,
         },
         memory: getMemoryMb(),
       };

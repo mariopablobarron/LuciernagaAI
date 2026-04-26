@@ -13,6 +13,8 @@
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "eval:bench": "tsx eval/run-counselling-bench.ts",
+    "eval:bench:quick": "tsx eval/run-counselling-bench.ts --limit 10",
     "system-check": "bash scripts/system-check.sh",
     "hardening:auto": "node scripts/auto-update-hardening-board.mjs",
     "format": "prettier --write .",
@@ -76,6 +78,7 @@
   "devDependencies": {
     "@faker-js/faker": "^9.9.0",
     "@playwright/test": "^1.59.1",
+    "tsx": "^4.19.2",
     "@swc/helpers": "^0.5.21",
     "@tailwindcss/postcss": "^4",
     "@types/canvas-confetti": "^1.9.0",

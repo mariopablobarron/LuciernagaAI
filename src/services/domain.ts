@@ -34,7 +34,7 @@ function normalize(message: string): string {
   return message
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -64,8 +64,10 @@ const DOMAIN_PATTERNS: Record<NonNullable<ProblemDomain>, RegExp[]> = {
     /\b(prestamo|credito|banco|factura|paga|cobrar|cuenta corriente)\b/,
   ],
   existential: [
-    /\b(sentido de la vida|para que vivo|proposito|por que estoy aqui|crisis existencial)\b/,
-    /\b(identidad|quien soy|no se quien soy|me he perdido|valores|creencias|fe)\b/,
+    /\bsentido de (la|mi|tu) vida\b/,
+    /\b(para|por) que (vivo|estoy aqui|sigo aqui)\b/,
+    /\b(proposito|crisis existencial|crisis de fe|en que creer)\b/,
+    /\b(identidad|quien soy|no se quien soy|me he perdido|valores|creencias)\b/,
     /\b(espiritual|religion|dios|trascendente|alma)\b/,
   ],
   family_role: [
@@ -74,7 +76,8 @@ const DOMAIN_PATTERNS: Record<NonNullable<ProblemDomain>, RegExp[]> = {
     /\b(ser padre|ser madre|maternidad|paternidad|crianza)\b/,
   ],
   social: [
-    /\b(soledad|me siento sol[oa]|sin amigos|nadie me|sin apoyo|aislad[oa])\b/,
+    /\b(soledad|sin amigos|nadie me|sin apoyo|aislad[oa])\b/,
+    /\bme siento (muy |bastante |tan |un poco )?sol[oa]\b/,
     /\b(no encajo|no tengo a nadie|me falta gente|no conecto con|me siento fuera)\b/,
   ],
   creative: [

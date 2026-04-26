@@ -8,76 +8,7 @@ import Header from '@/components/home/Header';
 import Footer from '@/components/home/Footer';
 import HeartbeatParticles from '@/components/effects/HeartbeatParticles';
 import Reveal, { RevealWords } from '@/components/effects/Reveal';
-
-function ChatMockup() {
-  const t = useTranslations('chatMockup');
-  const messages = [
-    { role: 'user', text: t('msg1User') },
-    { role: 'ai', text: t('msg2Ai') },
-    { role: 'user', text: t('msg3User') },
-    { role: 'ai', text: t('msg4Ai') },
-  ];
-
-  return (
-    <div className="relative isolate">
-      <div className="absolute -inset-4 bg-linear-to-br from-violet-500/25 via-fuchsia-500/20 to-cyan-500/15 rounded-3xl blur-2xl pointer-events-none -z-10" />
-      <div className="relative rounded-2xl border border-zinc-700/60 bg-zinc-900/80 backdrop-blur-sm overflow-hidden shadow-2xl shadow-fuchsia-500/10">
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800 bg-zinc-950/60">
-          <div className="flex gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-zinc-700" />
-            <div className="w-3 h-3 rounded-full bg-zinc-700" />
-            <div className="w-3 h-3 rounded-full bg-zinc-700" />
-          </div>
-          <span className="ml-auto text-[10px] uppercase tracking-[0.25em] text-zinc-500">
-            sesión · 04:12
-          </span>
-        </div>
-        <div className="p-4 sm:p-5 space-y-3">
-          {messages.map((msg, i) => (
-            <Reveal key={i} delay={i * 180} y={10} blur={3} duration={500}>
-              <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                {msg.role === 'ai' && (
-                  <div className="w-6 h-6 rounded-full bg-cyan-500/20 ring-1 ring-cyan-500/30 flex items-center justify-center mr-2 mt-0.5 shrink-0">
-                    <Sparkles className="w-3 h-3 text-cyan-400" />
-                  </div>
-                )}
-                <div
-                  className={`max-w-[80%] px-3.5 py-2 rounded-2xl text-sm leading-relaxed ${
-                    msg.role === 'user'
-                      ? 'bg-violet-600/80 text-white rounded-tr-sm'
-                      : 'bg-zinc-800 text-zinc-100 border border-zinc-700/50 rounded-tl-sm'
-                  }`}
-                >
-                  {msg.text}
-                </div>
-              </div>
-            </Reveal>
-          ))}
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-cyan-500/20 ring-1 ring-cyan-500/30 flex items-center justify-center shrink-0">
-              <Sparkles className="w-3 h-3 text-cyan-400" />
-            </div>
-            <div className="flex items-center gap-1 px-3.5 py-2 bg-zinc-800 rounded-2xl rounded-tl-sm border border-zinc-700/50">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce [animation-delay:0ms]" />
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce [animation-delay:150ms]" />
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce [animation-delay:300ms]" />
-            </div>
-          </div>
-        </div>
-        <div className="px-4 sm:px-5 pb-4">
-          <div className="flex items-center gap-2 bg-zinc-800/60 border border-zinc-700/40 rounded-xl px-4 py-2.5">
-            <span className="flex-1 text-sm text-zinc-500 italic" style={{ fontFamily: 'var(--font-serif)' }}>
-              {t('placeholder')}
-            </span>
-            <div className="w-7 h-7 rounded-lg bg-linear-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center">
-              <ArrowRight className="w-3.5 h-3.5 text-white" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+import ChatDemo from '@/components/home/ChatDemo';
 
 const FEATURES_KEYS = ['noJudgment', 'realState', 'concreteAction'] as const;
 const FEATURE_ICONS = [ShieldCheck, Zap, Target] as const;
@@ -239,7 +170,7 @@ export default function LandingPageI18n({
 
             <div className="mt-2 lg:mt-0">
               <Reveal delay={500} y={28} blur={6} duration={1000}>
-                <ChatMockup />
+                <ChatDemo />
               </Reveal>
             </div>
           </div>

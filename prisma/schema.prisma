@@ -2107,6 +2107,11 @@ model EnneagramAssessment {
   wing           Int?
   /// Versión del cuestionario (por si calibramos en el futuro).
   testVersion    String   @default("oeps-90-v1")
+  /// JSON: { qXX: 1..5 } con las respuestas individuales que dio el usuario.
+  /// Se guarda con consentimiento explícito (copy en la intro del test) para
+  /// que el equipo pueda contextualizar el resultado al revisar la ficha y
+  /// para que el propio usuario pueda revisar su histórico. Borrable.
+  rawAnswers     Json?
   completedAt    DateTime @default(now())
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 

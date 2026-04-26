@@ -178,6 +178,8 @@ type UserDetailResponse = {
     dominantType: number;
     wing: number | null;
     scoresByType: Record<string, number>;
+    testVersion?: string | null;
+    rawAnswers?: Record<string, number> | null;
     completedAt: string;
   };
 };
@@ -1230,10 +1232,43 @@ export default function AdminUserDetailPage() {
                         Tipo <span className="font-bold text-white">{data.enneagram.dominantType}</span> ·{" "}
                         <span className="text-zinc-200">{ENNEAGRAM_TYPE_NAMES[data.enneagram.dominantType] ?? "—"}</span>
                         {data.enneagram.wing ? <> · ala <span className="text-white">{data.enneagram.wing}</span></> : null}
+                        {data.enneagram.testVersion === "self-declared-v1" ? (
+                          <span className="ml-2 inline-block rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-300">
+                            Declarado
+                          </span>
+                        ) : null}
                       </p>
                       <p className="text-xs text-zinc-500">
                         Hecho el {formatDate(data.enneagram.completedAt)}
                       </p>
+                      {data.enneagram.rawAnswers &&
+                        Object.keys(data.enneagram.rawAnswers).length > 0 && (
+                          <details className="mt-2 group">
+                            <summary className="cursor-pointer text-xs text-fuchsia-300 hover:text-fuchsia-200 select-none">
+                              Ver las {Object.keys(data.enneagram.rawAnswers).length} respuestas del test
+                            </summary>
+                            <div className="mt-2 max-h-72 overflow-y-auto rounded-lg border border-zinc-800 bg-zinc-950/60 p-2">
+                              <table className="w-full text-[11px]">
+                                <thead className="text-zinc-500">
+                                  <tr>
+                                    <th className="text-left py-1">Pregunta</th>
+                                    <th className="text-right py-1">Respuesta (1-5)</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {Object.entries(data.enneagram.rawAnswers)
+                                    .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
+                                    .map(([qid, val]) => (
+                                      <tr key={qid} className="border-t border-zinc-800/60">
+                                        <td className="py-1 text-zinc-400 font-mono">{qid}</td>
+                                        <td className="py-1 text-right text-zinc-200">{val}</td>
+                                      </tr>
+                                    ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </details>
+                        )}
                     </div>
                   ) : (
                     <p className="mt-1 text-zinc-500">Sin test realizado.</p>

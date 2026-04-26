@@ -161,6 +161,66 @@ export default function EnneagramPage() {
     setPhase("running");
   }, []);
 
+  const [declareOpen, setDeclareOpen] = useState(false);
+  const [declareType, setDeclareType] = useState<EnneagramType | "">("");
+  const [declareWing, setDeclareWing] = useState<number | "">("");
+  const [declareSubmitting, setDeclareSubmitting] = useState(false);
+  const [declareError, setDeclareError] = useState<string | null>(null);
+
+  const [deleteSubmitting, setDeleteSubmitting] = useState(false);
+
+  const handleDeleteExisting = useCallback(async () => {
+    if (!confirm("¿Borrar tu test del eneagrama? Se eliminarán también las respuestas individuales. No se puede deshacer.")) return;
+    setDeleteSubmitting(true);
+    try {
+      const res = await fetch("/api/enneagram/me/delete", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (res.ok) {
+        setExisting(null);
+      }
+    } catch {
+      // ignore — el botón se reactiva
+    } finally {
+      setDeleteSubmitting(false);
+    }
+  }, []);
+
+  const handleDeclare = useCallback(async () => {
+    if (!declareType) return;
+    setDeclareSubmitting(true);
+    setDeclareError(null);
+    try {
+      const res = await fetch("/api/enneagram/declare", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          dominantType: Number(declareType),
+          wing: declareWing === "" ? null : Number(declareWing),
+        }),
+      });
+      const data = (await res.json()) as { success?: boolean; assessmentId?: string };
+      if (!res.ok || !data.success) {
+        setDeclareError("No pudimos guardar tu tipo. Prueba en un rato.");
+        return;
+      }
+      setExisting({
+        id: data.assessmentId!,
+        dominantType: Number(declareType),
+        wing: declareWing === "" ? null : Number(declareWing),
+        scoresByType: {} as Record<`type${EnneagramType}`, number>,
+        completedAt: new Date().toISOString(),
+      });
+      setDeclareOpen(false);
+    } catch {
+      setDeclareError("Sin conexión. Prueba en un rato.");
+    } finally {
+      setDeclareSubmitting(false);
+    }
+  }, [declareType, declareWing]);
+
   if (phase === "loading") {
     return (
       <main className="mx-auto max-w-2xl px-4 py-12 text-center text-zinc-400">
@@ -200,11 +260,11 @@ export default function EnneagramPage() {
         <ul className="space-y-2 text-sm text-zinc-400">
           <li>• Tarda unos 10-12 minutos.</li>
           <li>• Puedes pausar y volver: tus respuestas quedan guardadas en este navegador.</li>
-          <li>• Solo guardamos el resultado final (tipo + scores), no las respuestas individuales.</li>
+          <li>• Guardamos tu resultado y tus respuestas para que tu mentor pueda ajustar el tono y para que tú puedas revisar tu test cuando quieras. Puedes borrarlo desde aquí mismo.</li>
         </ul>
 
         {existing ? (
-          <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-4 space-y-1">
+          <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-4 space-y-2">
             <p className="text-sm text-emerald-200 font-semibold">
               Ya hiciste el test antes
             </p>
@@ -217,6 +277,14 @@ export default function EnneagramPage() {
             <p className="text-xs text-zinc-500">
               Hecho el {new Date(existing.completedAt).toLocaleDateString("es-ES", { dateStyle: "long" })}
             </p>
+            <button
+              type="button"
+              onClick={handleDeleteExisting}
+              disabled={deleteSubmitting}
+              className="text-xs text-red-400 hover:text-red-300 underline underline-offset-2 disabled:opacity-50"
+            >
+              {deleteSubmitting ? "Borrando…" : "Borrar mi test (incluye las respuestas individuales)"}
+            </button>
           </div>
         ) : null}
 
@@ -237,6 +305,87 @@ export default function EnneagramPage() {
               <RotateCcw className="h-4 w-4" /> Empezar de cero
             </button>
           ) : null}
+        </div>
+
+        <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4 space-y-3">
+          {!declareOpen ? (
+            <>
+              <p className="text-sm text-zinc-300">
+                ¿Ya conoces tu tipo (lo hiciste en otro test, libro o terapia)?
+              </p>
+              <button
+                type="button"
+                onClick={() => setDeclareOpen(true)}
+                className="text-sm font-semibold text-fuchsia-300 hover:text-fuchsia-200 underline underline-offset-2"
+              >
+                Declarar mi tipo sin hacer el test
+              </button>
+            </>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-sm text-zinc-300">
+                Selecciona tu tipo dominante. Si conoces tu ala, añádela.
+              </p>
+              <div className="flex flex-wrap items-end gap-3">
+                <label className="flex flex-col gap-1 text-xs text-zinc-400">
+                  <span>Tipo dominante</span>
+                  <select
+                    value={declareType}
+                    onChange={(e) => setDeclareType(e.target.value === "" ? "" : (Number(e.target.value) as EnneagramType))}
+                    className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 focus:border-fuchsia-500 focus:outline-none"
+                  >
+                    <option value="">Elige…</option>
+                    {([1, 2, 3, 4, 5, 6, 7, 8, 9] as const).map((t) => (
+                      <option key={t} value={t}>{t} — {ENNEAGRAM_TYPE_NAMES[t]}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="flex flex-col gap-1 text-xs text-zinc-400">
+                  <span>Ala (opcional)</span>
+                  <select
+                    value={declareWing}
+                    onChange={(e) => setDeclareWing(e.target.value === "" ? "" : Number(e.target.value))}
+                    className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 focus:border-fuchsia-500 focus:outline-none"
+                    disabled={!declareType}
+                  >
+                    <option value="">Sin ala</option>
+                    {declareType
+                      ? [
+                          declareType === 1 ? 9 : declareType - 1,
+                          declareType === 9 ? 1 : declareType + 1,
+                        ].map((w) => (
+                          <option key={w} value={w}>{w} — {ENNEAGRAM_TYPE_NAMES[w as EnneagramType]}</option>
+                        ))
+                      : null}
+                  </select>
+                </label>
+              </div>
+              {declareType ? (
+                <p className="text-xs text-zinc-500 italic">
+                  {ENNEAGRAM_TYPE_DESCRIPTIONS[declareType as EnneagramType]}
+                </p>
+              ) : null}
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={handleDeclare}
+                  disabled={!declareType || declareSubmitting}
+                  className="rounded-lg bg-fuchsia-600 hover:bg-fuchsia-500 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50 transition-colors"
+                >
+                  {declareSubmitting ? "Guardando…" : "Confirmar"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setDeclareOpen(false); setDeclareError(null); }}
+                  disabled={declareSubmitting}
+                  className="rounded-lg px-3 py-2 text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
+                >
+                  Cancelar
+                </button>
+              </div>
+              {declareError ? <p className="text-xs text-red-400">{declareError}</p> : null}
+            </div>
+          )}
         </div>
       </main>
     );

@@ -70,6 +70,7 @@ export async function POST(req: NextRequest) {
         scoresByType: result.scoresByType,
         dominantType: result.dominantType,
         wing: result.wing,
+        rawAnswers: cleaned as unknown as object,
       },
     });
 

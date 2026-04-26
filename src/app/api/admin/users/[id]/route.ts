@@ -210,7 +210,7 @@ export async function GET(req: NextRequest, { params }: Params) {
       prisma.enneagramAssessment.findFirst({
         where: { userId: id },
         orderBy: { completedAt: "desc" },
-        select: { id: true, dominantType: true, wing: true, scoresByType: true, completedAt: true },
+        select: { id: true, dominantType: true, wing: true, scoresByType: true, testVersion: true, rawAnswers: true, completedAt: true },
       }),
     ]);
 
@@ -349,6 +349,8 @@ export async function GET(req: NextRequest, { params }: Params) {
             dominantType: enneagram.dominantType,
             wing: enneagram.wing,
             scoresByType: enneagram.scoresByType,
+            testVersion: enneagram.testVersion,
+            rawAnswers: enneagram.rawAnswers,
             completedAt: enneagram.completedAt.toISOString(),
           }
         : null,

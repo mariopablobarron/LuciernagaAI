@@ -66,7 +66,7 @@ type FeedbackSummary = {
   byType: { type: string; count: number }[];
 };
 
-type Tab = "telegram" | "email" | "metrics" | "feedback" | "atribucion" | "tagging" | "testimonials" | "referidos" | "trackers" | "plantillas";
+type Tab = "telegram" | "email" | "metrics" | "feedback" | "atribucion" | "tagging" | "testimonials" | "referidos" | "trackers" | "plantillas" | "trafico";
 
 type EmailTemplateStats = {
   total: number;
@@ -281,6 +281,18 @@ function SegmentSelector({
 export default function MarketingPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>("telegram");
+
+  // Tráfico (PostHog) state
+  const [trafficData, setTrafficData] = useState<{
+    ok: boolean;
+    error?: string;
+    message?: string;
+    range?: "7d" | "30d" | "90d";
+    breakdown?: { source: string; medium: string; campaign: string; visitors: number; pageviews: number }[];
+    daily?: { day: string; visitors: number; pageviews: number }[];
+  } | null>(null);
+  const [trafficLoading, setTrafficLoading] = useState(false);
+  const [trafficRange, setTrafficRange] = useState<"7d" | "30d" | "90d">("30d");
 
   // Telegram state
   const [tgMessage, setTgMessage] = useState("");
@@ -824,6 +836,23 @@ export default function MarketingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
+  // ── Tráfico web (PostHog) ──────────────────────────────────────────────────
+  useEffect(() => {
+    if (activeTab !== "trafico") return;
+    setTrafficLoading(true);
+    fetch(`/api/admin/marketing/posthog-utm?range=${trafficRange}`, { credentials: "include" })
+      .then(async (r) => {
+        if (!checkAuth(r)) return null;
+        return (await r.json()) as typeof trafficData;
+      })
+      .then((d) => {
+        if (d) setTrafficData(d);
+      })
+      .catch(() => setTrafficData({ ok: false, error: "FETCH_FAILED", message: "No se pudo cargar." }))
+      .finally(() => setTrafficLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, trafficRange]);
+
   // ── Send handlers ──────────────────────────────────────────────────────────
 
   async function handleSendTelegram() {
@@ -922,6 +951,7 @@ export default function MarketingPage() {
     { key: "referidos", label: "Referidos", icon: <Users className="h-3.5 w-3.5" /> },
     { key: "trackers", label: "Trackers", icon: <Eye className="h-3.5 w-3.5" /> },
     { key: "plantillas", label: "Plantillas", icon: <Mail className="h-3.5 w-3.5" /> },
+    { key: "trafico", label: "Tráfico web", icon: <BarChart3 className="h-3.5 w-3.5" /> },
   ];
 
   return (
@@ -2422,6 +2452,140 @@ export default function MarketingPage() {
             </ul>
           </AdminPanel>
         </>
+      )}
+
+      {/* ── Tab: Tráfico web (PostHog) ───────────────────────────────────────── */}
+      {activeTab === "trafico" && (
+        <AdminPanel
+          title="Tráfico web por UTM"
+          description="Datos de PostHog. Visitantes únicos y pageviews agrupados por source/medium/campaign."
+        >
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+            <div className="flex gap-1">
+              {(["7d", "30d", "90d"] as const).map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => setTrafficRange(r)}
+                  className={`rounded-lg px-3 py-1 text-xs font-semibold transition-colors ${
+                    trafficRange === r
+                      ? "bg-violet-500/20 text-violet-200"
+                      : "border border-zinc-700 text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  {r === "7d" ? "Últimos 7 días" : r === "30d" ? "Últimos 30 días" : "Últimos 90 días"}
+                </button>
+              ))}
+            </div>
+            <p className="text-[11px] text-zinc-500">
+              Datos en vivo desde PostHog (HogQL)
+            </p>
+          </div>
+
+          {trafficLoading && !trafficData ? (
+            <p className="text-sm text-zinc-500">Cargando…</p>
+          ) : !trafficData?.ok ? (
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">
+              <p className="text-sm text-amber-200">
+                {trafficData?.message ?? "PostHog no está accesible."}
+              </p>
+              {trafficData?.error === "POSTHOG_NOT_CONFIGURED" && (
+                <ul className="mt-3 space-y-1 text-xs text-amber-100/80 list-disc pl-4">
+                  <li>Crea una <strong>Personal API Key</strong> en PostHog → Settings → User → Personal API Keys, scope <code>query:read</code>.</li>
+                  <li>Configura en Coolify Secrets:
+                    <code className="block mt-1 rounded bg-zinc-900 p-1.5 font-mono text-[10px] text-zinc-300">
+                      POSTHOG_API_HOST=https://eu.posthog.com{"\n"}
+                      POSTHOG_PROJECT_ID=12345{"\n"}
+                      POSTHOG_PERSONAL_API_KEY=phx_xxxxxxx
+                    </code>
+                  </li>
+                  <li>Force Redeploy y vuelve a esta pestaña.</li>
+                </ul>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Tabla breakdown */}
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-400 mb-2">
+                  Por fuente / medio / campaña
+                </h3>
+                <div className="overflow-x-auto rounded-xl border border-zinc-800">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-zinc-800 bg-zinc-800/30">
+                        <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Source</th>
+                        <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Medium</th>
+                        <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Campaign</th>
+                        <th className="px-3 py-2 text-right text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Visitantes</th>
+                        <th className="px-3 py-2 text-right text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Pageviews</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(trafficData.breakdown ?? []).map((r, i) => (
+                        <tr
+                          key={`${r.source}-${r.medium}-${r.campaign}-${i}`}
+                          className={`border-b border-zinc-800 ${i % 2 === 0 ? "bg-zinc-950" : "bg-zinc-800/20"}`}
+                        >
+                          <td className="px-3 py-2 font-mono text-xs text-white">{r.source}</td>
+                          <td className="px-3 py-2 font-mono text-xs text-zinc-400">{r.medium}</td>
+                          <td className="px-3 py-2 font-mono text-xs text-zinc-400">{r.campaign}</td>
+                          <td className="px-3 py-2 text-right font-semibold text-white">{r.visitors.toLocaleString("es-ES")}</td>
+                          <td className="px-3 py-2 text-right text-zinc-500">{r.pageviews.toLocaleString("es-ES")}</td>
+                        </tr>
+                      ))}
+                      {(!trafficData.breakdown || trafficData.breakdown.length === 0) && (
+                        <tr>
+                          <td colSpan={5} className="px-3 py-6 text-center text-xs text-zinc-500">
+                            Sin tráfico en este rango.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Daily series */}
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-400 mb-2">
+                  Por día (rango completo)
+                </h3>
+                <div className="overflow-x-auto rounded-xl border border-zinc-800 max-h-72">
+                  <table className="w-full text-sm">
+                    <thead className="sticky top-0 bg-zinc-900">
+                      <tr className="border-b border-zinc-800">
+                        <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Día</th>
+                        <th className="px-3 py-2 text-right text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Visitantes</th>
+                        <th className="px-3 py-2 text-right text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Pageviews</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(trafficData.daily ?? []).slice().reverse().map((d) => (
+                        <tr key={d.day} className="border-b border-zinc-800">
+                          <td className="px-3 py-2 font-mono text-xs text-white">{d.day}</td>
+                          <td className="px-3 py-2 text-right text-white">{d.visitors.toLocaleString("es-ES")}</td>
+                          <td className="px-3 py-2 text-right text-zinc-500">{d.pageviews.toLocaleString("es-ES")}</td>
+                        </tr>
+                      ))}
+                      {(!trafficData.daily || trafficData.daily.length === 0) && (
+                        <tr>
+                          <td colSpan={3} className="px-3 py-6 text-center text-xs text-zinc-500">
+                            Sin actividad diaria.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <p className="text-[11px] text-zinc-500">
+                Filtros UTM avanzados (por source/campaign): añade <code>?source=whatsapp</code> o <code>&amp;campaign=lanzamiento_amigos</code> al endpoint para acotar la serie diaria.
+              </p>
+            </div>
+          )}
+        </AdminPanel>
       )}
 
       {/* ── Modal: Preview de plantilla ─────────────────────────────────────── */}

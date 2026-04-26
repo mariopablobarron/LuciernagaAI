@@ -459,28 +459,4 @@ describe("buildContext — semantic memory", () => {
     const result = await buildContext(makeInput());
     expect(result.coachContext.pastEchoes).toBeNull();
   });
-
-  it("respects per-user opt-out from UserPreferences (PR3)", async () => {
-    const { getPrismaClient } = jest.requireActual("@/db/prisma") as {
-      getPrismaClient: () => unknown;
-    };
-    const client = getPrismaClient() as {
-      userPreferences: {
-        findUnique: jest.Mock;
-      };
-    };
-    const original = client.userPreferences.findUnique;
-    client.userPreferences.findUnique = jest.fn().mockResolvedValue({
-      semanticMemoryOptOut: true,
-    });
-
-    try {
-      const result = await buildContext(makeInput());
-      expect(result.coachContext.pastEchoes).toBeNull();
-      expect(embed).not.toHaveBeenCalled();
-      expect(retrieveSemanticMemory).not.toHaveBeenCalled();
-    } finally {
-      client.userPreferences.findUnique = original;
-    }
-  });
 });

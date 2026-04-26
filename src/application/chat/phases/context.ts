@@ -113,25 +113,19 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
   // evitaciones repetidas, eventos de crisis. Tolera fallos: si la query peta,
   // weeklyPattern queda en null y la continuidad sigue funcionando con el
   // resumen corto habitual.
-  // weeklyPattern y opt-out de memoria semántica en paralelo: ambos son
-  // queries baratas y el opt-out gobierna si llamamos a embed/retrieve.
-  const [weeklyPattern, semanticOptOut] = await Promise.all([
-    loadWeeklyPattern(userId).catch(() => null),
-    loadSemanticOptOut(userId).catch(() => false),
-  ]);
+  const weeklyPattern = await loadWeeklyPattern(userId).catch(() => null);
 
-  // ── Memoria semántica (PR2 + opt-out PR3) ────────────────────────────────
+  // ── Memoria semántica (PR2) ──────────────────────────────────────────────
   // Recupera material destilado del pasado (DailyLogs, resúmenes de
   // conversaciones cerradas) por similitud con el mensaje actual. Skip total
-  // para anónimos, crisis activa, opt-out del usuario, o si el feature flag
-  // está apagado. Tolera fallos: si OpenAI o pgvector petan, pastEchoes
-  // queda en null y el chat sigue exactamente como antes.
+  // para anónimos, crisis activa, o si el feature flag está apagado.
+  // Tolera fallos: si OpenAI o pgvector petan, pastEchoes queda en null y
+  // el chat sigue exactamente como antes.
   const pastEchoes = await loadSemanticEchoes({
     userId,
     query: input.queryHint?.trim() || message,
     isAnonymous: input.isAnonymous ?? false,
     crisisMode: input.crisisMode ?? false,
-    optOut: semanticOptOut,
   }).catch((err) => {
     logError("SEMANTIC_MEMORY", err, { stage: "retrieve", userId });
     return null;
@@ -345,7 +339,6 @@ async function loadSemanticEchoes(params: {
   query: string;
   isAnonymous: boolean;
   crisisMode: boolean;
-  optOut?: boolean;
 }): Promise<Array<{
   source: "daily_log" | "conversation_summary" | "insight";
   gist: string;
@@ -356,7 +349,6 @@ async function loadSemanticEchoes(params: {
   if (!process.env.OPENAI_API_KEY?.trim()) return null;
   if (params.isAnonymous) return null;
   if (params.crisisMode) return null;
-  if (params.optOut) return null;
   if (!params.query || params.query.trim().length < 4) return null;
 
   const queryVec = await embed(params.query);
@@ -377,17 +369,4 @@ async function loadSemanticEchoes(params: {
     daysAgo: Math.max(0, Math.floor((now - h.createdAt.getTime()) / (24 * 60 * 60 * 1000))),
     similarity: h.similarity,
   }));
-}
-
-// Lee el opt-out de memoria semántica de UserPreferences. Default false
-// si no hay preferencias guardadas o la query falla — el resto de filtros
-// (anonymous, crisis, flag) protegen los casos delicados.
-async function loadSemanticOptOut(userId: string): Promise<boolean> {
-  const client = getPrismaClient();
-  if (!client?.userPreferences?.findUnique) return false;
-  const prefs = await client.userPreferences.findUnique({
-    where: { userId },
-    select: { semanticMemoryOptOut: true },
-  });
-  return prefs?.semanticMemoryOptOut === true;
 }

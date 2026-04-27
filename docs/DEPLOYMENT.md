@@ -31,8 +31,8 @@ OPENROUTER_API_KEY=your-openrouter-api-key
 TELEGRAM_BOT_TOKEN=your-telegram-bot-token
 
 # App URLs
-APP_BASE_URL=https://luciernaga.app
-NEXT_PUBLIC_APP_URL=https://luciernaga.app
+APP_BASE_URL=https://tresmilmillonesdelatidos.es
+NEXT_PUBLIC_APP_URL=https://tresmilmillonesdelatidos.es
 ```
 
 ### Opción 1: Despliegue en Vercel (Recomendado)
@@ -106,7 +106,7 @@ docker run -d \
 
 5. **Dominio personalizado** (opcional)
    - Settings → Domains
-   - Agregar `luciernaga.app`
+   - Agregar `tresmilmillonesdelatidos.es`
    - Apuntar DNS a Vercel nameservers
 
 ### Checklist Pre-Deploy
@@ -145,7 +145,7 @@ npm run format
 
 1. **Health check**
    ```bash
-   curl https://luciernaga.app/api/health
+   curl https://tresmilmillonesdelatidos.es/api/health
    ```
 
 2. **Ver logs**

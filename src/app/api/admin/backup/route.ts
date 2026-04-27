@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { requireAdminPermission } from "@/lib/admin-auth";
+import { persistBackupToDisk, pruneOldBackups } from "@/lib/backup-storage";
 import { logError, logInfo } from "@/lib/logger";
 import { notifyAdmin, sendAdminDocument } from "@/services/telegram";
 import { isValidCronSecret } from "@/lib/cron-auth";
@@ -123,10 +124,58 @@ export async function GET(req: NextRequest) {
 
       if (!delivery.ok) {
         const isSizeIssue = delivery.reason === "size_exceeds_limit";
-        const headline = isSizeIssue
-          ? `🚨 BACKUP FUERA DE TELEGRAM — ${filename} pesa ${sizeKb} KB (límite 49 MB). El dump se generó OK pero NO está respaldado. Configurar destino externo (S3/R2) urgente.`
-          : `❌ Backup generado pero no se pudo subir a Telegram: ${filename} (${sizeKb} KB) — ${delivery.error ?? "unknown"}`;
-        notifyAdmin(headline);
+
+        if (isSizeIssue) {
+          const persisted = await persistBackupToDisk(compressed, filename);
+          if (persisted.ok) {
+            // Best-effort retention pass; logged internally, never throws.
+            await pruneOldBackups();
+            notifyAdmin(
+              `💾 BACKUP guardado en ${persisted.path} — ${filename} (${sizeKb} KB) excedía el límite de Telegram (49 MB). Verificar que /app/backups esté en un volumen persistente de Coolify.`,
+            );
+            logInfo("BACKUP", "backup_persisted_fallback", {
+              filename,
+              sizeKb,
+              path: persisted.path,
+              reason: delivery.reason,
+            });
+            return NextResponse.json({
+              ok: true,
+              filename,
+              sizeKb,
+              tables: tables.length,
+              rows: totalRows,
+              deliveredTo: "volume",
+              path: persisted.path,
+            });
+          }
+
+          notifyAdmin(
+            `🚨 BACKUP NO RESPALDADO — ${filename} (${sizeKb} KB) excede Telegram (49 MB) Y falló la persistencia a disco: ${persisted.error}`,
+          );
+          logError("BACKUP", new Error(persisted.error), {
+            filename,
+            sizeKb,
+            stage: "fallback_persist",
+            reason: delivery.reason,
+          });
+          return NextResponse.json(
+            {
+              ok: false,
+              error: "fallback_persist_failed",
+              telegramError: delivery.error ?? null,
+              reason: delivery.reason ?? null,
+              persistError: persisted.error,
+              filename,
+              sizeKb,
+            },
+            { status: 500 },
+          );
+        }
+
+        notifyAdmin(
+          `❌ Backup generado pero no se pudo subir a Telegram: ${filename} (${sizeKb} KB) — ${delivery.error ?? "unknown"}`,
+        );
         logError("BACKUP", new Error(delivery.error ?? "telegram_upload_failed"), {
           filename,
           sizeKb,
@@ -136,7 +185,7 @@ export async function GET(req: NextRequest) {
         return NextResponse.json(
           {
             ok: false,
-            error: isSizeIssue ? "size_exceeds_telegram_limit" : "telegram_upload_failed",
+            error: "telegram_upload_failed",
             telegramError: delivery.error ?? null,
             reason: delivery.reason ?? null,
             filename,

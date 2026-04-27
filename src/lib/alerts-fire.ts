@@ -77,21 +77,52 @@ function isThrottled(rule: Rule): boolean {
   return elapsedMs < rule.throttleMinutes * 60_000;
 }
 
-async function markFired(rule: Rule): Promise<void> {
+type FiringRecord = {
+  level: "critical" | "warning" | "info";
+  channel: string;
+  title: string;
+  message: string;
+  tag: string | null;
+  delivered: boolean;
+  errorReason?: string;
+};
+
+const FIRING_MESSAGE_MAX = 1000;
+
+async function markFired(rule: Rule, firing: FiringRecord): Promise<void> {
   try {
     const { getPrismaClient } = await import("@/db/prisma");
     const prisma = getPrismaClient();
-    await prisma.alertRule.update({
-      where: { id: rule.id },
-      data: {
-        lastFiredAt: new Date(),
-        firedCount: { increment: 1 },
-      },
-    });
-    // update local cache optimistically
-    rule.lastFiredAt = new Date();
+    const ops: Promise<unknown>[] = [
+      // Bump aggregates only on real deliveries; deduped/cooldown firings still
+      // get a row in AlertFiring (with delivered=false) for forensic value but
+      // they shouldn't push lastFiredAt forward.
+      firing.delivered
+        ? prisma.alertRule.update({
+            where: { id: rule.id },
+            data: {
+              lastFiredAt: new Date(),
+              firedCount: { increment: 1 },
+            },
+          })
+        : Promise.resolve(),
+      prisma.alertFiring.create({
+        data: {
+          ruleId: rule.id,
+          level: firing.level,
+          channel: firing.channel,
+          title: firing.title.slice(0, 500),
+          message: firing.message.slice(0, FIRING_MESSAGE_MAX),
+          tag: firing.tag ?? null,
+          delivered: firing.delivered,
+          errorReason: firing.errorReason ?? null,
+        },
+      }),
+    ];
+    await Promise.all(ops);
+    if (firing.delivered) rule.lastFiredAt = new Date();
   } catch {
-    // silent
+    // silent — alert path must never crash log enqueue
   }
 }
 
@@ -105,23 +136,32 @@ export async function evaluateLogForAlerts(entry: LogEntry): Promise<void> {
     if (!matches(rule, entry)) continue;
     if (isThrottled(rule)) continue;
 
+    const level: "critical" | "warning" =
+      entry.level === "error" ? "critical" : "warning";
+    const title = `[${entry.tag}] ${rule.name}`;
+    const message =
+      entry.message.slice(0, 500) +
+      (entry.stack ? `\n\nStack:\n${entry.stack.slice(0, 800)}` : "");
+
     // Fire-and-forget — no bloqueamos el enqueueLog principal
     void (async () => {
       try {
-        await sendAutomatedAlert(
-          {
-            type: entry.level === "error" ? "critical" : "warning",
-            title: `[${entry.tag}] ${rule.name}`,
-            message:
-              entry.message.slice(0, 500) +
-              (entry.stack ? `\n\nStack:\n${entry.stack.slice(0, 800)}` : ""),
-          },
+        const delivered = await sendAutomatedAlert(
+          { type: level, title, message },
           {
             dedupeKey: `alert-rule:${rule.id}`,
             cooldownMs: rule.throttleMinutes * 60_000,
           },
         );
-        await markFired(rule);
+        await markFired(rule, {
+          level,
+          channel: rule.channel,
+          title,
+          message,
+          tag: entry.tag,
+          delivered,
+          errorReason: delivered ? undefined : "deduped_or_cooldown",
+        });
       } catch {
         // ya se habrá logueado en sendAlert; evitamos bucle
       }

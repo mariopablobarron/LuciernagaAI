@@ -2043,20 +2043,46 @@ model WebhookLog {
 }
 
 model AlertRule {
-  id              String    @id @default(cuid())
+  id              String        @id @default(cuid())
   name            String
-  enabled         Boolean   @default(true)
+  enabled         Boolean       @default(true)
   level           String
   tagPattern      String?
   messagePattern  String?
-  channel         String    @default("telegram")
-  throttleMinutes Int       @default(15)
+  channel         String        @default("telegram")
+  throttleMinutes Int           @default(15)
   lastFiredAt     DateTime?
-  firedCount      Int       @default(0)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  firedCount      Int           @default(0)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  firings         AlertFiring[]
 
   @@index([enabled, level])
+}
+
+/// Per-event audit trail for alert rule firings. AlertRule.lastFiredAt and
+/// firedCount are aggregates; this table is the navigable history (what
+/// alerted, when, with what payload). Append-only.
+model AlertFiring {
+  id          String    @id @default(cuid())
+  ruleId      String
+  rule        AlertRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  firedAt     DateTime  @default(now())
+  /// Severity emitted to the channel (info|warning|critical).
+  level       String
+  channel     String
+  title       String
+  /// Truncated to ~1k chars by the writer to keep rows bounded.
+  message     String
+  tag         String?
+  /// false when sendAutomatedAlert returned false (deduped/cooldown) so we
+  /// can distinguish "rule matched but not delivered" from real deliveries.
+  delivered   Boolean   @default(true)
+  errorReason String?
+
+  @@index([firedAt])
+  @@index([ruleId, firedAt])
+  @@index([level, firedAt])
 }
 
 /// Local catalog of remote Claude Code routines created via /schedule.

@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
+import { requireCronSecret } from "@/lib/cron-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -16,10 +17,8 @@ type PrismaMigrationRow = {
 };
 
 export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
 
   const prisma = getPrismaClient();
 

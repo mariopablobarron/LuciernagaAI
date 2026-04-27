@@ -1,4 +1,5 @@
 import { getErrorMessage } from "@/lib/utils";
+import { sanitizeMeta } from "@/lib/log-sanitize";
 
 // In production suppress info-level console logs; warn and error always go through.
 const IS_PROD = process.env.NODE_ENV === "production";
@@ -133,15 +134,16 @@ function ts(): string {
 
 // ── Public API ────────────────────────────────────────────────────────────────
 export function logInfo(tag: string, message: string, meta?: Record<string, unknown>): void {
-  const ctx = { tag, ...meta };
-  if (!IS_PROD) console.info(`[${ts()}] [INFO] [${tag}] ${message}`, meta ?? "");
+  const safeMeta = sanitizeMeta(meta);
+  const ctx = { tag, ...safeMeta };
+  if (!IS_PROD) console.info(`[${ts()}] [INFO] [${tag}] ${message}`, safeMeta ?? "");
   void getLogtail()?.info(message, ctx);
   enqueueLog({
     timestamp: new Date(),
     level: "info",
     tag,
     message,
-    context: meta ?? null,
+    context: safeMeta ?? null,
   });
 }
 
@@ -156,32 +158,34 @@ async function fireAlerts(entry: { level: "warn" | "error"; tag: string; message
 }
 
 export function logWarn(tag: string, message: string, meta?: Record<string, unknown>): void {
-  const ctx = { tag, ...meta };
-  console.warn(`[${ts()}] [WARN] [${tag}] ${message}`, meta ?? "");
+  const safeMeta = sanitizeMeta(meta);
+  const ctx = { tag, ...safeMeta };
+  console.warn(`[${ts()}] [WARN] [${tag}] ${message}`, safeMeta ?? "");
   void getLogtail()?.warn(message, ctx);
   enqueueLog({
     timestamp: new Date(),
     level: "warn",
     tag,
     message,
-    context: meta ?? null,
+    context: safeMeta ?? null,
   });
   void fireAlerts({ level: "warn", tag, message });
 }
 
 export function logError(tag: string, error: unknown, meta?: Record<string, unknown>): void {
   const base = getErrorMessage(error);
-  const ctx = { tag, error: base, ...meta };
-  console.error(`[${ts()}] [ERROR] [${tag}] ${base}`, meta ?? "");
+  const safeMeta = sanitizeMeta(meta);
+  const ctx = { tag, error: base, ...safeMeta };
+  console.error(`[${ts()}] [ERROR] [${tag}] ${base}`, safeMeta ?? "");
   void getLogtail()?.error(base, ctx);
-  void captureToSentry(error, { tag, ...meta });
+  void captureToSentry(error, { tag, ...safeMeta });
   const stack = error instanceof Error ? error.stack : undefined;
   enqueueLog({
     timestamp: new Date(),
     level: "error",
     tag,
     message: base,
-    context: meta ?? null,
+    context: safeMeta ?? null,
     stack,
   });
   void fireAlerts({ level: "error", tag, message: base, stack });

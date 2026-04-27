@@ -1,14 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { logError, logInfo } from "@/lib/logger";
 import { buildWeeklyLetterSummaryMessage } from "@/lib/weekly-letter-summary";
+import { requireCronSecret } from "@/lib/cron-auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
 
   const botToken = process.env.TELEGRAM_BOT_TOKEN?.trim();
   const chatId = process.env.ADMIN_TELEGRAM_ID?.trim();

@@ -4,6 +4,7 @@ import { sendTelegramNotification } from "@/services/telegram";
 import { sendPushToUser } from "@/lib/web-push";
 import { logError, logInfo } from "@/lib/logger";
 import { sendAutomatedAlert } from "@/lib/alerts";
+import { requireCronSecret } from "@/lib/cron-auth";
 
 // GET /api/cron/action-reminders?secret=CRON_SECRET
 // Run once per hour. Sends at most 1 reminder per user per day, respetando
@@ -11,10 +12,9 @@ import { sendAutomatedAlert } from "@/lib/alerts";
 // telegramId) y Web Push (si tiene push subscriptions). Si tiene ambos,
 // llegan ambos canales — son complementarios, no excluyentes.
 export async function GET(req: NextRequest) {
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
   const url = new URL(req.url);
-  const secret = url.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim())
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
     const prisma = getPrismaClient();

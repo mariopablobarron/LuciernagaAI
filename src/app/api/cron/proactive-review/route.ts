@@ -3,16 +3,15 @@ import { getPrismaClient } from "@/db/prisma";
 import { notifyAdmin } from "@/services/telegram";
 import { logInfo, logError } from "@/lib/logger";
 import { sendAutomatedAlert } from "@/lib/alerts";
+import { requireCronSecret } from "@/lib/cron-auth";
 
 export const dynamic = "force-dynamic";
 
 // GET /api/cron/proactive-review?secret=CRON_SECRET
 // Run daily at 08:00. Detects users at risk and alerts the admin.
 export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
 
   const prisma = getPrismaClient();
   const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);

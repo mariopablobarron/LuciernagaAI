@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { sendAutomatedAlert } from "@/lib/alerts";
+import { requireCronSecret } from "@/lib/cron-auth";
 
 const RETENTION_DAYS = 90;
 const BATCH_CAP = 50;
@@ -10,10 +11,8 @@ const BATCH_CAP = 50;
 // Run daily. Hard-deletes users whose deletedAt is older than 90 days.
 // Cap of 50 users per run to keep the transaction bounded.
 export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
 
   try {
     const prisma = getPrismaClient();

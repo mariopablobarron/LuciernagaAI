@@ -9,6 +9,7 @@ import {
   listCapsulesDueForDelivery,
   markCapsuleReady,
 } from "@/services/capsules";
+import { requireCronSecret } from "@/lib/cron-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -22,10 +23,8 @@ export const dynamic = "force-dynamic";
 // Idempotente para los emails: solo procesamos cápsulas en pending; tras
 // markCapsuleReady pasan a ready y no vuelven a entrar en el bucle.
 export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
 
   try {
     const expiredResult = await expireStaleCapsules();

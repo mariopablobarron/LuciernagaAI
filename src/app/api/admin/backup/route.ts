@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { logError, logInfo } from "@/lib/logger";
 import { notifyAdmin, sendAdminDocument } from "@/services/telegram";
+import { isValidCronSecret } from "@/lib/cron-auth";
 import pg from "pg";
 
 export const dynamic = "force-dynamic";
@@ -12,9 +13,7 @@ export const maxDuration = 120;
 // Returns a gzipped SQL file with CREATE TABLE + COPY data for all tables.
 export async function GET(req: NextRequest) {
   // Require admin auth OR CRON_SECRET (for automated backups)
-  const secret = req.nextUrl.searchParams.get("secret")?.trim();
-  const expectedSecret = process.env.CRON_SECRET?.trim().replace(/[\r\n]/g, "");
-  const hasCronSecret = Boolean(secret && expectedSecret && secret === expectedSecret);
+  const hasCronSecret = isValidCronSecret(req.nextUrl.searchParams.get("secret"));
   if (!hasCronSecret) {
     const auth = requireAdminPermission(req, "backup");
     if (auth instanceof NextResponse) return auth;

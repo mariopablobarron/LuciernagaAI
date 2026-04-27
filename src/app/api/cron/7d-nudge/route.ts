@@ -5,6 +5,7 @@ import { logError, logInfo } from "@/lib/logger";
 import { sendAutomatedAlert } from "@/lib/alerts";
 import { isSyntheticEmail } from "@/services/user";
 import { trackSafe } from "@/services/events";
+import { requireCronSecret } from "@/lib/cron-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -30,11 +31,8 @@ const COOLDOWN_DAYS = 14;
 const TAKE_LIMIT = 200;
 
 export async function GET(req: NextRequest) {
-  const url = new URL(req.url);
-  const secret = url.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
 
   const prisma = getPrismaClient();
   const now = Date.now();

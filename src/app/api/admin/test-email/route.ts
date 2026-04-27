@@ -1,14 +1,14 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { sendUserEmail } from "@/lib/email";
+import { isValidCronSecret } from "@/lib/cron-auth";
 
 export const dynamic = "force-dynamic";
 
 // GET /api/admin/test-email?secret=CRON_SECRET&to=email@example.com
 export async function GET(req: NextRequest) {
   // Require admin auth OR CRON_SECRET
-  const secret = req.nextUrl.searchParams.get("secret");
-  const hasCronSecret = secret && secret === process.env.CRON_SECRET?.trim();
+  const hasCronSecret = isValidCronSecret(req.nextUrl.searchParams.get("secret"));
   if (!hasCronSecret) {
     const auth = requireAdminPermission(req, "settings");
     if (auth instanceof NextResponse) return auth;

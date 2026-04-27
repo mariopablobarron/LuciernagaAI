@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { isValidCronSecret } from "@/lib/cron-auth";
 
 /**
  * Validates that the request came from our own origin.
@@ -34,7 +35,7 @@ export function validateOrigin(req: NextRequest): boolean {
       if (process.env.NODE_ENV === "production") return false;
       return true; // dev/test — no base URL configured
     }
-    const hasCronSecret = req.nextUrl.searchParams.get("secret") === process.env.CRON_SECRET?.trim();
+    const hasCronSecret = isValidCronSecret(req.nextUrl.searchParams.get("secret"));
     const hasSessionCookie = req.cookies.has("session") || req.cookies.has("auth_token");
     const isAuthEndpoint = req.nextUrl.pathname.startsWith("/api/auth/");
     return hasCronSecret || hasSessionCookie || isAuthEndpoint;

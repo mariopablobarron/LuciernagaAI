@@ -19,6 +19,7 @@ import {
   shouldEmbed,
 } from "@/lib/embeddings";
 import { logError, logInfo } from "@/lib/logger";
+import { requireCronSecret } from "@/lib/cron-auth";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -26,10 +27,8 @@ export const maxDuration = 60;
 const BATCH_SIZE = 100; // mensajes por tick — controla coste y latencia
 
 export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
 
   if (!isEmbeddingsEnabled()) {
     return NextResponse.json({

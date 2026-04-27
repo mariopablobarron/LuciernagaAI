@@ -3,18 +3,15 @@ import { getPrismaClient } from "@/db/prisma";
 import { notifyAdmin } from "@/services/telegram";
 import { logError, logInfo } from "@/lib/logger";
 import { sendAutomatedAlert } from "@/lib/alerts";
+import { requireCronSecret } from "@/lib/cron-auth";
 
 // GET /api/cron/weekly-summary
 // Triggered by a cron job (e.g. Coolify scheduled task or Vercel cron).
 // Sends a Telegram summary of the past 7 days to the admin/psychologist.
 // Protect with CRON_SECRET env var.
 export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret");
-  const expected = process.env.CRON_SECRET?.trim();
-
-  if (!expected || secret !== expected) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
 
   try {
     const prisma = getPrismaClient();

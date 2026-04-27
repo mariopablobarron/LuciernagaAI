@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { sendAutomatedAlert } from "@/lib/alerts";
 import { logError, logInfo } from "@/lib/logger";
+import { requireCronSecret } from "@/lib/cron-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -42,11 +43,8 @@ function parseBuildTimestampMs(buildVersion: string): number | null {
 }
 
 export async function GET(req: NextRequest) {
-  const url = new URL(req.url);
-  const secret = url.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
 
   const buildVersion = process.env.NEXT_PUBLIC_BUILD_VERSION ?? "unknown";
   const coolifyAppUrl =

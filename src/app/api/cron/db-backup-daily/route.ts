@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { spawn } from "node:child_process";
 import { logError, logInfo } from "@/lib/logger";
+import { requireCronSecret } from "@/lib/cron-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -22,10 +23,8 @@ export const dynamic = "force-dynamic";
  *   `gunzip -c backup.sql.gz | psql "$DATABASE_URL"`
  */
 export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
 
   if (!process.env.DATABASE_URL?.trim()) {
     return NextResponse.json({ error: "DATABASE_URL_MISSING" }, { status: 500 });

@@ -3,16 +3,15 @@ import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { sendAutomatedAlert } from "@/lib/alerts";
 import { todayInMadrid, pickPromptForDate } from "@/lib/daily-round";
+import { requireCronSecret } from "@/lib/cron-auth";
 
 // GET /api/cron/daily-round-create?secret=CRON_SECRET
 // Idempotente: crea la ronda de hoy solo si no existe.
 // Programar diariamente ~00:05 (zona Madrid). Rotación determinista por fecha
 // para que el mismo día siempre devuelva el mismo prompt.
 export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
 
   try {
     const prisma = getPrismaClient();

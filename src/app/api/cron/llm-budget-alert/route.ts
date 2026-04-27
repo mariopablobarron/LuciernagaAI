@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { logError, logInfo } from "@/lib/logger";
 import { getPrismaClient } from "@/db/prisma";
 import { calcLlmBudget, buildBudgetTelegramMessage } from "@/lib/admin-tg/llm-budget";
+import { requireCronSecret } from "@/lib/cron-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -12,10 +13,8 @@ function todayKey(): string {
 }
 
 export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
 
   const botToken = process.env.TELEGRAM_BOT_TOKEN?.trim();
   const chatId = process.env.ADMIN_TELEGRAM_ID?.trim();

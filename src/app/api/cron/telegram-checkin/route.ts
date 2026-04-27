@@ -4,6 +4,7 @@ import { sendTelegramMessageAsync } from "@/services/telegram";
 import { logError, logInfo } from "@/lib/logger";
 import { sendAutomatedAlert } from "@/lib/alerts";
 import { getNotificationConfig } from "@/lib/notification-config";
+import { requireCronSecret } from "@/lib/cron-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -15,10 +16,8 @@ export const dynamic = "force-dynamic";
  * - evening: "¿Lo hiciste?" (run at 21:00)
  */
 export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
 
   const notifConfig = await getNotificationConfig();
   if (!notifConfig.cronDailyCheckin) {

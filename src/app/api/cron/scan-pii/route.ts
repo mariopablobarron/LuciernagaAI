@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { hasPII } from "@/lib/pii-filters";
+import { requireCronSecret } from "@/lib/cron-auth";
 
 // GET /api/cron/scan-pii?secret=CRON_SECRET
 //
@@ -13,12 +14,10 @@ import { hasPII } from "@/lib/pii-filters";
 // Cubre: CommunityPost, AnonQuestion, AnonAnswer, DailyRoundResponse,
 // DailyRoundMirror. Usa dry-run por defecto; con ?apply=1 aplica los cambios.
 export async function GET(req: NextRequest) {
-  const url = new URL(req.url);
-  const secret = url.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
 
+  const url = new URL(req.url);
   const apply = url.searchParams.get("apply") === "1";
   const limit = Math.min(Number(url.searchParams.get("limit") ?? 500), 2000);
 

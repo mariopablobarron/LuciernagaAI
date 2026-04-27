@@ -4,15 +4,14 @@ import { logError, logInfo } from "@/lib/logger";
 import { sendAutomatedAlert } from "@/lib/alerts";
 import { earnInvite } from "@/services/invites";
 import { awardBadge } from "@/services/badges";
+import { requireCronSecret } from "@/lib/cron-auth";
 
 // GET /api/cron/referral-30d-active?secret=CRON_SECRET
 // Run once daily. Grants an invitation + "active_30d" badge to users who
 // signed up 30+ days ago and are still engaged (lastSeen within 7 days).
 export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
 
   try {
     const prisma = getPrismaClient();

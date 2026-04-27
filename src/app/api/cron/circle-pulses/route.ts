@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { withCronLog } from "@/lib/cron-log";
 import { logInfo, logError } from "@/lib/logger";
 import { runOpenAllPulses, runCloseExpiredPulses } from "@/services/circlePulses";
+import { requireCronSecret } from "@/lib/cron-auth";
+import type { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -11,11 +13,8 @@ export const dynamic = "force-dynamic";
  * reflections for each respondent).
  */
 export const GET = withCronLog("circle-pulses", async (req) => {
-  const url = new URL(req.url);
-  const secret = url.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronSecret(req as NextRequest);
+  if (unauthorized) return unauthorized;
 
   const now = new Date();
   let opened = 0;

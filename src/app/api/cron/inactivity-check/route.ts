@@ -2,14 +2,13 @@ import { type NextRequest, NextResponse } from "next/server";
 import { checkInactiveUsers } from "@/services/family";
 import { logError, logInfo } from "@/lib/logger";
 import { sendAutomatedAlert } from "@/lib/alerts";
+import { requireCronSecret } from "@/lib/cron-auth";
 
 // GET /api/cron/inactivity-check?secret=CRON_SECRET
 // Run once daily. Notifies trusted contacts about inactive users.
 export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
 
   try {
     const result = await checkInactiveUsers();

@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { withCronLog } from "@/lib/cron-log";
+import { requireCronSecret } from "@/lib/cron-auth";
 import {
   buildWeeklyLetterNotificationEmail,
   sendUserEmail,
@@ -34,12 +35,10 @@ import { getUserCrisisStatus } from "@/services/state";
  * Admin can review content and flip `published` when satisfied.
  */
 export const GET = withCronLog("weekly-letter", async (req) => {
-  const url = new URL(req.url);
-  const secret = url.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronSecret(req as NextRequest);
+  if (unauthorized) return unauthorized;
 
+  const url = new URL(req.url);
   const dryRun =
     url.searchParams.get("dryRun") === "1" ||
     process.env.WEEKLY_LETTER_DRY_RUN === "true";

@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { logError, logInfo } from "@/lib/logger";
 import { sendAutomatedAlert } from "@/lib/alerts";
 import { createSnapshotForUser, listSnapshotEligibleUsers } from "@/services/capsules";
+import { requireCronSecret } from "@/lib/cron-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -14,10 +15,8 @@ export const dynamic = "force-dynamic";
 // Idempotente: re-ejecutar el mismo día no duplica (createSnapshotForUser
 // detecta el snapshot del día y devuelve null).
 export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
 
   try {
     const eligible = await listSnapshotEligibleUsers({ take: 200 });

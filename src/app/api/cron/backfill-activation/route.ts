@@ -1,16 +1,15 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { backfillActivationFields } from "@/services/activation";
 import { logError } from "@/lib/logger";
+import { requireCronSecret } from "@/lib/cron-auth";
 
 // GET /api/cron/backfill-activation?secret=CRON_SECRET&limit=500
 //
 // Idempotent. Safe to call multiple times — skips rows already populated.
 // Shared with POST /api/admin/backfill-activation (admin-triggered).
 export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret");
-  if (!secret || secret !== process.env.CRON_SECRET?.trim()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
 
   const limitParam = Number(req.nextUrl.searchParams.get("limit") ?? "500");
   const limit = Number.isFinite(limitParam) && limitParam > 0 ? limitParam : 500;

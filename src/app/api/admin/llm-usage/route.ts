@@ -84,6 +84,7 @@ export async function GET(req: NextRequest) {
       bySourceRaw,
       topConsumersRaw,
       latestLogs,
+      dailyRaw,
     ] = await Promise.all([
       // ── Resúmenes temporales ────────────────────────────────────────────────
       db.llmLog.aggregate({
@@ -152,7 +153,45 @@ export async function GET(req: NextRequest) {
           response: true,
         },
       }),
+
+      // ── Serie diaria 30d (para chart de tendencia) ─────────────────────────
+      db.$queryRaw<
+        Array<{
+          day: Date;
+          requests: bigint;
+          total_tokens: bigint;
+          cost_usd: number | null;
+        }>
+      >`
+        SELECT
+          DATE_TRUNC('day', "createdAt")::date AS day,
+          COUNT(*)::bigint AS requests,
+          COALESCE(SUM("totalTokens"), 0)::bigint AS total_tokens,
+          COALESCE(SUM("costUsd"), 0)::float AS cost_usd
+        FROM "LlmLog"
+        WHERE "createdAt" >= ${since30d}
+        GROUP BY 1
+        ORDER BY 1 ASC
+      `,
     ]);
+
+    // Build a dense 30-day series — fill gaps with zeros so the chart has no
+    // visual holes when there were no requests on a given day.
+    const dailyMap = new Map<string, { requests: number; totalTokens: number; costUsd: number }>();
+    for (const row of dailyRaw) {
+      const key = new Date(row.day).toISOString().slice(0, 10);
+      dailyMap.set(key, {
+        requests: Number(row.requests),
+        totalTokens: Number(row.total_tokens),
+        costUsd: formatCost(row.cost_usd),
+      });
+    }
+    const daily30d: Array<{ day: string; requests: number; totalTokens: number; costUsd: number }> = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+      const key = d.toISOString().slice(0, 10);
+      daily30d.push({ day: key, ...(dailyMap.get(key) ?? { requests: 0, totalTokens: 0, costUsd: 0 }) });
+    }
 
     // ── Enriquecer topConsumers con email ───────────────────────────────────
     const consumerUserIds = topConsumersRaw
@@ -237,6 +276,7 @@ export async function GET(req: NextRequest) {
         };
       }),
       recommendations,
+      daily30d,
       latestLogs: latestLogs.map((l) => ({
         ...l,
         costUsd: formatCost(l.costUsd),

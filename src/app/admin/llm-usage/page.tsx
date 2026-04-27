@@ -81,6 +81,13 @@ type Budget = {
   level: "ok" | "warn" | "critical";
 };
 
+type DailyPoint = {
+  day: string;          // YYYY-MM-DD
+  requests: number;
+  totalTokens: number;
+  costUsd: number;
+};
+
 type LlmUsageData = {
   budget?: Budget;
   summary: { last7d: PeriodSummary; last30d: PeriodSummary; allTime: PeriodSummary };
@@ -88,6 +95,7 @@ type LlmUsageData = {
   bySource: SourceRow[];
   topConsumers: ConsumerRow[];
   recommendations: Recommendation[];
+  daily30d: DailyPoint[];
   latestLogs: LogRow[];
 };
 
@@ -144,7 +152,7 @@ export default function LlmUsagePage() {
   if (error) return <main className="min-h-screen bg-zinc-950 p-6 text-white">{error}</main>;
   if (!data)  return <main className="min-h-screen bg-zinc-950 p-6 text-zinc-500">Cargando uso LLM...</main>;
 
-  const { summary, byModel, bySource, topConsumers, recommendations, latestLogs, budget } = data;
+  const { summary, byModel, bySource, topConsumers, recommendations, daily30d, latestLogs, budget } = data;
 
   return (
     <AdminShell
@@ -155,6 +163,10 @@ export default function LlmUsagePage() {
 
       {/* ── Budget mensual ── */}
       {budget && <BudgetPanel b={budget} />}
+
+      {/* ── Trend de costes 30d ── */}
+      <DailyCostTrend points={daily30d} />
+
 
       {/* ── Recomendaciones de optimización ── */}
       {recommendations.length > 0 && (
@@ -439,6 +451,62 @@ function BudgetPanel({ b }: { b: Budget }) {
       <p className="mt-3 text-[11px] text-zinc-500">
         Configura el budget en <code className="rounded bg-zinc-900 px-1.5 py-0.5">LLM_MONTHLY_BUDGET_USD</code> (env). Default: $200.
       </p>
+    </AdminPanel>
+  );
+}
+
+function DailyCostTrend({ points }: { points: DailyPoint[] }) {
+  if (!points.length) return null;
+  const maxCost = Math.max(...points.map((p) => p.costUsd), 0.0001);
+  const totalCost = points.reduce((s, p) => s + p.costUsd, 0);
+  const totalRequests = points.reduce((s, p) => s + p.requests, 0);
+  const avgDailyCost = totalCost / points.length;
+
+  // Linear regression on the last 14 days vs the prior 14 to flag rising spend.
+  const recent = points.slice(-14);
+  const prior = points.slice(-28, -14);
+  const recentAvg = recent.reduce((s, p) => s + p.costUsd, 0) / Math.max(1, recent.length);
+  const priorAvg = prior.reduce((s, p) => s + p.costUsd, 0) / Math.max(1, prior.length);
+  const trendPct = priorAvg > 0 ? ((recentAvg - priorAvg) / priorAvg) * 100 : null;
+  const trendDirection: "up" | "down" | "flat" =
+    trendPct === null || Math.abs(trendPct) < 5 ? "flat" : trendPct > 0 ? "up" : "down";
+  const trendColor =
+    trendDirection === "up" ? "text-rose-300" : trendDirection === "down" ? "text-emerald-300" : "text-zinc-400";
+  const trendArrow = trendDirection === "up" ? "↗" : trendDirection === "down" ? "↘" : "→";
+
+  return (
+    <AdminPanel
+      id="daily-cost-trend"
+      title="Tendencia de coste — últimos 30 días"
+      description={`Total: ${usd(totalCost)} · ${n(totalRequests)} requests · media ${usd(avgDailyCost)}/día`}
+    >
+      <div className="space-y-3">
+        <div className="flex items-baseline justify-between text-[11px] text-zinc-500">
+          <span>{points[0]?.day}</span>
+          <span className={trendColor}>
+            {trendArrow} 14d vs 14d previos:{" "}
+            {trendPct === null ? "—" : `${trendPct >= 0 ? "+" : ""}${trendPct.toFixed(1)}%`}
+          </span>
+          <span>{points[points.length - 1]?.day}</span>
+        </div>
+        <div className="flex h-32 items-end gap-1">
+          {points.map((p) => {
+            const heightPct = Math.max(2, (p.costUsd / maxCost) * 100);
+            return (
+              <div
+                key={p.day}
+                className="group relative flex-1 rounded-t bg-emerald-500/30 transition-colors hover:bg-emerald-400/60"
+                style={{ height: `${heightPct}%` }}
+                title={`${p.day} · ${usd(p.costUsd)} · ${n(p.requests)} req`}
+              >
+                <span className="pointer-events-none absolute -top-7 left-1/2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] text-white group-hover:block">
+                  {usd(p.costUsd)}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </AdminPanel>
   );
 }

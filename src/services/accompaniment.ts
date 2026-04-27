@@ -1,6 +1,10 @@
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
-import { markFirstMessageIfNull, tryMarkActivated } from "@/services/activation";
+import {
+  ACTIVATION_RULE,
+  markFirstMessageIfNull,
+  tryMarkActivated,
+} from "@/services/activation";
 
 export type PriorityLevel = "high" | "medium" | "low";
 export type TrendDirection = "improving" | "stable" | "worsening";
@@ -405,7 +409,7 @@ export async function trackUserMessage(userId: string): Promise<void> {
     if (!updated.firstMessageSentAt) {
       void markFirstMessageIfNull(userId);
     }
-    if (!updated.activatedAt && updated.messageCount >= 3) {
+    if (!updated.activatedAt && updated.messageCount >= ACTIVATION_RULE.minUserMessages) {
       void tryMarkActivated(userId);
     }
   } catch (error: unknown) {

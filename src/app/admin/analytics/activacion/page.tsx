@@ -12,6 +12,7 @@ type Cohort = {
   totalUsers: number;
   eligible: number;
   activated: number;
+  activatedWithin72h: number;
   rate: number | null;
   messagesReachedOnly: number;
   actionCompletedOnly: number;
@@ -20,12 +21,19 @@ type Cohort = {
 type ActivationData = {
   definition: {
     window_hours: number;
+    eligibility_wait_hours?: number;
+    rule_window_hours?: number | null;
     messages_required: number;
     needs_action_completed: boolean;
     description: string;
   };
   cohorts: Cohort[];
-  overall: { eligible: number; activated: number; rate: number | null };
+  overall: {
+    eligible: number;
+    activated: number;
+    activatedWithin72h: number;
+    rate: number | null;
+  };
   totalUsers: number;
 };
 
@@ -180,7 +188,9 @@ export default function ActivacionPage() {
               <div>
                 <p className="text-[10px] uppercase font-semibold text-zinc-500 mb-1">Activados</p>
                 <p className="text-2xl font-bold text-emerald-300">{data.overall.activated.toLocaleString()}</p>
-                <p className="text-[10px] text-zinc-500 mt-1">Hicieron el aha moment</p>
+                <p className="text-[10px] text-zinc-500 mt-1">
+                  {data.overall.activatedWithin72h.toLocaleString()} en las primeras {data.definition.window_hours}h
+                </p>
               </div>
               <div>
                 <p className="text-[10px] uppercase font-semibold text-zinc-500 mb-1">Tasa</p>
@@ -220,6 +230,9 @@ export default function ActivacionPage() {
                       <th className="px-3 py-2 font-semibold text-center">
                         <Flame className="inline h-3.5 w-3.5 text-emerald-400" /> Activados
                       </th>
+                      <th className="px-3 py-2 font-semibold text-center" title={`Activados en las primeras ${data.definition.window_hours}h`}>
+                        ≤{data.definition.window_hours}h
+                      </th>
                       <th className="px-3 py-2 font-semibold text-center">
                         <MessageSquare className="inline h-3.5 w-3.5 text-amber-400" /> Solo msg
                       </th>
@@ -237,6 +250,9 @@ export default function ActivacionPage() {
                         <td className="px-3 py-2 text-right text-zinc-400">{c.eligible}</td>
                         <td className="px-3 py-2 text-center text-emerald-300 font-semibold">
                           {c.activated}
+                        </td>
+                        <td className="px-3 py-2 text-center text-emerald-400/70">
+                          {c.activatedWithin72h}
                         </td>
                         <td className="px-3 py-2 text-center text-amber-400/70">
                           {c.messagesReachedOnly}

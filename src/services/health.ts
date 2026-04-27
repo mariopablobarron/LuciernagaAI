@@ -248,7 +248,7 @@ export async function getHealthReport(): Promise<HealthReport> {
       key: "activationD7",
       label: "Activación D7",
       description:
-        "% de signups (7-30d) que alcanzaron el aha moment: ≥3 mensajes en 72h + ≥1 acción completada.",
+        "% de signups (7-30d) que alcanzaron el aha moment: ≥3 mensajes y ≥1 acción completada (sin ventana temporal en la regla; el corte 7-30d es solo el periodo de observación).",
       value: Math.round(activationD7 * 10) / 10,
       unit: "percent",
       delta: Math.round(activationDelta * 10) / 10,

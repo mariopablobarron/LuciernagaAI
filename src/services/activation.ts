@@ -8,13 +8,30 @@ import { logError, logInfo } from "@/lib/logger";
  *
  * Definitions:
  *   - firstMessageSentAt: first user-authored message (not assistant replies).
- *   - activatedAt:        aha moment — ≥3 user messages *and* ≥1 action
- *                         completada. We relax the original "in 72h" window
- *                         here for simplicity; the 72h check still lives in
- *                         the analytics endpoint if needed for historical
- *                         cohort reports.
+ *   - activatedAt:        aha moment — see ACTIVATION_RULE below.
  *   - onboardingCompletedAt: the in-app wizard (/app) reached its final step.
  */
+
+/**
+ * Single source of truth for the activation rule. Any code that needs to know
+ * "is this user activated?" must read `User.activatedAt` (set by this module);
+ * any code that needs the rule itself must import these constants. Do not
+ * recompute the rule inline elsewhere — it has drifted before.
+ */
+export const ACTIVATION_RULE = {
+  minUserMessages: 3,
+  needsCompletedAction: true,
+  /** No time window — the rule passes whenever both conditions are true, ever. */
+  timeWindowHours: null,
+} as const;
+
+/**
+ * Cohort-honesty filter for the analytics endpoint: users younger than this
+ * many hours are excluded from "did not activate" totals because they have
+ * not had a realistic chance to reach the rule yet. **This is NOT part of
+ * the activation rule itself.**
+ */
+export const ACTIVATION_ELIGIBILITY_WAIT_HOURS = 72;
 
 /**
  * Devuelve true si el UPDATE efectivamente ocurrió — indica que es la
@@ -42,7 +59,7 @@ export async function tryMarkActivated(userId: string): Promise<void> {
       where: { id: userId },
       select: { messageCount: true, activatedAt: true },
     });
-    if (!user || user.activatedAt || user.messageCount < 3) return;
+    if (!user || user.activatedAt || user.messageCount < ACTIVATION_RULE.minUserMessages) return;
 
     const completed = await prisma.action.findFirst({
       where: { completed: true, goal: { userId } },
@@ -86,7 +103,7 @@ export type BackfillActivationStats = {
  * Retroactive backfill of the three activation audit fields. Idempotent.
  * Populates:
  *   - firstMessageSentAt ← MIN(Message.createdAt) where role='user'
- *   - activatedAt        ← now() when messageCount ≥ 3 AND ≥1 action completada
+ *   - activatedAt        ← now() when messageCount ≥ ACTIVATION_RULE.minUserMessages AND ≥1 action completada
  *   - onboardingCompletedAt ← consentAt (pragmatic proxy)
  */
 export async function backfillActivationFields(limit = 500): Promise<BackfillActivationStats> {
@@ -114,7 +131,7 @@ export async function backfillActivationFields(limit = 500): Promise<BackfillAct
   }
 
   const missingActivation = await prisma.user.findMany({
-    where: { activatedAt: null, deletedAt: null, messageCount: { gte: 3 } },
+    where: { activatedAt: null, deletedAt: null, messageCount: { gte: ACTIVATION_RULE.minUserMessages } },
     select: { id: true },
     take: safeLimit,
   });

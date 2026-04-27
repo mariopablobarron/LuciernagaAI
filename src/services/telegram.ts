@@ -1,6 +1,10 @@
 import { getPrismaClient } from "@/db/prisma";
 import { buildSyntheticEmail } from "@/services/user";
-import { markFirstMessageIfNull, tryMarkActivated } from "@/services/activation";
+import {
+  ACTIVATION_RULE,
+  markFirstMessageIfNull,
+  tryMarkActivated,
+} from "@/services/activation";
 import { logError, logInfo, logWarn } from "@/lib/logger";
 import { fetchWithTimeout } from "@/lib/fetchWithTimeout";
 
@@ -63,7 +67,7 @@ export async function touchTelegramUser(userId: string): Promise<void> {
     if (!updated.firstMessageSentAt) {
       void markFirstMessageIfNull(userId);
     }
-    if (!updated.activatedAt && updated.messageCount >= 3) {
+    if (!updated.activatedAt && updated.messageCount >= ACTIVATION_RULE.minUserMessages) {
       void tryMarkActivated(userId);
     }
   } catch {

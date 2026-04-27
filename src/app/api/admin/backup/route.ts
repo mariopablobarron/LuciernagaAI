@@ -122,19 +122,23 @@ export async function GET(req: NextRequest) {
       const delivery = await sendAdminDocument(compressed, filename, caption);
 
       if (!delivery.ok) {
-        notifyAdmin(
-          `❌ Backup generado pero no se pudo subir a Telegram: ${filename} (${sizeKb} KB) — ${delivery.error ?? "unknown"}`,
-        );
+        const isSizeIssue = delivery.reason === "size_exceeds_limit";
+        const headline = isSizeIssue
+          ? `🚨 BACKUP FUERA DE TELEGRAM — ${filename} pesa ${sizeKb} KB (límite 49 MB). El dump se generó OK pero NO está respaldado. Configurar destino externo (S3/R2) urgente.`
+          : `❌ Backup generado pero no se pudo subir a Telegram: ${filename} (${sizeKb} KB) — ${delivery.error ?? "unknown"}`;
+        notifyAdmin(headline);
         logError("BACKUP", new Error(delivery.error ?? "telegram_upload_failed"), {
           filename,
           sizeKb,
           stage: "telegram_upload",
+          reason: delivery.reason ?? null,
         });
         return NextResponse.json(
           {
             ok: false,
-            error: "telegram_upload_failed",
+            error: isSizeIssue ? "size_exceeds_telegram_limit" : "telegram_upload_failed",
             telegramError: delivery.error ?? null,
+            reason: delivery.reason ?? null,
             filename,
             sizeKb,
           },

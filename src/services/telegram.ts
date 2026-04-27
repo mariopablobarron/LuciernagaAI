@@ -224,17 +224,41 @@ export async function sendTelegramMessageAsync(
 
 /**
  * Send a document (file) to the admin Telegram chat. Used for backups.
- * Returns true on success.
  *
- * Telegram Bot API caps uploads at 50 MB via sendDocument. Larger files must
- * go through a different channel (S3/R2). For gzipped SQL dumps that's well
- * above any realistic size for this project in the foreseeable future.
+ * Telegram Bot API caps uploads at 50 MB via sendDocument. We refuse anything
+ * over TELEGRAM_DOC_MAX_BYTES (49 MB by default — 1 MB margin for the
+ * multipart envelope) before hitting the network, returning a specific
+ * `size_exceeds_limit` error so callers can route the dump elsewhere.
  */
+export const TELEGRAM_DOC_MAX_BYTES = 49 * 1024 * 1024;
+
+export type SendAdminDocumentResult =
+  | { ok: true }
+  | { ok: false; error: string; reason?: "size_exceeds_limit"; sizeBytes?: number; limitBytes?: number };
+
 export async function sendAdminDocument(
   buffer: Buffer | Uint8Array,
   filename: string,
   caption?: string,
-): Promise<{ ok: boolean; error?: string }> {
+): Promise<SendAdminDocumentResult> {
+  const sizeBytes = buffer.length;
+  if (sizeBytes > TELEGRAM_DOC_MAX_BYTES) {
+    const error = `Document ${filename} is ${sizeBytes} bytes, over the ${TELEGRAM_DOC_MAX_BYTES} byte Telegram limit`;
+    logError("TELEGRAM", new Error(error), {
+      stage: "sendAdminDocument_size_check",
+      filename,
+      sizeBytes,
+      limitBytes: TELEGRAM_DOC_MAX_BYTES,
+    });
+    return {
+      ok: false,
+      error,
+      reason: "size_exceeds_limit",
+      sizeBytes,
+      limitBytes: TELEGRAM_DOC_MAX_BYTES,
+    };
+  }
+
   const adminChatId = process.env.ADMIN_TELEGRAM_ID?.trim();
   if (!adminChatId) {
     logError("TELEGRAM", new Error("ADMIN_TELEGRAM_ID_missing"), { stage: "sendAdminDocument" });

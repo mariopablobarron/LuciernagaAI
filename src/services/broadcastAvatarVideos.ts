@@ -159,7 +159,7 @@ Reglas absolutas:
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
         "HTTP-Referer": process.env.APP_BASE_URL ?? "http://localhost:3000",
-        "X-Title": "mentor-web-broadcast-script",
+        "X-Title": "luciernaga-ai-broadcast-script",
       },
       body: JSON.stringify({
         model: OPENROUTER_MODEL,

@@ -134,7 +134,7 @@ async function requestOpenRouter(
           headers: {
             ...getOpenRouterHeaders(apiKey, { userId: opts.userId, feature: "main_chat_stream" }),
             "HTTP-Referer": process.env.APP_BASE_URL ?? "http://localhost:3000",
-            "X-Title": "mentor-web",
+            "X-Title": "luciernaga-ai",
           },
           body: JSON.stringify({
             model: OPENROUTER_MODEL,
@@ -327,7 +327,7 @@ export async function generateImpulseResponse(input: ImpulseResponseInput): Prom
         headers: {
           ...getOpenRouterHeaders(apiKey, { feature: "impulse" }),
           "HTTP-Referer": process.env.APP_BASE_URL ?? "http://localhost:3000",
-          "X-Title": "mentor-web-impulso",
+          "X-Title": "luciernaga-ai-impulso",
         },
         body: JSON.stringify({
           model: OPENROUTER_MODEL,
@@ -388,7 +388,7 @@ export async function* streamOpenRouterTokens(
         headers: {
           ...getOpenRouterHeaders(apiKey, { feature: "stream_tokens" }),
           "HTTP-Referer": process.env.APP_BASE_URL ?? "http://localhost:3000",
-          "X-Title": "mentor-web",
+          "X-Title": "luciernaga-ai",
         },
         body: JSON.stringify({
           model: OPENROUTER_MODEL,

@@ -151,7 +151,7 @@ export async function generateImpulseResponse(
           Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
           "HTTP-Referer": process.env.APP_BASE_URL ?? "http://localhost:3000",
-          "X-Title": "mentor-web-impulse",
+          "X-Title": "luciernaga-ai-impulse",
         },
         body: JSON.stringify({
           model: OPENROUTER_MODEL,

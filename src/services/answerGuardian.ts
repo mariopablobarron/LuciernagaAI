@@ -58,7 +58,7 @@ export async function classifyAnswer(
           Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
           "HTTP-Referer": process.env.APP_BASE_URL ?? "http://localhost:3000",
-          "X-Title": "mentor-web",
+          "X-Title": "luciernaga-ai",
         },
         body: JSON.stringify({
           model: MODEL,

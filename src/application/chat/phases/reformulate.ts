@@ -8,7 +8,7 @@
  * que ve el usuario ni el que se persiste.
  *
  * Idea inspirada en `create_history_aware_retriever` de LangChain (estándar
- * RAG conversacional). Adaptada para mentor-web: aquí no hay retrieval sobre
+ * RAG conversacional). Adaptada al producto: aquí no hay retrieval sobre
  * documentos, pero sí mejora la calidad de respuesta cuando el LLM tiene que
  * resolver pronombres referenciales.
  *

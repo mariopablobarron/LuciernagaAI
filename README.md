@@ -23,7 +23,7 @@ npm run dev
 ### Obligatorias
 
 ```env
-DATABASE_URL=postgresql://user:pass@host:5432/mentor_web
+DATABASE_URL=postgresql://user:pass@host:5432/luciernaga
 OPENROUTER_API_KEY=sk-or-...
 AUTH_TOKEN_SECRET=cadena-aleatoria-larga
 ADMIN_USERNAME=admin

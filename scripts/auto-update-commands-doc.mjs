@@ -79,11 +79,11 @@ const operationalCommands = [
     action: "Edita tareas programadas del servidor.",
   },
   {
-    command: "docker build -t mentor-web .",
+    command: "docker build -t luciernaga-ai .",
     action: "Construye imagen Docker local.",
   },
   {
-    command: "docker run --env-file .env -p 3000:3000 mentor-web",
+    command: "docker run --env-file .env -p 3000:3000 luciernaga-ai",
     action: "Levanta contenedor local con variables de entorno.",
   },
   {

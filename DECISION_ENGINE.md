@@ -28,7 +28,7 @@
 Cuando la base de datos esté disponible, ejecuta:
 
 ```bash
-cd /Users/STARTIDEA/mentor-web
+cd /Users/STARTIDEA/luciernaga-ai
 npx prisma migrate dev --name add_insights_models
 ```
 

@@ -18,7 +18,7 @@ npm run backup:daily
 
 Salida esperada:
 
-- Archivo en `./backups/db/mentor_web_YYYY-MM-DD_HHMMSS.sql.gz`
+- Archivo en `./backups/db/luciernaga_YYYY-MM-DD_HHMMSS.sql.gz`
 - Enlace simbolico en `./backups/db/latest.sql.gz`
 
 ## 3) Configuracion cron (diario 02:30)
@@ -30,7 +30,7 @@ crontab -e
 Agregar:
 
 ```cron
-30 2 * * * cd /Users/STARTIDEA/mentor-web && /bin/bash -lc 'export DATABASE_URL="postgresql://USER:PASS@HOST:5432/DB" BACKUP_RETENTION_DAYS=14; npm run backup:daily >> logs/db-backup.log 2>&1'
+30 2 * * * cd /Users/STARTIDEA/luciernaga-ai && /bin/bash -lc 'export DATABASE_URL="postgresql://USER:PASS@HOST:5432/DB" BACKUP_RETENTION_DAYS=14; npm run backup:daily >> logs/db-backup.log 2>&1'
 ```
 
 ## 4) Retencion
@@ -48,7 +48,7 @@ npm run backup:restore:latest
 ## 6) Restaurar backup especifico
 
 ```bash
-gunzip -c ./backups/db/mentor_web_YYYY-MM-DD_HHMMSS.sql.gz | psql "$DATABASE_URL"
+gunzip -c ./backups/db/luciernaga_YYYY-MM-DD_HHMMSS.sql.gz | psql "$DATABASE_URL"
 ```
 
 ## 7) Recomendaciones operativas

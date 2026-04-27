@@ -8,7 +8,7 @@
  * Inspirado en la taxonomía de intents emocionales de
  * paritoshtripathi935/aishikabot (`how_you_feel`, `why_you_feel`,
  * `religious`, `cultural`, `academic`, etc.) — adaptado al contexto
- * real de mentor-web: dominios que el mentor reconoce como vectores
+ * real del producto: dominios que el mentor reconoce como vectores
  * causales habituales en conversaciones reales.
  *
  * El dominio se mete en el coachContext y permite al system prompt

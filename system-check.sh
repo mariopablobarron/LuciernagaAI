@@ -4,7 +4,7 @@ set -euo pipefail
 BASE_URL="${BASE_URL:-http://localhost:3000}"
 FAILURES=0
 WARNINGS=0
-COOKIE_JAR="$(mktemp "${TMPDIR:-/tmp}/mentor-web-system-check.XXXXXX")"
+COOKIE_JAR="$(mktemp "${TMPDIR:-/tmp}/luciernaga-system-check.XXXXXX")"
 trap 'rm -f "$COOKIE_JAR"' EXIT
 
 print_section() {

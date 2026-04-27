@@ -28,7 +28,7 @@ fi
 mkdir -p "$BACKUP_DIR"
 
 TIMESTAMP="$(date -u +"%Y-%m-%d_%H%M%S")"
-BACKUP_FILE="$BACKUP_DIR/mentor_web_${TIMESTAMP}.sql.gz"
+BACKUP_FILE="$BACKUP_DIR/luciernaga_${TIMESTAMP}.sql.gz"
 TMP_FILE="$BACKUP_FILE.tmp"
 
 # Generate a consistent custom dump and compress it.

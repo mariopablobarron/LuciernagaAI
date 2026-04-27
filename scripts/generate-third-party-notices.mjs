@@ -18,7 +18,7 @@ const data = JSON.parse(json);
 
 const groups = new Map();
 for (const [pkg, info] of Object.entries(data)) {
-  if (pkg.startsWith("mentor-web@")) continue;
+  if (pkg.startsWith("luciernaga-ai@")) continue;
   const atIdx = pkg.lastIndexOf("@");
   const name = pkg.slice(0, atIdx);
   const version = pkg.slice(atIdx + 1);

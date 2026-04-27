@@ -46,8 +46,8 @@ Este documento se genera automaticamente. Solo se actualiza cuando detecta cambi
 | curl -X POST https://api.telegram.org/bot<TOKEN>/sendMessage -d "chat_id=<ID>" --data-urlencode "text=..." | Envia un mensaje manual por Telegram. |
 | curl -X POST "https://api.telegram.org/bot<TOKEN>/setWebhook" -d "url=https://TU_DOMINIO/api/telegram/webhook" | Registra o actualiza webhook de Telegram. |
 | crontab -e | Edita tareas programadas del servidor. |
-| docker build -t mentor-web . | Construye imagen Docker local. |
-| docker run --env-file .env -p 3000:3000 mentor-web | Levanta contenedor local con variables de entorno. |
+| docker build -t luciernaga-ai . | Construye imagen Docker local. |
+| docker run --env-file .env -p 3000:3000 luciernaga-ai | Levanta contenedor local con variables de entorno. |
 | git rev-parse --short HEAD | Muestra hash corto del commit actual. |
 | git status --short | Muestra estado resumido de cambios locales. |
 | git diff | Muestra diff de cambios no committeados. |

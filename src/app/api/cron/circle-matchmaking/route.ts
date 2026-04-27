@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { withCronLog } from "@/lib/cron-log";
+import { withCronDedup, isoWeekKey } from "@/lib/cron-log";
 import { logInfo, logError } from "@/lib/logger";
 import { runMatchmaking, runCycleEndCheck } from "@/services/circleMatchmaking";
 import { requireCronSecret } from "@/lib/cron-auth";
@@ -11,11 +11,12 @@ export const dynamic = "force-dynamic";
  * Weekly cron: closes circles whose 6-week cycle has ended (generating closing
  * letters for each member), then runs matchmaking to form new circles from
  * users currently sharing the same dominant pattern + primary emotion.
+ *
+ * Dedup: ISO week key — at most one successful (or failed) run per Mon-Sun
+ * window across all callers. If two cron-job.org schedules overlap, the
+ * second one short-circuits with `skipped: dedup_lock`.
  */
-export const GET = withCronLog("circle-matchmaking", async (req) => {
-  const unauthorized = requireCronSecret(req as NextRequest);
-  if (unauthorized) return unauthorized;
-
+const dedupedHandler = withCronDedup("circle-matchmaking", () => isoWeekKey(), async () => {
   const now = new Date();
   let closed = 0;
   let formed = 0;
@@ -52,3 +53,9 @@ export const GET = withCronLog("circle-matchmaking", async (req) => {
     runAt: now.toISOString(),
   });
 });
+
+export async function GET(req: NextRequest) {
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
+  return dedupedHandler(req);
+}

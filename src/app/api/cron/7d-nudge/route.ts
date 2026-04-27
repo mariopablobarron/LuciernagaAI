@@ -6,6 +6,7 @@ import { sendAutomatedAlert } from "@/lib/alerts";
 import { isSyntheticEmail } from "@/services/user";
 import { trackSafe } from "@/services/events";
 import { requireCronSecret } from "@/lib/cron-auth";
+import { withCronDedup, dailyUtcKey } from "@/lib/cron-log";
 
 export const dynamic = "force-dynamic";
 
@@ -30,9 +31,7 @@ const WINDOW_END_DAYS = 6; // lastSeen más reciente que esto → demasiado pron
 const COOLDOWN_DAYS = 14;
 const TAKE_LIMIT = 200;
 
-export async function GET(req: NextRequest) {
-  const unauthorized = requireCronSecret(req);
-  if (unauthorized) return unauthorized;
+const dedupedHandler = withCronDedup("7d-nudge", () => dailyUtcKey(), async () => {
 
   const prisma = getPrismaClient();
   const now = Date.now();
@@ -133,4 +132,10 @@ export async function GET(req: NextRequest) {
     }).catch(() => {});
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
+});
+
+export async function GET(req: NextRequest) {
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
+  return dedupedHandler(req);
 }

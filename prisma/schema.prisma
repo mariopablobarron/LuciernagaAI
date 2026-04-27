@@ -2009,6 +2009,7 @@ model EmailLog {
 model CronRunLog {
   id               String    @id @default(cuid())
   jobName          String
+  dedupKey         String?
   status           String    @default("running")
   startedAt        DateTime  @default(now())
   finishedAt       DateTime?
@@ -2017,6 +2018,7 @@ model CronRunLog {
   errorMessage     String?   @db.Text
   metadata         Json? // ⚠️ deprecated 2026-04-23: columna sin escritor ni lector en src/. Candidata a DROP en próxima limpieza de schema.
 
+  @@unique([jobName, dedupKey])
   @@index([jobName, startedAt])
   @@index([status, startedAt])
   @@index([startedAt])

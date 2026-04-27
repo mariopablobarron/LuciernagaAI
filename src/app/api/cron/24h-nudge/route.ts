@@ -5,6 +5,7 @@ import { logError, logInfo } from "@/lib/logger";
 import { sendAutomatedAlert } from "@/lib/alerts";
 import { isSyntheticEmail } from "@/services/user";
 import { requireCronSecret } from "@/lib/cron-auth";
+import { withCronDedup, dailyUtcKey } from "@/lib/cron-log";
 
 export const dynamic = "force-dynamic";
 
@@ -13,12 +14,9 @@ export const dynamic = "force-dynamic";
  *
  * Finds users who signed up 20-28 hours ago, have 0 messages,
  * and sends them a personalized nudge email.
- * Run daily at 10:00 UTC.
+ * Run daily at 10:00 UTC. Dedup by UTC day to prevent double-sends.
  */
-export async function GET(req: NextRequest) {
-  const unauthorized = requireCronSecret(req);
-  if (unauthorized) return unauthorized;
-
+const dedupedHandler = withCronDedup("24h-nudge", () => dailyUtcKey(), async () => {
   const prisma = getPrismaClient();
   const now = Date.now();
   // Window: signed up between 20h and 28h ago (captures ~24h regardless of exact cron time)
@@ -71,4 +69,10 @@ export async function GET(req: NextRequest) {
     sendAutomatedAlert({ type: "critical", title: "Cron falló: 24h-nudge", message: error instanceof Error ? error.message : "Error desconocido" }).catch(() => {});
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
+});
+
+export async function GET(req: NextRequest) {
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
+  return dedupedHandler(req);
 }

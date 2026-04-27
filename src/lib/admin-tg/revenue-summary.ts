@@ -1,22 +1,5 @@
 import { getPrismaClient } from "@/db/prisma";
-
-const fmt = (d: Date | null | undefined) =>
-  d
-    ? new Date(d).toLocaleString("es-ES", { timeZone: "Europe/Madrid", dateStyle: "short" })
-    : "—";
-
-// MRR aproximado a partir del stripePriceId (por si hay precios mensual/anual distintos)
-const PRICE_MONTHLY_MRR_USD = 9.99; // valor por defecto si no hay env
-const PRICE_ANNUAL_MRR_USD = 99.99 / 12;
-
-function pricePointsToMrr(stripePriceId: string | null): number {
-  if (!stripePriceId) return PRICE_MONTHLY_MRR_USD;
-  const monthly = process.env.STRIPE_PRICE_PRO_MONTHLY?.trim();
-  const annual = process.env.STRIPE_PRICE_PRO_ANNUAL?.trim();
-  if (annual && stripePriceId === annual) return PRICE_ANNUAL_MRR_USD;
-  if (monthly && stripePriceId === monthly) return PRICE_MONTHLY_MRR_USD;
-  return PRICE_MONTHLY_MRR_USD; // fallback prudente
-}
+import { pricePointsToMrr } from "@/lib/billing";
 
 export async function buildRevenueMessage(): Promise<string> {
   const prisma = getPrismaClient();

@@ -201,6 +201,12 @@ export default function AdminAnalyticsPage() {
             <Search className="h-3.5 w-3.5" /> Explorar eventos
           </Link>
           <Link
+            href="/admin/analytics/external"
+            className="inline-flex items-center gap-2 rounded-lg border border-cyan-700/60 bg-cyan-600/20 hover:bg-cyan-600/30 px-3 py-2 text-xs font-semibold text-cyan-200 hover:text-white transition-colors"
+          >
+            <LineChart className="h-3.5 w-3.5" /> Web & Redes (GA4 · GSC · Metricool)
+          </Link>
+          <Link
             href="/admin/analytics/animo"
             className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 px-3 py-2 text-xs font-semibold text-zinc-300 hover:text-white transition-colors"
           >

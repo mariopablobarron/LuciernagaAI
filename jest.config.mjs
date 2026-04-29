@@ -7,6 +7,31 @@ const createJestConfig = nextJest({
 /** @type {import('jest').Config} */
 const customJestConfig = {
   coverageProvider: "v8",
+  // Coverage opt-in con `npm run test:coverage`. Reportes bonitos (text-summary
+  // en consola, lcov para CI/Codecov, html para abrir en local) y umbrales
+  // suaves para empezar — los subimos cuando la cobertura real los supere.
+  collectCoverageFrom: [
+    "src/**/*.{ts,tsx}",
+    "!src/**/*.test.{ts,tsx}",
+    "!src/**/*.d.ts",
+    "!src/test/**",
+    "!src/types/**",
+    "!src/app/**/page.tsx",
+    "!src/app/**/layout.tsx",
+    "!src/components/ui/**",
+  ],
+  coverageReporters: ["text-summary", "lcov", "html"],
+  coverageDirectory: "coverage",
+  // Umbrales = suelo actual menos margen. No fuerzan subir cobertura, solo
+  // impiden que un PR la baje. Subir progresivamente cuando se gane terreno.
+  coverageThreshold: {
+    global: {
+      branches: 50,
+      functions: 25,
+      lines: 15,
+      statements: 15,
+    },
+  },
   testEnvironment: "node",
   globalTeardown: "<rootDir>/jest.teardown.ts",
   openHandlesTimeout: 0,

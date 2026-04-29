@@ -24,217 +24,27 @@ import {
   RefreshCw,
 } from "lucide-react";
 
-// ── Types ────────────────────────────────────────────────────────────────────
-
-type MarketingMetrics = {
-  signups7d: number;
-  quiz7d: number;
-  waitlist7d: number;
-  proUsers: number;
-  funnel: {
-    quiz: number;
-    waitlist: number;
-    signup: number;
-    pro: number;
-  };
-};
-
-type HistoryEntry = {
-  id: string;
-  channel: "telegram" | "email";
-  segment: string;
-  recipientCount: number;
-  successCount: number;
-  failCount: number;
-  createdAt: string;
-};
-
-type FeedbackItem = {
-  id: string;
-  type: string;
-  rating: number | null;
-  message: string;
-  page: string | null;
-  createdAt: string;
-  user: { email: string; name: string | null };
-};
-
-type FeedbackSummary = {
-  total: number;
-  avgRating: number | null;
-  ratingDistribution: { rating: number; count: number }[];
-  byType: { type: string; count: number }[];
-};
-
-type Tab = "telegram" | "email" | "metrics" | "feedback" | "atribucion" | "tagging" | "testimonials" | "referidos" | "trackers" | "plantillas" | "trafico";
-
-type EmailTemplateStats = {
-  total: number;
-  delivered: number;
-  failed: number;
-  bounced: number;
-  queued: number;
-  other: number;
-  lastSentAt: string | null;
-  lastError: string | null;
-};
-
-type EmailTemplateRow = {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  trigger: string;
-  builderFn?: string;
-  previewable: boolean;
-  stats: EmailTemplateStats;
-};
-
-type TemplatePreview = {
-  ok: boolean;
-  template?: { id: string; name: string; description: string };
-  subject?: string;
-  html?: string;
-  text?: string;
-  note?: string;
-  error?: string;
-  message?: string;
-};
-
-type EmailTemplatesPayload = {
-  categories: Record<string, string>;
-  templates: EmailTemplateRow[];
-  unknownTemplates: EmailTemplateRow[];
-  totals: { cataloged: number; uncataloged: number };
-};
-
-type TrackerStatus = {
-  id: "ga4" | "meta_pixel" | "inspectlet";
-  name: string;
-  description: string;
-  configured: boolean;
-  identifier: string | null;
-  envVar: string;
-  dashboardUrl: string;
-};
-
-type AttributionRow = {
-  source: string;
-  medium: string | null;
-  campaign: string | null;
-  signups: number;
-  proUsers: number;
-  proRate: number;
-};
-
-type AttributionReport = {
-  range: "7d" | "30d" | "90d" | "all";
-  rangeStart: string | null;
-  totalSignups: number;
-  totalPro: number;
-  overallProRate: number;
-  rows: AttributionRow[];
-};
-
-type TestimonialCandidate = {
-  id: string;
-  type: string;
-  rating: number | null;
-  message: string;
-  createdAt: string;
-  isPublicTestimonial: boolean;
-  testimonialOrder: number | null;
-  user: { name: string | null; email: string };
-};
-
-type ReferralRow = {
-  userId: string;
-  name: string | null;
-  email: string;
-  invitesCreated: number;
-  invitesUsed: number;
-  invitesEarned: number;
-  conversionRate: number;
-};
-
-type ReferralReason = {
-  reason: string;
-  generated: number;
-  used: number;
-  conversionRate: number; // 0..1
-};
-
-type ReferralRetentionWindow = {
-  referred: number;       // % retained (0..100)
-  nonReferred: number;
-  referredCohort: number;
-  nonReferredCohort: number;
-};
-
-type ReferralTimelinePoint = {
-  date: string;
-  generated: number;
-  used: number;
-};
-
-type ReferralSummary = {
-  totalInvitationsCreated: number;
-  totalInvitationsUsed: number;
-  uniqueInviters: number;
-  overallConversionRate: number;
-  topInviters: ReferralRow[];
-  pending: number;
-  generated7d: number;
-  used7d: number;
-  generated30d: number;
-  used30d: number;
-  byReason: ReferralReason[];
-  retention: {
-    d7: ReferralRetentionWindow;
-    d30: ReferralRetentionWindow;
-  };
-  dailyTimeline: ReferralTimelinePoint[];
-};
-
-const REFERRAL_REASON_LABEL: Record<string, string> = {
-  streak_7d: "Racha 7 días",
-  streak_30d: "Racha 30 días",
-  goal_complete: "Primer objetivo",
-  active_30d: "30 días activo",
-  manual: "Manual",
-  unknown: "Sin clasificar",
-};
-
-const SEGMENTS = [
-  { value: "all", label: "Todos" },
-  { value: "active_7d", label: "Activos 7d" },
-  { value: "inactive_7d", label: "Inactivos 7d+" },
-  { value: "pro", label: "Pro" },
-  { value: "free", label: "Free" },
-  { value: "crisis", label: "Crisis" },
-  { value: "state:bloqueo", label: "Estado: bloqueo" },
-  { value: "state:ansiedad", label: "Estado: ansiedad" },
-  { value: "state:duda", label: "Estado: duda" },
-  { value: "state:claridad", label: "Estado: claridad" },
-  { value: "state:neutral", label: "Estado: neutral" },
-];
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleString("es-ES", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-function conversionRate(from: number, to: number): string {
-  if (from === 0) return "0%";
-  return `${((to / from) * 100).toFixed(1)}%`;
-}
+import type {
+  MarketingMetrics,
+  HistoryEntry,
+  FeedbackItem,
+  FeedbackSummary,
+  Tab,
+  EmailTemplateRow,
+  TemplatePreview,
+  EmailTemplatesPayload,
+  TrackerStatus,
+  AttributionRow,
+  AttributionReport,
+  TestimonialCandidate,
+  ReferralRow,
+  ReferralReason,
+  ReferralRetentionWindow,
+  ReferralTimelinePoint,
+  ReferralSummary,
+} from "./_types";
+import { REFERRAL_REASON_LABEL, SEGMENTS } from "./_constants";
+import { formatDate, conversionRate } from "./_utils";
 
 // ── Segment selector (reused in Telegram + Email tabs) ───────────────────────
 

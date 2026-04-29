@@ -1,8 +1,11 @@
-'use client';
-
+// Server component: el árbol completo (557 LOC) se renderiza en server.
+// Los hijos interactivos (Header, Footer, HeartbeatParticles, Reveal,
+// RevealWords, ChatDemo) son ya client components y siguen funcionando
+// porque Next.js permite anidarlos como children. Resultado: bundle de
+// cliente reducido drásticamente (toda la copia y layout sale de aquí).
 import Link from 'next/link';
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { ArrowRight, ShieldCheck, Zap, Target, Sparkles, Bot, Users, X } from 'lucide-react';
 import Header from '@/components/home/Header';
 import Footer from '@/components/home/Footer';
@@ -33,11 +36,11 @@ type LandingProps = {
   advisorPhotoUrl?: string | null;
 };
 
-export default function LandingPageI18n({
+export default async function LandingPageI18n({
   founderPhotoUrl = '/team/mario.png',
   advisorPhotoUrl = null,
 }: LandingProps = {}) {
-  const t = useTranslations();
+  const t = await getTranslations();
   const advisorInitials = getInitials(t('team.advisor.name'));
 
   const tickerItems = [

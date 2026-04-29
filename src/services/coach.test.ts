@@ -180,3 +180,27 @@ describe("sanitizeCoachResponse", () => {
     expect(out).toBe("Eso es exactamente lo que pasa.");
   });
 });
+
+describe("audience guidance by tier", () => {
+  it("no añade nada cuando no hay tier", () => {
+    const prompt = buildCoachPrompt("duda");
+    expect(prompt).not.toContain("Audiencia: ADOLESCENTE");
+    expect(prompt).not.toContain("Audiencia: PERSONA MAYOR");
+  });
+
+  it("inyecta guía de adolescente cuando tier=minor", () => {
+    const prompt = buildCoachPrompt("duda", undefined, { audience: { tier: "minor" } });
+    expect(prompt).toContain("Audiencia: ADOLESCENTE");
+    expect(prompt).toContain("Fundación ANAR");
+  });
+
+  it("inyecta guía de mayor cuando tier=elder", () => {
+    const prompt = buildCoachPrompt("duda", undefined, { audience: { tier: "elder" } });
+    expect(prompt).toContain("Audiencia: PERSONA MAYOR");
+  });
+
+  it("no añade nada cuando tier=adult (es el default)", () => {
+    const prompt = buildCoachPrompt("duda", undefined, { audience: { tier: "adult" } });
+    expect(prompt).not.toContain("Audiencia:");
+  });
+});

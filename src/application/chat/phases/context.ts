@@ -18,6 +18,7 @@ import { buildProjectPromptBlock } from "@/services/project-coach-bridge";
 import { detectExtendedIntents } from "@/services/extendedIntents";
 import { findSimilarMessages } from "@/services/semanticMemory";
 import { getPrismaClient } from "@/db/prisma";
+import { isAgeRange, rangeToTier } from "@/lib/age-range";
 import type { OnboardingPayload } from "@/lib/onboarding-archetypes";
 import {
   buildSearchQuery,
@@ -104,7 +105,7 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
   // resumen corto habitual.
   const weeklyPattern = await loadWeeklyPattern(userId).catch(() => null);
 
-  const [impulseProfile, impulseLogs, journeyPromptBlock, projectPromptBlock, welcomeOnboarding, userPrefs, enneagramLatest] = await Promise.all([
+  const [impulseProfile, impulseLogs, journeyPromptBlock, projectPromptBlock, welcomeOnboarding, userPrefs, enneagramLatest, userAge] = await Promise.all([
     getUserImpulseProfile(userId).catch(() => null),
     listRecentImpulseLogs(userId, 5).catch(() => []),
     buildJourneyPromptBlock(userId).catch(() => null),
@@ -135,7 +136,23 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
         return null;
       }
     })(),
+    (async (): Promise<{ ageRange: string | null } | null> => {
+      try {
+        const client = getPrismaClient();
+        return await client.user.findUnique({
+          where: { id: userId },
+          select: { ageRange: true },
+        });
+      } catch {
+        return null;
+      }
+    })(),
   ]);
+
+  // Audience tier — sólo se inyecta si el usuario declaró rango.
+  const audienceTier = userAge?.ageRange && isAgeRange(userAge.ageRange)
+    ? rangeToTier(userAge.ageRange)
+    : null;
 
   // Forma gramatical preferida (feminine | masculine | neutral | null).
   // null/desconocido se trata como "neutral" en el coach prompt.
@@ -219,6 +236,7 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
           })),
         }
       : null,
+    audience: audienceTier ? { tier: audienceTier } : null,
   };
 
   logInfo("AI", "openrouter_call_requested", {

@@ -14,6 +14,7 @@ import HomeOnboarding from "@/components/home/HomeOnboarding";
 import HomeWorkspace, { type WorkspaceTab } from "@/components/home/HomeWorkspace";
 import InsightsPanel from "@/components/InsightsPanel";
 import Sidebar, { type SidebarConversation } from "@/components/Sidebar";
+import AgeGate from "@/components/AgeGate";
 import { UserInterventionsBanner } from "@/components/UserInterventionsBanner";
 import WeeklyLetterBanner from "@/components/WeeklyLetterBanner";
 import NameCaptureModal from "@/components/NameCaptureModal";
@@ -1905,7 +1906,7 @@ export default function HomePage() {
   }
 
   return (
-    <>
+    <AgeGate>
       <AvatarWeeklyModal />
       <AppLayout
         prelude={
@@ -2264,6 +2265,6 @@ export default function HomePage() {
           toast.success(`Encantado, ${savedName}.`);
         }}
       />
-    </>
+    </AgeGate>
   );
 }

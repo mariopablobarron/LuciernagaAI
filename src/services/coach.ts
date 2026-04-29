@@ -138,6 +138,11 @@ export type CoachContext = {
       score: number;
     }>;
   } | null;
+  // Audience tier inferido del rango etario auto-declarado. Modula tono y
+  // referencias del mentor. "minor" 14-17, "adult" 18-69, "elder" 70+.
+  audience?: {
+    tier: "minor" | "adult" | "elder";
+  } | null;
 };
 
 type ResponseFinalizationContext = {
@@ -457,6 +462,42 @@ function buildExtendedIntentGuidance(context: CoachContext): string {
   return lines.join("\n");
 }
 
+/**
+ * Audience tier guidance. Adapta el tono según el rango etario auto-declarado.
+ * Aplica una capa LIGERA encima del prompt base — no reemplaza la identidad
+ * del mentor, solo modula vocabulario, ritmo y referencias.
+ */
+function buildAudienceGuidance(context: CoachContext): string {
+  const tier = context.audience?.tier;
+  if (!tier) return "";
+
+  if (tier === "minor") {
+    return [
+      "Audiencia: ADOLESCENTE (14-17 años).",
+      "- Tono directo y cercano, sin jerga corporativa ni metáforas demasiado abstractas.",
+      "- Frases cortas. Evita el paternalismo ('cariño', 'mi vida', 'pequeño').",
+      "- NO recomiendes guardar secretos importantes con la familia o profesores.",
+      "- Si surge tema escolar, familiar o de adultos cercanos, sugiere puntualmente que un adulto de confianza esté al tanto. No insistas si la persona se cierra.",
+      "- En crisis: además del 024, recuerda Fundación ANAR (900 20 20 10, 24/7 gratis).",
+      "- Respeta que está formando su identidad. No diagnostiques. No etiquetes.",
+    ].join("\n");
+  }
+
+  if (tier === "elder") {
+    return [
+      "Audiencia: PERSONA MAYOR (70+ años).",
+      "- Vocabulario plano y claro. Sustituye jerga emocional moderna ('setear límites' → 'poner límites'; 'red flags' → 'señales de alarma'; 'gaslighting' → 'manipulación que te hace dudar').",
+      "- Respeto explícito por la trayectoria de vida. NO trates como frágil ni asumas que el malestar es 'cosa de la edad'.",
+      "- Evita referencias a redes sociales, apps o tecnología actual a menos que la persona las saque.",
+      "- Frases un poco más largas y reposadas — sin prisa.",
+      "- Si aparece tema de soledad, pérdida o cierre vital, no minimices con 'es ley de vida'. Acompaña.",
+    ].join("\n");
+  }
+
+  // adult: no adjustments — the base prompt is calibrated for this tier.
+  return "";
+}
+
 export function buildCoachPrompt(
   userState: UserState,
   emotionalProfile: EmotionalProfile = DEFAULT_EMOTIONAL_PROFILE,
@@ -473,6 +514,7 @@ export function buildCoachPrompt(
   const genderGuidance = buildGenderGuidance(context);
   const extendedIntentGuidance = buildExtendedIntentGuidance(context);
   const enneagramGuidance = buildEnneagramGuidance(context);
+  const audienceGuidance = buildAudienceGuidance(context);
   const conversationSummaryGuidance = context.conversationSummary
     ? `Resumen de la conversación hasta ahora (turnos anteriores a los visibles abajo, úsalo para recordar nombres, decisiones y arcos): ${context.conversationSummary}`
     : "";
@@ -570,6 +612,7 @@ No se pudo verificar información externa suficiente. No afirmes datos actuales 
     `Adaptación: ${EMOTION_GUIDANCE[emotionalProfile.primaryEmotion]} ${PATTERN_GUIDANCE[emotionalProfile.dominantPattern]} ${ENERGY_GUIDANCE[emotionalProfile.energyLevel]}`,
     empatheticResponseGuidance,
     mentorProtocolGuidance,
+    audienceGuidance,
     genderGuidance,
     enneagramGuidance,
     extendedIntentGuidance,

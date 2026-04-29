@@ -75,6 +75,21 @@ export function proxy(request: NextRequest) {
       return NextResponse.next();
     }
 
+    // Endpoints that re-validate CRON_SECRET in constant time inside their
+    // handler. We let them through when ?secret= is present so the handler
+    // can decide. If the secret is wrong, the handler returns 401 itself.
+    const cronSecretBypassPaths = new Set([
+      "/api/admin/usage-snapshot",
+      "/api/admin/analytics-external",
+      "/api/admin/reset-superadmin",
+    ]);
+    if (
+      cronSecretBypassPaths.has(pathname) &&
+      request.nextUrl.searchParams.get("secret")
+    ) {
+      return NextResponse.next();
+    }
+
     const auth = resolveAdminAuth(request);
     if (auth.authenticated) {
       return NextResponse.next();

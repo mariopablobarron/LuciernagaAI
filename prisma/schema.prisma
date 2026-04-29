@@ -61,6 +61,15 @@ model Conversation {
   @@index([userId, updatedAt])
 }
 
+/// Age range bucket. Stored as opaque string (project convention favours
+/// String + comment over native enums). Valid values:
+///   - "14_17"   adolescents
+///   - "18_29"   young adults
+///   - "30_49"   adults
+///   - "50_69"   mid-late adults
+///   - "70_plus" elders
+/// Users declaring under_14 are blocked at the entry screen and never
+/// reach this column (no row is created).
 model User {
   id                        String                    @id @default(cuid())
   email                     String                    @unique
@@ -82,6 +91,10 @@ model User {
   /// Cuando publiquemos un texto nuevo, comparamos contra CURRENT_CONSENT_VERSION
   /// y pedimos re-aceptar al usuario antes de seguir.
   consentVersion            String?
+  /// Rango etario auto-declarado en onboarding. Ver comentario sobre el modelo
+  /// User para los valores válidos. Nullable: usuarios anteriores a esta
+  /// columna no lo tienen y se les pedirá la primera vez que vuelvan.
+  ageRange                  String?
   source                    String?
   isActive                  Boolean                   @default(true)
   latidos                   Int                       @default(0)

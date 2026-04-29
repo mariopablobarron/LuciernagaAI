@@ -326,6 +326,39 @@ export function getHotlinesForCountry(code: string | null | undefined): CountryH
   return HOTLINES[upper] ?? DEFAULT_COUNTRY;
 }
 
+/**
+ * Audience-specific hotlines that are more appropriate than the general
+ * suicide-prevention line for a given user. Today populated for ES minors;
+ * extend per country/audience as needed.
+ *
+ * Returned as ADDITIONAL resources, not replacements — the general line
+ * always stays available. The crisis flow can prepend these when the user's
+ * declared age range is "14_17".
+ */
+export type AudienceHotlines = {
+  forMinors?: Hotline[];
+  forElders?: Hotline[];
+};
+
+const AUDIENCE_HOTLINES: Record<string, AudienceHotlines> = {
+  ES: {
+    forMinors: [
+      {
+        name: "Fundación ANAR — ayuda a menores",
+        number: "900 20 20 10",
+        available: "24/7 gratis y confidencial",
+        url: "https://www.anar.org",
+      },
+    ],
+  },
+};
+
+export function getAudienceHotlines(code: string | null | undefined): AudienceHotlines {
+  if (!code) return AUDIENCE_HOTLINES.ES ?? {};
+  const upper = code.trim().toUpperCase();
+  return AUDIENCE_HOTLINES[upper] ?? {};
+}
+
 /** Compact one-liner for inline injection in crisis assistant responses. */
 export function formatHotlinesInline(country: CountryHotlines): string {
   const main = country.suicidePrevention;

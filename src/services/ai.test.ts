@@ -64,3 +64,38 @@ describe("generateAIResponse", () => {
     );
   });
 });
+
+describe("OpenRouter request body", () => {
+  const originalApiKey = process.env.OPENROUTER_API_KEY;
+  const originalFetch = global.fetch;
+
+  afterEach(() => {
+    process.env.OPENROUTER_API_KEY = originalApiKey;
+    global.fetch = originalFetch;
+    jest.restoreAllMocks();
+  });
+
+  it("envía la cadena de fallback con route=fallback en lugar de un solo model", async () => {
+    process.env.OPENROUTER_API_KEY = "test-key";
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ choices: [{ message: { content: "ok" } }] }),
+    } as Response);
+    global.fetch = fetchMock;
+
+    await generateAIResponse("hola", "neutral");
+
+    const call = fetchMock.mock.calls[0];
+    const body = JSON.parse(call[1].body as string);
+
+    // Lleva la cadena, no un model único
+    expect(body.models).toEqual([
+      "anthropic/claude-sonnet-4-6",
+      "anthropic/claude-haiku-4-5",
+      "openai/gpt-4o-mini",
+    ]);
+    expect(body.route).toBe("fallback");
+    // Y NO el campo legacy `model` (para evitar ambigüedad con OpenRouter)
+    expect(body.model).toBeUndefined();
+  });
+});

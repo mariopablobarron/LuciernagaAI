@@ -28,6 +28,25 @@ interface OpenRouterStreamChunk {
 import { getOpenRouterChatUrl, getOpenRouterHeaders } from "@/lib/openrouter";
 
 const OPENROUTER_MODEL = "anthropic/claude-sonnet-4-6";
+/**
+ * OpenRouter fallback chain para el chat principal. Si Anthropic Sonnet
+ * falla (provider down, rate limit, error 5xx), OpenRouter intenta
+ * automáticamente Haiku 4.5 (mismo proveedor, más barato y rápido) y
+ * después GPT-4o-mini de OpenAI (proveedor distinto — supervivencia
+ * incluso si Anthropic entero está caído).
+ *
+ * Solo se usa para `models` + `route: "fallback"` en el body. El
+ * primer modelo de la lista es siempre el primario; OpenRouter va
+ * bajando si falla.
+ *
+ * Coste: invisible en condiciones normales — solo se paga el modelo
+ * que efectivamente respondió. El fallback es defensa en profundidad.
+ */
+const OPENROUTER_FALLBACK_CHAIN = [
+  OPENROUTER_MODEL,
+  "anthropic/claude-haiku-4-5",
+  "openai/gpt-4o-mini",
+] as const;
 const REQUEST_TIMEOUT_MS = 25000;
 type AIErrorType = "missing_config" | "provider_failure" | "unknown";
 
@@ -137,7 +156,8 @@ async function requestOpenRouter(
             "X-Title": "mentor-web",
           },
           body: JSON.stringify({
-            model: OPENROUTER_MODEL,
+            models: OPENROUTER_FALLBACK_CHAIN,
+            route: "fallback",
             messages: [
               {
                 role: "system",
@@ -330,7 +350,8 @@ export async function generateImpulseResponse(input: ImpulseResponseInput): Prom
           "X-Title": "mentor-web-impulso",
         },
         body: JSON.stringify({
-          model: OPENROUTER_MODEL,
+          models: OPENROUTER_FALLBACK_CHAIN,
+          route: "fallback",
           messages: [
             { role: "system", content: buildImpulsePrompt(input) },
             { role: "user", content: input.message },
@@ -391,7 +412,8 @@ export async function* streamOpenRouterTokens(
           "X-Title": "mentor-web",
         },
         body: JSON.stringify({
-          model: OPENROUTER_MODEL,
+          models: OPENROUTER_FALLBACK_CHAIN,
+          route: "fallback",
           messages: [
             { role: "system", content: systemPrompt },
             ...history,

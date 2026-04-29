@@ -111,7 +111,9 @@ jobs:
         run: npx prisma generate
 
       - name: Run tests
-        run: npm test -- --passWithNoTests
+        # Sin --passWithNoTests: si por accidente alguien borra todos los
+        # tests, el CI debe fallar (no enmascarar la regresión).
+        run: npm test
         env:
           DATABASE_URL: "postgresql://fake:fake@localhost:5432/fake"
           AUTH_TOKEN_SECRET: "ci-test-secret-key-minimum-32-chars"

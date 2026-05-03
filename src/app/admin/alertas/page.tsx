@@ -7,12 +7,10 @@ import {
   AlertCircle,
   AlertTriangle,
   Bell,
-  Check,
   Clock,
   PlusCircle,
   Send,
   Trash2,
-  X,
   Zap,
 } from "lucide-react";
 import { AdminShell } from "@/features/admin/components/AdminShell";
@@ -225,7 +223,9 @@ export default function AlertasPage() {
             <label className="block text-xs font-semibold text-zinc-400 mb-1">Canal</label>
             <select
               value={form.channel}
-              onChange={(e) => setForm((p) => ({ ...p, channel: e.target.value as Rule["channel"] }))}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, channel: e.target.value as Rule["channel"] }))
+              }
               className="w-full rounded-lg bg-zinc-950 border border-zinc-800 px-3 py-2 text-sm text-zinc-100 focus:border-violet-500/50 focus:outline-none"
             >
               <option value="telegram">Telegram</option>
@@ -234,13 +234,17 @@ export default function AlertasPage() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-zinc-400 mb-1">Throttle (minutos)</label>
+            <label className="block text-xs font-semibold text-zinc-400 mb-1">
+              Throttle (minutos)
+            </label>
             <input
               type="number"
               min={1}
               max={1440}
               value={form.throttleMinutes}
-              onChange={(e) => setForm((p) => ({ ...p, throttleMinutes: Number(e.target.value) || 15 }))}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, throttleMinutes: Number(e.target.value) || 15 }))
+              }
               className="w-full rounded-lg bg-zinc-950 border border-zinc-800 px-3 py-2 text-sm text-zinc-100 focus:border-violet-500/50 focus:outline-none"
             />
           </div>
@@ -260,7 +264,9 @@ export default function AlertasPage() {
       <AdminPanel
         title="Reglas activas"
         description={
-          rules ? `${rules.length} reglas · ${rules.filter((r) => r.enabled).length} habilitadas` : "Cargando…"
+          rules
+            ? `${rules.length} reglas · ${rules.filter((r) => r.enabled).length} habilitadas`
+            : "Cargando…"
         }
       >
         {loading && !rules ? (
@@ -340,7 +346,10 @@ export default function AlertasPage() {
         )}
       </AdminPanel>
 
-      <AdminPanel title="Sugerencias de reglas típicas" description="Copia manualmente las que te interesen.">
+      <AdminPanel
+        title="Sugerencias de reglas típicas"
+        description="Copia manualmente las que te interesen."
+      >
         <div className="grid md:grid-cols-2 gap-3 text-xs">
           {[
             {

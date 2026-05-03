@@ -57,8 +57,11 @@ type CrisisData = {
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString("es-ES", {
-    day: "2-digit", month: "2-digit", year: "numeric",
-    hour: "2-digit", minute: "2-digit",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
@@ -81,23 +84,36 @@ export default function AdminCrisisPage() {
   const [page, setPage] = useState(1);
   const [levelFilter, setLevelFilter] = useState("");
 
-  function load() {
-    setLoading(true);
-    const params = new URLSearchParams({ page: String(page), pageSize: "20" });
-    if (levelFilter) params.set("level", levelFilter);
+  useEffect(() => {
+    let active = true;
 
-    fetch(`/api/admin/crisis?${params}`, { credentials: "include" })
-      .then((r) => {
-        if (r.status === 401) { router.replace("/admin/login?next=/admin/crisis"); return null; }
-        return r.json();
-      })
-      .then((d: CrisisData | null) => { if (d) setData(d); })
-      .catch(() => { toast.error("Error al cargar datos de crisis"); })
-      .finally(() => setLoading(false));
-  }
+    async function loadCrisis() {
+      setLoading(true);
+      const params = new URLSearchParams({ page: String(page), pageSize: "20" });
+      if (levelFilter) params.set("level", levelFilter);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- legitimate fetch-on-filter-change; setLoading is UI feedback, not derived state
-  useEffect(() => { load(); }, [page, levelFilter]);
+      try {
+        const res = await fetch(`/api/admin/crisis?${params}`, { credentials: "include" });
+        if (!active) return;
+        if (res.status === 401) {
+          router.replace("/admin/login?next=/admin/crisis");
+          return;
+        }
+        const d = (await res.json()) as CrisisData | null;
+        if (active && d) setData(d);
+      } catch {
+        if (active) toast.error("Error al cargar datos de crisis");
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    void loadCrisis();
+
+    return () => {
+      active = false;
+    };
+  }, [page, levelFilter, router]);
 
   const stats = data?.stats;
   const active = data?.activeCrises ?? [];
@@ -110,7 +126,9 @@ export default function AdminCrisisPage() {
       subtitle="Eventos de crisis, usuarios en riesgo y estado de red de apoyo."
       showSectionNav={false}
       onLogout={async () => {
-        await fetch("/api/admin/logout", { method: "POST", credentials: "include" }).catch(() => {});
+        await fetch("/api/admin/logout", { method: "POST", credentials: "include" }).catch(
+          () => {}
+        );
         router.replace("/admin/login");
       }}
     >
@@ -162,9 +180,15 @@ export default function AdminCrisisPage() {
         <AdminPanel title={`Crisis activas (${active.length})`}>
           <div className="space-y-2">
             {active.map((c) => (
-              <div key={c.userId} className="flex items-center justify-between gap-3 rounded-xl border-2 border-red-500/30 bg-red-500/5 p-4">
+              <div
+                key={c.userId}
+                className="flex items-center justify-between gap-3 rounded-xl border-2 border-red-500/30 bg-red-500/5 p-4"
+              >
                 <div className="min-w-0">
-                  <Link href={`/admin/users/${c.userId}`} className="text-sm font-semibold text-red-300 hover:text-red-200 transition-colors">
+                  <Link
+                    href={`/admin/users/${c.userId}`}
+                    className="text-sm font-semibold text-red-300 hover:text-red-200 transition-colors"
+                  >
                     {c.name || c.email}
                   </Link>
                   <p className="text-xs text-zinc-500 truncate">{c.email}</p>
@@ -193,7 +217,10 @@ export default function AdminCrisisPage() {
       <div className="flex items-center gap-3">
         <select
           value={levelFilter}
-          onChange={(e) => { setLevelFilter(e.target.value); setPage(1); }}
+          onChange={(e) => {
+            setLevelFilter(e.target.value);
+            setPage(1);
+          }}
           className="rounded-xl border border-zinc-700 bg-zinc-900/80 px-3 py-2.5 text-sm text-zinc-300 focus:border-violet-500 focus:outline-none"
         >
           <option value="">Todos los niveles</option>
@@ -248,14 +275,20 @@ export default function AdminCrisisPage() {
                       >
                         {event.name || event.email.split("@")[0]}
                       </Link>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                        event.level === "critical"
-                          ? "bg-red-500/20 text-red-400"
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                          event.level === "critical"
+                            ? "bg-red-500/20 text-red-400"
+                            : event.level === "high"
+                              ? "bg-orange-500/20 text-orange-400"
+                              : "bg-amber-500/20 text-amber-400"
+                        }`}
+                      >
+                        {event.level === "critical"
+                          ? "CRITICO"
                           : event.level === "high"
-                            ? "bg-orange-500/20 text-orange-400"
-                            : "bg-amber-500/20 text-amber-400"
-                      }`}>
-                        {event.level === "critical" ? "CRITICO" : event.level === "high" ? "ALTO" : "MEDIO"}
+                            ? "ALTO"
+                            : "MEDIO"}
                       </span>
                       <span className="text-[10px] text-zinc-600">{timeAgo(event.createdAt)}</span>
                     </div>

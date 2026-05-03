@@ -1,12 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
-  Users, Search, Mail, Phone, MessageCircle, Bot,
-  CheckCircle2, XCircle, Flame, ChevronLeft, ChevronRight,
-  RefreshCw, Download, Brain,
+  Users,
+  Search,
+  Mail,
+  Phone,
+  Bot,
+  CheckCircle2,
+  XCircle,
+  Flame,
+  ChevronLeft,
+  ChevronRight,
+  RefreshCw,
+  Download,
+  Brain,
 } from "lucide-react";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 
@@ -71,33 +81,55 @@ export default function CrmPage() {
   const router = useRouter();
   const [data, setData] = useState<CrmData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [searchText, setSearchText] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [segment, setSegment] = useState("all");
   const [page, setPage] = useState(1);
   const [includeTeam, setIncludeTeam] = useState(false);
 
-  function load() {
-    setLoading(true);
-    const params = new URLSearchParams({ page: String(page), pageSize: "50", search, segment });
-    if (includeTeam) params.set("includeTeam", "1");
-    fetch(`/api/admin/crm?${params}`)
-      .then((r) => {
-        if (r.status === 401) { router.push("/admin/login"); return null; }
-        if (!r.ok) { toast.error(`Error ${r.status} al cargar CRM`); return null; }
-        return r.json();
-      })
-      .then((d: CrmData | null) => { if (d?.items) setData(d); })
-      .catch(() => { toast.error("Error al cargar CRM"); })
-      .finally(() => setLoading(false));
-  }
+  useEffect(() => {
+    let active = true;
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- legitimate fetch-on-filter-change; setLoading is UI feedback, not derived state
-  useEffect(() => { load(); }, [page, segment, includeTeam]);
+    async function loadCrm() {
+      setLoading(true);
+      const params = new URLSearchParams({
+        page: String(page),
+        pageSize: "50",
+        search: searchQuery,
+        segment,
+      });
+      if (includeTeam) params.set("includeTeam", "1");
 
-  function handleSearch(e: React.FormEvent) {
+      try {
+        const res = await fetch(`/api/admin/crm?${params}`, { credentials: "include" });
+        if (!active) return;
+        if (res.status === 401) {
+          router.push("/admin/login");
+          return;
+        }
+        if (!res.ok) {
+          toast.error(`Error ${res.status} al cargar CRM`);
+          return;
+        }
+        const d = (await res.json()) as CrmData | null;
+        if (active && d?.items) setData(d);
+      } catch {
+        if (active) toast.error("Error al cargar CRM");
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    void loadCrm();
+    return () => {
+      active = false;
+    };
+  }, [page, segment, includeTeam, searchQuery, router]);
+
+  function handleSearch(e: FormEvent) {
     e.preventDefault();
     setPage(1);
-    load();
+    setSearchQuery(searchText);
   }
 
   async function handleLogout() {
@@ -107,12 +139,31 @@ export default function CrmPage() {
 
   function handleExportCsv() {
     if (!data?.items.length) return;
-    const headers = ["Email", "Nombre", "Telefono", "Registro", "Ultima actividad", "Verificado", "Telegram", "Mensajes", "Racha", "Estado", "Plan"];
+    const headers = [
+      "Email",
+      "Nombre",
+      "Telefono",
+      "Registro",
+      "Ultima actividad",
+      "Verificado",
+      "Telegram",
+      "Mensajes",
+      "Racha",
+      "Estado",
+      "Plan",
+    ];
     const rows = data.items.map((u) => [
-      u.email, u.name ?? "", u.phone ?? "", u.createdAt.split("T")[0],
-      u.lastSeen.split("T")[0], u.emailVerified ? "Si" : "No",
-      u.hasTelegram ? "Si" : "No", String(u.messageCount),
-      String(u.streakDays), u.state, u.plan,
+      u.email,
+      u.name ?? "",
+      u.phone ?? "",
+      u.createdAt.split("T")[0],
+      u.lastSeen.split("T")[0],
+      u.emailVerified ? "Si" : "No",
+      u.hasTelegram ? "Si" : "No",
+      String(u.messageCount),
+      String(u.streakDays),
+      u.state,
+      u.plan,
     ]);
     const csv = [headers, ...rows].map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
@@ -146,7 +197,9 @@ export default function CrmPage() {
               <div key={m.label} className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <Icon className="w-4 h-4 text-violet-400" />
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{m.label}</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                    {m.label}
+                  </span>
                 </div>
                 <p className="text-xl font-bold text-white">{m.value}</p>
               </div>
@@ -161,8 +214,8 @@ export default function CrmPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
           <input
             type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
             placeholder="Buscar por email, nombre o telefono..."
             className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-sm text-white placeholder:text-zinc-600 focus:border-violet-500/50 focus:outline-none"
           />
@@ -171,7 +224,10 @@ export default function CrmPage() {
           {SEGMENT_OPTIONS.map((opt) => (
             <button
               key={opt.value}
-              onClick={() => { setSegment(opt.value); setPage(1); }}
+              onClick={() => {
+                setSegment(opt.value);
+                setPage(1);
+              }}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-all ${
                 segment === opt.value
                   ? "border-violet-500/30 bg-violet-500/15 text-violet-300"
@@ -185,7 +241,10 @@ export default function CrmPage() {
             <input
               type="checkbox"
               checked={includeTeam}
-              onChange={(e) => { setIncludeTeam(e.target.checked); setPage(1); }}
+              onChange={(e) => {
+                setIncludeTeam(e.target.checked);
+                setPage(1);
+              }}
               className="accent-violet-500"
             />
             Incluir equipo
@@ -198,7 +257,11 @@ export default function CrmPage() {
         >
           <Download className="w-3.5 h-3.5" /> CSV
         </button>
-        <button onClick={load} disabled={loading} className="p-2 text-zinc-500 hover:text-white transition-colors">
+        <button
+          onClick={load}
+          disabled={loading}
+          className="p-2 text-zinc-500 hover:text-white transition-colors"
+        >
           <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
         </button>
       </div>
@@ -237,7 +300,9 @@ export default function CrmPage() {
                     <td className="px-4 py-3">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-white text-sm">{u.name ?? u.email.split("@")[0]}</span>
+                          <span className="font-medium text-white text-sm">
+                            {u.name ?? u.email.split("@")[0]}
+                          </span>
                           {u.emailVerified ? (
                             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                           ) : (
@@ -271,7 +336,9 @@ export default function CrmPage() {
                     </td>
                     <td className="px-4 py-3 text-center hidden md:table-cell">
                       {u.streakDays > 0 ? (
-                        <span className="text-xs font-semibold text-amber-400">{u.streakDays}d</span>
+                        <span className="text-xs font-semibold text-amber-400">
+                          {u.streakDays}d
+                        </span>
                       ) : (
                         <span className="text-xs text-zinc-600">—</span>
                       )}
@@ -293,7 +360,8 @@ export default function CrmPage() {
         {data && data.pagination.totalPages > 1 && (
           <div className="flex items-center justify-between border-t border-zinc-800 px-4 py-3 text-sm">
             <span className="text-xs text-zinc-500">
-              {data.pagination.total} usuarios — pagina {data.pagination.page} de {data.pagination.totalPages}
+              {data.pagination.total} usuarios — pagina {data.pagination.page} de{" "}
+              {data.pagination.totalPages}
             </span>
             <div className="flex gap-2">
               <button

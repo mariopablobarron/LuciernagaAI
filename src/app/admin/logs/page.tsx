@@ -14,7 +14,6 @@ import {
   Code2,
   Download,
   FileText,
-  Filter,
   Mail,
   PlayCircle,
   RefreshCw,
@@ -146,11 +145,26 @@ function fmtTime(iso: string): string {
 function levelConfig(level: string) {
   switch (level) {
     case "error":
-      return { icon: AlertCircle, color: "text-red-400", bg: "bg-red-500/10", ring: "ring-red-500/30" };
+      return {
+        icon: AlertCircle,
+        color: "text-red-400",
+        bg: "bg-red-500/10",
+        ring: "ring-red-500/30",
+      };
     case "warn":
-      return { icon: AlertTriangle, color: "text-amber-400", bg: "bg-amber-500/10", ring: "ring-amber-500/30" };
+      return {
+        icon: AlertTriangle,
+        color: "text-amber-400",
+        bg: "bg-amber-500/10",
+        ring: "ring-amber-500/30",
+      };
     default:
-      return { icon: CheckCircle2, color: "text-cyan-400", bg: "bg-cyan-500/10", ring: "ring-cyan-500/30" };
+      return {
+        icon: CheckCircle2,
+        color: "text-cyan-400",
+        bg: "bg-cyan-500/10",
+        ring: "ring-cyan-500/30",
+      };
   }
 }
 
@@ -261,7 +275,9 @@ export default function LogsPage() {
       const params = new URLSearchParams();
       if (cronFilters.jobName) params.set("jobName", cronFilters.jobName);
       if (cronFilters.status) params.set("status", cronFilters.status);
-      const res = await fetch(`/api/admin/logs/cron?${params.toString()}`, { credentials: "include" });
+      const res = await fetch(`/api/admin/logs/cron?${params.toString()}`, {
+        credentials: "include",
+      });
       if (res.status === 401) {
         router.replace("/admin/login");
         return;
@@ -281,7 +297,9 @@ export default function LogsPage() {
       const params = new URLSearchParams();
       if (whFilters.source) params.set("source", whFilters.source);
       if (whFilters.status) params.set("status", whFilters.status);
-      const res = await fetch(`/api/admin/logs/webhook?${params.toString()}`, { credentials: "include" });
+      const res = await fetch(`/api/admin/logs/webhook?${params.toString()}`, {
+        credentials: "include",
+      });
       if (res.status === 401) {
         router.replace("/admin/login");
         return;
@@ -339,12 +357,12 @@ export default function LogsPage() {
     >
       {/* Tabs */}
       <div className="flex gap-2 border-b border-zinc-800">
-        {([
+        {[
           { key: "system" as const, label: "Sistema", icon: FileText },
           { key: "email" as const, label: "Correos", icon: Mail },
           { key: "cron" as const, label: "Crons", icon: Timer },
           { key: "webhook" as const, label: "Webhooks", icon: Webhook },
-        ]).map((t) => {
+        ].map((t) => {
           const Icon = t.icon;
           const active = activeTab === t.key;
           return (
@@ -365,7 +383,13 @@ export default function LogsPage() {
 
       {activeTab === "system" && (
         <>
-          {timeseries && <VolumeChart buckets={timeseries.system} accent="violet" label="Volumen 24h (sistema)" />}
+          {timeseries && (
+            <VolumeChart
+              buckets={timeseries.system}
+              accent="violet"
+              label="Volumen 24h (sistema)"
+            />
+          )}
           <SystemLogTab
             data={sysData}
             loading={sysLoading}
@@ -380,7 +404,13 @@ export default function LogsPage() {
       )}
       {activeTab === "email" && (
         <>
-          {timeseries && <VolumeChart buckets={timeseries.email} accent="emerald" label="Volumen 24h (correos)" />}
+          {timeseries && (
+            <VolumeChart
+              buckets={timeseries.email}
+              accent="emerald"
+              label="Volumen 24h (correos)"
+            />
+          )}
           <EmailLogTab
             data={emailData}
             loading={emailLoading}
@@ -393,7 +423,9 @@ export default function LogsPage() {
       )}
       {activeTab === "cron" && (
         <>
-          {timeseries && <VolumeChart buckets={timeseries.cron} accent="cyan" label="Volumen 24h (crons)" />}
+          {timeseries && (
+            <VolumeChart buckets={timeseries.cron} accent="cyan" label="Volumen 24h (crons)" />
+          )}
           <CronLogTab
             data={cronData}
             loading={cronLoading}
@@ -408,7 +440,13 @@ export default function LogsPage() {
       )}
       {activeTab === "webhook" && (
         <>
-          {timeseries && <VolumeChart buckets={timeseries.webhook} accent="fuchsia" label="Volumen 24h (webhooks)" />}
+          {timeseries && (
+            <VolumeChart
+              buckets={timeseries.webhook}
+              accent="fuchsia"
+              label="Volumen 24h (webhooks)"
+            />
+          )}
           <WebhookLogTab
             data={whData}
             loading={whLoading}
@@ -453,7 +491,8 @@ function VolumeChart({
           <p className="text-xs font-semibold uppercase text-zinc-400">{label}</p>
         </div>
         <p className="text-xs text-zinc-500">
-          <span className="font-bold text-white">{total.toLocaleString()}</span> eventos · últimas 24h
+          <span className="font-bold text-white">{total.toLocaleString()}</span> eventos · últimas
+          24h
         </p>
       </div>
       <div className="flex items-end gap-0.5 h-20">
@@ -466,14 +505,20 @@ function VolumeChart({
               key={b.hour}
               title={`${h}:00 — ${b.total}${
                 Object.keys(b.byKey).length
-                  ? "\n" + Object.entries(b.byKey).map(([k, v]) => `${k}: ${v}`).join("\n")
+                  ? "\n" +
+                    Object.entries(b.byKey)
+                      .map(([k, v]) => `${k}: ${v}`)
+                      .join("\n")
                   : ""
               }`}
               className="flex-1 flex flex-col justify-end group"
             >
               <div
                 className={`${accentFill[accent]} rounded-t transition-all`}
-                style={{ height: `${Math.max(heightPct, b.total > 0 ? 3 : 0)}%`, minHeight: b.total > 0 ? 2 : 0 }}
+                style={{
+                  height: `${Math.max(heightPct, b.total > 0 ? 3 : 0)}%`,
+                  minHeight: b.total > 0 ? 2 : 0,
+                }}
               />
             </div>
           );
@@ -503,7 +548,13 @@ function SystemLogTab({
   data: SystemResponse | null;
   loading: boolean;
   filters: { level: string; tag: string; search: string };
-  setFilters: (fn: (prev: { level: string; tag: string; search: string }) => { level: string; tag: string; search: string }) => void;
+  setFilters: (
+    fn: (prev: { level: string; tag: string; search: string }) => {
+      level: string;
+      tag: string;
+      search: string;
+    }
+  ) => void;
   onReload: () => void;
   onExport: () => void;
   expanded: string | null;
@@ -520,7 +571,9 @@ function SystemLogTab({
             return (
               <button
                 key={c.level}
-                onClick={() => setFilters((p) => ({ ...p, level: p.level === c.level ? "" : c.level }))}
+                onClick={() =>
+                  setFilters((p) => ({ ...p, level: p.level === c.level ? "" : c.level }))
+                }
                 className={`flex items-center gap-3 rounded-xl border p-3 ${cfg.bg} ${
                   filters.level === c.level ? `ring-2 ${cfg.ring}` : "border-zinc-800"
                 }`}
@@ -621,7 +674,11 @@ function SystemLogTab({
                     </span>
                     {(item.context || item.stack) && (
                       <span className="shrink-0 text-zinc-500 mt-0.5">
-                        {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                        {isExpanded ? (
+                          <ChevronDown className="h-4 w-4" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4" />
+                        )}
                       </span>
                     )}
                   </button>
@@ -629,7 +686,9 @@ function SystemLogTab({
                     <div className="px-4 pb-4 pl-[128px] space-y-2">
                       {item.context && Object.keys(item.context).length > 0 && (
                         <div>
-                          <p className="text-[10px] font-semibold uppercase text-zinc-500 mb-1">Contexto</p>
+                          <p className="text-[10px] font-semibold uppercase text-zinc-500 mb-1">
+                            Contexto
+                          </p>
                           <pre className="rounded-lg bg-zinc-950 border border-zinc-800 p-3 text-[11px] text-zinc-300 overflow-auto max-h-[200px]">
                             {JSON.stringify(item.context, null, 2)}
                           </pre>
@@ -637,7 +696,9 @@ function SystemLogTab({
                       )}
                       {item.stack && (
                         <div>
-                          <p className="text-[10px] font-semibold uppercase text-zinc-500 mb-1">Stack trace</p>
+                          <p className="text-[10px] font-semibold uppercase text-zinc-500 mb-1">
+                            Stack trace
+                          </p>
                           <pre className="rounded-lg bg-zinc-950 border border-zinc-800 p-3 text-[11px] text-zinc-400 overflow-auto max-h-[300px]">
                             {item.stack}
                           </pre>
@@ -668,7 +729,13 @@ function EmailLogTab({
   data: EmailResponse | null;
   loading: boolean;
   filters: { status: string; template: string; to: string };
-  setFilters: (fn: (prev: { status: string; template: string; to: string }) => { status: string; template: string; to: string }) => void;
+  setFilters: (
+    fn: (prev: { status: string; template: string; to: string }) => {
+      status: string;
+      template: string;
+      to: string;
+    }
+  ) => void;
   onReload: () => void;
   onExport: () => void;
 }) {
@@ -681,12 +748,16 @@ function EmailLogTab({
             return (
               <button
                 key={c.status}
-                onClick={() => setFilters((p) => ({ ...p, status: p.status === c.status ? "" : c.status }))}
+                onClick={() =>
+                  setFilters((p) => ({ ...p, status: p.status === c.status ? "" : c.status }))
+                }
                 className={`flex items-center justify-between rounded-xl border p-3 ${cfg.bg} ${
                   filters.status === c.status ? "border-violet-500/50" : "border-zinc-800"
                 }`}
               >
-                <span className={`text-[10px] font-semibold uppercase ${cfg.color}`}>{cfg.label}</span>
+                <span className={`text-[10px] font-semibold uppercase ${cfg.color}`}>
+                  {cfg.label}
+                </span>
                 <span className="text-lg font-bold text-white">{c.count.toLocaleString()}</span>
               </button>
             );
@@ -808,7 +879,9 @@ function CronLogTab({
   data: CronResponse | null;
   loading: boolean;
   filters: { jobName: string; status: string };
-  setFilters: (fn: (prev: { jobName: string; status: string }) => { jobName: string; status: string }) => void;
+  setFilters: (
+    fn: (prev: { jobName: string; status: string }) => { jobName: string; status: string }
+  ) => void;
   onReload: () => void;
   onExport: () => void;
   expanded: string | null;
@@ -825,22 +898,33 @@ function CronLogTab({
       {data && data.counts.lastPerJob.length > 0 && (
         <div className="rounded-2xl border border-zinc-800 bg-zinc-950/40 overflow-hidden">
           <div className="px-4 py-3 border-b border-zinc-800">
-            <p className="text-xs font-semibold uppercase text-zinc-500">Última ejecución por job</p>
+            <p className="text-xs font-semibold uppercase text-zinc-500">
+              Última ejecución por job
+            </p>
           </div>
           <div className="divide-y divide-zinc-800/60">
             {data.counts.lastPerJob.map((j) => {
-              const cfg = statusColors[j.status] ?? { color: "text-zinc-400", bg: "bg-zinc-500/10" };
+              const cfg = statusColors[j.status] ?? {
+                color: "text-zinc-400",
+                bg: "bg-zinc-500/10",
+              };
               return (
                 <button
                   key={j.jobName}
-                  onClick={() => setFilters((p) => ({ ...p, jobName: p.jobName === j.jobName ? "" : j.jobName }))}
+                  onClick={() =>
+                    setFilters((p) => ({ ...p, jobName: p.jobName === j.jobName ? "" : j.jobName }))
+                  }
                   className={`w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-zinc-900/40 transition-colors ${
                     filters.jobName === j.jobName ? "bg-zinc-900/60" : ""
                   }`}
                 >
                   <PlayCircle className={`h-4 w-4 shrink-0 ${cfg.color}`} />
-                  <span className="font-mono text-xs text-zinc-200 flex-1 truncate">{j.jobName}</span>
-                  <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold ${cfg.bg} ${cfg.color}`}>
+                  <span className="font-mono text-xs text-zinc-200 flex-1 truncate">
+                    {j.jobName}
+                  </span>
+                  <span
+                    className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold ${cfg.bg} ${cfg.color}`}
+                  >
                     {j.status}
                   </span>
                   <span className="text-[10px] text-zinc-500 font-mono shrink-0 w-[110px] text-right">
@@ -848,7 +932,9 @@ function CronLogTab({
                   </span>
                   {j.durationMs !== null && (
                     <span className="text-[10px] text-zinc-500 font-mono shrink-0 w-[55px] text-right">
-                      {j.durationMs < 1000 ? `${j.durationMs}ms` : `${(j.durationMs / 1000).toFixed(1)}s`}
+                      {j.durationMs < 1000
+                        ? `${j.durationMs}ms`
+                        : `${(j.durationMs / 1000).toFixed(1)}s`}
                     </span>
                   )}
                 </button>
@@ -865,12 +951,16 @@ function CronLogTab({
             return (
               <button
                 key={c.status}
-                onClick={() => setFilters((p) => ({ ...p, status: p.status === c.status ? "" : c.status }))}
+                onClick={() =>
+                  setFilters((p) => ({ ...p, status: p.status === c.status ? "" : c.status }))
+                }
                 className={`flex items-center justify-between rounded-xl border p-3 ${cfg.bg} ${
                   filters.status === c.status ? "border-violet-500/50" : "border-zinc-800"
                 }`}
               >
-                <span className={`text-[10px] font-semibold uppercase ${cfg.color}`}>{c.status}</span>
+                <span className={`text-[10px] font-semibold uppercase ${cfg.color}`}>
+                  {c.status}
+                </span>
                 <span className="text-lg font-bold text-white">{c.count.toLocaleString()}</span>
               </button>
             );
@@ -928,7 +1018,10 @@ function CronLogTab({
         ) : (
           <div className="divide-y divide-zinc-800/60">
             {data.items.map((item) => {
-              const cfg = statusColors[item.status] ?? { color: "text-zinc-400", bg: "bg-zinc-500/10" };
+              const cfg = statusColors[item.status] ?? {
+                color: "text-zinc-400",
+                bg: "bg-zinc-500/10",
+              };
               const isExpanded = expanded === item.id;
               return (
                 <div key={item.id} className="flex flex-col">
@@ -939,22 +1032,34 @@ function CronLogTab({
                     <span className="font-mono text-[10px] text-zinc-500 shrink-0 w-[110px] mt-0.5">
                       {fmtTime(item.startedAt)}
                     </span>
-                    <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold shrink-0 ${cfg.bg} ${cfg.color}`}>
+                    <span
+                      className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold shrink-0 ${cfg.bg} ${cfg.color}`}
+                    >
                       {item.status}
                     </span>
-                    <span className="font-mono text-xs text-zinc-200 flex-1 min-w-0 truncate">{item.jobName}</span>
+                    <span className="font-mono text-xs text-zinc-200 flex-1 min-w-0 truncate">
+                      {item.jobName}
+                    </span>
                     {item.durationMs !== null && (
                       <span className="flex items-center gap-1 text-[10px] text-zinc-500 shrink-0">
                         <Clock className="h-3 w-3" />
-                        {item.durationMs < 1000 ? `${item.durationMs}ms` : `${(item.durationMs / 1000).toFixed(1)}s`}
+                        {item.durationMs < 1000
+                          ? `${item.durationMs}ms`
+                          : `${(item.durationMs / 1000).toFixed(1)}s`}
                       </span>
                     )}
                     {item.recordsProcessed !== null && (
-                      <span className="text-[10px] text-cyan-400 shrink-0">{item.recordsProcessed} rec</span>
+                      <span className="text-[10px] text-cyan-400 shrink-0">
+                        {item.recordsProcessed} rec
+                      </span>
                     )}
                     {(item.metadata || item.errorMessage) && (
                       <span className="shrink-0 text-zinc-500 mt-0.5">
-                        {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                        {isExpanded ? (
+                          <ChevronDown className="h-4 w-4" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4" />
+                        )}
                       </span>
                     )}
                   </button>
@@ -962,7 +1067,9 @@ function CronLogTab({
                     <div className="px-4 pb-4 pl-[134px] space-y-2">
                       {item.errorMessage && (
                         <div>
-                          <p className="text-[10px] font-semibold uppercase text-red-400 mb-1">Error</p>
+                          <p className="text-[10px] font-semibold uppercase text-red-400 mb-1">
+                            Error
+                          </p>
                           <pre className="rounded-lg bg-red-500/5 border border-red-500/20 p-3 text-[11px] text-red-300 overflow-auto max-h-[200px]">
                             {item.errorMessage}
                           </pre>
@@ -970,7 +1077,9 @@ function CronLogTab({
                       )}
                       {item.metadata && (
                         <div>
-                          <p className="text-[10px] font-semibold uppercase text-zinc-500 mb-1">Metadata</p>
+                          <p className="text-[10px] font-semibold uppercase text-zinc-500 mb-1">
+                            Metadata
+                          </p>
                           <pre className="rounded-lg bg-zinc-950 border border-zinc-800 p-3 text-[11px] text-zinc-300 overflow-auto max-h-[200px]">
                             {JSON.stringify(item.metadata, null, 2)}
                           </pre>
@@ -1003,7 +1112,9 @@ function WebhookLogTab({
   data: WebhookResponse | null;
   loading: boolean;
   filters: { source: string; status: string };
-  setFilters: (fn: (prev: { source: string; status: string }) => { source: string; status: string }) => void;
+  setFilters: (
+    fn: (prev: { source: string; status: string }) => { source: string; status: string }
+  ) => void;
   onReload: () => void;
   onExport: () => void;
   expanded: string | null;
@@ -1022,9 +1133,13 @@ function WebhookLogTab({
           {data.counts.bySource.map((s) => (
             <button
               key={s.source}
-              onClick={() => setFilters((p) => ({ ...p, source: p.source === s.source ? "" : s.source }))}
+              onClick={() =>
+                setFilters((p) => ({ ...p, source: p.source === s.source ? "" : s.source }))
+              }
               className={`flex items-center justify-between rounded-xl border p-3 ${
-                filters.source === s.source ? "border-violet-500/50 bg-violet-500/10" : "border-zinc-800 bg-zinc-900/40"
+                filters.source === s.source
+                  ? "border-violet-500/50 bg-violet-500/10"
+                  : "border-zinc-800 bg-zinc-900/40"
               }`}
             >
               <span className="text-[10px] font-semibold uppercase text-zinc-400">{s.source}</span>
@@ -1084,7 +1199,10 @@ function WebhookLogTab({
         ) : (
           <div className="divide-y divide-zinc-800/60">
             {data.items.map((item) => {
-              const cfg = statusColors[item.status] ?? { color: "text-zinc-400", bg: "bg-zinc-500/10" };
+              const cfg = statusColors[item.status] ?? {
+                color: "text-zinc-400",
+                bg: "bg-zinc-500/10",
+              };
               const isExpanded = expanded === item.id;
               return (
                 <div key={item.id} className="flex flex-col">
@@ -1095,14 +1213,18 @@ function WebhookLogTab({
                     <span className="font-mono text-[10px] text-zinc-500 shrink-0 w-[110px] mt-0.5">
                       {fmtTime(item.receivedAt)}
                     </span>
-                    <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold shrink-0 ${cfg.bg} ${cfg.color}`}>
+                    <span
+                      className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold shrink-0 ${cfg.bg} ${cfg.color}`}
+                    >
                       {item.status}
                     </span>
                     <span className="rounded-md bg-zinc-800/80 px-1.5 py-0.5 text-[10px] font-bold text-zinc-300 shrink-0">
                       {item.source}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-zinc-200 truncate">{item.event ?? "(sin evento)"}</p>
+                      <p className="text-sm text-zinc-200 truncate">
+                        {item.event ?? "(sin evento)"}
+                      </p>
                       {item.errorMessage && (
                         <p className="text-xs text-red-400 truncate">{item.errorMessage}</p>
                       )}
@@ -1113,16 +1235,24 @@ function WebhookLogTab({
                       </span>
                     )}
                     {item.statusCode !== null && (
-                      <span className="font-mono text-[10px] text-zinc-500 shrink-0">{item.statusCode}</span>
+                      <span className="font-mono text-[10px] text-zinc-500 shrink-0">
+                        {item.statusCode}
+                      </span>
                     )}
                     {item.durationMs !== null && (
                       <span className="text-[10px] text-zinc-500 shrink-0">
-                        {item.durationMs < 1000 ? `${item.durationMs}ms` : `${(item.durationMs / 1000).toFixed(1)}s`}
+                        {item.durationMs < 1000
+                          ? `${item.durationMs}ms`
+                          : `${(item.durationMs / 1000).toFixed(1)}s`}
                       </span>
                     )}
                     {Boolean(item.payload) && (
                       <span className="shrink-0 text-zinc-500 mt-0.5">
-                        {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                        {isExpanded ? (
+                          <ChevronDown className="h-4 w-4" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4" />
+                        )}
                       </span>
                     )}
                   </button>

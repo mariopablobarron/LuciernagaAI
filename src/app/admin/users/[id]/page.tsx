@@ -1,9 +1,30 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Brain, Check, ChevronDown, ClipboardList, Clock, Download, Mail, MessageSquareText, NotebookPen, Pencil, Power, RefreshCw, Shield, ShieldAlert, Tag, Target, Trash2, UserX } from "lucide-react";
+import {
+  ArrowLeft,
+  Brain,
+  Check,
+  ChevronDown,
+  ClipboardList,
+  Clock,
+  Download,
+  Mail,
+  MessageSquareText,
+  NotebookPen,
+  Pencil,
+  Power,
+  RefreshCw,
+  Shield,
+  ShieldAlert,
+  Tag,
+  Target,
+  Trash2,
+  UserX,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,23 +39,44 @@ import UserAdminMessages from "@/components/admin/UserAdminMessages";
 
 type ClinicalNote = { id: string; content: string; tags: string[]; createdAt: string };
 type AssessmentItem = {
-  id: string; type: string; title: string; status: string; createdAt: string;
+  id: string;
+  type: string;
+  title: string;
+  status: string;
+  createdAt: string;
   response: { totalScore: number; severity: string; completedAt: string } | null;
 };
-type TimelineEntry = { date: string; emotionalState: string; mood: string | null; momentum: number | null; hasCheckin: boolean };
+type TimelineEntry = {
+  date: string;
+  emotionalState: string;
+  mood: string | null;
+  momentum: number | null;
+  hasCheckin: boolean;
+};
 type CrisisMarker = { date: string; level: string };
 
 const SEVERITY_LABELS: Record<string, string> = {
-  minimal: "Mínimo", mild: "Leve", moderate: "Moderado",
-  moderately_severe: "Mod. severo", severe: "Severo",
+  minimal: "Mínimo",
+  mild: "Leve",
+  moderate: "Moderado",
+  moderately_severe: "Mod. severo",
+  severe: "Severo",
 };
 const SEVERITY_COLORS: Record<string, string> = {
-  minimal: "text-emerald-400", mild: "text-yellow-400",
-  moderate: "text-orange-400", moderately_severe: "text-orange-500", severe: "text-red-500",
+  minimal: "text-emerald-400",
+  mild: "text-yellow-400",
+  moderate: "text-orange-400",
+  moderately_severe: "text-orange-500",
+  severe: "text-red-500",
 };
 const STATE_COLORS: Record<string, string> = {
-  activo: "bg-emerald-500", bloqueado: "bg-red-500", ansioso: "bg-amber-500",
-  desmotivado: "bg-purple-500", perdido: "bg-blue-400", neutral: "bg-zinc-500", unknown: "bg-zinc-700",
+  activo: "bg-emerald-500",
+  bloqueado: "bg-red-500",
+  ansioso: "bg-amber-500",
+  desmotivado: "bg-purple-500",
+  perdido: "bg-blue-400",
+  neutral: "bg-zinc-500",
+  unknown: "bg-zinc-700",
 };
 
 type UserDetailResponse = {
@@ -221,7 +263,14 @@ export default function AdminUserDetailPage() {
   const [tagSuggestions, setTagSuggestions] = useState<Array<{ tag: string; count: number }>>([]);
   const [tagsSaving, setTagsSaving] = useState(false);
   const [auditEntries, setAuditEntries] = useState<
-    Array<{ id: string; actorId: string; actorType: string; action: string; metadata: unknown; createdAt: string }>
+    Array<{
+      id: string;
+      actorId: string;
+      actorType: string;
+      action: string;
+      metadata: unknown;
+      createdAt: string;
+    }>
   >([]);
   const [gdprBusy, setGdprBusy] = useState<null | "anonymize">(null);
 
@@ -237,7 +286,11 @@ export default function AdminUserDetailPage() {
 
   // ── Admin action state ──────────────────────────────────────────────────────
   const [openSection, setOpenSection] = useState<string | null>(null);
-  const [actionFeedback, setActionFeedback] = useState<{ section: string; type: "success" | "error"; message: string } | null>(null);
+  const [actionFeedback, setActionFeedback] = useState<{
+    section: string;
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
   // Edit user info
   const [editName, setEditName] = useState("");
@@ -297,10 +350,14 @@ export default function AdminUserDetailPage() {
         body: JSON.stringify({ name: editName, email: editEmail, role: editRole }),
       });
       if (!res.ok) throw new Error("Error al guardar cambios.");
-      setData((prev) => prev ? {
-        ...prev,
-        user: { ...prev.user, name: editName, email: editEmail, role: editRole },
-      } : prev);
+      setData((prev) =>
+        prev
+          ? {
+              ...prev,
+              user: { ...prev.user, name: editName, email: editEmail, role: editRole },
+            }
+          : prev
+      );
       showFeedback("edit-user", "success", "Datos del usuario actualizados correctamente.");
     } catch {
       showFeedback("edit-user", "error", "No se pudieron guardar los cambios.");
@@ -311,7 +368,12 @@ export default function AdminUserDetailPage() {
 
   async function handleChangePlan() {
     if (!params?.id) return;
-    if (!window.confirm(`Cambiar plan a "${newPlan}"? Esta accion puede afectar la facturacion del usuario.`)) return;
+    if (
+      !window.confirm(
+        `Cambiar plan a "${newPlan}"? Esta accion puede afectar la facturacion del usuario.`
+      )
+    )
+      return;
     setSavingPlan(true);
     try {
       const res = await fetch(`/api/admin/users/${params.id}/change-plan`, {
@@ -321,12 +383,16 @@ export default function AdminUserDetailPage() {
         body: JSON.stringify({ plan: newPlan, reason: planReason }),
       });
       if (!res.ok) throw new Error("Error al cambiar plan.");
-      setData((prev) => prev ? {
-        ...prev,
-        subscription: prev.subscription
-          ? { ...prev.subscription, plan: newPlan }
-          : { plan: newPlan, status: "active", createdAt: new Date().toISOString() },
-      } : prev);
+      setData((prev) =>
+        prev
+          ? {
+              ...prev,
+              subscription: prev.subscription
+                ? { ...prev.subscription, plan: newPlan }
+                : { plan: newPlan, status: "active", createdAt: new Date().toISOString() },
+            }
+          : prev
+      );
       setPlanReason("");
       showFeedback("change-plan", "success", `Plan cambiado a "${newPlan}" correctamente.`);
     } catch {
@@ -338,7 +404,10 @@ export default function AdminUserDetailPage() {
 
   async function handleResetPassword() {
     if (!params?.id || !newPassword.trim()) return;
-    if (!window.confirm("Resetear la contrasena de este usuario? Se cerraran sus sesiones activas.")) return;
+    if (
+      !window.confirm("Resetear la contrasena de este usuario? Se cerraran sus sesiones activas.")
+    )
+      return;
     setSavingPassword(true);
     try {
       const res = await fetch(`/api/admin/users/${params.id}/reset-password`, {
@@ -403,9 +472,17 @@ export default function AdminUserDetailPage() {
         if (!res.ok) throw new Error("Error al desactivar usuario.");
       }
       setIsUserActive(activating);
-      showFeedback("toggle-active", "success", activating ? "Usuario reactivado." : "Usuario desactivado.");
+      showFeedback(
+        "toggle-active",
+        "success",
+        activating ? "Usuario reactivado." : "Usuario desactivado."
+      );
     } catch {
-      showFeedback("toggle-active", "error", activating ? "No se pudo reactivar el usuario." : "No se pudo desactivar el usuario.");
+      showFeedback(
+        "toggle-active",
+        "error",
+        activating ? "No se pudo reactivar el usuario." : "No se pudo desactivar el usuario."
+      );
     } finally {
       setTogglingActive(false);
     }
@@ -445,23 +522,47 @@ export default function AdminUserDetailPage() {
         if (id) {
           void Promise.allSettled([
             fetch(`/api/admin/clinical-notes/${id}`, { credentials: "include" })
-              .then((r) => r.ok ? r.json() as Promise<{ notes: ClinicalNote[] }> : null)
-              .then((d) => { if (d) setNotes(d.notes ?? []); }),
+              .then((r) => (r.ok ? (r.json() as Promise<{ notes: ClinicalNote[] }>) : null))
+              .then((d) => {
+                if (d) setNotes(d.notes ?? []);
+              }),
             fetch(`/api/admin/assessments/${id}`, { credentials: "include" })
-              .then((r) => r.ok ? r.json() as Promise<{ assessments: AssessmentItem[] }> : null)
-              .then((d) => { if (d) setAssessments(d.assessments ?? []); }),
+              .then((r) => (r.ok ? (r.json() as Promise<{ assessments: AssessmentItem[] }>) : null))
+              .then((d) => {
+                if (d) setAssessments(d.assessments ?? []);
+              }),
             fetch(`/api/admin/users/${id}/emotional-history?days=30`, { credentials: "include" })
-              .then((r) => r.ok ? r.json() as Promise<{ timeline: TimelineEntry[]; crisisMarkers: CrisisMarker[] }> : null)
-              .then((d) => { if (d) { setTimeline(d.timeline ?? []); setCrisisMarkers(d.crisisMarkers ?? []); } }),
+              .then((r) =>
+                r.ok
+                  ? (r.json() as Promise<{
+                      timeline: TimelineEntry[];
+                      crisisMarkers: CrisisMarker[];
+                    }>)
+                  : null
+              )
+              .then((d) => {
+                if (d) {
+                  setTimeline(d.timeline ?? []);
+                  setCrisisMarkers(d.crisisMarkers ?? []);
+                }
+              }),
             fetch(`/api/admin/users/${id}/tags`, { credentials: "include" })
-              .then((r) => r.ok ? r.json() as Promise<{ tags: string[] }> : null)
-              .then((d) => { if (d) setUserTags(d.tags ?? []); }),
+              .then((r) => (r.ok ? (r.json() as Promise<{ tags: string[] }>) : null))
+              .then((d) => {
+                if (d) setUserTags(d.tags ?? []);
+              }),
             fetch(`/api/admin/tags`, { credentials: "include" })
-              .then((r) => r.ok ? r.json() as Promise<{ tags: Array<{ tag: string; count: number }> }> : null)
-              .then((d) => { if (d) setTagSuggestions(d.tags ?? []); }),
+              .then((r) =>
+                r.ok ? (r.json() as Promise<{ tags: Array<{ tag: string; count: number }> }>) : null
+              )
+              .then((d) => {
+                if (d) setTagSuggestions(d.tags ?? []);
+              }),
             fetch(`/api/admin/users/${id}/audit`, { credentials: "include" })
-              .then((r) => r.ok ? r.json() as Promise<{ entries: typeof auditEntries }> : null)
-              .then((d) => { if (d) setAuditEntries(d.entries ?? []); }),
+              .then((r) => (r.ok ? (r.json() as Promise<{ entries: typeof auditEntries }>) : null))
+              .then((d) => {
+                if (d) setAuditEntries(d.entries ?? []);
+              }),
           ]);
         }
       } catch (fetchError: unknown) {
@@ -500,7 +601,10 @@ export default function AdminUserDetailPage() {
       return;
     }
     const cleaned = raw.replace(/[^a-z0-9_-]/g, "").slice(0, 40);
-    if (!cleaned) { setTagInput(""); return; }
+    if (!cleaned) {
+      setTagInput("");
+      return;
+    }
     const next = [...userTags, cleaned];
     setTagInput("");
     void saveTags(next);
@@ -513,7 +617,7 @@ export default function AdminUserDetailPage() {
   async function handleAnonymize() {
     if (!params?.id) return;
     const confirmed = window.confirm(
-      "¿Anonimizar este usuario? Se reemplazará su email, nombre y datos personales. Los mensajes y métricas se mantienen. ESTO NO SE PUEDE DESHACER.",
+      "¿Anonimizar este usuario? Se reemplazará su email, nombre y datos personales. Los mensajes y métricas se mantienen. ESTO NO SE PUEDE DESHACER."
     );
     if (!confirmed) return;
     setGdprBusy("anonymize");
@@ -600,11 +704,7 @@ export default function AdminUserDetailPage() {
           </Link>
         </Button>
         {params?.id && (
-          <Button
-            asChild
-            variant="outline"
-            size="sm"
-          >
+          <Button asChild variant="outline" size="sm">
             <a
               href={`/api/admin/users/${params.id}/export-pdf`}
               target="_blank"
@@ -624,9 +724,7 @@ export default function AdminUserDetailPage() {
 
       {loading || !data ? (
         <Card className="border-zinc-800 bg-zinc-900/50">
-          <CardContent className="p-5 text-zinc-500">
-            Cargando ficha de usuario...
-          </CardContent>
+          <CardContent className="p-5 text-zinc-500">Cargando ficha de usuario...</CardContent>
         </Card>
       ) : (
         <>
@@ -634,11 +732,15 @@ export default function AdminUserDetailPage() {
             <CardContent className="space-y-4 p-5">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                 <div className="flex items-center gap-4">
-                  <img
+                  <Image
                     src={`/api/user/avatar/${data.user.id}`}
-                    alt=""
+                    alt="Avatar de usuario"
+                    width={56}
+                    height={56}
                     className="h-14 w-14 rounded-full object-cover border-2 border-zinc-700 shrink-0"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
                   />
                   <div>
                     <p className="text-xl font-semibold text-white">
@@ -696,13 +798,9 @@ export default function AdminUserDetailPage() {
               </div>
 
               <div className="grid grid-cols-1 gap-3 text-sm md:grid-cols-3">
-                <p className="text-zinc-500">
-                  Última actividad: {formatDate(data.user.lastSeen)}
-                </p>
+                <p className="text-zinc-500">Última actividad: {formatDate(data.user.lastSeen)}</p>
                 <p className="text-zinc-500">Creado: {formatDate(data.user.createdAt)}</p>
-                <p className="text-zinc-500">
-                  Actualizado: {formatDate(data.user.updatedAt)}
-                </p>
+                <p className="text-zinc-500">Actualizado: {formatDate(data.user.updatedAt)}</p>
               </div>
             </CardContent>
           </Card>
@@ -711,24 +809,34 @@ export default function AdminUserDetailPage() {
           <Card className="border-zinc-800 bg-zinc-900/50">
             <CardHeader className="pb-3">
               <CardTitle>Activación y onboarding</CardTitle>
-              <CardDescription>Hitos del journey: primera entrada, AHA moment, captación.</CardDescription>
+              <CardDescription>
+                Hitos del journey: primera entrada, AHA moment, captación.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 text-sm">
               <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                 <div className="rounded-xl border border-zinc-800 bg-zinc-800/35 px-3 py-2">
                   <p className="text-xs text-zinc-500">Primer mensaje</p>
-                  <p className="font-semibold text-white">{formatDate(data.user.firstMessageSentAt)}</p>
+                  <p className="font-semibold text-white">
+                    {formatDate(data.user.firstMessageSentAt)}
+                  </p>
                 </div>
                 <div className="rounded-xl border border-zinc-800 bg-zinc-800/35 px-3 py-2">
                   <p className="text-xs text-zinc-500">AHA (activado)</p>
-                  <p className={`font-semibold ${data.user.activatedAt ? "text-emerald-400" : "text-zinc-500"}`}>
+                  <p
+                    className={`font-semibold ${data.user.activatedAt ? "text-emerald-400" : "text-zinc-500"}`}
+                  >
                     {data.user.activatedAt ? formatDate(data.user.activatedAt) : "Sin activar"}
                   </p>
                 </div>
                 <div className="rounded-xl border border-zinc-800 bg-zinc-800/35 px-3 py-2">
                   <p className="text-xs text-zinc-500">Onboarding completo</p>
-                  <p className={`font-semibold ${data.user.onboardingCompletedAt ? "text-emerald-400" : "text-zinc-500"}`}>
-                    {data.user.onboardingCompletedAt ? formatDate(data.user.onboardingCompletedAt) : "Pendiente"}
+                  <p
+                    className={`font-semibold ${data.user.onboardingCompletedAt ? "text-emerald-400" : "text-zinc-500"}`}
+                  >
+                    {data.user.onboardingCompletedAt
+                      ? formatDate(data.user.onboardingCompletedAt)
+                      : "Pendiente"}
                   </p>
                 </div>
                 <div className="rounded-xl border border-zinc-800 bg-zinc-800/35 px-3 py-2">
@@ -739,13 +847,16 @@ export default function AdminUserDetailPage() {
 
               {data.user.telegramId ? (
                 <p className="text-zinc-500">
-                  Telegram ID: <span className="font-mono text-zinc-300">{data.user.telegramId}</span>
+                  Telegram ID:{" "}
+                  <span className="font-mono text-zinc-300">{data.user.telegramId}</span>
                 </p>
               ) : null}
 
               {data.user.onboardingContext ? (
                 <div className="rounded-xl border border-zinc-800 bg-zinc-800/35 p-3">
-                  <p className="mb-2 text-xs font-medium text-zinc-400">Contexto inicial (de /app/inicio)</p>
+                  <p className="mb-2 text-xs font-medium text-zinc-400">
+                    Contexto inicial (de /app/inicio)
+                  </p>
                   <div className="grid grid-cols-1 gap-2 text-sm md:grid-cols-3">
                     <p className="text-zinc-300">
                       <span className="text-zinc-500">Sentir:</span>{" "}
@@ -768,7 +879,10 @@ export default function AdminUserDetailPage() {
           </Card>
 
           {/* ── ADMIN ACTIONS ────────────────────────────────────────── */}
-          <AdminPanel title="Acciones de administrador" description="Gestionar datos, plan, acceso y comunicaciones del usuario.">
+          <AdminPanel
+            title="Acciones de administrador"
+            description="Gestionar datos, plan, acceso y comunicaciones del usuario."
+          >
             {/* ── 1. Edit User Info ── */}
             <div className="rounded-xl border border-zinc-800 overflow-hidden">
               <button
@@ -780,7 +894,9 @@ export default function AdminUserDetailPage() {
                   <Pencil className="size-4 text-violet-400" />
                   Editar datos del usuario
                 </span>
-                <ChevronDown className={`size-4 text-zinc-500 transition-transform ${openSection === "edit-user" ? "rotate-180" : ""}`} />
+                <ChevronDown
+                  className={`size-4 text-zinc-500 transition-transform ${openSection === "edit-user" ? "rotate-180" : ""}`}
+                />
               </button>
               {openSection === "edit-user" && (
                 <div className="space-y-3 border-t border-zinc-800 px-4 py-4">
@@ -816,7 +932,9 @@ export default function AdminUserDetailPage() {
                     </select>
                   </div>
                   {actionFeedback?.section === "edit-user" && (
-                    <p className={`text-xs font-medium ${actionFeedback.type === "success" ? "text-emerald-400" : "text-red-400"}`}>
+                    <p
+                      className={`text-xs font-medium ${actionFeedback.type === "success" ? "text-emerald-400" : "text-red-400"}`}
+                    >
                       {actionFeedback.message}
                     </p>
                   )}
@@ -845,7 +963,9 @@ export default function AdminUserDetailPage() {
                   <RefreshCw className="size-4 text-violet-400" />
                   Cambiar plan
                 </span>
-                <ChevronDown className={`size-4 text-zinc-500 transition-transform ${openSection === "change-plan" ? "rotate-180" : ""}`} />
+                <ChevronDown
+                  className={`size-4 text-zinc-500 transition-transform ${openSection === "change-plan" ? "rotate-180" : ""}`}
+                />
               </button>
               {openSection === "change-plan" && (
                 <div className="space-y-3 border-t border-zinc-800 px-4 py-4">
@@ -861,7 +981,9 @@ export default function AdminUserDetailPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-zinc-500">Motivo (opcional)</label>
+                    <label className="mb-1 block text-xs font-medium text-zinc-500">
+                      Motivo (opcional)
+                    </label>
                     <textarea
                       value={planReason}
                       onChange={(e) => setPlanReason(e.target.value)}
@@ -871,7 +993,9 @@ export default function AdminUserDetailPage() {
                     />
                   </div>
                   {actionFeedback?.section === "change-plan" && (
-                    <p className={`text-xs font-medium ${actionFeedback.type === "success" ? "text-emerald-400" : "text-red-400"}`}>
+                    <p
+                      className={`text-xs font-medium ${actionFeedback.type === "success" ? "text-emerald-400" : "text-red-400"}`}
+                    >
                       {actionFeedback.message}
                     </p>
                   )}
@@ -899,12 +1023,16 @@ export default function AdminUserDetailPage() {
                   <ShieldAlert className="size-4 text-amber-400" />
                   Resetear contrasena
                 </span>
-                <ChevronDown className={`size-4 text-zinc-500 transition-transform ${openSection === "reset-password" ? "rotate-180" : ""}`} />
+                <ChevronDown
+                  className={`size-4 text-zinc-500 transition-transform ${openSection === "reset-password" ? "rotate-180" : ""}`}
+                />
               </button>
               {openSection === "reset-password" && (
                 <div className="space-y-3 border-t border-zinc-800 px-4 py-4">
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-zinc-500">Nueva contrasena</label>
+                    <label className="mb-1 block text-xs font-medium text-zinc-500">
+                      Nueva contrasena
+                    </label>
                     <div className="relative">
                       <input
                         type={showPw ? "text" : "password"}
@@ -913,13 +1041,19 @@ export default function AdminUserDetailPage() {
                         className="h-9 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 pr-10 text-sm text-white placeholder:text-zinc-600 focus:border-violet-500 focus:outline-none"
                         placeholder="Nueva contrasena"
                       />
-                      <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300">
+                      <button
+                        type="button"
+                        onClick={() => setShowPw(!showPw)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+                      >
                         {showPw ? "🙈" : "👁️"}
                       </button>
                     </div>
                   </div>
                   {actionFeedback?.section === "reset-password" && (
-                    <p className={`text-xs font-medium ${actionFeedback.type === "success" ? "text-emerald-400" : "text-red-400"}`}>
+                    <p
+                      className={`text-xs font-medium ${actionFeedback.type === "success" ? "text-emerald-400" : "text-red-400"}`}
+                    >
                       {actionFeedback.message}
                     </p>
                   )}
@@ -948,7 +1082,9 @@ export default function AdminUserDetailPage() {
                   <Mail className="size-4 text-violet-400" />
                   Enviar email
                 </span>
-                <ChevronDown className={`size-4 text-zinc-500 transition-transform ${openSection === "send-email" ? "rotate-180" : ""}`} />
+                <ChevronDown
+                  className={`size-4 text-zinc-500 transition-transform ${openSection === "send-email" ? "rotate-180" : ""}`}
+                />
               </button>
               {openSection === "send-email" && (
                 <div className="space-y-3 border-t border-zinc-800 px-4 py-4">
@@ -973,7 +1109,9 @@ export default function AdminUserDetailPage() {
                     />
                   </div>
                   {actionFeedback?.section === "send-email" && (
-                    <p className={`text-xs font-medium ${actionFeedback.type === "success" ? "text-emerald-400" : "text-red-400"}`}>
+                    <p
+                      className={`text-xs font-medium ${actionFeedback.type === "success" ? "text-emerald-400" : "text-red-400"}`}
+                    >
                       {actionFeedback.message}
                     </p>
                   )}
@@ -1000,10 +1138,14 @@ export default function AdminUserDetailPage() {
                 className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-semibold text-zinc-200 hover:bg-zinc-800/40 transition-colors"
               >
                 <span className="flex items-center gap-2">
-                  <Power className={`size-4 ${isUserActive ? "text-red-400" : "text-emerald-400"}`} />
+                  <Power
+                    className={`size-4 ${isUserActive ? "text-red-400" : "text-emerald-400"}`}
+                  />
                   {isUserActive ? "Desactivar usuario" : "Reactivar usuario"}
                 </span>
-                <ChevronDown className={`size-4 text-zinc-500 transition-transform ${openSection === "toggle-active" ? "rotate-180" : ""}`} />
+                <ChevronDown
+                  className={`size-4 text-zinc-500 transition-transform ${openSection === "toggle-active" ? "rotate-180" : ""}`}
+                />
               </button>
               {openSection === "toggle-active" && (
                 <div className="space-y-3 border-t border-zinc-800 px-4 py-4">
@@ -1013,7 +1155,9 @@ export default function AdminUserDetailPage() {
                       : "Al reactivar el usuario, recuperara acceso a la plataforma con su plan actual."}
                   </p>
                   {actionFeedback?.section === "toggle-active" && (
-                    <p className={`text-xs font-medium ${actionFeedback.type === "success" ? "text-emerald-400" : "text-red-400"}`}>
+                    <p
+                      className={`text-xs font-medium ${actionFeedback.type === "success" ? "text-emerald-400" : "text-red-400"}`}
+                    >
                       {actionFeedback.message}
                     </p>
                   )}
@@ -1077,7 +1221,12 @@ export default function AdminUserDetailPage() {
                       <option key={s.tag} value={s.tag}>{`${s.tag} (${s.count})`}</option>
                     ))}
                 </datalist>
-                <Button type="button" size="sm" onClick={addTagFromInput} disabled={tagsSaving || !tagInput.trim()}>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={addTagFromInput}
+                  disabled={tagsSaving || !tagInput.trim()}
+                >
                   Añadir
                 </Button>
               </div>
@@ -1106,16 +1255,24 @@ export default function AdminUserDetailPage() {
                           .join(" · ")
                       : "";
                     return (
-                      <li key={entry.id} className="flex items-start gap-3 rounded-lg border border-zinc-800 bg-zinc-950/50 px-3 py-2 text-xs">
+                      <li
+                        key={entry.id}
+                        className="flex items-start gap-3 rounded-lg border border-zinc-800 bg-zinc-950/50 px-3 py-2 text-xs"
+                      >
                         <span className="shrink-0 font-mono text-zinc-500">
-                          {new Date(entry.createdAt).toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" })}
+                          {new Date(entry.createdAt).toLocaleString("es-ES", {
+                            dateStyle: "short",
+                            timeStyle: "short",
+                          })}
                         </span>
                         <span className="shrink-0 rounded bg-zinc-800 px-1.5 py-0.5 font-semibold text-zinc-300">
                           {entry.action}
                         </span>
                         <span className="flex-1 text-zinc-400">
                           <span className="text-zinc-200">{entry.actorId}</span>
-                          {metaSummary ? <span className="ml-1 text-zinc-500">· {metaSummary}</span> : null}
+                          {metaSummary ? (
+                            <span className="ml-1 text-zinc-500">· {metaSummary}</span>
+                          ) : null}
                         </span>
                       </li>
                     );
@@ -1159,7 +1316,7 @@ export default function AdminUserDetailPage() {
                 onClick={(e) => {
                   e.preventDefault();
                   window.alert(
-                    "Para borrar físicamente (erase total), usa el panel de Acciones → Desactivar usuario, y después confirma el borrado duro desde la herramienta de soporte. Esto evita borrados accidentales desde la ficha.",
+                    "Para borrar físicamente (erase total), usa el panel de Acciones → Desactivar usuario, y después confirma el borrado duro desde la herramienta de soporte. Esto evita borrados accidentales desde la ficha."
                   );
                 }}
               >
@@ -1189,16 +1346,10 @@ export default function AdminUserDetailPage() {
                       <Badge variant="secondary">Fase {data.state.transformationPhase}</Badge>
                       <Badge variant="secondary">Riesgo {data.state.riskLevel}</Badge>
                     </div>
-                    <p className="text-zinc-500">
-                      Emoción primaria: {data.state.primaryEmotion}
-                    </p>
-                    <p className="text-zinc-500">
-                      Patrón dominante: {data.state.dominantPattern}
-                    </p>
+                    <p className="text-zinc-500">Emoción primaria: {data.state.primaryEmotion}</p>
+                    <p className="text-zinc-500">Patrón dominante: {data.state.dominantPattern}</p>
                     <p className="text-zinc-500">Área foco: {data.state.focusArea}</p>
-                    <p className="text-zinc-500">
-                      Nivel de energía: {data.state.energyLevel}
-                    </p>
+                    <p className="text-zinc-500">Nivel de energía: {data.state.energyLevel}</p>
                     {data.state.mood ? (
                       <p className="text-zinc-500">Ánimo declarado: {data.state.mood}</p>
                     ) : null}
@@ -1206,10 +1357,15 @@ export default function AdminUserDetailPage() {
                     <div className="rounded-lg border border-zinc-800 bg-zinc-800/30 px-3 py-2">
                       <p className="text-xs font-medium text-zinc-400">Diálogo activo</p>
                       <p className="mt-1 text-zinc-500">
-                        Intención: <span className="text-zinc-300">{data.state.dialogueIntent}</span> ·
-                        {" "}Paso: <span className="text-zinc-300">{data.state.dialogueStep}</span>
+                        Intención:{" "}
+                        <span className="text-zinc-300">{data.state.dialogueIntent}</span> · Paso:{" "}
+                        <span className="text-zinc-300">{data.state.dialogueStep}</span>
                         {data.state.dialogueFlow ? (
-                          <> · Flujo: <span className="text-zinc-300">{data.state.dialogueFlow}</span></>
+                          <>
+                            {" "}
+                            · Flujo:{" "}
+                            <span className="text-zinc-300">{data.state.dialogueFlow}</span>
+                          </>
                         ) : null}
                       </p>
                     </div>
@@ -1218,9 +1374,7 @@ export default function AdminUserDetailPage() {
                         Crisis activa hasta: {formatDate(data.state.crisisActiveUntil)}
                       </p>
                     ) : null}
-                    <p className="text-zinc-500">
-                      Actualizado: {formatDate(data.state.updatedAt)}
-                    </p>
+                    <p className="text-zinc-500">Actualizado: {formatDate(data.state.updatedAt)}</p>
                   </>
                 )}
 
@@ -1229,9 +1383,18 @@ export default function AdminUserDetailPage() {
                   {data.enneagram ? (
                     <div className="mt-1 space-y-1 text-zinc-400">
                       <p>
-                        Tipo <span className="font-bold text-white">{data.enneagram.dominantType}</span> ·{" "}
-                        <span className="text-zinc-200">{ENNEAGRAM_TYPE_NAMES[data.enneagram.dominantType] ?? "—"}</span>
-                        {data.enneagram.wing ? <> · ala <span className="text-white">{data.enneagram.wing}</span></> : null}
+                        Tipo{" "}
+                        <span className="font-bold text-white">{data.enneagram.dominantType}</span>{" "}
+                        ·{" "}
+                        <span className="text-zinc-200">
+                          {ENNEAGRAM_TYPE_NAMES[data.enneagram.dominantType] ?? "—"}
+                        </span>
+                        {data.enneagram.wing ? (
+                          <>
+                            {" "}
+                            · ala <span className="text-white">{data.enneagram.wing}</span>
+                          </>
+                        ) : null}
                         {data.enneagram.testVersion === "self-declared-v1" ? (
                           <span className="ml-2 inline-block rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-300">
                             Declarado
@@ -1245,7 +1408,8 @@ export default function AdminUserDetailPage() {
                         Object.keys(data.enneagram.rawAnswers).length > 0 && (
                           <details className="mt-2 group">
                             <summary className="cursor-pointer text-xs text-fuchsia-300 hover:text-fuchsia-200 select-none">
-                              Ver las {Object.keys(data.enneagram.rawAnswers).length} respuestas del test
+                              Ver las {Object.keys(data.enneagram.rawAnswers).length} respuestas del
+                              test
                             </summary>
                             <div className="mt-2 max-h-72 overflow-y-auto rounded-lg border border-zinc-800 bg-zinc-950/60 p-2">
                               <table className="w-full text-[11px]">
@@ -1257,7 +1421,9 @@ export default function AdminUserDetailPage() {
                                 </thead>
                                 <tbody>
                                   {Object.entries(data.enneagram.rawAnswers)
-                                    .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
+                                    .sort(([a], [b]) =>
+                                      a.localeCompare(b, undefined, { numeric: true })
+                                    )
                                     .map(([qid, val]) => (
                                       <tr key={qid} className="border-t border-zinc-800/60">
                                         <td className="py-1 text-zinc-400 font-mono">{qid}</td>
@@ -1291,9 +1457,7 @@ export default function AdminUserDetailPage() {
                       <Badge variant="secondary">Código {data.profile.code}</Badge>
                     </div>
                     <p className="text-zinc-500">{data.profile.description}</p>
-                    <p className="text-zinc-500">
-                      Foco operativo: {data.profile.operationalFocus}
-                    </p>
+                    <p className="text-zinc-500">Foco operativo: {data.profile.operationalFocus}</p>
                     <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
                       <div className="rounded-lg border border-zinc-800 px-2 py-2">
                         Claridad {data.profile.scores.claridad}
@@ -1325,9 +1489,7 @@ export default function AdminUserDetailPage() {
                     Actual {data.streak?.currentDays || 0} días · Mejor {data.streak?.bestDays || 0}{" "}
                     días
                   </p>
-                  <p className="text-zinc-500">
-                    Estado {data.streak?.status || "inactive"}
-                  </p>
+                  <p className="text-zinc-500">Estado {data.streak?.status || "inactive"}</p>
                   <p className="text-zinc-500">
                     Último check-in {formatDate(data.streak?.lastCheckInDate || null)}
                   </p>
@@ -1386,7 +1548,8 @@ export default function AdminUserDetailPage() {
                 <div>
                   <p className="text-sm font-semibold text-white">Ver todo lo que ha escrito</p>
                   <p className="text-xs text-zinc-500">
-                    Timeline unificado: mensajes · comunidad · diario · check-ins · feedback. Con filtros y exportación CSV/TXT.
+                    Timeline unificado: mensajes · comunidad · diario · check-ins · feedback. Con
+                    filtros y exportación CSV/TXT.
                   </p>
                 </div>
               </div>
@@ -1407,11 +1570,17 @@ export default function AdminUserDetailPage() {
                   <p className="text-sm text-zinc-500">Sin conversaciones registradas.</p>
                 ) : (
                   data.conversations.map((conversation) => (
-                    <div key={conversation.id} className="rounded-xl border border-zinc-800 p-3 flex items-start justify-between gap-3">
+                    <div
+                      key={conversation.id}
+                      className="rounded-xl border border-zinc-800 p-3 flex items-start justify-between gap-3"
+                    >
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">{conversation.title}</p>
+                        <p className="text-sm font-semibold text-white truncate">
+                          {conversation.title}
+                        </p>
                         <p className="mt-1 text-xs text-zinc-500">
-                          {conversation.messageCount} mensajes · {formatDate(conversation.updatedAt)}
+                          {conversation.messageCount} mensajes ·{" "}
+                          {formatDate(conversation.updatedAt)}
                         </p>
                       </div>
                       <Link
@@ -1443,9 +1612,7 @@ export default function AdminUserDetailPage() {
                     >
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge variant="danger">{event.level}</Badge>
-                        <span className="text-xs text-zinc-500">
-                          {formatDate(event.createdAt)}
-                        </span>
+                        <span className="text-xs text-zinc-500">{formatDate(event.createdAt)}</span>
                       </div>
                       <p className="mt-2 text-sm text-white">{event.message}</p>
                       <p className="mt-1 text-xs text-zinc-500">Respuesta: {event.response}</p>
@@ -1470,9 +1637,7 @@ export default function AdminUserDetailPage() {
                     >
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge variant="warning">{event.type}</Badge>
-                        <span className="text-xs text-zinc-500">
-                          {formatDate(event.createdAt)}
-                        </span>
+                        <span className="text-xs text-zinc-500">{formatDate(event.createdAt)}</span>
                       </div>
                       <p className="mt-2 text-sm text-white">{event.action.description}</p>
                       {event.action.goalTitle ? (
@@ -1494,11 +1659,15 @@ export default function AdminUserDetailPage() {
                 <Brain className="size-4" />
                 Estado emocional — últimos 30 días
               </CardTitle>
-              <CardDescription>Un cuadrado por día. Color = estado registrado en check-in.</CardDescription>
+              <CardDescription>
+                Un cuadrado por día. Color = estado registrado en check-in.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {timeline.length === 0 ? (
-                <p className="text-sm text-zinc-500">Sin datos de check-in en los últimos 30 días.</p>
+                <p className="text-sm text-zinc-500">
+                  Sin datos de check-in en los últimos 30 días.
+                </p>
               ) : (
                 <div className="flex flex-wrap gap-1.5">
                   {timeline.map((entry) => {
@@ -1515,12 +1684,14 @@ export default function AdminUserDetailPage() {
                 </div>
               )}
               <div className="mt-3 flex flex-wrap gap-3 text-xs text-zinc-500">
-                {Object.entries(STATE_COLORS).filter(([k]) => k !== "unknown").map(([state, cls]) => (
-                  <span key={state} className="flex items-center gap-1">
-                    <span className={`inline-block h-3 w-3 rounded-sm ${cls}`} />
-                    {state}
-                  </span>
-                ))}
+                {Object.entries(STATE_COLORS)
+                  .filter(([k]) => k !== "unknown")
+                  .map(([state, cls]) => (
+                    <span key={state} className="flex items-center gap-1">
+                      <span className={`inline-block h-3 w-3 rounded-sm ${cls}`} />
+                      {state}
+                    </span>
+                  ))}
               </div>
             </CardContent>
           </Card>
@@ -1535,7 +1706,11 @@ export default function AdminUserDetailPage() {
               <CardDescription>Privadas — solo visibles desde el panel de admin.</CardDescription>
             </CardHeader>
             <div className="mx-6 mb-4 rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-xs text-yellow-300 leading-relaxed">
-              <strong>Aviso legal:</strong> Esta sección es exclusiva para profesionales de salud mental habilitados. El uso por parte de personal no clínico puede constituir una infracción ética y regulatoria (LOPDGDD / GDPR, art. 9 — datos de salud). Si no eres psicólogo/a u otro profesional sanitario colegiado, no introduzcas observaciones diagnósticas ni de salud mental en este campo.
+              <strong>Aviso legal:</strong> Esta sección es exclusiva para profesionales de salud
+              mental habilitados. El uso por parte de personal no clínico puede constituir una
+              infracción ética y regulatoria (LOPDGDD / GDPR, art. 9 — datos de salud). Si no eres
+              psicólogo/a u otro profesional sanitario colegiado, no introduzcas observaciones
+              diagnósticas ni de salud mental en este campo.
             </div>
             <CardContent className="space-y-4">
               <div className="flex gap-2">
@@ -1560,7 +1735,10 @@ export default function AdminUserDetailPage() {
               ) : (
                 <div className="space-y-2">
                   {notes.map((note) => (
-                    <div key={note.id} className="group rounded-xl border border-zinc-800 bg-zinc-800/30 p-3">
+                    <div
+                      key={note.id}
+                      className="group rounded-xl border border-zinc-800 bg-zinc-800/30 p-3"
+                    >
                       <div className="flex items-start justify-between gap-2">
                         <p className="text-sm text-white whitespace-pre-wrap">{note.content}</p>
                         <button
@@ -1570,7 +1748,9 @@ export default function AdminUserDetailPage() {
                           <Trash2 className="size-3.5" />
                         </button>
                       </div>
-                      <p className="mt-1 text-xs text-zinc-500">{new Date(note.createdAt).toLocaleString()}</p>
+                      <p className="mt-1 text-xs text-zinc-500">
+                        {new Date(note.createdAt).toLocaleString()}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -1585,7 +1765,9 @@ export default function AdminUserDetailPage() {
                 <ClipboardList className="size-4" />
                 Escalas de evaluación
               </CardTitle>
-              <CardDescription>Asigna PHQ-9 o GAD-7. El usuario las recibe en la app.</CardDescription>
+              <CardDescription>
+                Asigna PHQ-9 o GAD-7. El usuario las recibe en la app.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex gap-2">
@@ -1619,13 +1801,20 @@ export default function AdminUserDetailPage() {
                         </Badge>
                       </div>
                       {a.response ? (
-                        <p className={`mt-1 text-sm font-semibold ${SEVERITY_COLORS[a.response.severity] ?? ""}`}>
-                          Puntuación {a.response.totalScore} · {SEVERITY_LABELS[a.response.severity] ?? a.response.severity}
+                        <p
+                          className={`mt-1 text-sm font-semibold ${SEVERITY_COLORS[a.response.severity] ?? ""}`}
+                        >
+                          Puntuación {a.response.totalScore} ·{" "}
+                          {SEVERITY_LABELS[a.response.severity] ?? a.response.severity}
                         </p>
                       ) : (
-                        <p className="mt-1 text-xs text-zinc-500">Esperando respuesta del usuario</p>
+                        <p className="mt-1 text-xs text-zinc-500">
+                          Esperando respuesta del usuario
+                        </p>
                       )}
-                      <p className="mt-1 text-xs text-zinc-500">{new Date(a.createdAt).toLocaleString()}</p>
+                      <p className="mt-1 text-xs text-zinc-500">
+                        {new Date(a.createdAt).toLocaleString()}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -1636,9 +1825,7 @@ export default function AdminUserDetailPage() {
           <Card className="border-zinc-800 bg-zinc-900/50">
             <CardHeader className="pb-3">
               <CardTitle>Todos los mensajes ({data.messages.length})</CardTitle>
-              <CardDescription>
-                Historial completo de mensajes del usuario.
-              </CardDescription>
+              <CardDescription>Historial completo de mensajes del usuario.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2 max-h-[600px] overflow-y-auto">
               {data.messages.length === 0 ? (

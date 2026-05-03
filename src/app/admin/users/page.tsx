@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
   ArrowDown,
@@ -13,7 +14,6 @@ import {
   Download,
   Flame,
   Clock,
-  Mail,
   MessageCircle,
   RefreshCw,
   Search,
@@ -68,16 +68,17 @@ type AdminUsersResponse = {
   kindCounts: Record<UserKind, number>;
 };
 
-type SortKey = "name" | "lastSeen" | "engagementScore" | "streakDays" | "state" | "messages7d" | "usageMs7d";
+type SortKey =
+  | "name"
+  | "lastSeen"
+  | "engagementScore"
+  | "streakDays"
+  | "state"
+  | "messages7d"
+  | "usageMs7d";
 type SortDir = "asc" | "desc";
 
-type SegmentId =
-  | "active-real"
-  | "at-risk"
-  | "dormant-7d"
-  | "no-activation"
-  | "churn-30d"
-  | "pro";
+type SegmentId = "active-real" | "at-risk" | "dormant-7d" | "no-activation" | "churn-30d" | "pro";
 
 type SegmentPreset = {
   id: SegmentId;
@@ -135,11 +136,31 @@ const SEGMENT_PRESETS: SegmentPreset[] = [
 // ─── Config ──────────────────────────────────────────────────────────────────
 
 const STATE_CONFIG: Record<string, { label: string; dot: string; bg: string }> = {
-  claridad: { label: "Claridad", dot: "bg-cyan-400", bg: "bg-cyan-500/10 text-cyan-300 border-cyan-500/30" },
-  bloqueo: { label: "Bloqueo", dot: "bg-red-400", bg: "bg-red-500/10 text-red-300 border-red-500/30" },
-  ansiedad: { label: "Ansiedad", dot: "bg-amber-400", bg: "bg-amber-500/10 text-amber-300 border-amber-500/30" },
-  duda: { label: "Duda", dot: "bg-violet-400", bg: "bg-violet-500/10 text-violet-300 border-violet-500/30" },
-  neutral: { label: "Neutral", dot: "bg-zinc-500", bg: "bg-zinc-700/30 text-zinc-400 border-zinc-600/30" },
+  claridad: {
+    label: "Claridad",
+    dot: "bg-cyan-400",
+    bg: "bg-cyan-500/10 text-cyan-300 border-cyan-500/30",
+  },
+  bloqueo: {
+    label: "Bloqueo",
+    dot: "bg-red-400",
+    bg: "bg-red-500/10 text-red-300 border-red-500/30",
+  },
+  ansiedad: {
+    label: "Ansiedad",
+    dot: "bg-amber-400",
+    bg: "bg-amber-500/10 text-amber-300 border-amber-500/30",
+  },
+  duda: {
+    label: "Duda",
+    dot: "bg-violet-400",
+    bg: "bg-violet-500/10 text-violet-300 border-violet-500/30",
+  },
+  neutral: {
+    label: "Neutral",
+    dot: "bg-zinc-500",
+    bg: "bg-zinc-700/30 text-zinc-400 border-zinc-600/30",
+  },
 };
 
 const RISK_CONFIG: Record<string, { label: string; color: string }> = {
@@ -155,9 +176,15 @@ const PLAN_CONFIG: Record<string, { label: string; style: string }> = {
 };
 
 const KIND_CONFIG: Record<UserKind, { label: string; style: string }> = {
-  registered: { label: "Registrado", style: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" },
+  registered: {
+    label: "Registrado",
+    style: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
+  },
   "anon-active": { label: "Anónimo activo", style: "bg-sky-500/15 text-sky-300 border-sky-500/30" },
-  "anon-dormant": { label: "Anónimo dormido", style: "bg-zinc-700/30 text-zinc-500 border-zinc-600/30" },
+  "anon-dormant": {
+    label: "Anónimo dormido",
+    style: "bg-zinc-700/30 text-zinc-500 border-zinc-600/30",
+  },
   test: { label: "Prueba", style: "bg-amber-500/15 text-amber-300 border-amber-500/30" },
   team: { label: "Equipo", style: "bg-violet-500/15 text-violet-300 border-violet-500/30" },
 };
@@ -236,7 +263,8 @@ export default function AdminUsersPage() {
   function toggleSelect(id: string) {
     setSelected((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   }
@@ -250,16 +278,22 @@ export default function AdminUsersPage() {
   }
 
   async function handleBulkDelete() {
-    if (!window.confirm(`Eliminar ${selected.size} usuario(s)? Esta accion no se puede deshacer.`)) return;
+    if (!window.confirm(`Eliminar ${selected.size} usuario(s)? Esta accion no se puede deshacer.`))
+      return;
     setBulkAction(true);
     let deleted = 0;
     let failed = 0;
     for (const id of selected) {
       try {
-        const res = await fetch(`/api/admin/users/${id}`, { method: "DELETE", credentials: "include" });
+        const res = await fetch(`/api/admin/users/${id}`, {
+          method: "DELETE",
+          credentials: "include",
+        });
         if (res.ok) deleted++;
         else failed++;
-      } catch { failed++; }
+      } catch {
+        failed++;
+      }
     }
     if (failed > 0) {
       toast.error(`${failed} usuario(s) no se pudieron eliminar (permiso insuficiente o error).`);
@@ -276,8 +310,9 @@ export default function AdminUsersPage() {
     const selectedUsers = users.filter((u) => selected.has(u.id));
     const csv = [
       "email,nombre,estado,plan,engagement,racha,ultimo_acceso",
-      ...selectedUsers.map((u) =>
-        `${u.email},${u.name ?? ""},${u.state},${u.plan},${u.engagementScore},${u.streakDays},${u.lastSeen}`
+      ...selectedUsers.map(
+        (u) =>
+          `${u.email},${u.name ?? ""},${u.state},${u.plan},${u.engagementScore},${u.streakDays},${u.lastSeen}`
       ),
     ].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
@@ -300,6 +335,121 @@ export default function AdminUsersPage() {
       lastSeenTo: lastSeenTo || undefined,
     };
   }
+
+  const filtersRef = useRef({
+    page,
+    query,
+    stateFilter,
+    kindFilter,
+    riskOnly,
+    planFilter,
+    createdFrom,
+    createdTo,
+    lastSeenFrom,
+    lastSeenTo,
+  });
+
+  useEffect(() => {
+    filtersRef.current = {
+      page,
+      query,
+      stateFilter,
+      kindFilter,
+      riskOnly,
+      planFilter,
+      createdFrom,
+      createdTo,
+      lastSeenFrom,
+      lastSeenTo,
+    };
+  }, [
+    page,
+    query,
+    stateFilter,
+    kindFilter,
+    riskOnly,
+    planFilter,
+    createdFrom,
+    createdTo,
+    lastSeenFrom,
+    lastSeenTo,
+  ]);
+
+  type FetchUsersOptions = {
+    page: number;
+    query: string;
+    stateFilter: string;
+    kindFilter: string;
+    riskOnly: boolean;
+    planFilter: string;
+    createdFrom: string;
+    createdTo: string;
+    lastSeenFrom: string;
+    lastSeenTo: string;
+  };
+
+  const fetchUsers = useCallback(
+    async (signal?: AbortSignal, opts?: FetchUsersOptions) => {
+      const {
+        page: currentPage,
+        query: currentQuery,
+        stateFilter: currentStateFilter,
+        kindFilter: currentKindFilter,
+        riskOnly: currentRiskOnly,
+        planFilter: currentPlanFilter,
+        createdFrom: currentCreatedFrom,
+        createdTo: currentCreatedTo,
+        lastSeenFrom: currentLastSeenFrom,
+        lastSeenTo: currentLastSeenTo,
+      } = opts ?? filtersRef.current;
+
+      setLoading(true);
+      setError(null);
+      const params = new URLSearchParams();
+      params.set("page", String(currentPage));
+      params.set("pageSize", "25");
+      if (currentQuery.trim()) params.set("q", currentQuery.trim());
+      if (currentStateFilter !== "all") params.set("state", currentStateFilter);
+      if (currentKindFilter !== "all") params.set("kind", currentKindFilter);
+      if (currentRiskOnly) params.set("risk", "1");
+      if (currentPlanFilter !== "all") params.set("plan", currentPlanFilter);
+      if (currentCreatedFrom) params.set("createdFrom", currentCreatedFrom);
+      if (currentCreatedTo) params.set("createdTo", currentCreatedTo);
+      if (currentLastSeenFrom) params.set("lastSeenFrom", currentLastSeenFrom);
+      if (currentLastSeenTo) params.set("lastSeenTo", currentLastSeenTo);
+
+      try {
+        const res = await fetch(`/api/admin/users?${params.toString()}`, {
+          cache: "no-store",
+          credentials: "include",
+          signal,
+        });
+        if (signal?.aborted) return;
+        if (res.status === 401) {
+          router.replace("/admin/login?next=/admin/users");
+          return;
+        }
+        const payload = (await res.json().catch(() => null)) as
+          | (AdminUsersResponse & { requiredPermission?: string; error?: string })
+          | null;
+        if (signal?.aborted) return;
+        if (res.status === 403) {
+          const required = payload?.requiredPermission || "users:read";
+          throw new Error(
+            `Tu rol no tiene permiso "${required}". Pide a un superadmin que actualice tu rol (admin, support o clinical para ver usuarios).`
+          );
+        }
+        if (!res.ok || !payload) throw new Error("No se pudo cargar el listado.");
+        setData(payload);
+      } catch (e: unknown) {
+        if (e instanceof DOMException && e.name === "AbortError") return;
+        setError(e instanceof Error ? e.message : "Error cargando usuarios.");
+      } finally {
+        if (!signal?.aborted) setLoading(false);
+      }
+    },
+    [router]
+  );
 
   function bulkTargetPayload() {
     return bulkScope === "filter"
@@ -353,7 +503,7 @@ export default function AdminUsersPage() {
     const scopeLabel =
       bulkScope === "filter" ? "los usuarios del filtro actual" : `${selected.size} usuario(s)`;
     const confirmed = window.confirm(
-      `¿Cambiar plan de ${scopeLabel} a ${bulkPlan}?\nEsta acción afecta facturación.`,
+      `¿Cambiar plan de ${scopeLabel} a ${bulkPlan}?\nEsta acción afecta facturación.`
     );
     if (!confirmed) return;
     setBulkAction(true);
@@ -391,7 +541,7 @@ export default function AdminUsersPage() {
     const scopeLabel =
       bulkScope === "filter" ? "los usuarios del filtro actual" : `${selected.size} usuario(s)`;
     const confirmed = window.confirm(
-      `¿Enviar email a ${scopeLabel}?\nLos anónimos sin email real se saltan automáticamente.`,
+      `¿Enviar email a ${scopeLabel}?\nLos anónimos sin email real se saltan automáticamente.`
     );
     if (!confirmed) return;
     setBulkAction(true);
@@ -413,7 +563,7 @@ export default function AdminUsersPage() {
       };
       if (!res.ok) throw new Error("bulk_email_failed");
       toast.success(
-        `Enviados ${payload.sent ?? 0} · Saltados ${payload.skipped ?? 0} · Fallos ${payload.failures ?? 0}`,
+        `Enviados ${payload.sent ?? 0} · Saltados ${payload.skipped ?? 0} · Fallos ${payload.failures ?? 0}`
       );
       setBulkModal(null);
       setBulkEmailSubject("");
@@ -460,7 +610,7 @@ export default function AdminUsersPage() {
       if (res.status === 403) {
         const required = payload?.requiredPermission || "users:read";
         throw new Error(
-          `Tu rol no tiene permiso "${required}". Pide a un superadmin que actualice tu rol (admin, support o clinical para ver usuarios).`,
+          `Tu rol no tiene permiso "${required}". Pide a un superadmin que actualice tu rol (admin, support o clinical para ver usuarios).`
         );
       }
       if (!res.ok || !payload) throw new Error("No se pudo cargar el listado.");
@@ -477,8 +627,7 @@ export default function AdminUsersPage() {
     const controller = new AbortController();
     void fetchUsers(controller.signal);
     return () => controller.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, kindFilter]);
+  }, [page, kindFilter, fetchUsers]);
 
   async function handleLogout() {
     try {
@@ -490,7 +639,7 @@ export default function AdminUsersPage() {
 
   function applyFilters() {
     setPage(1);
-    void fetchUsers();
+    void fetchUsers(undefined, { ...filtersRef.current, page: 1 });
   }
 
   function applySegment(id: SegmentId | null) {
@@ -513,10 +662,14 @@ export default function AdminUsersPage() {
         if (preset.filters.plan) setPlanFilter(preset.filters.plan);
         if (preset.filters.risk) setRiskOnly(true);
         if (preset.filters.lastSeenFromOffsetDays != null) {
-          setLastSeenFrom(new Date(now - preset.filters.lastSeenFromOffsetDays * 86400000).toISOString());
+          setLastSeenFrom(
+            new Date(now - preset.filters.lastSeenFromOffsetDays * 86400000).toISOString()
+          );
         }
         if (preset.filters.lastSeenToOffsetDays != null) {
-          setLastSeenTo(new Date(now - preset.filters.lastSeenToOffsetDays * 86400000).toISOString());
+          setLastSeenTo(
+            new Date(now - preset.filters.lastSeenToOffsetDays * 86400000).toISOString()
+          );
         }
         if (preset.filters.createdToOffsetDays != null) {
           setCreatedTo(new Date(now - preset.filters.createdToOffsetDays * 86400000).toISOString());
@@ -569,13 +722,22 @@ export default function AdminUsersPage() {
   // KPIs
   const allItems = data?.items ?? [];
   const totalUsers = data?.pagination.total ?? 0;
-  const kindCounts = data?.kindCounts ?? { registered: 0, "anon-active": 0, "anon-dormant": 0, test: 0, team: 0 };
+  const kindCounts = data?.kindCounts ?? {
+    registered: 0,
+    "anon-active": 0,
+    "anon-dormant": 0,
+    test: 0,
+    team: 0,
+  };
   const realUsers = kindCounts.registered + kindCounts["anon-active"];
-  const withRisk = allItems.filter((u) => u.riskLevel === "high" || u.riskLevel === "critical").length;
+  const withRisk = allItems.filter(
+    (u) => u.riskLevel === "high" || u.riskLevel === "critical"
+  ).length;
   const withCrisis = allItems.filter((u) => u.crisisActive).length;
-  const avgEngagement = allItems.length > 0
-    ? Math.round(allItems.reduce((s, u) => s + u.engagementScore, 0) / allItems.length)
-    : 0;
+  const avgEngagement =
+    allItems.length > 0
+      ? Math.round(allItems.reduce((s, u) => s + u.engagementScore, 0) / allItems.length)
+      : 0;
   const proUsers = allItems.filter((u) => u.plan === "pro").length;
   const activeToday = allItems.filter((u) => {
     const diff = Date.now() - new Date(u.lastSeen).getTime();
@@ -584,9 +746,11 @@ export default function AdminUsersPage() {
 
   function SortIcon({ col }: { col: SortKey }) {
     if (sortKey !== col) return null;
-    return sortDir === "asc"
-      ? <ArrowUp className="inline h-3 w-3 ml-0.5" />
-      : <ArrowDown className="inline h-3 w-3 ml-0.5" />;
+    return sortDir === "asc" ? (
+      <ArrowUp className="inline h-3 w-3 ml-0.5" />
+    ) : (
+      <ArrowDown className="inline h-3 w-3 ml-0.5" />
+    );
   }
 
   return (
@@ -632,7 +796,9 @@ export default function AdminUsersPage() {
                 <Target className="h-3.5 w-3.5" />
                 <span className="font-semibold uppercase tracking-wide">Engagement</span>
               </div>
-              <p className={`mt-2 text-2xl font-bold ${avgEngagement >= 50 ? "text-emerald-400" : "text-amber-400"}`}>
+              <p
+                className={`mt-2 text-2xl font-bold ${avgEngagement >= 50 ? "text-emerald-400" : "text-amber-400"}`}
+              >
                 {avgEngagement}%
               </p>
             </div>
@@ -756,7 +922,10 @@ export default function AdminUsersPage() {
           {/* Kind filter */}
           <select
             value={kindFilter}
-            onChange={(e) => { setKindFilter(e.target.value as UserKind | "all"); setPage(1); }}
+            onChange={(e) => {
+              setKindFilter(e.target.value as UserKind | "all");
+              setPage(1);
+            }}
             className="rounded-xl border border-zinc-700 bg-zinc-900/80 px-3 py-2.5 text-sm text-zinc-300 focus:border-violet-500 focus:outline-none"
           >
             <option value="all">Todos los tipos</option>
@@ -769,7 +938,10 @@ export default function AdminUsersPage() {
 
           {/* Risk toggle */}
           <button
-            onClick={() => { setRiskOnly(!riskOnly); setTimeout(applyFilters, 0); }}
+            onClick={() => {
+              setRiskOnly(!riskOnly);
+              setTimeout(applyFilters, 0);
+            }}
             className={`rounded-xl border px-3 py-2.5 text-sm font-semibold transition-all ${
               riskOnly
                 ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
@@ -810,7 +982,10 @@ export default function AdminUsersPage() {
           </a>
           <button
             type="button"
-            onClick={() => { setBulkScope("filter"); setBulkModal("tag"); }}
+            onClick={() => {
+              setBulkScope("filter");
+              setBulkModal("tag");
+            }}
             className="inline-flex items-center gap-1.5 rounded-xl border border-violet-500/30 px-3 py-2.5 text-xs text-violet-300 hover:bg-violet-500/10"
             title="Aplicar tag a todos los del filtro"
           >
@@ -818,7 +993,10 @@ export default function AdminUsersPage() {
           </button>
           <button
             type="button"
-            onClick={() => { setBulkScope("filter"); setBulkModal("email"); }}
+            onClick={() => {
+              setBulkScope("filter");
+              setBulkModal("email");
+            }}
             className="inline-flex items-center gap-1.5 rounded-xl border border-cyan-500/30 px-3 py-2.5 text-xs text-cyan-300 hover:bg-cyan-500/10"
             title="Enviar email a todos los del filtro"
           >
@@ -841,7 +1019,9 @@ export default function AdminUsersPage() {
               <input
                 type="date"
                 value={createdFrom ? createdFrom.slice(0, 10) : ""}
-                onChange={(e) => setCreatedFrom(e.target.value ? new Date(e.target.value).toISOString() : "")}
+                onChange={(e) =>
+                  setCreatedFrom(e.target.value ? new Date(e.target.value).toISOString() : "")
+                }
                 className="rounded-lg border border-zinc-700 bg-zinc-900/60 px-2 py-1.5 text-sm text-zinc-200"
               />
             </label>
@@ -850,7 +1030,9 @@ export default function AdminUsersPage() {
               <input
                 type="date"
                 value={createdTo ? createdTo.slice(0, 10) : ""}
-                onChange={(e) => setCreatedTo(e.target.value ? new Date(e.target.value).toISOString() : "")}
+                onChange={(e) =>
+                  setCreatedTo(e.target.value ? new Date(e.target.value).toISOString() : "")
+                }
                 className="rounded-lg border border-zinc-700 bg-zinc-900/60 px-2 py-1.5 text-sm text-zinc-200"
               />
             </label>
@@ -859,7 +1041,9 @@ export default function AdminUsersPage() {
               <input
                 type="date"
                 value={lastSeenFrom ? lastSeenFrom.slice(0, 10) : ""}
-                onChange={(e) => setLastSeenFrom(e.target.value ? new Date(e.target.value).toISOString() : "")}
+                onChange={(e) =>
+                  setLastSeenFrom(e.target.value ? new Date(e.target.value).toISOString() : "")
+                }
                 className="rounded-lg border border-zinc-700 bg-zinc-900/60 px-2 py-1.5 text-sm text-zinc-200"
               />
             </label>
@@ -868,7 +1052,9 @@ export default function AdminUsersPage() {
               <input
                 type="date"
                 value={lastSeenTo ? lastSeenTo.slice(0, 10) : ""}
-                onChange={(e) => setLastSeenTo(e.target.value ? new Date(e.target.value).toISOString() : "")}
+                onChange={(e) =>
+                  setLastSeenTo(e.target.value ? new Date(e.target.value).toISOString() : "")
+                }
                 className="rounded-lg border border-zinc-700 bg-zinc-900/60 px-2 py-1.5 text-sm text-zinc-200"
               />
             </label>
@@ -886,7 +1072,9 @@ export default function AdminUsersPage() {
       {/* ── User Table ──────────────────────────────────────────── */}
       {loading ? (
         <div className="space-y-2">
-          {Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-16" />)}
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Skeleton key={i} className="h-16" />
+          ))}
         </div>
       ) : users.length === 0 ? (
         <div className="card-surface rounded-xl border border-zinc-800 p-8 text-center">
@@ -945,31 +1133,60 @@ export default function AdminUsersPage() {
 
           {/* Table header */}
           <div className="hidden lg:grid lg:grid-cols-[auto_1.5fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr_0.5fr_0.4fr_auto] gap-3 border-b border-zinc-800 px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
-            <button onClick={toggleSelectAll} className="flex items-center justify-center w-6" title="Seleccionar todos">
-              <div className={`h-4 w-4 rounded border transition-colors ${selected.size === users.length && users.length > 0 ? "bg-violet-500 border-violet-500" : "border-zinc-600 hover:border-zinc-400"}`}>
-                {selected.size === users.length && users.length > 0 && <Check className="h-3 w-3 text-white mx-auto" />}
+            <button
+              onClick={toggleSelectAll}
+              className="flex items-center justify-center w-6"
+              title="Seleccionar todos"
+            >
+              <div
+                className={`h-4 w-4 rounded border transition-colors ${selected.size === users.length && users.length > 0 ? "bg-violet-500 border-violet-500" : "border-zinc-600 hover:border-zinc-400"}`}
+              >
+                {selected.size === users.length && users.length > 0 && (
+                  <Check className="h-3 w-3 text-white mx-auto" />
+                )}
               </div>
             </button>
-            <button onClick={() => handleSort("name")} className="text-left hover:text-zinc-300 transition-colors">
+            <button
+              onClick={() => handleSort("name")}
+              className="text-left hover:text-zinc-300 transition-colors"
+            >
               Usuario <SortIcon col="name" />
             </button>
-            <button onClick={() => handleSort("state")} className="text-left hover:text-zinc-300 transition-colors">
+            <button
+              onClick={() => handleSort("state")}
+              className="text-left hover:text-zinc-300 transition-colors"
+            >
               Estado <SortIcon col="state" />
             </button>
             <span>Plan / Riesgo</span>
-            <button onClick={() => handleSort("engagementScore")} className="text-left hover:text-zinc-300 transition-colors">
+            <button
+              onClick={() => handleSort("engagementScore")}
+              className="text-left hover:text-zinc-300 transition-colors"
+            >
               Engagement <SortIcon col="engagementScore" />
             </button>
-            <button onClick={() => handleSort("messages7d")} className="text-left hover:text-zinc-300 transition-colors">
+            <button
+              onClick={() => handleSort("messages7d")}
+              className="text-left hover:text-zinc-300 transition-colors"
+            >
               Msgs 7d <SortIcon col="messages7d" />
             </button>
-            <button onClick={() => handleSort("usageMs7d")} className="text-left hover:text-zinc-300 transition-colors">
+            <button
+              onClick={() => handleSort("usageMs7d")}
+              className="text-left hover:text-zinc-300 transition-colors"
+            >
               Uso 7d <SortIcon col="usageMs7d" />
             </button>
-            <button onClick={() => handleSort("streakDays")} className="text-left hover:text-zinc-300 transition-colors">
+            <button
+              onClick={() => handleSort("streakDays")}
+              className="text-left hover:text-zinc-300 transition-colors"
+            >
               Racha <SortIcon col="streakDays" />
             </button>
-            <button onClick={() => handleSort("lastSeen")} className="text-left hover:text-zinc-300 transition-colors">
+            <button
+              onClick={() => handleSort("lastSeen")}
+              className="text-left hover:text-zinc-300 transition-colors"
+            >
               Visto <SortIcon col="lastSeen" />
             </button>
             <span />
@@ -983,25 +1200,33 @@ export default function AdminUsersPage() {
               const planCfg = PLAN_CONFIG[user.plan] ?? PLAN_CONFIG.free;
 
               return (
-                <div
-                  key={user.id}
-                  className="group block transition-colors hover:bg-zinc-800/30"
-                >
+                <div key={user.id} className="group block transition-colors hover:bg-zinc-800/30">
                   {/* Desktop row */}
                   <div className="hidden lg:grid lg:grid-cols-[auto_1.5fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr_0.5fr_0.4fr_auto] items-center gap-3 px-4 py-3">
                     {/* Checkbox */}
                     <button
-                      onClick={(e) => { e.stopPropagation(); toggleSelect(user.id); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleSelect(user.id);
+                      }}
                       className="flex items-center justify-center w-6"
                     >
-                      <div className={`h-4 w-4 rounded border transition-colors ${selected.has(user.id) ? "bg-violet-500 border-violet-500" : "border-zinc-700 group-hover:border-zinc-500"}`}>
+                      <div
+                        className={`h-4 w-4 rounded border transition-colors ${selected.has(user.id) ? "bg-violet-500 border-violet-500" : "border-zinc-700 group-hover:border-zinc-500"}`}
+                      >
                         {selected.has(user.id) && <Check className="h-3 w-3 text-white mx-auto" />}
                       </div>
                     </button>
                     {/* User */}
                     <div className="flex items-center gap-3 min-w-0">
                       {user.hasAvatar ? (
-                        <img src={`/api/user/avatar/${user.id}`} alt="" className="h-8 w-8 rounded-full object-cover shrink-0" />
+                        <Image
+                          src={`/api/user/avatar/${user.id}`}
+                          alt="Avatar de usuario"
+                          width={32}
+                          height={32}
+                          className="h-8 w-8 rounded-full object-cover shrink-0"
+                        />
                       ) : (
                         <div className="h-8 w-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-500 shrink-0">
                           {(user.name || user.email)[0].toUpperCase()}
@@ -1017,7 +1242,9 @@ export default function AdminUsersPage() {
 
                     {/* State */}
                     <div>
-                      <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${stateCfg.bg}`}>
+                      <span
+                        className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${stateCfg.bg}`}
+                      >
                         <span className={`inline-block h-1.5 w-1.5 rounded-full ${stateCfg.dot}`} />
                         {stateCfg.label}
                       </span>
@@ -1025,7 +1252,9 @@ export default function AdminUsersPage() {
 
                     {/* Plan + Kind + Risk */}
                     <div className="flex flex-wrap items-center gap-1.5">
-                      <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold ${planCfg.style}`}>
+                      <span
+                        className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold ${planCfg.style}`}
+                      >
                         {planCfg.label}
                       </span>
                       <span
@@ -1039,9 +1268,7 @@ export default function AdminUsersPage() {
                           {riskCfg.label}
                         </span>
                       )}
-                      {user.crisisActive && (
-                        <ShieldAlert className="h-3.5 w-3.5 text-red-400" />
-                      )}
+                      {user.crisisActive && <ShieldAlert className="h-3.5 w-3.5 text-red-400" />}
                     </div>
 
                     {/* Engagement */}
@@ -1065,25 +1292,38 @@ export default function AdminUsersPage() {
 
                     {/* Usage 7d */}
                     <div className="flex items-center gap-1.5 text-xs text-zinc-400">
-                      <Clock className={`h-3 w-3 ${user.usageMs7d > 0 ? "text-violet-300" : "text-zinc-700"}`} />
-                      <span className={`font-semibold tabular-nums ${user.usageMs7d > 0 ? "text-zinc-300" : "text-zinc-600"}`}>
+                      <Clock
+                        className={`h-3 w-3 ${user.usageMs7d > 0 ? "text-violet-300" : "text-zinc-700"}`}
+                      />
+                      <span
+                        className={`font-semibold tabular-nums ${user.usageMs7d > 0 ? "text-zinc-300" : "text-zinc-600"}`}
+                      >
                         {formatUsageMs(user.usageMs7d)}
                       </span>
                     </div>
 
                     {/* Streak */}
                     <div className="flex items-center gap-1.5 text-xs">
-                      <Flame className={`h-3 w-3 ${user.streakDays > 0 ? "text-amber-400" : "text-zinc-700"}`} />
-                      <span className={`font-semibold tabular-nums ${user.streakDays > 0 ? "text-amber-300" : "text-zinc-600"}`}>
+                      <Flame
+                        className={`h-3 w-3 ${user.streakDays > 0 ? "text-amber-400" : "text-zinc-700"}`}
+                      />
+                      <span
+                        className={`font-semibold tabular-nums ${user.streakDays > 0 ? "text-amber-300" : "text-zinc-600"}`}
+                      >
                         {user.streakDays}d
                       </span>
                     </div>
 
                     {/* Last seen */}
-                    <span className="text-xs text-zinc-600 tabular-nums">{timeAgo(user.lastSeen)}</span>
+                    <span className="text-xs text-zinc-600 tabular-nums">
+                      {timeAgo(user.lastSeen)}
+                    </span>
 
                     {/* Arrow → detail */}
-                    <Link href={`/admin/users/${user.id}`} className="p-1 rounded-lg hover:bg-zinc-700/50 transition-colors">
+                    <Link
+                      href={`/admin/users/${user.id}`}
+                      className="p-1 rounded-lg hover:bg-zinc-700/50 transition-colors"
+                    >
                       <ArrowRight className="h-4 w-4 text-zinc-700 group-hover:text-violet-400 transition-colors" />
                     </Link>
                   </div>
@@ -1091,44 +1331,89 @@ export default function AdminUsersPage() {
                   {/* Mobile card */}
                   <div className="lg:hidden space-y-3 px-4 py-4">
                     <div className="flex items-start gap-3">
-                      <button
-                        onClick={() => toggleSelect(user.id)}
-                        className="mt-1 shrink-0"
-                      >
-                        <div className={`h-4 w-4 rounded border transition-colors ${selected.has(user.id) ? "bg-violet-500 border-violet-500" : "border-zinc-700"}`}>
-                          {selected.has(user.id) && <Check className="h-3 w-3 text-white mx-auto" />}
+                      <button onClick={() => toggleSelect(user.id)} className="mt-1 shrink-0">
+                        <div
+                          className={`h-4 w-4 rounded border transition-colors ${selected.has(user.id) ? "bg-violet-500 border-violet-500" : "border-zinc-700"}`}
+                        >
+                          {selected.has(user.id) && (
+                            <Check className="h-3 w-3 text-white mx-auto" />
+                          )}
                         </div>
                       </button>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between">
-                          <Link href={`/admin/users/${user.id}`} className="min-w-0 flex-1 flex items-center gap-2.5">
+                          <Link
+                            href={`/admin/users/${user.id}`}
+                            className="min-w-0 flex-1 flex items-center gap-2.5"
+                          >
                             {user.hasAvatar ? (
-                              <img src={`/api/user/avatar/${user.id}`} alt="" className="h-8 w-8 rounded-full object-cover shrink-0" />
+                              <Image
+                                src={`/api/user/avatar/${user.id}`}
+                                alt="Avatar de usuario"
+                                width={32}
+                                height={32}
+                                className="h-8 w-8 rounded-full object-cover shrink-0"
+                              />
                             ) : (
                               <div className="h-8 w-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-500 shrink-0">
                                 {(user.name || user.email)[0].toUpperCase()}
                               </div>
                             )}
                             <div className="min-w-0">
-                              <p className="truncate font-medium text-white">{user.name || user.email.split("@")[0]}</p>
+                              <p className="truncate font-medium text-white">
+                                {user.name || user.email.split("@")[0]}
+                              </p>
                               <p className="truncate text-xs text-zinc-600">{user.email}</p>
                             </div>
                           </Link>
                           <div className="flex items-center gap-1.5 ml-3">
-                            <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${stateCfg.bg}`}>
-                              <span className={`inline-block h-1.5 w-1.5 rounded-full ${stateCfg.dot}`} />
+                            <span
+                              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${stateCfg.bg}`}
+                            >
+                              <span
+                                className={`inline-block h-1.5 w-1.5 rounded-full ${stateCfg.dot}`}
+                              />
                               {stateCfg.label}
                             </span>
-                            {user.crisisActive && <ShieldAlert className="h-3.5 w-3.5 text-red-400" />}
+                            {user.crisisActive && (
+                              <ShieldAlert className="h-3.5 w-3.5 text-red-400" />
+                            )}
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-3 text-xs text-zinc-500 mt-2">
-                          <span className={`${planCfg.style} rounded-full border px-2 py-0.5 text-[10px] font-semibold`}>{planCfg.label}</span>
-                          <span className={`${KIND_CONFIG[user.kind].style} rounded-full border px-2 py-0.5 text-[10px] font-semibold`}>{KIND_CONFIG[user.kind].label}</span>
-                          <span>Eng: <strong className="text-zinc-300">{user.engagementScore}</strong></span>
-                          <span>Msgs: <strong className="text-zinc-300">{user.counts.messages7d}</strong></span>
-                          <span>Uso: <strong className={user.usageMs7d > 0 ? "text-violet-300" : "text-zinc-500"}>{formatUsageMs(user.usageMs7d)}</strong></span>
-                          <span>Racha: <strong className={user.streakDays > 0 ? "text-amber-300" : "text-zinc-500"}>{user.streakDays}d</strong></span>
+                          <span
+                            className={`${planCfg.style} rounded-full border px-2 py-0.5 text-[10px] font-semibold`}
+                          >
+                            {planCfg.label}
+                          </span>
+                          <span
+                            className={`${KIND_CONFIG[user.kind].style} rounded-full border px-2 py-0.5 text-[10px] font-semibold`}
+                          >
+                            {KIND_CONFIG[user.kind].label}
+                          </span>
+                          <span>
+                            Eng: <strong className="text-zinc-300">{user.engagementScore}</strong>
+                          </span>
+                          <span>
+                            Msgs:{" "}
+                            <strong className="text-zinc-300">{user.counts.messages7d}</strong>
+                          </span>
+                          <span>
+                            Uso:{" "}
+                            <strong
+                              className={user.usageMs7d > 0 ? "text-violet-300" : "text-zinc-500"}
+                            >
+                              {formatUsageMs(user.usageMs7d)}
+                            </strong>
+                          </span>
+                          <span>
+                            Racha:{" "}
+                            <strong
+                              className={user.streakDays > 0 ? "text-amber-300" : "text-zinc-500"}
+                            >
+                              {user.streakDays}d
+                            </strong>
+                          </span>
                           <span>Visto: {timeAgo(user.lastSeen)}</span>
                         </div>
                       </div>
@@ -1145,7 +1430,8 @@ export default function AdminUsersPage() {
       {!loading && data && data.pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-xs text-zinc-600">
-            Página {data.pagination.page} de {data.pagination.totalPages} · {data.pagination.total} usuarios
+            Página {data.pagination.page} de {data.pagination.totalPages} · {data.pagination.total}{" "}
+            usuarios
           </p>
           <div className="flex gap-2">
             <button
@@ -1186,14 +1472,17 @@ export default function AdminUsersPage() {
               </p>
               <p className="mt-1 text-xs text-zinc-500">
                 {bulkModal === "tag" && "Separa varias etiquetas por coma. Minúsculas, guiones."}
-                {bulkModal === "plan" && "El motivo queda registrado en el audit log. Cambiar a Pro afecta facturación."}
+                {bulkModal === "plan" &&
+                  "El motivo queda registrado en el audit log. Cambiar a Pro afecta facturación."}
                 {bulkModal === "email" && "Se envía solo a usuarios con email real y activo."}
               </p>
             </div>
 
             {/* Scope selector */}
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-2 space-y-2">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Aplicar a</p>
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
+                Aplicar a
+              </p>
               <div className="flex gap-2 text-xs">
                 <button
                   type="button"
@@ -1221,8 +1510,8 @@ export default function AdminUsersPage() {
               </div>
               {bulkScope === "filter" && (
                 <p className="text-[11px] text-amber-400/80">
-                  Aplica a todos los usuarios que coincidan con el filtro actual, no solo los de esta página.
-                  Cap de 500 para evitar operaciones incontroladas.
+                  Aplica a todos los usuarios que coincidan con el filtro actual, no solo los de
+                  esta página. Cap de 500 para evitar operaciones incontroladas.
                 </p>
               )}
             </div>

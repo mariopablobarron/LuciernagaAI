@@ -1,13 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
-  AlertTriangle, CheckCircle2, Database, Download, Info,
-  RefreshCw, Shield, ShieldAlert, Activity, Bot,
-  Building2, CreditCard, Brain, Users, Zap, Clock,
-  Mail, Send, MailX,
+  AlertTriangle,
+  CheckCircle2,
+  Database,
+  Download,
+  Info,
+  RefreshCw,
+  Shield,
+  ShieldAlert,
+  Activity,
+  Bot,
+  Building2,
+  CreditCard,
+  Brain,
+  Users,
+  Zap,
+  Clock,
+  Mail,
+  Send,
+  MailX,
 } from "lucide-react";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 
@@ -61,9 +76,27 @@ type UnverifiedUser = {
 };
 
 const LEVEL_CONFIG = {
-  critical: { icon: ShieldAlert, color: "text-red-400", bg: "bg-red-500/10", border: "border-red-500/20", label: "Critico" },
-  warning: { icon: AlertTriangle, color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20", label: "Atencion" },
-  info: { icon: Info, color: "text-cyan-400", bg: "bg-cyan-500/10", border: "border-cyan-500/20", label: "Info" },
+  critical: {
+    icon: ShieldAlert,
+    color: "text-red-400",
+    bg: "bg-red-500/10",
+    border: "border-red-500/20",
+    label: "Critico",
+  },
+  warning: {
+    icon: AlertTriangle,
+    color: "text-amber-400",
+    bg: "bg-amber-500/10",
+    border: "border-amber-500/20",
+    label: "Atencion",
+  },
+  info: {
+    icon: Info,
+    color: "text-cyan-400",
+    bg: "bg-cyan-500/10",
+    border: "border-cyan-500/20",
+    label: "Info",
+  },
 };
 
 const AREA_ICONS: Record<string, typeof Database> = {
@@ -79,7 +112,13 @@ const AREA_ICONS: Record<string, typeof Database> = {
 
 function formatDate(iso: string): string {
   const d = new Date(iso);
-  return d.toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  return d.toLocaleDateString("es-ES", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function formatRelative(iso: string): string {
@@ -97,31 +136,42 @@ export default function OperacionesPage() {
   const [unverified, setUnverified] = useState<UnverifiedUser[] | null>(null);
   const [resending, setResending] = useState<string | "all" | null>(null);
 
-  function loadUnverified() {
+  const loadUnverified = useCallback(() => {
     fetch("/api/admin/operations/unverified", { credentials: "include" })
       .then((r) => (r.ok ? r.json() : null))
       .then((d: { users: UnverifiedUser[] } | null) => {
         if (d) setUnverified(d.users);
       })
       .catch(() => {});
-  }
+  }, []);
 
-  function load() {
+  const load = useCallback(() => {
     setLoading(true);
     fetch("/api/admin/operations", { credentials: "include" })
       .then((r) => {
-        if (r.status === 401) { router.push("/admin/login"); return null; }
-        if (!r.ok) { toast.error(`Error ${r.status} al cargar operaciones`); return null; }
+        if (r.status === 401) {
+          router.push("/admin/login");
+          return null;
+        }
+        if (!r.ok) {
+          toast.error(`Error ${r.status} al cargar operaciones`);
+          return null;
+        }
         return r.json();
       })
-      .then((d: OpsData | null) => { if (d) setData(d); })
-      .catch(() => { toast.error("Error al cargar operaciones"); })
+      .then((d: OpsData | null) => {
+        if (d) setData(d);
+      })
+      .catch(() => {
+        toast.error("Error al cargar operaciones");
+      })
       .finally(() => setLoading(false));
     loadUnverified();
-  }
+  }, [router, loadUnverified]);
 
   async function handleResend(userId: string | "all") {
-    if (userId === "all" && !confirm("¿Reenviar verificación a todos los usuarios sin verificar?")) return;
+    if (userId === "all" && !confirm("¿Reenviar verificación a todos los usuarios sin verificar?"))
+      return;
     setResending(userId);
     try {
       const body = userId === "all" ? { all: true } : { userId };
@@ -133,8 +183,10 @@ export default function OperacionesPage() {
       });
       const json = await res.json();
       if (userId === "all") {
-        const sent = json.results?.filter((r: { status: string }) => r.status === "sent").length ?? 0;
-        const failed = json.results?.filter((r: { status: string }) => r.status === "send_failed").length ?? 0;
+        const sent =
+          json.results?.filter((r: { status: string }) => r.status === "sent").length ?? 0;
+        const failed =
+          json.results?.filter((r: { status: string }) => r.status === "send_failed").length ?? 0;
         toast.success(`Reenviados: ${sent}. Fallos: ${failed}.`);
       } else if (json.status === "sent") {
         toast.success("Correo reenviado");
@@ -149,8 +201,9 @@ export default function OperacionesPage() {
     }
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- legitimate fetch-on-mount; setLoading is UI feedback, not derived state
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   async function handleLogout() {
     await fetch("/api/admin/logout", { method: "POST" });
@@ -179,24 +232,45 @@ export default function OperacionesPage() {
         </div>
       ) : data ? (
         <div className="space-y-6">
-
           {/* Summary bar */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             {[
-              { label: "Crisis 7d", value: data.stats.crisisCount7d, icon: ShieldAlert, alert: data.stats.crisisCount7d > 0 },
-              { label: "Pagos fallidos", value: data.stats.failedSubs, icon: CreditCard, alert: data.stats.failedSubs > 0 },
+              {
+                label: "Crisis 7d",
+                value: data.stats.crisisCount7d,
+                icon: ShieldAlert,
+                alert: data.stats.crisisCount7d > 0,
+              },
+              {
+                label: "Pagos fallidos",
+                value: data.stats.failedSubs,
+                icon: CreditCard,
+                alert: data.stats.failedSubs > 0,
+              },
               { label: "Inactivos 7d", value: data.stats.inactiveUsers, icon: Users, alert: false },
               { label: "Telegram", value: data.stats.telegramUsers, icon: Bot, alert: false },
-              { label: "Organizaciones", value: data.stats.orgCount, icon: Building2, alert: false },
+              {
+                label: "Organizaciones",
+                value: data.stats.orgCount,
+                icon: Building2,
+                alert: false,
+              },
             ].map((m) => {
               const Icon = m.icon;
               return (
-                <div key={m.label} className={`rounded-xl border p-4 ${m.alert ? "border-red-500/30 bg-red-500/5" : "border-zinc-800 bg-zinc-900/50"}`}>
+                <div
+                  key={m.label}
+                  className={`rounded-xl border p-4 ${m.alert ? "border-red-500/30 bg-red-500/5" : "border-zinc-800 bg-zinc-900/50"}`}
+                >
                   <div className="flex items-center gap-2 mb-1">
                     <Icon className={`w-4 h-4 ${m.alert ? "text-red-400" : "text-zinc-500"}`} />
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{m.label}</span>
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                      {m.label}
+                    </span>
                   </div>
-                  <p className={`text-xl font-bold ${m.alert ? "text-red-300" : "text-white"}`}>{m.value}</p>
+                  <p className={`text-xl font-bold ${m.alert ? "text-red-300" : "text-white"}`}>
+                    {m.value}
+                  </p>
                 </div>
               );
             })}
@@ -218,7 +292,11 @@ export default function OperacionesPage() {
                   </span>
                 )}
               </div>
-              <button onClick={load} disabled={loading} className="p-1.5 text-zinc-500 hover:text-white transition-colors">
+              <button
+                onClick={load}
+                disabled={loading}
+                className="p-1.5 text-zinc-500 hover:text-white transition-colors"
+              >
                 <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
               </button>
             </div>
@@ -226,7 +304,9 @@ export default function OperacionesPage() {
             {data.recommendations.length === 0 ? (
               <div className="flex items-center gap-3 px-5 py-8 text-emerald-400">
                 <CheckCircle2 className="w-5 h-5" />
-                <span className="text-sm font-semibold">Todo en orden. Sin recomendaciones pendientes.</span>
+                <span className="text-sm font-semibold">
+                  Todo en orden. Sin recomendaciones pendientes.
+                </span>
               </div>
             ) : (
               <div className="divide-y divide-zinc-800/50">
@@ -239,7 +319,11 @@ export default function OperacionesPage() {
                       <LevelIcon className={`w-4 h-4 shrink-0 mt-0.5 ${config.color}`} />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
-                          <span className={`text-[10px] font-bold uppercase tracking-wider ${config.color}`}>{config.label}</span>
+                          <span
+                            className={`text-[10px] font-bold uppercase tracking-wider ${config.color}`}
+                          >
+                            {config.label}
+                          </span>
                           <span className="flex items-center gap-1 text-[10px] text-zinc-500">
                             <AreaIcon className="w-3 h-3" /> {rec.area}
                           </span>
@@ -259,9 +343,7 @@ export default function OperacionesPage() {
               <div className="flex items-center justify-between px-5 py-4 border-b border-amber-500/20">
                 <div className="flex items-center gap-3">
                   <Mail className="w-4 h-4 text-amber-400" />
-                  <h2 className="text-sm font-semibold text-white">
-                    Usuarios sin verificar email
-                  </h2>
+                  <h2 className="text-sm font-semibold text-white">Usuarios sin verificar email</h2>
                   <span className="rounded-full bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[10px] font-bold text-amber-300">
                     {unverified.length}
                   </span>
@@ -285,7 +367,10 @@ export default function OperacionesPage() {
                         : { icon: Mail, color: "text-emerald-400", label: "Token válido" };
                   const StatusIcon = statusConfig.icon;
                   return (
-                    <div key={u.id} className="flex items-center gap-4 px-5 py-3 hover:bg-amber-500/5 transition-colors">
+                    <div
+                      key={u.id}
+                      className="flex items-center gap-4 px-5 py-3 hover:bg-amber-500/5 transition-colors"
+                    >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="text-sm font-medium text-white truncate">{u.email}</p>
@@ -333,16 +418,24 @@ export default function OperacionesPage() {
             <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4">
               <div className="flex items-center gap-2 mb-1">
                 <Zap className="w-4 h-4 text-violet-400" />
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">LLM calls 7d</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                  LLM calls 7d
+                </span>
               </div>
-              <p className="text-xl font-bold text-white">{data.stats.llmCalls7d.toLocaleString()}</p>
+              <p className="text-xl font-bold text-white">
+                {data.stats.llmCalls7d.toLocaleString()}
+              </p>
             </div>
             <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4">
               <div className="flex items-center gap-2 mb-1">
                 <Activity className="w-4 h-4 text-fuchsia-400" />
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Tokens 7d</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                  Tokens 7d
+                </span>
               </div>
-              <p className="text-xl font-bold text-white">{data.stats.llmTokens7d.toLocaleString()}</p>
+              <p className="text-xl font-bold text-white">
+                {data.stats.llmTokens7d.toLocaleString()}
+              </p>
             </div>
           </div>
 
@@ -365,18 +458,21 @@ export default function OperacionesPage() {
               <div className="px-5 py-8 text-center">
                 <Database className="w-8 h-8 text-zinc-700 mx-auto mb-3" />
                 <p className="text-sm text-zinc-500">No hay backups registrados.</p>
-                <p className="text-xs text-zinc-600 mt-1">Configura el cron diario para tener copias automaticas.</p>
+                <p className="text-xs text-zinc-600 mt-1">
+                  Configura el cron diario para tener copias automaticas.
+                </p>
               </div>
             ) : (
               <div className="divide-y divide-zinc-800/50">
                 {data.backups.map((b) => (
-                  <div key={b.id} className="flex items-center justify-between px-5 py-3 hover:bg-zinc-800/20 transition-colors">
+                  <div
+                    key={b.id}
+                    className="flex items-center justify-between px-5 py-3 hover:bg-zinc-800/20 transition-colors"
+                  >
                     <div className="flex items-center gap-3">
                       <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                       <div>
-                        <p className="text-sm text-white">
-                          {b.label ?? `Backup ${b.type}`}
-                        </p>
+                        <p className="text-sm text-white">{b.label ?? `Backup ${b.type}`}</p>
                         <p className="text-xs text-zinc-500">
                           {b.summary ?? `${b.recordCount} registros`}
                         </p>
@@ -399,10 +495,17 @@ export default function OperacionesPage() {
                 <Brain className="w-4 h-4 text-amber-400" />
                 <span className="text-sm font-semibold text-white">Evitaciones 7d</span>
               </div>
-              <span className={`text-xs font-bold ${
-                data.stats.avoidanceTrend > 20 ? "text-red-400" : data.stats.avoidanceTrend < -10 ? "text-emerald-400" : "text-zinc-500"
-              }`}>
-                {data.stats.avoidanceTrend > 0 ? "+" : ""}{data.stats.avoidanceTrend}% vs semana anterior
+              <span
+                className={`text-xs font-bold ${
+                  data.stats.avoidanceTrend > 20
+                    ? "text-red-400"
+                    : data.stats.avoidanceTrend < -10
+                      ? "text-emerald-400"
+                      : "text-zinc-500"
+                }`}
+              >
+                {data.stats.avoidanceTrend > 0 ? "+" : ""}
+                {data.stats.avoidanceTrend}% vs semana anterior
               </span>
             </div>
             <p className="text-3xl font-bold text-white">{data.stats.avoidance7d}</p>

@@ -3,8 +3,15 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
-  BookOpen, Download, Users, Building2, ShieldCheck,
-  Stethoscope, ChevronRight, FileText, Loader2, ExternalLink,
+  BookOpen,
+  Download,
+  Users,
+  Building2,
+  ShieldCheck,
+  Stethoscope,
+  FileText,
+  Loader2,
+  ExternalLink,
 } from "lucide-react";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 
@@ -29,7 +36,8 @@ const DOCS: DocMeta[] = [
   {
     id: "guia",
     title: "Guia de la plataforma",
-    subtitle: "Visión general, argumentario, fundador, principios pedagógicos y guía completa por rol",
+    subtitle:
+      "Visión general, argumentario, fundador, principios pedagógicos y guía completa por rol",
     icon: BookOpen,
     color: "text-violet-400",
     bg: "bg-violet-500/10",
@@ -39,7 +47,8 @@ const DOCS: DocMeta[] = [
   {
     id: "usuario",
     title: "Manual de usuario",
-    subtitle: "Como usar la plataforma dia a dia: chat, metas, diario, check-ins, Modo Impulso, Telegram",
+    subtitle:
+      "Como usar la plataforma dia a dia: chat, metas, diario, check-ins, Modo Impulso, Telegram",
     icon: Users,
     color: "text-cyan-400",
     bg: "bg-cyan-500/10",
@@ -69,7 +78,8 @@ const DOCS: DocMeta[] = [
   {
     id: "psicologa",
     title: "Manual para la Psicologa Responsable",
-    subtitle: "Onboarding clínico completo: rol, panel clínico, crisis, intervenciones, videos avatar, revisión previa al lanzamiento",
+    subtitle:
+      "Onboarding clínico completo: rol, panel clínico, crisis, intervenciones, videos avatar, revisión previa al lanzamiento",
     icon: Stethoscope,
     color: "text-rose-400",
     bg: "bg-rose-500/10",
@@ -85,7 +95,10 @@ const DOCS: DocMeta[] = [
 type TocEntry = { id: string; text: string; level: number };
 
 function slugify(text: string): string {
-  return text.toLowerCase().replace(/[^a-z0-9áéíóúñü]+/gi, "-").replace(/(^-|-$)/g, "");
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9áéíóúñü]+/gi, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
 function renderMarkdown(md: string): { elements: React.ReactNode[]; toc: TocEntry[] } {
@@ -112,9 +125,12 @@ function renderMarkdown(md: string): { elements: React.ReactNode[]; toc: TocEntr
       // Find earliest match
       type Match = { type: string; index: number; match: RegExpMatchArray };
       const matches: Match[] = [];
-      if (boldMatch?.index != null) matches.push({ type: "bold", index: boldMatch.index, match: boldMatch });
-      if (codeMatch?.index != null) matches.push({ type: "code", index: codeMatch.index, match: codeMatch });
-      if (linkMatch?.index != null) matches.push({ type: "link", index: linkMatch.index, match: linkMatch });
+      if (boldMatch?.index != null)
+        matches.push({ type: "bold", index: boldMatch.index, match: boldMatch });
+      if (codeMatch?.index != null)
+        matches.push({ type: "code", index: codeMatch.index, match: codeMatch });
+      if (linkMatch?.index != null)
+        matches.push({ type: "link", index: linkMatch.index, match: linkMatch });
 
       if (matches.length === 0) {
         parts.push(remaining);
@@ -129,11 +145,18 @@ function renderMarkdown(md: string): { elements: React.ReactNode[]; toc: TocEntr
       }
 
       if (first.type === "bold") {
-        parts.push(<strong key={pKey++} className="text-white font-semibold">{first.match[1]}</strong>);
+        parts.push(
+          <strong key={pKey++} className="text-white font-semibold">
+            {first.match[1]}
+          </strong>
+        );
         remaining = remaining.slice(first.index + first.match[0].length);
       } else if (first.type === "code") {
         parts.push(
-          <code key={pKey++} className="bg-zinc-800 px-1.5 py-0.5 rounded text-xs text-violet-300 font-mono">
+          <code
+            key={pKey++}
+            className="bg-zinc-800 px-1.5 py-0.5 rounded text-xs text-violet-300 font-mono"
+          >
             {first.match[1]}
           </code>
         );
@@ -156,7 +179,10 @@ function renderMarkdown(md: string): { elements: React.ReactNode[]; toc: TocEntr
     const trimmed = line.trim();
 
     // Skip empty lines
-    if (trimmed === "") { i++; continue; }
+    if (trimmed === "") {
+      i++;
+      continue;
+    }
 
     // Horizontal rules
     if (/^-{3,}$/.test(trimmed)) {
@@ -175,7 +201,10 @@ function renderMarkdown(md: string): { elements: React.ReactNode[]; toc: TocEntr
       }
       i++; // skip closing ```
       elements.push(
-        <pre key={key++} className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 overflow-x-auto text-xs text-zinc-300 font-mono my-3">
+        <pre
+          key={key++}
+          className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 overflow-x-auto text-xs text-zinc-300 font-mono my-3"
+        >
           {codeLines.join("\n")}
         </pre>
       );
@@ -200,7 +229,11 @@ function renderMarkdown(md: string): { elements: React.ReactNode[]; toc: TocEntr
       const id = slugify(text);
       toc.push({ id, text, level: 2 });
       elements.push(
-        <h2 key={key++} id={id} className="text-xl font-bold text-white mt-8 mb-3 pb-2 border-b border-violet-500/30 scroll-mt-20">
+        <h2
+          key={key++}
+          id={id}
+          className="text-xl font-bold text-white mt-8 mb-3 pb-2 border-b border-violet-500/30 scroll-mt-20"
+        >
           {inlineFormat(text)}
         </h2>
       );
@@ -212,7 +245,11 @@ function renderMarkdown(md: string): { elements: React.ReactNode[]; toc: TocEntr
       const id = slugify(text);
       toc.push({ id, text, level: 3 });
       elements.push(
-        <h3 key={key++} id={id} className="text-lg font-semibold text-violet-300 mt-6 mb-2 scroll-mt-20">
+        <h3
+          key={key++}
+          id={id}
+          className="text-lg font-semibold text-violet-300 mt-6 mb-2 scroll-mt-20"
+        >
           {inlineFormat(text)}
         </h3>
       );
@@ -223,7 +260,11 @@ function renderMarkdown(md: string): { elements: React.ReactNode[]; toc: TocEntr
       const text = trimmed.slice(5);
       const id = slugify(text);
       elements.push(
-        <h4 key={key++} id={id} className="text-sm font-semibold text-zinc-200 mt-4 mb-1 scroll-mt-20">
+        <h4
+          key={key++}
+          id={id}
+          className="text-sm font-semibold text-zinc-200 mt-4 mb-1 scroll-mt-20"
+        >
           {inlineFormat(text)}
         </h4>
       );
@@ -239,8 +280,13 @@ function renderMarkdown(md: string): { elements: React.ReactNode[]; toc: TocEntr
         i++;
       }
       elements.push(
-        <blockquote key={key++} className="border-l-3 border-violet-500 bg-violet-500/5 rounded-r-lg px-4 py-3 my-3 text-sm text-violet-200 italic">
-          {quoteLines.map((l, j) => <p key={j}>{inlineFormat(l)}</p>)}
+        <blockquote
+          key={key++}
+          className="border-l-3 border-violet-500 bg-violet-500/5 rounded-r-lg px-4 py-3 my-3 text-sm text-violet-200 italic"
+        >
+          {quoteLines.map((l, j) => (
+            <p key={j}>{inlineFormat(l)}</p>
+          ))}
         </blockquote>
       );
       continue;
@@ -250,7 +296,10 @@ function renderMarkdown(md: string): { elements: React.ReactNode[]; toc: TocEntr
     if (trimmed.startsWith("|") && trimmed.endsWith("|")) {
       const tableRows: string[][] = [];
       while (i < lines.length && lines[i].trim().startsWith("|") && lines[i].trim().endsWith("|")) {
-        const cells = lines[i].split("|").slice(1, -1).map((c) => c.trim());
+        const cells = lines[i]
+          .split("|")
+          .slice(1, -1)
+          .map((c) => c.trim());
         // Skip separator row
         if (!cells.every((c) => /^[-:]+$/.test(c))) {
           tableRows.push(cells);
@@ -266,7 +315,10 @@ function renderMarkdown(md: string): { elements: React.ReactNode[]; toc: TocEntr
               <thead>
                 <tr className="bg-zinc-900/80">
                   {headers.map((h, j) => (
-                    <th key={j} className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500 border-b border-zinc-800">
+                    <th
+                      key={j}
+                      className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500 border-b border-zinc-800"
+                    >
                       {inlineFormat(h)}
                     </th>
                   ))}
@@ -276,7 +328,10 @@ function renderMarkdown(md: string): { elements: React.ReactNode[]; toc: TocEntr
                 {body.map((row, ri) => (
                   <tr key={ri} className="hover:bg-zinc-800/20 transition-colors">
                     {row.map((cell, ci) => (
-                      <td key={ci} className={`px-3 py-2 text-xs ${ci === 0 ? "font-medium text-zinc-200" : "text-zinc-400"}`}>
+                      <td
+                        key={ci}
+                        className={`px-3 py-2 text-xs ${ci === 0 ? "font-medium text-zinc-200" : "text-zinc-400"}`}
+                      >
                         {inlineFormat(cell)}
                       </td>
                     ))}
@@ -355,21 +410,27 @@ export default function AdminGuiaPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadDoc = useCallback(async (docId: DocId) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`/api/admin/docs?doc=${docId}&format=md`);
-      if (res.status === 401) { router.push("/admin/login"); return; }
-      if (!res.ok) throw new Error(`Error ${res.status}`);
-      const text = await res.text();
-      setContent(text);
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Error al cargar el documento");
-    } finally {
-      setLoading(false);
-    }
-  }, [router]);
+  const loadDoc = useCallback(
+    async (docId: DocId) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`/api/admin/docs?doc=${docId}&format=md`);
+        if (res.status === 401) {
+          router.push("/admin/login");
+          return;
+        }
+        if (!res.ok) throw new Error(`Error ${res.status}`);
+        const text = await res.text();
+        setContent(text);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : "Error al cargar el documento");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [router]
+  );
 
   useEffect(() => {
     void loadDoc(activeDoc);
@@ -409,16 +470,22 @@ export default function AdminGuiaPage() {
               }`}
             >
               <div className="flex items-center gap-2 mb-2">
-                <div className={`w-8 h-8 rounded-lg ${doc.bg} border ${doc.border} flex items-center justify-center`}>
+                <div
+                  className={`w-8 h-8 rounded-lg ${doc.bg} border ${doc.border} flex items-center justify-center`}
+                >
                   <Icon className={`w-4 h-4 ${doc.color}`} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className={`text-xs font-semibold truncate ${isActive ? "text-white" : "text-zinc-300"}`}>
+                  <p
+                    className={`text-xs font-semibold truncate ${isActive ? "text-white" : "text-zinc-300"}`}
+                  >
                     {doc.title}
                   </p>
                 </div>
               </div>
-              <p className="text-[10px] text-zinc-500 leading-relaxed line-clamp-2">{doc.audience}</p>
+              <p className="text-[10px] text-zinc-500 leading-relaxed line-clamp-2">
+                {doc.audience}
+              </p>
             </button>
           );
         })}
@@ -427,7 +494,9 @@ export default function AdminGuiaPage() {
       {/* Active document header */}
       <div className="flex items-start justify-between gap-4 rounded-xl border border-zinc-800 bg-zinc-900/30 p-5">
         <div className="flex items-start gap-4 min-w-0">
-          <div className={`w-12 h-12 rounded-xl ${activeMeta.bg} border ${activeMeta.border} flex items-center justify-center shrink-0`}>
+          <div
+            className={`w-12 h-12 rounded-xl ${activeMeta.bg} border ${activeMeta.border} flex items-center justify-center shrink-0`}
+          >
             <activeMeta.icon className={`w-6 h-6 ${activeMeta.color}`} />
           </div>
           <div className="min-w-0">
@@ -474,45 +543,46 @@ export default function AdminGuiaPage() {
           </div>
         )}
 
-        {error && (
-          <div className="p-6 text-sm text-red-400">
-            Error: {error}
-          </div>
-        )}
+        {error && <div className="p-6 text-sm text-red-400">Error: {error}</div>}
 
-        {!loading && !error && content && (() => {
-          const { elements, toc } = renderMarkdown(content);
-          return (
-            <div className="flex">
-              {/* TOC sidebar */}
-              {toc.length > 0 && (
-                <nav className="hidden xl:block w-56 shrink-0 border-r border-zinc-800 px-4 py-8 sticky top-16 max-h-[calc(100vh-4rem)] overflow-y-auto">
-                  <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-600 mb-3">Indice</p>
-                  <div className="space-y-0.5">
-                    {toc.map((entry) => (
-                      <a
-                        key={entry.id}
-                        href={`#${entry.id}`}
-                        className={`block text-xs transition-colors hover:text-violet-300 ${
-                          entry.level === 1 ? "text-zinc-300 font-semibold py-1" :
-                          entry.level === 2 ? "text-zinc-400 pl-3 py-0.5" :
-                          "text-zinc-500 pl-6 py-0.5"
-                        }`}
-                      >
-                        {entry.text}
-                      </a>
-                    ))}
-                  </div>
-                </nav>
-              )}
+        {!loading &&
+          !error &&
+          content &&
+          (() => {
+            const { elements, toc } = renderMarkdown(content);
+            return (
+              <div className="flex">
+                {/* TOC sidebar */}
+                {toc.length > 0 && (
+                  <nav className="hidden xl:block w-56 shrink-0 border-r border-zinc-800 px-4 py-8 sticky top-16 max-h-[calc(100vh-4rem)] overflow-y-auto">
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-600 mb-3">
+                      Indice
+                    </p>
+                    <div className="space-y-0.5">
+                      {toc.map((entry) => (
+                        <a
+                          key={entry.id}
+                          href={`#${entry.id}`}
+                          className={`block text-xs transition-colors hover:text-violet-300 ${
+                            entry.level === 1
+                              ? "text-zinc-300 font-semibold py-1"
+                              : entry.level === 2
+                                ? "text-zinc-400 pl-3 py-0.5"
+                                : "text-zinc-500 pl-6 py-0.5"
+                          }`}
+                        >
+                          {entry.text}
+                        </a>
+                      ))}
+                    </div>
+                  </nav>
+                )}
 
-              {/* Content */}
-              <div className="flex-1 px-6 py-8 md:px-10 md:py-10 max-w-4xl">
-                {elements}
+                {/* Content */}
+                <div className="flex-1 px-6 py-8 md:px-10 md:py-10 max-w-4xl">{elements}</div>
               </div>
-            </div>
-          );
-        })()}
+            );
+          })()}
       </div>
     </AdminShell>
   );

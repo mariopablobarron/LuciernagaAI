@@ -4,7 +4,10 @@ import { join } from "node:path";
 import { requireAdminPermission } from "@/lib/admin-auth";
 
 const DOCS: Record<string, { file: string; title: string }> = {
-  guia: { file: "GUIA-TRES-MIL-MILLONES.md", title: "Guia completa de Tres Mil Millones de Latidos" },
+  guia: {
+    file: "GUIA-TRES-MIL-MILLONES.md",
+    title: "Guia completa de Tres Mil Millones de Latidos",
+  },
   usuario: { file: "manual-usuarios-finales.md", title: "Manual de usuario" },
   organizaciones: { file: "manual-organizaciones.md", title: "Manual para organizaciones" },
   admin: { file: "manual-admin.md", title: "Manual de administracion" },
@@ -22,7 +25,6 @@ function mdToHtml(md: string): string {
   let inTable = false;
   let inCode = false;
   let inList = false;
-  let tableHeaders: string[] = [];
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -33,8 +35,13 @@ function mdToHtml(md: string): string {
         out.push("</code></pre>");
         inCode = false;
       } else {
-        if (inList) { out.push("</ul>"); inList = false; }
-        out.push('<pre style="background:#f5f5f5;padding:12px;border-radius:4px;overflow-x:auto;font-size:9pt;"><code>');
+        if (inList) {
+          out.push("</ul>");
+          inList = false;
+        }
+        out.push(
+          '<pre style="background:#f5f5f5;padding:12px;border-radius:4px;overflow-x:auto;font-size:9pt;"><code>'
+        );
         inCode = true;
       }
       continue;
@@ -46,60 +53,104 @@ function mdToHtml(md: string): string {
 
     // Empty line
     if (line.trim() === "") {
-      if (inList) { out.push("</ul>"); inList = false; }
-      if (inTable) { out.push("</tbody></table></div>"); inTable = false; }
+      if (inList) {
+        out.push("</ul>");
+        inList = false;
+      }
+      if (inTable) {
+        out.push("</tbody></table></div>");
+        inTable = false;
+      }
       out.push("");
       continue;
     }
 
     // Horizontal rule
     if (/^-{3,}$/.test(line.trim())) {
-      if (inList) { out.push("</ul>"); inList = false; }
-      if (inTable) { out.push("</tbody></table></div>"); inTable = false; }
+      if (inList) {
+        out.push("</ul>");
+        inList = false;
+      }
+      if (inTable) {
+        out.push("</tbody></table></div>");
+        inTable = false;
+      }
       out.push("<hr/>");
       continue;
     }
 
     // Headers
     const h6 = line.match(/^######\s+(.*)/);
-    if (h6) { out.push(`<h6>${inline(h6[1])}</h6>`); continue; }
+    if (h6) {
+      out.push(`<h6>${inline(h6[1])}</h6>`);
+      continue;
+    }
     const h5 = line.match(/^#####\s+(.*)/);
-    if (h5) { out.push(`<h5>${inline(h5[1])}</h5>`); continue; }
+    if (h5) {
+      out.push(`<h5>${inline(h5[1])}</h5>`);
+      continue;
+    }
     const h4 = line.match(/^####\s+(.*)/);
-    if (h4) { out.push(`<h4>${inline(h4[1])}</h4>`); continue; }
+    if (h4) {
+      out.push(`<h4>${inline(h4[1])}</h4>`);
+      continue;
+    }
     const h3 = line.match(/^###\s+(.*)/);
-    if (h3) { out.push(`<h3>${inline(h3[1])}</h3>`); continue; }
+    if (h3) {
+      out.push(`<h3>${inline(h3[1])}</h3>`);
+      continue;
+    }
     const h2 = line.match(/^##\s+(.*)/);
     if (h2) {
-      if (inList) { out.push("</ul>"); inList = false; }
-      if (inTable) { out.push("</tbody></table></div>"); inTable = false; }
+      if (inList) {
+        out.push("</ul>");
+        inList = false;
+      }
+      if (inTable) {
+        out.push("</tbody></table></div>");
+        inTable = false;
+      }
       out.push(`<h2>${inline(h2[1])}</h2>`);
       continue;
     }
     const h1 = line.match(/^#\s+(.*)/);
     if (h1) {
-      if (inList) { out.push("</ul>"); inList = false; }
-      if (inTable) { out.push("</tbody></table></div>"); inTable = false; }
+      if (inList) {
+        out.push("</ul>");
+        inList = false;
+      }
+      if (inTable) {
+        out.push("</tbody></table></div>");
+        inTable = false;
+      }
       out.push(`<h1>${inline(h1[1])}</h1>`);
       continue;
     }
 
     // Blockquote
     if (line.trim().startsWith("> ")) {
-      if (inList) { out.push("</ul>"); inList = false; }
+      if (inList) {
+        out.push("</ul>");
+        inList = false;
+      }
       out.push(`<blockquote>${inline(line.trim().slice(2))}</blockquote>`);
       continue;
     }
 
     // Table
     if (line.includes("|") && line.trim().startsWith("|")) {
-      const cells = line.split("|").slice(1, -1).map((c) => c.trim());
+      const cells = line
+        .split("|")
+        .slice(1, -1)
+        .map((c) => c.trim());
       // Separator line
       if (cells.every((c) => /^[-:]+$/.test(c))) continue;
       if (!inTable) {
-        if (inList) { out.push("</ul>"); inList = false; }
+        if (inList) {
+          out.push("</ul>");
+          inList = false;
+        }
         inTable = true;
-        tableHeaders = cells;
         out.push('<div style="overflow-x:auto;margin:8pt 0;"><table>');
         out.push("<thead><tr>");
         for (const h of cells) out.push(`<th>${inline(h)}</th>`);
@@ -121,7 +172,10 @@ function mdToHtml(md: string): string {
     // Unordered list
     if (/^\s*[-*]\s+/.test(line)) {
       const content = line.replace(/^\s*[-*]\s+/, "");
-      if (!inList) { out.push("<ul>"); inList = true; }
+      if (!inList) {
+        out.push("<ul>");
+        inList = true;
+      }
       out.push(`<li>${inline(content)}</li>`);
       continue;
     }
@@ -129,13 +183,19 @@ function mdToHtml(md: string): string {
     // Ordered list
     if (/^\s*\d+\.\s+/.test(line)) {
       const content = line.replace(/^\s*\d+\.\s+/, "");
-      if (!inList) { out.push('<ul style="list-style-type:decimal;">'); inList = true; }
+      if (!inList) {
+        out.push('<ul style="list-style-type:decimal;">');
+        inList = true;
+      }
       out.push(`<li>${inline(content)}</li>`);
       continue;
     }
 
     // Close list if we're no longer in one
-    if (inList) { out.push("</ul>"); inList = false; }
+    if (inList) {
+      out.push("</ul>");
+      inList = false;
+    }
 
     // Paragraph
     if (line.trim()) {
@@ -161,7 +221,10 @@ function inline(s: string): string {
   // Italic
   r = r.replace(/\*(.+?)\*/g, "<em>$1</em>");
   // Inline code
-  r = r.replace(/`([^`]+)`/g, '<code style="background:#f0f0f0;padding:1px 4px;border-radius:3px;font-size:0.9em;">$1</code>');
+  r = r.replace(
+    /`([^`]+)`/g,
+    '<code style="background:#f0f0f0;padding:1px 4px;border-radius:3px;font-size:0.9em;">$1</code>'
+  );
   // Links
   r = r.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color:#6d28d9;">$1</a>');
   return r;
@@ -177,7 +240,7 @@ export async function GET(req: NextRequest) {
   if (!doc || !DOCS[doc]) {
     return NextResponse.json(
       { error: "Parametro doc invalido. Opciones: guia, usuario, organizaciones, admin" },
-      { status: 400 },
+      { status: 400 }
     );
   }
 

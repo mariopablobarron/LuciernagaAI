@@ -50,8 +50,11 @@ type AuditData = {
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString("es-ES", {
-    day: "2-digit", month: "2-digit", year: "numeric",
-    hour: "2-digit", minute: "2-digit",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
@@ -74,24 +77,37 @@ export default function AdminAuditPage() {
   const [page, setPage] = useState(1);
   const [typeFilter, setTypeFilter] = useState("");
 
-  function load() {
-    setLoading(true);
-    const params = new URLSearchParams({ page: String(page), pageSize: "30" });
-    if (typeFilter) params.set("type", typeFilter);
+  useEffect(() => {
+    let active = true;
 
-    fetch(`/api/admin/audit?${params}`, { credentials: "include" })
-      .then((r) => {
-        if (r.status === 401) { router.replace("/admin/login?next=/admin/audit"); return null; }
-        if (!r.ok) return null;
-        return r.json();
-      })
-      .then((d: AuditData | null) => { if (d) setData(d); })
-      .catch(() => { toast.error("Error al cargar audit log"); })
-      .finally(() => setLoading(false));
-  }
+    async function loadAudit() {
+      setLoading(true);
+      const params = new URLSearchParams({ page: String(page), pageSize: "30" });
+      if (typeFilter) params.set("type", typeFilter);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- legitimate fetch-on-filter-change; setLoading is UI feedback, not derived state
-  useEffect(() => { load(); }, [page, typeFilter]);
+      try {
+        const res = await fetch(`/api/admin/audit?${params}`, { credentials: "include" });
+        if (!active) return;
+        if (res.status === 401) {
+          router.replace("/admin/login?next=/admin/audit");
+          return;
+        }
+        if (!res.ok) return;
+        const d = (await res.json()) as AuditData | null;
+        if (active && d) setData(d);
+      } catch {
+        if (active) toast.error("Error al cargar audit log");
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    void loadAudit();
+
+    return () => {
+      active = false;
+    };
+  }, [page, typeFilter, router]);
 
   const stats = data?.stats;
   const events = data?.events?.items ?? [];
@@ -105,7 +121,9 @@ export default function AdminAuditPage() {
       subtitle="Registro de eventos del sistema, actividad de usuarios y snapshots."
       showSectionNav={false}
       onLogout={async () => {
-        await fetch("/api/admin/logout", { method: "POST", credentials: "include" }).catch(() => {});
+        await fetch("/api/admin/logout", { method: "POST", credentials: "include" }).catch(
+          () => {}
+        );
         router.replace("/admin/login");
       }}
     >
@@ -142,7 +160,10 @@ export default function AdminAuditPage() {
         <AdminPanel title="Tipos de evento">
           <div className="flex flex-wrap gap-2">
             <button
-              onClick={() => { setTypeFilter(""); setPage(1); }}
+              onClick={() => {
+                setTypeFilter("");
+                setPage(1);
+              }}
               className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${
                 !typeFilter
                   ? "border-violet-500/40 bg-violet-500/10 text-violet-300"
@@ -154,7 +175,10 @@ export default function AdminAuditPage() {
             {eventTypes.slice(0, 15).map((t) => (
               <button
                 key={t.type}
-                onClick={() => { setTypeFilter(t.type); setPage(1); }}
+                onClick={() => {
+                  setTypeFilter(t.type);
+                  setPage(1);
+                }}
                 className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${
                   typeFilter === t.type
                     ? "border-violet-500/40 bg-violet-500/10 text-violet-300"
@@ -178,7 +202,9 @@ export default function AdminAuditPage() {
           <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
         </button>
         <p className="ml-auto text-xs text-zinc-600">
-          {pagination ? `${pagination.total} eventos · pagina ${pagination.page}/${pagination.totalPages}` : "Cargando..."}
+          {pagination
+            ? `${pagination.total} eventos · pagina ${pagination.page}/${pagination.totalPages}`
+            : "Cargando..."}
         </p>
       </div>
 
@@ -197,7 +223,10 @@ export default function AdminAuditPage() {
         ) : (
           <div className="space-y-1">
             {events.map((event) => (
-              <div key={event.id} className="flex items-start gap-3 rounded-xl border border-zinc-800/50 bg-zinc-900/30 px-4 py-3 hover:bg-zinc-800/20 transition-colors">
+              <div
+                key={event.id}
+                className="flex items-start gap-3 rounded-xl border border-zinc-800/50 bg-zinc-900/30 px-4 py-3 hover:bg-zinc-800/20 transition-colors"
+              >
                 <div className="mt-0.5 h-2 w-2 rounded-full bg-violet-500/50 shrink-0" />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -207,11 +236,16 @@ export default function AdminAuditPage() {
                     <span className="text-xs text-zinc-500">
                       {event.user.name || event.user.email.split("@")[0]}
                     </span>
-                    <span className="text-[10px] text-zinc-700 ml-auto">{timeAgo(event.createdAt)}</span>
+                    <span className="text-[10px] text-zinc-700 ml-auto">
+                      {timeAgo(event.createdAt)}
+                    </span>
                   </div>
                   {event.metadata && Object.keys(event.metadata).length > 0 && (
                     <p className="text-[11px] text-zinc-600 mt-1 truncate">
-                      {Object.entries(event.metadata).slice(0, 3).map(([k, v]) => `${k}: ${String(v)}`).join(" · ")}
+                      {Object.entries(event.metadata)
+                        .slice(0, 3)
+                        .map(([k, v]) => `${k}: ${String(v)}`)
+                        .join(" · ")}
                     </p>
                   )}
                 </div>
@@ -248,10 +282,16 @@ export default function AdminAuditPage() {
 
       {/* ── Snapshots ─────────────────────────────────────────────── */}
       {snapshots.length > 0 && (
-        <AdminPanel title="Snapshots recientes" tooltip="Copias de seguridad y capturas automaticas del estado del sistema.">
+        <AdminPanel
+          title="Snapshots recientes"
+          tooltip="Copias de seguridad y capturas automaticas del estado del sistema."
+        >
           <div className="space-y-2">
             {snapshots.map((s) => (
-              <div key={s.id} className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/30 px-4 py-3">
+              <div
+                key={s.id}
+                className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/30 px-4 py-3"
+              >
                 <Database className="h-4 w-4 text-zinc-600 shrink-0" />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm text-zinc-300">{s.label || s.type}</p>

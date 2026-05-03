@@ -13,17 +13,37 @@ const ASSESSMENT_TEMPLATES = {
       { id: "3", text: "Dificultad para dormir, mantenerse dormido o dormir demasiado", scale: 3 },
       { id: "4", text: "Sentirse cansado o con poca energía", scale: 3 },
       { id: "5", text: "Poco apetito o comer en exceso", scale: 3 },
-      { id: "6", text: "Sentirse mal consigo mismo — o sentir que es un fracaso o que le ha fallado a sí mismo o a su familia", scale: 3 },
-      { id: "7", text: "Dificultad para concentrarse en cosas, como leer el periódico o ver la televisión", scale: 3 },
-      { id: "8", text: "Moverse o hablar tan lentamente que la gente puede notarlo; o lo contrario, sentirse tan inquieto que se mueve más de lo normal", scale: 3 },
-      { id: "9", text: "Pensamientos de que sería mejor estar muerto o de hacerse daño de alguna manera", scale: 3 },
+      {
+        id: "6",
+        text: "Sentirse mal consigo mismo — o sentir que es un fracaso o que le ha fallado a sí mismo o a su familia",
+        scale: 3,
+      },
+      {
+        id: "7",
+        text: "Dificultad para concentrarse en cosas, como leer el periódico o ver la televisión",
+        scale: 3,
+      },
+      {
+        id: "8",
+        text: "Moverse o hablar tan lentamente que la gente puede notarlo; o lo contrario, sentirse tan inquieto que se mueve más de lo normal",
+        scale: 3,
+      },
+      {
+        id: "9",
+        text: "Pensamientos de que sería mejor estar muerto o de hacerse daño de alguna manera",
+        scale: 3,
+      },
     ],
   },
   gad7: {
     title: "GAD-7 — Escala de Trastorno de Ansiedad Generalizada",
     questions: [
       { id: "1", text: "Sentirse nervioso/a, ansioso/a o con los nervios de punta", scale: 3 },
-      { id: "2", text: "No poder dejar de preocuparse o no poder controlar la preocupación", scale: 3 },
+      {
+        id: "2",
+        text: "No poder dejar de preocuparse o no poder controlar la preocupación",
+        scale: 3,
+      },
       { id: "3", text: "Preocuparse demasiado por diferentes cosas", scale: 3 },
       { id: "4", text: "Dificultad para relajarse", scale: 3 },
       { id: "5", text: "Estar tan inquieto/a que es difícil quedarse quieto/a", scale: 3 },
@@ -35,26 +55,8 @@ const ASSESSMENT_TEMPLATES = {
 
 type AssessmentType = keyof typeof ASSESSMENT_TEMPLATES;
 
-function getSeverity(type: AssessmentType, score: number): string {
-  if (type === "phq9") {
-    if (score <= 4) return "minimal";
-    if (score <= 9) return "mild";
-    if (score <= 14) return "moderate";
-    if (score <= 19) return "moderately_severe";
-    return "severe";
-  }
-  // GAD-7
-  if (score <= 4) return "minimal";
-  if (score <= 9) return "mild";
-  if (score <= 14) return "moderate";
-  return "severe";
-}
-
 // GET /api/admin/assessments/[userId] — list assessments for a user
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ userId: string }> },
-) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
   try {
     const auth = requireAdminPermission(req, "assessments");
     if (auth instanceof NextResponse) return auth;
@@ -70,16 +72,16 @@ export async function GET(
 
     return NextResponse.json({ assessments });
   } catch (err) {
-    logError("ADMIN", err instanceof Error ? err : new Error(String(err)), { route: "/api/admin/assessments/[userId]", method: "GET" });
+    logError("ADMIN", err instanceof Error ? err : new Error(String(err)), {
+      route: "/api/admin/assessments/[userId]",
+      method: "GET",
+    });
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
 // POST /api/admin/assessments/[userId] — assign PHQ-9 or GAD-7 to a user
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ userId: string }> },
-) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
   try {
     const auth = requireAdminPermission(req, "assessments");
     if (auth instanceof NextResponse) return auth;
@@ -110,8 +112,10 @@ export async function POST(
 
     return NextResponse.json({ assessment }, { status: 201 });
   } catch (err) {
-    logError("ADMIN", err instanceof Error ? err : new Error(String(err)), { route: "/api/admin/assessments/[userId]", method: "POST" });
+    logError("ADMIN", err instanceof Error ? err : new Error(String(err)), {
+      route: "/api/admin/assessments/[userId]",
+      method: "POST",
+    });
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
-

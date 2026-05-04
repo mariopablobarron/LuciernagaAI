@@ -43,7 +43,14 @@ const customJestConfig = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
-  testPathIgnorePatterns: ["<rootDir>/node_modules/", "<rootDir>/.next/", "<rootDir>/clauditor/", "<rootDir>/e2e/"],
+  testPathIgnorePatterns: [
+    "<rootDir>/node_modules/",
+    "<rootDir>/.next/",
+    "<rootDir>/clauditor/",
+    "<rootDir>/e2e/",
+    "<rootDir>/.claude/", // worktrees paralelos de Claude Code (sus tests son Playwright, no Jest)
+    "<rootDir>/playwright/",
+  ],
 };
 
 export default createJestConfig(customJestConfig);

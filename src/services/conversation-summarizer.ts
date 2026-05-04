@@ -20,9 +20,9 @@
 import { logError, logInfo } from "@/lib/logger";
 import { getPrismaClient } from "@/db/prisma";
 import { listMessagesForConversation } from "@/services/conversation";
+import { BACKGROUND_FAST_MODEL as OPENROUTER_MODEL } from "@/lib/openrouter-models";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const OPENROUTER_MODEL = "anthropic/claude-haiku-4-5";
 const REQUEST_TIMEOUT_MS = 15_000;
 
 /** Total de mensajes que dejamos literales al final del histórico. */

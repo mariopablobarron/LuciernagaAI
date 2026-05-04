@@ -1,10 +1,10 @@
 import { logError, logInfo } from "@/lib/logger";
+import { MAIN_CHAT_MODEL as OPENROUTER_MODEL } from "@/lib/openrouter-models";
 import type { WeeklyLetterDigest } from "@/services/weekly-letter-digest";
 
 export const WEEKLY_LETTER_SUBJECT = "Tu semana — una pregunta";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const OPENROUTER_MODEL = "anthropic/claude-sonnet-4-6";
 const MAX_WORDS = 200;
 const REQUEST_TIMEOUT_MS = 20_000;
 

@@ -1,6 +1,7 @@
 import { getPrismaClient } from "@/db/prisma";
 import { logInfo, logError } from "@/lib/logger";
 import { buildCirclePulseOpenedEmail, buildMentorReflectionEmail, sendUserEmail } from "@/lib/email";
+import { BACKGROUND_FAST_MODEL as OPENROUTER_MODEL } from "@/lib/openrouter-models";
 
 const APP_URL = process.env.APP_BASE_URL?.trim() ?? "https://tresmilmillonesdelatidos.es";
 
@@ -8,7 +9,6 @@ const APP_URL = process.env.APP_BASE_URL?.trim() ?? "https://tresmilmillonesdela
 
 const PULSE_LENGTH_DAYS = 7;
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const OPENROUTER_MODEL = "anthropic/claude-haiku-4-5";
 const REQUEST_TIMEOUT_MS = 20_000;
 
 // ─── Time helpers ────────────────────────────────────────────────────────────

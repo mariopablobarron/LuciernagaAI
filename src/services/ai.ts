@@ -27,26 +27,7 @@ interface OpenRouterStreamChunk {
 
 import { getOpenRouterChatUrl, getOpenRouterHeaders } from "@/lib/openrouter";
 
-const OPENROUTER_MODEL = "anthropic/claude-sonnet-4-6";
-/**
- * OpenRouter fallback chain para el chat principal. Si Anthropic Sonnet
- * falla (provider down, rate limit, error 5xx), OpenRouter intenta
- * automáticamente Haiku 4.5 (mismo proveedor, más barato y rápido) y
- * después GPT-4o-mini de OpenAI (proveedor distinto — supervivencia
- * incluso si Anthropic entero está caído).
- *
- * Solo se usa para `models` + `route: "fallback"` en el body. El
- * primer modelo de la lista es siempre el primario; OpenRouter va
- * bajando si falla.
- *
- * Coste: invisible en condiciones normales — solo se paga el modelo
- * que efectivamente respondió. El fallback es defensa en profundidad.
- */
-const OPENROUTER_FALLBACK_CHAIN = [
-  OPENROUTER_MODEL,
-  "anthropic/claude-haiku-4-5",
-  "openai/gpt-4o-mini",
-] as const;
+import { MAIN_CHAT_MODEL as OPENROUTER_MODEL, MAIN_CHAT_FALLBACK_CHAIN as OPENROUTER_FALLBACK_CHAIN } from "@/lib/openrouter-models";
 const REQUEST_TIMEOUT_MS = 25000;
 type AIErrorType = "missing_config" | "provider_failure" | "unknown";
 

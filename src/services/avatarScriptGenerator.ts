@@ -1,9 +1,9 @@
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { fetchWithTimeout } from "@/lib/utils";
+import { MAIN_CHAT_MODEL as OPENROUTER_MODEL } from "@/lib/openrouter-models";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const OPENROUTER_MODEL = "anthropic/claude-sonnet-4-6";
 const REQUEST_TIMEOUT_MS = 30_000;
 const MAX_CONTEXT_CHARS = 4_000;
 

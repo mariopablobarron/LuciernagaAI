@@ -1,0 +1,148 @@
+name: VPS Direct Deploy (luciernaga-ai)
+
+# La app `luciernaga-ai` corre en el VPS desde un compose manual en
+# /docker/luciernaga-ai-traefik/, fuera de gestión Coolify (se sacó tras
+# el incidente de snapshot restore del 2026-04-30 — Coolify no le aplicaba
+# labels Traefik). Por eso el webhook a Coolify no recrea su contenedor.
+#
+# Este workflow conecta SSH al VPS y dispara el flujo correcto:
+#   1. git pull del repo en /tmp/build-luciernaga.
+#   2. docker build con tag = commit hash corto.
+#   3. sed para apuntar el compose al tag nuevo.
+#   4. docker compose up -d.
+#   5. logs runtime para verificar.
+#
+# Setup necesario (1 vez):
+#   - Generar SSH keypair en local: ssh-keygen -t ed25519 -f ~/.ssh/vps_deploy
+#   - Pegar PUBLICA en /root/.ssh/authorized_keys del VPS (vía Web Console
+#     Hostinger UNA SOLA VEZ).
+#   - Pegar PRIVADA en GitHub → Settings → Secrets → New repository secret:
+#       Name:  VPS_SSH_KEY
+#       Value: contenido de ~/.ssh/vps_deploy (incluye BEGIN/END lines)
+#   - (Opcional) Si quieres notificación Telegram al terminar: setear
+#     TELEGRAM_BOT_TOKEN y ADMIN_TELEGRAM_ID en secrets también.
+#
+# Doc completa: docs/setup-auto-deploy.md
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "docs/**"
+      - "*.md"
+      - ".github/workflows/dev-journal.yml"
+      - ".github/workflows/hardening-board-auto-update.yml"
+      - ".github/workflows/user-manual-pdf-auto-update.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: vps-direct-deploy
+  cancel-in-progress: false # no cancelar deploy en curso si llega otro
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25 # build puede tardar 6-10 min, dejamos margen
+
+    steps:
+      - name: Validar secrets configurados
+        run: |
+          if [ -z "${{ secrets.VPS_SSH_KEY }}" ]; then
+            echo "::error::VPS_SSH_KEY secret no configurado. Ver docs/setup-auto-deploy.md"
+            exit 1
+          fi
+          echo "OK"
+
+      - name: Deploy via SSH al VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: 72.61.195.108
+          port: 22
+          username: root
+          key: ${{ secrets.VPS_SSH_KEY }}
+          command_timeout: 20m
+          script: |
+            set -e
+            echo "════════════════════════════════════════"
+            echo "  VPS Direct Deploy — luciernaga-ai"
+            echo "════════════════════════════════════════"
+
+            BUILD_DIR=/tmp/build-luciernaga
+            APP_DIR=/docker/luciernaga-ai-traefik
+
+            echo ""
+            echo "▶ 1/5  Sincronizar repo"
+            if [ -d "$BUILD_DIR/.git" ]; then
+              cd "$BUILD_DIR"
+              git fetch --quiet --depth 1 origin main
+              git reset --hard origin/main
+            else
+              rm -rf "$BUILD_DIR"
+              git clone --depth 1 https://github.com/mariopablobarron/LuciernagaAI.git "$BUILD_DIR"
+              cd "$BUILD_DIR"
+            fi
+            COMMIT=$(git rev-parse --short HEAD)
+            echo "   Commit: $COMMIT"
+
+            echo ""
+            echo "▶ 2/5  Build imagen Docker (~6-10 min)"
+            docker build -t cmnc4qjph0006p2a3ggmfdflz:$COMMIT . 2>&1 | tail -10
+
+            echo ""
+            echo "▶ 3/5  Actualizar compose con tag nuevo"
+            cd "$APP_DIR"
+            sed -i "s|image: cmnc4qjph0006p2a3ggmfdflz:.*|image: cmnc4qjph0006p2a3ggmfdflz:$COMMIT|" docker-compose.yml
+            grep "image:" docker-compose.yml
+
+            echo ""
+            echo "▶ 4/5  Recrear contenedor con imagen nueva"
+            docker compose up -d
+            sleep 12
+
+            echo ""
+            echo "▶ 5/5  Estado runtime"
+            docker ps --filter name=luciernaga-ai --format '{{.Names}} {{.Status}}'
+            echo ""
+            echo "── Últimos logs ──────────────────────────"
+            docker logs --tail 25 luciernaga-ai 2>&1 | tail -25
+            echo "──────────────────────────────────────────"
+
+            echo ""
+            echo "▶ 6/5  Limpieza imágenes viejas (>7 días)"
+            docker image prune -f --filter "until=168h" --filter "label=app=mentor-web" 2>&1 | tail -3 || true
+
+            echo ""
+            echo "✅ Deploy completado ($COMMIT)"
+
+      - name: Verificar que la web responde
+        run: |
+          sleep 5
+          for i in 1 2 3 4 5 6; do
+            CODE=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 8 https://tresmilmillonesdelatidos.es/api/health || echo "000")
+            if [ "$CODE" = "200" ]; then
+              echo "✅ Health: HTTP 200"
+              curl -sS https://tresmilmillonesdelatidos.es/api/health | head -c 400
+              echo ""
+              exit 0
+            fi
+            echo "Intento $i — HTTP $CODE — espera 10s..."
+            sleep 10
+          done
+          echo "::error::Health check no llegó a 200 tras 60s"
+          exit 1
+
+      - name: Notificar Telegram (opcional)
+        if: always() && env.TELEGRAM_BOT_TOKEN != '' && env.ADMIN_TELEGRAM_ID != ''
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          ADMIN_TELEGRAM_ID: ${{ secrets.ADMIN_TELEGRAM_ID }}
+        run: |
+          STATUS_EMOJI="✅"
+          [ "${{ job.status }}" = "failure" ] && STATUS_EMOJI="🔴"
+          [ "${{ job.status }}" = "cancelled" ] && STATUS_EMOJI="⚠️"
+          MSG="${STATUS_EMOJI} VPS Deploy ${{ job.status }} — commit ${GITHUB_SHA::7} (${GITHUB_ACTOR})%0Ahttps://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          curl -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${ADMIN_TELEGRAM_ID}" \
+            -d "text=${MSG}" \
+            -d "parse_mode=HTML" > /dev/null

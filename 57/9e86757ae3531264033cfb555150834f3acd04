@@ -1,0 +1,26 @@
+src/app/settings/page.tsx
+  c72d0ada98a9afb7 28,722-724
+src/components/AgeRangeSection.tsx
+  c72d0ada98a9afb7 1-145
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "579e86757ae3531264033cfb555150834f3acd04",
+  "prompts": {
+    "c72d0ada98a9afb7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron",
+      "messages": [],
+      "total_additions": 149,
+      "total_deletions": 0,
+      "accepted_lines": 270,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/1a6d5792240fa04cea6e249b04ccfbb9d5d0803210212a526a497825fba6583e"
+    }
+  }
+}

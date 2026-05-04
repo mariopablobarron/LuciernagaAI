@@ -25,6 +25,7 @@ import type { BrowserSessionUser } from '@/lib/session-client';
 import { BillingSection } from '@/components/ui/billing-section';
 import { TrustedContactSection } from '@/components/ui/trusted-contact-section';
 import { PrivacySettings } from '@/components/ui/privacy-settings';
+import AgeRangeSection from '@/components/AgeRangeSection';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -717,6 +718,9 @@ export default function SettingsPage() {
             </select>
           )}
         </div>
+
+        {/* ── Age range ──────────────────────────────────────────────── */}
+        <AgeRangeSection />
 
         {/* ── Security ───────────────────────────────────────────────── */}
         <div className={`${COMPONENTS.card} p-6 space-y-4`}>

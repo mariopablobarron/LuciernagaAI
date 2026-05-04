@@ -1,0 +1,24 @@
+src/app/api/telegram/webhook/route.test.ts
+  c72d0ada98a9afb7 1-276
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "cb37dbf920886efcab9c470d5304a87ba89b32c6",
+  "prompts": {
+    "c72d0ada98a9afb7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron",
+      "messages": [],
+      "total_additions": 276,
+      "total_deletions": 0,
+      "accepted_lines": 397,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/b9dfd40eb2d450cf9b19a2b0c61acfb9f99206d6e116139f8531892ce0c8889f"
+    }
+  }
+}

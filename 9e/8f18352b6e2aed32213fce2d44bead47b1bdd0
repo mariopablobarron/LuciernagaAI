@@ -1,0 +1,24 @@
+jest.config.mjs
+  f12e84bac900e417 46-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "9e8f18352b6e2aed32213fce2d44bead47b1bdd0",
+  "prompts": {
+    "f12e84bac900e417": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron",
+      "messages": [],
+      "total_additions": 8,
+      "total_deletions": 1,
+      "accepted_lines": 8,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/17f76c91cc18771f4e699b50009cdaa28e2d1199d8bc105973a9512f69a6e109"
+    }
+  }
+}

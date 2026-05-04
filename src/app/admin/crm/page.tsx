@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -87,44 +87,38 @@ export default function CrmPage() {
   const [page, setPage] = useState(1);
   const [includeTeam, setIncludeTeam] = useState(false);
 
-  useEffect(() => {
-    let active = true;
+  const load = useCallback(async () => {
+    setLoading(true);
+    const params = new URLSearchParams({
+      page: String(page),
+      pageSize: "50",
+      search: searchQuery,
+      segment,
+    });
+    if (includeTeam) params.set("includeTeam", "1");
 
-    async function loadCrm() {
-      setLoading(true);
-      const params = new URLSearchParams({
-        page: String(page),
-        pageSize: "50",
-        search: searchQuery,
-        segment,
-      });
-      if (includeTeam) params.set("includeTeam", "1");
-
-      try {
-        const res = await fetch(`/api/admin/crm?${params}`, { credentials: "include" });
-        if (!active) return;
-        if (res.status === 401) {
-          router.push("/admin/login");
-          return;
-        }
-        if (!res.ok) {
-          toast.error(`Error ${res.status} al cargar CRM`);
-          return;
-        }
-        const d = (await res.json()) as CrmData | null;
-        if (active && d?.items) setData(d);
-      } catch {
-        if (active) toast.error("Error al cargar CRM");
-      } finally {
-        if (active) setLoading(false);
+    try {
+      const res = await fetch(`/api/admin/crm?${params}`, { credentials: "include" });
+      if (res.status === 401) {
+        router.push("/admin/login");
+        return;
       }
+      if (!res.ok) {
+        toast.error(`Error ${res.status} al cargar CRM`);
+        return;
+      }
+      const d = (await res.json()) as CrmData | null;
+      if (d?.items) setData(d);
+    } catch {
+      toast.error("Error al cargar CRM");
+    } finally {
+      setLoading(false);
     }
-
-    void loadCrm();
-    return () => {
-      active = false;
-    };
   }, [page, segment, includeTeam, searchQuery, router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   function handleSearch(e: FormEvent) {
     e.preventDefault();

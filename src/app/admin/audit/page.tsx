@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Activity,
@@ -77,37 +77,30 @@ export default function AdminAuditPage() {
   const [page, setPage] = useState(1);
   const [typeFilter, setTypeFilter] = useState("");
 
-  useEffect(() => {
-    let active = true;
+  const load = useCallback(async () => {
+    setLoading(true);
+    const params = new URLSearchParams({ page: String(page), pageSize: "30" });
+    if (typeFilter) params.set("type", typeFilter);
 
-    async function loadAudit() {
-      setLoading(true);
-      const params = new URLSearchParams({ page: String(page), pageSize: "30" });
-      if (typeFilter) params.set("type", typeFilter);
-
-      try {
-        const res = await fetch(`/api/admin/audit?${params}`, { credentials: "include" });
-        if (!active) return;
-        if (res.status === 401) {
-          router.replace("/admin/login?next=/admin/audit");
-          return;
-        }
-        if (!res.ok) return;
-        const d = (await res.json()) as AuditData | null;
-        if (active && d) setData(d);
-      } catch {
-        if (active) toast.error("Error al cargar audit log");
-      } finally {
-        if (active) setLoading(false);
+    try {
+      const res = await fetch(`/api/admin/audit?${params}`, { credentials: "include" });
+      if (res.status === 401) {
+        router.replace("/admin/login?next=/admin/audit");
+        return;
       }
+      if (!res.ok) return;
+      const d = (await res.json()) as AuditData | null;
+      if (d) setData(d);
+    } catch {
+      toast.error("Error al cargar audit log");
+    } finally {
+      setLoading(false);
     }
-
-    void loadAudit();
-
-    return () => {
-      active = false;
-    };
   }, [page, typeFilter, router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   const stats = data?.stats;
   const events = data?.events?.items ?? [];

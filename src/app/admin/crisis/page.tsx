@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
@@ -84,36 +84,29 @@ export default function AdminCrisisPage() {
   const [page, setPage] = useState(1);
   const [levelFilter, setLevelFilter] = useState("");
 
-  useEffect(() => {
-    let active = true;
+  const load = useCallback(async () => {
+    setLoading(true);
+    const params = new URLSearchParams({ page: String(page), pageSize: "20" });
+    if (levelFilter) params.set("level", levelFilter);
 
-    async function loadCrisis() {
-      setLoading(true);
-      const params = new URLSearchParams({ page: String(page), pageSize: "20" });
-      if (levelFilter) params.set("level", levelFilter);
-
-      try {
-        const res = await fetch(`/api/admin/crisis?${params}`, { credentials: "include" });
-        if (!active) return;
-        if (res.status === 401) {
-          router.replace("/admin/login?next=/admin/crisis");
-          return;
-        }
-        const d = (await res.json()) as CrisisData | null;
-        if (active && d) setData(d);
-      } catch {
-        if (active) toast.error("Error al cargar datos de crisis");
-      } finally {
-        if (active) setLoading(false);
+    try {
+      const res = await fetch(`/api/admin/crisis?${params}`, { credentials: "include" });
+      if (res.status === 401) {
+        router.replace("/admin/login?next=/admin/crisis");
+        return;
       }
+      const d = (await res.json()) as CrisisData | null;
+      if (d) setData(d);
+    } catch {
+      toast.error("Error al cargar datos de crisis");
+    } finally {
+      setLoading(false);
     }
-
-    void loadCrisis();
-
-    return () => {
-      active = false;
-    };
   }, [page, levelFilter, router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   const stats = data?.stats;
   const active = data?.activeCrises ?? [];

@@ -576,53 +576,6 @@ export default function AdminUsersPage() {
     }
   }
 
-  async function fetchUsers(signal?: AbortSignal) {
-    setLoading(true);
-    setError(null);
-    const params = new URLSearchParams();
-    params.set("page", String(page));
-    params.set("pageSize", "25");
-    if (query.trim()) params.set("q", query.trim());
-    if (stateFilter !== "all") params.set("state", stateFilter);
-    if (kindFilter !== "all") params.set("kind", kindFilter);
-    if (riskOnly) params.set("risk", "1");
-    if (planFilter !== "all") params.set("plan", planFilter);
-    if (createdFrom) params.set("createdFrom", createdFrom);
-    if (createdTo) params.set("createdTo", createdTo);
-    if (lastSeenFrom) params.set("lastSeenFrom", lastSeenFrom);
-    if (lastSeenTo) params.set("lastSeenTo", lastSeenTo);
-
-    try {
-      const res = await fetch(`/api/admin/users?${params.toString()}`, {
-        cache: "no-store",
-        credentials: "include",
-        signal,
-      });
-      if (signal?.aborted) return;
-      if (res.status === 401) {
-        router.replace("/admin/login?next=/admin/users");
-        return;
-      }
-      const payload = (await res.json().catch(() => null)) as
-        | (AdminUsersResponse & { requiredPermission?: string; error?: string })
-        | null;
-      if (signal?.aborted) return;
-      if (res.status === 403) {
-        const required = payload?.requiredPermission || "users:read";
-        throw new Error(
-          `Tu rol no tiene permiso "${required}". Pide a un superadmin que actualice tu rol (admin, support o clinical para ver usuarios).`
-        );
-      }
-      if (!res.ok || !payload) throw new Error("No se pudo cargar el listado.");
-      setData(payload);
-    } catch (e: unknown) {
-      if (e instanceof DOMException && e.name === "AbortError") return;
-      setError(e instanceof Error ? e.message : "Error cargando usuarios.");
-    } finally {
-      if (!signal?.aborted) setLoading(false);
-    }
-  }
-
   useEffect(() => {
     const controller = new AbortController();
     void fetchUsers(controller.signal);

@@ -82,6 +82,7 @@ export function proxy(request: NextRequest) {
       "/api/admin/usage-snapshot",
       "/api/admin/analytics-external",
       "/api/admin/cleanup-rolled-back-migrations",
+      "/api/admin/seo-opportunities",
     ]);
     if (
       cronSecretBypassPaths.has(pathname) &&

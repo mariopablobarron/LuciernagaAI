@@ -2165,3 +2165,90 @@ model TeamLetterRequest {
   @@index([status, requestedAt])
   @@index([userId, requestedAt])
 }
+
+// ─── SEO agent tables ────────────────────────────────────────────────────────
+// Espejo local de métricas GA4 + Search Console y catálogo de oportunidades
+// detectadas por SeoOpportunityService. Permite auditar tendencias sin
+// quemar cuotas de Google APIs.
+
+/// Snapshot diario de métricas GA4 por pagePath. Re-sync sobreescribe.
+model Ga4DailyMetric {
+  id                String   @id @default(cuid())
+  date              DateTime @db.Date
+  pagePath          String
+  activeUsers       Int      @default(0)
+  sessions          Int      @default(0)
+  screenPageViews   Int      @default(0)
+  eventCount        Int      @default(0)
+  conversions       Float    @default(0)
+  averageSessionSec Float    @default(0)
+  bounceRate        Float    @default(0)
+  syncedAt          DateTime @default(now())
+
+  @@unique([date, pagePath])
+  @@index([pagePath])
+  @@index([date])
+}
+
+/// Snapshot diario por query de Search Console. Re-sync sobreescribe.
+model GscDailyQuery {
+  id          String   @id @default(cuid())
+  date        DateTime @db.Date
+  query       String
+  clicks      Int      @default(0)
+  impressions Int      @default(0)
+  ctr         Float    @default(0)
+  position    Float    @default(0)
+  syncedAt    DateTime @default(now())
+
+  @@unique([date, query])
+  @@index([query])
+  @@index([date])
+  @@index([clicks])
+  @@index([impressions])
+}
+
+/// Snapshot diario por página de Search Console. Re-sync sobreescribe.
+model GscDailyPage {
+  id          String   @id @default(cuid())
+  date        DateTime @db.Date
+  page        String
+  clicks      Int      @default(0)
+  impressions Int      @default(0)
+  ctr         Float    @default(0)
+  position    Float    @default(0)
+  syncedAt    DateTime @default(now())
+
+  @@unique([date, page])
+  @@index([page])
+  @@index([date])
+}
+
+/// Oportunidad SEO detectada por SeoOpportunityService.
+model SeoOpportunity {
+  id             String    @id @default(cuid())
+  /// Tipo de oportunidad: ranking_4_20 | low_ctr_high_impressions |
+  /// clicks_drop | impressions_growing_low_clicks | cannibalization |
+  /// orgtraffic_low_conversion | high_conversion_low_traffic |
+  /// new_content | title_meta | internal_links
+  kind           String
+  /// Prioridad 1 (menor) a 10 (urgente). Calculada por el detector.
+  priority       Int       @default(5)
+  url            String?
+  query          String?
+  /// Datos brutos que justifican la oportunidad (clicks, impressions,
+  /// posición histórica, etc.). Estructura específica por kind.
+  metrics        Json?
+  recommendation String    @db.Text
+  /// open | in_progress | done | dismissed
+  status         String    @default("open")
+  detectedAt     DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  resolvedAt     DateTime?
+  /// Hash de identidad (kind + url + query) para evitar duplicados al re-correr.
+  fingerprint    String    @unique
+
+  @@index([status, priority])
+  @@index([kind, status])
+  @@index([detectedAt])
+}

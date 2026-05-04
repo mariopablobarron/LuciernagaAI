@@ -13,6 +13,7 @@ import {
   MessageSquare,
   RefreshCw,
   Search,
+  Sparkles,
   Target,
   TrendingDown,
   TrendingUp,
@@ -205,6 +206,12 @@ export default function AdminAnalyticsPage() {
             className="inline-flex items-center gap-2 rounded-lg border border-cyan-700/60 bg-cyan-600/20 hover:bg-cyan-600/30 px-3 py-2 text-xs font-semibold text-cyan-200 hover:text-white transition-colors"
           >
             <LineChart className="h-3.5 w-3.5" /> Web & Redes (GA4 · GSC · Metricool)
+          </Link>
+          <Link
+            href="/admin/analytics/seo"
+            className="inline-flex items-center gap-2 rounded-lg border border-amber-700/60 bg-amber-600/20 hover:bg-amber-600/30 px-3 py-2 text-xs font-semibold text-amber-200 hover:text-white transition-colors"
+          >
+            <Sparkles className="h-3.5 w-3.5" /> Oportunidades SEO
           </Link>
           <Link
             href="/admin/analytics/animo"

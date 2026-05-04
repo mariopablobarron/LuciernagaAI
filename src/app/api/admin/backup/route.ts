@@ -3,6 +3,7 @@ import { requireAdminPermission } from "@/lib/admin-auth";
 import { logError, logInfo } from "@/lib/logger";
 import { notifyAdmin, sendAdminDocument } from "@/services/telegram";
 import { isValidCronSecret } from "@/lib/cron-auth";
+import { persistBackupLocally } from "@/lib/backup-storage";
 import pg from "pg";
 
 export const dynamic = "force-dynamic";
@@ -123,8 +124,26 @@ export async function GET(req: NextRequest) {
 
       if (!delivery.ok) {
         const isSizeIssue = delivery.reason === "size_exceeds_limit";
+
+        // Fallback: si Telegram rechaza por tamaño, persistimos al filesystem
+        // local. Coherente con `scripts/db-backup-daily.sh` (mismo BACKUP_DIR).
+        // Solo se intenta para size_exceeds_limit — errores de auth/red NO
+        // se persisten para no enmascarar problemas de configuración.
+        let persistedPath: string | null = null;
+        let persistError: string | null = null;
+        if (isSizeIssue) {
+          const persisted = await persistBackupLocally(compressed, filename);
+          if (persisted.ok) {
+            persistedPath = persisted.absolutePath;
+          } else {
+            persistError = persisted.error;
+          }
+        }
+
         const headline = isSizeIssue
-          ? `🚨 BACKUP FUERA DE TELEGRAM — ${filename} pesa ${sizeKb} KB (límite 49 MB). El dump se generó OK pero NO está respaldado. Configurar destino externo (S3/R2) urgente.`
+          ? persistedPath
+            ? `⚠️ Backup ${filename} (${sizeKb} KB) supera el límite de Telegram (49 MB). Guardado en: ${persistedPath}`
+            : `🚨 BACKUP PERDIDO — ${filename} (${sizeKb} KB) supera Telegram y el fallback local también falló (${persistError ?? "unknown"}). Configurar destino externo (S3/R2) URGENTE.`
           : `❌ Backup generado pero no se pudo subir a Telegram: ${filename} (${sizeKb} KB) — ${delivery.error ?? "unknown"}`;
         notifyAdmin(headline);
         logError("BACKUP", new Error(delivery.error ?? "telegram_upload_failed"), {
@@ -132,17 +151,29 @@ export async function GET(req: NextRequest) {
           sizeKb,
           stage: "telegram_upload",
           reason: delivery.reason ?? null,
+          persistedPath,
+          persistError,
         });
+
+        // Si pudimos persistir local, devolvemos 200 + info útil — el backup
+        // existe y está accesible. Si todo falló, 500.
+        const status = isSizeIssue && persistedPath ? 200 : 500;
         return NextResponse.json(
           {
-            ok: false,
-            error: isSizeIssue ? "size_exceeds_telegram_limit" : "telegram_upload_failed",
+            ok: !!(isSizeIssue && persistedPath),
+            error: isSizeIssue
+              ? persistedPath
+                ? null
+                : "size_exceeds_telegram_limit_and_local_fallback_failed"
+              : "telegram_upload_failed",
             telegramError: delivery.error ?? null,
             reason: delivery.reason ?? null,
             filename,
             sizeKb,
+            persistedPath,
+            persistError,
           },
-          { status: 500 },
+          { status },
         );
       }
 

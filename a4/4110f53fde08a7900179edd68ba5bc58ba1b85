@@ -1,0 +1,26 @@
+.github/workflows/vps-direct-deploy.yml
+  c72d0ada98a9afb7 1-148
+docs/setup-auto-deploy.md
+  c72d0ada98a9afb7 1-140
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "a44110f53fde08a7900179edd68ba5bc58ba1b85",
+  "prompts": {
+    "c72d0ada98a9afb7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron",
+      "messages": [],
+      "total_additions": 288,
+      "total_deletions": 0,
+      "accepted_lines": 1629,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/1d31aeaf4b16cb38a64d1bd588ea8cdc501f2867588e1838df526c597c005917"
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
+import { getOpenRouterChatUrl, getOpenRouterHeaders } from "@/lib/openrouter";
 
 interface GeneratedChallenge {
   title: string;
@@ -39,11 +40,10 @@ Reglas:
 - Concreto, no genérico`;
 
   try {
-    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const res = await fetch(getOpenRouterChatUrl(), {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
+        ...getOpenRouterHeaders(apiKey, { feature: "personalized_challenge" }),
         "HTTP-Referer": process.env.APP_BASE_URL ?? "https://tresmilmillonesdelatidos.es",
       },
       body: JSON.stringify({

@@ -1,16 +1,9 @@
 import { logError, logInfo } from "@/lib/logger";
 import { logLlmCall } from "@/lib/llm-logger";
 import { getErrorMessage, fetchWithTimeout } from "@/lib/utils";
-import {
-  buildCoachPrompt,
-  buildFallbackResponse,
-  type CoachContext,
-} from "@/services/coach";
+import { buildCoachPrompt, buildFallbackResponse, type CoachContext } from "@/services/coach";
 import type { UserState } from "@/domain/types";
-import {
-  DEFAULT_EMOTIONAL_PROFILE,
-  type EmotionalProfile,
-} from "@/types/emotional-profile";
+import { DEFAULT_EMOTIONAL_PROFILE, type EmotionalProfile } from "@/types/emotional-profile";
 
 interface OpenRouterResponse {
   choices?: Array<{ message?: { content?: string } }>;
@@ -25,9 +18,28 @@ interface OpenRouterStreamChunk {
   choices?: Array<{ delta?: { content?: string }; finish_reason?: string | null }>;
 }
 
-import { getOpenRouterChatUrl, getOpenRouterHeaders } from "@/lib/openrouter";
+import { getOpenRouterChatUrl, getOpenRouterHeaders, getOpenRouterModel } from "@/lib/openrouter";
 
-import { MAIN_CHAT_MODEL as OPENROUTER_MODEL, MAIN_CHAT_FALLBACK_CHAIN as OPENROUTER_FALLBACK_CHAIN } from "@/lib/openrouter-models";
+const OPENROUTER_MODEL = getOpenRouterModel("anthropic/claude-sonnet-4-6");
+/**
+ * OpenRouter fallback chain para el chat principal. Si Anthropic Sonnet
+ * falla (provider down, rate limit, error 5xx), OpenRouter intenta
+ * automáticamente Haiku 4.5 (mismo proveedor, más barato y rápido) y
+ * después GPT-4o-mini de OpenAI (proveedor distinto — supervivencia
+ * incluso si Anthropic entero está caído).
+ *
+ * Solo se usa para `models` + `route: "fallback"` en el body. El
+ * primer modelo de la lista es siempre el primario; OpenRouter va
+ * bajando si falla.
+ *
+ * Coste: invisible en condiciones normales — solo se paga el modelo
+ * que efectivamente respondió. El fallback es defensa en profundidad.
+ */
+const OPENROUTER_FALLBACK_CHAIN = [
+  OPENROUTER_MODEL,
+  "anthropic/claude-haiku-4-5",
+  "openai/gpt-4o-mini",
+] as const;
 const REQUEST_TIMEOUT_MS = 25000;
 type AIErrorType = "missing_config" | "provider_failure" | "unknown";
 
@@ -92,7 +104,7 @@ async function requestOpenRouter(
   emotionalProfile: EmotionalProfile,
   coachContext: CoachContext,
   history: ConversationTurn[] = [],
-  opts: { userId?: string; source?: string } = {},
+  opts: { userId?: string; source?: string } = {}
 ): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY?.trim();
   if (!apiKey) {
@@ -158,9 +170,7 @@ async function requestOpenRouter(
         await new Promise((r) => setTimeout(r, RETRY_DELAYS[attempt - 1]));
         continue;
       }
-      throw new OpenRouterProviderError(
-        `OpenRouter request failed: ${getErrorMessage(error)}`
-      );
+      throw new OpenRouterProviderError(`OpenRouter request failed: ${getErrorMessage(error)}`);
     }
 
     if (!response.ok) {
@@ -226,7 +236,7 @@ export async function generateAIResponse(
   emotionalProfile: EmotionalProfile = DEFAULT_EMOTIONAL_PROFILE,
   coachContext: CoachContext = {},
   history: ConversationTurn[] = [],
-  opts: { userId?: string; source?: string } = {},
+  opts: { userId?: string; source?: string } = {}
 ): Promise<{
   response: string;
   fallback: boolean;
@@ -236,7 +246,14 @@ export async function generateAIResponse(
   const typedState = normalizeState(userState);
 
   try {
-    const response = await requestOpenRouter(message, typedState, emotionalProfile, coachContext, history, opts);
+    const response = await requestOpenRouter(
+      message,
+      typedState,
+      emotionalProfile,
+      coachContext,
+      history,
+      opts
+    );
     logInfo("AI", "ai_response_generated", {
       state: typedState,
       primaryEmotion: emotionalProfile.primaryEmotion,
@@ -298,7 +315,9 @@ function buildImpulsePrompt(input: ImpulseResponseInput): string {
     input.recentLogs.length > 0
       ? `\nÚltimos estados reportados:\n${input.recentLogs
           .slice(0, 3)
-          .map((l) => `- Estado: ${l.emotionalState ?? "desconocido"} | Nota: ${l.note ?? "sin nota"}`)
+          .map(
+            (l) => `- Estado: ${l.emotionalState ?? "desconocido"} | Nota: ${l.note ?? "sin nota"}`
+          )
           .join("\n")}`
       : "";
 
@@ -315,7 +334,8 @@ export async function generateImpulseResponse(input: ImpulseResponseInput): Prom
   const apiKey = process.env.OPENROUTER_API_KEY?.trim();
   if (!apiKey) {
     return {
-      response: "Hoy solo haz esto: abre el documento o la tarea más importante y trabaja 10 minutos sin parar. Te llevará 10 minutos.",
+      response:
+        "Hoy solo haz esto: abre el documento o la tarea más importante y trabaja 10 minutos sin parar. Te llevará 10 minutos.",
       fallback: true,
     };
   }
@@ -364,7 +384,8 @@ export async function generateImpulseResponse(input: ImpulseResponseInput): Prom
   } catch (error: unknown) {
     logError("AI", error, { area: "generateImpulseResponse", profile: input.profileCode });
     return {
-      response: "Hoy solo haz esto: define en una sola línea qué tarea es tu prioridad y empiézala ahora. Te llevará 5 minutos.",
+      response:
+        "Hoy solo haz esto: define en una sola línea qué tarea es tu prioridad y empiézala ahora. Te llevará 5 minutos.",
       fallback: true,
     };
   }
@@ -373,7 +394,7 @@ export async function generateImpulseResponse(input: ImpulseResponseInput): Prom
 export async function* streamOpenRouterTokens(
   message: string,
   systemPrompt: string,
-  history: ConversationTurn[] = [],
+  history: ConversationTurn[] = []
 ): AsyncGenerator<string, void, unknown> {
   const apiKey = process.env.OPENROUTER_API_KEY?.trim();
   if (!apiKey) {
@@ -414,7 +435,9 @@ export async function* streamOpenRouterTokens(
   }
 
   if (!res.ok) {
-    logError("AI", new Error(`OpenRouter stream HTTP ${res.status}`), { area: "streamOpenRouterTokens" });
+    logError("AI", new Error(`OpenRouter stream HTTP ${res.status}`), {
+      area: "streamOpenRouterTokens",
+    });
     yield buildFallbackResponse();
     return;
   }

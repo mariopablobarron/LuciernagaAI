@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { logError, logInfo, logWarn } from "@/lib/logger";
 import { generateAIResponse } from "@/services/ai";
 import { saveConversationMessage } from "@/services/conversation";
+import { getOpenRouterChatUrl, getOpenRouterHeaders } from "@/lib/openrouter";
 import { analyzeEmotionalProfile, getEmotionalProfile } from "@/services/emotional-model";
 import { detectUserState } from "@/services/state";
 import {
@@ -152,9 +153,7 @@ async function buildStatsMessage(): Promise<string> {
     }),
   ]);
 
-  const stateLines = stateRows
-    .map((r) => `  ${r.state}: ${r._count.state}`)
-    .join("\n");
+  const stateLines = stateRows.map((r) => `  ${r.state}: ${r._count.state}`).join("\n");
 
   return [
     `📊 *Stats del día*`,
@@ -242,7 +241,8 @@ async function buildTasksMessage(): Promise<string> {
   if (tasks.length === 0) return "✅ Sin tareas pendientes.";
 
   const lines = tasks.map(
-    (t, i) => `${i + 1}. [${t.id.slice(-6)}] ${t.instruction.slice(0, 80)}${t.instruction.length > 80 ? "…" : ""}`
+    (t, i) =>
+      `${i + 1}. [${t.id.slice(-6)}] ${t.instruction.slice(0, 80)}${t.instruction.length > 80 ? "…" : ""}`
   );
   return `📋 *Tareas pendientes* (${tasks.length})\n\n${lines.join("\n")}\n\nEjecuta con: npm run tg-tasks`;
 }
@@ -274,14 +274,26 @@ async function callAdminAI(question: string): Promise<string> {
   // Prefer Anthropic API (Opus with thinking), fall back to OpenRouter
   const anthropicKey = process.env.ANTHROPIC_API_KEY?.trim();
   const openrouterKey = process.env.OPENROUTER_API_KEY?.trim();
-  if (!anthropicKey && !openrouterKey) return "❌ Ni ANTHROPIC_API_KEY ni OPENROUTER_API_KEY configurada.";
+  if (!anthropicKey && !openrouterKey)
+    return "❌ Ni ANTHROPIC_API_KEY ni OPENROUTER_API_KEY configurada.";
 
   const prisma = getPrismaClient();
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
-  const [totalUsers, activeToday, active7d, messagesTotal, messages7d, activeStreaks, waitlist, crisisEvents, proUsers, goalsActive] = await Promise.all([
+  const [
+    totalUsers,
+    activeToday,
+    active7d,
+    messagesTotal,
+    messages7d,
+    activeStreaks,
+    waitlist,
+    crisisEvents,
+    proUsers,
+    goalsActive,
+  ] = await Promise.all([
     prisma.user.count(),
     prisma.user.count({ where: { lastSeen: { gte: startOfDay } } }),
     prisma.user.count({ where: { lastSeen: { gte: sevenDaysAgo } } }),
@@ -289,7 +301,9 @@ async function callAdminAI(question: string): Promise<string> {
     prisma.message.count({ where: { createdAt: { gte: sevenDaysAgo }, role: "user" } }),
     prisma.streak.count({ where: { status: "active" } }),
     prisma.waitlistEntry.count({ where: { status: "approved" } }),
-    prisma.crisisEvent.count({ where: { createdAt: { gte: sevenDaysAgo }, level: { in: ["high", "critical"] } } }),
+    prisma.crisisEvent.count({
+      where: { createdAt: { gte: sevenDaysAgo }, level: { in: ["high", "critical"] } },
+    }),
     prisma.subscription.count({ where: { plan: "pro", status: "active" } }),
     prisma.goal.count({ where: { status: "active" } }),
   ]);
@@ -370,7 +384,9 @@ async function callAdminAI(question: string): Promise<string> {
 
       if (!res.ok) {
         const body = await res.text().catch(() => "");
-        logError("TELEGRAM", new Error(`Anthropic API HTTP ${res.status}`), { body: body.slice(0, 300) });
+        logError("TELEGRAM", new Error(`Anthropic API HTTP ${res.status}`), {
+          body: body.slice(0, 300),
+        });
         // Fall through to OpenRouter
       } else {
         const data = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
@@ -381,11 +397,10 @@ async function callAdminAI(question: string): Promise<string> {
 
     // Fallback to OpenRouter
     if (openrouterKey) {
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      const res = await fetch(getOpenRouterChatUrl(), {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${openrouterKey}`,
-          "Content-Type": "application/json",
+          ...getOpenRouterHeaders(openrouterKey, { feature: "telegram_admin_ai" }),
           "HTTP-Referer": process.env.APP_BASE_URL ?? "https://tresmilmillonesdelatidos.es",
         },
         body: JSON.stringify({
@@ -402,7 +417,9 @@ async function callAdminAI(question: string): Promise<string> {
 
       if (!res.ok) {
         const body = await res.text().catch(() => "");
-        logError("TELEGRAM", new Error(`OpenRouter HTTP ${res.status}`), { body: body.slice(0, 200) });
+        logError("TELEGRAM", new Error(`OpenRouter HTTP ${res.status}`), {
+          body: body.slice(0, 200),
+        });
         return `❌ Error de IA (${res.status}). Intenta de nuevo.`;
       }
 
@@ -569,9 +586,15 @@ export async function POST(req: NextRequest) {
         } catch (err) {
           const msg = err instanceof Error ? err.message : "";
           if (msg.includes("EXPIRED")) {
-            await sendTelegramMessage(chatId, "⏰ Este enlace ha caducado. Genera uno nuevo desde la app.");
+            await sendTelegramMessage(
+              chatId,
+              "⏰ Este enlace ha caducado. Genera uno nuevo desde la app."
+            );
           } else {
-            await sendTelegramMessage(chatId, "❌ Enlace no válido. Inténtalo de nuevo desde la web.");
+            await sendTelegramMessage(
+              chatId,
+              "❌ Enlace no válido. Inténtalo de nuevo desde la web."
+            );
           }
           logError("TELEGRAM", err, { area: "web_link", chatId });
         }
@@ -620,7 +643,15 @@ export async function POST(req: NextRequest) {
     // Acepta: "/nota <texto>", "/notas", "/nota_hecha <id>", o mensaje que empiece por 📝
     // Reutiliza el modelo AdminNote (tablón admin). Tag del mensaje (#cron, #env…) se
     // valida contra el set oficial; si no coincide, cae a "general".
-    const VALID_NOTE_TAGS = new Set(["general", "referrals", "migration", "env", "cron", "ui", "incident"]);
+    const VALID_NOTE_TAGS = new Set([
+      "general",
+      "referrals",
+      "migration",
+      "env",
+      "cron",
+      "ui",
+      "incident",
+    ]);
     const isNoteCommand =
       isAdmin(chatId) &&
       (text === "/notas" ||
@@ -664,13 +695,19 @@ export async function POST(req: NextRequest) {
             orderBy: { createdAt: "desc" },
           });
           if (!match) {
-            await sendTelegramMessage(chatId, `No encuentro una nota pendiente con id terminado en "${suffix}".`);
+            await sendTelegramMessage(
+              chatId,
+              `No encuentro una nota pendiente con id terminado en "${suffix}".`
+            );
           } else {
             await prisma.adminNote.update({
               where: { id: match.id },
               data: { status: "done", resolvedAt: new Date(), resolvedBy: "telegram_admin" },
             });
-            await sendTelegramMessage(chatId, `✅ Nota \`${match.id.slice(-6)}\` marcada como hecha.`);
+            await sendTelegramMessage(
+              chatId,
+              `✅ Nota \`${match.id.slice(-6)}\` marcada como hecha.`
+            );
           }
         } else {
           // /nota <texto> ó 📝 <texto>
@@ -732,7 +769,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
-    const adminCommands = ["/stats", "/usuarios", "/crisis", "/retencion", "/tareas", "/ayuda", "/cartas", "/deploy", "/llm", "/ingresos", "/salud"];
+    const adminCommands = [
+      "/stats",
+      "/usuarios",
+      "/crisis",
+      "/retencion",
+      "/tareas",
+      "/ayuda",
+      "/cartas",
+      "/deploy",
+      "/llm",
+      "/ingresos",
+      "/salud",
+    ];
     if (
       adminCommands.includes(text) ||
       text.startsWith("/hecho") ||
@@ -946,12 +995,9 @@ export async function POST(req: NextRequest) {
     if (adminChatId && chatId.toString() !== adminChatId && notifConfig.telegramUserMessages) {
       const userName = message.from?.first_name ?? userId;
       const preview = text.length > 200 ? text.slice(0, 200) + "…" : text;
-      const aiPreview = aiResult.response.length > 300 ? aiResult.response.slice(0, 300) + "…" : aiResult.response;
-      const fwd = [
-        `💬 *${userName}* (${userId})`,
-        `👤 ${preview}`,
-        `🤖 ${aiPreview}`,
-      ].join("\n\n");
+      const aiPreview =
+        aiResult.response.length > 300 ? aiResult.response.slice(0, 300) + "…" : aiResult.response;
+      const fwd = [`💬 *${userName}* (${userId})`, `👤 ${preview}`, `🤖 ${aiPreview}`].join("\n\n");
       sendTelegramMessage(Number(adminChatId), fwd).catch(() => {});
     }
 

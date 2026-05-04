@@ -1,10 +1,10 @@
 import { logError, logInfo } from "@/lib/logger";
-import { MAIN_CHAT_MODEL as OPENROUTER_MODEL } from "@/lib/openrouter-models";
 import type { WeeklyLetterDigest } from "@/services/weekly-letter-digest";
+import { getOpenRouterChatUrl, getOpenRouterHeaders, getOpenRouterModel } from "@/lib/openrouter";
 
 export const WEEKLY_LETTER_SUBJECT = "Tu semana — una pregunta";
 
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+const OPENROUTER_MODEL = getOpenRouterModel("anthropic/claude-sonnet-4-6");
 const MAX_WORDS = 200;
 const REQUEST_TIMEOUT_MS = 20_000;
 
@@ -66,12 +66,11 @@ async function callOpenRouter(userPrompt: string): Promise<string> {
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
-    const res = await fetch(OPENROUTER_URL, {
+    const res = await fetch(getOpenRouterChatUrl(), {
       method: "POST",
       signal: controller.signal,
       headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
+        ...getOpenRouterHeaders(apiKey, { feature: "weekly_letter" }),
         "HTTP-Referer": process.env.APP_BASE_URL ?? "http://localhost:3000",
         "X-Title": "mentor-web",
       },
@@ -115,7 +114,7 @@ export async function composeWeeklyLetter(
   options: {
     now?: Date;
     callLLM?: (prompt: string) => Promise<string>;
-  } = {},
+  } = {}
 ): Promise<ComposedLetter> {
   const callLLM = options.callLLM ?? callOpenRouter;
   const userPrompt = buildUserPrompt(digest);
@@ -135,9 +134,7 @@ export async function composeWeeklyLetter(
       }
 
       const words = countWords(raw);
-      const body = words > MAX_WORDS
-        ? raw.split(/\s+/).slice(0, MAX_WORDS).join(" ")
-        : raw;
+      const body = words > MAX_WORDS ? raw.split(/\s+/).slice(0, MAX_WORDS).join(" ") : raw;
 
       logInfo("WEEKLY_LETTER", "letter_composed", {
         userId: digest.userId,

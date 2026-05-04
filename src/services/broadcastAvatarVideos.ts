@@ -3,18 +3,11 @@ import path from "path";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { fetchWithTimeout } from "@/lib/utils";
-import {
-  createAvatarVideo,
-  downloadAvatarVideo,
-  getAvatarVideoStatus,
-} from "@/services/heygen";
-import {
-  getRecipientsBySegment,
-  type SegmentKey,
-} from "@/services/marketing-segments";
-import { MAIN_CHAT_MODEL as OPENROUTER_MODEL } from "@/lib/openrouter-models";
+import { getOpenRouterChatUrl, getOpenRouterHeaders, getOpenRouterModel } from "@/lib/openrouter";
+import { createAvatarVideo, downloadAvatarVideo, getAvatarVideoStatus } from "@/services/heygen";
+import { getRecipientsBySegment, type SegmentKey } from "@/services/marketing-segments";
 
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+const OPENROUTER_MODEL = getOpenRouterModel("anthropic/claude-sonnet-4-6");
 const REQUEST_TIMEOUT_MS = 30_000;
 const MAX_CONTEXT_CHARS = 3_500;
 
@@ -61,7 +54,7 @@ export class BroadcastLimitError extends Error {
   constructor(
     code: "monthly_cap" | "no_recipients_after_cooldown",
     message: string,
-    details: Record<string, unknown> = {},
+    details: Record<string, unknown> = {}
   ) {
     super(message);
     this.name = "BroadcastLimitError";
@@ -114,7 +107,7 @@ function avatarStorageDir(): string {
 async function writeBroadcastVideoToDisk(
   subdir: "shared" | "deliveries",
   id: string,
-  buf: Buffer,
+  buf: Buffer
 ): Promise<string> {
   const dir = path.join(avatarStorageDir(), "broadcasts", subdir);
   await fs.mkdir(dir, { recursive: true });
@@ -152,12 +145,11 @@ Reglas absolutas:
 - Devuelve SOLO el guión, sin comillas ni preámbulo.`;
 
   const res = await fetchWithTimeout(
-    OPENROUTER_URL,
+    getOpenRouterChatUrl(),
     {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
+        ...getOpenRouterHeaders(apiKey, { feature: "broadcast_script" }),
         "HTTP-Referer": process.env.APP_BASE_URL ?? "http://localhost:3000",
         "X-Title": "mentor-web-broadcast-script",
       },
@@ -174,13 +166,13 @@ Reglas absolutas:
         max_tokens: 220,
       }),
     },
-    REQUEST_TIMEOUT_MS,
+    REQUEST_TIMEOUT_MS
   );
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(
-      `OpenRouter broadcast script failed: HTTP ${res.status} — ${text.slice(0, 300)}`,
+      `OpenRouter broadcast script failed: HTTP ${res.status} — ${text.slice(0, 300)}`
     );
   }
   const json = (await res.json()) as {
@@ -215,7 +207,7 @@ async function fetchUserContext(userId: string): Promise<string> {
  * admin endpoint right after creation (fire-and-forget).
  */
 export async function createBroadcast(
-  params: CreateBroadcastParams,
+  params: CreateBroadcastParams
 ): Promise<CreateBroadcastResult> {
   if (!params.title.trim()) throw new Error("title required");
   if (params.mode === "literal" && !params.literalScript?.trim()) {
@@ -236,7 +228,7 @@ export async function createBroadcast(
     throw new BroadcastLimitError(
       "monthly_cap",
       `Cap mensual alcanzado: ${limits.monthlyCount}/${limits.monthlyCap} broadcasts en los últimos 30 días. Sube el cap en config si es intencional.`,
-      { monthlyCount: limits.monthlyCount, monthlyCap: limits.monthlyCap },
+      { monthlyCount: limits.monthlyCount, monthlyCap: limits.monthlyCap }
     );
   }
 
@@ -266,9 +258,7 @@ export async function createBroadcast(
 
   // ── Filter 2: per-recipient cooldown ─────────────────────────────────────
   // Drop users who received any broadcast in the last cooldownDays.
-  const cooldownCutoff = new Date(
-    Date.now() - limits.cooldownDays * 24 * 60 * 60 * 1000,
-  );
+  const cooldownCutoff = new Date(Date.now() - limits.cooldownDays * 24 * 60 * 60 * 1000);
   const recentlyDelivered = await prisma.broadcastAvatarDelivery.findMany({
     where: {
       userId: { in: recipients.map((r) => r.id) },
@@ -278,9 +268,7 @@ export async function createBroadcast(
   });
   const recentSet = new Set(recentlyDelivered.map((d) => d.userId));
 
-  const finalRecipients = recipients.filter(
-    (r) => !optedOutSet.has(r.id) && !recentSet.has(r.id),
-  );
+  const finalRecipients = recipients.filter((r) => !optedOutSet.has(r.id) && !recentSet.has(r.id));
 
   if (finalRecipients.length === 0) {
     throw new BroadcastLimitError(
@@ -290,7 +278,7 @@ export async function createBroadcast(
         candidates: recipients.length,
         optedOut: optedOutSet.size,
         inCooldown: recentSet.size,
-      },
+      }
     );
   }
 
@@ -350,9 +338,7 @@ async function loadAvatarId(): Promise<string> {
   return config.avatarId;
 }
 
-export async function processBroadcastCampaign(
-  campaignId: string,
-): Promise<void> {
+export async function processBroadcastCampaign(campaignId: string): Promise<void> {
   const prisma = getPrismaClient();
   const campaign = await prisma.broadcastAvatarCampaign.findUnique({
     where: { id: campaignId },
@@ -433,10 +419,7 @@ export async function processBroadcastCampaign(
               where: { id: d.id },
               data: {
                 status: "FAILED",
-                errorMessage:
-                  error instanceof Error
-                    ? error.message.slice(0, 500)
-                    : "unknown",
+                errorMessage: error instanceof Error ? error.message.slice(0, 500) : "unknown",
               },
             })
             .catch(() => {});
@@ -452,8 +435,7 @@ export async function processBroadcastCampaign(
       where: { id: campaignId },
       data: {
         status: "FAILED",
-        errorMessage:
-          error instanceof Error ? error.message.slice(0, 500) : "unknown",
+        errorMessage: error instanceof Error ? error.message.slice(0, 500) : "unknown",
       },
     });
     throw error;
@@ -494,16 +476,10 @@ export async function runPollBroadcastAvatarVideos(): Promise<BroadcastPollStats
   for (const c of sharedCampaigns) {
     if (!c.sharedHeygenId) continue;
     try {
-      const { status, videoUrl, errorMessage } = await getAvatarVideoStatus(
-        c.sharedHeygenId,
-      );
+      const { status, videoUrl, errorMessage } = await getAvatarVideoStatus(c.sharedHeygenId);
       if (status === "completed" && videoUrl) {
         const buf = await downloadAvatarVideo(videoUrl);
-        const relativeUrl = await writeBroadcastVideoToDisk(
-          "shared",
-          c.id,
-          buf,
-        );
+        const relativeUrl = await writeBroadcastVideoToDisk("shared", c.id, buf);
         await prisma.$transaction([
           prisma.broadcastAvatarCampaign.update({
             where: { id: c.id },
@@ -554,16 +530,10 @@ export async function runPollBroadcastAvatarVideos(): Promise<BroadcastPollStats
   for (const d of perUserDeliveries) {
     if (!d.heygenVideoId) continue;
     try {
-      const { status, videoUrl, errorMessage } = await getAvatarVideoStatus(
-        d.heygenVideoId,
-      );
+      const { status, videoUrl, errorMessage } = await getAvatarVideoStatus(d.heygenVideoId);
       if (status === "completed" && videoUrl) {
         const buf = await downloadAvatarVideo(videoUrl);
-        const relativeUrl = await writeBroadcastVideoToDisk(
-          "deliveries",
-          d.id,
-          buf,
-        );
+        const relativeUrl = await writeBroadcastVideoToDisk("deliveries", d.id, buf);
         await prisma.broadcastAvatarDelivery.update({
           where: { id: d.id },
           data: { status: "READY", videoUrl: relativeUrl },

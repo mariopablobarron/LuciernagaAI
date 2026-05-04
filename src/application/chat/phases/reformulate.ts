@@ -16,10 +16,10 @@
  */
 
 import { logError, logInfo } from "@/lib/logger";
+import { getOpenRouterChatUrl, getOpenRouterHeaders } from "@/lib/openrouter";
 
 const REFORMULATION_MODEL =
-  process.env.OPENROUTER_REFORMULATION_MODEL?.trim() ||
-  "google/gemini-2.5-flash-lite";
+  process.env.OPENROUTER_REFORMULATION_MODEL?.trim() || "google/gemini-2.5-flash-lite";
 
 const SYSTEM_PROMPT =
   "Reformula el mensaje del usuario en una versión autocontenida usando el historial. " +
@@ -68,7 +68,13 @@ type HistoryEntry = { role: "user" | "assistant"; content: string };
 export type ReformulationResult = {
   reformulated: boolean;
   standalone: string | null;
-  reason: "no_history" | "looks_explicit" | "skipped_short" | "llm_failed" | "unchanged" | "rewritten";
+  reason:
+    | "no_history"
+    | "looks_explicit"
+    | "skipped_short"
+    | "llm_failed"
+    | "unchanged"
+    | "rewritten";
 };
 
 export async function reformulateMessage(input: {
@@ -97,11 +103,10 @@ export async function reformulateMessage(input: {
       content: h.content.length > 400 ? `${h.content.slice(0, 400)}…` : h.content,
     }));
 
-    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const res = await fetch(getOpenRouterChatUrl(), {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
+        ...getOpenRouterHeaders(apiKey, { feature: "reformulate" }),
       },
       body: JSON.stringify({
         model: REFORMULATION_MODEL,
@@ -109,7 +114,10 @@ export async function reformulateMessage(input: {
         temperature: 0.1,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
-          ...recentHistory.map((h) => ({ role: h.role === "assistant" ? "assistant" : "user", content: h.content })),
+          ...recentHistory.map((h) => ({
+            role: h.role === "assistant" ? "assistant" : "user",
+            content: h.content,
+          })),
           { role: "user", content: `[Mensaje a reformular]: ${message}` },
         ],
       }),
@@ -127,7 +135,12 @@ export async function reformulateMessage(input: {
     // Si la reformulación es básicamente el mismo mensaje (cambio menor),
     // no merece la pena meterlo como ruido en el system prompt.
     const original = message.trim();
-    if (standalone.length < original.length + 5 && standalone.toLowerCase().startsWith(original.toLowerCase().slice(0, Math.min(20, original.length)))) {
+    if (
+      standalone.length < original.length + 5 &&
+      standalone
+        .toLowerCase()
+        .startsWith(original.toLowerCase().slice(0, Math.min(20, original.length)))
+    ) {
       return { reformulated: false, standalone: null, reason: "unchanged" };
     }
 

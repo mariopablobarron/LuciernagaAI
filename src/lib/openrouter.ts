@@ -14,17 +14,30 @@
  *   const res = await fetch(url, { method: "POST", headers, body: ... });
  *
  * Helicone proxy doc: https://docs.helicone.ai/getting-started/integration-method/openrouter
+ *
+ * Si necesitas desviar las llamadas a un endpoint compatible con OpenRouter
+ * (por ejemplo, un proxy de OpenCode o un endpoint interno), configura
+ * OPENROUTER_CHAT_URL.
  */
 
 const HELICONE_OPENROUTER_PROXY = "https://openrouter.helicone.ai/api/v1/chat/completions";
-const OPENROUTER_DIRECT = "https://openrouter.ai/api/v1/chat/completions";
+const OPENROUTER_DEFAULT_CHAT_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 export function isHeliconeEnabled(): boolean {
   return Boolean(process.env.HELICONE_API_KEY?.trim());
 }
 
 export function getOpenRouterChatUrl(): string {
-  return isHeliconeEnabled() ? HELICONE_OPENROUTER_PROXY : OPENROUTER_DIRECT;
+  const explicitUrl = process.env.OPENROUTER_CHAT_URL?.trim();
+  if (explicitUrl) {
+    return explicitUrl;
+  }
+
+  return isHeliconeEnabled() ? HELICONE_OPENROUTER_PROXY : OPENROUTER_DEFAULT_CHAT_URL;
+}
+
+export function getOpenRouterModel(defaultModel: string): string {
+  return process.env.OPENROUTER_MODEL?.trim() || defaultModel;
 }
 
 type HeliconeMeta = {
@@ -39,7 +52,10 @@ type HeliconeMeta = {
   cacheTtlSeconds?: number;
 };
 
-export function getOpenRouterHeaders(apiKey: string, meta: HeliconeMeta = {}): Record<string, string> {
+export function getOpenRouterHeaders(
+  apiKey: string,
+  meta: HeliconeMeta = {}
+): Record<string, string> {
   const headers: Record<string, string> = {
     Authorization: `Bearer ${apiKey}`,
     "Content-Type": "application/json",

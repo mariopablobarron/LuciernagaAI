@@ -18,11 +18,11 @@
  */
 
 import { logError, logInfo } from "@/lib/logger";
+import { getOpenRouterChatUrl, getOpenRouterHeaders, getOpenRouterModel } from "@/lib/openrouter";
 import { getPrismaClient } from "@/db/prisma";
 import { listMessagesForConversation } from "@/services/conversation";
-import { BACKGROUND_FAST_MODEL as OPENROUTER_MODEL } from "@/lib/openrouter-models";
 
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+const OPENROUTER_MODEL = getOpenRouterModel("anthropic/claude-haiku-4-5");
 const REQUEST_TIMEOUT_MS = 15_000;
 
 /** Total de mensajes que dejamos literales al final del histórico. */
@@ -70,12 +70,11 @@ async function callOpenRouter(systemPrompt: string, userPrompt: string): Promise
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    const res = await fetch(OPENROUTER_URL, {
+    const res = await fetch(getOpenRouterChatUrl(), {
       method: "POST",
       signal: controller.signal,
       headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
+        ...getOpenRouterHeaders(apiKey, { feature: "conversation_summary" }),
         "HTTP-Referer": process.env.APP_BASE_URL ?? "http://localhost:3000",
         "X-Title": "mentor-web",
       },
@@ -112,15 +111,13 @@ export type SummarizeInput = {
  * Genera (o actualiza) el resumen acumulado. Devuelve null si no hay
  * mensajes nuevos a procesar (el caller decide si conserva el previo).
  */
-export async function generateConversationSummary(
-  input: SummarizeInput,
-): Promise<string | null> {
+export async function generateConversationSummary(input: SummarizeInput): Promise<string | null> {
   if (input.newTurns.length === 0) return input.previousSummary;
   const callLLM = input.callLLM ?? callOpenRouter;
   try {
     const reply = await callLLM(
       SYSTEM_PROMPT,
-      buildUserPrompt(input.previousSummary, input.newTurns),
+      buildUserPrompt(input.previousSummary, input.newTurns)
     );
     if (!reply || reply.length < 20) {
       // Demasiado corto o vacío: probablemente el LLM falló silenciosamente.

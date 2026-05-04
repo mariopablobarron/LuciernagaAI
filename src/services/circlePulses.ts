@@ -1,14 +1,18 @@
 import { getPrismaClient } from "@/db/prisma";
 import { logInfo, logError } from "@/lib/logger";
-import { buildCirclePulseOpenedEmail, buildMentorReflectionEmail, sendUserEmail } from "@/lib/email";
-import { BACKGROUND_FAST_MODEL as OPENROUTER_MODEL } from "@/lib/openrouter-models";
+import {
+  buildCirclePulseOpenedEmail,
+  buildMentorReflectionEmail,
+  sendUserEmail,
+} from "@/lib/email";
+import { getOpenRouterChatUrl, getOpenRouterHeaders, getOpenRouterModel } from "@/lib/openrouter";
 
 const APP_URL = process.env.APP_BASE_URL?.trim() ?? "https://tresmilmillonesdelatidos.es";
 
-// ─── Tunables ────────────────────────────────────────────────────────────────
+// ─── Tunables ──────────────────────────────────────────────────────────────
 
 const PULSE_LENGTH_DAYS = 7;
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+const OPENROUTER_MODEL = getOpenRouterModel("anthropic/claude-haiku-4-5");
 const REQUEST_TIMEOUT_MS = 20_000;
 
 // ─── Time helpers ────────────────────────────────────────────────────────────
@@ -43,7 +47,11 @@ Reglas absolutas:
 4. Segunda persona singular ("tú"), no plural — cada miembro responde solo.
 5. Si recibes contexto contradictorio o vacío, responde: PROMPT_FALLBACK.`;
 
-function buildPromptUserMessage(matchPattern: string, matchEmotion: string, weekStart: Date): string {
+function buildPromptUserMessage(
+  matchPattern: string,
+  matchEmotion: string,
+  weekStart: Date
+): string {
   return [
     `Patrón compartido del grupo: ${matchPattern}`,
     `Emoción dominante: ${matchEmotion}`,
@@ -57,19 +65,22 @@ function fallbackPrompt(matchPattern: string, matchEmotion: string): string {
   return `¿Qué reconoces hoy en ti del patrón "${matchPattern}" con la emoción "${matchEmotion}", que la semana pasada no veías?`;
 }
 
-async function callOpenRouter(systemPrompt: string, userPrompt: string, maxTokens = 200): Promise<string> {
+async function callOpenRouter(
+  systemPrompt: string,
+  userPrompt: string,
+  maxTokens = 200
+): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY?.trim();
   if (!apiKey) throw new Error("Missing OPENROUTER_API_KEY");
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    const res = await fetch(OPENROUTER_URL, {
+    const res = await fetch(getOpenRouterChatUrl(), {
       method: "POST",
       signal: controller.signal,
       headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
+        ...getOpenRouterHeaders(apiKey, { feature: "circle_pulse" }),
         "HTTP-Referer": process.env.APP_BASE_URL ?? "http://localhost:3000",
         "X-Title": "mentor-web",
       },
@@ -99,7 +110,7 @@ async function callOpenRouter(systemPrompt: string, userPrompt: string, maxToken
 export async function generateEmergentPrompt(
   circleId: string,
   weekStart: Date,
-  options: { callLLM?: (system: string, user: string) => Promise<string> } = {},
+  options: { callLLM?: (system: string, user: string) => Promise<string> } = {}
 ): Promise<{ prompt: string; promptSource: "emergent" | "fallback" }> {
   const prisma = getPrismaClient();
   const circle = await prisma.circle.findUnique({
@@ -110,14 +121,23 @@ export async function generateEmergentPrompt(
 
   const callLLM = options.callLLM ?? ((s, u) => callOpenRouter(s, u, 80));
   try {
-    const raw = await callLLM(PROMPT_SYSTEM, buildPromptUserMessage(circle.matchPattern, circle.matchEmotion, weekStart));
+    const raw = await callLLM(
+      PROMPT_SYSTEM,
+      buildPromptUserMessage(circle.matchPattern, circle.matchEmotion, weekStart)
+    );
     if (raw === "PROMPT_FALLBACK" || raw.length < 10 || raw.length > 220) {
-      return { prompt: fallbackPrompt(circle.matchPattern, circle.matchEmotion), promptSource: "fallback" };
+      return {
+        prompt: fallbackPrompt(circle.matchPattern, circle.matchEmotion),
+        promptSource: "fallback",
+      };
     }
     return { prompt: raw, promptSource: "emergent" };
   } catch (error) {
     logError("CIRCLE_PULSES", error, { circleId, step: "generate_prompt" });
-    return { prompt: fallbackPrompt(circle.matchPattern, circle.matchEmotion), promptSource: "fallback" };
+    return {
+      prompt: fallbackPrompt(circle.matchPattern, circle.matchEmotion),
+      promptSource: "fallback",
+    };
   }
 }
 
@@ -129,7 +149,7 @@ export async function generateEmergentPrompt(
  */
 export async function openWeeklyPulseForCircle(
   circleId: string,
-  now: Date = new Date(),
+  now: Date = new Date()
 ): Promise<{ pulseId: string; created: boolean }> {
   const prisma = getPrismaClient();
   const weekStart = weekStartOf(now);
@@ -178,11 +198,15 @@ export async function openWeeklyPulseForCircle(
               weekEnd,
               appUrl: APP_URL,
             }),
-          }),
-        ),
+          })
+        )
     );
   } catch (error) {
-    logError("CIRCLE_PULSES", error, { step: "notify_pulse_opened", circleId, pulseId: created.id });
+    logError("CIRCLE_PULSES", error, {
+      step: "notify_pulse_opened",
+      circleId,
+      pulseId: created.id,
+    });
   }
 
   return { pulseId: created.id, created: true };
@@ -191,7 +215,9 @@ export async function openWeeklyPulseForCircle(
 /**
  * Opens this week's pulse for every active circle.
  */
-export async function runOpenAllPulses(now: Date = new Date()): Promise<{ opened: number; skipped: number }> {
+export async function runOpenAllPulses(
+  now: Date = new Date()
+): Promise<{ opened: number; skipped: number }> {
   const prisma = getPrismaClient();
   const circles = await prisma.circle.findMany({
     where: { isActive: true },
@@ -215,7 +241,9 @@ export async function runOpenAllPulses(now: Date = new Date()): Promise<{ opened
  * Closes any pulse whose weekEnd has passed and is still open. Triggers reflection
  * generation for each member that responded.
  */
-export async function runCloseExpiredPulses(now: Date = new Date()): Promise<{ closed: number; reflectionsCreated: number }> {
+export async function runCloseExpiredPulses(
+  now: Date = new Date()
+): Promise<{ closed: number; reflectionsCreated: number }> {
   const prisma = getPrismaClient();
   const expired = await prisma.circlePulse.findMany({
     where: { status: "open", weekEnd: { lte: now } },
@@ -252,7 +280,7 @@ Reglas absolutas:
 function buildReflectionUserMessage(
   pulsePrompt: string,
   ownResponse: string,
-  othersResponses: string[],
+  othersResponses: string[]
 ): string {
   const others = othersResponses.map((r, i) => `[${i + 1}] "${r.replace(/"/g, "'")}"`).join("\n");
   return [
@@ -275,7 +303,7 @@ function buildReflectionUserMessage(
  */
 export async function generateReflectionsForPulse(
   pulseId: string,
-  options: { callLLM?: (system: string, user: string) => Promise<string> } = {},
+  options: { callLLM?: (system: string, user: string) => Promise<string> } = {}
 ): Promise<number> {
   const prisma = getPrismaClient();
   const pulse = await prisma.circlePulse.findUnique({
@@ -296,14 +324,15 @@ export async function generateReflectionsForPulse(
 
   let created = 0;
   for (const own of pulse.responses) {
-    const others = pulse.responses
-      .filter((r) => r.userId !== own.userId)
-      .map((r) => r.content);
+    const others = pulse.responses.filter((r) => r.userId !== own.userId).map((r) => r.content);
 
     let content: string;
     let source: "auto" | "fallback" = "auto";
     try {
-      const raw = await callLLM(REFLECTION_SYSTEM, buildReflectionUserMessage(pulse.prompt, own.content, others));
+      const raw = await callLLM(
+        REFLECTION_SYSTEM,
+        buildReflectionUserMessage(pulse.prompt, own.content, others)
+      );
       if (raw === "NO_MATERIAL" || raw.length < 30) {
         source = "fallback";
         content = "Lo que escribiste deja huella aunque hoy no lleguen palabras del mentor.";

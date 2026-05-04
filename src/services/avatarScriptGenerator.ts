@@ -1,9 +1,9 @@
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { fetchWithTimeout } from "@/lib/utils";
-import { MAIN_CHAT_MODEL as OPENROUTER_MODEL } from "@/lib/openrouter-models";
+import { getOpenRouterChatUrl, getOpenRouterHeaders, getOpenRouterModel } from "@/lib/openrouter";
 
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+const OPENROUTER_MODEL = getOpenRouterModel("anthropic/claude-sonnet-4-6");
 const REQUEST_TIMEOUT_MS = 30_000;
 const MAX_CONTEXT_CHARS = 4_000;
 
@@ -32,9 +32,7 @@ export type GenerateScriptParams = {
  * Pulls the goal title, recent user messages, and current emotional state
  * to fill the admin-editable prompt template before calling OpenRouter.
  */
-export async function generateGoalAvatarScript(
-  params: GenerateScriptParams,
-): Promise<string> {
+export async function generateGoalAvatarScript(params: GenerateScriptParams): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY?.trim();
   if (!apiKey) throw new Error("OPENROUTER_API_KEY is not configured");
 
@@ -90,11 +88,11 @@ export async function generateGoalAvatarScript(
     .replace(/\{currentState\}/g, currentState);
 
   const res = await fetchWithTimeout(
-    OPENROUTER_URL,
+    getOpenRouterChatUrl(),
     {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        ...getOpenRouterHeaders(apiKey, { feature: `avatar_script_${params.phase.toLowerCase()}` }),
         "Content-Type": "application/json",
         "HTTP-Referer": process.env.APP_BASE_URL ?? "http://localhost:3000",
         "X-Title": `mentor-web-avatar-${params.phase.toLowerCase()}`,
@@ -112,13 +110,13 @@ export async function generateGoalAvatarScript(
         max_tokens: 220,
       }),
     },
-    REQUEST_TIMEOUT_MS,
+    REQUEST_TIMEOUT_MS
   );
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(
-      `OpenRouter script generation failed: HTTP ${res.status} — ${text.slice(0, 300)}`,
+      `OpenRouter script generation failed: HTTP ${res.status} — ${text.slice(0, 300)}`
     );
   }
 
@@ -132,17 +130,13 @@ export async function generateGoalAvatarScript(
 
   const violations = FORBIDDEN_PATTERNS.filter((re) => re.test(script));
   if (violations.length > 0) {
-    logError(
-      "AVATAR_SCRIPT",
-      new Error("script_contains_forbidden_patterns"),
-      {
-        userId: params.userId,
-        goalId: params.goalId,
-        phase: params.phase,
-        patterns: violations.map((re) => re.source),
-        script: script.slice(0, 300),
-      },
-    );
+    logError("AVATAR_SCRIPT", new Error("script_contains_forbidden_patterns"), {
+      userId: params.userId,
+      goalId: params.goalId,
+      phase: params.phase,
+      patterns: violations.map((re) => re.source),
+      script: script.slice(0, 300),
+    });
   }
 
   logInfo("AVATAR_SCRIPT", "script_generated", {

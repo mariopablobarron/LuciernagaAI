@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { resolveIdentity, InvalidSessionTokenError } from "@/lib/auth";
 import { logError } from "@/lib/logger";
+import { getOpenRouterChatUrl, getOpenRouterHeaders } from "@/lib/openrouter";
 
 export const dynamic = "force-dynamic";
 
@@ -36,11 +37,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "AI_NOT_CONFIGURED" }, { status: 503 });
     }
 
-    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const res = await fetch(getOpenRouterChatUrl(), {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
+        ...getOpenRouterHeaders(apiKey, { feature: "reframe" }),
         "HTTP-Referer": process.env.APP_BASE_URL ?? "https://tresmilmillonesdelatidos.es",
       },
       body: JSON.stringify({

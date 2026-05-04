@@ -1,6 +1,7 @@
 import { logError, logInfo } from "@/lib/logger";
 import { logLlmCall } from "@/lib/llm-logger";
 import { fetchWithTimeout } from "@/lib/utils";
+import { getOpenRouterChatUrl, getOpenRouterHeaders, getOpenRouterModel } from "@/lib/openrouter";
 
 /**
  * Answer guardian — classifies a user's would-be community answer as
@@ -12,8 +13,7 @@ import { fetchWithTimeout } from "@/lib/utils";
  * to publishing the original text. Does not replace content safety.
  */
 
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "anthropic/claude-sonnet-4-6";
+const MODEL = getOpenRouterModel("anthropic/claude-sonnet-4-6");
 const TIMEOUT_MS = 15000;
 
 export type AnswerClassification = {
@@ -38,7 +38,7 @@ type OpenRouterJson = {
 
 export async function classifyAnswer(
   content: string,
-  opts: { userId?: string } = {},
+  opts: { userId?: string } = {}
 ): Promise<AnswerClassification | null> {
   const apiKey = process.env.OPENROUTER_API_KEY?.trim();
   if (!apiKey) {
@@ -51,12 +51,11 @@ export async function classifyAnswer(
 
   try {
     const response = await fetchWithTimeout(
-      OPENROUTER_URL,
+      getOpenRouterChatUrl(),
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
+          ...getOpenRouterHeaders(apiKey, { feature: "answer_guardian" }),
           "HTTP-Referer": process.env.APP_BASE_URL ?? "http://localhost:3000",
           "X-Title": "mentor-web",
         },
@@ -71,7 +70,7 @@ export async function classifyAnswer(
           response_format: { type: "json_object" },
         }),
       },
-      TIMEOUT_MS,
+      TIMEOUT_MS
     );
 
     if (!response.ok) {

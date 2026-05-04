@@ -1,14 +1,14 @@
 import { logError, logInfo } from "@/lib/logger";
 import { getErrorMessage, fetchWithTimeout } from "@/lib/utils";
 import { buildFallbackResponse } from "@/services/coach";
-import { MAIN_CHAT_MODEL as OPENROUTER_MODEL } from "@/lib/openrouter-models";
+import { getOpenRouterChatUrl, getOpenRouterHeaders, getOpenRouterModel } from "@/lib/openrouter";
 import type { DailyImpulseLogSnapshot, ImpulseProfileSnapshot } from "@/types/impulse";
 
 interface OpenRouterResponse {
   choices?: Array<{ message?: { content?: string } }>;
 }
 
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+const OPENROUTER_MODEL = getOpenRouterModel("anthropic/claude-sonnet-4-6");
 const REQUEST_TIMEOUT_MS = 25000;
 
 function estimateMinutes(profileCode: ImpulseProfileSnapshot["code"]): number {
@@ -91,16 +91,15 @@ function extractReply(data: OpenRouterResponse): string {
   return data.choices?.[0]?.message?.content?.trim() ?? "";
 }
 
-function normalizeImpulseResponse(
-  response: string,
-  userProfile: ImpulseProfileSnapshot
-): string {
+function normalizeImpulseResponse(response: string, userProfile: ImpulseProfileSnapshot): string {
   const trimmed = response.trim();
   const estimatedMinutes = estimateMinutes(userProfile.code);
 
   const hasActionLine = /Hoy solo haz esto:/i.test(trimmed);
   const hasTimeLine = /Te llevará \d+ minutos\./i.test(trimmed);
-  const hasValidationLine = /Cuando lo termines, dime: hecho, no hecho o bloqueado\./i.test(trimmed);
+  const hasValidationLine = /Cuando lo termines, dime: hecho, no hecho o bloqueado\./i.test(
+    trimmed
+  );
 
   if (hasActionLine && hasTimeLine && hasValidationLine) {
     return trimmed;
@@ -144,11 +143,11 @@ export async function generateImpulseResponse(
     });
 
     const response = await fetchWithTimeout(
-      OPENROUTER_URL,
+      getOpenRouterChatUrl(),
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${apiKey}`,
+          ...getOpenRouterHeaders(apiKey, { feature: "impulse_ai" }),
           "Content-Type": "application/json",
           "HTTP-Referer": process.env.APP_BASE_URL ?? "http://localhost:3000",
           "X-Title": "mentor-web-impulse",

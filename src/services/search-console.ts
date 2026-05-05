@@ -5,12 +5,21 @@ import { logError } from "@/lib/logger";
  * Google Search Console API client.
  *
  * Required env vars:
- *   - GOOGLE_SERVICE_ACCOUNT_JSON_B64  Same Service Account as GA4.
- *   - GSC_SITE_URL                     Either "https://tresmilmillonesdelatidos.es/"
- *                                      or "sc-domain:tresmilmillonesdelatidos.es"
+ *   - GSC_SITE_URL  Either "https://tresmilmillonesdelatidos.es/"
+ *                   or "sc-domain:tresmilmillonesdelatidos.es"
  *
- * The Service Account email needs to be added as User in Search Console
- * for the property.
+ * Authentication — one of two modes (OAuth2 preferred, SA fallback):
+ *
+ * Mode A — OAuth2 user token (recommended, works without GSC user management API):
+ *   - GSC_OAUTH_REFRESH_TOKEN   Refresh token from Mario's Google account.
+ *   - GSC_OAUTH_CLIENT_ID       OAuth2 Desktop client ID.
+ *   - GSC_OAUTH_CLIENT_SECRET   OAuth2 Desktop client secret.
+ *   Note: refresh tokens expire in 7 days if the GCP OAuth app is in "Test" mode.
+ *   Regenerate with: python3 ~/Documents/grant_gsc_v2.py
+ *
+ * Mode B — Service Account JWT (only works if SA is added as GSC user):
+ *   - GOOGLE_SERVICE_ACCOUNT_JSON_B64  Same Service Account as GA4.
+ *   GSC does not support adding SA emails as users via API; requires manual UI step.
  */
 
 export type GSCSnapshot = {
@@ -27,16 +36,40 @@ export type GSCFailure = { ok: false; error: string; reason?: string; missing?: 
 export function checkGSCReady():
   | { ready: true }
   | { ready: false; reason: "not_configured"; missing: string[] } {
-  const b64 = process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64?.trim();
   const site = process.env.GSC_SITE_URL?.trim();
   const missing: string[] = [];
-  if (!b64) missing.push("GOOGLE_SERVICE_ACCOUNT_JSON_B64");
   if (!site) missing.push("GSC_SITE_URL");
+
+  // Mode A: OAuth2 user token
+  const hasOAuth =
+    process.env.GSC_OAUTH_REFRESH_TOKEN?.trim() &&
+    process.env.GSC_OAUTH_CLIENT_ID?.trim() &&
+    process.env.GSC_OAUTH_CLIENT_SECRET?.trim();
+
+  // Mode B: Service Account JWT
+  const hasSA = process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64?.trim();
+
+  if (!hasOAuth && !hasSA) {
+    missing.push("GSC_OAUTH_REFRESH_TOKEN+GSC_OAUTH_CLIENT_ID+GSC_OAUTH_CLIENT_SECRET (or GOOGLE_SERVICE_ACCOUNT_JSON_B64)");
+  }
+
   if (missing.length > 0) return { ready: false, reason: "not_configured", missing };
   return { ready: true };
 }
 
-function getJwtClient() {
+function getAuthClient() {
+  // Mode A: OAuth2 user credentials (preferred — avoids GSC user management API)
+  const refreshToken = process.env.GSC_OAUTH_REFRESH_TOKEN?.trim();
+  const clientId = process.env.GSC_OAUTH_CLIENT_ID?.trim();
+  const clientSecret = process.env.GSC_OAUTH_CLIENT_SECRET?.trim();
+
+  if (refreshToken && clientId && clientSecret) {
+    const oauth2 = new google.auth.OAuth2(clientId, clientSecret);
+    oauth2.setCredentials({ refresh_token: refreshToken });
+    return oauth2;
+  }
+
+  // Mode B: Service Account JWT fallback
   const b64 = process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64!;
   const decoded = Buffer.from(b64, "base64").toString("utf-8");
   const creds = JSON.parse(decoded) as { client_email: string; private_key: string };
@@ -69,7 +102,7 @@ export async function getSearchConsoleSnapshot(daysBack = 28): Promise<GSCSnapsh
   const endDate = isoDaysAgo(0);
 
   try {
-    const auth = getJwtClient();
+    const auth = getAuthClient();
     const webmasters = google.webmasters({ version: "v3", auth });
 
     const [totalsResp, queriesResp, pagesResp] = await Promise.all([

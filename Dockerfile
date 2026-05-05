@@ -96,8 +96,10 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:3000/api/health || exit 1
 
-# Use dumb-init to handle graceful shutdown
-ENTRYPOINT ["/usr/sbin/dumb-init", "--"]
+# Use dumb-init to handle graceful shutdown.
+# Path correcto en debian/ubuntu base node:20-slim: /usr/bin/dumb-init
+# (NO /usr/sbin/ — el binario se instala en /usr/bin/).
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
 # Apply pending migrations, seed superadmin, then start server.
 # Migration failure is FATAL: a container running against an out-of-date

@@ -68,7 +68,9 @@ COPY --from=builder /app/public ./public
 COPY src ./src
 COPY docs ./docs
 COPY .git ./.git
-COPY CLAUDE.md AGENTS.md ./
+# Nota: CLAUDE.md y AGENTS.md están en .dockerignore (meta-archivos para
+# AI tools locales). Si quieres operar Claude Code dentro del contenedor,
+# primero quítalos del .dockerignore para que el build los pueda copiar.
 COPY tsconfig.json next-env.d.ts postcss.config.mjs eslint.config.mjs ./
 
 # Configure git for Claude Code commits

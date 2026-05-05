@@ -64,19 +64,16 @@ COPY scripts/seed-superadmin.mjs ./scripts/seed-superadmin.mjs
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 
-# Copy full source for Claude Code (read/edit files inside container)
+# Copy source for runtime (Next.js standalone necesita src para SSR de
+# rutas dinámicas y los .ts del API).
 COPY src ./src
 COPY docs ./docs
-COPY .git ./.git
-# Nota: CLAUDE.md y AGENTS.md están en .dockerignore (meta-archivos para
-# AI tools locales). Si quieres operar Claude Code dentro del contenedor,
-# primero quítalos del .dockerignore para que el build los pueda copiar.
 COPY tsconfig.json next-env.d.ts postcss.config.mjs eslint.config.mjs ./
 
-# Configure git for Claude Code commits
-RUN git config --global user.name "Claude Code" && \
-    git config --global user.email "claude@tresmilmillonesdelatidos.es" && \
-    git config --global --add safe.directory /app
+# Nota: .git, CLAUDE.md y AGENTS.md están en .dockerignore (meta-archivos
+# que AI tools usan en local). Si en el futuro quieres operar Claude Code
+# dentro del contenedor, hay que quitarlos del .dockerignore primero —
+# y también añadir aquí los `git config` que vivían antes de este punto.
 
 # Production env
 ENV NODE_ENV=production

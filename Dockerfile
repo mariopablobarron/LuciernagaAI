@@ -45,17 +45,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install Claude Code CLI
 RUN npm install -g @anthropic-ai/claude-code || echo '[WARN] Claude Code install skipped'
 
-# Copy package files
+# Copy package files + Prisma schema BEFORE npm ci.
+# package.json tiene postinstall = "prisma generate", que necesita
+# /app/prisma/schema.prisma presente. Si copiamos prisma DESPUÉS, npm ci
+# falla con "Could not load schema". Por eso este orden.
 COPY package*.json ./
 COPY next.config.ts ./
 COPY prisma.config.ts ./
-
-# Install ONLY production dependencies
-RUN npm ci --omit=dev --prefer-offline --no-audit
-
-# Copy Prisma schema + migrations and generate client for Linux
 COPY prisma ./prisma
-RUN npx prisma generate
+
+# Install ONLY production dependencies (postinstall regenerará el client
+# de Prisma para Linux con el schema ya disponible).
+RUN npm ci --omit=dev --prefer-offline --no-audit
 
 # Copy seed script for initial superadmin creation
 COPY scripts/seed-superadmin.mjs ./scripts/seed-superadmin.mjs

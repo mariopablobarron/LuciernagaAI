@@ -23,6 +23,10 @@ RUN npm ci --prefer-offline --no-audit
 # Copy source code
 COPY src ./src
 COPY public ./public
+# messages/ contiene los JSON de i18n (es.json, en.json) que src/i18n/request.ts
+# importa dinámicamente con `import("../../messages/${locale}.json")`. Sin
+# este COPY, Turbopack falla con "Module not found" en build.
+COPY messages ./messages
 
 # Build Next.js app
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -71,6 +75,9 @@ COPY --from=builder /app/public ./public
 # rutas dinámicas y los .ts del API).
 COPY src ./src
 COPY docs ./docs
+# messages/ — JSON de i18n cargados en runtime por algunas rutas
+# (src/app/api/admin/marketing/team/route.ts y similares).
+COPY messages ./messages
 COPY tsconfig.json next-env.d.ts postcss.config.mjs eslint.config.mjs ./
 
 # Nota: .git, CLAUDE.md y AGENTS.md están en .dockerignore (meta-archivos

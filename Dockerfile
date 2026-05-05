@@ -5,7 +5,9 @@ FROM node:20-slim AS builder
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files + Prisma schema BEFORE npm ci.
+# Razón: package.json tiene postinstall = "prisma generate", que necesita
+# /app/prisma/schema.prisma presente en el momento del install.
 COPY package*.json ./
 COPY tsconfig.json ./
 COPY next.config.ts ./
@@ -13,12 +15,12 @@ COPY next-env.d.ts ./
 COPY postcss.config.mjs ./
 COPY eslint.config.mjs ./
 COPY prisma.config.ts ./
+COPY prisma ./prisma
 
 # Install dependencies (including devDependencies for build)
 RUN npm ci --prefer-offline --no-audit
 
 # Copy source code
-COPY prisma ./prisma
 COPY src ./src
 COPY public ./public
 

@@ -1,0 +1,21 @@
+src/services/seo-sync.ts
+  s_c72d0ada98a9af::t_7e98e6bb7af30e 12,17-18,22-52
+  s_c72d0ada98a9af::t_f12f8e3d129a77 82
+  s_c72d0ada98a9af::t_d1b056eaa8171e 181
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "db8eee10a33f147100b45cf1cd843ca4ee051d13",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

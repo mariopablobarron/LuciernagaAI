@@ -9,15 +9,47 @@ import { checkGSCReady } from "@/services/search-console";
  *
  * Reusa las env vars de los servicios snapshot:
  *   GOOGLE_SERVICE_ACCOUNT_JSON_B64, GA4_PROPERTY_ID, GSC_SITE_URL.
+ *   Para GSC acepta también Mode A (OAuth2 refresh token).
  *
  * Idempotente: usa @@unique([date, X]) en cada tabla y upsert.
  */
 
-function getJwtClient(scopes: string[]) {
+/** GA4 siempre usa SA JWT (la SA fue añadida como viewer en GA4). */
+function getGa4JwtClient() {
   const b64 = process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64!;
   const decoded = Buffer.from(b64, "base64").toString("utf-8");
   const creds = JSON.parse(decoded) as { client_email: string; private_key: string };
-  return new google.auth.JWT({ email: creds.client_email, key: creds.private_key, scopes });
+  return new google.auth.JWT({
+    email: creds.client_email,
+    key: creds.private_key,
+    scopes: ["https://www.googleapis.com/auth/analytics.readonly"],
+  });
+}
+
+/**
+ * GSC: Mode A (OAuth2 refresh token) si está configurado,
+ * Mode B (SA JWT) como fallback — mismo patrón que search-console.ts.
+ */
+function getGscAuthClient() {
+  const refreshToken = process.env.GSC_OAUTH_REFRESH_TOKEN?.trim();
+  const clientId = process.env.GSC_OAUTH_CLIENT_ID?.trim();
+  const clientSecret = process.env.GSC_OAUTH_CLIENT_SECRET?.trim();
+
+  if (refreshToken && clientId && clientSecret) {
+    const oauth2 = new google.auth.OAuth2(clientId, clientSecret);
+    oauth2.setCredentials({ refresh_token: refreshToken });
+    return oauth2;
+  }
+
+  // Fallback SA JWT
+  const b64 = process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64!;
+  const decoded = Buffer.from(b64, "base64").toString("utf-8");
+  const creds = JSON.parse(decoded) as { client_email: string; private_key: string };
+  return new google.auth.JWT({
+    email: creds.client_email,
+    key: creds.private_key,
+    scopes: ["https://www.googleapis.com/auth/webmasters.readonly"],
+  });
 }
 
 function isoDate(d: Date | string): string {
@@ -47,7 +79,7 @@ export async function syncGa4DailyByPage(daysBack = 28): Promise<SyncResult> {
   }
 
   const propertyId = process.env.GA4_PROPERTY_ID!.trim();
-  const auth = getJwtClient(["https://www.googleapis.com/auth/analytics.readonly"]);
+  const auth = getGa4JwtClient();
   const analytics = google.analyticsdata({ version: "v1beta", auth });
 
   try {
@@ -146,7 +178,7 @@ export async function syncGscDailyByPage(daysBack = 28): Promise<SyncResult> {
 
 async function syncGscDaily(dim: "query" | "page", daysBack: number): Promise<SyncResult> {
   const site = process.env.GSC_SITE_URL!.trim();
-  const auth = getJwtClient(["https://www.googleapis.com/auth/webmasters.readonly"]);
+  const auth = getGscAuthClient();
   const webmasters = google.webmasters({ version: "v3", auth });
 
   const startDate = isoDate(new Date(Date.now() - daysBack * 86_400_000));

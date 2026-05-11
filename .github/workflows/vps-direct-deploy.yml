@@ -87,12 +87,12 @@ jobs:
 
             echo ""
             echo "▶ 2/5  Build imagen Docker (~6-10 min)"
-            docker build -t cmnc4qjph0006p2a3ggmfdflz:$COMMIT . 2>&1 | tail -10
+            docker build -t luciernaga-ai:$COMMIT . 2>&1 | tail -10
 
             echo ""
             echo "▶ 3/5  Actualizar compose con tag nuevo"
             cd "$APP_DIR"
-            sed -i "s|image: cmnc4qjph0006p2a3ggmfdflz:.*|image: cmnc4qjph0006p2a3ggmfdflz:$COMMIT|" docker-compose.yml
+            sed -i "s|image: luciernaga-ai[^\"]*|image: luciernaga-ai:$COMMIT|" docker-compose.yml
             grep "image:" docker-compose.yml
 
             echo ""
@@ -110,7 +110,7 @@ jobs:
 
             echo ""
             echo "▶ 6/5  Limpieza imágenes viejas (>7 días)"
-            docker image prune -f --filter "until=168h" --filter "label=app=mentor-web" 2>&1 | tail -3 || true
+            docker images luciernaga-ai --format "{{.Tag}}" | sort -r | tail -n +4 | xargs -r -I{} docker rmi luciernaga-ai:{} 2>/dev/null || true
 
             echo ""
             echo "✅ Deploy completado ($COMMIT)"

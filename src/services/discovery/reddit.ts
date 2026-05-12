@@ -59,19 +59,24 @@ type RedditAPIResponse = {
   data?: { children?: RedditAPIChild[] };
 };
 
-/** Subreddits relevantes para el producto (mental health / wellbeing en español). */
+/**
+ * Subreddits hispanohablantes verificados con HTTP 200 al hacer audit
+ * manual (12-may-2026). NO añadir ñ/acentos en URL (Reddit los rechaza).
+ * NO añadir subreddits 302 (redirigen a página de búsqueda, no existen).
+ */
 export const TARGET_SUBREDDITS = [
-  "españa",
   "spain",
-  "SaludMentalES",
-  "Productividad",
   "AskRedditespanol",
   "argentina",
   "mexico",
-  "Pareja",
-  "Universidad_es",
+  "Colombia",
+  "chile",
+  "peru",
   "ansiedad",
-  "Depression_es",
+  "AnsiedadES",
+  "Desahogo",
+  "Desahogos",
+  "psicologia",
 ] as const;
 
 /** Keywords y frases que indican un buen match. */
@@ -153,29 +158,107 @@ async function fetchSubredditSearch(subreddit: string, query: string): Promise<R
 }
 
 /**
- * Busca matches en todos los subreddits objetivo para todas las keywords.
- * Devuelve resultados deduplicados por externalId con keywords fusionadas.
+ * Búsqueda global en Reddit (todos los subreddits), filtrada después por
+ * los subreddits objetivo. Captura matches incluso en subs no listados.
+ * Más eficiente que ir sub×keyword (12×14 = 168 vs 14 globales).
+ */
+async function fetchGlobalSearch(query: string): Promise<RedditPost[]> {
+  const url = new URL(`${REDDIT_BASE}/search.json`);
+  url.searchParams.set("q", query);
+  url.searchParams.set("sort", "new");
+  url.searchParams.set("t", "week");
+  url.searchParams.set("limit", "25");
+
+  try {
+    const res = await fetch(url.toString(), {
+      headers: { "User-Agent": UA, Accept: "application/json" },
+      cache: "no-store",
+    });
+
+    if (res.status === 429) {
+      const ra = res.headers.get("retry-after");
+      logWarn("DISCOVERY", "reddit_rate_limited", { query, retryAfter: ra });
+      return [];
+    }
+    if (!res.ok) {
+      logWarn("DISCOVERY", "reddit_global_error", { query, status: res.status });
+      return [];
+    }
+
+    const json = (await res.json()) as RedditAPIResponse;
+    const children = json.data?.children ?? [];
+
+    const targetSet = new Set<string>(TARGET_SUBREDDITS.map((s) => s.toLowerCase()));
+
+    return children
+      .filter((c) => c.kind === "t3")
+      .map((c) => c.data)
+      .filter(
+        (d) =>
+          !d.over_18 &&
+          !d.locked &&
+          !d.archived &&
+          !d.removed_by_category &&
+          (d.selftext?.trim().length ?? 0) > 30 &&
+          targetSet.has(d.subreddit.toLowerCase()),
+      )
+      .map<RedditPost>((d) => ({
+        platform: "reddit",
+        externalId: d.name,
+        externalUrl: `${REDDIT_BASE}${d.permalink}`,
+        subreddit: d.subreddit_name_prefixed,
+        title: d.title,
+        excerpt: d.selftext.slice(0, TRUNCATE),
+        authorHandle: d.author === "[deleted]" ? null : d.author,
+        postedAt: new Date(d.created_utc * 1000),
+        score: d.score,
+        numComments: d.num_comments,
+        matchedKeywords: [query],
+      }));
+  } catch (e) {
+    logError("DISCOVERY", e, { stage: "reddit_global_fetch", query });
+    return [];
+  }
+}
+
+/**
+ * Busca matches usando dos estrategias complementarias:
+ *  1. Búsqueda global por keyword, filtrada a subreddits objetivo
+ *     (captura matches incluso en subs nuevos)
+ *  2. Búsqueda dirigida sub×keyword en los subreddits clave de mental health
+ *     (más profundidad en r/Desahogo, r/ansiedad, r/AnsiedadES, r/psicologia)
  *
- * Rate-limited: 200ms entre llamadas para mantenerse cómodamente bajo el límite.
+ * Devuelve resultados deduplicados por externalId con keywords fusionadas.
  */
 export async function discoverRedditMatches(): Promise<RedditPost[]> {
   const byId = new Map<string, RedditPost>();
 
-  for (const subreddit of TARGET_SUBREDDITS) {
+  const merge = (matches: RedditPost[]) => {
+    for (const match of matches) {
+      const existing = byId.get(match.externalId);
+      if (existing) {
+        for (const k of match.matchedKeywords) {
+          if (!existing.matchedKeywords.includes(k)) existing.matchedKeywords.push(k);
+        }
+      } else {
+        byId.set(match.externalId, match);
+      }
+    }
+  };
+
+  // Estrategia 1: global por keyword
+  for (const keyword of SEARCH_KEYWORDS) {
+    const matches = await fetchGlobalSearch(keyword);
+    merge(matches);
+    await new Promise((r) => setTimeout(r, 250));
+  }
+
+  // Estrategia 2: profundidad en los 4 subreddits clave de mental health
+  const DEEP_SUBS = ["Desahogo", "ansiedad", "AnsiedadES", "psicologia"];
+  for (const subreddit of DEEP_SUBS) {
     for (const keyword of SEARCH_KEYWORDS) {
       const matches = await fetchSubredditSearch(subreddit, keyword);
-      for (const match of matches) {
-        const existing = byId.get(match.externalId);
-        if (existing) {
-          // Merge matched keywords
-          for (const k of match.matchedKeywords) {
-            if (!existing.matchedKeywords.includes(k)) existing.matchedKeywords.push(k);
-          }
-        } else {
-          byId.set(match.externalId, match);
-        }
-      }
-      // Be polite to Reddit
+      merge(matches);
       await new Promise((r) => setTimeout(r, 200));
     }
   }

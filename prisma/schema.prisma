@@ -1466,8 +1466,30 @@ model BlogPost {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  syndications BlogSyndication[]
+
   @@index([status, publishedAt])
   @@index([slug])
+}
+
+/// Tracks where a BlogPost has been syndicated (Medium, Dev.to, Hashnode, etc.)
+/// Re-publication keeps canonical URL pointing to tresmilmillonesdelatidos.es to
+/// avoid duplicate-content SEO penalties.
+model BlogSyndication {
+  id           String    @id @default(cuid())
+  blogPostId   String
+  blogPost     BlogPost  @relation(fields: [blogPostId], references: [id], onDelete: Cascade)
+  platform     String // "medium" | "devto" | "hashnode"
+  status       String    @default("pending") // pending | success | failed | skipped
+  externalId   String? // ID returned by the platform after publish
+  externalUrl  String? // public URL on the destination platform
+  errorMessage String?   @db.Text
+  attemptedAt  DateTime  @default(now())
+  succeededAt  DateTime?
+
+  @@unique([blogPostId, platform])
+  @@index([blogPostId])
+  @@index([status])
 }
 
 // ─── Badges / Achievements ───────────────────────────────────────────────────

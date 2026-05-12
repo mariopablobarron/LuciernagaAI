@@ -7,6 +7,7 @@ import dynamic from "next/dynamic";
 import { ArrowLeft, Save, Eye, Globe, Loader2 } from "lucide-react";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 import { blocksToPlainText } from "@/components/BlockEditor";
+import { SyndicationPanel } from "@/features/admin/components/blog/SyndicationPanel";
 import { toast } from "sonner";
 import type { Block } from "@blocknote/core";
 
@@ -273,6 +274,9 @@ export default function BlogEditorPage({ params }: { params: Promise<{ id: strin
               className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-1.5 text-xs text-white placeholder-zinc-600 focus:border-violet-500/50 focus:outline-none"
             />
           </div>
+
+          {/* Syndication — only for existing posts */}
+          {!isNew && postId && <SyndicationPanel postId={postId} postStatus={status} />}
         </div>
       </div>
     </AdminShell>

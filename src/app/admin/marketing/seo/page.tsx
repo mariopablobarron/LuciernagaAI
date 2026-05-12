@@ -202,7 +202,9 @@ export default function SeoMarketingPage() {
     }
   }, []);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- async fn, not synchronous
   useEffect(() => { void loadMetrics(rangeDays); }, [rangeDays, loadMetrics]);
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- async fn, not synchronous
   useEffect(() => { void loadOpps(); }, [loadOpps]);
 
   const gsc = data?.providers.searchConsole;
@@ -606,7 +608,7 @@ export default function SeoMarketingPage() {
                     <p className="text-sm text-zinc-100 leading-snug">{op.recommendation}</p>
                     <p className="text-[11px] text-zinc-600 mt-0.5">
                       {KIND_LABELS[op.kind] ?? op.kind}
-                      {op.query ? <> · <span className="font-mono">"{op.query}"</span></> : null}
+                      {op.query ? <> · <span className="font-mono">&ldquo;{op.query}&rdquo;</span></> : null}
                     </p>
                   </div>
                   <Link

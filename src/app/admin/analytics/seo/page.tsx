@@ -98,6 +98,7 @@ export default function SeoOpportunitiesPage() {
   }, [statusFilter, kindFilter]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- async fn, not synchronous
     void load();
   }, [load]);
 
@@ -207,7 +208,7 @@ export default function SeoOpportunitiesPage() {
                 : "No hay oportunidades con estos filtros."}
             </p>
             <pre className="mt-4 inline-block text-xs text-zinc-600 bg-zinc-950/60 px-3 py-2 rounded-lg font-mono">
-              curl ".../api/cron/seo-sync?secret=$CRON_SECRET"
+              {'curl ".../api/cron/seo-sync?secret=$CRON_SECRET"'}
             </pre>
           </div>
         ) : null}

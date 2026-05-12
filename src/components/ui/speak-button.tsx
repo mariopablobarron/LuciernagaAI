@@ -39,14 +39,12 @@ export function SpeakButton({
   lang?: string;
   className?: string;
 }) {
-  const [supported, setSupported] = useState(false);
+  const [supported] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return typeof window.speechSynthesis !== "undefined" && typeof SpeechSynthesisUtterance !== "undefined";
+  });
   const [speaking, setSpeaking] = useState(false);
   const utterRef = useRef<SpeechSynthesisUtterance | null>(null);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    setSupported(typeof window.speechSynthesis !== "undefined" && typeof SpeechSynthesisUtterance !== "undefined");
-  }, []);
 
   // Si el componente se desmonta, parar reproducción
   useEffect(() => {

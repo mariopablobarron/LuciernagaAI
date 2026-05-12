@@ -2,13 +2,20 @@
  * Reddit discovery client — busca posts recientes en subreddits relevantes
  * que mencionen keywords del producto.
  *
- * Usa la API JSON pública (no requiere auth para lectura). Solo requiere un
- * `User-Agent` honesto identificándote como cliente concreto — Reddit banea
- * agentes genéricos.
+ * IMPORTANTE: Reddit bloquea IPs de cloud/VPS para los endpoints JSON
+ * anónimos (devuelve HTML del desktop site). Por tanto, **requerimos OAuth
+ * "Application Only"** desde producción. Sin credenciales → todo skipped.
  *
- * Rate limits: ~60 req/min con UA honesto. Respetamos cabeceras de Retry-After.
+ * Setup (Mario, una vez):
+ *   1. https://www.reddit.com/prefs/apps → Create app
+ *   2. Tipo: "script" (read-only es suficiente)
+ *   3. Redirect URI: https://tresmilmillonesdelatidos.es (no se usa)
+ *   4. Copiar client_id (debajo del nombre) y client_secret
+ *   5. Añadir en Coolify:
+ *        REDDIT_CLIENT_ID=...
+ *        REDDIT_CLIENT_SECRET=...
  *
- * Docs: https://www.reddit.com/dev/api
+ * Docs: https://www.reddit.com/dev/api / https://github.com/reddit-archive/reddit/wiki/OAuth2
  */
 
 import { logError, logWarn } from "@/lib/logger";
@@ -16,7 +23,55 @@ import { logError, logWarn } from "@/lib/logger";
 const UA =
   "TresMilMillonesDeLatidos-Discovery/1.0 (by /u/luciernaga-ai; contact mario@startidea.es)";
 
-const REDDIT_BASE = "https://www.reddit.com";
+const REDDIT_BASE = "https://oauth.reddit.com";
+const REDDIT_AUTH = "https://www.reddit.com/api/v1/access_token";
+
+// Cache del token: válido 1h. Refrescamos a los 50min para margen.
+let cachedToken: { token: string; expiresAt: number } | null = null;
+
+async function getAccessToken(): Promise<string | null> {
+  const clientId = process.env.REDDIT_CLIENT_ID?.trim();
+  const clientSecret = process.env.REDDIT_CLIENT_SECRET?.trim();
+  if (!clientId || !clientSecret) {
+    logWarn("DISCOVERY", "reddit_no_credentials", { reason: "REDDIT_CLIENT_ID/SECRET not set" });
+    return null;
+  }
+
+  if (cachedToken && cachedToken.expiresAt > Date.now()) {
+    return cachedToken.token;
+  }
+
+  try {
+    const basic = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
+    const res = await fetch(REDDIT_AUTH, {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${basic}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": UA,
+      },
+      body: "grant_type=client_credentials",
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      logWarn("DISCOVERY", "reddit_auth_error", { status: res.status, body: text.slice(0, 200) });
+      return null;
+    }
+
+    const json = (await res.json()) as { access_token?: string; expires_in?: number };
+    if (!json.access_token) return null;
+
+    cachedToken = {
+      token: json.access_token,
+      expiresAt: Date.now() + Math.min((json.expires_in ?? 3600) - 600, 3000) * 1000,
+    };
+    return cachedToken.token;
+  } catch (e) {
+    logError("DISCOVERY", e, { stage: "reddit_auth" });
+    return null;
+  }
+}
 
 export type RedditPost = {
   platform: "reddit";
@@ -99,9 +154,9 @@ export const SEARCH_KEYWORDS = [
 
 const TRUNCATE = 800;
 
-async function fetchSubredditSearch(subreddit: string, query: string): Promise<RedditPost[]> {
+async function fetchSubredditSearch(subreddit: string, query: string, token: string): Promise<RedditPost[]> {
   // Reddit search endpoint, restricted to one subreddit, sorted by new, last 7d
-  const url = new URL(`${REDDIT_BASE}/r/${subreddit}/search.json`);
+  const url = new URL(`${REDDIT_BASE}/r/${subreddit}/search`);
   url.searchParams.set("q", query);
   url.searchParams.set("restrict_sr", "on");
   url.searchParams.set("sort", "new");
@@ -110,7 +165,11 @@ async function fetchSubredditSearch(subreddit: string, query: string): Promise<R
 
   try {
     const res = await fetch(url.toString(), {
-      headers: { "User-Agent": UA, Accept: "application/json" },
+      headers: {
+        "User-Agent": UA,
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       cache: "no-store",
     });
 
@@ -162,8 +221,8 @@ async function fetchSubredditSearch(subreddit: string, query: string): Promise<R
  * los subreddits objetivo. Captura matches incluso en subs no listados.
  * Más eficiente que ir sub×keyword (12×14 = 168 vs 14 globales).
  */
-async function fetchGlobalSearch(query: string): Promise<RedditPost[]> {
-  const url = new URL(`${REDDIT_BASE}/search.json`);
+async function fetchGlobalSearch(query: string, token: string): Promise<RedditPost[]> {
+  const url = new URL(`${REDDIT_BASE}/search`);
   url.searchParams.set("q", query);
   url.searchParams.set("sort", "new");
   url.searchParams.set("t", "week");
@@ -171,7 +230,11 @@ async function fetchGlobalSearch(query: string): Promise<RedditPost[]> {
 
   try {
     const res = await fetch(url.toString(), {
-      headers: { "User-Agent": UA, Accept: "application/json" },
+      headers: {
+        "User-Agent": UA,
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       cache: "no-store",
     });
 
@@ -231,6 +294,14 @@ async function fetchGlobalSearch(query: string): Promise<RedditPost[]> {
  * Devuelve resultados deduplicados por externalId con keywords fusionadas.
  */
 export async function discoverRedditMatches(): Promise<RedditPost[]> {
+  const token = await getAccessToken();
+  if (!token) {
+    logWarn("DISCOVERY", "reddit_skipped_no_oauth", {
+      hint: "Add REDDIT_CLIENT_ID and REDDIT_CLIENT_SECRET to enable Reddit discovery",
+    });
+    return [];
+  }
+
   const byId = new Map<string, RedditPost>();
 
   const merge = (matches: RedditPost[]) => {
@@ -248,7 +319,7 @@ export async function discoverRedditMatches(): Promise<RedditPost[]> {
 
   // Estrategia 1: global por keyword
   for (const keyword of SEARCH_KEYWORDS) {
-    const matches = await fetchGlobalSearch(keyword);
+    const matches = await fetchGlobalSearch(keyword, token);
     merge(matches);
     await new Promise((r) => setTimeout(r, 250));
   }
@@ -257,7 +328,7 @@ export async function discoverRedditMatches(): Promise<RedditPost[]> {
   const DEEP_SUBS = ["Desahogo", "ansiedad", "AnsiedadES", "psicologia"];
   for (const subreddit of DEEP_SUBS) {
     for (const keyword of SEARCH_KEYWORDS) {
-      const matches = await fetchSubredditSearch(subreddit, keyword);
+      const matches = await fetchSubredditSearch(subreddit, keyword, token);
       merge(matches);
       await new Promise((r) => setTimeout(r, 200));
     }

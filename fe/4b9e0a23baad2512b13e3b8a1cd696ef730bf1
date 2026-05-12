@@ -1,0 +1,19 @@
+.github/workflows/coolify-auto-deploy.yml
+  s_c72d0ada98a9af::t_328a7c1e2ee1f6 23-26,29,32-34,36-38,40-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "fe4b9e0a23baad2512b13e3b8a1cd696ef730bf1",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

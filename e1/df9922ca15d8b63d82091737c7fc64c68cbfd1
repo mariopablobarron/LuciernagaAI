@@ -1,0 +1,23 @@
+src/app/api/cron/email-health-check/route.ts
+  s_c72d0ada98a9af::t_9ae49044f52dbd 1-29
+src/lib/email-health.ts
+  s_c72d0ada98a9af::t_346087f41deb3e 1-107,112-177,179-212
+  s_c72d0ada98a9af::t_ba4bae64fdcef3 108-111
+  s_c72d0ada98a9af::t_0489f67b570900 178
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "e1df9922ca15d8b63d82091737c7fc64c68cbfd1",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

@@ -1472,6 +1472,44 @@ model BlogPost {
   @@index([slug])
 }
 
+/// Discovery agent — conversaciones encontradas en foros públicos donde
+/// tu producto aporta valor real. El agente las encuentra, las puntúa con
+/// LLM, redacta un borrador en tu voz, y tú apruebas/rechazas desde admin.
+/// Nunca se publica nada sin tu OK. Cuentas usadas son las tuyas (no falsas).
+model DiscoveryMatch {
+  id              String    @id @default(cuid())
+  platform        String // "reddit" | "hn" | future: "quora", "twitter"
+  externalId      String // post/thread ID en la plataforma
+  externalUrl     String
+  subredditOrTag  String? // r/SaludMentalES, story, etc.
+  title           String?
+  excerpt         String?   @db.Text // primeras N líneas del post
+  authorHandle    String?
+  postedAt        DateTime?
+  matchedKeywords String[]  @default([])
+
+  llmScore     Int? // 0-10 puntuación de relevancia
+  llmReason    String?   @db.Text // razonamiento del LLM
+  draftResponse String?  @db.Text // borrador en brand voice
+
+  /// pending | approved | rejected | published | failed
+  status         String    @default("pending")
+  approvedAt     DateTime?
+  rejectedAt     DateTime?
+  publishedAt    DateTime?
+  publishedUrl   String? // URL del comentario publicado
+  publishError   String?   @db.Text
+
+  notifiedAt     DateTime? // cuándo se envió a Telegram
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([platform, externalId])
+  @@index([status, createdAt])
+  @@index([platform, llmScore])
+}
+
 /// Tracks where a BlogPost has been syndicated (Medium, Dev.to, Hashnode, etc.)
 /// Re-publication keeps canonical URL pointing to tresmilmillonesdelatidos.es to
 /// avoid duplicate-content SEO penalties.

@@ -47,9 +47,7 @@ export async function GET(req: NextRequest) {
   if (unauthorized) return unauthorized;
 
   const buildVersion = process.env.NEXT_PUBLIC_BUILD_VERSION ?? "unknown";
-  const coolifyAppUrl =
-    process.env.COOLIFY_APP_URL?.trim() ||
-    "http://72.61.195.108:3000/applications/cmnc4qjph0006p2a3ggmfdflz";
+  const coolifyAppUrl = process.env.COOLIFY_APP_URL?.trim() || "(COOLIFY_APP_URL not configured)";
 
   try {
     const ghRes = await fetch(`https://api.github.com/repos/${REPO}/commits/main`, {

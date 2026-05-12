@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
+import { requireCronSecret } from "@/lib/cron-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +18,10 @@ function unwrap(raw: string | undefined): string {
   return raw.replace(/^[\s'"`]+|[\s'"`]+$/g, "");
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const unauthorized = requireCronSecret(req);
+  if (unauthorized) return unauthorized;
+
   const raw = process.env.ROUTINES_REGISTER_SECRET ?? "";
   const peeled = unwrap(raw);
   const isHexOnly = /^[0-9a-fA-F]+$/.test(peeled);

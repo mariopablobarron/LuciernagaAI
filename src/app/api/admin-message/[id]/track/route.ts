@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
+import { verifyTrackingToken } from "@/lib/tracking-token";
 
 export const dynamic = "force-dynamic";
 
@@ -24,9 +25,17 @@ function buildImageResponse(): NextResponse {
   });
 }
 
-export async function GET(_req: NextRequest, { params }: Params) {
+export async function GET(req: NextRequest, { params }: Params) {
   const { id } = await params;
   if (!id) return buildImageResponse();
+
+  // Verify HMAC token to prevent arbitrary message marking via ID guessing.
+  // Always return the transparent GIF regardless of auth (email clients must get a pixel).
+  const token = req.nextUrl.searchParams.get("t");
+  if (!token || !verifyTrackingToken(id, token)) {
+    // Log silently and return the pixel without updating — don't reveal failure
+    return buildImageResponse();
+  }
 
   try {
     const prisma = getPrismaClient();

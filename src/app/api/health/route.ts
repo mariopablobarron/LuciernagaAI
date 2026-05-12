@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { cache } from "@/lib/cache";
 
@@ -77,7 +77,7 @@ function getMemoryMb() {
 
 const HEALTH_CACHE_TTL_MS = 10 * 1000; // 10 seconds
 
-export async function GET(): Promise<NextResponse<HealthResponse>> {
+export async function GET(req?: NextRequest): Promise<NextResponse<HealthResponse>> {
   const body = await cache.get<HealthResponse>(
     "health:check",
     HEALTH_CACHE_TTL_MS,
@@ -111,7 +111,27 @@ export async function GET(): Promise<NextResponse<HealthResponse>> {
     },
   );
 
-  return NextResponse.json(body, {
-    status: body.status === "down" ? 503 : 200,
+  // In production, sensitive details (missing env var names, failed migration
+  // names) are only returned if the caller provides a valid health token.
+  const isProduction = process.env.NODE_ENV === "production";
+  const healthToken = process.env.HEALTH_CHECK_TOKEN?.trim();
+  const providedToken = req
+    ? (req.headers.get("x-health-token") ?? req.nextUrl.searchParams.get("healthToken"))
+    : null;
+  const hasAccess = !isProduction || (healthToken && providedToken === healthToken);
+
+  const safeBody: HealthResponse = hasAccess
+    ? body
+    : {
+        ...body,
+        checks: {
+          ...body.checks,
+          missingVars: body.checks.missingVars.length > 0 ? ["(redacted)"] : [],
+          failedMigrations: body.checks.failedMigrations.length > 0 ? ["(redacted)"] : [],
+        },
+      };
+
+  return NextResponse.json(safeBody, {
+    status: safeBody.status === "down" ? 503 : 200,
   });
 }

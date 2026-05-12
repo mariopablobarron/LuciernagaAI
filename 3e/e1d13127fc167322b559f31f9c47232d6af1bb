@@ -1,0 +1,24 @@
+docs/discovery-setup.md
+  s_c72d0ada98a9af::t_ace5624d21b8ab 1-192
+src/services/discovery/reddit.ts
+  s_c72d0ada98a9af::t_6276f4f6399f74 224-225,233-237
+  s_c72d0ada98a9af::t_0f265fca71a8a4 157,159,168-172
+  s_c72d0ada98a9af::t_ed67b17b539f50 297-304,322,331
+  s_c72d0ada98a9af::t_37fa81ec7510c9 5-7,9-16,18,26-74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "3ee1d13127fc167322b559f31f9c47232d6af1bb",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

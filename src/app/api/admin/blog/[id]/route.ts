@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
+import { syndicatePost } from "@/services/syndication";
 
 export const dynamic = "force-dynamic";
 
@@ -64,6 +65,20 @@ export async function PUT(
     }
 
     const post = await prisma.blogPost.update({ where: { id }, data });
+
+    // Trigger syndication when post transitions from draft → published.
+    // Non-blocking: caller gets the post immediately; syndication runs in the
+    // background. Failures are logged but never raise to the caller.
+    const becamePublished = body.status === "published" && existing.status !== "published";
+    if (becamePublished) {
+      void syndicatePost(id).catch((err) =>
+        logError("SYNDICATION", err instanceof Error ? err : new Error(String(err)), {
+          context: "auto_trigger_on_publish",
+          postId: id,
+        }),
+      );
+    }
+
     return NextResponse.json({ post });
   } catch (error) {
     logError("BLOG", error, { action: "update" });

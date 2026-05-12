@@ -172,12 +172,63 @@ Re-correr el discovery NO duplica matches: `unique(platform, externalId)`.
 
 ---
 
-## Roadmap Fase 2.1
+## Fase 2.1 — Auto-publishing (YA DESPLEGADA)
 
-- **Auto-posting via Reddit API** una vez que tengamos métricas de aprobación reales. Requiere refresh token de tu cuenta (no `script` mode, sino `web app`).
+El botón "Auto-publicar" publica el borrador en Reddit directamente con tu cuenta (sin copy-paste). Setup adicional:
+
+### 1. Crear segunda app Reddit tipo **web app**
+
+La app de tipo `script` de Fase 2 solo sirve para LEER. Para postear hace falta `web app`:
+
+1. [reddit.com/prefs/apps](https://www.reddit.com/prefs/apps) → "create another app..."
+2. Tipo: **web app**
+3. name: `tresmilmillonesdelatidos-publish`
+4. **redirect uri**: `https://tresmilmillonesdelatidos.es/api/admin/distribution/reddit-oauth-callback` (literal exacto)
+5. Crear. Copia `client_id` (bajo el nombre) y `secret`.
+
+### 2. Env vars en Coolify
+
+```
+REDDIT_USER_CLIENT_ID=...
+REDDIT_USER_CLIENT_SECRET=...
+```
+
+(Si reutilizas las de Fase 2 — `REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET` — funciona igual, pero esas son para una app `script` que no soporta redirect. Mejor tener las dos por separado).
+
+Redeploy.
+
+### 3. Conectar tu cuenta
+
+1. Ve a `/admin/distribution`
+2. Banner arriba con botón **"Conectar Reddit"**
+3. Reddit te pide aprobar los permisos (`identity`, `read`, `submit`) — pulsa "Allow"
+4. Vuelves al admin con tu username conectado (`u/luciernaga-ai` o el que uses)
+5. Los matches `pending` y `approved` ahora tienen botón naranja **"Auto-publicar"**
+
+### 4. Flujo nuevo
+
+| Paso | Antes (Fase 2) | Ahora (Fase 2.1) |
+|---|---|---|
+| Leer borrador | En `/admin/distribution` | Igual |
+| Editar | Igual | Igual |
+| Aprobar | Sí | Sí (opcional) |
+| Publicar en Reddit | Manual: copia → pega → URL | **Un click "Auto-publicar"** |
+| Marcar publicado | Manual: pega URL | Automático |
+
+Los matches que fallen al auto-publicar (rate limit, token expirado, etc.) quedan en status `failed` con el error visible y un botón de "Reintentar".
+
+### Token storage
+
+Los refresh tokens se guardan en `IntegrationToken` (singleton por platform), con `unique(platform)`. Se refrescan automáticamente cuando caducan (50 min antes de la hora de expiración).
+
+---
+
+## Roadmap futuro
+
 - **Hacker News** vía Algolia API (gratis, no necesita auth). Útil si publicas algo con ángulo técnico.
 - **Análisis de tracción**: dashboard con tasa de aprobación, tráfico generado por respuesta, conversión a registros en tu web.
 - **Iteración del prompt**: cuando tengas 20+ aprobaciones reales, refinamos el system prompt del scorer con tus preferencias.
+- **Auto-replies a respuestas**: si alguien responde a tu comentario en Reddit, podrías recibir notificación Telegram con borrador.
 
 ---
 

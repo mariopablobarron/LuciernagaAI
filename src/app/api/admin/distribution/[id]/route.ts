@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
+import { postRedditComment } from "@/services/discovery/reddit-oauth";
 
 export const dynamic = "force-dynamic";
 
@@ -59,6 +60,32 @@ export async function PATCH(
         }
         data.draftResponse = body.draftResponse.slice(0, 2000);
         break;
+      case "auto-publish": {
+        // Publica el draftResponse directamente en Reddit con la cuenta OAuth conectada.
+        if (existing.platform !== "reddit") {
+          return NextResponse.json({ error: "auto-publish solo soportado en Reddit por ahora" }, { status: 400 });
+        }
+        if (!existing.draftResponse?.trim()) {
+          return NextResponse.json({ error: "Sin borrador para publicar" }, { status: 400 });
+        }
+        const result = await postRedditComment({
+          parentFullname: existing.externalId,
+          text: existing.draftResponse,
+        });
+        if (!result.ok) {
+          await prisma.discoveryMatch.update({
+            where: { id },
+            data: { status: "failed", publishError: result.error.slice(0, 500) },
+          });
+          return NextResponse.json({ error: result.error }, { status: 502 });
+        }
+        data.status = "published";
+        data.publishedAt = new Date();
+        data.publishedUrl = result.url;
+        data.publishError = null;
+        if (!existing.approvedAt) data.approvedAt = new Date();
+        break;
+      }
       default:
         return NextResponse.json({ error: "action inválida" }, { status: 400 });
     }

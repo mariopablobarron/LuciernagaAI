@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AdminShell } from "@/features/admin/components/AdminShell";
-import { Loader2, Check, X, ExternalLink, Copy, Send, Edit3, RefreshCw } from "lucide-react";
+import { Loader2, Check, X, ExternalLink, Copy, Send, Edit3, RefreshCw, Zap, Link2 } from "lucide-react";
 import { toast } from "sonner";
 
 type Match = {
@@ -54,8 +54,16 @@ function timeAgo(iso: string | null): string {
   return `${Math.floor(h / 24)}d`;
 }
 
+type RedditStatus = {
+  connected: boolean;
+  username: string | null;
+  expiresAt: string | null;
+  hasCredentials: boolean;
+};
+
 export default function DistributionPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [matches, setMatches] = useState<Match[]>([]);
   const [stats, setStats] = useState<Stats>({});
   const [filter, setFilter] = useState<string>("pending");
@@ -63,6 +71,31 @@ export default function DistributionPage() {
   const [actioningId, setActioningId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState<string>("");
+  const [reddit, setReddit] = useState<RedditStatus | null>(null);
+
+  // Mostrar toast tras callback OAuth
+  useEffect(() => {
+    const r = searchParams.get("reddit");
+    if (r === "connected") toast.success("Reddit conectado");
+    else if (r === "denied") toast.error("Conexión a Reddit cancelada");
+    else if (r === "state_error") toast.error("Error de estado OAuth — reintenta");
+    else if (r === "exchange_failed") toast.error("Falló el intercambio de token con Reddit");
+  }, [searchParams]);
+
+  const loadRedditStatus = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/distribution/reddit-status", {
+        cache: "no-store",
+        credentials: "include",
+      });
+      if (!res.ok) return;
+      setReddit((await res.json()) as RedditStatus);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    void loadRedditStatus();
+  }, [loadRedditStatus]);
 
   const handleLogout = useCallback(async () => {
     await fetch("/api/admin/logout", { credentials: "include", method: "POST" }).catch(() => {});
@@ -127,14 +160,56 @@ export default function DistributionPage() {
       showSectionNav={false}
     >
       <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
-        <div className="flex items-center justify-end">
-          <button
-            type="button"
-            onClick={() => void load()}
-            className="text-xs px-3 py-1.5 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 flex items-center gap-1.5"
-          >
-            <RefreshCw className="h-3 w-3" /> Refrescar
-          </button>
+        {/* Reddit connection banner */}
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-3 min-w-0">
+            <Link2 className={`h-4 w-4 ${reddit?.connected ? "text-emerald-400" : "text-zinc-500"}`} />
+            <div className="text-xs">
+              {reddit === null ? (
+                <span className="text-zinc-500">Comprobando estado de Reddit…</span>
+              ) : reddit.connected ? (
+                <span className="text-zinc-300">
+                  Reddit conectado como{" "}
+                  <span className="text-emerald-300 font-medium">u/{reddit.username ?? "—"}</span>{" "}
+                  · Auto-publish activo
+                </span>
+              ) : !reddit.hasCredentials ? (
+                <span className="text-amber-400">
+                  Falta configurar Reddit OAuth (REDDIT_USER_CLIENT_ID / SECRET).
+                </span>
+              ) : (
+                <span className="text-zinc-400">
+                  Reddit no conectado. Aprueba con flujo manual o conecta para auto-publish.
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {reddit?.hasCredentials && !reddit.connected && (
+              <a
+                href="/api/admin/distribution/reddit-oauth-start"
+                className="text-xs px-2.5 py-1 rounded-md bg-orange-500/20 text-orange-300 border border-orange-500/40 hover:bg-orange-500/30 flex items-center gap-1.5"
+              >
+                <Zap className="h-3 w-3" /> Conectar Reddit
+              </a>
+            )}
+            {reddit?.connected && (
+              <a
+                href="/api/admin/distribution/reddit-oauth-start"
+                className="text-[10px] px-2 py-0.5 rounded text-zinc-500 hover:text-orange-300"
+                title="Re-autorizar (si cambias de cuenta)"
+              >
+                re-conectar
+              </a>
+            )}
+            <button
+              type="button"
+              onClick={() => void load()}
+              className="text-xs px-3 py-1.5 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 flex items-center gap-1.5"
+            >
+              <RefreshCw className="h-3 w-3" /> Refrescar
+            </button>
+          </div>
         </div>
 
         {/* Filter tabs */}
@@ -283,7 +358,7 @@ export default function DistributionPage() {
 
                 {/* Actions */}
                 {m.status === "pending" && (
-                  <div className="flex items-center gap-2 pt-2 border-t border-zinc-800/50">
+                  <div className="flex items-center gap-2 pt-2 border-t border-zinc-800/50 flex-wrap">
                     <button
                       type="button"
                       disabled={actioningId === m.id}
@@ -292,6 +367,21 @@ export default function DistributionPage() {
                     >
                       <Check className="h-3 w-3" /> Aprobar
                     </button>
+                    {reddit?.connected && m.platform === "reddit" && m.draftResponse && (
+                      <button
+                        type="button"
+                        disabled={actioningId === m.id}
+                        onClick={() => {
+                          if (confirm("¿Publicar el borrador en Reddit ahora con tu cuenta?")) {
+                            void performAction(m.id, "auto-publish");
+                          }
+                        }}
+                        className="text-xs px-2.5 py-1 rounded-md bg-orange-500/20 text-orange-300 border border-orange-500/40 hover:bg-orange-500/30 disabled:opacity-50 flex items-center gap-1.5"
+                        title="Publicar el draft directamente con tu cuenta Reddit (no necesita copy-paste)"
+                      >
+                        <Zap className="h-3 w-3" /> Auto-publicar
+                      </button>
+                    )}
                     <button
                       type="button"
                       disabled={actioningId === m.id}
@@ -305,7 +395,44 @@ export default function DistributionPage() {
 
                 {m.status === "approved" && (
                   <div className="flex items-center gap-2 pt-2 border-t border-zinc-800/50 flex-wrap">
-                    <div className="text-[10px] text-emerald-400 px-1">Aprobado. Publica manualmente y pega la URL aquí:</div>
+                    {reddit?.connected && m.platform === "reddit" && (
+                      <button
+                        type="button"
+                        disabled={actioningId === m.id}
+                        onClick={() => {
+                          if (confirm("¿Publicar el borrador en Reddit ahora con tu cuenta?")) {
+                            void performAction(m.id, "auto-publish");
+                          }
+                        }}
+                        className="text-xs px-2.5 py-1 rounded-md bg-orange-500/20 text-orange-300 border border-orange-500/40 hover:bg-orange-500/30 disabled:opacity-50 flex items-center gap-1.5"
+                      >
+                        <Zap className="h-3 w-3" /> Auto-publicar ahora
+                      </button>
+                    )}
+                    <div className="text-[10px] text-emerald-400 px-1">
+                      {reddit?.connected && m.platform === "reddit"
+                        ? "Aprobado. Auto-publica o pega URL manual:"
+                        : "Aprobado. Publica manualmente y pega la URL:"}
+                    </div>
+                    <PublishForm matchId={m.id} onPublished={() => void load()} />
+                  </div>
+                )}
+
+                {m.status === "failed" && (
+                  <div className="flex items-center gap-2 pt-2 border-t border-zinc-800/50 flex-wrap">
+                    <div className="text-[10px] text-rose-400 px-1">
+                      Fallo al publicar. Reintenta o publica manualmente.
+                    </div>
+                    {reddit?.connected && m.platform === "reddit" && (
+                      <button
+                        type="button"
+                        disabled={actioningId === m.id}
+                        onClick={() => void performAction(m.id, "auto-publish")}
+                        className="text-xs px-2.5 py-1 rounded-md bg-orange-500/20 text-orange-300 border border-orange-500/40 hover:bg-orange-500/30 disabled:opacity-50 flex items-center gap-1.5"
+                      >
+                        <RefreshCw className="h-3 w-3" /> Reintentar
+                      </button>
+                    )}
                     <PublishForm matchId={m.id} onPublished={() => void load()} />
                   </div>
                 )}

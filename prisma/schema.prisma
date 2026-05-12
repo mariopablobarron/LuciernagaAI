@@ -1472,6 +1472,22 @@ model BlogPost {
   @@index([slug])
 }
 
+/// Almacena refresh tokens OAuth de Mario para publicar en plataformas
+/// externas (Reddit, futuro Twitter, LinkedIn). Singleton por plataforma:
+/// solo hay UN usuario admin que publica.
+model IntegrationToken {
+  id           String    @id @default(cuid())
+  platform     String    @unique // "reddit" | future
+  accessToken  String    @db.Text
+  refreshToken String?   @db.Text
+  expiresAt    DateTime?
+  scope        String?
+  username     String? // handle en la plataforma (u/luciernaga-ai, @mario, etc.)
+  metadata     Json? // datos extra
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
 /// Discovery agent — conversaciones encontradas en foros públicos donde
 /// tu producto aporta valor real. El agente las encuentra, las puntúa con
 /// LLM, redacta un borrador en tu voz, y tú apruebas/rechazas desde admin.

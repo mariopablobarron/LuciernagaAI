@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/lib/prisma";
+import { verifyUnsubscribeToken } from "@/lib/unsubscribe-token";
 
 const HTML_RESPONSE = `<!DOCTYPE html>
 <html lang="es">
@@ -55,12 +56,25 @@ const ERROR_HTML = `<!DOCTYPE html>
  */
 export async function GET(request: NextRequest) {
   const email = request.nextUrl.searchParams.get("email")?.trim().toLowerCase();
+  const token = request.nextUrl.searchParams.get("token");
 
   if (!email) {
     return new NextResponse(ERROR_HTML, {
       status: 400,
       headers: { "Content-Type": "text/html; charset=utf-8" },
     });
+  }
+
+  // Require a valid HMAC token to prevent arbitrary unsubscription of any email.
+  // Legacy links without a token still work in development; in production they
+  // are rejected to prevent abuse.
+  if (!token || !verifyUnsubscribeToken(email, token)) {
+    if (process.env.NODE_ENV === "production") {
+      return new NextResponse(ERROR_HTML, {
+        status: 400,
+        headers: { "Content-Type": "text/html; charset=utf-8" },
+      });
+    }
   }
 
   try {

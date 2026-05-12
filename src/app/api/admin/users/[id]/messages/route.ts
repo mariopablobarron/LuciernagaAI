@@ -6,6 +6,7 @@ import { audit } from "@/lib/audit";
 import { sendUserEmail } from "@/lib/email";
 import { baseLayout } from "@/lib/email-layout";
 import { isSyntheticEmail } from "@/services/user";
+import { signTrackingToken } from "@/lib/tracking-token";
 
 export const dynamic = "force-dynamic";
 
@@ -125,7 +126,7 @@ export async function POST(req: NextRequest, { params }: Params) {
       const html = renderEmailHtml({
         subject,
         body: content,
-        trackingPixelUrl: `${baseUrl}/api/admin-message/${message.id}/track`,
+        trackingPixelUrl: `${baseUrl}/api/admin-message/${message.id}/track?t=${encodeURIComponent(signTrackingToken(message.id))}`,
         openUrl: `${baseUrl}/app/mensajes/${message.id}`,
       });
       const text = `${subject}\n\n${content}\n\nAbrir en la app: ${baseUrl}/app/mensajes/${message.id}`;

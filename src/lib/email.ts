@@ -1,6 +1,7 @@
 // Transactional email sending for user-facing messages
 
 import { baseLayout } from "@/lib/email-layout";
+import { signUnsubscribeToken } from "@/lib/unsubscribe-token";
 
 export type QuizState = "bloqueo" | "ansiedad" | "duda" | "claridad" | "neutral";
 
@@ -373,7 +374,8 @@ export async function sendUserEmail(email: UserEmail): Promise<boolean> {
     return false;
   }
 
-  const unsubscribeUrl = `${baseUrl}/api/email/unsubscribe?email=${encodeURIComponent(email.to)}`;
+  const unsubscribeToken = signUnsubscribeToken(email.to);
+  const unsubscribeUrl = `${baseUrl}/api/email/unsubscribe?email=${encodeURIComponent(email.to)}&token=${encodeURIComponent(unsubscribeToken)}`;
 
   try {
     const res = await fetch(RESEND_URL, {

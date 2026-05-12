@@ -26,12 +26,15 @@ export const POST = withRateLimit(async function POST(request: NextRequest) {
 
     logInfo("CONTACT", "nuevo_mensaje", { name, email });
 
+    // Escape special characters for Telegram MarkdownV2
+    const escapeTg = (s: string) => s.replace(/[_*[\]()~`>#+=|{}.!\\-]/g, "\\$&");
+
     // Forward to admin via Telegram (fire-and-forget)
     notifyAdmin(
       `📬 *Nuevo mensaje de contacto*\n\n` +
-      `*Nombre:* ${name}\n` +
-      `*Email:* \`${email}\`\n\n` +
-      `*Mensaje:*\n${message.slice(0, 800)}${message.length > 800 ? "…" : ""}`
+      `*Nombre:* ${escapeTg(name)}\n` +
+      `*Email:* \`${escapeTg(email)}\`\n\n` +
+      `*Mensaje:*\n${escapeTg(message.slice(0, 800))}${message.length > 800 ? "…" : ""}`
     );
 
     return NextResponse.json({ success: true });

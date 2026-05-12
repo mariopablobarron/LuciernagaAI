@@ -499,16 +499,20 @@ export async function POST(req: NextRequest) {
   }
 
   // Verify Telegram webhook secret
-  const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
+  const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET?.trim();
+  if (!webhookSecret && process.env.NODE_ENV === "production") {
+    // Reject all requests in production if the secret is not configured.
+    // Set TELEGRAM_WEBHOOK_SECRET to the value used when registering the webhook.
+    logWarn("TELEGRAM", "webhook_secret_missing_in_production", {
+      warning: "TELEGRAM_WEBHOOK_SECRET not configured — rejecting all webhook requests",
+    });
+    return NextResponse.json({ ok: false }, { status: 401 });
+  }
   if (webhookSecret) {
     const incomingSecret = req.headers.get("x-telegram-bot-api-secret-token");
     if (incomingSecret !== webhookSecret) {
       return NextResponse.json({ ok: false }, { status: 401 });
     }
-  } else if (process.env.NODE_ENV === "production") {
-    logWarn("TELEGRAM", "webhook_secret_not_configured", {
-      warning: "TELEGRAM_WEBHOOK_SECRET not set — webhook accepts all requests",
-    });
   }
 
   let chatId: number | undefined;

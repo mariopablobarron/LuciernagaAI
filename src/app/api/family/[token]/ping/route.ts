@@ -2,12 +2,28 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { resolveFamilyPortal, notifyUserOfPing } from "@/services/family";
 import { logError } from "@/lib/logger";
+import { checkRateLimit } from "@/lib/rate-limit";
+
+function getIp(req: NextRequest): string {
+  return (
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    req.headers.get("x-real-ip") ??
+    "unknown"
+  );
+}
 
 // POST /api/family/[token]/ping — send "are you ok?" ping to user
 export async function POST(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ token: string }> },
 ) {
+  // Rate-limit by IP to prevent token brute-forcing: 10 attempts per hour
+  const ip = getIp(req);
+  const rl = checkRateLimit(`family-ping:${ip}`, 10, 3_600_000);
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "Demasiados intentos. Inténtalo más tarde." }, { status: 429 });
+  }
+
   const { token } = await params;
 
   const contact = await resolveFamilyPortal(token);
@@ -47,6 +63,9 @@ export async function POST(
   return NextResponse.json({ ok: true, pingId: ping.id }, { status: 201 });
 }
 
+// CUID2 format validation (starts with letter, 24+ alphanumeric chars)
+const CUID_RE = /^[a-z][a-z0-9]{20,}$/i;
+
 // PATCH /api/family/[token]/ping?id=xxx — user responds to ping
 export async function PATCH(
   req: NextRequest,
@@ -55,6 +74,11 @@ export async function PATCH(
   const { token } = await params;
   const pingId = req.nextUrl.searchParams.get("id");
   if (!pingId) return NextResponse.json({ error: "id requerido" }, { status: 400 });
+
+  // Validate CUID format to reject obviously malformed IDs early
+  if (!CUID_RE.test(pingId)) {
+    return NextResponse.json({ error: "id inválido" }, { status: 400 });
+  }
 
   // This endpoint is hit from the user's app (no family token auth needed here)
   // Validate ping belongs to this portal's user

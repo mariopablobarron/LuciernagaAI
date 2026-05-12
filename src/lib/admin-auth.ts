@@ -75,10 +75,10 @@ function getEnvCredentials(): { username: string; password: string } | null {
 
   if (username && password) return { username, password };
 
-  // In production, env credentials are optional (admins live in DB now)
-  if (process.env.NODE_ENV === "production") return null;
-
-  return { username: "admin", password: "admin123" };
+  // Env credentials are optional when admins exist in DB.
+  // Never fall back to hardcoded credentials — any environment without
+  // ADMIN_USERNAME/ADMIN_PASSWORD set must use DB-based admin accounts.
+  return null;
 }
 
 // ─── Token operations ────────────────────────────────────────────────────────

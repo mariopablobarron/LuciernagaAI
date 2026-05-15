@@ -279,6 +279,9 @@ export default function SeoMarketingPage() {
           </div>
         </div>
 
+        <IndexNowPanel />
+
+
         {/* ── GSC KPIs ────────────────────────────────────────────────────── */}
         <div>
           <div className="flex items-center gap-2 mb-3">
@@ -685,5 +688,71 @@ export default function SeoMarketingPage() {
 
       </div>
     </AdminShell>
+  );
+}
+
+/**
+ * Panel IndexNow — submit URLs a Bing+Yandex en tiempo real.
+ * Bing alimenta ChatGPT search, Copilot, DuckDuckGo, Yahoo.
+ */
+function IndexNowPanel() {
+  const [status, setStatus] = useState<{ configured: boolean; keyMasked: string | null } | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    void fetch("/api/admin/seo/submit", { credentials: "include" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then(setStatus)
+      .catch(() => {});
+  }, []);
+
+  const submitAll = useCallback(async () => {
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/admin/seo/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ all: true }),
+      });
+      const j = (await res.json().catch(() => ({}))) as { ok?: boolean; submitted?: number; error?: string };
+      if (j.ok) {
+        toast.success(`IndexNow: ${j.submitted} URLs enviadas a Bing+Yandex`);
+      } else {
+        toast.error(j.error ?? "Error al enviar a IndexNow");
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  }, []);
+
+  if (!status) return null;
+
+  return (
+    <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-3 flex items-center justify-between gap-3 flex-wrap">
+      <div className="text-xs">
+        <span className="text-zinc-500 uppercase tracking-wider text-[10px] font-medium mr-2">IndexNow</span>
+        {status.configured ? (
+          <span className="text-emerald-300">
+            ✓ Configurado · key {status.keyMasked} · realtime push a Bing+Yandex (alimenta ChatGPT search)
+          </span>
+        ) : (
+          <span className="text-amber-400">
+            ⚠️ Sin configurar — añade <code className="bg-zinc-800 px-1 rounded">INDEXNOW_KEY</code> en Coolify para indexación inmediata
+          </span>
+        )}
+      </div>
+      {status.configured && (
+        <button
+          type="button"
+          onClick={() => void submitAll()}
+          disabled={submitting}
+          className="text-xs px-2.5 py-1 rounded-md bg-violet-500/15 text-violet-300 border border-violet-500/30 hover:bg-violet-500/25 disabled:opacity-50 flex items-center gap-1.5"
+        >
+          <RefreshCw className={`h-3 w-3 ${submitting ? "animate-spin" : ""}`} />
+          Enviar sitemap a IndexNow
+        </button>
+      )}
+    </div>
   );
 }

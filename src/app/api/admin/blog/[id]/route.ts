@@ -3,6 +3,7 @@ import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
 import { syndicatePost } from "@/services/syndication";
+import { notifyIndexNowSingle } from "@/services/seo/indexnow";
 
 export const dynamic = "force-dynamic";
 
@@ -66,14 +67,22 @@ export async function PUT(
 
     const post = await prisma.blogPost.update({ where: { id }, data });
 
-    // Trigger syndication when post transitions from draft → published.
-    // Non-blocking: caller gets the post immediately; syndication runs in the
-    // background. Failures are logged but never raise to the caller.
+    // Trigger syndication + IndexNow ping when post transitions from draft → published.
+    // Non-blocking: caller gets the post immediately; los side-effects corren en
+    // paralelo. Fallos logged pero nunca afectan al caller.
     const becamePublished = body.status === "published" && existing.status !== "published";
     if (becamePublished) {
       void syndicatePost(id).catch((err) =>
         logError("SYNDICATION", err instanceof Error ? err : new Error(String(err)), {
           context: "auto_trigger_on_publish",
+          postId: id,
+        }),
+      );
+      // IndexNow: ping inmediato del nuevo post a Bing/Yandex.
+      const slug = (data.slug as string | undefined) ?? post.slug;
+      void notifyIndexNowSingle(`https://tresmilmillonesdelatidos.es/blog/${slug}`).catch((err) =>
+        logError("SEO", err instanceof Error ? err : new Error(String(err)), {
+          context: "indexnow_on_publish",
           postId: id,
         }),
       );

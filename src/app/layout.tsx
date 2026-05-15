@@ -88,6 +88,8 @@ export const metadata: Metadata = {
     languages: {
       "es": "https://tresmilmillonesdelatidos.es",
       "en": "https://tresmilmillonesdelatidos.es/en",
+      "pt": "https://tresmilmillonesdelatidos.es/pt",
+      "fr": "https://tresmilmillonesdelatidos.es/fr",
     },
   },
   manifest: "/manifest.json",
@@ -181,9 +183,9 @@ const jsonLd = {
       ],
       provider: { "@id": "https://tresmilmillonesdelatidos.es/#organization" },
       author: { "@id": "https://tresmilmillonesdelatidos.es/#founder" },
-      inLanguage: ["es", "en"],
+      inLanguage: ["es", "en", "pt", "fr"],
       description:
-        "Tres Mil Millones de Latidos es una plataforma de mentoría con inteligencia artificial. Detecta tu estado emocional y te guía a la acción concreta con microacciones de 10 minutos.",
+        "Tres Mil Millones de Latidos es una plataforma de mentoría con inteligencia artificial. Detecta tu estado emocional y te guía a la acción concreta con microacciones de 10 minutos. Disponible en español, inglés, portugués y francés.",
     },
     {
       "@type": "WebSite",

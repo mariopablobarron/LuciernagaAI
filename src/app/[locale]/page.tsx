@@ -12,14 +12,41 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "hero" });
 
-  const isSpanish = locale === "es" || locale === "";
-  const siteName = isSpanish ? "Tres Mil Millones de Latidos" : "Three Billion Heartbeats";
+  // Configuración por locale: marca, claim SEO, OG locale BCP-47.
+  // El default (locale === "" o "es") sirve la versión española sin prefijo URL.
+  const SITE_CONFIG = {
+    es: {
+      name: "Tres Mil Millones de Latidos",
+      seoSuffix: "Mentor IA en español, anónimo",
+      ogLocale: "es_ES",
+      url: "https://tresmilmillonesdelatidos.es",
+    },
+    en: {
+      name: "Three Billion Heartbeats",
+      seoSuffix: "AI mentor, anonymous chat",
+      ogLocale: "en_US",
+      url: "https://tresmilmillonesdelatidos.es/en",
+    },
+    pt: {
+      name: "Três Bilhões de Batidas",
+      seoSuffix: "Mentor de IA em português, anônimo",
+      ogLocale: "pt_BR",
+      url: "https://tresmilmillonesdelatidos.es/pt",
+    },
+    fr: {
+      name: "Trois Milliards de Battements",
+      seoSuffix: "Mentor IA en français, anonyme",
+      ogLocale: "fr_FR",
+      url: "https://tresmilmillonesdelatidos.es/fr",
+    },
+  } as const;
+
+  const norm = (locale === "" ? "es" : locale) as keyof typeof SITE_CONFIG;
+  const cfg = SITE_CONFIG[norm] ?? SITE_CONFIG.es;
   // Title optimizado SEO: brand + categoría + diferenciador único, ≤60 chars
   // (la frase identitaria "Cuéntale lo que te bloquea / Sal con un paso" se
   // mantiene como H1 visible — no compite con el title del navegador).
-  const title = isSpanish
-    ? `${siteName} · Mentor IA en español, anónimo`
-    : `${siteName} · AI mentor, anonymous chat`;
+  const title = `${cfg.name} · ${cfg.seoSuffix}`;
   const description = t("subtitle");
 
   return {
@@ -28,24 +55,22 @@ export async function generateMetadata({
     title: { absolute: title },
     description,
     alternates: {
-      canonical: isSpanish
-        ? "https://tresmilmillonesdelatidos.es"
-        : `https://tresmilmillonesdelatidos.es/${locale}`,
+      canonical: cfg.url,
       languages: {
-        es: "https://tresmilmillonesdelatidos.es",
-        en: "https://tresmilmillonesdelatidos.es/en",
+        es: SITE_CONFIG.es.url,
+        en: SITE_CONFIG.en.url,
+        pt: SITE_CONFIG.pt.url,
+        fr: SITE_CONFIG.fr.url,
       },
     },
     openGraph: {
       title,
       description,
-      siteName,
+      siteName: cfg.name,
       type: "website",
-      locale: isSpanish ? "es_ES" : "en_US",
-      url: isSpanish
-        ? "https://tresmilmillonesdelatidos.es"
-        : `https://tresmilmillonesdelatidos.es/${locale}`,
-      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: siteName }],
+      locale: cfg.ogLocale,
+      url: cfg.url,
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: cfg.name }],
     },
     twitter: {
       card: "summary_large_image" as const,
@@ -57,7 +82,7 @@ export async function generateMetadata({
 }
 
 export function generateStaticParams() {
-  return [{ locale: "es" }, { locale: "en" }];
+  return [{ locale: "es" }, { locale: "en" }, { locale: "pt" }, { locale: "fr" }];
 }
 
 export default async function LocaleLandingPage({

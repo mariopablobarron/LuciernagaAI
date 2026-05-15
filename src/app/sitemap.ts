@@ -6,11 +6,14 @@ type Entry = {
   path: string;
   priority: number;
   changeFrequency: "daily" | "weekly" | "monthly" | "yearly";
-  hasEn?: boolean;
+  /** Si la página tiene versiones traducidas en otros locales (en/pt/fr).
+   *  Hoy solo la home (/) está realmente traducida. El resto sigue
+   *  siendo solo ES — añadir hreflang sin traducción real es engaño SEO. */
+  hasMultiLocale?: boolean;
 };
 
 const PAGES: Entry[] = [
-  { path: "/", priority: 1, changeFrequency: "weekly", hasEn: true },
+  { path: "/", priority: 1, changeFrequency: "weekly", hasMultiLocale: true },
   { path: "/precios", priority: 0.9, changeFrequency: "monthly" },
   { path: "/calculadora-latidos", priority: 0.9, changeFrequency: "monthly" },
   { path: "/test", priority: 0.8, changeFrequency: "monthly" },
@@ -40,12 +43,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: now,
     changeFrequency: page.changeFrequency,
     priority: page.priority,
-    ...(page.hasEn
+    ...(page.hasMultiLocale
       ? {
           alternates: {
             languages: {
               es: `${BASE}${page.path}`,
               en: `${BASE}/en${page.path === "/" ? "" : page.path}`,
+              pt: `${BASE}/pt${page.path === "/" ? "" : page.path}`,
+              fr: `${BASE}/fr${page.path === "/" ? "" : page.path}`,
             },
           },
         }

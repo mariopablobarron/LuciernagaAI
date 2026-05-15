@@ -5,7 +5,8 @@ import { applySiteContentOverrides } from "./overrides";
 export default getRequestConfig(async ({ requestLocale }) => {
   let locale = await requestLocale;
 
-  if (!locale || !routing.locales.includes(locale as "es" | "en")) {
+  // Type narrowing acepta cualquier locale soportado en routing.ts
+  if (!locale || !routing.locales.includes(locale as (typeof routing.locales)[number])) {
     locale = routing.defaultLocale;
   }
 

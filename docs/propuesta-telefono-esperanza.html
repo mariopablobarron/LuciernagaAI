@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Propuesta de colaboración — Teléfono de la Esperanza</title>
+<style>
+  @page {
+    size: A4;
+    margin: 14mm 14mm 12mm 14mm;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: -apple-system, "Helvetica Neue", "Inter", sans-serif;
+    color: #1a1a1a;
+    font-size: 9.6pt;
+    line-height: 1.42;
+    background: #fff;
+  }
+  .header {
+    border-bottom: 2px solid #be185d;
+    padding-bottom: 8pt;
+    margin-bottom: 10pt;
+  }
+  .eyebrow {
+    font-size: 7.5pt;
+    text-transform: uppercase;
+    letter-spacing: 1.5pt;
+    color: #be185d;
+    font-weight: 600;
+    margin-bottom: 4pt;
+  }
+  h1 {
+    font-size: 17pt;
+    font-weight: 700;
+    line-height: 1.15;
+    color: #18181b;
+    margin-bottom: 5pt;
+  }
+  h1 .accent { color: #be185d; }
+  .subtitle {
+    font-size: 9.5pt;
+    color: #52525b;
+    font-style: italic;
+  }
+  .intro {
+    background: #fdf2f8;
+    border-left: 3px solid #be185d;
+    padding: 8pt 10pt;
+    margin-bottom: 10pt;
+    font-size: 9.3pt;
+    line-height: 1.5;
+  }
+  .intro strong { color: #be185d; }
+  .levels {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8pt;
+    margin-bottom: 10pt;
+  }
+  .level {
+    border: 1px solid #e4e4e7;
+    border-radius: 4pt;
+    padding: 9pt;
+    background: #fafafa;
+  }
+  .level.l1 { border-top: 3px solid #be185d; }
+  .level.l2 { border-top: 3px solid #c026d3; }
+  .level.l3 { border-top: 3px solid #7c3aed; }
+  .level-tag {
+    font-size: 7pt;
+    text-transform: uppercase;
+    letter-spacing: 1pt;
+    font-weight: 700;
+    color: #71717a;
+    margin-bottom: 3pt;
+  }
+  .level h2 {
+    font-size: 11pt;
+    color: #18181b;
+    margin-bottom: 2pt;
+    line-height: 1.2;
+  }
+  .level .time {
+    font-size: 8pt;
+    color: #71717a;
+    margin-bottom: 6pt;
+    font-style: italic;
+  }
+  .level ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .level ul li {
+    font-size: 8.7pt;
+    line-height: 1.4;
+    margin-bottom: 4pt;
+    padding-left: 9pt;
+    position: relative;
+  }
+  .level ul li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: #be185d;
+    font-weight: bold;
+  }
+  .level .ask {
+    margin-top: 7pt;
+    padding-top: 6pt;
+    border-top: 1px dashed #d4d4d8;
+    font-size: 8pt;
+    color: #52525b;
+  }
+  .level .ask strong { color: #be185d; }
+  .principles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8pt;
+    margin-bottom: 10pt;
+  }
+  .panel {
+    border: 1px solid #e4e4e7;
+    border-radius: 4pt;
+    padding: 9pt 11pt;
+  }
+  .panel h3 {
+    font-size: 9.5pt;
+    color: #18181b;
+    margin-bottom: 5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.6pt;
+    font-weight: 700;
+  }
+  .panel ul {
+    list-style: none;
+    padding: 0;
+  }
+  .panel ul li {
+    font-size: 8.7pt;
+    line-height: 1.45;
+    margin-bottom: 3pt;
+    padding-left: 11pt;
+    position: relative;
+  }
+  .panel.win ul li::before { content: "✓"; color: #15803d; font-weight: bold; position: absolute; left: 0; }
+  .panel.commit ul li::before { content: "•"; color: #be185d; font-weight: bold; position: absolute; left: 0; }
+  .cta {
+    background: #18181b;
+    color: #fafafa;
+    border-radius: 4pt;
+    padding: 10pt 14pt;
+    text-align: center;
+  }
+  .cta .label {
+    font-size: 7.5pt;
+    text-transform: uppercase;
+    letter-spacing: 1.5pt;
+    color: #f472b6;
+    margin-bottom: 4pt;
+  }
+  .cta p {
+    font-size: 10pt;
+    line-height: 1.5;
+    color: #fafafa;
+    font-style: italic;
+  }
+  .cta .quote-mark {
+    font-size: 16pt;
+    color: #f472b6;
+    line-height: 1;
+    vertical-align: middle;
+  }
+  .footer {
+    margin-top: 9pt;
+    padding-top: 6pt;
+    border-top: 1px solid #e4e4e7;
+    display: flex;
+    justify-content: space-between;
+    font-size: 7.8pt;
+    color: #71717a;
+  }
+  .footer .brand { font-weight: 600; color: #18181b; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="eyebrow">Propuesta de colaboración · Mayo 2026</div>
+  <h1>Teléfono de la Esperanza <span class="accent">×</span> Tres Mil Millones de Latidos</h1>
+  <div class="subtitle">Un menú en tres niveles. Sin compromiso inicial. Empezamos por donde encaje.</div>
+</div>
+
+<div class="intro">
+  <strong>Tres Mil Millones de Latidos</strong> es un acompañante conversacional con IA, entrada anónima y marco pedagógico (interpela, no aconseja). Llega a quien hoy no llama —adolescentes, hombres jóvenes, madrugadas— y devuelve cada crisis real a una persona humana. <strong>No sustituye al voluntariado: lo libera para los casos donde sólo un humano vale.</strong>
+</div>
+
+<div class="levels">
+
+  <div class="level l1">
+    <div class="level-tag">Nivel 1 — Punto de partida</div>
+    <h2>POC co-marcado</h2>
+    <div class="time">4-6 semanas · sin coste</div>
+    <ul>
+      <li>Chat "Teléfono de la Esperanza" embebido en vuestra web</li>
+      <li>Entrada 100% anónima, conforme a RGPD</li>
+      <li>Detección automática de señales de riesgo → CTA al 717 003 717</li>
+      <li>Disclaimers visibles: no diagnostica, no sustituye</li>
+      <li>Filtra acompañamiento del verdadero estado de crisis</li>
+    </ul>
+    <div class="ask"><strong>A cambio:</strong> sello "Avalado por TdE" + carta formal de colaboración (no vinculante).</div>
+  </div>
+
+  <div class="level l2">
+    <div class="level-tag">Nivel 2 — Si Nivel 1 funciona</div>
+    <h2>Integración operativa</h2>
+    <div class="time">3 meses</div>
+    <ul>
+      <li>Companion entre llamadas: diario, cartas semanales, ejercicios</li>
+      <li>Dashboard agregado (cero PII) para vuestros financiadores</li>
+      <li>API de derivación bidireccional con el teléfono</li>
+      <li>Reportes mensuales: temas, picos horarios, geografía</li>
+      <li>Convenio formal de colaboración</li>
+    </ul>
+    <div class="ask"><strong>A cambio:</strong> co-comunicación pública del partnership.</div>
+  </div>
+
+  <div class="level l3">
+    <div class="level-tag">Nivel 3 — Partnership profundo</div>
+    <h2>Co-creación clínica</h2>
+    <div class="time">6+ meses</div>
+    <ul>
+      <li>Journey co-diseñado con vuestros psicólogos (post-crisis, duelo, soledad crónica)</li>
+      <li>Simulacros IA para formación de voluntarios nuevos</li>
+      <li>Co-solicitud de fondos (Next Gen, FEDER, Salud Mental)</li>
+      <li>Repositorio anonimizado para investigación universitaria</li>
+      <li>Co-IP del proyecto</li>
+    </ul>
+    <div class="ask"><strong>A cambio:</strong> reparto 50/50 de financiación pública conjunta.</div>
+  </div>
+
+</div>
+
+<div class="principles">
+
+  <div class="panel win">
+    <h3>Lo que ganáis vosotros</h3>
+    <ul>
+      <li>Atendéis a quien hoy no os llama (chat &gt; teléfono para &lt;30 años)</li>
+      <li>Reducís agotamiento de voluntarios: filtran el ruido, atienden lo crítico</li>
+      <li>Nueva métrica para financiadores: conversaciones + derivaciones</li>
+      <li>Trazabilidad agregada (sin PII) de patrones recurrentes</li>
+      <li>Cobertura 24/7 sin sumar voluntarios al turno de madrugada</li>
+    </ul>
+  </div>
+
+  <div class="panel commit">
+    <h3>Nuestros compromisos no negociables</h3>
+    <ul>
+      <li><strong>Anonymous-first:</strong> ningún dato personal por defecto</li>
+      <li><strong>Marco pedagógico:</strong> nunca diagnostica, nunca aconseja</li>
+      <li><strong>Detección de crisis:</strong> handoff humano inmediato</li>
+      <li><strong>Auditoría completa</strong> por vuestros supervisores clínicos</li>
+      <li><strong>Sin exclusividad ni datos individualizados</strong> a voluntarios</li>
+    </ul>
+  </div>
+
+</div>
+
+<div class="cta">
+  <div class="label">Propuesta para esta primera reunión</div>
+  <p><span class="quote-mark">"</span>No firmamos nada hoy. Os enseño la herramienta en 15 minutos. Si encaja con vuestra misión, hacemos un POC de 6 semanas con un embed en una sección concreta de vuestra web —sin compromiso, sin coste. Si después las métricas os convencen, ahí hablamos de marco formal.<span class="quote-mark">"</span></p>
+</div>
+
+<div class="footer">
+  <div><span class="brand">Mario Pablo Barron</span> · CEO Startidea · mario@startidea.es</div>
+  <div>tresmilmillonesdelatidos.es</div>
+</div>
+
+</body>
+</html>

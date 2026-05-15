@@ -176,10 +176,20 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Rewrites (example)
+  // Rewrites
   async rewrites() {
     return {
-      beforeFiles: [],
+      // beforeFiles corren ANTES del filesystem routing — necesario para
+      // ganar la prioridad sobre `[[...page]]` catch-all.
+      beforeFiles: [
+        // IndexNow: Bing/Yandex exigen que la key se sirva en la raíz del
+        // dominio (`/<KEY>.txt`) aunque el spec acepte `keyLocation` custom.
+        // Re-escribimos cualquier `/<hex>.txt` al endpoint que valida la key.
+        {
+          source: "/:key([0-9a-f]{8,128}).txt",
+          destination: "/api/seo/indexnow-key",
+        },
+      ],
       afterFiles: [],
       fallback: [],
     };

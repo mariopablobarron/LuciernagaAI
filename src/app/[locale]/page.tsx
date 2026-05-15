@@ -14,7 +14,12 @@ export async function generateMetadata({
 
   const isSpanish = locale === "es" || locale === "";
   const siteName = isSpanish ? "Tres Mil Millones de Latidos" : "Three Billion Heartbeats";
-  const title = `${siteName} — ${t("title")} ${t("titleHighlight")}`;
+  // Title optimizado SEO: brand + categoría + diferenciador único, ≤60 chars
+  // (la frase identitaria "Cuéntale lo que te bloquea / Sal con un paso" se
+  // mantiene como H1 visible — no compite con el title del navegador).
+  const title = isSpanish
+    ? `${siteName} · Mentor IA en español, anónimo`
+    : `${siteName} · AI mentor, anonymous chat`;
   const description = t("subtitle");
 
   return {

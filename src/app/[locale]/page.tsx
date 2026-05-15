@@ -28,9 +28,9 @@ export async function generateMetadata({
       url: "https://tresmilmillonesdelatidos.es/en",
     },
     pt: {
-      name: "Três Bilhões de Batidas",
-      seoSuffix: "Mentor de IA em português, anônimo",
-      ogLocale: "pt_BR",
+      name: "Três Mil Milhões de Batidas",
+      seoSuffix: "Mentor IA em português, anónimo",
+      ogLocale: "pt_PT",
       url: "https://tresmilmillonesdelatidos.es/pt",
     },
     fr: {

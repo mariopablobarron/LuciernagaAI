@@ -1,0 +1,27 @@
+docs/propuesta-telefono-esperanza.html
+  s_c72d0ada98a9af::t_a95fcdd86a284e 1-282
+docs/blog-drafts/01-no-consigo-empezar.md
+  s_c72d0ada98a9af::t_ad7923018d1958 1-91
+docs/competitive-brief-2026-05.md
+  s_c72d0ada98a9af::t_e5767991ba4d0a 1-386
+docs/blog-drafts/03-diario-emocional-pagina-en-blanco.md
+  s_c72d0ada98a9af::t_c92f15e9720a57 1-109
+docs/blog-drafts/02-coach-psicologo-mentor.md
+  s_c72d0ada98a9af::t_e33fca3fa56c79 1-137
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "bffa1693aeb386ee6c47a017d8cfdf772285dda6",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+src/services/seo/indexnow.ts
+  s_c72d0ada98a9af::t_d4995c0c8f2b6b 59-62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "f2c8ae91a2f3accb0936cd7489614ed4112317f4",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

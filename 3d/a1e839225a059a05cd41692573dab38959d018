@@ -1,0 +1,32 @@
+src/app/api/seo/indexnow-key/route.ts
+  s_c72d0ada98a9af::t_86cdbfb1cbebf0 1-22
+src/app/api/admin/blog/[id]/route.ts
+  s_c72d0ada98a9af::t_32c521fbb42534 70-72,79-85
+  s_c72d0ada98a9af::t_efe2f9cf14b18a 6
+docs/seo-improvements.md
+  s_c72d0ada98a9af::t_e2b28b400c6aaa 1-138
+src/app/admin/marketing/seo/page.tsx
+  s_c72d0ada98a9af::t_50f64d27589943 693-758
+  s_c72d0ada98a9af::t_903ceaa1d51b5b 282-284
+src/app/api/admin/seo/submit/route.ts
+  s_c72d0ada98a9af::t_c46119e748bf39 1-55
+src/services/seo/indexnow.ts
+  s_c72d0ada98a9af::t_1f29dbc2ade511 1-58,60-97
+  s_c72d0ada98a9af::t_1dbc4d94de7454 59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "3da1e839225a059a05cd41692573dab38959d018",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

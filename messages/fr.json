@@ -1,0 +1,161 @@
+{
+  "nav": {
+    "chat": "Chat",
+    "journeys": "Parcours",
+    "dashboard": "Tableau de bord",
+    "pricing": "Tarifs",
+    "freeTest": "Test gratuit",
+    "login": "Connexion",
+    "cta": "Commence à battre",
+    "brand": "Trois Milliards",
+    "brandFull": "de Battements"
+  },
+  "hero": {
+    "badge": "Mentor IA en français · Sans e-mail pour commencer · Custodie clinique humaine",
+    "title": "Raconte ce qui te bloque.",
+    "titleHighlight": "Repars avec une étape concrète pour aujourd'hui.",
+    "subtitle": "Mentor avec IA en français, anonyme dès le premier message. Zéro entraînement de modèles avec tes conversations, supervision clinique humaine, et orientation immédiate vers le 3114 si la situation devient trop lourde pour un chat. L'IA est l'outil. La méthode et la supervision sont assurées par une équipe humaine.",
+    "bullet1": "Tu écris ce qui t'arrive, sans filtres ni formulaires",
+    "bullet2": "Détecte ton état et adapte la conversation",
+    "bullet3": "Termine avec une prochaine étape concrète pour aujourd'hui",
+    "cta": "Commence à écrire",
+    "ctaSecondary": "Créer un compte pour sauvegarder",
+    "noSignup": "Sans inscription. Sans e-mail. Écris, c'est tout.",
+    "socialProof": "+200 personnes",
+    "socialProofText": "l'utilisent chaque semaine",
+    "langNote": "Mentorat avec IA en français. Ne remplace pas une thérapie."
+  },
+  "features": {
+    "sectionLabel": "Comment ça marche",
+    "title": "Chaque battement, un pas en avant",
+    "subtitle": "Un mentorat qui comprend où tu en es et t'accompagne vers l'action, battement après battement.",
+    "noJudgment": {
+      "title": "Sans jugement",
+      "description": "Que des questions qui te font avancer. Pas de conseils non sollicités, pas d'évaluations, pas de pression."
+    },
+    "realState": {
+      "title": "État réel",
+      "description": "Détecte si tu es bloqué·e, anxieux·se ou clair·e et adapte la conversation à là où tu en es vraiment."
+    },
+    "concreteAction": {
+      "title": "Action concrète",
+      "description": "Chaque conversation se termine par une prochaine étape réelle que tu peux exécuter aujourd'hui en moins de 10 minutes."
+    }
+  },
+  "howItWorks": {
+    "sectionLabel": "Le processus",
+    "title": "Ton changement en 3 battements",
+    "step1": {
+      "title": "Tu décris comment tu te sens",
+      "description": "Sans filtres, sans jugement. Raconte à Trois Milliards de Battements ce qui t'arrive, ce que tu évites, ce qui te bloque."
+    },
+    "step2": {
+      "title": "Tu obtiens de la clarté",
+      "description": "Bloqué·e, anxieux·se, dans le doute ou clair·e — la conversation s'adapte à où tu en es."
+    },
+    "step3": {
+      "title": "Tu agis en moins de 5 min",
+      "description": "Une prochaine étape concrète, exécutable, qui crée du momentum réel dès aujourd'hui."
+    }
+  },
+  "team": {
+    "sectionLabel": "Qui est derrière",
+    "title": "Nous ne sommes pas une IA livrée à elle-même",
+    "subtitle": "L'IA exécute une méthode que nous concevons, supervisons et améliorons chaque semaine. Ce n'est pas un chatbot générique : c'est un système avec des responsables qui ont un nom et un prénom.",
+    "aiRole": {
+      "title": "L'IA",
+      "description": "Lit ce que tu écris, détecte ton état et te renvoie des questions et des prochaines étapes. Exécute vite, à toute heure, sans jugement."
+    },
+    "humanRole": {
+      "title": "L'équipe humaine",
+      "description": "Conçoit la méthode pédagogique, examine des conversations anonymes, ajuste le système et décide quand quelque chose doit être orienté vers un·e professionnel·le."
+    },
+    "founder": {
+      "name": "Mario Pablo Sánchez Barrón",
+      "role": "Fondateur · CEO Startidea",
+      "bio": "Je conçois la méthode, je supervise le comportement du système et je réponds personnellement au mail du support."
+    },
+    "advisor": {
+      "name": "Amaya Prado",
+      "role": "Conseillère clinique · Psychologue",
+      "bio": "Psychologue spécialisée en enfance, adolescence et jeunesse, avec plus de 20 ans d'expérience en intervention psychologique, orientation familiale et psychologie scolaire. Approche préventive et intégrative. Collaboratrice régulière dans des médias nationaux."
+    },
+    "transparency": "Nous ne lisons pas tes conversations en temps réel. Nous examinons des échantillons anonymisés pour améliorer le système, et le critère clinique est revu avec une assistance professionnelle. Si quelque chose frôle la crise ou requiert une thérapie, nous te le disons et nous t'orientons. Nous ne jouons pas aux psychologues."
+  },
+  "notWhat": {
+    "sectionLabel": "Ce que ce N'EST PAS",
+    "title": "Pour qu'il n'y ait pas de confusion",
+    "item1": {
+      "title": "Ce n'est pas une thérapie",
+      "description": "Cela ne remplace pas un·e psychologue ni une intervention clinique. Si tu es en crise, nous t'orientons."
+    },
+    "item2": {
+      "title": "Ce n'est pas ChatGPT générique",
+      "description": "C'est un système avec méthode, garde-fous et supervision humaine. Il ne va pas te donner des conseils en l'air ni te résumer un livre."
+    },
+    "item3": {
+      "title": "Ce n'est pas du coaching motivationnel",
+      "description": "Pas de belles phrases ni d'affirmations vides. Des questions concrètes et une étape réelle pour aujourd'hui."
+    }
+  },
+  "finalCta": {
+    "title1": "Certains battements sont déjà passés.",
+    "title2": "Ceux qui viennent sont encore à toi.",
+    "subtitle": "Trois milliards de battements dans une vie. Combien sont déjà passés sans que tu les sentes ?",
+    "cta": "Commence à battre autrement",
+    "ctaSignup": "Ou crée un compte pour sauvegarder ta progression",
+    "disclaimer": "Ne remplace pas une thérapie ni une intervention psychologique professionnelle."
+  },
+  "chatMockup": {
+    "msg1User": "Ça fait des semaines que je n'avance pas sur le projet",
+    "msg2Ai": "Quelle est la plus petite chose que tu pourrais faire dans les 10 prochaines minutes ?",
+    "msg3User": "J'imagine ouvrir le fichier et écrire un paragraphe",
+    "msg4Ai": "C'est exactement ce dont tu as besoin. Fais-le maintenant. Tu me racontes après.",
+    "placeholder": "Écris ce qui t'arrive…"
+  },
+  "footer": {
+    "rights": "Tous droits réservés.",
+    "privacy": "Confidentialité",
+    "terms": "Conditions"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "coach": "Coach IA",
+    "coachDesc": "Personnalise la façon dont ton mentor te parle",
+    "tone": "Ton de la conversation",
+    "toneDirect": "Direct",
+    "toneDirectDesc": "Va droit au but, sans détours",
+    "toneSocratic": "Socratique",
+    "toneSocraticDesc": "Te guide par des questions",
+    "toneWarm": "Chaleureux",
+    "toneWarmDesc": "Empathique et proche",
+    "notifications": "Notifications",
+    "notificationsDesc": "Contrôle ce que nous t'envoyons et quand",
+    "dailyReminders": "Rappels quotidiens",
+    "dailyRemindersDesc": "Check-in et actions en attente",
+    "reminderTime": "Heure du rappel",
+    "reminderTimeDesc": "Tu recevras le rappel à cette heure",
+    "weeklyEmail": "Résumé hebdomadaire par e-mail",
+    "weeklyEmailDesc": "Ta progression de la semaine chaque dimanche",
+    "insights": "Nouveaux insights",
+    "insightsDesc": "Quand tu auras de nouvelles recommandations",
+    "goals": "Objectifs accomplis",
+    "goalsDesc": "Célébrations quand tu termines un objectif",
+    "updates": "Mises à jour du produit",
+    "updatesDesc": "Nouvelles fonctions et améliorations",
+    "telegram": "Telegram",
+    "telegramDesc": "Reçois des rappels et discute hors de l'app",
+    "region": "Région",
+    "regionDesc": "Affecte l'heure des rappels",
+    "security": "Sécurité",
+    "changePassword": "Changer de mot de passe",
+    "data": "Tes données",
+    "dataDesc": "Droit à la portabilité (Art. 20 RGPD)",
+    "exportCsv": "Historique du chat (CSV)",
+    "exportJson": "Données complètes (JSON)",
+    "dangerZone": "Zone de danger",
+    "dangerDesc": "Ces actions sont irréversibles.",
+    "deleteAccount": "Supprimer mon compte et toutes mes données",
+    "saved": "Enregistré"
+  }
+}

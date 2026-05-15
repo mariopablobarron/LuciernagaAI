@@ -1,97 +1,97 @@
 {
   "nav": {
     "chat": "Chat",
-    "journeys": "Jornadas",
+    "journeys": "Percursos",
     "dashboard": "Painel",
     "pricing": "Preços",
     "freeTest": "Teste grátis",
     "login": "Entrar",
-    "cta": "Comece a bater",
-    "brand": "Três Bilhões",
+    "cta": "Começa a bater",
+    "brand": "Três Mil Milhões",
     "brandFull": "de Batidas"
   },
   "hero": {
-    "badge": "Mentor de IA em português · Sem e-mail para começar · Custódia clínica humana",
-    "title": "Conte o que está te travando.",
-    "titleHighlight": "Saia com um próximo passo concreto para hoje.",
-    "subtitle": "Mentor com IA em português, anônimo desde a primeira mensagem. Zero treinamento de modelos com suas conversas, supervisão clínica humana, e encaminhamento imediato ao 188 do CVV se a coisa pesar demais para um chat. A IA é a ferramenta. O método e a supervisão são feitos por um time humano.",
-    "bullet1": "Você escreve o que está acontecendo, sem filtros nem formulários",
-    "bullet2": "Detecta seu estado e adapta a conversa",
+    "badge": "Mentor IA em português · Sem e-mail para começar · Custódia clínica humana",
+    "title": "Conta-nos o que te bloqueia.",
+    "titleHighlight": "Sai com um próximo passo concreto para hoje.",
+    "subtitle": "Mentor com IA em português, anónimo desde a primeira mensagem. Zero treino de modelos com as tuas conversas, supervisão clínica humana, e encaminhamento imediato para o SNS 24 (808 24 24 24) e a SOS Voz Amiga (213 544 545) se a situação pesar demasiado para um chat. A IA é a ferramenta. O método e a supervisão são feitos por uma equipa humana.",
+    "bullet1": "Escreves o que se passa, sem filtros nem formulários",
+    "bullet2": "Deteta o teu estado e adapta a conversa",
     "bullet3": "Termina com um próximo passo possível para hoje",
-    "cta": "Comece a escrever",
-    "ctaSecondary": "Criar conta para salvar progresso",
-    "noSignup": "Sem cadastro. Sem e-mail. Só escreva.",
+    "cta": "Começa a escrever",
+    "ctaSecondary": "Criar conta para guardar progresso",
+    "noSignup": "Sem registo. Sem e-mail. Escreve, e pronto.",
     "socialProof": "+200 pessoas",
-    "socialProofText": "usando toda semana",
+    "socialProofText": "a usar todas as semanas",
     "langNote": "Mentoria com IA em português. Não substitui terapia."
   },
   "features": {
     "sectionLabel": "Como funciona",
-    "title": "Cada batida, um passo adiante",
-    "subtitle": "Uma mentoria que entende onde você está e te acompanha rumo à ação, batida a batida.",
+    "title": "Cada batida, um passo em frente",
+    "subtitle": "Uma mentoria que percebe onde estás e te acompanha rumo à ação, batida a batida.",
     "noJudgment": {
       "title": "Sem julgamentos",
       "description": "Só perguntas que te fazem avançar. Sem conselhos não pedidos, sem avaliações, sem pressão."
     },
     "realState": {
       "title": "Estado real",
-      "description": "Detecta se você está travado, ansioso ou com clareza e adapta a conversa para onde você realmente está."
+      "description": "Deteta se estás bloqueado, ansioso ou com clareza e adapta a conversa ao sítio onde realmente estás."
     },
     "concreteAction": {
       "title": "Ação concreta",
-      "description": "Cada conversa termina com um próximo passo real que você pode executar hoje em menos de 10 minutos."
+      "description": "Cada conversa termina com um próximo passo real que podes executar hoje em menos de 10 minutos."
     }
   },
   "howItWorks": {
     "sectionLabel": "O processo",
-    "title": "Sua mudança em 3 batidas",
+    "title": "A tua mudança em 3 batidas",
     "step1": {
-      "title": "Você descreve como se sente",
-      "description": "Sem filtros, sem julgamento. Conte ao Três Bilhões de Batidas o que está acontecendo, o que evita, o que te trava."
+      "title": "Descreves como te sentes",
+      "description": "Sem filtros, sem julgamento. Conta ao Três Mil Milhões de Batidas o que se passa, o que evitas, o que te trava."
     },
     "step2": {
-      "title": "Você ganha clareza",
-      "description": "Travado, ansioso, em dúvida ou com clareza — a conversa se adapta a onde você está."
+      "title": "Ganhas clareza",
+      "description": "Bloqueado, ansioso, na dúvida ou com clareza — a conversa adapta-se a onde estás."
     },
     "step3": {
-      "title": "Você age em menos de 5 min",
-      "description": "Um próximo passo concreto, possível, que gera momentum real desde hoje."
+      "title": "Ages em menos de 5 min",
+      "description": "Um próximo passo concreto, possível, que cria movimento real desde hoje."
     }
   },
   "team": {
-    "sectionLabel": "Quem está por trás",
+    "sectionLabel": "Quem está por detrás",
     "title": "Não somos uma IA solta",
-    "subtitle": "A IA executa um método que desenhamos, supervisionamos e melhoramos toda semana. Isso não é um chatbot genérico: é um sistema com responsáveis com nome e sobrenome.",
+    "subtitle": "A IA executa um método que desenhamos, supervisionamos e melhoramos todas as semanas. Isto não é um chatbot genérico: é um sistema com responsáveis com nome e apelido.",
     "aiRole": {
       "title": "A IA",
-      "description": "Lê o que você escreve, detecta seu estado e devolve perguntas e próximos passos. Executa rápido, a qualquer hora, sem julgamento."
+      "description": "Lê o que escreves, deteta o teu estado e devolve perguntas e próximos passos. Executa rápido, a qualquer hora, sem julgamento."
     },
     "humanRole": {
-      "title": "O time humano",
-      "description": "Desenha o método pedagógico, revisa conversas anônimas, ajusta o sistema e decide quando algo deve ser encaminhado a um profissional."
+      "title": "A equipa humana",
+      "description": "Desenha o método pedagógico, revê conversas anónimas, ajusta o sistema e decide quando algo deve ser encaminhado para um profissional."
     },
     "founder": {
       "name": "Mario Pablo Sánchez Barrón",
       "role": "Fundador · CEO da Startidea",
-      "bio": "Eu desenho o método, supervisiono o comportamento do sistema e respondo pessoalmente ao e-mail de suporte."
+      "bio": "Desenho o método, supervisiono o comportamento do sistema e respondo pessoalmente ao e-mail de apoio."
     },
     "advisor": {
       "name": "Amaya Prado",
       "role": "Conselheira clínica · Psicóloga",
-      "bio": "Psicóloga especializada em infância, adolescência e juventude, com mais de 20 anos de experiência em intervenção psicológica, orientação familiar e psicologia educacional. Abordagem preventiva e integradora. Colaboradora regular em mídia nacional."
+      "bio": "Psicóloga especializada em infância, adolescência e juventude, com mais de 20 anos de experiência em intervenção psicológica, orientação familiar e psicologia educativa. Abordagem preventiva e integradora. Colaboradora regular em meios nacionais."
     },
-    "transparency": "Não lemos suas conversas em tempo real. Revisamos amostras anonimizadas para melhorar o sistema, e o critério clínico é revisado com assessoria profissional. Se algo se aproxima de crise ou requer terapia, a gente fala e te encaminha. Não brincamos de psicólogo."
+    "transparency": "Não lemos as tuas conversas em tempo real. Revemos amostras anonimizadas para melhorar o sistema, e o critério clínico é revisto com aconselhamento profissional. Se algo se aproximar de crise ou exigir terapia, dizemos-te e encaminhamos-te. Não brincamos aos psicólogos."
   },
   "notWhat": {
     "sectionLabel": "O que NÃO é",
     "title": "Para não haver confusão",
     "item1": {
       "title": "Não é terapia",
-      "description": "Não substitui psicólogo nem intervenção clínica. Se você estiver em crise, te encaminhamos."
+      "description": "Não substitui um psicólogo nem uma intervenção clínica. Se estiveres em crise, encaminhamos-te."
     },
     "item2": {
-      "title": "Não é ChatGPT genérico",
-      "description": "É um sistema com método, guard-rails e supervisão humana. Não vai te dar conselhos soltos nem resumir um livro."
+      "title": "Não é o ChatGPT genérico",
+      "description": "É um sistema com método, guard-rails e supervisão humana. Não te vai dar conselhos soltos nem resumir-te um livro."
     },
     "item3": {
       "title": "Não é coaching motivacional",
@@ -100,18 +100,18 @@
   },
   "finalCta": {
     "title1": "Algumas batidas já passaram.",
-    "title2": "As que vêm ainda são suas.",
-    "subtitle": "Três bilhões de batidas em uma vida. Quantas já passaram sem você sentir?",
-    "cta": "Comece a bater diferente",
-    "ctaSignup": "Ou crie uma conta para salvar seu progresso",
+    "title2": "As que vêm ainda são tuas.",
+    "subtitle": "Três mil milhões de batidas numa vida. Quantas já passaram sem as sentires?",
+    "cta": "Começa a bater de outra forma",
+    "ctaSignup": "Ou cria uma conta para guardar o teu progresso",
     "disclaimer": "Não substitui terapia nem intervenção psicológica profissional."
   },
   "chatMockup": {
-    "msg1User": "Faz semanas que não avanço com o projeto",
-    "msg2Ai": "Qual é a coisa menor que você poderia fazer nos próximos 10 minutos?",
-    "msg3User": "Acho que abrir o arquivo e escrever um parágrafo",
-    "msg4Ai": "Isso é exatamente o que você precisa. Faça agora. Depois me conta.",
-    "placeholder": "Escreva o que está acontecendo…"
+    "msg1User": "Há semanas que não avanço com o projeto",
+    "msg2Ai": "Qual é a coisa mais pequena que poderias fazer nos próximos 10 minutos?",
+    "msg3User": "Imagino que abrir o ficheiro e escrever um parágrafo",
+    "msg4Ai": "É exatamente o que precisas. Fá-lo agora. Depois contas-me.",
+    "placeholder": "Escreve o que se passa…"
   },
   "footer": {
     "rights": "Todos os direitos reservados.",
@@ -119,43 +119,43 @@
     "terms": "Termos"
   },
   "settings": {
-    "title": "Configuração",
+    "title": "Definições",
     "coach": "Coach IA",
-    "coachDesc": "Personalize como seu mentor fala com você",
+    "coachDesc": "Personaliza como o teu mentor te fala",
     "tone": "Tom da conversa",
     "toneDirect": "Direto",
-    "toneDirectDesc": "Vai direto ao ponto, sem rodeios",
+    "toneDirectDesc": "Vai direto ao assunto, sem rodeios",
     "toneSocratic": "Socrático",
-    "toneSocraticDesc": "Te guia com perguntas",
+    "toneSocraticDesc": "Guia-te com perguntas",
     "toneWarm": "Caloroso",
     "toneWarmDesc": "Empático e próximo",
     "notifications": "Notificações",
-    "notificationsDesc": "Controle o que enviamos e quando",
+    "notificationsDesc": "Controla o que enviamos e quando",
     "dailyReminders": "Lembretes diários",
     "dailyRemindersDesc": "Check-in e ações pendentes",
-    "reminderTime": "Horário do lembrete",
-    "reminderTimeDesc": "Você receberá o lembrete neste horário",
+    "reminderTime": "Hora do lembrete",
+    "reminderTimeDesc": "Receberás o lembrete a esta hora",
     "weeklyEmail": "Resumo semanal por e-mail",
-    "weeklyEmailDesc": "Seu progresso da semana todo domingo",
+    "weeklyEmailDesc": "O teu progresso da semana todos os domingos",
     "insights": "Novos insights",
-    "insightsDesc": "Quando você tiver novas recomendações",
+    "insightsDesc": "Quando tiveres novas recomendações",
     "goals": "Objetivos concluídos",
-    "goalsDesc": "Comemorações quando você terminar um objetivo",
+    "goalsDesc": "Celebrações quando terminas um objetivo",
     "updates": "Atualizações do produto",
-    "updatesDesc": "Novas funções e melhorias",
+    "updatesDesc": "Novas funcionalidades e melhorias",
     "telegram": "Telegram",
-    "telegramDesc": "Receba lembretes e converse fora do app",
+    "telegramDesc": "Recebe lembretes e conversa fora da app",
     "region": "Região",
-    "regionDesc": "Afeta o horário dos lembretes",
+    "regionDesc": "Afeta a hora dos lembretes",
     "security": "Segurança",
-    "changePassword": "Alterar senha",
-    "data": "Seus dados",
-    "dataDesc": "Direito à portabilidade (Art. 18 LGPD)",
-    "exportCsv": "Histórico de chat (CSV)",
+    "changePassword": "Mudar palavra-passe",
+    "data": "Os teus dados",
+    "dataDesc": "Direito à portabilidade (Art. 20 RGPD)",
+    "exportCsv": "Histórico do chat (CSV)",
     "exportJson": "Dados completos (JSON)",
     "dangerZone": "Zona de perigo",
-    "dangerDesc": "Estas ações não podem ser desfeitas.",
-    "deleteAccount": "Excluir minha conta e todos os meus dados",
-    "saved": "Salvo"
+    "dangerDesc": "Estas ações são irreversíveis.",
+    "deleteAccount": "Apagar a minha conta e todos os meus dados",
+    "saved": "Guardado"
   }
 }

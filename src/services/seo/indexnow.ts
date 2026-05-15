@@ -56,7 +56,10 @@ export async function notifyIndexNow(urls: string[]): Promise<{ ok: boolean; sta
       body: JSON.stringify({
         host: HOST,
         key,
-        keyLocation: `https://${HOST}/api/seo/indexnow-key`,
+        // Bing exige que la key sea accesible en /<KEY>.txt en la raíz del
+        // dominio. next.config rewrite mapea ese path al endpoint que
+        // devuelve la key. Si usamos /api/... → HTTP 422 (URL no validada).
+        keyLocation: `https://${HOST}/${key}.txt`,
         urlList: cleanUrls,
       }),
     });

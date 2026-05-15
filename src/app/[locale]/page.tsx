@@ -23,7 +23,9 @@ export async function generateMetadata({
   const description = t("subtitle");
 
   return {
-    title,
+    // .absolute evita que el template "%s | Tres Mil Millones de Latidos"
+    // del root layout duplique la marca al final.
+    title: { absolute: title },
     description,
     alternates: {
       canonical: isSpanish

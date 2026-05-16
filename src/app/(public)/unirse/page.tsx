@@ -2,6 +2,7 @@
 
 import { Suspense, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ArrowRight, CheckCircle, Lock, Sparkles } from "lucide-react";
 import { COMPONENTS } from "@/styles/design-system";
 import PrivacyCheckbox from "@/components/PrivacyCheckbox";
@@ -9,31 +10,11 @@ import { trackEvent } from "@/lib/analytics";
 import { trackMetaEvent } from "@/lib/meta-pixel";
 import { getUtmParams } from "@/lib/utm";
 
-const MISSIONS = [
-  {
-    number: 1,
-    label: "Misión 1 de 3",
-    question: "¿Cuál es el cambio que más necesitas hacer en tu vida ahora mismo?",
-    hint: "Sé específico/a. No lo que 'deberías' cambiar — lo que realmente necesitas.",
-    placeholder: "Ej: Dejar de procrastinar en mi proyecto, mejorar mis relaciones, recuperar energía...",
-  },
-  {
-    number: 2,
-    label: "Misión 2 de 3",
-    question: "¿Qué has intentado antes para conseguirlo y no funcionó?",
-    hint: "Cuéntanos lo que ya sabes que no sirve. Eso nos ayuda a no repetirlo.",
-    placeholder: "Ej: Apps de productividad, promesas a mí mismo, cursos que no terminé...",
-  },
-  {
-    number: 3,
-    label: "Misión 3 de 3",
-    question: "¿Qué pasaría si dentro de 30 días nada hubiera cambiado?",
-    hint: "Siente el peso real de no actuar. Esta pregunta es el motor.",
-    placeholder: "Ej: Seguiría igual de paralizado, perdería la oportunidad, me sentiría...",
-  },
-];
+// 3 misiones con IDs estables. Copy desde messages.join.mission.m1..m3.{label,question,hint,placeholder}.
+const MISSION_IDS = ['m1', 'm2', 'm3'] as const;
 
 function UnirseContent() {
+  const t = useTranslations('join');
   const searchParams = useSearchParams();
   const router = useRouter();
   const inviteCode = searchParams.get("invite") ?? undefined;
@@ -60,7 +41,7 @@ function UnirseContent() {
 
   function handleMissionNext() {
     if (current.trim().length < 10) {
-      setError("Escribe al menos una frase completa.");
+      setError(t('errorTooShort'));
       return;
     }
     setError("");
@@ -108,14 +89,14 @@ function UnirseContent() {
       );
       setStep("done");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Algo falló. Inténtalo de nuevo.");
+      setError(err instanceof Error ? err.message : t('errorGeneric'));
     } finally {
       setLoading(false);
     }
   }
 
   const missionIndex = typeof step === "number" && step > 0 ? step - 1 : 0;
-  const mission = MISSIONS[missionIndex];
+  const missionId = MISSION_IDS[missionIndex];
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-4 py-16">
@@ -124,7 +105,7 @@ function UnirseContent() {
         <div className="w-full max-w-lg mb-10">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs text-zinc-500 font-medium uppercase tracking-widest">
-              {step === 0 ? "Acceso beta" : `Misión ${step} de 3`}
+              {step === 0 ? t('betaAccess') : t('progressLabel', { current: step, total: 3 })}
             </span>
             <span className="text-xs text-zinc-600">
               {step === 0 ? "0" : Math.round(((step as number) / 3) * 100)}%
@@ -145,26 +126,25 @@ function UnirseContent() {
           {inviteCode && (
             <div className="flex items-center gap-2 justify-center">
               <Sparkles className="h-4 w-4 text-fuchsia-400" />
-              <span className="text-sm text-fuchsia-300 font-medium">Has sido invitado/a. Acceso garantizado.</span>
+              <span className="text-sm text-fuchsia-300 font-medium">{t('invited')}</span>
             </div>
           )}
           <div className="text-center space-y-3">
             <div className="text-5xl mb-2">💓</div>
-            <h1 className="text-3xl md:text-4xl font-bold">Tres preguntas.<br />Un latido de honestidad.</h1>
-            <p className="text-zinc-400 text-lg leading-relaxed">
-              No hay formulario de registro. Hay tres preguntas que nadie más se atreve a hacerte.
-              Respóndelas y el acceso es tuyo.
-            </p>
+            <h1 className="text-3xl md:text-4xl font-bold">
+              {t('introTitle1')}<br />{t('introTitle2')}
+            </h1>
+            <p className="text-zinc-400 text-lg leading-relaxed">{t('introSubtitle')}</p>
           </div>
 
           {/* What to expect */}
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 space-y-3">
-            {MISSIONS.map((m, i) => (
-              <div key={i} className="flex items-start gap-3">
+            {MISSION_IDS.map((id, i) => (
+              <div key={id} className="flex items-start gap-3">
                 <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-violet-500/20 text-xs font-bold text-violet-400">
                   {i + 1}
                 </div>
-                <p className="text-sm text-zinc-400">{m.question}</p>
+                <p className="text-sm text-zinc-400">{t(`mission.${id}.question`)}</p>
               </div>
             ))}
           </div>
@@ -174,24 +154,24 @@ function UnirseContent() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="tu@email.com"
+              placeholder={t('emailPlaceholder')}
               required
               className={COMPONENTS.inputField}
             />
             <PrivacyCheckbox
               checked={privacyAccepted}
               onChange={setPrivacyAccepted}
-              context="Tus respuestas y email se usaran para personalizar tu experiencia."
+              context={t('privacyContext')}
             />
             <button
               type="submit"
               disabled={!privacyAccepted}
               className={`${COMPONENTS.buttonPrimary} w-full flex items-center justify-center gap-2 py-3 disabled:opacity-40 disabled:cursor-not-allowed`}
             >
-              Empezar las misiones <ArrowRight className="h-4 w-4" />
+              {t('startMissions')} <ArrowRight className="h-4 w-4" />
             </button>
           </form>
-          <p className="text-center text-xs text-zinc-600">Sin tarjeta. Sin spam. Solo latidos que cuentan.</p>
+          <p className="text-center text-xs text-zinc-600">{t('introFooter')}</p>
         </div>
       )}
 
@@ -200,16 +180,18 @@ function UnirseContent() {
         <div className="w-full max-w-lg space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500" key={step}>
           <div className="space-y-2">
             <span className="text-xs font-semibold uppercase tracking-widest text-violet-400">
-              {mission.label}
+              {t(`mission.${missionId}.label`)}
             </span>
-            <h2 className="text-2xl md:text-3xl font-bold leading-snug">{mission.question}</h2>
-            <p className="text-sm text-zinc-500 italic">{mission.hint}</p>
+            <h2 className="text-2xl md:text-3xl font-bold leading-snug">
+              {t(`mission.${missionId}.question`)}
+            </h2>
+            <p className="text-sm text-zinc-500 italic">{t(`mission.${missionId}.hint`)}</p>
           </div>
 
           <textarea
             value={current}
             onChange={(e) => { setCurrent(e.target.value); setError(""); }}
-            placeholder={mission.placeholder}
+            placeholder={t(`mission.${missionId}.placeholder`)}
             rows={5}
             className={`${COMPONENTS.inputField} resize-none`}
             autoFocus
@@ -223,7 +205,7 @@ function UnirseContent() {
             disabled={loading || current.trim().length < 10}
             className={`${COMPONENTS.buttonPrimary} w-full flex items-center justify-center gap-2 py-3 disabled:opacity-50`}
           >
-            {loading ? "Enviando..." : step === 3 ? "Desbloquear acceso" : "Siguiente misión"}
+            {loading ? t('sending') : step === 3 ? t('unlockAccess') : t('nextMission')}
             {!loading && <ArrowRight className="h-4 w-4" />}
           </button>
 
@@ -246,14 +228,12 @@ function UnirseContent() {
         <div className="w-full max-w-lg space-y-8 text-center animate-in fade-in zoom-in-95 duration-500">
           <div className="space-y-4">
             <div className="text-6xl animate-bounce">💓</div>
-            <h1 className="text-3xl md:text-4xl font-bold">Primer latido. Hecho.</h1>
-            <p className="text-zinc-400 text-lg">
-              Has completado las tres misiones. Tu ritmo ya empezó.
-            </p>
+            <h1 className="text-3xl md:text-4xl font-bold">{t('doneTitle')}</h1>
+            <p className="text-zinc-400 text-lg">{t('doneSubtitle')}</p>
           </div>
 
           <div className="rounded-2xl border border-violet-500/30 bg-violet-500/10 p-6 space-y-3 text-left">
-            <p className="text-sm font-semibold text-violet-300">Lo que acabas de hacer</p>
+            <p className="text-sm font-semibold text-violet-300">{t('doneRecap')}</p>
             {answers.map((ans, i) => (
               <div key={i} className="flex items-start gap-2">
                 <CheckCircle className="h-4 w-4 mt-0.5 shrink-0 text-violet-400" />
@@ -268,18 +248,14 @@ function UnirseContent() {
               onClick={() => router.push(`/signup?email=${encodeURIComponent(email)}`)}
               className={`${COMPONENTS.buttonPrimary} w-full flex items-center justify-center gap-2 py-3 text-base`}
             >
-              Crear mi cuenta <ArrowRight className="h-4 w-4" />
+              {t('createAccount')} <ArrowRight className="h-4 w-4" />
             </button>
-            <p className="text-xs text-zinc-600">
-              Solo falta tu nombre y una contraseña. Tus respuestas dan ritmo a tu primera sesión.
-            </p>
+            <p className="text-xs text-zinc-600">{t('createAccountHint')}</p>
           </div>
 
           <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4 flex items-center gap-3">
             <Lock className="h-4 w-4 shrink-0 text-zinc-600" />
-            <p className="text-xs text-zinc-500">
-              7 días latiendo y ganarás una invitación para traer a alguien que también lo necesita.
-            </p>
+            <p className="text-xs text-zinc-500">{t('inviteUnlock')}</p>
           </div>
         </div>
       )}

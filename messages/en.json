@@ -1547,5 +1547,216 @@
     "suggestionTitle": "Is something missing?",
     "suggestionDesc": "If there's something that would make your life easier, tell us. We don't promise to build everything, but we read every suggestion.",
     "suggestionCta": "Send suggestion"
+  },
+  "join": {
+    "betaAccess": "Beta access",
+    "progressLabel": "Mission {current} of {total}",
+    "invited": "You've been invited. Access guaranteed.",
+    "introTitle1": "Three questions.",
+    "introTitle2": "One heartbeat of honesty.",
+    "introSubtitle": "There's no signup form. There are three questions no one else dares to ask you. Answer them and access is yours.",
+    "emailPlaceholder": "you@email.com",
+    "privacyContext": "Your answers and email will be used to personalize your experience.",
+    "startMissions": "Start the missions",
+    "introFooter": "No card. No spam. Just heartbeats that count.",
+    "mission": {
+      "m1": {
+        "label": "Mission 1 of 3",
+        "question": "What's the change you most need to make in your life right now?",
+        "hint": "Be specific. Not what you 'should' change — what you really need to.",
+        "placeholder": "E.g.: Stop procrastinating on my project, improve my relationships, get my energy back..."
+      },
+      "m2": {
+        "label": "Mission 2 of 3",
+        "question": "What have you tried before to make it happen, and it didn't work?",
+        "hint": "Tell us what you already know doesn't work. That helps us not repeat it.",
+        "placeholder": "E.g.: Productivity apps, promises to myself, courses I never finished..."
+      },
+      "m3": {
+        "label": "Mission 3 of 3",
+        "question": "What would happen if 30 days from now nothing had changed?",
+        "hint": "Feel the real weight of not acting. This question is the engine.",
+        "placeholder": "E.g.: I'd still be just as paralyzed, I'd lose the opportunity, I'd feel..."
+      }
+    },
+    "errorTooShort": "Write at least one full sentence.",
+    "errorGeneric": "Something went wrong. Try again.",
+    "sending": "Sending...",
+    "nextMission": "Next mission",
+    "unlockAccess": "Unlock access",
+    "doneTitle": "First heartbeat. Done.",
+    "doneSubtitle": "You've completed the three missions. Your rhythm has begun.",
+    "doneRecap": "What you just did",
+    "createAccount": "Create my account",
+    "createAccountHint": "Just your name and a password left. Your answers set the rhythm for your first session.",
+    "inviteUnlock": "7 days beating and you'll earn an invitation to bring someone who also needs it."
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: April 10, 2026",
+    "section": {
+      "responsable": {
+        "title": "Data controller",
+        "item1": "<strong>Holder:</strong> Mario Pablo Sánchez Barrón",
+        "item2": "<strong>Trade name:</strong> Startidea",
+        "item3": "<strong>Product:</strong> Three Billion Heartbeats",
+        "item4": "<strong>Privacy email:</strong> <mailto>privacidad@tresmilmillonesdelatidos.es</mailto>",
+        "item5": "<strong>Website:</strong> tresmilmillonesdelatidos.es"
+      },
+      "datos": {
+        "title": "Data we collect",
+        "item1": "Email address (to identify your account)",
+        "item2": "Name (if you provide it voluntarily)",
+        "item3": "Password (stored hashed, never in plain text)",
+        "item4": "Messages and conversations within the platform",
+        "item5": "Emotional check-ins and journal entries",
+        "item6": "Goals, actions and progress",
+        "item7": "Anonymized usage patterns (access frequency, not content)",
+        "item8": "Telegram ID (if you link your account)",
+        "item9": "Subscription data managed by Stripe (we don't store payment data)",
+        "outro1": "We don't collect location data, biometric data or sensitive information beyond what you choose to share in conversations."
+      },
+      "baseJuridica": {
+        "title": "Legal basis for processing",
+        "item1": "<strong>Performance of contract</strong> (art. 6.1.b GDPR): We need your data to provide the service you've requested.",
+        "item2": "<strong>Consent</strong> (art. 6.1.a GDPR): For marketing communications and optional features like the family portal.",
+        "item3": "<strong>Legitimate interest</strong> (art. 6.1.f GDPR): To improve the service through anonymized analytics and to detect crisis situations."
+      },
+      "finalidad": {
+        "title": "How we use your data",
+        "item1": "To provide the AI conversational mentoring service",
+        "item2": "To personalize your experience and track your progress",
+        "item3": "To detect situations of emotional risk and activate crisis protocols",
+        "item4": "To send you account-related communications (reminders, weekly summaries)",
+        "item5": "To generate anonymized statistics that improve the service",
+        "outro1": "We don't sell, transfer or share your information with third parties for commercial or advertising purposes."
+      },
+      "terceros": {
+        "title": "Providers and third parties",
+        "intro": "To operate the service we use the following providers:",
+        "item1": "<strong>Hosting:</strong> European servers with encryption in transit and at rest.",
+        "item2": "<strong>Conversational AI:</strong> Conversations are processed by language models. They are not used to train third-party models.",
+        "item3": "<strong>Stripe:</strong> Payment processing. Stripe is PCI-DSS compliant. We don't store card data.",
+        "item4": "<strong>Telegram:</strong> If you link your account. Telegram processes the messages you send it.",
+        "item5": "<strong>Transactional email:</strong> For verification, reminders and summaries.",
+        "outro1": "All providers are contractually bound to protect your data in accordance with the GDPR."
+      },
+      "transferencias": {
+        "title": "International transfers",
+        "outro1": "Some of our providers may process data outside the European Economic Area (EEA). In all cases, appropriate safeguards are in place: European Commission adequacy decisions, standard contractual clauses or equivalent privacy frameworks (EU-US Data Privacy Framework)."
+      },
+      "retencion": {
+        "title": "Data retention",
+        "item1": "<strong>Active account:</strong> As long as you keep your account, we retain your data to provide the service.",
+        "item2": "<strong>After deletion:</strong> When you delete your account, we erase your personal data within a maximum period of 30 days.",
+        "item3": "<strong>Anonymized data:</strong> Aggregated and anonymized statistics may be kept indefinitely.",
+        "item4": "<strong>Legal obligations:</strong> If the law requires us to retain certain data, we will do so for the required period."
+      },
+      "cookies": {
+        "title": "Cookies",
+        "intro": "We use cookies strictly necessary for the operation of the service:",
+        "item1": "<strong>mw_session:</strong> User session cookie. Required to keep your session logged in. Expires when you log out.",
+        "item2": "<strong>mw_admin_session:</strong> Admin session cookie. Only for the internal team. Expires in 24 hours.",
+        "item3": "<strong>Accessibility preferences:</strong> Stored in localStorage to remember your visual settings.",
+        "outro1": "We don't use third-party cookies, tracking cookies or advertising cookies. As these are strictly necessary cookies, they don't require prior consent under the ePrivacy Directive."
+      },
+      "derechos": {
+        "title": "Your rights",
+        "intro": "Under the GDPR, you have the following rights:",
+        "item1": "<strong>Access:</strong> Request a copy of all your personal data.",
+        "item2": "<strong>Rectification:</strong> Correct inaccurate or incomplete data.",
+        "item3": "<strong>Erasure:</strong> Request the deletion of your data ('right to be forgotten').",
+        "item4": "<strong>Portability:</strong> Receive your data in a structured and readable format (JSON or CSV).",
+        "item5": "<strong>Objection:</strong> Object to processing based on legitimate interest.",
+        "item6": "<strong>Restriction:</strong> Request the restriction of processing in certain cases.",
+        "outro1": "To exercise these rights: from the platform, go to Settings and use the option to export or delete data. From Telegram, type <code>/borrar_datos</code>. Or contact us at <mailto>privacidad@tresmilmillonesdelatidos.es</mailto>. We respond within a maximum of 30 days.",
+        "outro2": "You have the right to file a complaint with the <link>Spanish Data Protection Agency (AEPD)</link>."
+      },
+      "menores": {
+        "title": "Minors",
+        "outro1": "The service is intended for users aged 16 and over. We don't knowingly collect data from minors. If you are under 16 and have created an account, contact us to delete it."
+      },
+      "cambios": {
+        "title": "Changes to this policy",
+        "outro1": "We may update this policy periodically. If the changes are significant, we will notify you by email or via a notice on the platform at least 30 days in advance."
+      }
+    }
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "lastUpdated": "Last updated: April 10, 2026",
+    "section": {
+      "aceptacion": {
+        "title": "Acceptance of terms",
+        "intro": "By accessing and using Three Billion Heartbeats you accept these terms of service. If you do not agree with any of them, please do not use the platform."
+      },
+      "descripcion": {
+        "title": "Description of the service",
+        "intro": "Three Billion Heartbeats is a personal companionship platform based on artificial intelligence. The service includes conversations with an AI mentor, emotional check-ins, personal journaling, goals with actions, guided exercises and transformation programs."
+      },
+      "aviso": {
+        "title": "Legal notice — Not therapy",
+        "intro": "<strongAmber>Three Billion Heartbeats is NOT a substitute for psychological therapy, medical diagnosis or professional mental health intervention.</strongAmber>",
+        "outro1": "The AI accompanies, asks questions and proposes actions, but it does not diagnose, does not prescribe and cannot provide clinical care. In situations of crisis or emergency, contact immediately:",
+        "item1": "<strong>988</strong> — Suicide & Crisis Lifeline (US, 24/7)",
+        "item2": "<strong>112</strong> — Emergency services (EU)",
+        "item3": "<strong>911</strong> — Emergency services (US, 24/7)"
+      },
+      "limitacion": {
+        "title": "Limitation of liability",
+        "intro": "The service is provided 'as is'. We don't guarantee that the AI's responses are always accurate, complete or appropriate to your particular situation. You should apply your own judgment before acting on any suggestion.",
+        "outro1": "To the maximum extent permitted by law, Startidea will not be liable for indirect, incidental, special or consequential damages arising from the use or the inability to use the service."
+      },
+      "disponibilidad": {
+        "title": "Service availability",
+        "intro": "We strive to keep the service available 24/7, but we don't guarantee uninterrupted availability. There may be maintenance periods, updates or technical incidents that temporarily affect access."
+      },
+      "uso": {
+        "title": "Acceptable use",
+        "intro": "You agree to use the platform only for lawful purposes and for the benefit of your personal development. The following is prohibited:",
+        "item1": "Harassing, threatening, defaming or harming third parties",
+        "item2": "Attempting to access other users' accounts",
+        "item3": "Using the service to generate illegal or harmful content",
+        "item4": "Manipulating or attempting to bypass security systems"
+      },
+      "propiedad": {
+        "title": "Intellectual property",
+        "intro": "<strong>Your content is yours.</strong> The conversations, journal entries, goals and reflections you generate are your property. You can export or delete them at any time.",
+        "outro1": "By using the service, you grant us a limited, non-exclusive and revocable license to process your content for the sole purpose of providing the service (generating AI responses, detecting emotional states, generating insights). We don't use your content to train third-party AI models or for advertising purposes.",
+        "outro2": "The brand, design, code and original content of Three Billion Heartbeats are owned by Startidea. Reproduction without authorization is not permitted."
+      },
+      "pagos": {
+        "title": "Plans, payments and cancellation",
+        "intro": "<strong>MVP period (until October 2026):</strong> All features are available for free. No credit card required.",
+        "outro1": "<strong>Paid plans (post-MVP):</strong> Payments are managed through Stripe. Subscriptions renew automatically unless you cancel before the renewal date.",
+        "outro2": "<strong>Cancellation:</strong> You can cancel your subscription at any time from Settings or from Stripe's billing portal. You'll keep access to the Pro plan until the end of the already-paid period. No partial refunds are issued for unused periods.",
+        "outro3": "<strong>Account deletion:</strong> You can delete your account and all your data at any time from Settings or by typing <code>/borrar_datos</code> on Telegram."
+      },
+      "privacidad": {
+        "title": "Privacy and data",
+        "intro": "Your privacy is our priority. See our <link>Privacy Policy</link> to understand in detail how we collect, use and protect your data."
+      },
+      "modificaciones": {
+        "title": "Modifications",
+        "intro": "We reserve the right to update these terms. Any relevant change will be communicated at least 30 days in advance by email or notice on the platform. Continued use of the service after that period implies acceptance of the current terms."
+      },
+      "legislacion": {
+        "title": "Governing law",
+        "intro": "These terms are governed by Spanish law. For any dispute, the parties submit to the courts of Granada (Spain), unless consumer regulations establish a different jurisdiction."
+      },
+      "lssi": {
+        "title": "Legal notice (LSSI)",
+        "intro": "In compliance with Spanish Law 34/2002 of July 11, on Information Society Services and Electronic Commerce (LSSI-CE):",
+        "item1": "<strong>Holder:</strong> Mario Pablo Sánchez Barrón",
+        "item2": "<strong>Trade name:</strong> Startidea",
+        "item3": "<strong>Address:</strong> Granada, Spain",
+        "item4": "<strong>Email:</strong> <mailto>hola@tresmilmillonesdelatidos.es</mailto>",
+        "item5": "<strong>Website:</strong> <link>tresmilmillonesdelatidos.es</link>"
+      },
+      "contacto": {
+        "title": "Contact",
+        "intro": "For inquiries about these terms write to us at <mailto>hola@tresmilmillonesdelatidos.es</mailto>."
+      }
+    }
   }
 }

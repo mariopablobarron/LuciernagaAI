@@ -221,5 +221,72 @@
       "commit3": "Si encuentras algo que viola estos principios, escríbenos. Lo corregimos y lo publicamos.",
       "commit4": "No usamos menores de edad en nuestra plataforma sin consentimiento de responsables legales y mecanismos adicionales de protección."
     }
+  },
+  "about": {
+    "eyebrow": "De dónde surge esto",
+    "title": "Cada latido es una",
+    "titleHighlight": "elección",
+    "subtitle": "Tres Mil Millones de Latidos nace de una convicción: la tecnología puede acompañar sin sustituir lo humano. No somos una app de productividad. Somos un espacio donde la inteligencia artificial se pone al servicio de lo que más importa: que entiendas qué te pasa y actúes en consecuencia.",
+    "questionTitle": "La pregunta que lo empezó todo",
+    "questionP1": "El corazón humano late aproximadamente tres mil millones de veces en una vida. Cada uno de esos latidos es una oportunidad — de avanzar, de pararse, de elegir.",
+    "questionP2": "La mayoría de las personas saben que algo tiene que cambiar. Lo sienten. Pero entre el saber y el hacer hay un abismo: bloqueos que no se nombran, patrones que se repiten, decisiones que se posponen. Y en ese espacio, la claridad se pierde.",
+    "questionP3Pre": "Tres Mil Millones de Latidos",
+    "questionP3": "existe para cerrar ese abismo. No con consejos genéricos ni motivación vacía, sino con una pregunta en el momento justo, un espejo que muestra lo que no estás viendo, y un siguiente paso que puedas dar hoy.",
+    "philosophyTitle": "Cómo pensamos",
+    "philosophy": {
+      "interpelar": {
+        "title": "Interpelar antes de instruir",
+        "desc": "No decimos qué hacer. Preguntamos para que descubras lo que ya sabes pero no te atreves a ver."
+      },
+      "porque": {
+        "title": "Siempre el porqué",
+        "desc": "Cada acción tiene un motivo. Sin entender el porqué, la acción es obediencia, no cambio."
+      },
+      "gafas": {
+        "title": "Gafas nuevas",
+        "desc": "Ayudamos a ver lo que has normalizado. Lo que das por hecho muchas veces es lo que más te frena."
+      },
+      "localGlobal": {
+        "title": "De lo local a lo global",
+        "desc": "Empezamos por lo concreto de hoy — tu bloqueo, tu emoción — y desde ahí descubrimos el patrón grande."
+      },
+      "inside": {
+        "title": "El cambio viene de dentro",
+        "desc": "No se impone. Se interpela. La pregunta correcta genera más cambio que la mejor instrucción."
+      },
+      "progress": {
+        "title": "Progreso, no perfección",
+        "desc": "Un paso imperfecto hoy vale más que un plan perfecto mañana. Avanzar es lo que cuenta."
+      }
+    },
+    "behindTitle": "Quién está detrás",
+    "startidea": {
+      "name": "Startidea",
+      "tagline": "Agencia de Innovación Social y Desarrollo Tecnológico",
+      "p1Pre": "Tres Mil Millones de Latidos surge de",
+      "p1": ", una agencia con 15 años de experiencia trabajando con organizaciones que buscan impacto real. Hemos acompañado a empresas, instituciones educativas, ONGs y administraciones públicas en procesos de innovación social y transformación digital.",
+      "p2Pre": "Después de 15 años viendo cómo las personas se bloquean, posponen y pierden claridad — incluso cuando tienen recursos y motivación — nos preguntamos:",
+      "p2Strong": "¿y si la tecnología pudiera hacer lo que un buen mentor hace? Estar ahí, en el momento justo, con la pregunta correcta.",
+      "p3": "Tres Mil Millones de Latidos es nuestra respuesta. Un proyecto que combina inteligencia artificial, psicología del comportamiento y 15 años de experiencia en acompañamiento real para crear algo que no existía: un mentor que no da respuestas — hace las preguntas que tú no te estás haciendo."
+    },
+    "founderTitle": "Fundador",
+    "founder": {
+      "name": "Mario Pablo Sánchez Barrón",
+      "role": "Fundador de Startidea · Creador de Tres Mil Millones de Latidos",
+      "p1": "Con más de 15 años de trayectoria en el desarrollo de productos digitales con impacto social, Mario ha combinado la tecnología con una visión profundamente humana: las herramientas digitales deben servir para que las personas se entiendan mejor a sí mismas y actúen en consecuencia.",
+      "p2": "Tras años trabajando con equipos, clientes y organizaciones de todo tipo, identificó un patrón recurrente: la mayoría de las personas no necesitan más información ni más consejos. Necesitan un espacio donde pensar con claridad, sin juicio, y un empujón concreto para actuar hoy — no mañana.",
+      "p3Strong": "Tres Mil Millones de Latidos es ese espacio.",
+      "p3": "La respuesta a una pregunta que Mario se ha hecho durante años: ¿cómo ayudo a alguien a dar el primer paso cuando está bloqueado, sin decirle lo que tiene que hacer?"
+    },
+    "commitmentsTitle": "Compromisos",
+    "commitment1": "No sustituimos ayuda profesional. Si detectamos riesgo, conectamos con líneas de emergencia.",
+    "commitment2": "Tus conversaciones son tuyas. No vendemos datos ni los usamos con fines publicitarios.",
+    "commitment3": "Puedes exportar o eliminar todos tus datos en cualquier momento.",
+    "commitment4": "La IA acompaña — no diagnostica, no prescribe, no juzga.",
+    "ctaNote": "Comprometidos con el bienestar emocional a través de la tecnología.",
+    "ctaPrimary": "Empezar ahora",
+    "ctaSecondary": "Conocer Startidea",
+    "profNote": "¿Profesional de la psicología, coaching o acompañamiento?",
+    "profLink": "Mira cómo complementa tu consulta"
   }
 }

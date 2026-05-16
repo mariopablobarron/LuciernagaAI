@@ -221,5 +221,72 @@
       "commit3": "Se encontrares algo que viola estes princípios, escreve-nos. Corrigimos e publicamos.",
       "commit4": "Não usamos menores de idade na nossa plataforma sem consentimento dos responsáveis legais e mecanismos adicionais de proteção."
     }
+  },
+  "about": {
+    "eyebrow": "De onde nasce isto",
+    "title": "Cada batida é uma",
+    "titleHighlight": "escolha",
+    "subtitle": "Três Mil Milhões de Batidas nasce de uma convicção: a tecnologia pode acompanhar sem substituir o que é humano. Não somos uma app de produtividade. Somos um espaço onde a inteligência artificial se põe ao serviço do que mais importa: que percebas o que se passa contigo e ajas em conformidade.",
+    "questionTitle": "A pergunta que começou tudo",
+    "questionP1": "O coração humano bate aproximadamente três mil milhões de vezes ao longo de uma vida. Cada uma dessas batidas é uma oportunidade — para avançar, para parar, para escolher.",
+    "questionP2": "A maioria das pessoas sabe que algo tem de mudar. Sentem-no. Mas entre o saber e o fazer há um abismo: bloqueios que não se nomeiam, padrões que se repetem, decisões que se adiam. E nesse espaço, a clareza perde-se.",
+    "questionP3Pre": "Três Mil Milhões de Batidas",
+    "questionP3": "existe para fechar esse abismo. Não com conselhos genéricos nem motivação vazia, mas com uma pergunta no momento certo, um espelho que mostra o que não estás a ver, e um próximo passo que possas dar hoje.",
+    "philosophyTitle": "Como pensamos",
+    "philosophy": {
+      "interpelar": {
+        "title": "Interpelar antes de instruir",
+        "desc": "Não dizemos o que fazer. Perguntamos para descobrires o que já sabes mas não te atreves a ver."
+      },
+      "porque": {
+        "title": "Sempre o porquê",
+        "desc": "Cada ação tem um motivo. Sem perceber o porquê, a ação é obediência, não mudança."
+      },
+      "gafas": {
+        "title": "Óculos novos",
+        "desc": "Ajudamos-te a ver o que normalizaste. O que dás por adquirido é muitas vezes o que mais te trava."
+      },
+      "localGlobal": {
+        "title": "Do local ao global",
+        "desc": "Começamos pelo concreto de hoje — o teu bloqueio, a tua emoção — e a partir daí descobrimos o padrão maior."
+      },
+      "inside": {
+        "title": "A mudança vem de dentro",
+        "desc": "Não se impõe. Interpela-se. A pergunta certa gera mais mudança do que a melhor instrução."
+      },
+      "progress": {
+        "title": "Progresso, não perfeição",
+        "desc": "Um passo imperfeito hoje vale mais que um plano perfeito amanhã. Avançar é o que conta."
+      }
+    },
+    "behindTitle": "Quem está por detrás",
+    "startidea": {
+      "name": "Startidea",
+      "tagline": "Agência de Inovação Social e Desenvolvimento Tecnológico",
+      "p1Pre": "Três Mil Milhões de Batidas nasce de",
+      "p1": ", uma agência com 15 anos de experiência a trabalhar com organizações que procuram impacto real. Acompanhámos empresas, instituições educativas, ONGs e administrações públicas em processos de inovação social e transformação digital.",
+      "p2Pre": "Após 15 anos a ver como as pessoas se bloqueiam, adiam e perdem clareza — mesmo quando têm recursos e motivação — perguntámo-nos:",
+      "p2Strong": "e se a tecnologia pudesse fazer o que um bom mentor faz? Estar lá, no momento certo, com a pergunta certa.",
+      "p3": "Três Mil Milhões de Batidas é a nossa resposta. Um projeto que combina inteligência artificial, psicologia do comportamento e 15 anos de experiência em acompanhamento real para criar algo que não existia: um mentor que não dá respostas — faz as perguntas que tu não te estás a fazer."
+    },
+    "founderTitle": "Fundador",
+    "founder": {
+      "name": "Mario Pablo Sánchez Barrón",
+      "role": "Fundador da Startidea · Criador de Três Mil Milhões de Batidas",
+      "p1": "Com mais de 15 anos de trajetória no desenvolvimento de produtos digitais com impacto social, o Mario combinou a tecnologia com uma visão profundamente humana: as ferramentas digitais devem servir para que as pessoas se compreendam melhor e ajam em conformidade.",
+      "p2": "Após anos a trabalhar com equipas, clientes e organizações de todo o tipo, identificou um padrão recorrente: a maioria das pessoas não precisa de mais informação nem de mais conselhos. Precisa de um espaço onde pensar com clareza, sem juízo, e de um empurrão concreto para agir hoje — não amanhã.",
+      "p3Strong": "Três Mil Milhões de Batidas é esse espaço.",
+      "p3": "A resposta a uma pergunta que o Mario se tem feito durante anos: como ajudo alguém a dar o primeiro passo quando está bloqueado, sem lhe dizer o que tem de fazer?"
+    },
+    "commitmentsTitle": "Compromissos",
+    "commitment1": "Não substituímos ajuda profissional. Se detetarmos risco, ligamos a linhas de emergência.",
+    "commitment2": "As tuas conversas são tuas. Não vendemos dados nem os usamos para fins publicitários.",
+    "commitment3": "Podes exportar ou apagar todos os teus dados em qualquer momento.",
+    "commitment4": "A IA acompanha — não diagnostica, não prescreve, não julga.",
+    "ctaNote": "Comprometidos com o bem-estar emocional através da tecnologia.",
+    "ctaPrimary": "Começar agora",
+    "ctaSecondary": "Conhecer a Startidea",
+    "profNote": "Profissional de psicologia, coaching ou acompanhamento?",
+    "profLink": "Vê como complementa a tua consulta"
   }
 }

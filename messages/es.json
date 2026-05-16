@@ -1547,5 +1547,216 @@
     "suggestionTitle": "¿Echas en falta algo?",
     "suggestionDesc": "Si hay algo que te haría la vida más fácil, cuéntanoslo. No prometemos construirlo todo, pero leemos cada sugerencia.",
     "suggestionCta": "Enviar sugerencia"
+  },
+  "join": {
+    "betaAccess": "Acceso beta",
+    "progressLabel": "Misión {current} de {total}",
+    "invited": "Has sido invitado/a. Acceso garantizado.",
+    "introTitle1": "Tres preguntas.",
+    "introTitle2": "Un latido de honestidad.",
+    "introSubtitle": "No hay formulario de registro. Hay tres preguntas que nadie más se atreve a hacerte. Respóndelas y el acceso es tuyo.",
+    "emailPlaceholder": "tu@email.com",
+    "privacyContext": "Tus respuestas y email se usarán para personalizar tu experiencia.",
+    "startMissions": "Empezar las misiones",
+    "introFooter": "Sin tarjeta. Sin spam. Solo latidos que cuentan.",
+    "mission": {
+      "m1": {
+        "label": "Misión 1 de 3",
+        "question": "¿Cuál es el cambio que más necesitas hacer en tu vida ahora mismo?",
+        "hint": "Sé específico/a. No lo que 'deberías' cambiar — lo que realmente necesitas.",
+        "placeholder": "Ej: Dejar de procrastinar en mi proyecto, mejorar mis relaciones, recuperar energía..."
+      },
+      "m2": {
+        "label": "Misión 2 de 3",
+        "question": "¿Qué has intentado antes para conseguirlo y no funcionó?",
+        "hint": "Cuéntanos lo que ya sabes que no sirve. Eso nos ayuda a no repetirlo.",
+        "placeholder": "Ej: Apps de productividad, promesas a mí mismo, cursos que no terminé..."
+      },
+      "m3": {
+        "label": "Misión 3 de 3",
+        "question": "¿Qué pasaría si dentro de 30 días nada hubiera cambiado?",
+        "hint": "Siente el peso real de no actuar. Esta pregunta es el motor.",
+        "placeholder": "Ej: Seguiría igual de paralizado, perdería la oportunidad, me sentiría..."
+      }
+    },
+    "errorTooShort": "Escribe al menos una frase completa.",
+    "errorGeneric": "Algo falló. Inténtalo de nuevo.",
+    "sending": "Enviando...",
+    "nextMission": "Siguiente misión",
+    "unlockAccess": "Desbloquear acceso",
+    "doneTitle": "Primer latido. Hecho.",
+    "doneSubtitle": "Has completado las tres misiones. Tu ritmo ya empezó.",
+    "doneRecap": "Lo que acabas de hacer",
+    "createAccount": "Crear mi cuenta",
+    "createAccountHint": "Solo falta tu nombre y una contraseña. Tus respuestas dan ritmo a tu primera sesión.",
+    "inviteUnlock": "7 días latiendo y ganarás una invitación para traer a alguien que también lo necesita."
+  },
+  "privacy": {
+    "title": "Política de Privacidad",
+    "lastUpdated": "Última actualización: 10 de abril de 2026",
+    "section": {
+      "responsable": {
+        "title": "Responsable del tratamiento",
+        "item1": "<strong>Titular:</strong> Mario Pablo Sánchez Barrón",
+        "item2": "<strong>Nombre comercial:</strong> Startidea",
+        "item3": "<strong>Producto:</strong> Tres Mil Millones de Latidos",
+        "item4": "<strong>Correo de privacidad:</strong> <mailto>privacidad@tresmilmillonesdelatidos.es</mailto>",
+        "item5": "<strong>Web:</strong> tresmilmillonesdelatidos.es"
+      },
+      "datos": {
+        "title": "Datos que recopilamos",
+        "item1": "Dirección de email (para identificar tu cuenta)",
+        "item2": "Nombre (si lo proporcionas voluntariamente)",
+        "item3": "Contraseña (almacenada con hash, nunca en texto plano)",
+        "item4": "Mensajes y conversaciones dentro de la plataforma",
+        "item5": "Check-ins emocionales y entradas de diario",
+        "item6": "Metas, acciones y progreso",
+        "item7": "Patrones de uso anonimizados (frecuencia de acceso, no contenido)",
+        "item8": "ID de Telegram (si vinculas tu cuenta)",
+        "item9": "Datos de suscripción gestionados por Stripe (no almacenamos datos de pago)",
+        "outro1": "No recopilamos datos de ubicación, datos biométricos ni información sensible más allá de lo que tú decides compartir en las conversaciones."
+      },
+      "baseJuridica": {
+        "title": "Base jurídica del tratamiento",
+        "item1": "<strong>Ejecución del contrato</strong> (art. 6.1.b RGPD): Necesitamos tus datos para prestarte el servicio que has solicitado.",
+        "item2": "<strong>Consentimiento</strong> (art. 6.1.a RGPD): Para comunicaciones de marketing y funcionalidades opcionales como el portal familiar.",
+        "item3": "<strong>Interés legítimo</strong> (art. 6.1.f RGPD): Para mejorar el servicio mediante análisis anonimizados y para la detección de situaciones de crisis."
+      },
+      "finalidad": {
+        "title": "Cómo usamos tus datos",
+        "item1": "Para ofrecerte el servicio de mentoría conversacional con IA",
+        "item2": "Para personalizar tu experiencia y hacer seguimiento de tu progreso",
+        "item3": "Para detectar situaciones de riesgo emocional y activar protocolos de crisis",
+        "item4": "Para enviarte comunicaciones relacionadas con tu cuenta (recordatorios, resúmenes semanales)",
+        "item5": "Para generar estadísticas anonimizadas que mejoren el servicio",
+        "outro1": "No vendemos, cedemos ni compartimos tu información con terceros con fines comerciales o publicitarios."
+      },
+      "terceros": {
+        "title": "Proveedores y terceros",
+        "intro": "Para operar el servicio utilizamos los siguientes proveedores:",
+        "item1": "<strong>Alojamiento:</strong> Servidores europeos con cifrado en tránsito y en reposo.",
+        "item2": "<strong>IA conversacional:</strong> Las conversaciones se procesan mediante modelos de lenguaje. No se utilizan para entrenar modelos de terceros.",
+        "item3": "<strong>Stripe:</strong> Gestión de pagos. Stripe cumple PCI-DSS. No almacenamos datos de tarjeta.",
+        "item4": "<strong>Telegram:</strong> Si vinculas tu cuenta. Telegram procesa los mensajes que le envías.",
+        "item5": "<strong>Email transaccional:</strong> Para envío de verificación, recordatorios y resúmenes.",
+        "outro1": "Todos los proveedores están obligados contractualmente a proteger tus datos conforme al RGPD."
+      },
+      "transferencias": {
+        "title": "Transferencias internacionales",
+        "outro1": "Algunos de nuestros proveedores pueden procesar datos fuera del Espacio Económico Europeo (EEE). En todos los casos, existen garantías adecuadas: decisiones de adecuación de la Comisión Europea, cláusulas contractuales tipo o marcos de privacidad equivalentes (EU-US Data Privacy Framework)."
+      },
+      "retencion": {
+        "title": "Conservación de datos",
+        "item1": "<strong>Cuenta activa:</strong> Mientras mantengas tu cuenta, conservamos tus datos para prestarte el servicio.",
+        "item2": "<strong>Tras la eliminación:</strong> Al eliminar tu cuenta, borramos tus datos personales en un plazo máximo de 30 días.",
+        "item3": "<strong>Datos anonimizados:</strong> Las estadísticas agregadas y anonimizadas pueden conservarse indefinidamente.",
+        "item4": "<strong>Obligaciones legales:</strong> Si la ley nos obliga a conservar ciertos datos, lo haremos por el periodo requerido."
+      },
+      "cookies": {
+        "title": "Cookies",
+        "intro": "Utilizamos cookies estrictamente necesarias para el funcionamiento del servicio:",
+        "item1": "<strong>mw_session:</strong> Cookie de sesión de usuario. Necesaria para mantener tu sesión iniciada. Caduca al cerrar sesión.",
+        "item2": "<strong>mw_admin_session:</strong> Cookie de sesión de administración. Solo para el equipo interno. Caduca en 24 horas.",
+        "item3": "<strong>Preferencias de accesibilidad:</strong> Almacenadas en localStorage para recordar tus ajustes visuales.",
+        "outro1": "No utilizamos cookies de terceros, cookies de seguimiento ni cookies publicitarias. Al ser cookies estrictamente necesarias, no requieren consentimiento previo según la directiva ePrivacy."
+      },
+      "derechos": {
+        "title": "Tus derechos",
+        "intro": "Conforme al RGPD, tienes los siguientes derechos:",
+        "item1": "<strong>Acceso:</strong> Solicitar una copia de todos tus datos personales.",
+        "item2": "<strong>Rectificación:</strong> Corregir datos inexactos o incompletos.",
+        "item3": "<strong>Supresión:</strong> Pedir la eliminación de tus datos («derecho al olvido»).",
+        "item4": "<strong>Portabilidad:</strong> Recibir tus datos en un formato estructurado y legible (JSON o CSV).",
+        "item5": "<strong>Oposición:</strong> Oponerte al tratamiento basado en interés legítimo.",
+        "item6": "<strong>Limitación:</strong> Solicitar la restricción del tratamiento en determinados supuestos.",
+        "outro1": "Para ejercer estos derechos: desde la plataforma, ve a Ajustes y usa la opción de exportar o eliminar datos. Desde Telegram, escribe <code>/borrar_datos</code>. O contáctanos en <mailto>privacidad@tresmilmillonesdelatidos.es</mailto>. Respondemos en un plazo máximo de 30 días.",
+        "outro2": "Tienes derecho a presentar una reclamación ante la <link>Agencia Española de Protección de Datos (AEPD)</link>."
+      },
+      "menores": {
+        "title": "Menores de edad",
+        "outro1": "El servicio está dirigido a mayores de 16 años. No recopilamos datos de menores de forma deliberada. Si eres menor de 16 años y has creado una cuenta, contáctanos para eliminarla."
+      },
+      "cambios": {
+        "title": "Cambios en esta política",
+        "outro1": "Podemos actualizar esta política periódicamente. Si los cambios son significativos, te lo notificaremos por email o mediante un aviso en la plataforma con al menos 30 días de antelación."
+      }
+    }
+  },
+  "terms": {
+    "title": "Términos de Servicio",
+    "lastUpdated": "Última actualización: 10 de abril de 2026",
+    "section": {
+      "aceptacion": {
+        "title": "Aceptación de términos",
+        "intro": "Al acceder y usar Tres Mil Millones de Latidos aceptas estos términos de servicio. Si no estás de acuerdo con alguno de ellos, por favor no uses la plataforma."
+      },
+      "descripcion": {
+        "title": "Descripción del servicio",
+        "intro": "Tres Mil Millones de Latidos es una plataforma de acompañamiento personal basada en inteligencia artificial. El servicio incluye conversaciones con un mentor IA, check-ins emocionales, diario personal, metas con acciones, ejercicios guiados y programas de transformación."
+      },
+      "aviso": {
+        "title": "Aviso legal — No es terapia",
+        "intro": "<strongAmber>Tres Mil Millones de Latidos NO sustituye la terapia psicológica, el diagnóstico médico ni la intervención profesional de salud mental.</strongAmber>",
+        "outro1": "La IA acompaña, hace preguntas y propone acciones, pero no diagnostica, no prescribe y no puede proporcionar atención clínica. En situaciones de crisis o emergencia, contacta de inmediato con:",
+        "item1": "<strong>024</strong> — Línea de atención a la conducta suicida (España, 24/7)",
+        "item2": "<strong>112</strong> — Emergencias (España / UE)",
+        "item3": "<strong>988</strong> — Suicide & Crisis Lifeline (Estados Unidos, 24/7)"
+      },
+      "limitacion": {
+        "title": "Limitación de responsabilidad",
+        "intro": "El servicio se proporciona «tal cual» (as is). No garantizamos que las respuestas de la IA sean siempre precisas, completas o adecuadas a tu situación particular. Debes aplicar tu propio criterio antes de actuar sobre cualquier sugerencia.",
+        "outro1": "En la medida máxima permitida por la ley, Startidea no será responsable de daños indirectos, incidentales, especiales o consecuentes derivados del uso o la imposibilidad de uso del servicio."
+      },
+      "disponibilidad": {
+        "title": "Disponibilidad del servicio",
+        "intro": "Nos esforzamos por mantener el servicio disponible 24/7, pero no garantizamos su disponibilidad ininterrumpida. Puede haber periodos de mantenimiento, actualizaciones o incidencias técnicas que afecten temporalmente al acceso."
+      },
+      "uso": {
+        "title": "Uso aceptable",
+        "intro": "Te comprometes a usar la plataforma únicamente para propósitos lícitos y en beneficio de tu desarrollo personal. Queda prohibido:",
+        "item1": "Acosar, amenazar, difamar o perjudicar a terceros",
+        "item2": "Intentar acceder a cuentas de otros usuarios",
+        "item3": "Usar el servicio para generar contenido ilegal o dañino",
+        "item4": "Manipular o intentar eludir los sistemas de seguridad"
+      },
+      "propiedad": {
+        "title": "Propiedad intelectual",
+        "intro": "<strong>Tu contenido es tuyo.</strong> Las conversaciones, entradas de diario, metas y reflexiones que generas son de tu propiedad. Puedes exportarlas o eliminarlas en cualquier momento.",
+        "outro1": "Al usar el servicio, nos otorgas una licencia limitada, no exclusiva y revocable para procesar tu contenido con el único fin de prestarte el servicio (generar respuestas de la IA, detectar estados emocionales, generar insights). No usamos tu contenido para entrenar modelos de IA de terceros ni para fines publicitarios.",
+        "outro2": "La marca, el diseño, el código y los contenidos originales de Tres Mil Millones de Latidos son propiedad de Startidea. No se permite su reproducción sin autorización."
+      },
+      "pagos": {
+        "title": "Planes, pagos y cancelación",
+        "intro": "<strong>Periodo MVP (hasta octubre 2026):</strong> Todas las funciones están disponibles de forma gratuita. No se requiere tarjeta de crédito.",
+        "outro1": "<strong>Planes de pago (post-MVP):</strong> Los pagos se gestionan a través de Stripe. Las suscripciones se renuevan automáticamente salvo que las canceles antes de la fecha de renovación.",
+        "outro2": "<strong>Cancelación:</strong> Puedes cancelar tu suscripción en cualquier momento desde Ajustes o desde el portal de pagos de Stripe. Seguirás teniendo acceso al plan Pro hasta el final del periodo ya pagado. No se realizan reembolsos parciales por periodos no utilizados.",
+        "outro3": "<strong>Eliminación de cuenta:</strong> Puedes eliminar tu cuenta y todos tus datos en cualquier momento desde Ajustes o escribiendo <code>/borrar_datos</code> en Telegram."
+      },
+      "privacidad": {
+        "title": "Privacidad y datos",
+        "intro": "Tu privacidad es nuestra prioridad. Consulta nuestra <link>Política de Privacidad</link> para entender en detalle cómo recopilamos, usamos y protegemos tus datos."
+      },
+      "modificaciones": {
+        "title": "Modificaciones",
+        "intro": "Nos reservamos el derecho de actualizar estos términos. Cualquier cambio relevante será comunicado con al menos 30 días de antelación por email o aviso en la plataforma. El uso continuado del servicio tras ese periodo implica la aceptación de los términos vigentes."
+      },
+      "legislacion": {
+        "title": "Legislación aplicable",
+        "intro": "Estos términos se rigen por la legislación española. Para cualquier controversia, las partes se someten a los juzgados y tribunales de Granada (España), salvo que la normativa de consumo establezca un fuero diferente."
+      },
+      "lssi": {
+        "title": "Aviso legal (LSSI)",
+        "intro": "En cumplimiento de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI-CE):",
+        "item1": "<strong>Titular:</strong> Mario Pablo Sánchez Barrón",
+        "item2": "<strong>Nombre comercial:</strong> Startidea",
+        "item3": "<strong>Domicilio:</strong> Granada, España",
+        "item4": "<strong>Correo electrónico:</strong> <mailto>hola@tresmilmillonesdelatidos.es</mailto>",
+        "item5": "<strong>Sitio web:</strong> <link>tresmilmillonesdelatidos.es</link>"
+      },
+      "contacto": {
+        "title": "Contacto",
+        "intro": "Para consultas sobre estos términos escríbenos a <mailto>hola@tresmilmillonesdelatidos.es</mailto>."
+      }
+    }
   }
 }

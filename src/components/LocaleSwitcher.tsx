@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 
 /**
  * Locales soportados con metadata para UI.
@@ -19,24 +18,32 @@ const LOCALES = [
 type LocaleCode = (typeof LOCALES)[number]["code"];
 
 /**
- * Construye la href para cambiar a otro locale preservando el resto del path.
- * El locale por defecto (es) NO lleva prefijo URL; los demás sí.
+ * Calcula la URL destino al cambiar de locale.
  *
- * Ejemplos:
- *   ("/", "es", "pt")        → "/pt"
- *   ("/en/faq", "en", "es")  → "/faq"
- *   ("/pt/precios", "pt", "fr") → "/fr/precios"
+ * Estrategia: la mayoría de páginas viven fuera del segmento [locale] y
+ * leen el locale activo de la cookie NEXT_LOCALE (gestionado en
+ * src/i18n/request.ts). Solo la landing (/, /en, /es, /pt, /fr) usa el
+ * prefijo URL para locale. Para todo lo demás, basta con quedarse en la
+ * misma URL y dejar que el cambio de cookie + router.refresh() recargue
+ * la página con el nuevo locale.
+ *
+ * Reglas:
+ *   - Si estamos en la landing ("/" o "/<locale>"), devolvemos la URL
+ *     correspondiente al nuevo locale ("/" para es, "/<locale>" resto).
+ *   - Si estamos en cualquier otra página, devolvemos la misma URL.
  */
-function buildOtherLocaleHref(pathname: string, current: string, other: LocaleCode): string {
-  // Quitar prefijo del locale actual si lo hay
-  const stripped =
-    current === "es"
-      ? pathname || "/"
-      : pathname.replace(new RegExp(`^/${current}(?=/|$)`), "") || "/";
-  // El default (es) no lleva prefijo; los demás sí
-  if (other === "es") return stripped;
-  const prefixed = `/${other}${stripped === "/" ? "" : stripped}`;
-  return prefixed || `/${other}`;
+function targetUrl(pathname: string, other: LocaleCode): string {
+  const isLanding =
+    pathname === "/" ||
+    pathname === "/es" ||
+    pathname === "/en" ||
+    pathname === "/pt" ||
+    pathname === "/fr";
+
+  if (isLanding) {
+    return other === "es" ? "/" : `/${other}`;
+  }
+  return pathname;
 }
 
 type Props = {
@@ -47,7 +54,9 @@ type Props = {
 export default function LocaleSwitcher({ className, onNavigate }: Props) {
   const pathname = usePathname() || "/";
   const locale = useLocale();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [, startTransition] = useTransition();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const currentLocale = LOCALES.find((l) => l.code === locale) ?? LOCALES[0];
@@ -70,6 +79,29 @@ export default function LocaleSwitcher({ className, onNavigate }: Props) {
       document.removeEventListener("keydown", onKey);
     };
   }, [open]);
+
+  function selectLocale(code: LocaleCode) {
+    if (code === locale) {
+      setOpen(false);
+      return;
+    }
+    // Persistir locale en cookie (1 año). Esto es lo que lee
+    // src/i18n/request.ts para todas las páginas fuera de [locale].
+    const oneYear = 60 * 60 * 24 * 365;
+    document.cookie = `NEXT_LOCALE=${code}; path=/; max-age=${oneYear}; samesite=lax`;
+
+    const dest = targetUrl(pathname, code);
+    setOpen(false);
+    onNavigate?.();
+
+    startTransition(() => {
+      if (dest !== pathname) {
+        router.push(dest);
+      }
+      // Refresh fuerza re-render con el nuevo locale (lee cookie).
+      router.refresh();
+    });
+  }
 
   return (
     <div ref={containerRef} className="relative">
@@ -105,17 +137,13 @@ export default function LocaleSwitcher({ className, onNavigate }: Props) {
         >
           {LOCALES.map((l) => {
             const isCurrent = l.code === locale;
-            const href = buildOtherLocaleHref(pathname, locale, l.code);
             return (
               <li key={l.code} role="option" aria-selected={isCurrent}>
-                <Link
-                  href={href}
-                  hrefLang={l.code}
-                  onClick={() => {
-                    setOpen(false);
-                    onNavigate?.();
-                  }}
-                  className={`flex items-center gap-2.5 px-3 py-2 text-xs ${
+                <button
+                  type="button"
+                  onClick={() => selectLocale(l.code)}
+                  lang={l.code}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs ${
                     isCurrent
                       ? "text-violet-300 bg-violet-500/10"
                       : "text-zinc-300 hover:text-white hover:bg-zinc-800"
@@ -124,9 +152,9 @@ export default function LocaleSwitcher({ className, onNavigate }: Props) {
                   <span aria-hidden className="text-base leading-none">
                     {l.flag}
                   </span>
-                  <span className="flex-1">{l.name}</span>
+                  <span className="flex-1 text-left">{l.name}</span>
                   <span className="text-[10px] text-zinc-500">{l.label}</span>
-                </Link>
+                </button>
               </li>
             );
           })}

@@ -1176,5 +1176,250 @@
     "followupBullet3": "Señales de riesgo antes de que escalen",
     "followupCta": "Empezar gratis",
     "retake": "Repetir el test"
+  },
+  "resources": {
+    "eyebrow": "Recursos",
+    "title": "Todo en",
+    "titleHighlight": "un solo sitio",
+    "subtitle": "Guías, herramientas y lecturas organizadas por intención, no por fecha. Empieza por donde estés.",
+    "section": {
+      "empezar": {
+        "title": "Para empezar",
+        "subtitle": "Si acabas de llegar, por aquí."
+      },
+      "herramientas": {
+        "title": "Herramientas gratuitas",
+        "subtitle": "Sin cuenta ni tarjeta. Pruébalas ahora."
+      },
+      "leer": {
+        "title": "Leer en profundidad",
+        "subtitle": "Artículos y reflexiones del equipo."
+      },
+      "profesionales": {
+        "title": "Si eres profesional",
+        "subtitle": "Para psicólogas, coaches y profesionales del bienestar."
+      }
+    },
+    "item": {
+      "metodo": {
+        "title": "El método",
+        "desc": "Cómo piensa y responde el mentor: interpelar antes de instruir, las cinco fases, los seis principios, y lo que explícitamente no hace."
+      },
+      "casos": {
+        "title": "Casos de uso",
+        "desc": "Cuatro formas reales de usarlo — bloqueos, ansiedad cotidiana, transiciones vitales, autoconocimiento — para que veas dónde encajas tú."
+      },
+      "guia": {
+        "title": "Guía de uso",
+        "desc": "Cómo sacarle partido al día a día: check-ins, diario, objetivos, conversaciones con el mentor."
+      },
+      "faq": {
+        "title": "Preguntas frecuentes",
+        "desc": "Respuestas directas sobre cómo funciona, privacidad, precios y límites."
+      },
+      "calculadora": {
+        "title": "Calculadora de latidos",
+        "desc": "Cuántos latidos te quedan estadísticamente. Una forma cruda de preguntarte qué estás haciendo con los tuyos."
+      },
+      "test": {
+        "title": "Test gratuito",
+        "desc": "Un auto-diagnóstico breve para entender dónde estás antes de empezar."
+      },
+      "reto": {
+        "title": "El reto de 30 días",
+        "desc": "Cómo funciona el reto, qué esperar y quién lo aprovecha mejor."
+      },
+      "blog": {
+        "title": "Blog",
+        "desc": "Reflexiones sobre bienestar emocional, tecnología humana, acompañamiento y cambio personal."
+      },
+      "sobre": {
+        "title": "Sobre nosotros",
+        "desc": "De dónde viene este proyecto, el porqué y quiénes estamos detrás. Startidea, Mario, 15 años de acompañamiento."
+      },
+      "panel": {
+        "title": "Para psicólogas y profesionales",
+        "desc": "Cómo encaja el mentor entre sesiones, qué ve el panel clínico, cómo se supervisa el criterio clínico y dónde están los límites."
+      },
+      "contacto": {
+        "title": "Hablar con el equipo",
+        "desc": "Si quieres explorar una colaboración o probarlo con algún cliente, escríbenos."
+      }
+    },
+    "footerLine": "El mejor recurso es el que usas hoy.",
+    "footerCta": "Empezar ahora"
+  },
+  "guide": {
+    "title": "Guía de",
+    "titleHighlight": "usuario",
+    "subtitle": "Todo lo que necesitas saber para sacarle el máximo partido a Tres Mil Millones de Latidos. De principio a fin, paso a paso.",
+    "cta": "Empezar ahora",
+    "faqTitle": "Preguntas frecuentes",
+    "section": {
+      "start": {
+        "shortLabel": "Tu primer latido",
+        "title": "1. Tu primer latido",
+        "subtitle": "Empieza en menos de 60 segundos",
+        "step1": "Entra en el chat desde la app.",
+        "step1LinkText": "Ir al chat",
+        "step2": "Escribe lo que te pasa, sin filtros. No hay respuesta correcta.",
+        "step3": "El mentor detecta tu estado emocional y adapta la conversación.",
+        "step4": "Al terminar, recibes un siguiente paso concreto que puedes hacer hoy."
+      },
+      "chat": {
+        "shortLabel": "El Chat — tu mentor",
+        "title": "2. El Chat — tu mentor",
+        "subtitle": "No es un chatbot genérico. Es un sistema que te conoce.",
+        "feature1": {
+          "label": "Detección emocional",
+          "desc": "Identifica si estás bloqueado, ansioso, en duda o con claridad, y adapta su respuesta."
+        },
+        "feature2": {
+          "label": "Metas y acciones",
+          "desc": "Cuando expresas una intención, el sistema crea una meta con acciones concretas de 10 minutos."
+        },
+        "feature3": {
+          "label": "Microacciones",
+          "desc": "Cada conversación termina con algo que puedes hacer HOY. Pasos tan pequeños que no puedes decir que no."
+        },
+        "feature4": {
+          "label": "Historial completo",
+          "desc": "Todas las conversaciones se guardan. El mentor recuerda tu historia para dar continuidad."
+        }
+      },
+      "checkin": {
+        "shortLabel": "Check-in diario",
+        "title": "3. Check-in diario",
+        "subtitle": "Registra cómo te sientes en 30 segundos",
+        "step1": "Abre la pestaña Check-in desde el workspace o usa el bot de Telegram.",
+        "step2": "Registra tu estado emocional del día.",
+        "step3": "Acumula rachas: cuántos días seguidos llevas registrándote.",
+        "step4": "Con el tiempo, verás patrones: qué días son más difíciles, qué situaciones te afectan."
+      },
+      "diario": {
+        "shortLabel": "Diario personal",
+        "title": "4. Diario personal",
+        "subtitle": "Un espacio privado para escribir sin que nadie responda",
+        "feature1": {
+          "label": "Escritura libre",
+          "desc": "Reflexiones, desahogos, ideas, gratitud. Sin estructura obligatoria."
+        },
+        "feature2": {
+          "label": "Estado de ánimo",
+          "desc": "Etiqueta cada entrada: genial, bien, neutral, mal o terrible."
+        },
+        "feature3": {
+          "label": "Etiquetas",
+          "desc": "Organiza tus entradas con etiquetas emocionales."
+        }
+      },
+      "metas": {
+        "shortLabel": "Metas y progreso",
+        "title": "5. Metas y progreso",
+        "subtitle": "Convierte intenciones en acciones ejecutables",
+        "feature1": {
+          "label": "Meta concreta",
+          "desc": "No \"mejorar mi vida\", sino \"tener una conversación honesta con mi jefe\"."
+        },
+        "feature2": {
+          "label": "Acciones vinculadas",
+          "desc": "Cada meta tiene pasos de 5-15 minutos que puedes completar y marcar."
+        },
+        "feature3": {
+          "label": "Racha y progreso",
+          "desc": "Días consecutivos de actividad. Barra de progreso en la barra lateral."
+        },
+        "feature4": {
+          "label": "Patrones de evitación",
+          "desc": "El sistema detecta qué pospones o rechazas y te lo muestra."
+        }
+      },
+      "respirar": {
+        "shortLabel": "Respiración",
+        "title": "6. Ejercicios de respiración",
+        "subtitle": "Calma la ansiedad en 2 minutos",
+        "feature1": {
+          "label": "Respiración 4-7-8",
+          "desc": "Inhala 4s, retén 7s, exhala 8s. Ideal para calmar ansiedad."
+        },
+        "feature2": {
+          "label": "Respiración cuadrada",
+          "desc": "Inhala 4s, retén 4s, exhala 4s, retén 4s. Para centrarte."
+        }
+      },
+      "comunidad": {
+        "shortLabel": "Comunidad",
+        "title": "7. Comunidad",
+        "subtitle": "No estás solo en el proceso",
+        "feature1": {
+          "label": "Posts anónimos",
+          "desc": "Comparte reflexiones y avances sin que nadie sepa quién eres."
+        },
+        "feature2": {
+          "label": "Apoyo mutuo",
+          "desc": "Dale \"Me gusta\" a los posts que te resuenen."
+        },
+        "feature3": {
+          "label": "Por fases",
+          "desc": "Los posts se organizan según la fase del proceso en la que estás."
+        }
+      },
+      "journeys": {
+        "shortLabel": "Viajes guiados",
+        "title": "8. Viajes guiados",
+        "subtitle": "Programas estructurados paso a paso",
+        "step1": "Elige un viaje según tu fase: autoconocimiento, gestión emocional, propósito o acción.",
+        "step2": "Cada módulo tiene ejercicios prácticos con guía del mentor.",
+        "step3": "Tu progreso se rastrea y puedes retomar donde lo dejaste.",
+        "step4": "Al completar módulos, avanzas en tu fase de transformación."
+      },
+      "settings": {
+        "shortLabel": "Configuración",
+        "title": "9. Configuración",
+        "subtitle": "Personaliza tu experiencia",
+        "feature1": {
+          "label": "Tono del mentor",
+          "desc": "Elige entre Directo, Socrático o Cálido."
+        },
+        "feature2": {
+          "label": "Recordatorios",
+          "desc": "Check-ins diarios, acciones pendientes y resumen semanal."
+        },
+        "feature3": {
+          "label": "Exportar datos",
+          "desc": "Descarga tu historial en CSV o todos tus datos en JSON (RGPD)."
+        },
+        "feature4": {
+          "label": "Privacidad",
+          "desc": "Cambia contraseña, gestiona consentimiento y elimina tu cuenta."
+        }
+      }
+    },
+    "faq": {
+      "psicologo": {
+        "q": "¿La IA sustituye a un psicólogo?",
+        "a": "No. Tres Mil Millones de Latidos es una herramienta de coaching y autoconocimiento. No diagnostica, no prescribe y no sustituye terapia profesional. En caso de crisis, te conecta con líneas de emergencia (024, 112)."
+      },
+      "datos": {
+        "q": "¿Mis datos son privados?",
+        "a": "Sí. Tus conversaciones son tuyas. El sistema cumple con el RGPD europeo. Puedes exportar o eliminar todos tus datos desde Ajustes en cualquier momento."
+      },
+      "planes": {
+        "q": "¿Qué diferencia hay entre Free y Pro?",
+        "a": "Free: 10 conversaciones/mes, 20 mensajes por conversación. Pro (9 €/mes): conversaciones y mensajes ilimitados, Modo Impulso, bot de Telegram, portal familiar e insights avanzados. Ahora mismo todo es gratis durante el MVP."
+      },
+      "telegram": {
+        "q": "¿Puedo usar Telegram?",
+        "a": "Sí. Ve a Ajustes > Telegram. Podrás chatear con tu mentor y recibir recordatorios directamente en Telegram."
+      },
+      "impulso": {
+        "q": "¿Qué es el Modo Impulso?",
+        "a": "Un programa intensivo de 21 días con diagnóstico, retos personalizados diarios, check-ins y análisis de comportamiento. Disponible en plan Pro (gratis durante el MVP)."
+      },
+      "precio": {
+        "q": "¿Cuánto cuesta?",
+        "a": "Ahora mismo todo es gratis. Estamos en fase MVP hasta octubre de 2026. Después habrá un plan Free (10 conv/mes) y un Pro (9 €/mes). Los primeros usuarios tendrán condiciones especiales."
+      }
+    }
   }
 }

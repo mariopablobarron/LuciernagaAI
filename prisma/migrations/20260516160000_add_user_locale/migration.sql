@@ -1,0 +1,12 @@
+-- User.locale: idioma preferido del usuario para emails y notificaciones
+-- programadas (nudges, weekly letter, family invites, circle pulses...).
+-- Se captura en signup desde el contexto del request (cookie NEXT_LOCALE o
+-- body.locale del cliente).
+--
+-- NOT NULL con DEFAULT 'es' → seguro para users históricos (todos quedan
+-- en español por compatibilidad). Cuando un usuario cambie su idioma desde
+-- el LocaleSwitcher, la próxima acción autenticada actualizará User.locale.
+--
+-- Valores válidos: "es" | "en" | "pt" | "fr". Validados en runtime por
+-- pickEmailLocale() / SUPPORTED_LOCALES en chatOrchestrator.
+ALTER TABLE "User" ADD COLUMN "locale" TEXT NOT NULL DEFAULT 'es';

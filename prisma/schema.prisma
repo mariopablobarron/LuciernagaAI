@@ -95,6 +95,12 @@ model User {
   /// User para los valores válidos. Nullable: usuarios anteriores a esta
   /// columna no lo tienen y se les pedirá la primera vez que vuelvan.
   ageRange                  String?
+  /// Idioma preferido del usuario (es/en/pt/fr). Se captura en signup desde
+  /// el contexto del request (cookie NEXT_LOCALE o body.locale del cliente).
+  /// Usado por todos los emails programados (nudges, weekly letter, family
+  /// invites...) que se envían fuera de un request context activo.
+  /// Default "es" por compatibilidad con users históricos.
+  locale                    String                    @default("es")
   source                    String?
   isActive                  Boolean                   @default(true)
   latidos                   Int                       @default(0)

@@ -148,6 +148,7 @@ export async function POST(req: NextRequest) {
             consentGiven: true,
             consentAt,
             consentVersion: CURRENT_CONSENT_VERSION,
+            locale,
             ...(orgId && { organizationId: orgId }),
           },
         });
@@ -169,6 +170,7 @@ export async function POST(req: NextRequest) {
           consentGiven: true,
           consentAt,
           consentVersion: CURRENT_CONSENT_VERSION,
+          locale,
           ...(orgId && { organizationId: orgId }),
         },
       });

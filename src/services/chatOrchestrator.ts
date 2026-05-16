@@ -131,29 +131,43 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
   const countryCode =
     countryHeader && /^[A-Za-z]{2}$/.test(countryHeader) ? countryHeader.toUpperCase() : null;
 
-  // Detect active locale (es/en/pt/fr) from:
-  //   1. Explicit body.locale (cliente lo puede mandar)
-  //   2. Referer URL path (/en/*, /pt/*, /fr/* → locale; otherwise → es)
+  // Detect active locale (es/en/pt/fr) en este orden de prioridad:
+  //   1. body.locale explícito (el cliente puede mandarlo)
+  //   2. cookie NEXT_LOCALE (la que setea LocaleSwitcher + middleware i18n).
+  //      Esta es la fuente de verdad para la mayoría de páginas porque viven
+  //      fuera del segmento [locale] y se traducen vía cookie.
+  //   3. Referer URL path (/en/*, /pt/*, /fr/* → locale). Cubre el caso de
+  //      landing pura sin cookie todavía.
+  //   4. Default "es".
   //
   // Determina el idioma EN EL QUE responde el mentor + qué recursos de crisis
-  // sugerir (024 ES, 988 EN, SNS 24 PT, 3114 FR). No depende del país real del
-  // usuario sino de la versión del sitio que está usando.
+  // sugerir (024 ES, 988 EN, SNS 24 PT, 3114 FR). No depende del país real
+  // del usuario sino de la versión del sitio que está usando.
   const SUPPORTED_LOCALES = ["es", "en", "pt", "fr"] as const;
   type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
+  function isSupported(v: string | null | undefined): v is SupportedLocale {
+    return !!v && (SUPPORTED_LOCALES as readonly string[]).includes(v);
+  }
+
   let locale: SupportedLocale = "es";
   const bodyLocale = (body as Record<string, unknown>).locale;
-  if (typeof bodyLocale === "string" && SUPPORTED_LOCALES.includes(bodyLocale as SupportedLocale)) {
-    locale = bodyLocale as SupportedLocale;
+  if (typeof bodyLocale === "string" && isSupported(bodyLocale)) {
+    locale = bodyLocale;
   } else {
-    const referer = req.headers.get("referer") ?? "";
-    try {
-      const path = new URL(referer).pathname;
-      const seg = path.split("/")[1];
-      if (seg && SUPPORTED_LOCALES.includes(seg as SupportedLocale)) {
-        locale = seg as SupportedLocale;
+    const cookieLocale = req.cookies.get("NEXT_LOCALE")?.value;
+    if (isSupported(cookieLocale)) {
+      locale = cookieLocale;
+    } else {
+      const referer = req.headers.get("referer") ?? "";
+      try {
+        const path = new URL(referer).pathname;
+        const seg = path.split("/")[1];
+        if (isSupported(seg)) {
+          locale = seg;
+        }
+      } catch {
+        // Referer ausente o malformado — mantener default "es"
       }
-    } catch {
-      // Referer ausente o malformado — mantener default "es"
     }
   }
 

@@ -1,0 +1,27 @@
+messages/fr.json
+  s_c72d0ada98a9af::t_250bee2b997eb1 979-1062
+src/app/(public)/calculadora-latidos/page.tsx
+  s_c72d0ada98a9af::t_4d24d8a2b87aeb 5,21-26,29-38,42-56,61-69,94,99-105,116,120,143-144,147-150,215,217,220-222,240,251,258,269,277,285-288,297,312,316,318,322,330,334,336,340,342,346,348,352,354,358,367-368,379,383-385,389-390,401-402,408,432,439,446,453-454,457,460,471,475-480,483-485,489,491-493,497-498,500
+messages/es.json
+  s_c72d0ada98a9af::t_30a3c504ed562a 979-1062
+messages/en.json
+  s_c72d0ada98a9af::t_81f63e608a95f1 979-1062
+messages/pt.json
+  s_c72d0ada98a9af::t_746158932b4daf 979-1062
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "427f1736f8bd2e7cea26e73f7ffbd12aabd35abd",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

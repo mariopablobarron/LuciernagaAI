@@ -221,5 +221,72 @@
       "commit3": "Si tu trouves quelque chose qui viole ces principes, écris-nous. Nous le corrigeons et nous le publions.",
       "commit4": "Nous n'utilisons pas de mineurs sur notre plateforme sans le consentement des responsables légaux et des mécanismes de protection supplémentaires."
     }
+  },
+  "about": {
+    "eyebrow": "D'où ça vient",
+    "title": "Chaque battement est un",
+    "titleHighlight": "choix",
+    "subtitle": "Trois Milliards de Battements naît d'une conviction : la technologie peut accompagner sans remplacer l'humain. Nous ne sommes pas une app de productivité. Nous sommes un espace où l'intelligence artificielle se met au service de ce qui compte le plus — que tu comprennes ce qui t'arrive et que tu agisses en conséquence.",
+    "questionTitle": "La question qui a tout commencé",
+    "questionP1": "Le cœur humain bat environ trois milliards de fois dans une vie. Chacun de ces battements est une opportunité — d'avancer, de s'arrêter, de choisir.",
+    "questionP2": "La plupart des gens savent que quelque chose doit changer. Ils le sentent. Mais entre savoir et faire il y a un abîme : des blocages qu'on ne nomme pas, des schémas qui se répètent, des décisions qu'on reporte. Et dans cet espace, la clarté se perd.",
+    "questionP3Pre": "Trois Milliards de Battements",
+    "questionP3": "existe pour combler cet abîme. Pas avec des conseils génériques ni une motivation vide, mais avec une question au bon moment, un miroir qui montre ce que tu ne vois pas, et un prochain pas que tu peux faire aujourd'hui.",
+    "philosophyTitle": "Comment nous pensons",
+    "philosophy": {
+      "interpelar": {
+        "title": "Interpeller avant d'instruire",
+        "desc": "Nous ne disons pas quoi faire. Nous demandons pour que tu découvres ce que tu sais déjà mais n'oses pas voir."
+      },
+      "porque": {
+        "title": "Toujours le pourquoi",
+        "desc": "Chaque action a une raison. Sans comprendre le pourquoi, l'action est obéissance, pas changement."
+      },
+      "gafas": {
+        "title": "Lunettes neuves",
+        "desc": "Nous t'aidons à voir ce que tu as normalisé. Ce que tu tiens pour acquis est souvent ce qui te freine le plus."
+      },
+      "localGlobal": {
+        "title": "Du local au global",
+        "desc": "Nous commençons par le concret d'aujourd'hui — ton blocage, ton émotion — et à partir de là nous découvrons le schéma plus large."
+      },
+      "inside": {
+        "title": "Le changement vient de l'intérieur",
+        "desc": "Il ne s'impose pas. Il s'interpelle. La bonne question génère plus de changement que la meilleure instruction."
+      },
+      "progress": {
+        "title": "Progrès, pas perfection",
+        "desc": "Un pas imparfait aujourd'hui vaut plus qu'un plan parfait demain. Avancer, c'est ce qui compte."
+      }
+    },
+    "behindTitle": "Qui est derrière",
+    "startidea": {
+      "name": "Startidea",
+      "tagline": "Agence d'Innovation Sociale et de Développement Technologique",
+      "p1Pre": "Trois Milliards de Battements naît de",
+      "p1": ", une agence avec 15 ans d'expérience auprès d'organisations qui cherchent un impact réel. Nous avons accompagné des entreprises, des institutions éducatives, des ONG et des administrations publiques dans des processus d'innovation sociale et de transformation numérique.",
+      "p2Pre": "Après 15 ans à voir comment les gens se bloquent, reportent et perdent en clarté — même avec ressources et motivation — nous nous sommes demandé :",
+      "p2Strong": "et si la technologie pouvait faire ce qu'un bon mentor fait ? Être là, au bon moment, avec la bonne question.",
+      "p3": "Trois Milliards de Battements est notre réponse. Un projet qui combine intelligence artificielle, psychologie comportementale et 15 ans d'expérience en accompagnement réel pour créer quelque chose qui n'existait pas : un mentor qui ne donne pas de réponses — il pose les questions que tu ne te poses pas."
+    },
+    "founderTitle": "Fondateur",
+    "founder": {
+      "name": "Mario Pablo Sánchez Barrón",
+      "role": "Fondateur de Startidea · Créateur de Trois Milliards de Battements",
+      "p1": "Avec plus de 15 ans d'expérience dans le développement de produits numériques à impact social, Mario a combiné la technologie avec une vision profondément humaine : les outils numériques doivent servir à ce que les gens se comprennent mieux et agissent en conséquence.",
+      "p2": "Après des années à travailler avec des équipes, clients et organisations de tout type, il a identifié un schéma récurrent : la plupart des gens n'ont pas besoin de plus d'informations ni de plus de conseils. Ils ont besoin d'un espace pour penser clairement, sans jugement, et d'un coup de pouce concret pour agir aujourd'hui — pas demain.",
+      "p3Strong": "Trois Milliards de Battements est cet espace.",
+      "p3": "La réponse à une question que Mario se pose depuis des années : comment aider quelqu'un à faire le premier pas quand il est bloqué, sans lui dire ce qu'il doit faire ?"
+    },
+    "commitmentsTitle": "Engagements",
+    "commitment1": "Nous ne remplaçons pas l'aide professionnelle. Si nous détectons un risque, nous connectons aux lignes d'urgence.",
+    "commitment2": "Tes conversations sont à toi. Nous ne vendons pas tes données et ne les utilisons pas à des fins publicitaires.",
+    "commitment3": "Tu peux exporter ou supprimer toutes tes données à tout moment.",
+    "commitment4": "L'IA accompagne — elle ne diagnostique pas, ne prescrit pas, ne juge pas.",
+    "ctaNote": "Engagés pour le bien-être émotionnel à travers la technologie.",
+    "ctaPrimary": "Commencer maintenant",
+    "ctaSecondary": "À propos de Startidea",
+    "profNote": "Tu es psychologue, coach ou professionnel de l'accompagnement ?",
+    "profLink": "Vois comment ça complète ton activité"
   }
 }

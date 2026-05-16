@@ -221,5 +221,72 @@
       "commit3": "If you find something that violates these principles, write to us. We fix it and we publish it.",
       "commit4": "We don't use minors on our platform without consent from legal guardians and additional protection mechanisms."
     }
+  },
+  "about": {
+    "eyebrow": "Where this comes from",
+    "title": "Every heartbeat is a",
+    "titleHighlight": "choice",
+    "subtitle": "Three Billion Heartbeats is born from one conviction: technology can accompany without replacing what's human. We're not a productivity app. We're a space where artificial intelligence serves what matters most — that you understand what's happening and act accordingly.",
+    "questionTitle": "The question that started it all",
+    "questionP1": "The human heart beats approximately three billion times in a lifetime. Each of those beats is an opportunity — to move forward, to pause, to choose.",
+    "questionP2": "Most people know something needs to change. They feel it. But between knowing and doing there's an abyss: blockages that go unnamed, patterns that repeat, decisions that get postponed. And in that space, clarity is lost.",
+    "questionP3Pre": "Three Billion Heartbeats",
+    "questionP3": "exists to close that abyss. Not with generic advice or empty motivation, but with a question at the right moment, a mirror showing what you're not seeing, and a next step you can take today.",
+    "philosophyTitle": "How we think",
+    "philosophy": {
+      "interpelar": {
+        "title": "Question before instructing",
+        "desc": "We don't tell you what to do. We ask, so you discover what you already know but don't dare to see."
+      },
+      "porque": {
+        "title": "Always the why",
+        "desc": "Every action has a reason. Without understanding the why, action is obedience, not change."
+      },
+      "gafas": {
+        "title": "New glasses",
+        "desc": "We help you see what you've normalized. What you take for granted is often what holds you back the most."
+      },
+      "localGlobal": {
+        "title": "From local to global",
+        "desc": "We start with the concrete of today — your blockage, your emotion — and from there we discover the bigger pattern."
+      },
+      "inside": {
+        "title": "Change comes from within",
+        "desc": "It isn't imposed. It's questioned into being. The right question creates more change than the best instruction."
+      },
+      "progress": {
+        "title": "Progress, not perfection",
+        "desc": "An imperfect step today is worth more than a perfect plan tomorrow. Moving forward is what counts."
+      }
+    },
+    "behindTitle": "Who's behind this",
+    "startidea": {
+      "name": "Startidea",
+      "tagline": "Social Innovation and Technology Development Agency",
+      "p1Pre": "Three Billion Heartbeats emerges from",
+      "p1": ", an agency with 15 years of experience working with organizations seeking real impact. We've supported companies, educational institutions, NGOs, and public administrations in processes of social innovation and digital transformation.",
+      "p2Pre": "After 15 years watching how people get stuck, postpone, and lose clarity — even when they have resources and motivation — we asked ourselves:",
+      "p2Strong": "what if technology could do what a good mentor does? Be there, at the right moment, with the right question.",
+      "p3": "Three Billion Heartbeats is our answer. A project that combines artificial intelligence, behavioral psychology, and 15 years of real-world accompaniment experience to create something that didn't exist: a mentor that doesn't give answers — it asks the questions you're not asking yourself."
+    },
+    "founderTitle": "Founder",
+    "founder": {
+      "name": "Mario Pablo Sánchez Barrón",
+      "role": "Founder of Startidea · Creator of Three Billion Heartbeats",
+      "p1": "With over 15 years of experience developing digital products with social impact, Mario has combined technology with a deeply human vision: digital tools should help people understand themselves better and act accordingly.",
+      "p2": "After years working with teams, clients, and organizations of all kinds, he identified a recurring pattern: most people don't need more information or more advice. They need a space to think clearly, without judgment, and a concrete push to act today — not tomorrow.",
+      "p3Strong": "Three Billion Heartbeats is that space.",
+      "p3": "The answer to a question Mario has been asking himself for years: how do I help someone take the first step when they're stuck, without telling them what to do?"
+    },
+    "commitmentsTitle": "Commitments",
+    "commitment1": "We don't replace professional help. If we detect risk, we connect with emergency lines.",
+    "commitment2": "Your conversations are yours. We don't sell data or use it for advertising.",
+    "commitment3": "You can export or delete all your data at any time.",
+    "commitment4": "AI accompanies — it doesn't diagnose, prescribe, or judge.",
+    "ctaNote": "Committed to emotional wellbeing through technology.",
+    "ctaPrimary": "Start now",
+    "ctaSecondary": "About Startidea",
+    "profNote": "Psychology, coaching, or accompaniment professional?",
+    "profLink": "See how it complements your practice"
   }
 }

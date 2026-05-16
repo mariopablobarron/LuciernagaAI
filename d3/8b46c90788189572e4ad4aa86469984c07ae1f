@@ -1,0 +1,22 @@
+scripts/i18n-sync.mjs
+  s_c72d0ada98a9af::t_1eaa2ecc184c42 93-96,123-125,129
+  s_c72d0ada98a9af::t_2e64007905be8e 1-92,97-122,126-128,130-376
+package.json
+  s_c72d0ada98a9af::t_52d8a2a2d7e800 21-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "d38b46c90788189572e4ad4aa86469984c07ae1f",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

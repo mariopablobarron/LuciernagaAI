@@ -5,6 +5,7 @@ import { logError } from "@/lib/logger";
 import { syndicatePost } from "@/services/syndication";
 import { notifyIndexNowSingle } from "@/services/seo/indexnow";
 import { pickEmailLocale } from "@/lib/email-i18n";
+import { translatePostToAllLocales } from "@/services/blog-translator";
 
 export const dynamic = "force-dynamic";
 
@@ -100,18 +101,21 @@ export async function PUT(
 
     const post = await prisma.blogPost.update({ where: { id }, data });
 
-    // Trigger syndication + IndexNow ping when post transitions from draft → published.
-    // Non-blocking: caller gets the post immediately; los side-effects corren en
-    // paralelo. Fallos logged pero nunca afectan al caller.
+    // Side-effects al publicar por PRIMERA vez (transición draft→published).
+    // Todos fire-and-forget: el caller recibe el post inmediatamente; los
+    // fallos se loggean pero no afectan a la respuesta.
     const becamePublished = body.status === "published" && existing.status !== "published";
+    const finalLocale = (data.locale as string | undefined) ?? existing.locale;
+
     if (becamePublished) {
+      // 1. Syndication (cross-post a Reddit/etc).
       void syndicatePost(id).catch((err) =>
         logError("SYNDICATION", err instanceof Error ? err : new Error(String(err)), {
           context: "auto_trigger_on_publish",
           postId: id,
         }),
       );
-      // IndexNow: ping inmediato del nuevo post a Bing/Yandex.
+      // 2. IndexNow: ping inmediato del nuevo post a Bing/Yandex.
       const slug = (data.slug as string | undefined) ?? post.slug;
       void notifyIndexNowSingle(`https://tresmilmillonesdelatidos.es/blog/${slug}`).catch((err) =>
         logError("SEO", err instanceof Error ? err : new Error(String(err)), {
@@ -119,6 +123,14 @@ export async function PUT(
           postId: id,
         }),
       );
+      // 3. Auto-traducción: solo si el post fuente es ES. Genera drafts en
+      // EN/PT/FR vía LLM. Idempotente — no sobrescribe traducciones existentes.
+      // Para regenerar tras editar el ES, usar el botón manual con force=true.
+      if (finalLocale === "es") {
+        void translatePostToAllLocales(post.id).catch((e) =>
+          logError("BLOG_TRANSLATOR", e, { action: "auto_on_publish", postId: post.id }),
+        );
+      }
     }
 
     return NextResponse.json({ post });

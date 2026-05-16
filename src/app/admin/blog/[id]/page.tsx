@@ -4,7 +4,7 @@ import { use, useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { ArrowLeft, Save, Eye, Globe, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Eye, Globe, Loader2, Languages } from "lucide-react";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 import { blocksToPlainText } from "@/components/BlockEditor";
 import { SyndicationPanel } from "@/features/admin/components/blog/SyndicationPanel";
@@ -158,6 +158,53 @@ export default function BlogEditorPage({ params }: { params: Promise<{ id: strin
     finally { setSaving(false); }
   }
 
+  // Auto-traducción manual: solo para posts ES. Genera/regenera drafts en
+  // EN/PT/FR. El backend ya hace esto automáticamente al publicar, pero
+  // este botón sirve para REGENERAR cuando se ha editado el ES (con force=true).
+  const [translating, setTranslating] = useState(false);
+
+  async function handleRegenerateTranslations(force: boolean) {
+    if (!postId) {
+      toast.error("Guarda el post primero");
+      return;
+    }
+    if (locale !== "es") {
+      toast.error("Solo los posts en español pueden generar traducciones");
+      return;
+    }
+    setTranslating(true);
+    try {
+      const res = await fetch(`/api/admin/blog/${postId}/translate`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ force }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error ?? `Error ${res.status}`);
+        return;
+      }
+      const data = await res.json() as {
+        results: { targetLocale: string; status: string; error?: string }[];
+      };
+      const created = data.results.filter((r) => r.status === "created").length;
+      const regen = data.results.filter((r) => r.status === "regenerated").length;
+      const skipped = data.results.filter((r) => r.status === "skipped_exists").length;
+      const errors = data.results.filter((r) => r.status === "error").length;
+      const parts: string[] = [];
+      if (created) parts.push(`${created} creadas`);
+      if (regen) parts.push(`${regen} regeneradas`);
+      if (skipped) parts.push(`${skipped} omitidas (ya existían)`);
+      if (errors) parts.push(`${errors} con error`);
+      toast.success(`Traducciones: ${parts.join(", ") || "sin cambios"}`);
+    } catch {
+      toast.error("Error de red");
+    } finally {
+      setTranslating(false);
+    }
+  }
+
   async function handleLogout() {
     await fetch("/api/admin/logout", { method: "POST" });
     router.push("/admin/login");
@@ -249,6 +296,66 @@ export default function BlogEditorPage({ params }: { params: Promise<{ id: strin
               El mismo slug puede coexistir en distintos idiomas. El blog público filtra por idioma del visitante.
             </p>
           </div>
+
+          {/* Auto-traducción — solo para posts ES (fuente). Aparece tras guardar. */}
+          {locale === "es" && postId && (
+            <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Languages className="w-3.5 h-3.5 text-cyan-400" />
+                <label className="text-xs font-medium text-cyan-400 uppercase tracking-wider">
+                  Auto-traducción
+                </label>
+              </div>
+              <p className="text-[11px] text-zinc-400 leading-relaxed">
+                Al publicar este post en español, se generan drafts automáticos en EN/PT/FR.
+                Aparecerán en el listado para que los revises antes de publicarlos.
+              </p>
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => void handleRegenerateTranslations(false)}
+                  disabled={translating}
+                  className="flex items-center justify-center gap-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/20 transition-colors disabled:opacity-40"
+                  title="Genera drafts EN/PT/FR si no existen. No sobrescribe los que ya hay."
+                >
+                  {translating ? (
+                    <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Generando…</>
+                  ) : (
+                    <><Languages className="w-3.5 h-3.5" /> Generar traducciones</>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (confirm("Regenerar sobrescribe las traducciones existentes (incluso publicadas). ¿Continuar?")) {
+                      void handleRegenerateTranslations(true);
+                    }
+                  }}
+                  disabled={translating}
+                  className="text-[10px] text-zinc-500 hover:text-amber-400 transition-colors disabled:opacity-40"
+                >
+                  Forzar regeneración (sobrescribe)
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Aviso para posts en otros idiomas: son auto-traducidos por defecto */}
+          {locale !== "es" && (
+            <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 space-y-2">
+              <div className="flex items-center gap-2">
+                <Languages className="w-3.5 h-3.5 text-amber-400" />
+                <label className="text-xs font-medium text-amber-400 uppercase tracking-wider">
+                  Versión traducida
+                </label>
+              </div>
+              <p className="text-[11px] text-zinc-400 leading-relaxed">
+                Este post está en <strong className="text-zinc-300">{LOCALE_OPTIONS.find((o) => o.code === locale)?.label}</strong>.
+                Si fue auto-traducido, revisa el tono antes de publicar. Tus ediciones aquí
+                NO se pierden cuando se regenera la traducción desde el ES (solo se sobrescribe con "Forzar").
+              </p>
+            </div>
+          )}
 
           {/* Slug */}
           <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 space-y-2">

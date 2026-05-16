@@ -3,6 +3,7 @@ import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
 import { pickEmailLocale } from "@/lib/email-i18n";
+import { translatePostToAllLocales } from "@/services/blog-translator";
 
 export const dynamic = "force-dynamic";
 
@@ -99,6 +100,17 @@ export async function POST(req: NextRequest) {
         publishedAt: status === "published" ? new Date() : null,
       },
     });
+
+    // Auto-traducción: si el post es ES y se publica directamente, dispara
+    // la generación de drafts EN/PT/FR en background. Mario los revisa después
+    // en /admin/blog (filtros por idioma + bandera). Si solo se guarda como
+    // draft, NO se traduce — esperamos a que esté listo para publicar.
+    // Idempotente: si ya existen drafts, no los sobrescribe.
+    if (locale === "es" && status === "published") {
+      void translatePostToAllLocales(post.id).catch((e) =>
+        logError("BLOG_TRANSLATOR", e, { action: "auto_on_create", postId: post.id }),
+      );
+    }
 
     return NextResponse.json({ post }, { status: 201 });
   } catch (error) {

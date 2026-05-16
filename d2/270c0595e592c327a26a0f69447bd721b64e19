@@ -1,0 +1,47 @@
+src/lib/email-i18n.ts
+  s_c72d0ada98a9af::t_04b58c6588cc55 747-1323
+src/services/circleMatchmaking.ts
+  s_c72d0ada98a9af::t_9d704ec4c08dd6 265,278
+  s_c72d0ada98a9af::t_5252672e441654 4
+src/app/api/admin/community/reflections/[id]/route.ts
+  s_c72d0ada98a9af::t_c5cb6b4fd7627c 74
+  s_c72d0ada98a9af::t_2653fd3bee3ab0 91
+  s_c72d0ada98a9af::t_c3f88e421d18be 6
+src/services/family.ts
+  s_c72d0ada98a9af::t_149f4789581f1e 21
+  s_c72d0ada98a9af::t_9117c796a9b844 155,171
+  s_c72d0ada98a9af::t_e64fa017bcbb94 199
+  s_c72d0ada98a9af::t_4139592ab0ded4 37,44-47,55
+  s_c72d0ada98a9af::t_250f5ad067673b 86,93,100
+  s_c72d0ada98a9af::t_0d8b22876f5c3b 121,128,135
+  s_c72d0ada98a9af::t_08627f3160d62a 232
+src/lib/email.ts
+  s_c72d0ada98a9af::t_7154348f6c39c6 972,974-975,977-985,991,995,997,1001,1003,1005
+  s_c72d0ada98a9af::t_cc76348d40d7f1 780,783-786,788-792
+  s_c72d0ada98a9af::t_855e62a26ec8dc 756,759-762,764,766,768-771
+  s_c72d0ada98a9af::t_ef7ac035ba1ef6 940,942-943,945,951-952,954,956,960,963
+  s_c72d0ada98a9af::t_c8a1aad7c86128 693-700,708,711-713,715,717-718,722,724,727-728,731,734,736,738,740-741,743,745,747
+  s_c72d0ada98a9af::t_74ad65578e6c71 867,870-873,875,879-881
+  s_c72d0ada98a9af::t_f06561558a3d97 903,905-906,908,910-914,919,925,929,931,933
+  s_c72d0ada98a9af::t_3513f23f9d6539 20-30,33-39
+  s_c72d0ada98a9af::t_3a903898e207c2 801,804-807,809-810,814-816
+src/services/circlePulses.ts
+  s_c72d0ada98a9af::t_c0c8d617e5a1db 186,201
+  s_c72d0ada98a9af::t_a7a5e5a366df70 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "d2270c0595e592c327a26a0f69447bd721b64e19",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

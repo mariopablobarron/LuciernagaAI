@@ -1,0 +1,31 @@
+src/app/admin/blog/[id]/page.tsx
+  s_c72d0ada98a9af::t_bbcff2c61d9977 119
+  s_c72d0ada98a9af::t_44b95407a81c89 7
+  s_c72d0ada98a9af::t_c839cdbc41de85 281-299,372
+  s_c72d0ada98a9af::t_f9d5a0712ebfdc 84-88
+  s_c72d0ada98a9af::t_6423cb2c3f89f6 22,34-40
+  s_c72d0ada98a9af::t_335cc76df12012 52
+  s_c72d0ada98a9af::t_e0c1b5ec16ca6a 300-359
+  s_c72d0ada98a9af::t_74851abe9f4c6d 161-207
+src/app/api/admin/blog/route.ts
+  s_c72d0ada98a9af::t_8028e6317f6cdb 70-71,75-80,82-85,91
+  s_c72d0ada98a9af::t_277daf202aa2f0 104-114
+  s_c72d0ada98a9af::t_9f28060c6435f2 5
+  s_c72d0ada98a9af::t_8c208fe5aa9c94 19,23-26
+  s_c72d0ada98a9af::t_2184fb81d8d0c9 6
+src/services/blog-translator.ts
+  s_c72d0ada98a9af::t_bf4c90ba3a9980 1-325
+src/app/api/admin/blog/[id]/translate/route.ts
+  s_c72d0ada98a9af::t_5748ebcd16345f 1-65
+src/app/api/admin/blog/[id]/route.ts
+  s_c72d0ada98a9af::t_d12dc8737e2d9d 7
+  s_c72d0ada98a9af::t_b201fabd10a51e 8
+  s_c72d0ada98a9af::t_a46689ea13a904 103-108,110-120,123-125,134-135
+  s_c72d0ada98a9af::t_274bb736fdb917 45-48,53-60,63-72,74-86,126-133
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "b632c91649930ea8fce5a76b92f5111921119498",
+  "prompts": {}
+}

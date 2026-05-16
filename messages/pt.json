@@ -693,5 +693,76 @@
     "ctaSubtitle": "Lê o método antes de te registares. Sem dar email.",
     "ctaPrimary": "Ler o método",
     "ctaSecondary": "Experimentar grátis"
+  },
+  "useCases": {
+    "eyebrow": "Casos de uso",
+    "title": "Depende",
+    "titleHighlight": "do que tragas",
+    "subtitle": "O mentor não é a mesma coisa para toda a gente. Quatro formas reais como as pessoas o estão a usar. Olha para a que mais se parece com o teu momento.",
+    "signsLabel": "Vais reconhecer-te se…",
+    "howLabel": "O que vais encontrar aqui",
+    "limitStrong": "Onde está o limite.",
+    "ctaCaso": "Começar por aqui",
+    "footerNote": "Se não te reconheces em nenhum — ou reconheces-te em vários — não faz mal. O mentor adapta-se ao que tragas no dia em que entras. Estes são apenas exemplos, não rótulos.",
+    "footerCta1": "Ler o método",
+    "footerCta2": "Perguntas frequentes",
+    "case": {
+      "bloqueos": {
+        "kicker": "Bloqueios e decisões",
+        "title": "Sabes que algo tem de mudar, mas não arrancas",
+        "pitch": "Dás voltas ao mesmo sem avançar. Tens claro que não queres continuar como estás, mas sempre que te pões a decidir aparece outra dúvida. Não é falta de informação — é outra coisa.",
+        "signal1": "Adias decisões importantes \"até teres tudo claro\"",
+        "signal2": "Consomes conteúdo sobre o tema mas não passas à ação",
+        "signal3": "Sentes que se te enganares não vais conseguir resolver",
+        "signal4": "As pessoas à tua volta já te deram conselhos — não te servem",
+        "how1": "O mentor separa facto de interpretação para veres o que é medo e o que é critério",
+        "how2": "Devolve-te perguntas incómodas que tu próprio andas a evitar",
+        "how3": "Propõe o passo mais pequeno possível hoje — não o plano perfeito",
+        "how4": "Revê contigo os padrões quando a decisão volta sempre",
+        "limit": "Se o bloqueio vem acompanhado de sintomas depressivos sustentados ou ansiedade incapacitante, complementa com um profissional humano."
+      },
+      "ansiedad": {
+        "kicker": "Ansiedade do dia a dia",
+        "title": "Vais acelerado por dentro mesmo que por fora tudo funcione",
+        "pitch": "Não é uma perturbação diagnosticada. É aquele nó que te acompanha ao acordar, a cabeça que não para, a sensação de andares sempre atrasado. Queres entendê-lo antes que escale.",
+        "signal1": "Custa-te desligar mesmo quando não há nada urgente",
+        "signal2": "Revês mentalmente o que pode correr mal antes de dormir",
+        "signal3": "Zangas-te com coisas pequenas e depois sentes-te culpado",
+        "signal4": "O teu corpo avisa (tensão, insónia, digestão) e tu ignoras",
+        "how1": "Check-ins diários que te obrigam a nomear o que sentes antes de agir",
+        "how2": "Exercícios de respiração guiados para baixar o pico no momento",
+        "how3": "O mentor deteta padrões entre o que pensas e o que te acontece no corpo",
+        "how4": "Diário guiado para separar a ameaça real da imaginada",
+        "limit": "Se tens ataques de pânico, evitamentos importantes ou a ansiedade interfere com a tua vida diária, isto não substitui uma avaliação clínica."
+      },
+      "transiciones": {
+        "kicker": "Transições de vida",
+        "title": "Estás num \"entre\". O velho já não, o novo ainda não",
+        "pitch": "Mudança de trabalho, separação, mudança de casa, fim de uma etapa, início de outra. Não é crise: é o terreno incómodo entre duas versões de ti. Precisas de organizar o que largas e escolher o que constróis.",
+        "signal1": "Custa-te explicar a outros como estás sem soar dramático",
+        "signal2": "Por momentos estás bem e por momentos invade-te a nostalgia ou a incerteza",
+        "signal3": "Tens decisões grandes para tomar e não sabes a partir de onde",
+        "signal4": "Perguntas-te \"quem sou agora?\" mais do que o habitual",
+        "how1": "Trabalho por objetivos para aterrar a direção em ações concretas",
+        "how2": "O mentor ajuda-te a nomear o que terminou antes de forçares o que vem a seguir",
+        "how3": "Seguimento de padrões emocionais para veres a curva, não só o dia",
+        "how4": "Lembretes contextuais para voltares a ti quando te perdes no ruído",
+        "limit": "Se a transição inclui luto por perda recente ou separação traumática, este acompanhamento complementa mas não substitui terapia específica."
+      },
+      "autoconocimiento": {
+        "kicker": "Autoconhecimento",
+        "title": "Não estás mal. Queres ver-te com mais honestidade",
+        "pitch": "Não há crise. Há curiosidade. Queres entender porque reages como reages, que padrões se repetem nas tuas relações, que valores estás a viver e quais deixaste de lado. Ver os óculos com que olhas.",
+        "signal1": "Tens tempo e energia, mas sentes que podias viver mais desperto",
+        "signal2": "Notas padrões repetidos mas não sabes exatamente quais são",
+        "signal3": "Queres escrever/refletir regularmente mas não sustentas o hábito sozinho",
+        "signal4": "Interessa-te o como funcionas, não só o que fazer",
+        "how1": "Diário guiado com perguntas que não te farias sozinho",
+        "how2": "Sistema de padrões que te devolve o que não estás a ver",
+        "how3": "Conversas de fundo sobre valores, decisões, relações",
+        "how4": "Sem pressa para \"arranjar\" nada — ritmo teu",
+        "limit": "Este caso não tem contraindicações particulares para além dos limites gerais: o mentor acompanha, não diagnostica."
+      }
+    }
   }
 }

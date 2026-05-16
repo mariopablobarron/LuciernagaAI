@@ -693,5 +693,76 @@
     "ctaSubtitle": "Read the method before registering. Without giving your email.",
     "ctaPrimary": "Read the method",
     "ctaSecondary": "Try it free"
+  },
+  "useCases": {
+    "eyebrow": "Use cases",
+    "title": "It depends on",
+    "titleHighlight": "what you bring",
+    "subtitle": "The mentor isn't the same thing for everyone. Four real ways people are using it. Look at the one that most resembles your moment.",
+    "signsLabel": "You'll recognize yourself if…",
+    "howLabel": "What you'll find here",
+    "limitStrong": "Where the limit is.",
+    "ctaCaso": "Start with this",
+    "footerNote": "If you don't recognize yourself in any of them — or recognize yourself in several — it's fine. The mentor adapts to what you bring the day you come in. These are just examples, not labels.",
+    "footerCta1": "Read the method",
+    "footerCta2": "Frequently asked questions",
+    "case": {
+      "bloqueos": {
+        "kicker": "Blocks and decisions",
+        "title": "You know something has to change, but you don't get started",
+        "pitch": "You keep going around the same thing without moving forward. You're clear you don't want to keep going as you are, but every time you sit down to decide, another doubt shows up. It's not lack of information — it's something else.",
+        "signal1": "You postpone important decisions \"until you have it clear\"",
+        "signal2": "You consume content about the topic but don't act",
+        "signal3": "You feel that if you get it wrong you won't be able to fix it",
+        "signal4": "The people around you have already given you advice — it doesn't help",
+        "how1": "The mentor separates fact from interpretation so you can see what is fear and what is judgment",
+        "how2": "Sends back uncomfortable questions you yourself are dodging",
+        "how3": "Proposes the smallest possible step today — not the perfect plan",
+        "how4": "Reviews with you the patterns when the decision keeps coming back",
+        "limit": "If the block comes with sustained depressive symptoms or disabling anxiety, complement it with a human professional."
+      },
+      "ansiedad": {
+        "kicker": "Everyday anxiety",
+        "title": "You're racing inside even though on the outside everything works",
+        "pitch": "It's not a diagnosed disorder. It's that knot that comes with you when you wake up, the head that won't stop, the feeling that you're always behind. You want to understand it before it escalates.",
+        "signal1": "You find it hard to switch off even when nothing is urgent",
+        "signal2": "You mentally review what could go wrong before going to sleep",
+        "signal3": "You get angry at small things and then feel guilty",
+        "signal4": "Your body warns you (tension, insomnia, digestion) and you ignore it",
+        "how1": "Daily check-ins that force you to name what you feel before acting",
+        "how2": "Guided breathing exercises to bring down the peak in the moment",
+        "how3": "The mentor identifies patterns between what you think and what happens in your body",
+        "how4": "Guided journal to separate the real threat from the imagined one",
+        "limit": "If you have panic attacks, significant avoidances or the anxiety interferes with your daily life, this does not replace clinical assessment."
+      },
+      "transiciones": {
+        "kicker": "Life transitions",
+        "title": "You're in an \"in-between\". The old no longer, the new not yet",
+        "pitch": "Job change, breakup, move, end of a stage, start of another. It's not a crisis: it's the uncomfortable ground between two versions of you. You need to sort out what you're letting go and choose what you're building.",
+        "signal1": "You find it hard to explain to others how you are without sounding dramatic",
+        "signal2": "Sometimes you're fine and sometimes nostalgia or uncertainty take over",
+        "signal3": "You have big decisions to make and don't know where to make them from",
+        "signal4": "You ask yourself \"who am I now?\" more than usual",
+        "how1": "Goal-oriented work to ground the direction in concrete actions",
+        "how2": "The mentor helps you name what ended before forcing what comes next",
+        "how3": "Tracking emotional patterns to see the curve, not just the day",
+        "how4": "Contextual reminders to come back to yourself when you get lost in the noise",
+        "limit": "If the transition includes grief from recent loss or traumatic breakup, this companionship complements but does not replace specific therapy."
+      },
+      "autoconocimiento": {
+        "kicker": "Self-knowledge",
+        "title": "You're not unwell. You want to see yourself with more honesty",
+        "pitch": "There's no crisis. There's curiosity. You want to understand why you react the way you do, what patterns repeat in your relationships, what values you're living and which ones you set aside. To see the glasses through which you look.",
+        "signal1": "You have time and energy, but feel you could live more awake",
+        "signal2": "You notice repeated patterns but don't know exactly what they are",
+        "signal3": "You want to write/reflect regularly but can't sustain the habit alone",
+        "signal4": "You care about how you work, not just what to do",
+        "how1": "Guided journal with questions you wouldn't ask yourself alone",
+        "how2": "Pattern system that returns to you what you're not seeing",
+        "how3": "Deep conversations about values, decisions, relationships",
+        "how4": "No rush to \"fix\" anything — your own pace",
+        "limit": "This case has no particular contraindications beyond the general limits: the mentor accompanies, doesn't diagnose."
+      }
+    }
   }
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { ArrowRight, BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
 
 type PostCard = {
@@ -17,16 +18,26 @@ type PostCard = {
 
 type Pagination = { page: number; pageSize: number; total: number; totalPages: number };
 
-function formatDate(iso: string | null) {
-  if (!iso) return "";
-  return new Date(iso).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
-}
+const LOCALE_BCP47: Record<string, string> = {
+  es: "es-ES",
+  en: "en-US",
+  pt: "pt-PT",
+  fr: "fr-FR",
+};
 
 export default function BlogPage() {
+  const t = useTranslations("blog");
+  const locale = useLocale();
   const [posts, setPosts] = useState<PostCard[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
+
+  const bcp = LOCALE_BCP47[locale] ?? "en-US";
+  function formatDate(iso: string | null) {
+    if (!iso) return "";
+    return new Date(iso).toLocaleDateString(bcp, { day: "numeric", month: "long", year: "numeric" });
+  }
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -51,11 +62,9 @@ export default function BlogPage() {
       <div className="text-center space-y-4">
         <div className="flex items-center justify-center gap-2">
           <BookOpen className="w-6 h-6 text-violet-400" />
-          <h1 className="text-3xl sm:text-4xl font-bold text-white">Blog</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white">{t("title")}</h1>
         </div>
-        <p className="text-zinc-400 text-lg max-w-xl mx-auto">
-          Articulos, reflexiones y recomendaciones sobre bienestar emocional, desarrollo personal e inteligencia artificial.
-        </p>
+        <p className="text-zinc-400 text-lg max-w-xl mx-auto">{t("subtitle")}</p>
       </div>
 
       {/* Posts grid */}
@@ -66,9 +75,9 @@ export default function BlogPage() {
       ) : posts.length === 0 ? (
         <div className="text-center py-20 space-y-4">
           <BookOpen className="w-12 h-12 text-zinc-700 mx-auto" />
-          <p className="text-zinc-500">Proximamente publicaremos articulos aqui.</p>
+          <p className="text-zinc-500">{t("empty")}</p>
           <Link href="/" className="inline-flex items-center gap-2 text-sm text-violet-400 hover:text-violet-300 transition-colors">
-            Volver al inicio <ArrowRight className="w-4 h-4" />
+            {t("emptyBack")} <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       ) : (
@@ -135,7 +144,7 @@ export default function BlogPage() {
             onClick={() => { setPage((p) => p - 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
             className="flex items-center gap-1 rounded-lg border border-zinc-800 px-4 py-2 text-sm text-zinc-400 hover:text-white hover:border-violet-500/30 transition-all disabled:opacity-30"
           >
-            <ChevronLeft className="w-4 h-4" /> Anterior
+            <ChevronLeft className="w-4 h-4" /> {t("prev")}
           </button>
           <span className="text-sm text-zinc-500">
             {pagination.page} / {pagination.totalPages}
@@ -145,7 +154,7 @@ export default function BlogPage() {
             onClick={() => { setPage((p) => p + 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
             className="flex items-center gap-1 rounded-lg border border-zinc-800 px-4 py-2 text-sm text-zinc-400 hover:text-white hover:border-violet-500/30 transition-all disabled:opacity-30"
           >
-            Siguiente <ChevronRight className="w-4 h-4" />
+            {t("next")} <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       )}

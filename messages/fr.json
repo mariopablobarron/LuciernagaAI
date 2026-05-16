@@ -1773,5 +1773,20 @@
         "intro": "Pour toute question concernant ces conditions, écris-nous à <mailto>hola@tresmilmillonesdelatidos.es</mailto>."
       }
     }
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Articles, réflexions et recommandations sur le bien-être émotionnel, le développement personnel et l'intelligence artificielle.",
+    "empty": "Nous publierons bientôt des articles ici.",
+    "emptyBack": "Retour à l'accueil",
+    "prev": "Précédent",
+    "next": "Suivant",
+    "notFoundTitle": "Article introuvable",
+    "backToBlog": "Retour au blog",
+    "backShort": "Blog",
+    "backArrow": "← Retour au blog",
+    "ctaTitle": "Tu veux passer du blocage à l'action ?",
+    "ctaDesc": "Trois Milliards de Battements t'accompagne avec l'IA. Gratuit pendant le MVP.",
+    "ctaButton": "Commencer maintenant"
   }
 }

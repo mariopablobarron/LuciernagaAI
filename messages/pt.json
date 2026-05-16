@@ -1773,5 +1773,20 @@
         "intro": "Para questões sobre estes termos escreve-nos para <mailto>hola@tresmilmillonesdelatidos.es</mailto>."
       }
     }
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Artigos, reflexões e recomendações sobre bem-estar emocional, desenvolvimento pessoal e inteligência artificial.",
+    "empty": "Em breve publicaremos artigos aqui.",
+    "emptyBack": "Voltar ao início",
+    "prev": "Anterior",
+    "next": "Seguinte",
+    "notFoundTitle": "Artigo não encontrado",
+    "backToBlog": "Voltar ao blog",
+    "backShort": "Blog",
+    "backArrow": "← Voltar ao blog",
+    "ctaTitle": "Queres passar do bloqueio à ação?",
+    "ctaDesc": "Três Mil Milhões de Batidas acompanha-te com IA. Gratuito durante o MVP.",
+    "ctaButton": "Começar agora"
   }
 }

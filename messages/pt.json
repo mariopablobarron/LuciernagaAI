@@ -288,5 +288,183 @@
     "ctaSecondary": "Conhecer a Startidea",
     "profNote": "Profissional de psicologia, coaching ou acompanhamento?",
     "profLink": "Vê como complementa a tua consulta"
+  },
+  "faq": {
+    "eyebrow": "Perguntas frequentes",
+    "title": "O que as pessoas",
+    "titleHighlight": "perguntam antes de começar",
+    "subtitle": "Esta página resolve as tuas dúvidas para que decidas se Três Mil Milhões de Batidas encaixa contigo. Respostas diretas, sem marketing.",
+    "notFoundPre": "Se não está aqui o que procuras,",
+    "notFoundLink": "escreve-nos",
+    "ctaTitle": "Pronto para experimentar?",
+    "ctaSubtitle": "Começas sem dar dados. O email só se pede quando há algo que vale a pena guardar.",
+    "ctaButton": "Começar agora — gratuito",
+    "ctaQuestionPre": "A tua pergunta não está aqui?",
+    "ctaQuestionLink": "Conta-nos",
+    "ctaQuestionSuf": "e acrescentamo-la.",
+    "basico": {
+      "title": "O básico",
+      "what": {
+        "q": "O que é Três Mil Milhões de Batidas?",
+        "a": "Um mentor digital com IA que te acompanha para perceberes o que te passa e dares o próximo passo. Não é uma app de produtividade nem um chatbot genérico: faz perguntas para encontrares as tuas próprias respostas, em vez de te dar conselhos vazios."
+      },
+      "naming": {
+        "q": "Porque se chama assim?",
+        "a": "Um coração humano bate à volta de três mil milhões de vezes ao longo de uma vida. Cada batida é uma escolha — a maioria inconscientes. O projeto existe para que mais batidas tuas tenham direção real, não para acrescentar ruído."
+      },
+      "vsChatGPT": {
+        "q": "Em que se diferencia do ChatGPT ou de outras IAs?",
+        "a": "O ChatGPT responde ao que lhe pedes. Nós trabalhamos ao contrário: interpelamos antes de instruir. O mentor está treinado num quadro pedagógico concreto — validar a emoção, ordenar o pensamento, propor uma ação pequena — e recorda o teu contexto entre conversas para te acompanhar a sério."
+      },
+      "noPsy": {
+        "q": "Preciso de saber de psicologia ou mindfulness para usar?",
+        "a": "Não. Usa-se a escrever como falarias com alguém de confiança. O mentor adapta-se ao que trazes nesse dia."
+      },
+      "wellState": {
+        "q": "Posso usar se estou bem e só procuro clareza?",
+        "a": "Sim. Não é preciso estar mal para o usar. Muita gente usa-o para decidir, ordenar a cabeça antes de algo importante ou sustentar uma fase boa."
+      }
+    },
+    "empezar": {
+      "title": "Começar sem dar dados",
+      "register": {
+        "q": "Tenho de me registar para começar?",
+        "a": "Não. Entras no chat e começas a falar. Não pedimos email, nem nome, nem cartão para experimentares. Essa é a nossa proposta: que cruzar a porta não custe nada."
+      },
+      "whyEmail": {
+        "q": "Porque é que depois me pede o email?",
+        "a": "Só quando há algo que vale a pena conservar — um objetivo, uma ação assumida, uma conversa a que valeria voltar. O email guarda o teu progresso para não o perderes se fechares o navegador. Se não o quiseres deixar, continuas a usar tudo igual sem guardar."
+      },
+      "attachAnon": {
+        "q": "E se entrei como anónimo e depois quero guardar o que conversei?",
+        "a": "Sim. Em qualquer momento podes associar a sessão a um email e tudo o que falaste fica ligado à tua conta — sem perder nada."
+      }
+    },
+    "funciona": {
+      "title": "Como funciona",
+      "when": {
+        "q": "Quando é que me convém usar?",
+        "a": "Quando sentes que algo não vai bem mas não sabes nomeá-lo, quando te bloqueias perante uma decisão, quando voltas a cair num padrão, ou quando queres pensar em voz alta sem sentires que incomodas alguém."
+      },
+      "time": {
+        "q": "Quanto tempo demora a ajudar-me?",
+        "a": "Uma conversa pode esclarecer-te algo em 10 minutos. As mudanças de fundo levam mais: costumamos ver padrões claros a partir de 3-4 semanas de uso regular. Não prometemos magia rápida — sim um acompanhamento que soma todos os dias."
+      },
+      "memory": {
+        "q": "O mentor lembra-se do que lhe contei?",
+        "a": "Sim. Mantém o teu contexto entre sessões: os teus objetivos abertos, os padrões que deteta, o que tem funcionado e o que evitaste. Não te faz repetir a tua história todas as vezes."
+      },
+      "enneagram": {
+        "q": "O que é o teste do Eneagrama e para que serve?",
+        "a": "Um questionário opcional de 90 frases (10-12 minutos) em /profile/eneagrama. Usamo-lo só para uma coisa: ajustar o tom e as perguntas do mentor a como tu funcionas. Se o teu tipo é perfeccionista, evita o \"devias\"; se tens tendência a evitar conflitos, pergunta-te mais direto o que queres TU. Não te etiqueta no chat, não conta a ninguém. Podes repeti-lo quando quiseres."
+      },
+      "weeklyLetter": {
+        "q": "O que é a carta semanal?",
+        "a": "Uma vez por semana o mentor escreve-te uma carta curta sobre o que viu em ti — citando frases tuas — e termina com uma só pergunta para a semana seguinte. Chega por email se ativares; se não, fica na app."
+      },
+      "teamLetter": {
+        "q": "O que é a \"carta da equipa\"?",
+        "a": "Diferente da carta semanal. Após alguns turnos no chat aparece um oferecimento: se quiseres, alguém da equipa lê o teu fio e escreve-te uma nota pessoal para o teu email nos dias seguintes. É opcional, não automática, e assina-a uma pessoa real — não a IA. Serve quando queres um olhar humano sobre algo concreto que estás a trabalhar."
+      },
+      "exercises": {
+        "q": "Há exercícios ou só conversa?",
+        "a": "Ambos. Para além do chat: respiração guiada, check-ins diários, diário, trabalho por objetivos com ações pequenas, um teste gratuito de impulso, uma calculadora de batidas restantes, e \"cápsulas\" — cartas que escreves ao teu eu do futuro e são entregues na data que escolheres."
+      },
+      "structured": {
+        "q": "Há um plano estruturado ou tudo é livre?",
+        "a": "As duas coisas. Podes falar ao ritmo que quiseres. Ou entrar no desafio de 30 dias ou no Modo Impulso 21 dias, que te dão uma sequência clara: um foco, um check-in e uma ação concreta todos os dias."
+      }
+    },
+    "comunidad": {
+      "title": "Comunidade e círculos",
+      "individual": {
+        "q": "Há comunidade ou é só individual?",
+        "a": "É individual ao entrar — só tu e o mentor. Quando quiseres, podes integrar um círculo: um grupo fechado de quatro pessoas que partilham um mesmo padrão emocional recente. Não substitui o mentor, complementa-o com espelho de pares."
+      },
+      "join": {
+        "q": "Como entro num círculo?",
+        "a": "Não há lista para te inscreveres. Atribuímos-te um círculo automaticamente quando há match com o teu estado atual. O emparelhamento é por afinidade de padrão, não por idade nem demografia, e respeita o teu anonimato dentro do grupo."
+      },
+      "inside": {
+        "q": "O que se passa dentro do círculo?",
+        "a": "Cada semana abre-se um \"pulso\": uma pergunta. Cada membro responde quando quiser durante 7 dias — anonimamente. Ao fechar-se, o mentor deixa-te uma devolução privada que recolhe o que do grupo te toca a ti. Os ciclos duram seis semanas e no final recebes uma carta de fecho arquivada para sempre."
+      }
+    },
+    "privacidad": {
+      "title": "Privacidade e dados",
+      "whoReads": {
+        "q": "Quem pode ler as minhas conversas?",
+        "a": "Ninguém as lê por defeito. Guardam-se cifradas para que o mentor mantenha contexto. Só acederíamos a uma conversa específica se tu abrisses uma incidência de suporte e nos pedisses para o fazer."
+      },
+      "circleAnon": {
+        "q": "E dentro do círculo, os outros sabem quem sou?",
+        "a": "Não. As respostas no círculo são anónimas para os outros membros — não se vê o teu nome, nem o teu email, nem a tua foto. Só o conteúdo do que escreves."
+      },
+      "training": {
+        "q": "Usam os meus dados para treinar IA ou para publicidade?",
+        "a": "Não. Não vendemos dados, não os partilhamos com anunciantes e não os usamos para treinar modelos de terceiros. As conversas são tuas."
+      },
+      "exportDelete": {
+        "q": "Posso exportar ou apagar tudo?",
+        "a": "Sim. A partir das definições podes descarregar uma exportação completa (RGPD art. 15) ou apagar a tua conta. Ao apagá-la, apagam-se também as conversas e conteúdos associados."
+      }
+    },
+    "precios": {
+      "title": "Preços e conta",
+      "free": {
+        "q": "É gratuito? Há período de experimentação?",
+        "a": "Podes entrar a experimentar sem te registares. O teste gratuito e o desafio de 30 dias também não exigem pagamento. Os planos e detalhes atualizados estão na página de preços."
+      },
+      "pro": {
+        "q": "O que inclui o plano Pro?",
+        "a": "Conversas ilimitadas, Modo Impulso 21 dias com seguimento, desafios personalizados ao teu padrão, acesso a círculos e carta semanal por email. Preço atualizado em /precios."
+      },
+      "cancel": {
+        "q": "Posso cancelar quando quiser?",
+        "a": "Sim. Não há fidelização. Cancelas a partir da tua conta e mantens acesso até ao final do período já pago."
+      },
+      "pause": {
+        "q": "E se quiser fazer uma pausa sem perder o trabalhado?",
+        "a": "A tua conta e as tuas conversas conservam-se mesmo que não entres durante semanas. Voltas quando quiseres e o mentor segue onde tinham ficado."
+      },
+      "mobile": {
+        "q": "Funciona no telemóvel?",
+        "a": "Sim. É uma app web otimizada: usa-se a partir do navegador do telemóvel ou do computador, sem instalar nada."
+      }
+    },
+    "limites": {
+      "title": "Limites e responsabilidade",
+      "vsTherapy": {
+        "q": "Substitui um psicólogo ou psiquiatra?",
+        "a": "Não, e nunca pretenderemos que o faça. É um acompanhamento complementar. Se houver um transtorno diagnosticado, um tratamento em curso ou uma crise, o profissional humano é quem deve levar o caso — nós podemos apoiar entre sessões, não substituí-las."
+      },
+      "crisis": {
+        "q": "O que acontece se o mentor detetar que estou mal?",
+        "a": "Se aparecer risco (ideação suicida, autolesões, crise aguda), o mentor deixa de fazer coaching e liga-te aos recursos de emergência (em Portugal, SNS 24 — 808 24 24 24 —, SOS Voz Amiga — 213 544 545 — e 112). Essa é uma linha que não cruzamos."
+      },
+      "trustedContact": {
+        "q": "Posso deixar alguém de confiança para situações extremas?",
+        "a": "Sim. Nas definições podes registar um contacto de confiança. Se entrares numa crise sustentada, o sistema pode avisá-lo — só em cenários definidos por ti, nunca por defeito."
+      },
+      "aiMistakes": {
+        "q": "A IA engana-se?",
+        "a": "Às vezes sim. Por isso o quadro pedagógico está desenhado para te devolver perguntas antes de respostas fechadas: a decisão é sempre tua. Se algo que o mentor te diz não encaixa contigo, di-lo — ajusta o rumo na mesma conversa."
+      }
+    },
+    "proyecto": {
+      "title": "O projeto",
+      "team": {
+        "q": "Quem está por trás?",
+        "a": "Constrói-o a Startidea, uma equipa pequena em Espanha comprometida com o bem-estar emocional através da tecnologia. Mais na página \"Sobre nós\"."
+      },
+      "languages": {
+        "q": "Em que idiomas está disponível?",
+        "a": "Espanhol de forma nativa, além de inglês, português (Portugal) e francês na home e páginas principais. O espanhol é onde se afinaram primeiro o tom e o quadro pedagógico — os restantes idiomas vão-se estendendo página a página."
+      },
+      "pros": {
+        "q": "Há versão para profissionais ou equipas?",
+        "a": "Sim. Trabalhamos com organizações e profissionais de saúde mental. Mais detalhes em /para-profesionales."
+      }
+    }
   }
 }

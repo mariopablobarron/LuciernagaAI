@@ -90,6 +90,17 @@ export default function LocaleSwitcher({ className, onNavigate }: Props) {
     const oneYear = 60 * 60 * 24 * 365;
     document.cookie = `NEXT_LOCALE=${code}; path=/; max-age=${oneYear}; samesite=lax`;
 
+    // Si el usuario está autenticado, persistimos también User.locale en BD
+    // para que los emails programados (nudges, weekly letter, family invites)
+    // usen el idioma elegido. Fire-and-forget: no bloqueamos navegación.
+    // Anonymous users: el endpoint devuelve persisted: false sin error.
+    void fetch("/api/user/locale", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ locale: code }),
+      credentials: "include",
+    }).catch(() => { /* Best effort */ });
+
     const dest = targetUrl(pathname, code);
     setOpen(false);
     onNavigate?.();

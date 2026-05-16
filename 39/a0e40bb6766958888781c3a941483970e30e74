@@ -1,0 +1,39 @@
+src/app/api/user/locale/route.ts
+  s_c72d0ada98a9af::t_f6e0391569856d 1-40
+src/components/LocaleSwitcher.tsx
+  s_c72d0ada98a9af::t_fbf44c98ea7d02 156
+  s_c72d0ada98a9af::t_75594e3119acbb 7-20,22,34,58,60,62-69,71-82,117-152,158-165,167,169-174
+  s_c72d0ada98a9af::t_3fc2aaebabce8d 93-103
+  s_c72d0ada98a9af::t_d1df03826dd9ae 3,5,21,23-33,35-46,57,59,83-92,104-116,153-155,157,166,168
+src/app/api/auth/signup/route.ts
+  s_c72d0ada98a9af::t_78f5aa911660a5 10
+  s_c72d0ada98a9af::t_9da4d6df1bea84 173
+  s_c72d0ada98a9af::t_6d22e0a62d0aa6 151
+  s_c72d0ada98a9af::t_9825cdbe3787e4 286,290
+  s_c72d0ada98a9af::t_77dad8d38b16e3 64,69-72
+prisma/migrations/20260516160000_add_user_locale/migration.sql
+  s_c72d0ada98a9af::t_15eff65565df0e 1-12
+prisma/schema.prisma
+  c72d0ada98a9afb7 1475-1476,1479-1552,2250-2336
+  s_c72d0ada98a9af::t_b0c3898f341272 98-103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "39a0e40bb6766958888781c3a941483970e30e74",
+  "prompts": {
+    "c72d0ada98a9afb7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron",
+      "messages_url": "https://usegitai.com/cas/ec20cc280ccc4d404a1fa2b12a8b74be9f319da96f567f45cf9760fa63166571",
+      "total_additions": 687,
+      "total_deletions": 0,
+      "accepted_lines": 163,
+      "overriden_lines": 0
+    }
+  }
+}

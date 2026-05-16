@@ -976,5 +976,89 @@
     "ctaDesc": "Si te dedicas a la psicología, el coaching o el acompañamiento profesional y te interesa probar el panel clínico con algún cliente, escríbenos. Revisamos cada colaboración caso por caso — no trabajamos con cualquiera.",
     "ctaPrimary": "Hablar con el equipo",
     "ctaSecondary": "Leer el método completo"
+  },
+  "calculator": {
+    "eyebrow": "Herramienta gratuita",
+    "title": "Calculadora de Latidos",
+    "introPre": "Tu corazón late unas {bpm} veces por minuto. En toda una vida, son cerca de",
+    "introHighlight": "3 mil millones de latidos",
+    "introPost": "Descubre cuántos llevas y cuántos te quedan.",
+    "modeAge": "Mi edad",
+    "modeCustom": "Tiempo personalizado",
+    "birthDateLabel": "Fecha de nacimiento",
+    "amountLabel": "Cantidad de tiempo",
+    "amountPlaceholder": "Ej: 2",
+    "unitMinutes": "Minutos",
+    "unitHours": "Horas",
+    "unitDays": "Días",
+    "unitYears": "Años",
+    "calculateButton": "Calcular latidos",
+    "format": {
+      "billion": "{n} mil millones",
+      "million": "{n}M",
+      "thousand": "{n}K"
+    },
+    "resultLabelAge": "Latidos que te han traído hasta aquí",
+    "resultLabelCustom": "Latidos en ese tiempo",
+    "resultCaptionAge": "Cada uno de ellos te sostuvo para llegar a este momento.",
+    "reframeTitle": "Lo que representan tus latidos",
+    "reframeSunrises": "amaneceres vividos",
+    "reframeSongs": "canciones que cabrían",
+    "reframeHours": "horas de experiencia",
+    "reframeHugs": "abrazos posibles",
+    "reframeFooter": "Tu corazón late {bpm} veces por minuto sin que se lo pidas. Esa constancia ya la tienes dentro.",
+    "perspectiveTitleAge": "Tus latidos en perspectiva",
+    "perspectiveTitleCustom": "{beats} latidos equivalen a...",
+    "perspectiveRatio": "x{n} veces en tu vida",
+    "preset": {
+      "hug": {
+        "label": "Un abrazo largo",
+        "description": "20 segundos de contacto real"
+      },
+      "song": {
+        "label": "Una canción favorita",
+        "description": "3 minutos y medio de pausa"
+      },
+      "talk": {
+        "label": "Una buena conversación",
+        "description": "1 hora que puede cambiar tu día"
+      },
+      "sleep": {
+        "label": "Una noche de sueño",
+        "description": "8 horas restaurando tu cuerpo"
+      },
+      "year": {
+        "label": "Un año de tu vida",
+        "description": "Unos 37M de latidos invertidos"
+      },
+      "birth": {
+        "label": "Desde que naciste",
+        "description": "Cada uno cuenta"
+      }
+    },
+    "emailTitle": "Recibe tu informe de latidos por email",
+    "emailDesc": "Tu cálculo, perspectiva y un primer paso de acción personalizado.",
+    "emailPlaceholder": "tu@email.com",
+    "emailSend": "Enviar",
+    "emailSent": "Enviado — revisa tu bandeja de entrada",
+    "emailConsent": "Tu email se usará solo para enviar este informe.",
+    "ctaTitle": "Tu corazón ya hace su parte. Ahora te toca a ti.",
+    "ctaDesc": "Con la misma constancia con la que late tu corazón, puedes avanzar un paso cada día. Tres Mil Millones de Latidos te ayuda a convertir la intención en acción.",
+    "ctaPrimary": "Empezar ahora",
+    "ctaSecondary": "Hacer el test gratuito",
+    "seoTitle": "Por qué contar latidos",
+    "seo1aPre": "Tu corazón late unas",
+    "seo1aBpm": "{bpm} veces por minuto",
+    "seo1aPost": "sin que se lo pidas. Son {perHour} por hora, {perDay} al día. Cada uno sostiene todo lo que haces, piensas y sientes.",
+    "seo1bPre": "A lo largo de una vida, el corazón late cerca de",
+    "seo1bStrong": "3 mil millones de veces",
+    "seo1bPost": "No es una cuenta atrás — es un recordatorio de lo que ya has construido latido a latido.",
+    "seo2a": "Esta calculadora usa la frecuencia cardiaca en reposo promedio de un adulto sano. Tu frecuencia real varía con la edad, el ejercicio y la genética.",
+    "seo2bPre": "El objetivo no es la precisión clínica: es la",
+    "seo2bStrong": "perspectiva",
+    "seo2bPost": "Darte cuenta de que ya cargas con millones de latidos de experiencia puede ser el empujón que necesitas para dar el siguiente paso.",
+    "nowWhatTitle": "¿Y ahora qué?",
+    "nowWhatDesc": "Saber cuántos latidos quedan no cambia nada. Lo que cambia es decidir qué haces con el siguiente. Tres Mil Millones de Latidos te ayuda a dar ese paso.",
+    "nowWhatCta": "Empezar ahora →"
   }
 }

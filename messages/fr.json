@@ -976,5 +976,89 @@
     "ctaDesc": "Si tu travailles dans la psychologie, le coaching ou l'accompagnement professionnel et que tu souhaites essayer le tableau de bord clinique avec un client, écris-nous. Nous étudions chaque collaboration au cas par cas — nous ne travaillons pas avec n'importe qui.",
     "ctaPrimary": "Parler avec l'équipe",
     "ctaSecondary": "Lire la méthode complète"
+  },
+  "calculator": {
+    "eyebrow": "Outil gratuit",
+    "title": "Calculateur de Battements",
+    "introPre": "Ton cœur bat environ {bpm} fois par minute. Sur toute une vie, cela représente près de",
+    "introHighlight": "3 milliards de battements",
+    "introPost": "Découvre combien tu en as déjà vécus et combien il t'en reste.",
+    "modeAge": "Mon âge",
+    "modeCustom": "Temps personnalisé",
+    "birthDateLabel": "Date de naissance",
+    "amountLabel": "Quantité de temps",
+    "amountPlaceholder": "Ex : 2",
+    "unitMinutes": "Minutes",
+    "unitHours": "Heures",
+    "unitDays": "Jours",
+    "unitYears": "Années",
+    "calculateButton": "Calculer les battements",
+    "format": {
+      "billion": "{n} milliards",
+      "million": "{n}M",
+      "thousand": "{n}K"
+    },
+    "resultLabelAge": "Battements qui t'ont mené jusqu'ici",
+    "resultLabelCustom": "Battements pendant ce temps",
+    "resultCaptionAge": "Chacun d'eux t'a soutenu pour arriver à ce moment.",
+    "reframeTitle": "Ce que représentent tes battements",
+    "reframeSunrises": "levers de soleil vécus",
+    "reframeSongs": "chansons qui pourraient tenir",
+    "reframeHours": "heures d'expérience",
+    "reframeHugs": "câlins possibles",
+    "reframeFooter": "Ton cœur bat {bpm} fois par minute sans que tu le lui demandes. Cette constance, tu l'as déjà en toi.",
+    "perspectiveTitleAge": "Tes battements en perspective",
+    "perspectiveTitleCustom": "{beats} battements équivalent à...",
+    "perspectiveRatio": "x{n} fois dans ta vie",
+    "preset": {
+      "hug": {
+        "label": "Un long câlin",
+        "description": "20 secondes de contact réel"
+      },
+      "song": {
+        "label": "Une chanson préférée",
+        "description": "3 minutes et demie de pause"
+      },
+      "talk": {
+        "label": "Une bonne conversation",
+        "description": "1 heure qui peut changer ta journée"
+      },
+      "sleep": {
+        "label": "Une nuit de sommeil",
+        "description": "8 heures à restaurer ton corps"
+      },
+      "year": {
+        "label": "Une année de ta vie",
+        "description": "Environ 37M de battements investis"
+      },
+      "birth": {
+        "label": "Depuis ta naissance",
+        "description": "Chacun compte"
+      }
+    },
+    "emailTitle": "Reçois ton rapport de battements par email",
+    "emailDesc": "Ton calcul, ta perspective et une première action personnalisée.",
+    "emailPlaceholder": "toi@email.com",
+    "emailSend": "Envoyer",
+    "emailSent": "Envoyé — vérifie ta boîte de réception",
+    "emailConsent": "Ton email ne servira qu'à envoyer ce rapport.",
+    "ctaTitle": "Ton cœur fait déjà sa part. Maintenant, c'est à toi.",
+    "ctaDesc": "Avec la même constance que celle de ton cœur, tu peux avancer d'un pas chaque jour. Trois Milliards de Battements t'aide à transformer l'intention en action.",
+    "ctaPrimary": "Commencer maintenant",
+    "ctaSecondary": "Faire le test gratuit",
+    "seoTitle": "Pourquoi compter les battements",
+    "seo1aPre": "Ton cœur bat environ",
+    "seo1aBpm": "{bpm} fois par minute",
+    "seo1aPost": "sans que tu le lui demandes. Cela fait {perHour} par heure, {perDay} par jour. Chacun soutient tout ce que tu fais, penses et ressens.",
+    "seo1bPre": "Au cours d'une vie, le cœur bat près de",
+    "seo1bStrong": "3 milliards de fois",
+    "seo1bPost": "Ce n'est pas un compte à rebours — c'est un rappel de ce que tu as déjà construit battement par battement.",
+    "seo2a": "Ce calculateur utilise la fréquence cardiaque au repos moyenne d'un adulte en bonne santé. Ta fréquence réelle varie selon l'âge, l'exercice et la génétique.",
+    "seo2bPre": "L'objectif n'est pas la précision clinique : c'est la",
+    "seo2bStrong": "perspective",
+    "seo2bPost": "Te rendre compte que tu portes déjà des millions de battements d'expérience peut être le coup de pouce dont tu as besoin pour faire le pas suivant.",
+    "nowWhatTitle": "Et maintenant ?",
+    "nowWhatDesc": "Savoir combien de battements il te reste ne change rien. Ce qui change, c'est de décider ce que tu fais du prochain. Trois Milliards de Battements t'aide à faire ce pas.",
+    "nowWhatCta": "Commencer maintenant →"
   }
 }

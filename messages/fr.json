@@ -764,5 +764,80 @@
         "limit": "Ce cas n'a pas de contre-indications particulières au-delà des limites générales : le mentor accompagne, il ne diagnostique pas."
       }
     }
+  },
+  "pricing": {
+    "metaTitle": "Tarifs — Trois Milliards de Battements",
+    "metaDescription": "Trois Milliards de Battements : accès complet gratuit pendant la phase MVP. Inscris-toi et accède au mentorat avec IA, check-ins, journal, Mode Impulse et plus. Sans carte bancaire.",
+    "metaOgDescription": "Phase MVP : accès Pro gratuit. Mentorat avec IA, check-ins, journal et Mode Impulse. Sans frais.",
+    "metaTwitterDescription": "Mentorat avec IA gratuit pendant le MVP. Sans carte bancaire.",
+    "eyebrow": "tresmilmillonesdelatidos.es",
+    "title": "Accès complet. Gratuit. Maintenant.",
+    "subtitle": "Nous sommes en phase MVP. Les premiers utilisateurs accèdent à tout le plan Pro sans frais jusqu'en octobre 2026. Sans carte. Sans engagement.",
+    "mvpBadge": "PHASE MVP — ACCÈS OUVERT",
+    "mvpPlanLabel": "Plan Pro complet",
+    "mvpPriceMain": "0 euros",
+    "mvpPriceUnit": "/6 mois",
+    "mvpSubnote": "Sans carte. Sans engagement. Juste ton inscription.",
+    "mvpCta": "Créer un compte gratuit",
+    "mvpCtaFootnote": "En t'inscrivant, tu accèdes automatiquement au plan Pro complet. Aucune carte bancaire ne te sera demandée.",
+    "feature1": "Conversations illimitées avec le coach IA",
+    "feature2": "Messages illimités",
+    "feature3": "Mode Impulse complet — 21 jours de transformation",
+    "feature4": "Diagnostics avancés et défis personnalisés",
+    "feature5": "Insights hebdomadaires de comportement",
+    "feature6": "Check-in quotidien avec série",
+    "feature7": "Carte des schémas d'évitement",
+    "feature8": "Historique complet des conversations",
+    "feature9": "Bot Telegram intégré",
+    "feature10": "Portail pour personnes de confiance",
+    "whyTitle": "Pourquoi c'est gratuit (et jusqu'à quand)",
+    "whyP1": "Trois Milliards de Battements est en phase de produit minimum viable. Ça fonctionne, mais ça apprend encore. Et pour apprendre, il faut de vraies personnes qui l'utilisent pour de vrai — pas des bêtas fermées ni des démos auxquelles personne ne touche.",
+    "whyP2": "Pendant ces 6 mois (jusqu'en octobre 2026), tout le plan Pro est ouvert sans frais. En échange, tes interactions nous aident à améliorer le produit. Nous ne vendons pas tes données. Nous ne les partageons pas. Nous les utilisons, anonymisées, pour que l'outil soit meilleur pour toi et pour ceux qui viendront après.",
+    "whyP3": "Quand la phase MVP se terminera, le plan gratuit gardera le chat sans limite. Pro sera pour celles et ceux qui veulent une continuité cross-device, une mémoire persistante entre les sessions et le Mode Impulse. Sans surprise.",
+    "futureTitle": "Tarifs après la phase MVP",
+    "futureSubtitle": "Voici les tarifs qui s'appliqueront à la fin de la période d'accès ouvert. Les utilisateurs MVP bénéficieront de conditions spéciales.",
+    "futurePlan": {
+      "free": {
+        "name": "Free",
+        "price": "0 euros/mois",
+        "desc": "Conversations sans limite avec le mentor IA. Sans plafond quotidien."
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "9 euros/mois",
+        "desc": "Continuité cross-device, mémoire persistante, Mode Impulse et priorité"
+      },
+      "proAnnual": {
+        "name": "Pro annuel",
+        "price": "79 euros/an",
+        "desc": "Identique au Pro, en économisant 2 mois"
+      }
+    },
+    "whyProTitle": "Pourquoi le plan Pro existe-t-il ?",
+    "whyProDesc": "Le vrai changement n'arrive pas en une conversation — il arrive quand tu maintiens le fil pendant des semaines. La continuité, c'est ce qui transforme une idée en habitude. Pro existe pour que tu ne perdes pas ce fil : conversations illimitées, suivi des actions, et un mentor qui se souvient de toute ton histoire.",
+    "faqTitle": "Questions fréquentes",
+    "faq": {
+      "free": {
+        "q": "Est-ce vraiment gratuit ?",
+        "a": "Oui. Pendant la phase MVP (jusqu'en octobre 2026), rien n'est facturé. Tu n'as pas besoin de carte bancaire. Il suffit de t'inscrire avec ton email."
+      },
+      "data": {
+        "q": "Qu'advient-il de mes données ?",
+        "a": "Tes conversations et données émotionnelles sont traitées de façon anonymisée pour améliorer le produit. Elles ne sont jamais vendues ni partagées avec des tiers. Tu peux tout supprimer à tout moment depuis les Paramètres. Conforme RGPD."
+      },
+      "afterMvp": {
+        "q": "Que se passe-t-il à la fin du MVP ?",
+        "a": "Tu pourras continuer à utiliser le plan gratuit avec chat sans limite, ou choisir Pro à son tarif normal pour les extras (continuité cross-device, mémoire persistante, Mode Impulse). Les utilisateurs MVP bénéficieront de conditions spéciales."
+      },
+      "psy": {
+        "q": "Trois Milliards de Battements remplace-t-il un psychologue ?",
+        "a": "Non. C'est un outil de mentorat conversationnel avec IA. Il aide à mettre de l'ordre dans les idées et à passer à l'action, mais ne remplace pas une thérapie professionnelle. En cas de crise, contacte le 3114. Si tu as besoin de nous, écris-nous."
+      },
+      "mobile": {
+        "q": "Puis-je l'utiliser depuis mon téléphone ?",
+        "a": "Oui. Le site est optimisé pour mobile et tu peux l'ajouter à ton écran d'accueil. Tu peux aussi utiliser le bot Telegram pour discuter directement depuis là."
+      }
+    },
+    "ctaBottom": "Commencer maintenant — c'est gratuit"
   }
 }

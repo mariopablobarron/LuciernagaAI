@@ -839,5 +839,71 @@
       }
     },
     "ctaBottom": "Start now — it's free"
+  },
+  "challenge": {
+    "badge": "The 30-day challenge",
+    "title": "30 days.",
+    "titleHighlight": "Real change.",
+    "subtitle": "Not just another app. It's a commitment to yourself with the most direct AI there is. Every day you act, your streak grows. Every streak that grows makes change inevitable.",
+    "participantsLine": "{count} people in the challenge right now",
+    "ctaPrimary": "Accept the challenge",
+    "ctaShare": "Share challenge",
+    "ctaShareCopied": "Copied",
+    "statRachas": "Active streaks",
+    "statObjetivos": "Goals completed",
+    "statDias": "Days of the challenge",
+    "stepsTitle": "How does it work?",
+    "stepsSubtitle": "Three steps. No complications.",
+    "step1": {
+      "title": "Complete the 3 missions",
+      "desc": "Answer the questions no one else asks you. That's already the first real step."
+    },
+    "step2": {
+      "title": "30 days of daily action",
+      "desc": "Every day counts. Your streak updates every time you open Three Billion Heartbeats and take action."
+    },
+    "step3": {
+      "title": "Share your progress",
+      "desc": "On day 7 you unlock an invitation. On day 30, three more. Real change is contagious."
+    },
+    "milestonesTitle": "What you unlock",
+    "milestonesSubtitle": "Progress comes with real rewards.",
+    "dayLabel": "Day {n}",
+    "milestone1": {
+      "title": "Full access",
+      "desc": "From day one you have access to the most direct AI there is."
+    },
+    "milestone7": {
+      "title": "First invitation",
+      "desc": "You earn 1 invitation to bring someone who needs it."
+    },
+    "milestone14": {
+      "title": "Advanced mode",
+      "desc": "The AI adjusts its intensity to your accumulated progress."
+    },
+    "milestone30": {
+      "title": "3 invitations + certificate",
+      "desc": "Completing the challenge makes you an ambassador of change."
+    },
+    "testimonialsTitle": "What people say along the way",
+    "testimonial1": {
+      "day": "12",
+      "text": "For the first time in months I know exactly what I have to do tomorrow.",
+      "name": "Ana M."
+    },
+    "testimonial2": {
+      "day": "21",
+      "text": "The AI asked me something that left me speechless. Speechless in a good way.",
+      "name": "Carlos R."
+    },
+    "testimonial3": {
+      "day": "7",
+      "text": "I thought I'd last two days. It's been a week and I don't want to stop.",
+      "name": "Sara L."
+    },
+    "ctaTitle": "Are you ready for the 30 days?",
+    "ctaSubtitle": "Three questions. One commitment. Thirty days. The change you've been putting off starts today.",
+    "ctaFinal": "Accept the challenge now",
+    "ctaFinalNote": "No card. No spam. Just 30 days."
   }
 }

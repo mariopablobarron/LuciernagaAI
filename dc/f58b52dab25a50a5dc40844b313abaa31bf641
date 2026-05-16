@@ -1,0 +1,27 @@
+messages/es.json
+  s_c72d0ada98a9af::t_60a4f53e3477b2 908-978
+messages/en.json
+  s_c72d0ada98a9af::t_33108800e15387 908-978
+messages/pt.json
+  s_c72d0ada98a9af::t_d0663cd4df78fb 908-978
+messages/fr.json
+  s_c72d0ada98a9af::t_da1956c79657c7 908-978
+src/app/(public)/para-profesionales/page.tsx
+  s_c72d0ada98a9af::t_cfcedb05d7fe7f 4,17-29,31-32,43,46,48,52,62,65-70,82,85,87,93-94,106,109,111-112,115-118,124-131,144,147,149,152-153,161-162,168,174
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "dcf58b52dab25a50a5dc40844b313abaa31bf641",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

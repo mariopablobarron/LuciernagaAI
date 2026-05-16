@@ -1,6 +1,7 @@
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { buildReminderEmail, sendUserEmail } from "@/lib/email";
+import { pickEmailLocale } from "@/lib/email-i18n";
 import { isSyntheticEmail } from "@/services/user";
 import { fetchWithTimeout } from "@/lib/fetchWithTimeout";
 
@@ -24,6 +25,7 @@ type TelegramReminderUser = BaseReminderUser & {
 type EmailReminderUser = BaseReminderUser & {
   channel: "email";
   email: string;
+  locale: string;
 };
 
 export type ReminderUser = TelegramReminderUser | EmailReminderUser;
@@ -65,6 +67,7 @@ export async function getUsersNeedingReminder(): Promise<ReminderUser[]> {
       source: true,
       telegramId: true,
       lastSeen: true,
+      locale: true,
       goals: {
         where: { status: "active" },
         take: 1,
@@ -106,6 +109,7 @@ export async function getUsersNeedingReminder(): Promise<ReminderUser[]> {
         email: user.email,
         lastSeen: user.lastSeen,
         pendingAction,
+        locale: user.locale,
       });
     }
   }
@@ -152,7 +156,11 @@ export async function sendTelegramReminder(user: TelegramReminderUser): Promise<
 
 export async function sendEmailReminder(user: EmailReminderUser): Promise<void> {
   const appUrl = process.env.APP_BASE_URL ?? "https://tresmilmillonesdelatidos.es";
-  const template = buildReminderEmail({ pendingAction: user.pendingAction, appUrl });
+  const template = buildReminderEmail({
+    pendingAction: user.pendingAction,
+    appUrl,
+    locale: pickEmailLocale(user.locale),
+  });
 
   const sent = await sendUserEmail({ to: user.email, userId: user.id, template: "reminder", ...template });
 

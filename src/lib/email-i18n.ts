@@ -542,3 +542,205 @@ export const WAITLIST_STRINGS: Record<EmailLocale, {
     cta: "Créer mon compte",
   },
 };
+
+/** 24h nudge (signup hace 1 día y aún 0 mensajes). */
+export const NUDGE_24H_STRINGS: Record<EmailLocale, {
+  subjectWithName: (firstName: string) => string;
+  subjectAnon: string;
+  greeting: (firstName: string | null) => string;
+  line1: string;
+  line2: string;
+  closing: string;
+  cta: string;
+}> = {
+  es: {
+    subjectWithName: (n) => `${n}, ayer empezaste algo`,
+    subjectAnon: "Ayer empezaste algo",
+    greeting: (n) => (n ? n : "Hola"),
+    line1: "Ayer diste un paso. Hoy toca el segundo.",
+    line2: "No necesitas una hora. No necesitas tenerlo claro. Solo necesitas escribir una frase sobre cómo estás ahora mismo.",
+    closing: "A veces volver es solo abrir la puerta y decir \"hoy estoy así\".",
+    cta: "Segundo latido",
+  },
+  en: {
+    subjectWithName: (n) => `${n}, you started something yesterday`,
+    subjectAnon: "You started something yesterday",
+    greeting: (n) => (n ? n : "Hi"),
+    line1: "Yesterday you took a step. Today, take the second.",
+    line2: "You don't need an hour. You don't need clarity. You just need to write one sentence about how you are right now.",
+    closing: "Sometimes coming back is just opening the door and saying \"today I'm like this\".",
+    cta: "Second heartbeat",
+  },
+  pt: {
+    subjectWithName: (n) => `${n}, ontem começaste algo`,
+    subjectAnon: "Ontem começaste algo",
+    greeting: (n) => (n ? n : "Olá"),
+    line1: "Ontem deste um passo. Hoje toca o segundo.",
+    line2: "Não precisas de uma hora. Não precisas de o ter claro. Só precisas de escrever uma frase sobre como estás agora.",
+    closing: "Às vezes voltar é só abrir a porta e dizer \"hoje estou assim\".",
+    cta: "Segunda batida",
+  },
+  fr: {
+    subjectWithName: (n) => `${n}, tu as commencé quelque chose hier`,
+    subjectAnon: "Tu as commencé quelque chose hier",
+    greeting: (n) => (n ? n : "Salut"),
+    line1: "Hier tu as fait un pas. Aujourd'hui, fais le deuxième.",
+    line2: "Tu n'as pas besoin d'une heure. Tu n'as pas besoin d'avoir tout clair. Tu as juste besoin d'écrire une phrase sur comment tu es maintenant.",
+    closing: "Parfois revenir, c'est juste ouvrir la porte et dire \"aujourd'hui je suis comme ça\".",
+    cta: "Deuxième battement",
+  },
+};
+
+/** 7d nudge (lleva 6-8 días sin volver tras al menos 1 mensaje). */
+export const NUDGE_7D_STRINGS: Record<EmailLocale, {
+  subjectWithName: (firstName: string) => string;
+  subjectAnon: string;
+  greeting: (firstName: string | null) => string;
+  weekAgoLine: string;
+  stillThere: string;
+  closing: string;
+  cta: string;
+}> = {
+  es: {
+    subjectWithName: (n) => `${n}, lo último que dijiste`,
+    subjectAnon: "Lo último que dijiste",
+    greeting: (n) => (n ? n : "Hola"),
+    weekAgoLine: "Hace una semana escribiste:",
+    stillThere: "¿Sigue ahí?",
+    closing: "No hace falta una respuesta larga. Solo una frase nueva.",
+    cta: "Escribir una frase nueva",
+  },
+  en: {
+    subjectWithName: (n) => `${n}, the last thing you said`,
+    subjectAnon: "The last thing you said",
+    greeting: (n) => (n ? n : "Hi"),
+    weekAgoLine: "A week ago you wrote:",
+    stillThere: "Is it still there?",
+    closing: "No need for a long reply. Just one new sentence.",
+    cta: "Write one new sentence",
+  },
+  pt: {
+    subjectWithName: (n) => `${n}, a última coisa que disseste`,
+    subjectAnon: "A última coisa que disseste",
+    greeting: (n) => (n ? n : "Olá"),
+    weekAgoLine: "Há uma semana escreveste:",
+    stillThere: "Ainda está aí?",
+    closing: "Não é preciso uma resposta longa. Só uma frase nova.",
+    cta: "Escrever uma frase nova",
+  },
+  fr: {
+    subjectWithName: (n) => `${n}, la dernière chose que tu as dite`,
+    subjectAnon: "La dernière chose que tu as dite",
+    greeting: (n) => (n ? n : "Salut"),
+    weekAgoLine: "Il y a une semaine tu écrivais :",
+    stillThere: "C'est toujours là ?",
+    closing: "Pas besoin d'une longue réponse. Juste une phrase nouvelle.",
+    cta: "Écrire une phrase nouvelle",
+  },
+};
+
+/** Email de recordatorio de acción pendiente (24h tras última sesión). */
+export const REMINDER_STRINGS: Record<EmailLocale, {
+  subject: string;
+  eyebrow: string;
+  title: string;
+  pendingHeader: string;
+  question: string;
+  textIntro: string;
+  textPendingHeader: string;
+  textQuestion: string;
+  cta: string;
+}> = {
+  es: {
+    subject: `Tienes una acción pendiente en ${BRAND_NAME.es}`,
+    eyebrow: "Han pasado 24 horas",
+    title: "Tienes algo pendiente",
+    pendingHeader: "Lo que dijiste que harías",
+    question: "¿Qué está pasando? Puede que necesites ajustar la acción, o simplemente retomar.",
+    textIntro: "Han pasado 24 horas desde tu última sesión.",
+    textPendingHeader: "Dijiste que harías esto:",
+    textQuestion: "¿Qué está pasando? Vuelve cuando puedas.",
+    cta: "Volver ahora",
+  },
+  en: {
+    subject: `You have a pending action in ${BRAND_NAME.en}`,
+    eyebrow: "24 hours have passed",
+    title: "You have something pending",
+    pendingHeader: "What you said you'd do",
+    question: "What's going on? Maybe you need to adjust the action, or simply pick it back up.",
+    textIntro: "24 hours have passed since your last session.",
+    textPendingHeader: "You said you'd do this:",
+    textQuestion: "What's going on? Come back when you can.",
+    cta: "Return now",
+  },
+  pt: {
+    subject: `Tens uma ação pendente em ${BRAND_NAME.pt}`,
+    eyebrow: "Passaram 24 horas",
+    title: "Tens algo pendente",
+    pendingHeader: "O que disseste que farias",
+    question: "O que está a acontecer? Talvez precises de ajustar a ação, ou simplesmente retomar.",
+    textIntro: "Passaram 24 horas desde a tua última sessão.",
+    textPendingHeader: "Disseste que farias isto:",
+    textQuestion: "O que está a acontecer? Volta quando puderes.",
+    cta: "Voltar agora",
+  },
+  fr: {
+    subject: `Tu as une action en attente dans ${BRAND_NAME.fr}`,
+    eyebrow: "24 heures se sont écoulées",
+    title: "Tu as quelque chose en attente",
+    pendingHeader: "Ce que tu as dit que tu ferais",
+    question: "Qu'est-ce qui se passe ? Tu as peut-être besoin d'ajuster l'action, ou simplement de la reprendre.",
+    textIntro: "24 heures se sont écoulées depuis ta dernière session.",
+    textPendingHeader: "Tu as dit que tu ferais ceci :",
+    textQuestion: "Qu'est-ce qui se passe ? Reviens quand tu peux.",
+    cta: "Revenir maintenant",
+  },
+};
+
+/** Notificación de carta semanal del mentor lista para leer. */
+export const WEEKLY_LETTER_STRINGS: Record<EmailLocale, {
+  subject: string;
+  greeting: (firstName: string | null) => string;
+  intro: string;
+  htmlIntro: string;
+  cta: string;
+  footerNote: string;
+  signature: string;
+}> = {
+  es: {
+    subject: "Tu carta de esta semana está lista",
+    greeting: (n) => (n ? `Hola ${n}` : "Hola"),
+    intro: "El mentor te ha escrito una carta sobre esta semana. Léela en la app cuando tengas un momento:",
+    htmlIntro: "El mentor te ha escrito una carta sobre esta semana. Cuando tengas un momento, léela en la app.",
+    cta: "Leer la carta",
+    footerNote: "Recibes este aviso porque tienes activada la carta semanal.",
+    signature: `— ${BRAND_NAME.es}`,
+  },
+  en: {
+    subject: "Your letter for this week is ready",
+    greeting: (n) => (n ? `Hi ${n}` : "Hi"),
+    intro: "The mentor has written you a letter about this week. Read it in the app when you have a moment:",
+    htmlIntro: "The mentor has written you a letter about this week. When you have a moment, read it in the app.",
+    cta: "Read the letter",
+    footerNote: "You're receiving this because you have the weekly letter enabled.",
+    signature: `— ${BRAND_NAME.en}`,
+  },
+  pt: {
+    subject: "A tua carta desta semana está pronta",
+    greeting: (n) => (n ? `Olá ${n}` : "Olá"),
+    intro: "O mentor escreveu-te uma carta sobre esta semana. Lê-a na app quando tiveres um momento:",
+    htmlIntro: "O mentor escreveu-te uma carta sobre esta semana. Quando tiveres um momento, lê-a na app.",
+    cta: "Ler a carta",
+    footerNote: "Recebes este aviso porque tens a carta semanal ativada.",
+    signature: `— ${BRAND_NAME.pt}`,
+  },
+  fr: {
+    subject: "Ta lettre de la semaine est prête",
+    greeting: (n) => (n ? `Salut ${n}` : "Salut"),
+    intro: "Le mentor t'a écrit une lettre sur cette semaine. Lis-la dans l'app quand tu as un moment :",
+    htmlIntro: "Le mentor t'a écrit une lettre sur cette semaine. Quand tu as un moment, lis-la dans l'app.",
+    cta: "Lire la lettre",
+    footerNote: "Tu reçois cet avis parce que tu as activé la lettre hebdomadaire.",
+    signature: `— ${BRAND_NAME.fr}`,
+  },
+};

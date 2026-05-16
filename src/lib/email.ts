@@ -14,6 +14,10 @@ import {
   HEARTBEAT_STRINGS,
   WELCOME_STRINGS,
   WAITLIST_STRINGS,
+  NUDGE_24H_STRINGS,
+  NUDGE_7D_STRINGS,
+  REMINDER_STRINGS,
+  WEEKLY_LETTER_STRINGS,
 } from "@/lib/email-i18n";
 
 export type QuizState = "bloqueo" | "ansiedad" | "duda" | "claridad" | "neutral";
@@ -405,37 +409,36 @@ export async function sendUserEmail(email: UserEmail): Promise<boolean> {
 export function buildReminderEmail(params: {
   pendingAction: string;
   appUrl: string;
+  locale?: EmailLocale;
 }): Pick<UserEmail, "subject" | "html" | "text"> {
   const { pendingAction, appUrl } = params;
-
-  const subject = "Tienes una acción pendiente en Tres Mil Millones de Latidos";
+  const loc = pickEmailLocale(params.locale);
+  const s = REMINDER_STRINGS[loc];
 
   const text =
-    `Han pasado 24 horas desde tu última sesión.\n\n` +
-    `Dijiste que harías esto:\n${pendingAction}\n\n` +
-    `¿Qué está pasando? Vuelve cuando puedas.\n\n` +
+    `${s.textIntro}\n\n` +
+    `${s.textPendingHeader}\n${pendingAction}\n\n` +
+    `${s.textQuestion}\n\n` +
     `${appUrl}`;
 
   const body = `
-            <p style="margin:0 0 8px;font-size:13px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Han pasado 24 horas</p>
-            <h1 style="margin:0 0 20px;font-size:22px;font-weight:700;color:#111;line-height:1.3;letter-spacing:-0.3px">Tienes algo pendiente</h1>
-            <p style="margin:0 0 8px;font-size:13px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Lo que dijiste que harías</p>
+            <p style="margin:0 0 8px;font-size:13px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.5px">${escapeHtml(s.eyebrow)}</p>
+            <h1 style="margin:0 0 20px;font-size:22px;font-weight:700;color:#111;line-height:1.3;letter-spacing:-0.3px">${escapeHtml(s.title)}</h1>
+            <p style="margin:0 0 8px;font-size:13px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.5px">${escapeHtml(s.pendingHeader)}</p>
             <div style="background:#fef9e7;border-left:3px solid #f5c518;border-radius:4px;padding:14px 16px;margin:0 0 24px">
               <p style="margin:0;font-size:18px;color:#222;line-height:1.5">${escapeHtml(pendingAction)}</p>
             </div>
-            <p style="margin:0;font-size:15px;color:#444;line-height:1.6">
-              ¿Qué está pasando? Puede que necesites ajustar la acción, o simplemente retomar.
-            </p>`;
+            <p style="margin:0;font-size:15px;color:#444;line-height:1.6">${escapeHtml(s.question)}</p>`;
 
   const html = baseLayout({
     theme: "light",
     header: "branded",
     footer: "product",
     body,
-    cta: { href: appUrl, label: "Volver ahora" },
+    cta: { href: appUrl, label: s.cta },
   });
 
-  return { subject, html, text };
+  return { subject: s.subject, html, text };
 }
 
 function escapeHtml(value: string): string {
@@ -554,41 +557,40 @@ export function buildWelcomeEmail(params: {
 export function build24hNudgeEmail(params: {
   name: string | null;
   appUrl: string;
+  locale?: EmailLocale;
 }): Pick<UserEmail, "subject" | "html" | "text"> {
   const { name, appUrl } = params;
+  const loc = pickEmailLocale(params.locale);
+  const s = NUDGE_24H_STRINGS[loc];
   const firstName = name ? escapeHtml(name.trim().split(/\s+/)[0]) : null;
-  const greeting = firstName ?? "Hola";
+  const greeting = s.greeting(firstName);
 
-  const subject = firstName
-    ? `${firstName}, ayer empezaste algo`
-    : "Ayer empezaste algo";
+  const subject = firstName ? s.subjectWithName(firstName) : s.subjectAnon;
 
   const text = [
     `${greeting},`,
     ``,
-    `Ayer diste un paso. Hoy toca el segundo.`,
+    s.line1,
     ``,
-    `No necesitas una hora. No necesitas tenerlo claro. Solo necesitas escribir una frase sobre cómo estás ahora mismo.`,
+    s.line2,
     ``,
     `${appUrl}/app`,
     ``,
-    `A veces volver es solo abrir la puerta y decir "hoy estoy así".`,
+    s.closing,
   ].join("\n");
 
   const body = `
             <p style="margin:0 0 20px;font-size:22px;color:#fff;font-weight:700;letter-spacing:-0.3px">${greeting},</p>
-            <p style="margin:0 0 8px;font-size:15px;line-height:1.7;color:#a1a1aa">Ayer diste un paso. Hoy toca el segundo.</p>
-            <p style="margin:0 0 8px;font-size:15px;line-height:1.7;color:#a1a1aa">
-              No necesitas una hora. No necesitas tenerlo claro. Solo necesitas escribir una frase sobre cómo estás ahora mismo.
-            </p>
-            <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#71717a;text-align:center;font-style:italic">A veces volver es solo abrir la puerta y decir "hoy estoy así".</p>`;
+            <p style="margin:0 0 8px;font-size:15px;line-height:1.7;color:#a1a1aa">${escapeHtml(s.line1)}</p>
+            <p style="margin:0 0 8px;font-size:15px;line-height:1.7;color:#a1a1aa">${escapeHtml(s.line2)}</p>
+            <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#71717a;text-align:center;font-style:italic">${escapeHtml(s.closing)}</p>`;
 
   const html = baseLayout({
     theme: "dark",
     header: "branded",
     footer: "product",
     body,
-    cta: { href: `${appUrl}/app`, label: "Segundo latido" },
+    cta: { href: `${appUrl}/app`, label: s.cta },
   });
 
   return { subject, html, text };
@@ -606,10 +608,13 @@ export function build7dNudgeEmail(params: {
   name: string | null;
   lastUserPhrase: string;
   appUrl: string;
+  locale?: EmailLocale;
 }): Pick<UserEmail, "subject" | "html" | "text"> {
   const { name, appUrl } = params;
+  const loc = pickEmailLocale(params.locale);
+  const s = NUDGE_7D_STRINGS[loc];
   const firstName = name ? escapeHtml(name.trim().split(/\s+/)[0]) : null;
-  const greeting = firstName ?? "Hola";
+  const greeting = s.greeting(firstName);
 
   // Truncamos a 140 caracteres para que entre cómodo en el email; sin punto
   // final si la frase ya termina en signo.
@@ -617,39 +622,37 @@ export function build7dNudgeEmail(params: {
   const phrase = trimmed.length > 140 ? `${trimmed.slice(0, 137)}...` : trimmed;
   const safePhrase = escapeHtml(phrase);
 
-  const subject = firstName
-    ? `${firstName}, lo último que dijiste`
-    : "Lo último que dijiste";
+  const subject = firstName ? s.subjectWithName(firstName) : s.subjectAnon;
 
   const text = [
     `${greeting},`,
     ``,
-    `Hace una semana escribiste:`,
+    s.weekAgoLine,
     ``,
     `«${phrase}»`,
     ``,
-    `¿Sigue ahí?`,
+    s.stillThere,
     ``,
     `${appUrl}/app`,
     ``,
-    `No hace falta una respuesta larga. Solo una frase nueva.`,
+    s.closing,
   ].join("\n");
 
   const body = `
             <p style="margin:0 0 20px;font-size:22px;color:#fff;font-weight:700;letter-spacing:-0.3px">${greeting},</p>
-            <p style="margin:0 0 12px;font-size:13px;line-height:1.5;color:#a1a1aa">Hace una semana escribiste:</p>
+            <p style="margin:0 0 12px;font-size:13px;line-height:1.5;color:#a1a1aa">${escapeHtml(s.weekAgoLine)}</p>
             <blockquote style="margin:0 0 20px;padding:16px 20px;border-left:3px solid #a78bfa;background:#0a0a0a;border-radius:6px;font-family:Georgia,serif;font-size:18px;line-height:1.6;color:#e4e4e7;font-style:italic">
               &laquo;${safePhrase}&raquo;
             </blockquote>
-            <p style="margin:0;font-size:18px;line-height:1.6;color:#fff;font-weight:600">¿Sigue ahí?</p>
-            <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#71717a;text-align:center;font-style:italic">No hace falta una respuesta larga. Solo una frase nueva.</p>`;
+            <p style="margin:0;font-size:18px;line-height:1.6;color:#fff;font-weight:600">${escapeHtml(s.stillThere)}</p>
+            <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#71717a;text-align:center;font-style:italic">${escapeHtml(s.closing)}</p>`;
 
   const html = baseLayout({
     theme: "dark",
     header: "branded",
     footer: "product",
     body,
-    cta: { href: `${appUrl}/app`, label: "Escribir una frase nueva" },
+    cta: { href: `${appUrl}/app`, label: s.cta },
   });
 
   return { subject, html, text };
@@ -834,38 +837,37 @@ export function buildWeeklyLetterNotificationEmail(params: {
   name: string | null;
   letterId: string;
   appUrl: string;
+  locale?: EmailLocale;
 }): Pick<UserEmail, "subject" | "html" | "text"> {
+  const loc = pickEmailLocale(params.locale);
+  const s = WEEKLY_LETTER_STRINGS[loc];
   const firstName = params.name ? escapeHtml(params.name.trim().split(/\s+/)[0]) : null;
-  const greeting = firstName ? `Hola ${firstName}` : "Hola";
-  const subject = "Tu carta de esta semana está lista";
+  const greeting = s.greeting(firstName);
   const letterUrl = `${params.appUrl}/app?letter=${encodeURIComponent(params.letterId)}`;
 
   const text = [
     `${greeting},`,
     ``,
-    `El mentor te ha escrito una carta sobre esta semana.`,
-    `Léela en la app cuando tengas un momento:`,
+    s.intro,
     letterUrl,
     ``,
-    `— Tres Mil Millones de Latidos`,
+    s.signature,
   ].join("\n");
 
   const body = `
             <p style="margin:0 0 16px;font-size:18px;color:#fff;font-weight:600">${greeting},</p>
-            <p style="margin:0;font-size:15px;line-height:1.7;color:#a1a1aa">
-              El mentor te ha escrito una carta sobre esta semana. Cuando tengas un momento, léela en la app.
-            </p>`;
+            <p style="margin:0;font-size:15px;line-height:1.7;color:#a1a1aa">${escapeHtml(s.htmlIntro)}</p>`;
 
   const html = baseLayout({
     theme: "dark",
     header: "branded",
     footer: "product",
     body,
-    cta: { href: letterUrl, label: "Leer la carta" },
-    footerNote: "Recibes este aviso porque tienes activada la carta semanal.",
+    cta: { href: letterUrl, label: s.cta },
+    footerNote: s.footerNote,
   });
 
-  return { subject, html, text };
+  return { subject: s.subject, html, text };
 }
 
 export function buildSupportMessageEmail(params: {

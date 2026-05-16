@@ -5,6 +5,7 @@ import {
   buildMentorReflectionEmail,
   sendUserEmail,
 } from "@/lib/email";
+import { pickEmailLocale } from "@/lib/email-i18n";
 import { getOpenRouterChatUrl, getOpenRouterHeaders, getOpenRouterModel } from "@/lib/openrouter";
 
 const APP_URL = process.env.APP_BASE_URL?.trim() ?? "https://tresmilmillonesdelatidos.es";
@@ -182,7 +183,7 @@ export async function openWeeklyPulseForCircle(
   try {
     const members = await prisma.circleMember.findMany({
       where: { circleId, leftAt: null },
-      select: { user: { select: { id: true, email: true, name: true } } },
+      select: { user: { select: { id: true, email: true, name: true, locale: true } } },
     });
     await Promise.all(
       members
@@ -197,6 +198,7 @@ export async function openWeeklyPulseForCircle(
               prompt,
               weekEnd,
               appUrl: APP_URL,
+              locale: pickEmailLocale(m.user.locale),
             }),
           })
         )

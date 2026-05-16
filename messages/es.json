@@ -157,5 +157,69 @@
     "dangerDesc": "Estas acciones no se pueden deshacer.",
     "deleteAccount": "Eliminar mi cuenta y todos mis datos",
     "saved": "Guardado"
+  },
+  "ethics": {
+    "eyebrow": "Ética y límites",
+    "title": "Lo que",
+    "titleHighlight": "nunca haremos",
+    "titleEnd": ", y lo que sí",
+    "subtitle": "Construimos una herramienta que toca la vida emocional de la gente. Esta página es nuestro posicionamiento explícito — IA, datos, dependencia, límites clínicos, responsabilidad. Sin letra pequeña.",
+    "weDoLabel": "Lo que hacemos",
+    "weNeverLabel": "Lo que nunca haremos",
+    "ctaNote": "Si algo de lo que hacemos no encaja con lo que leíste aquí, es un fallo. Escríbenos.",
+    "ctaReport": "Reportar un fallo ético",
+    "ctaPrivacy": "Política de privacidad",
+    "ia": {
+      "title": "Sobre la inteligencia artificial",
+      "lead": "La IA es una herramienta, no un terapeuta. Nuestro mentor usa modelos generativos para acompañar, no para diagnosticar ni decidir por ti.",
+      "commit1": "El mentor está construido sobre un marco pedagógico hardcoded. No improvisa: sigue un proceso supervisado.",
+      "commit2": "Hay validadores automáticos que bloquean respuestas que violan nuestros principios (imperativos huecos, validación sin contexto, felicitaciones rápidas).",
+      "commit3": "Cuando la IA se equivoca, corregimos el prompt y lo documentamos en el changelog público.",
+      "commit4": "La decisión final siempre es tuya. El mentor devuelve preguntas, no veredictos.",
+      "never1": "Nunca usaremos tus conversaciones para entrenar modelos de terceros.",
+      "never2": "Nunca generaremos diagnósticos clínicos ni recomendaciones médicas.",
+      "never3": "Nunca pretenderemos que el mentor es humano."
+    },
+    "datos": {
+      "title": "Sobre tus datos",
+      "lead": "Lo que escribes en el mentor es íntimo. Lo tratamos con el mismo cuidado que esperaríamos si fuera nuestro.",
+      "commit1": "Tus conversaciones se guardan cifradas y se usan solo para darte continuidad: el mentor recuerda tu contexto para acompañar mejor.",
+      "commit2": "Solo accederíamos a una conversación concreta si tú abres una incidencia de soporte y nos lo pides explícitamente.",
+      "commit3": "Puedes exportar todo lo que tenemos sobre ti desde ajustes. Puedes borrarlo. El borrado es real, no marcado de baja.",
+      "commit4": "Cumplimos RGPD. Servidores en la Unión Europea.",
+      "never1": "Nunca venderemos tus datos.",
+      "never2": "Nunca los compartiremos con anunciantes ni redes publicitarias.",
+      "never3": "Nunca los cruzaremos con perfiles comerciales para segmentarte."
+    },
+    "dependencia": {
+      "title": "Sobre la dependencia emocional",
+      "lead": "El objetivo del mentor es que nos necesites menos, no más. Lo escribimos en código, no solo en el marketing.",
+      "commit1": "El mentor cierra cada conversación dejándote con claridad, no con necesidad de volver.",
+      "commit2": "Si detectamos uso compulsivo (muchas conversaciones largas al día, sin avances), el sistema propone pausa y descanso — no más sesiones.",
+      "commit3": "No usamos patrones de diseño adictivos: sin infinite scroll, sin notificaciones para recuperar atención, sin recompensas variables.",
+      "commit4": "Los recordatorios son contextuales y útiles, no ganchos de retención.",
+      "never1": "Nunca optimizaremos métricas de engagement a costa de tu bienestar.",
+      "never2": "Nunca añadiremos mecánicas de gamificación diseñadas para que vuelvas por volver.",
+      "never3": "Nunca diremos \"te echo de menos\" o similar para forzar reactivación."
+    },
+    "limitesClinicos": {
+      "title": "Sobre los límites clínicos",
+      "lead": "Hay una línea clara entre acompañamiento y atención profesional. No la cruzamos y vigilamos que no se cruce sola.",
+      "commit1": "Hay una psicóloga colegiada responsable del criterio clínico: revisa detección de riesgo, intervenciones y plantillas del mentor.",
+      "commit2": "Si detectamos señales de riesgo (ideación suicida, autolesión, crisis aguda), el mentor deja de hacer coaching y conecta con recursos de emergencia.",
+      "commit3": "Tenemos protocolo de crisis documentado. La psicóloga responsable firma cada cambio que pueda afectar al criterio clínico.",
+      "commit4": "Somos complemento, no sustituto, de terapia. Si alguien está en tratamiento, el profesional humano lleva el caso.",
+      "never1": "Nunca haremos diagnósticos psicopatológicos.",
+      "never2": "Nunca prescribiremos medicación ni dosis.",
+      "never3": "Nunca desaconsejaremos acudir a un profesional humano."
+    },
+    "responsabilidad": {
+      "title": "Sobre nuestra responsabilidad",
+      "lead": "Cuando construyes algo que toca la vida emocional de la gente, la responsabilidad es seria. No la delegamos.",
+      "commit1": "Revisamos conversaciones de forma agregada y anonimizada para mejorar el marco pedagógico.",
+      "commit2": "Documentamos cada cambio relevante en un changelog público que puedes leer.",
+      "commit3": "Si encuentras algo que viola estos principios, escríbenos. Lo corregimos y lo publicamos.",
+      "commit4": "No usamos menores de edad en nuestra plataforma sin consentimiento de responsables legales y mecanismos adicionales de protección."
+    }
   }
 }

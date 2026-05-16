@@ -693,5 +693,76 @@
     "ctaSubtitle": "Lis la méthode avant de t'inscrire. Sans donner d'email.",
     "ctaPrimary": "Lire la méthode",
     "ctaSecondary": "Essayer gratuitement"
+  },
+  "useCases": {
+    "eyebrow": "Cas d'usage",
+    "title": "Ça dépend de",
+    "titleHighlight": "ce que tu apportes",
+    "subtitle": "Le mentor n'est pas la même chose pour tout le monde. Quatre façons réelles dont les gens l'utilisent. Regarde celle qui ressemble le plus à ton moment.",
+    "signsLabel": "Tu vas te reconnaître si…",
+    "howLabel": "Ce que tu trouveras ici",
+    "limitStrong": "Où se trouve la limite.",
+    "ctaCaso": "Commencer par là",
+    "footerNote": "Si tu ne te reconnais dans aucun — ou si tu te reconnais dans plusieurs — ce n'est pas grave. Le mentor s'adapte à ce que tu apportes le jour où tu arrives. Ce sont juste des exemples, pas des étiquettes.",
+    "footerCta1": "Lire la méthode",
+    "footerCta2": "Questions fréquentes",
+    "case": {
+      "bloqueos": {
+        "kicker": "Blocages et décisions",
+        "title": "Tu sais que quelque chose doit changer, mais tu ne démarres pas",
+        "pitch": "Tu tournes en rond sur la même chose sans avancer. Tu sais clairement que tu ne veux pas continuer comme ça, mais chaque fois que tu te mets à décider, un autre doute apparaît. Ce n'est pas un manque d'information — c'est autre chose.",
+        "signal1": "Tu reportes des décisions importantes \"jusqu'à y voir clair\"",
+        "signal2": "Tu consommes du contenu sur le sujet mais tu n'agis pas",
+        "signal3": "Tu sens que si tu te trompes tu ne pourras pas rattraper",
+        "signal4": "Les gens autour de toi t'ont déjà donné des conseils — ça ne te sert pas",
+        "how1": "Le mentor sépare le fait de l'interprétation pour que tu voies ce qui est peur et ce qui est jugement",
+        "how2": "Il te renvoie des questions inconfortables que tu esquives toi-même",
+        "how3": "Il propose le plus petit pas possible aujourd'hui — pas le plan parfait",
+        "how4": "Il revoit avec toi les schémas quand la décision revient encore et encore",
+        "limit": "Si le blocage s'accompagne de symptômes dépressifs durables ou d'une anxiété invalidante, complète avec un professionnel humain."
+      },
+      "ansiedad": {
+        "kicker": "Anxiété quotidienne",
+        "title": "Tu cours à l'intérieur même si à l'extérieur tout marche",
+        "pitch": "Ce n'est pas un trouble diagnostiqué. C'est ce nœud qui t'accompagne au réveil, la tête qui ne s'arrête pas, la sensation d'être toujours en retard. Tu veux comprendre avant que ça s'aggrave.",
+        "signal1": "Tu as du mal à déconnecter même quand rien n'est urgent",
+        "signal2": "Tu passes mentalement en revue ce qui pourrait mal tourner avant de dormir",
+        "signal3": "Tu t'énerves pour de petites choses puis tu te sens coupable",
+        "signal4": "Ton corps prévient (tension, insomnie, digestion) et toi tu ignores",
+        "how1": "Des check-ins quotidiens qui t'obligent à nommer ce que tu ressens avant d'agir",
+        "how2": "Des exercices de respiration guidés pour faire baisser le pic sur le moment",
+        "how3": "Le mentor identifie les liens entre ce que tu penses et ce qui se passe dans ton corps",
+        "how4": "Un journal guidé pour séparer la menace réelle de la menace imaginée",
+        "limit": "Si tu as des attaques de panique, des évitements importants ou si l'anxiété interfère avec ta vie quotidienne, cela ne remplace pas une évaluation clinique."
+      },
+      "transiciones": {
+        "kicker": "Transitions de vie",
+        "title": "Tu es dans un \"entre-deux\". L'ancien ne va plus, le nouveau pas encore",
+        "pitch": "Changement de travail, rupture, déménagement, fin d'une étape, début d'une autre. Ce n'est pas une crise : c'est le terrain inconfortable entre deux versions de toi. Tu as besoin de mettre de l'ordre dans ce que tu lâches et de choisir ce que tu construis.",
+        "signal1": "Tu as du mal à expliquer aux autres comment tu vas sans paraître dramatique",
+        "signal2": "Par moments tu vas bien et par moments la nostalgie ou l'incertitude t'envahissent",
+        "signal3": "Tu as de grandes décisions à prendre et tu ne sais pas depuis où",
+        "signal4": "Tu te demandes \"qui suis-je maintenant ?\" plus que d'habitude",
+        "how1": "Un travail par objectifs pour ancrer la direction dans des actions concrètes",
+        "how2": "Le mentor t'aide à nommer ce qui s'est terminé avant de forcer la suite",
+        "how3": "Un suivi des schémas émotionnels pour voir la courbe, pas seulement la journée",
+        "how4": "Des rappels contextuels pour revenir à toi quand tu te perds dans le bruit",
+        "limit": "Si la transition inclut un deuil suite à une perte récente ou une rupture traumatique, cet accompagnement complète mais ne remplace pas une thérapie spécifique."
+      },
+      "autoconocimiento": {
+        "kicker": "Connaissance de soi",
+        "title": "Tu ne vas pas mal. Tu veux te voir avec plus d'honnêteté",
+        "pitch": "Il n'y a pas de crise. Il y a de la curiosité. Tu veux comprendre pourquoi tu réagis comme tu réagis, quels schémas se répètent dans tes relations, quelles valeurs tu vis et lesquelles tu as laissées de côté. Voir les lunettes avec lesquelles tu regardes.",
+        "signal1": "Tu as du temps et de l'énergie, mais tu sens que tu pourrais vivre plus éveillé",
+        "signal2": "Tu remarques des schémas répétés mais tu ne sais pas exactement lesquels",
+        "signal3": "Tu veux écrire/réfléchir régulièrement mais tu ne tiens pas l'habitude seul",
+        "signal4": "Ce qui t'intéresse c'est comment tu fonctionnes, pas seulement quoi faire",
+        "how1": "Un journal guidé avec des questions que tu ne te poserais pas seul",
+        "how2": "Un système de schémas qui te renvoie ce que tu ne vois pas",
+        "how3": "Des conversations de fond sur les valeurs, les décisions, les relations",
+        "how4": "Sans hâte de \"réparer\" quoi que ce soit — à ton rythme",
+        "limit": "Ce cas n'a pas de contre-indications particulières au-delà des limites générales : le mentor accompagne, il ne diagnostique pas."
+      }
+    }
   }
 }

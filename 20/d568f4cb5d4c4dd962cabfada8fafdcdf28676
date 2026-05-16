@@ -1,0 +1,45 @@
+src/lib/email.ts
+  s_c72d0ada98a9af::t_ef00aad1f15534 16-19
+  s_c72d0ada98a9af::t_68cce211dcdf5b 609,612-613,615,623,628,632,636,641,645-646,653
+  s_c72d0ada98a9af::t_d3ec8715bd4fdd 838,840-841,843,849,852,857,864-865,868
+  s_c72d0ada98a9af::t_6fb99400e2ace5 410,413-414,417-419,423-425,429,436,439
+  s_c72d0ada98a9af::t_4653326b55baf0 558,561-562,564,566,571,573,577,582-584,591
+src/services/weekly-letter-eligibility.ts
+  s_c72d0ada98a9af::t_564b4012c9a92d 10-12
+  s_c72d0ada98a9af::t_c95fde036b6d09 51,66
+src/lib/email-i18n.ts
+  s_c72d0ada98a9af::t_bb9cc58373e14f 545-746
+src/app/api/cron/24h-nudge/route.ts
+  s_c72d0ada98a9af::t_6647d21bcc6da0 34
+  s_c72d0ada98a9af::t_3dd3fa32e5a32c 4
+  s_c72d0ada98a9af::t_383c822d8f9c96 50-54
+src/app/api/cron/weekly-letter/route.ts
+  s_c72d0ada98a9af::t_fcb74672b150cf 129
+  s_c72d0ada98a9af::t_f4b2a919de2e84 10
+src/services/reminders.ts
+  s_c72d0ada98a9af::t_e5c33a63d182bc 112
+  s_c72d0ada98a9af::t_1c6b8349da55fb 159-163
+  s_c72d0ada98a9af::t_54a1c282030e61 4
+  s_c72d0ada98a9af::t_c10800777bf24b 70
+  s_c72d0ada98a9af::t_9ca3b5303e475a 28
+src/app/api/cron/7d-nudge/route.ts
+  s_c72d0ada98a9af::t_93cb857ec97d95 91
+  s_c72d0ada98a9af::t_d34fca7a82797c 59
+  s_c72d0ada98a9af::t_f90fcd103ce814 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "20d568f4cb5d4c4dd962cabfada8fafdcdf28676",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

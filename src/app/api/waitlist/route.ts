@@ -3,6 +3,7 @@ import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { consumeInviteCode } from "@/services/invites";
 import { buildWaitlistWelcomeEmail, sendUserEmail } from "@/lib/email";
+import { pickEmailLocale } from "@/lib/email-i18n";
 
 const MAX_BODY_SIZE = 10 * 1024; // 10 KB
 
@@ -20,9 +21,12 @@ export async function POST(req: NextRequest) {
       mission3?: string;
       inviteCode?: string;
       utm?: Record<string, string>;
+      locale?: string;
     };
 
     const { email, mission1, mission2, mission3, inviteCode, utm } = body;
+    // Locale del email: body.locale (cliente) → cookie NEXT_LOCALE → "es".
+    const locale = pickEmailLocale(body.locale ?? req.cookies.get("NEXT_LOCALE")?.value);
 
     if (!email || !mission1 || !mission2 || !mission3) {
       return NextResponse.json({ error: "Faltan campos obligatorios" }, { status: 400 });
@@ -46,7 +50,7 @@ export async function POST(req: NextRequest) {
     logInfo("WAITLIST", "entry_created", { id: entry.id, email: emailLower, ...(utm && { utm }) });
 
     const appUrl = process.env.APP_BASE_URL ?? "http://localhost:3000";
-    sendUserEmail({ ...buildWaitlistWelcomeEmail({ to: emailLower, appUrl }), template: "waitlist_welcome" }).catch(
+    sendUserEmail({ ...buildWaitlistWelcomeEmail({ to: emailLower, appUrl, locale }), template: "waitlist_welcome" }).catch(
       (e) => logError("WAITLIST", e, { action: "send_waitlist_welcome_email", email: emailLower }),
     );
 

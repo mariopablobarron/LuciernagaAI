@@ -2,88 +2,61 @@
 
 import { baseLayout } from "@/lib/email-layout";
 import { signUnsubscribeToken } from "@/lib/unsubscribe-token";
+import {
+  type EmailLocale,
+  pickEmailLocale,
+  fmtBeats as fmtBeatsLocale,
+  fmtNum as fmtNumLocale,
+  VERIFICATION_STRINGS,
+  PASSWORD_RESET_STRINGS,
+  QUIZ_STATE_I18N,
+  QUIZ_LEAD_STRINGS,
+  HEARTBEAT_STRINGS,
+  WELCOME_STRINGS,
+  WAITLIST_STRINGS,
+} from "@/lib/email-i18n";
 
 export type QuizState = "bloqueo" | "ansiedad" | "duda" | "claridad" | "neutral";
-
-const QUIZ_STATE_CONTENT: Record<
-  QuizState,
-  { emoji: string; label: string; action: string; headline: string }
-> = {
-  bloqueo: {
-    emoji: "🧱",
-    label: "Bloqueo mental",
-    headline: "Sabes lo que tienes que hacer — pero no puedes empezar.",
-    action:
-      "Abre ahora el documento, archivo o herramienta del proyecto. Solo abrirlo, sin hacer nada más. En los próximos 2 minutos.",
-  },
-  ansiedad: {
-    emoji: "⚡",
-    label: "Ansiedad de acción",
-    headline: "Tienes energía — pero se convierte en presión, no en avance.",
-    action:
-      "Escribe en papel o en un documento: «¿Qué es lo peor concreto que puede pasar?» Una frase. Sin adornos. Nómbralo.",
-  },
-  duda: {
-    emoji: "🌫️",
-    label: "Niebla de dirección",
-    headline: "Tienes ganas — pero no sabes hacia dónde.",
-    action:
-      "Responde en 30 segundos: ¿Cuál es el UN objetivo que, si avanzara esta semana, sentiría que hay progreso real? Escríbelo ahora.",
-  },
-  claridad: {
-    emoji: "✨",
-    label: "Momento de claridad",
-    headline: "Sabes lo que quieres y tienes energía para avanzar.",
-    action:
-      "Define en una frase el resultado concreto de hoy. No la lista entera: solo la cosa más importante que, si la haces, el día habrá valido.",
-  },
-  neutral: {
-    emoji: "🔵",
-    label: "Estado neutro",
-    headline: "Estás en punto muerto — ni bloqueado ni en impulso claro.",
-    action:
-      "Elige una tarea de menos de 20 minutos que lleves postergando. Ponla en tu agenda de hoy con hora exacta.",
-  },
-};
+export type { EmailLocale } from "@/lib/email-i18n";
 
 export function buildQuizLeadEmail(params: {
   to: string;
   state: QuizState;
   appUrl: string;
+  locale?: EmailLocale;
 }): UserEmail {
   const { to, state, appUrl } = params;
-  const content = QUIZ_STATE_CONTENT[state];
+  const loc = pickEmailLocale(params.locale);
+  const content = QUIZ_STATE_I18N[loc][state];
+  const s = QUIZ_LEAD_STRINGS[loc];
 
-  const subject = `${content.emoji} Tu diagnóstico: ${content.label}`;
+  const subject = s.subjectTpl(content.emoji, content.label);
 
   const text =
-    `Tu resultado del test de Tres Mil Millones de Latidos\n\n` +
-    `Estado detectado: ${content.label}\n\n` +
+    `${s.textIntro}\n\n` +
+    `${s.textStateDetected} ${content.label}\n\n` +
     `${content.headline}\n\n` +
-    `Tu acción para ahora:\n${content.action}\n\n` +
-    `Tres Mil Millones de Latidos te ayuda a hacer seguimiento de tu estado y avanzar con conversaciones orientadas a acción.\n\n` +
-    `Empieza gratis → ${appUrl}`;
+    `${s.textActionHeader}\n${content.action}\n\n` +
+    `${s.textPitch}\n\n` +
+    `${s.textCta} ${appUrl}`;
 
   const body = `
-            <p style="margin:0 0 8px;font-size:13px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Tu resultado del test</p>
+            <p style="margin:0 0 8px;font-size:13px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.5px">${escapeHtml(s.resultHeader)}</p>
             <p style="margin:0 0 4px;font-size:32px;line-height:1">${escapeHtml(content.emoji)}</p>
             <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#111;line-height:1.3;letter-spacing:-0.3px">${escapeHtml(content.label)}</h1>
             <p style="margin:0 0 24px;font-size:15px;color:#444;line-height:1.6;font-style:italic">"${escapeHtml(content.headline)}"</p>
             <div style="background:#f5f3ff;border-left:3px solid #7c3aed;border-radius:4px;padding:14px 16px;margin-bottom:24px">
-              <p style="margin:0 0 6px;font-size:11px;color:#7c3aed;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Tu acción para ahora</p>
+              <p style="margin:0 0 6px;font-size:11px;color:#7c3aed;font-weight:700;text-transform:uppercase;letter-spacing:.5px">${escapeHtml(s.actionLabel)}</p>
               <p style="margin:0;font-size:15px;color:#1e1b4b;line-height:1.6;font-weight:500">${escapeHtml(content.action)}</p>
             </div>
-            <p style="margin:0;font-size:15px;color:#444;line-height:1.6">
-              Tres Mil Millones de Latidos detecta tu estado en cada conversación y te orienta a la acción concreta.
-              Sin consejos genéricos. Sin rodeos.
-            </p>`;
+            <p style="margin:0;font-size:15px;color:#444;line-height:1.6">${escapeHtml(s.pitch)}</p>`;
 
   const html = baseLayout({
     theme: "light",
     header: "branded",
     footer: "product",
     body,
-    cta: { href: appUrl, label: "Empezar gratis" },
+    cta: { href: appUrl, label: s.cta },
   });
 
   return { to, subject, html, text };
@@ -95,26 +68,26 @@ export function buildVerificationEmail(params: {
   to: string;
   verifyUrl: string;
   name?: string;
+  locale?: EmailLocale;
 }): UserEmail {
   const { to, verifyUrl, name } = params;
-  const greeting = name ? `Hola ${escapeHtml(name)}` : "Hola";
-
-  const subject = "Verifica tu email — Tres Mil Millones de Latidos";
+  const loc = pickEmailLocale(params.locale);
+  const s = VERIFICATION_STRINGS[loc];
+  const safeName = name ? escapeHtml(name) : null;
+  const greeting = s.greeting(safeName);
 
   const text =
     `${greeting},\n\n` +
-    `Gracias por registrarte en Tres Mil Millones de Latidos.\n\n` +
-    `Verifica tu email haciendo clic en este enlace:\n${verifyUrl}\n\n` +
-    `El enlace caduca en 24 horas.\n\n` +
-    `Si no te has registrado, ignora este mensaje.`;
+    `${s.intro}\n\n` +
+    `${verifyUrl}\n\n` +
+    `${s.hint}\n\n` +
+    `${s.ignore}`;
 
   const body = `
             <p style="margin:0 0 16px;font-size:18px;color:#111;font-weight:600">${greeting},</p>
-            <p style="margin:0 0 8px;font-size:15px;color:#444;line-height:1.6">
-              Gracias por registrarte. Solo necesitas verificar tu email para empezar.
-            </p>
+            <p style="margin:0 0 8px;font-size:15px;color:#444;line-height:1.6">${escapeHtml(s.intro)}</p>
             <p style="margin:24px 0 0;font-size:13px;color:#888;line-height:1.5">
-              El enlace caduca en 24 horas. Si no te has registrado, ignora este mensaje.
+              ${escapeHtml(s.hint)} ${escapeHtml(s.ignore)}
             </p>`;
 
   const html = baseLayout({
@@ -122,10 +95,10 @@ export function buildVerificationEmail(params: {
     header: "branded",
     footer: "product",
     body,
-    cta: { href: verifyUrl, label: "Verificar mi email" },
+    cta: { href: verifyUrl, label: s.cta },
   });
 
-  return { to, subject, html, text };
+  return { to, subject: s.subject, html, text };
 }
 
 // ─── Password reset ──────────────────────────────────────────────────────────
@@ -134,25 +107,25 @@ export function buildPasswordResetEmail(params: {
   to: string;
   resetUrl: string;
   name?: string | null;
+  locale?: EmailLocale;
 }): UserEmail {
   const { to, resetUrl, name } = params;
-  const greeting = name ? `Hola ${escapeHtml(name)}` : "Hola";
-
-  const subject = "Recupera tu acceso";
+  const loc = pickEmailLocale(params.locale);
+  const s = PASSWORD_RESET_STRINGS[loc];
+  const safeName = name ? escapeHtml(name) : null;
+  const greeting = s.greeting(safeName);
 
   const text =
     `${greeting},\n\n` +
-    `Recibimos una petición para restablecer tu contraseña.\n\n` +
-    `Haz clic en el enlace (válido 1 hora):\n${resetUrl}\n\n` +
-    `Si no pediste esto, ignora este mensaje.`;
+    `${s.intro}\n\n` +
+    `${resetUrl}\n\n` +
+    `${s.hint} ${s.ignore}`;
 
   const body = `
             <p style="margin:0 0 16px;font-size:18px;color:#111;font-weight:600">${greeting},</p>
-            <p style="margin:0 0 8px;font-size:15px;color:#444;line-height:1.6">
-              Recibimos una petición para restablecer la contraseña de tu cuenta.
-            </p>
+            <p style="margin:0 0 8px;font-size:15px;color:#444;line-height:1.6">${escapeHtml(s.intro)}</p>
             <p style="margin:24px 0 0;font-size:13px;color:#888;line-height:1.5">
-              El enlace caduca en 1 hora. Si no pediste esto, ignora este correo.
+              ${escapeHtml(s.hint)} ${escapeHtml(s.ignore)}
             </p>`;
 
   const html = baseLayout({
@@ -160,10 +133,10 @@ export function buildPasswordResetEmail(params: {
     header: "branded",
     footer: "product",
     body,
-    cta: { href: resetUrl, label: "Restablecer contraseña" },
+    cta: { href: resetUrl, label: s.cta },
   });
 
-  return { to, subject, html, text };
+  return { to, subject: s.subject, html, text };
 }
 
 // ─── Heartbeat Calculator Email ──────────────────────────────────────────────
@@ -172,107 +145,98 @@ const AVG_BPM = 72;
 const BEATS_PER_HOUR = AVG_BPM * 60;
 const BEATS_PER_DAY = BEATS_PER_HOUR * 24;
 
-function fmtBeats(n: number): string {
-  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)} mil millones`;
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)} millones`;
-  return n.toLocaleString("es-ES");
-}
-
 export function buildHeartbeatEmail(params: {
   to: string;
   beats: number;
   appUrl: string;
+  locale?: EmailLocale;
 }): UserEmail {
   const { to, beats, appUrl } = params;
+  const loc = pickEmailLocale(params.locale);
+  const s = HEARTBEAT_STRINGS[loc];
   const days = Math.round(beats / BEATS_PER_DAY);
   const hours = Math.round(beats / BEATS_PER_HOUR);
   const songs = Math.round(beats / (AVG_BPM * 3.5));
   const hugs = Math.round(beats / (AVG_BPM * 0.33));
+  const beatsStr = fmtBeatsLocale(beats, loc);
 
-  const subject = `💓 ${fmtBeats(beats)} latidos — tu informe personal`;
+  const subject = s.subjectTpl(beatsStr);
 
   const text = [
-    `Tu informe de latidos`,
+    s.reportLabel,
     ``,
-    `Tu corazon ha latido aproximadamente ${fmtBeats(beats)} veces para traerte hasta aqui.`,
+    s.introTpl(beatsStr),
     ``,
-    `Eso equivale a:`,
-    `- ${days.toLocaleString("es-ES")} amaneceres vividos`,
-    `- ${hours.toLocaleString("es-ES")} horas de experiencia acumulada`,
-    `- ${songs.toLocaleString("es-ES")} canciones que cabrian en ese tiempo`,
-    `- ${hugs.toLocaleString("es-ES")} abrazos posibles`,
+    `- ${fmtNumLocale(days, loc)} ${s.sunrises}`,
+    `- ${fmtNumLocale(hours, loc)} ${s.hours}`,
+    `- ${fmtNumLocale(songs, loc)} ${s.songs}`,
+    `- ${fmtNumLocale(hugs, loc)} ${s.hugs}`,
     ``,
-    `Cada latido sostuvo una decision, un momento de duda, un paso adelante.`,
-    `No son numeros — son tu historia.`,
+    s.reframeBody,
+    s.reframeTitle,
     ``,
-    `Lo que puedes hacer ahora:`,
-    `Tu corazon ya tiene la constancia. Solo falta que tu le des una direccion.`,
-    `El primer paso no tiene que ser grande — solo tiene que ser tuyo.`,
+    `${s.nowTitle}:`,
+    s.nowBody,
     ``,
-    `Dar mi primer paso: ${appUrl}/app`,
+    `${s.ctaButton}: ${appUrl}/app`,
     ``,
     `---`,
     ``,
-    `Convierte intencion en accion con Tres Mil Millones de Latidos:`,
-    `Un mentor con IA, check-ins diarios, objetivos y retos de 21 dias.`,
+    s.signupPitch,
     ``,
-    `Crear cuenta gratis: ${appUrl}/signup?utm_source=calculator&utm_medium=email&utm_campaign=heartbeat_report`,
-    `Ya tienes cuenta? ${appUrl}/login`,
+    `${s.signupCta}: ${appUrl}/signup?utm_source=calculator&utm_medium=email&utm_campaign=heartbeat_report`,
+    `${s.haveAccount} ${appUrl}/login`,
     ``,
-    `— Tres Mil Millones de Latidos`,
+    s.signature,
   ].join("\n");
 
   const body = `
-            <p style="margin:0 0 8px;font-size:13px;color:#71717a;text-transform:uppercase;letter-spacing:0.15em;font-weight:600">Tu informe de latidos</p>
-            <p style="margin:0 0 24px;font-size:36px;font-weight:800;background:linear-gradient(135deg,#c084fc,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1">${fmtBeats(beats)}</p>
-            <p style="margin:0 0 24px;font-size:15px;color:#a1a1aa;line-height:1.7">
-              Tu corazón ha latido <strong style="color:#e4e4e7">${fmtBeats(beats)} veces</strong> para traerte hasta aquí. Cada uno sostuvo una decisión, un momento de duda, un paso adelante.
-            </p>
+            <p style="margin:0 0 8px;font-size:13px;color:#71717a;text-transform:uppercase;letter-spacing:0.15em;font-weight:600">${escapeHtml(s.reportLabel)}</p>
+            <p style="margin:0 0 24px;font-size:36px;font-weight:800;background:linear-gradient(135deg,#c084fc,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1">${beatsStr}</p>
+            <p style="margin:0 0 24px;font-size:15px;color:#a1a1aa;line-height:1.7">${s.introHtmlTpl(beatsStr)}</p>
             <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px">
               <tr>
                 <td width="50%" style="padding:6px">
                   <div style="background:#7c3aed10;border:1px solid #7c3aed30;border-radius:10px;padding:16px;text-align:center">
-                    <p style="margin:0;font-size:22px;font-weight:700;color:#c4b5fd">${days.toLocaleString("es-ES")}</p>
-                    <p style="margin:4px 0 0;font-size:11px;color:#71717a">amaneceres vividos</p>
+                    <p style="margin:0;font-size:22px;font-weight:700;color:#c4b5fd">${fmtNumLocale(days, loc)}</p>
+                    <p style="margin:4px 0 0;font-size:11px;color:#71717a">${escapeHtml(s.sunrises)}</p>
                   </div>
                 </td>
                 <td width="50%" style="padding:6px">
                   <div style="background:#ec489910;border:1px solid #ec489930;border-radius:10px;padding:16px;text-align:center">
-                    <p style="margin:0;font-size:22px;font-weight:700;color:#f9a8d4">${songs.toLocaleString("es-ES")}</p>
-                    <p style="margin:4px 0 0;font-size:11px;color:#71717a">canciones que caben</p>
+                    <p style="margin:0;font-size:22px;font-weight:700;color:#f9a8d4">${fmtNumLocale(songs, loc)}</p>
+                    <p style="margin:4px 0 0;font-size:11px;color:#71717a">${escapeHtml(s.songs)}</p>
                   </div>
                 </td>
               </tr>
               <tr>
                 <td width="50%" style="padding:6px">
                   <div style="background:#06b6d410;border:1px solid #06b6d430;border-radius:10px;padding:16px;text-align:center">
-                    <p style="margin:0;font-size:22px;font-weight:700;color:#67e8f9">${hours.toLocaleString("es-ES")}</p>
-                    <p style="margin:4px 0 0;font-size:11px;color:#71717a">horas de experiencia</p>
+                    <p style="margin:0;font-size:22px;font-weight:700;color:#67e8f9">${fmtNumLocale(hours, loc)}</p>
+                    <p style="margin:4px 0 0;font-size:11px;color:#71717a">${escapeHtml(s.hours)}</p>
                   </div>
                 </td>
                 <td width="50%" style="padding:6px">
                   <div style="background:#10b98110;border:1px solid #10b98130;border-radius:10px;padding:16px;text-align:center">
-                    <p style="margin:0;font-size:22px;font-weight:700;color:#6ee7b7">${hugs.toLocaleString("es-ES")}</p>
-                    <p style="margin:4px 0 0;font-size:11px;color:#71717a">abrazos posibles</p>
+                    <p style="margin:0;font-size:22px;font-weight:700;color:#6ee7b7">${fmtNumLocale(hugs, loc)}</p>
+                    <p style="margin:4px 0 0;font-size:11px;color:#71717a">${escapeHtml(s.hugs)}</p>
                   </div>
                 </td>
               </tr>
             </table>
             <div style="background:#27272a;border-radius:10px;padding:20px;margin:0 0 16px">
-              <p style="margin:0 0 8px;font-size:18px;font-weight:700;color:#fff">No son números — son tu historia</p>
-              <p style="margin:0;font-size:15px;color:#a1a1aa;line-height:1.6">
-                Detrás de cada latido hubo decisiones que tomaste, miedos que enfrentaste y días que simplemente aguantaste. Tu corazón tiene la constancia. Solo falta que tú le des una dirección.
-              </p>
+              <p style="margin:0 0 8px;font-size:18px;font-weight:700;color:#fff">${escapeHtml(s.reframeTitle)}</p>
+              <p style="margin:0;font-size:15px;color:#a1a1aa;line-height:1.6">${escapeHtml(s.reframeBodyLong)}</p>
             </div>
-            <p style="margin:0;font-size:15px;color:#e4e4e7;font-weight:600">El primer paso no tiene que ser grande — solo tiene que ser tuyo.</p>`;
+            <p style="margin:0;font-size:15px;color:#e4e4e7;font-weight:600">${escapeHtml(s.emphasizedClose)}</p>`;
 
   const html = baseLayout({
     theme: "dark",
     header: "branded",
     footer: "product",
     body,
-    cta: { href: `${appUrl}/app`, label: "Dar mi primer paso" },
-    footerNote: "Este informe se generó desde la calculadora de latidos.",
+    cta: { href: `${appUrl}/app`, label: s.ctaButton },
+    footerNote: s.footerNote,
   });
 
   return { to, subject, html, text };
@@ -488,58 +452,51 @@ export function buildWaitlistWelcomeEmail(params: {
   to: string;
   name?: string;
   appUrl: string;
+  locale?: EmailLocale;
 }): UserEmail {
   const { to, name, appUrl } = params;
-  const greeting = name ? `Hola ${escapeHtml(name)}` : "Hola";
+  const loc = pickEmailLocale(params.locale);
+  const s = WAITLIST_STRINGS[loc];
+  const safeName = name ? escapeHtml(name) : null;
+  const greeting = s.greeting(safeName);
   const signupUrl = `${appUrl}/signup`;
 
-  const subject =
-    "Tu transformación empieza aquí — Tres Mil Millones de Latidos";
-
   const text = [
-    `${name ? `Hola ${name}` : "Hola"},`,
+    `${greeting},`,
     ``,
-    `Ya diste el primer paso. Respondiste tres preguntas que la mayoría evita. Eso dice algo de ti.`,
+    s.line1,
     ``,
-    `Tres Mil Millones de Latidos no es otra app de productividad. Es un espacio para ordenar lo que sientes, nombrar lo que te frena y avanzar con acción concreta.`,
+    s.line2,
     ``,
-    `El siguiente paso: crea tu cuenta y empieza tu primera conversación.`,
+    s.highlight,
     ``,
-    `${signupUrl}`,
+    signupUrl,
     ``,
-    `Sin rodeos. Sin consejos genéricos. Solo tú y la claridad que necesitas.`,
+    s.closing,
     ``,
-    `— Tres Mil Millones de Latidos`,
+    s.signature,
     ``,
-    `Este servicio acompaña — no sustituye ayuda profesional.`,
+    s.disclaimer,
   ].join("\n");
 
   const body = `
             <p style="margin:0 0 20px;font-size:18px;color:#fff;font-weight:600">${greeting},</p>
-            <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#a1a1aa">
-              Ya diste el primer paso. Respondiste tres preguntas que la mayoría evita. Eso dice algo de ti.
-            </p>
-            <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#a1a1aa">
-              Tres Mil Millones de Latidos no es otra app de productividad. Es un espacio para ordenar lo que sientes, nombrar lo que te frena y avanzar con acción concreta.
-            </p>
+            <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#a1a1aa">${escapeHtml(s.line1)}</p>
+            <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#a1a1aa">${escapeHtml(s.line2)}</p>
             <div style="background:#27272a;border-left:3px solid #d946ef;border-radius:4px;padding:16px 20px;margin:24px 0">
-              <p style="margin:0;font-size:15px;color:#e4e4e7;line-height:1.6;font-weight:500">
-                El siguiente paso: crea tu cuenta y empieza tu primera conversación.
-              </p>
+              <p style="margin:0;font-size:15px;color:#e4e4e7;line-height:1.6;font-weight:500">${escapeHtml(s.highlight)}</p>
             </div>
-            <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#71717a">
-              Sin rodeos. Sin consejos genéricos. Solo tú y la claridad que necesitas.
-            </p>`;
+            <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#71717a">${escapeHtml(s.closing)}</p>`;
 
   const html = baseLayout({
     theme: "dark",
     header: "branded",
     footer: "product",
     body,
-    cta: { href: signupUrl, label: "Crear mi cuenta" },
+    cta: { href: signupUrl, label: s.cta },
   });
 
-  return { to, subject, html, text };
+  return { to, subject: s.subject, html, text };
 }
 
 // ─── Welcome email ──────────────────────────────────────────────────────────
@@ -547,47 +504,46 @@ export function buildWaitlistWelcomeEmail(params: {
 export function buildWelcomeEmail(params: {
   name: string | null;
   appUrl: string;
+  locale?: EmailLocale;
 }): Pick<UserEmail, "subject" | "html" | "text"> {
   const { name, appUrl } = params;
+  const loc = pickEmailLocale(params.locale);
+  const s = WELCOME_STRINGS[loc];
   const firstName = name ? escapeHtml(name.trim().split(/\s+/)[0]) : null;
-  const greeting = firstName ? `${firstName}` : "Hola";
+  const greeting = s.greeting(firstName);
 
-  const subject = firstName
-    ? `${firstName}, tu primer latido empieza aquí`
-    : "Tu primer latido empieza aquí";
+  const subject = firstName ? s.subjectWithName(firstName) : s.subjectAnon;
 
   const text = [
     `${greeting},`,
     ``,
-    `Has dado el primer paso. La mayoría no llega aquí.`,
+    s.line1,
     ``,
-    `Tres Mil Millones de Latidos no es una app que te dice qué hacer. Es un espacio que te pregunta lo que nadie te pregunta — para que veas lo que no estás viendo.`,
+    s.line2,
     ``,
-    `No necesitas tenerlo claro. Solo necesitas empezar por lo que sientes hoy.`,
+    // El "highlight" en HTML lleva <br>, en text-plain lo paso a salto natural
+    s.highlight.replace(/<br>/g, "\n"),
     ``,
-    `Tu primer paso: entra y cuéntame cómo estás.`,
     `${appUrl}/app`,
     ``,
-    `Cada latido cuenta. Y este es el primero.`,
+    s.closing,
   ].join("\n");
 
   const body = `
             <p style="margin:0 0 20px;font-size:22px;color:#fff;font-weight:700;letter-spacing:-0.3px">${greeting},</p>
-            <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#a1a1aa">Has dado el primer paso. La mayoría no llega aquí.</p>
-            <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#a1a1aa">
-              Esto no es una app que te dice qué hacer. Es un espacio que te pregunta lo que nadie te pregunta — para que veas lo que no estás viendo.
-            </p>
+            <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#a1a1aa">${escapeHtml(s.line1)}</p>
+            <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#a1a1aa">${escapeHtml(s.line2)}</p>
             <div style="background:#27272a;border-left:3px solid #d946ef;border-radius:4px;padding:16px 20px;margin:24px 0">
-              <p style="margin:0;font-size:18px;color:#e4e4e7;line-height:1.6">No necesitas tenerlo claro.<br>Solo necesitas empezar por lo que sientes hoy.</p>
+              <p style="margin:0;font-size:18px;color:#e4e4e7;line-height:1.6">${s.highlight}</p>
             </div>
-            <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#71717a;text-align:center">Cada latido cuenta. Y este es el primero.</p>`;
+            <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#71717a;text-align:center">${escapeHtml(s.closing)}</p>`;
 
   const html = baseLayout({
     theme: "dark",
     header: "branded",
     footer: "product",
     body,
-    cta: { href: `${appUrl}/app`, label: "Mi primer latido" },
+    cta: { href: `${appUrl}/app`, label: s.cta },
   });
 
   return { subject, html, text };

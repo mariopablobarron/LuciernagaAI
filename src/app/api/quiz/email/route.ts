@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { logError, logInfo } from "@/lib/logger";
 import { buildQuizLeadEmail, sendUserEmail, type QuizState } from "@/lib/email";
+import { pickEmailLocale } from "@/lib/email-i18n";
 
 const VALID_STATES: QuizState[] = ["bloqueo", "ansiedad", "duda", "claridad", "neutral"];
 
@@ -14,7 +15,7 @@ function isValidState(value: unknown): value is QuizState {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = (await req.json()) as { email?: unknown; state?: unknown };
+    const body = (await req.json()) as { email?: unknown; state?: unknown; locale?: unknown };
 
     if (!body.email || typeof body.email !== "string" || !isValidEmail(body.email)) {
       return NextResponse.json({ success: false, error: "EMAIL_INVALID" }, { status: 400 });
@@ -26,10 +27,17 @@ export async function POST(req: NextRequest) {
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://tresmilmillonesdelatidos.es/explore";
 
+    // Locale del email: body.locale (cliente) → cookie NEXT_LOCALE → "es".
+    const locale = pickEmailLocale(
+      (typeof body.locale === "string" ? body.locale : null) ??
+        req.cookies.get("NEXT_LOCALE")?.value
+    );
+
     const email = buildQuizLeadEmail({
       to: body.email,
       state: body.state,
       appUrl,
+      locale,
     });
 
     const sent = await sendUserEmail({ ...email, template: "quiz_lead" });

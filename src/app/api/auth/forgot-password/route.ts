@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { generateResetToken, resetTokenExpiry } from "@/lib/reset-token";
 import { sendUserEmail, buildPasswordResetEmail } from "@/lib/email";
+import { pickEmailLocale } from "@/lib/email-i18n";
 import { logError } from "@/lib/logger";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { normalizeEmail } from "@/services/user";
@@ -17,8 +18,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const body = (await req.json()) as { email?: string };
+    const body = (await req.json()) as { email?: string; locale?: string };
     const email = normalizeEmail(body.email?.trim() ?? "");
+    // Locale: body.locale → cookie NEXT_LOCALE → "es". El usuario aún no se
+    // identifica (estamos en flow de recuperación), por eso no usamos User.locale.
+    const locale = pickEmailLocale(body.locale ?? req.cookies.get("NEXT_LOCALE")?.value);
 
     if (!email) {
       return NextResponse.json({ success: false, error: "EMAIL_REQUIRED" }, { status: 400 });
@@ -48,7 +52,7 @@ export async function POST(req: NextRequest) {
     const resetUrl = `${appUrl}/reset-password?token=${raw}`;
 
     await sendUserEmail({
-      ...buildPasswordResetEmail({ to: email, resetUrl, name: user.name }),
+      ...buildPasswordResetEmail({ to: email, resetUrl, name: user.name, locale }),
       userId: user.id,
       template: "password_reset",
     });

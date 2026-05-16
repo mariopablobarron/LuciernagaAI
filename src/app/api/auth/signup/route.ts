@@ -7,6 +7,7 @@ import { logError, logInfo } from "@/lib/logger";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getUserSessionProfile, normalizeEmail } from "@/services/user";
 import { sendUserEmail, buildVerificationEmail, buildWelcomeEmail } from "@/lib/email";
+import { pickEmailLocale } from "@/lib/email-i18n";
 import { issueWebLinkToken } from "@/lib/telegram-link";
 import { sendAlert } from "@/lib/alerts";
 import { dispatchN8nEvent } from "@/lib/n8n";
@@ -60,11 +61,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const body = (await req.json()) as SignupBody;
+    const body = (await req.json()) as SignupBody & { locale?: string };
     const email = normalizeEmail(body.email?.trim() ?? "");
     const password = body.password?.trim() ?? "";
     const name = body.name?.trim() ?? "";
     const phone = body.phone?.trim() || null;
+    // Locale para los emails de signup (verification + welcome).
+    // body.locale (cliente lo manda según LocaleSwitcher) → cookie NEXT_LOCALE
+    // → "es". Este valor también marca el idioma futuro de los emails programados.
+    const locale = pickEmailLocale(body.locale ?? req.cookies.get("NEXT_LOCALE")?.value);
     const utmSource = body.utm && Object.keys(body.utm).length > 0
       ? JSON.stringify(body.utm)
       : null;
@@ -276,11 +281,11 @@ export async function POST(req: NextRequest) {
       const baseUrl = process.env.APP_BASE_URL ?? "http://localhost:3000";
       const verifyUrl = `${baseUrl}/api/auth/verify-email?token=${result.verifyToken}`;
       sendUserEmail({
-        ...buildVerificationEmail({ to: email, verifyUrl, name: name || undefined }),
+        ...buildVerificationEmail({ to: email, verifyUrl, name: name || undefined, locale }),
         userId: result.userId,
         template: "verification",
       }).catch((e) => logError("AUTH", e, { action: "send_verification_email", email }));
-      const welcomeEmail = buildWelcomeEmail({ name: name || null, appUrl: baseUrl });
+      const welcomeEmail = buildWelcomeEmail({ name: name || null, appUrl: baseUrl, locale });
       sendUserEmail({
         to: email,
         ...welcomeEmail,

@@ -905,5 +905,76 @@
     "ctaSubtitle": "Trois questions. Un engagement. Trente jours. Le changement que tu repousses depuis longtemps commence aujourd'hui.",
     "ctaFinal": "Relève le défi maintenant",
     "ctaFinalNote": "Sans carte. Sans spam. Juste 30 jours."
+  },
+  "professionals": {
+    "eyebrow": "Pour les professionnels de la santé mentale et du bien-être",
+    "title": "Ton client,",
+    "titleHighlight": "entre les séances",
+    "subtitle": "Trois Milliards de Battements ne remplace pas ton travail. Il le complète. Un mentor avec IA qui accompagne tes clients entre les séances, dans un cadre pédagogique révisé cliniquement et avec un tableau de bord professionnel pour que tu aies une visibilité réelle.",
+    "honestyTitle": "Ce que nous voulons clarifier avant de commencer",
+    "honesty1Strong": "Ce n'est pas une thérapie.",
+    "honesty1": "Il ne diagnostique pas, ne prescrit pas, ne remplace pas la relation clinique. Si un cas nécessite une intervention, c'est le professionnel humain qui s'en charge.",
+    "honesty2Strong": "Le mentor a des limites qu'il ne franchit pas.",
+    "honesty2": "Face à des signaux de risque, il cesse de faire du coaching et oriente vers des ressources d'urgence et une aide professionnelle.",
+    "honesty3Strong": "Une professionnelle de la psychologie est responsable du critère clinique",
+    "honesty3": "qui supervise la détection des risques, les interventions et les modèles du mentor.",
+    "benefitsTitle": "Ce qu'il apporte à ta consultation",
+    "benefit": {
+      "panel": {
+        "title": "Tableau de bord clinique",
+        "desc": "Tu vois l'évolution, l'état émotionnel, les schémas détectés et les actions accomplies des clients qui te désignent comme professionnel de référence."
+      },
+      "risk": {
+        "title": "Détection précoce du risque",
+        "desc": "Le système surveille les signaux (idéation suicidaire, automutilation, crise aiguë) et les remonte vers ton tableau de bord avant qu'ils n'arrivent à ta prochaine séance."
+      },
+      "notes": {
+        "title": "Notes cliniques intégrées",
+        "desc": "Tu peux prendre des notes sur le client dans le tableau de bord, les associer à des moments précis et les revoir avant chaque séance."
+      },
+      "diary": {
+        "title": "Journal et schémas du client",
+        "desc": "Le client travaille sur son journal, ses check-ins et ses objectifs entre les séances. Tu arrives en consultation avec une carte, pas avec une page blanche."
+      },
+      "interventions": {
+        "title": "Interventions supervisées",
+        "desc": "Tu peux activer des interventions spécifiques (messages, pauses, recentrages du mentor) pour ton client particulier, toujours à ta discrétion."
+      },
+      "privacy": {
+        "title": "Confidentialité et consentement",
+        "desc": "Le client décide de ce qu'il partage avec toi. Tu vois ce qu'il autorise — nous ne lisons pas les conversations sans son consentement explicite."
+      }
+    },
+    "frameworkTitle": "Le cadre qu'utilise le mentor",
+    "frameworkIntro": "Quatre principes hardcodés dans les prompts du système et surveillés par des validateurs automatiques :",
+    "principle1Title": "Interpeller avant d'instruire",
+    "principle1Desc": "Le mentor ne dit pas « tu dois faire X ». Il pose des questions. Il rend visible ce que le client ne voit pas.",
+    "principle2Title": "Questions avant réponses",
+    "principle2Desc": "Les réponses ferment. Les questions ouvrent.",
+    "principle3Title": "Du local au global",
+    "principle3Desc": "Nous commençons par la donnée concrète du jour, pas par des cadres génériques.",
+    "principle4Title": "Le changement vient de l'intérieur",
+    "principle4Desc": "On ne pousse pas le client — on l'accompagne là où il peut se voir lui-même.",
+    "frameworkProhibitedPre": "Il est",
+    "frameworkProhibitedStrong": "explicitement interdit",
+    "frameworkProhibitedCont": "au système d'utiliser des impératifs creux, de valider sans contexte, de féliciter rapidement à l'accomplissement d'objectifs ou de renforcer la dépendance émotionnelle envers la plateforme. Lis la méthode complète sur",
+    "frameworkLinkText": "/como-funciona",
+    "useCasesTitle": "Où ça s'intègre dans ta pratique",
+    "useCase1": {
+      "title": "Entre les séances",
+      "desc": "Clients qui ont besoin d'un contenant ordonné hors consultation, sans le transformer en thérapie 24/7."
+    },
+    "useCase2": {
+      "title": "Liste d'attente",
+      "desc": "Les personnes qui ne peuvent pas encore accéder à une consultation en présentiel disposent d'un premier point de contact structuré."
+    },
+    "useCase3": {
+      "title": "Cas de faible intensité",
+      "desc": "Personnes avec des blocages, des doutes ou des transitions de vie qui ne nécessitent pas d'intervention clinique formelle."
+    },
+    "ctaTitle": "Tu veux l'explorer ?",
+    "ctaDesc": "Si tu travailles dans la psychologie, le coaching ou l'accompagnement professionnel et que tu souhaites essayer le tableau de bord clinique avec un client, écris-nous. Nous étudions chaque collaboration au cas par cas — nous ne travaillons pas avec n'importe qui.",
+    "ctaPrimary": "Parler avec l'équipe",
+    "ctaSecondary": "Lire la méthode complète"
   }
 }

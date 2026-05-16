@@ -905,5 +905,76 @@
     "ctaSubtitle": "Tres preguntas. Un compromiso. Treinta días. El cambio que llevas tiempo aplazando empieza hoy.",
     "ctaFinal": "Acepta el reto ahora",
     "ctaFinalNote": "Sin tarjeta. Sin spam. Solo 30 días."
+  },
+  "professionals": {
+    "eyebrow": "Para profesionales de la salud mental y el bienestar",
+    "title": "Tu cliente,",
+    "titleHighlight": "entre sesiones",
+    "subtitle": "Tres Mil Millones de Latidos no sustituye tu trabajo. Lo complementa. Un mentor con IA que acompaña a tus clientes entre sesiones, dentro de un marco pedagógico revisado clínicamente y con un panel profesional para que tú tengas visibilidad real.",
+    "honestyTitle": "Lo que queremos dejar claro antes de empezar",
+    "honesty1Strong": "No es terapia.",
+    "honesty1": "No diagnostica, no prescribe, no sustituye la relación clínica. Si un caso necesita intervención, el profesional humano es quien lleva el caso.",
+    "honesty2Strong": "El mentor tiene líneas que no cruza.",
+    "honesty2": "Ante señales de riesgo, deja de hacer coaching y deriva a recursos de emergencia y ayuda profesional.",
+    "honesty3Strong": "Hay una profesional de la psicología responsable del criterio clínico",
+    "honesty3": "que supervisa detección de riesgo, intervenciones y plantillas del mentor.",
+    "benefitsTitle": "Qué te aporta a tu consulta",
+    "benefit": {
+      "panel": {
+        "title": "Panel clínico",
+        "desc": "Ves evolución, estado emocional, patrones detectados y acciones completadas de los clientes que te vinculan como profesional de referencia."
+      },
+      "risk": {
+        "title": "Detección de riesgo temprano",
+        "desc": "El sistema monitoriza señales (ideación suicida, autolesión, crisis aguda) y las escala a tu panel antes de que lleguen a tu próxima sesión."
+      },
+      "notes": {
+        "title": "Notas clínicas integradas",
+        "desc": "Puedes tomar notas sobre el cliente dentro del panel, asociarlas a momentos concretos, y revisarlas antes de cada sesión."
+      },
+      "diary": {
+        "title": "Diario y patrones del cliente",
+        "desc": "El cliente trabaja en su diario, check-ins y objetivos entre sesiones. Tú llegas a consulta con un mapa, no con un folio en blanco."
+      },
+      "interventions": {
+        "title": "Intervenciones supervisadas",
+        "desc": "Puedes activar intervenciones específicas (mensajes, pausas, reenfoques del mentor) para tu cliente concreto, siempre bajo tu criterio."
+      },
+      "privacy": {
+        "title": "Privacidad y consentimiento",
+        "desc": "El cliente decide qué comparte contigo. Tú ves lo que autoriza — no leemos conversaciones sin su consentimiento explícito."
+      }
+    },
+    "frameworkTitle": "El marco que usa el mentor",
+    "frameworkIntro": "Cuatro principios hardcoded en los prompts del sistema y vigilados por validadores automáticos:",
+    "principle1Title": "Interpelar antes que instruir",
+    "principle1Desc": "El mentor no dice \"tienes que hacer X\". Pregunta. Hace visible lo que el cliente no está viendo.",
+    "principle2Title": "Preguntas antes que respuestas",
+    "principle2Desc": "Las respuestas cierran. Las preguntas abren.",
+    "principle3Title": "De lo local a lo global",
+    "principle3Desc": "Empezamos por el dato concreto del día, no por marcos genéricos.",
+    "principle4Title": "El cambio viene desde dentro",
+    "principle4Desc": "No se empuja al cliente — se acompaña al lugar donde pueda verse a sí mismo.",
+    "frameworkProhibitedPre": "El sistema tiene",
+    "frameworkProhibitedStrong": "explícitamente prohibido",
+    "frameworkProhibitedCont": "usar imperativos huecos, validar sin contexto, felicitar rápido al completar objetivos o reforzar dependencia emocional hacia la plataforma. Lee el método completo en",
+    "frameworkLinkText": "/como-funciona",
+    "useCasesTitle": "Dónde encaja en tu práctica",
+    "useCase1": {
+      "title": "Entre sesiones",
+      "desc": "Clientes que necesitan contención ordenada fuera de consulta, sin convertirlo en terapia 24/7."
+    },
+    "useCase2": {
+      "title": "Lista de espera",
+      "desc": "Personas que aún no pueden acceder a consulta presencial tienen un primer punto de contacto estructurado."
+    },
+    "useCase3": {
+      "title": "Casos de baja intensidad",
+      "desc": "Personas con bloqueos, dudas o transiciones vitales que no requieren intervención clínica formal."
+    },
+    "ctaTitle": "¿Quieres explorarlo?",
+    "ctaDesc": "Si te dedicas a la psicología, el coaching o el acompañamiento profesional y te interesa probar el panel clínico con algún cliente, escríbenos. Revisamos cada colaboración caso por caso — no trabajamos con cualquiera.",
+    "ctaPrimary": "Hablar con el equipo",
+    "ctaSecondary": "Leer el método completo"
   }
 }

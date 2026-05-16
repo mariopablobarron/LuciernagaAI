@@ -1,0 +1,43 @@
+src/app/api/auth/forgot-password/route.ts
+  s_c72d0ada98a9af::t_defae17a3201a1 5
+  s_c72d0ada98a9af::t_7f2e6276131189 21,23-25
+  s_c72d0ada98a9af::t_fabf3a216257fa 55
+src/app/api/waitlist/route.ts
+  s_c72d0ada98a9af::t_f611f955adc6bd 24,28-29
+  s_c72d0ada98a9af::t_e96b2c0146e129 53
+  s_c72d0ada98a9af::t_801d0d20dc7e41 6
+src/app/api/auth/signup/route.ts
+  s_c72d0ada98a9af::t_78f5aa911660a5 10
+  s_c72d0ada98a9af::t_77dad8d38b16e3 64,69-72
+  s_c72d0ada98a9af::t_9825cdbe3787e4 284,288
+src/lib/email.test.ts
+  s_c72d0ada98a9af::t_e371bbd3a56f48 178-222
+  s_c72d0ada98a9af::t_495a69f0deef3d 132-134
+src/lib/email-i18n.ts
+  s_c72d0ada98a9af::t_1b417166997dfc 1-330,334-353,357-376,380-399,403-422,426-428,433,441-443,452-453,462-463,472-473,482-484,489-491,498-500,510-511,521-522,532-533,543-544
+  s_c72d0ada98a9af::t_ac36e15a5d526a 400-402
+  s_c72d0ada98a9af::t_ac8d317de21a0e 423-425
+  s_c72d0ada98a9af::t_920eeef5229969 429-432,434-440,444-451,454-461,464-471,474-481,485-488,492-497,501-509,512-520,523-531,534-542
+  s_c72d0ada98a9af::t_db12713331fa52 331-333,354-356
+src/app/api/auth/resend-verification/route.ts
+  s_c72d0ada98a9af::t_fcf0c38204fd30 7
+  s_c72d0ada98a9af::t_e5676f1898fdec 57-58,65
+src/app/api/quiz/email/route.ts
+  s_c72d0ada98a9af::t_e1066990b5174b 4,18,30-35,40
+src/lib/email.ts
+  s_c72d0ada98a9af::t_aee79433f70379 152,155-156,161,163,166,168,170-173,175-176,178-179,181,185,187-188,190,194-196,201-202,207-208,215-216,221-222,228-229,231,238-239
+  s_c72d0ada98a9af::t_50d414853ef05f 71,74-77,81-84,88,90,98,101
+  s_c72d0ada98a9af::t_2fb0baa099016c 5-17,20
+  s_c72d0ada98a9af::t_b9a5d917e71861 110,113-116,120-122,126,128,136,139
+  s_c72d0ada98a9af::t_02a5c9abc8a370 455,458-461,465,467,469,471,473,475,477,479,484-485,487,489,496,499
+  s_c72d0ada98a9af::t_5816853cfbd28a 507,510-511,513,515,520,522,524-525,529,534-535,537,539,546
+  s_c72d0ada98a9af::t_b048639bb3934e 26,29-31,33,36-37,39-41,44,49,52,59
+src/app/api/calculator/email/route.ts
+  s_c72d0ada98a9af::t_5e5b1dc43ce4ca 4,8-14,30-35,37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "0e0c1d8616f465688a6dc1ae02b7c9c097cd3749",
+  "prompts": {}
+}

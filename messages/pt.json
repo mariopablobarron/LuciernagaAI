@@ -547,5 +547,151 @@
     "ctaNote": "O método só faz sentido quando o vives.",
     "ctaPrimary": "Experimentar agora",
     "ctaSecondary": "Conhecer o projeto"
+  },
+  "comparison": {
+    "eyebrow": "Comparativo",
+    "title": "Três Mil Milhões de Batidas vs ChatGPT, terapia e apps de bem-estar",
+    "subtitle": "Se estás a decidir que ferramenta usar para organizar o que te acontece, isto compara honestamente o que cada uma faz e quando convém escolher qual. Sem exagerar o nosso. Sem esconder o que não fazemos.",
+    "lastUpdated": "Última atualização: {date} · Revisto pela equipa clínica de Três Mil Milhões de Batidas.",
+    "lastUpdatedDate": "Abril 2026",
+    "tableTitle": "Comparativo ponto a ponto",
+    "colCriterio": "Critério",
+    "colProducto": "Três Mil Milhões de Batidas",
+    "colChatGPT": "ChatGPT / Claude",
+    "colTerapia": "Terapia tradicional",
+    "colMeditacion": "Apps de meditação",
+    "row": {
+      "purpose": {
+        "criterio": "Propósito principal",
+        "producto": "Acompanhar bloqueios, decisões e ação",
+        "chatgpt": "Assistente conversacional genérico",
+        "terapia": "Tratamento clínico 1:1",
+        "meditacion": "Relaxamento, sono, mindfulness"
+      },
+      "framework": {
+        "criterio": "Quadro pedagógico próprio",
+        "producto": "Sim — interpela, não instrui",
+        "chatgpt": "Não — responde ao que lhe pedires",
+        "terapia": "Conforme o terapeuta",
+        "meditacion": "Exercícios, não diálogo"
+      },
+      "crisisDetection": {
+        "criterio": "Deteção automática de crise",
+        "producto": "Sim — linguagem de risco → recursos clínicos",
+        "chatgpt": "Parcial, não estruturada",
+        "terapia": "Apenas na sessão",
+        "meditacion": "Não"
+      },
+      "clinicalSupervision": {
+        "criterio": "Supervisão clínica humana",
+        "producto": "Sim — psicóloga responsável pelo sistema",
+        "chatgpt": "Não",
+        "terapia": "Sim — é humana diretamente",
+        "meditacion": "Não"
+      },
+      "context": {
+        "criterio": "Contexto persistente entre sessões",
+        "producto": "Sim — estado emocional + objetivos + histórico",
+        "chatgpt": "Parcial (depende do plano)",
+        "terapia": "Sim — notas clínicas do terapeuta",
+        "meditacion": "Não"
+      },
+      "actions": {
+        "criterio": "Ações concretas e mensuráveis",
+        "producto": "Sim — microações de 10-15 min, objetivos, acompanhamento",
+        "chatgpt": "Se lhe pedires",
+        "terapia": "Se o terapeuta as atribuir",
+        "meditacion": "Não aplicável"
+      },
+      "community": {
+        "criterio": "Comunidade entre pares",
+        "producto": "Sim — círculos de 4 pessoas, assíncronos, ciclos de 6 semanas, emparelhados por padrão emocional",
+        "chatgpt": "Não",
+        "terapia": "Opcional — terapia de grupo",
+        "meditacion": "Fóruns ligeiros em algumas apps"
+      },
+      "availability": {
+        "criterio": "Disponibilidade",
+        "producto": "24/7 — web e Telegram",
+        "chatgpt": "24/7",
+        "terapia": "Apenas em consultas",
+        "meditacion": "24/7"
+      },
+      "privacy": {
+        "criterio": "Privacidade e apagamento RGPD",
+        "producto": "Sim — hard delete, cifragem em trânsito, política clara",
+        "chatgpt": "Política OpenAI/Anthropic padrão",
+        "terapia": "Sigilo profissional",
+        "meditacion": "Variável por fornecedor"
+      },
+      "price": {
+        "criterio": "Preço mensal de referência",
+        "producto": "0€ Free · 9€ Pro",
+        "chatgpt": "0-20€ (ChatGPT Plus)",
+        "terapia": "40-80€ por sessão",
+        "meditacion": "10-15€/mês"
+      },
+      "replaceTherapy": {
+        "criterio": "Substitui um terapeuta profissional?",
+        "producto": "NÃO — di-lo explicitamente",
+        "chatgpt": "Não se pronuncia",
+        "terapia": "É terapia",
+        "meditacion": "NÃO"
+      }
+    },
+    "section1": {
+      "title": "Quando escolher Três Mil Milhões de Batidas e quando escolher terapia?",
+      "p1Strong": "Escolhe terapia profissional",
+      "p1": "se tens diagnóstico clínico prévio, ideação suicida persistente, perturbações alimentares graves, dependências sem tratamento, suspeita de psicose ou trauma complexo. Nesses casos a plataforma não é suficiente e dizemos-to explicitamente desde o chat.",
+      "p2Strong": "Escolhe Três Mil Milhões de Batidas",
+      "p2": "se estás em bloqueios, dúvidas, transições de vida, procrastinação ou precisas de um espaço estruturado para organizar o pensamento e passar à ação. Também se já tens terapeuta e precisas de acompanhamento entre sessões.",
+      "p3Strong": "Usa ambos",
+      "p3": "quando o teu terapeuta achar útil: muitos profissionais trabalham connosco como complemento estruturado entre as suas consultas. Ver",
+      "p3Link": "/para-profesionales",
+      "p3Suffix": "."
+    },
+    "section2": {
+      "title": "Porquê não usar simplesmente ChatGPT ou Claude?",
+      "p1": "Porque",
+      "p1Strong": "ChatGPT e Claude são assistentes genéricos",
+      "p1Cont": ", não mentores. Respondem ao que lhes pedires: se lhes pedires motivação barata, dão-ta; se lhes pedires conselho clínico, também (e aí há um risco real). Três Mil Milhões de Batidas tem um quadro pedagógico hardcoded: proibido dar imperativos ocos como \"tu consegues\" ou \"continua assim\", obrigatório terminar em pergunta, e quando deteta linguagem de autolesão ou ideação suicida,",
+      "p1Strong2": "deixa de conversar como coach",
+      "p1End": "e encaminha para recursos de emergência + alerta a equipa clínica.",
+      "p2": "Além disso, Três Mil Milhões de Batidas recorda o teu estado emocional entre sessões, os teus objetivos ativos e as ações que completaste ou adiaste. ChatGPT, por defeito, começa do zero a cada conversa."
+    },
+    "section3": {
+      "title": "O que traz Três Mil Milhões de Batidas que não trazem Calm, Headspace ou outras apps de meditação?",
+      "p1": "Calm e Headspace são excelentes para",
+      "p1Strong": "relaxamento guiado, higiene do sono e prática de mindfulness",
+      "p1Cont": ". São exercícios pré-gravados que tu executas. Não há conversa, não há acompanhamento do teu contexto, não há ação fora do momento da meditação.",
+      "p2": "Três Mil Milhões de Batidas faz o contrário:",
+      "p2Strong": "conversa estruturada + ações concretas fora da app",
+      "p2Cont": ". O foco não é baixar o stress do momento, é avançar no que tens parado. Não são excludentes: podes usar Calm para dormir melhor e Três Mil Milhões de Batidas para decidir se deixas o teu trabalho. São ferramentas distintas."
+    },
+    "section4": {
+      "title": "Privacidade e supervisão clínica — o que deves saber",
+      "item1Strong": "As tuas conversas",
+      "item1": "são processadas por IA externa (Anthropic Claude) sob acordo de privacidade com o fornecedor.",
+      "item2Strong": "O papel clínico",
+      "item2": "da equipa pode aceder ao histórico de utilizadores com risco elevado (protocolo supervisionado pela psicóloga responsável). Isto está documentado no consentimento ao registares-te.",
+      "item3Strong": "Dados em trânsito cifrados",
+      "item3": "(TLS). Não há cifragem adicional ao nível de coluna na base de dados — recomendamos não partilhar informação que não partilharias com um fornecedor de software padrão.",
+      "item4Strong": "Apagamento completo RGPD",
+      "item4": "(hard delete) disponível a qualquer momento a partir das definições da conta."
+    },
+    "faqQ1": "Três Mil Milhões de Batidas é um substituto da terapia psicológica?",
+    "faqA1": "Não. Três Mil Milhões de Batidas não diagnostica, não prescreve, e não substitui um terapeuta profissional. É um acompanhamento entre sessões ou um primeiro ponto de contacto para pessoas que ainda não acedem a terapia. Tem uma psicóloga responsável pelo critério clínico que supervisiona deteção de risco e intervenções.",
+    "faqQ2": "Porquê não usar simplesmente ChatGPT ou Claude?",
+    "faqA2": "ChatGPT e Claude são assistentes genéricos. Três Mil Milhões de Batidas aplica um quadro pedagógico específico (interpelar antes de instruir, perguntas antes de respostas), deteta linguagem de risco e encaminha para recursos clínicos (SNS 24), recorda o teu estado emocional entre sessões, propõe ações concretas com tempo limitado, e está supervisionado por uma profissional da psicologia. ChatGPT responde a qualquer coisa sem contexto; Três Mil Milhões de Batidas acompanha um processo.",
+    "faqQ3": "Quando convém uma app de meditação como Calm ou Headspace em vez de Três Mil Milhões de Batidas?",
+    "faqA3": "Se o que procuras é relaxamento guiado, higiene do sono ou mindfulness sem um processo personalizado, uma app de meditação é mais direta. Três Mil Milhões de Batidas é conversacional e centra-se em bloqueios, decisões e transições de vida — não substitui exercícios de respiração ou sessões de meditação guiada. Podem complementar-se.",
+    "faqQ4": "Quando ir a terapia em vez de usar Três Mil Milhões de Batidas?",
+    "faqA4": "Sempre que haja diagnóstico clínico prévio, ideação suicida persistente, perturbações alimentares graves, dependências severas, psicose, ou suspeita de trauma complexo. Três Mil Milhões de Batidas pode acompanhar entre sessões, mas não substitui o tratamento profissional 1:1. Se não tens terapeuta e achas que precisas, Três Mil Milhões de Batidas sugere-to explicitamente.",
+    "faqQ5": "O que acontece com a minha privacidade? Quem pode ler as minhas conversas?",
+    "faqA5": "As conversas são processadas por IA externa (Anthropic Claude via OpenRouter) sob acordo de privacidade. No servidor de Três Mil Milhões de Batidas, o papel clinical pode aceder a conversas de utilizadores com riskLevel alto ou crise ativa como parte do protocolo de supervisão clínica. Os teus dados estão cifrados em trânsito (TLS) e podes pedir apagamento completo a qualquer momento (RGPD).",
+    "ctaTitle": "Queres ver como funciona antes de decidir?",
+    "ctaSubtitle": "Lê o método antes de te registares. Sem dar email.",
+    "ctaPrimary": "Ler o método",
+    "ctaSecondary": "Experimentar grátis"
   }
 }

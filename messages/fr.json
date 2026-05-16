@@ -547,5 +547,151 @@
     "ctaNote": "La méthode ne prend sens que lorsqu'on la vit.",
     "ctaPrimary": "Essayer maintenant",
     "ctaSecondary": "Découvrir le projet"
+  },
+  "comparison": {
+    "eyebrow": "Comparatif",
+    "title": "Trois Milliards de Battements vs ChatGPT, thérapie et apps de bien-être",
+    "subtitle": "Si tu cherches quel outil utiliser pour mettre de l'ordre dans ce qui t'arrive, ceci compare honnêtement ce que chacun fait et quand il convient de choisir lequel. Sans gonfler le nôtre. Sans cacher ce que nous ne faisons pas.",
+    "lastUpdated": "Dernière mise à jour : {date} · Revu par l'équipe clinique de Trois Milliards de Battements.",
+    "lastUpdatedDate": "Avril 2026",
+    "tableTitle": "Comparatif point par point",
+    "colCriterio": "Critère",
+    "colProducto": "Trois Milliards de Battements",
+    "colChatGPT": "ChatGPT / Claude",
+    "colTerapia": "Thérapie traditionnelle",
+    "colMeditacion": "Apps de méditation",
+    "row": {
+      "purpose": {
+        "criterio": "Objectif principal",
+        "producto": "Accompagner blocages, décisions et action",
+        "chatgpt": "Assistant conversationnel générique",
+        "terapia": "Traitement clinique 1:1",
+        "meditacion": "Relaxation, sommeil, mindfulness"
+      },
+      "framework": {
+        "criterio": "Cadre pédagogique propre",
+        "producto": "Oui — il interpelle, il n'instruit pas",
+        "chatgpt": "Non — répond à ce qu'on lui demande",
+        "terapia": "Selon le thérapeute",
+        "meditacion": "Exercices, pas de dialogue"
+      },
+      "crisisDetection": {
+        "criterio": "Détection automatique de crise",
+        "producto": "Oui — langage à risque → ressources cliniques",
+        "chatgpt": "Partielle, non structurée",
+        "terapia": "Uniquement en séance",
+        "meditacion": "Non"
+      },
+      "clinicalSupervision": {
+        "criterio": "Supervision clinique humaine",
+        "producto": "Oui — psychologue responsable du système",
+        "chatgpt": "Non",
+        "terapia": "Oui — directement humaine",
+        "meditacion": "Non"
+      },
+      "context": {
+        "criterio": "Contexte persistant entre sessions",
+        "producto": "Oui — état émotionnel + objectifs + historique",
+        "chatgpt": "Partiel (selon l'abonnement)",
+        "terapia": "Oui — notes cliniques du thérapeute",
+        "meditacion": "Non"
+      },
+      "actions": {
+        "criterio": "Actions concrètes et mesurables",
+        "producto": "Oui — micro-actions de 10-15 min, objectifs, suivi",
+        "chatgpt": "Si tu lui demandes",
+        "terapia": "Si le thérapeute les assigne",
+        "meditacion": "Non applicable"
+      },
+      "community": {
+        "criterio": "Communauté entre pairs",
+        "producto": "Oui — cercles de 4 personnes, asynchrones, cycles de 6 semaines, appariés par schéma émotionnel",
+        "chatgpt": "Non",
+        "terapia": "Optionnel — thérapie de groupe",
+        "meditacion": "Forums légers dans certaines apps"
+      },
+      "availability": {
+        "criterio": "Disponibilité",
+        "producto": "24/7 — web et Telegram",
+        "chatgpt": "24/7",
+        "terapia": "Uniquement sur rendez-vous",
+        "meditacion": "24/7"
+      },
+      "privacy": {
+        "criterio": "Confidentialité et effacement RGPD",
+        "producto": "Oui — hard delete, chiffrement en transit, politique claire",
+        "chatgpt": "Politique OpenAI/Anthropic standard",
+        "terapia": "Secret professionnel",
+        "meditacion": "Variable selon le fournisseur"
+      },
+      "price": {
+        "criterio": "Prix mensuel de référence",
+        "producto": "0€ Free · 9€ Pro",
+        "chatgpt": "0-20€ (ChatGPT Plus)",
+        "terapia": "40-80€ par séance",
+        "meditacion": "10-15€/mois"
+      },
+      "replaceTherapy": {
+        "criterio": "Remplace-t-il un thérapeute professionnel ?",
+        "producto": "NON — il le dit explicitement",
+        "chatgpt": "Ne se prononce pas",
+        "terapia": "C'est de la thérapie",
+        "meditacion": "NON"
+      }
+    },
+    "section1": {
+      "title": "Quand choisir Trois Milliards de Battements et quand choisir la thérapie ?",
+      "p1Strong": "Choisis la thérapie professionnelle",
+      "p1": "si tu as un diagnostic clinique préalable, des idées suicidaires persistantes, des troubles alimentaires graves, des dépendances non traitées, une suspicion de psychose ou un trauma complexe. Dans ces cas, la plateforme ne suffit pas et nous te le dirons explicitement depuis le chat.",
+      "p2Strong": "Choisis Trois Milliards de Battements",
+      "p2": "si tu es dans des blocages, des doutes, des transitions de vie, de la procrastination ou si tu as besoin d'un espace structuré pour ordonner ta pensée et passer à l'action. Aussi si tu as déjà un thérapeute et que tu as besoin d'accompagnement entre les séances.",
+      "p3Strong": "Utilise les deux",
+      "p3": "quand ton thérapeute le juge utile : beaucoup de professionnels travaillent avec nous comme complément structuré entre leurs consultations. Voir",
+      "p3Link": "/para-profesionales",
+      "p3Suffix": "."
+    },
+    "section2": {
+      "title": "Pourquoi ne pas simplement utiliser ChatGPT ou Claude ?",
+      "p1": "Parce que",
+      "p1Strong": "ChatGPT et Claude sont des assistants génériques",
+      "p1Cont": ", pas des mentors. Ils répondent à ce que tu leur demandes : si tu demandes de la motivation bon marché, ils te la donnent ; si tu demandes un conseil clinique, aussi (et là il y a un risque réel). Trois Milliards de Battements a un cadre pédagogique hardcoded : interdit de donner des impératifs creux comme \"tu peux le faire\" ou \"continue comme ça\", obligatoire de terminer par une question, et quand il détecte un langage d'automutilation ou d'idéation suicidaire,",
+      "p1Strong2": "il cesse de converser en tant que coach",
+      "p1End": "et redirige vers des ressources d'urgence + alerte l'équipe clinique.",
+      "p2": "De plus, Trois Milliards de Battements se souvient de ton état émotionnel entre les sessions, de tes objectifs actifs et des actions que tu as complétées ou reportées. ChatGPT, par défaut, repart de zéro à chaque conversation."
+    },
+    "section3": {
+      "title": "Qu'apporte Trois Milliards de Battements que n'apportent pas Calm, Headspace ou d'autres apps de méditation ?",
+      "p1": "Calm et Headspace sont excellents pour",
+      "p1Strong": "la relaxation guidée, l'hygiène du sommeil et la pratique du mindfulness",
+      "p1Cont": ". Ce sont des exercices pré-enregistrés que tu exécutes. Pas de conversation, pas de suivi de ton contexte, pas d'action en dehors du moment de la méditation.",
+      "p2": "Trois Milliards de Battements fait l'inverse :",
+      "p2Strong": "conversation structurée + actions concrètes hors de l'app",
+      "p2Cont": ". L'objectif n'est pas de baisser le stress du moment, c'est d'avancer sur ce qui est bloqué. Ils ne sont pas exclusifs : tu peux utiliser Calm pour mieux dormir et Trois Milliards de Battements pour décider si tu quittes ton travail. Ce sont des outils différents."
+    },
+    "section4": {
+      "title": "Confidentialité et supervision clinique — ce que tu dois savoir",
+      "item1Strong": "Tes conversations",
+      "item1": "sont traitées par une IA externe (Anthropic Claude) sous accord de confidentialité avec le fournisseur.",
+      "item2Strong": "Le rôle clinique",
+      "item2": "de l'équipe peut accéder à l'historique des utilisateurs à risque élevé (protocole supervisé par la psychologue responsable). Cela est documenté dans le consentement lors de ton inscription.",
+      "item3Strong": "Données en transit chiffrées",
+      "item3": "(TLS). Il n'y a pas de chiffrement supplémentaire au niveau colonne dans la base de données — nous recommandons de ne pas partager d'informations que tu ne partagerais pas avec un fournisseur de logiciel standard.",
+      "item4Strong": "Effacement complet RGPD",
+      "item4": "(hard delete) disponible à tout moment depuis les paramètres du compte."
+    },
+    "faqQ1": "Trois Milliards de Battements est-il un substitut à la thérapie psychologique ?",
+    "faqA1": "Non. Trois Milliards de Battements ne diagnostique pas, ne prescrit pas, et ne remplace pas un thérapeute professionnel. C'est un accompagnement entre les séances ou un premier point de contact pour les personnes qui n'accèdent pas encore à la thérapie. Il a une psychologue responsable du critère clinique qui supervise la détection du risque et les interventions.",
+    "faqQ2": "Pourquoi ne pas simplement utiliser ChatGPT ou Claude ?",
+    "faqA2": "ChatGPT et Claude sont des assistants génériques. Trois Milliards de Battements applique un cadre pédagogique spécifique (interpeller avant d'instruire, questions avant réponses), détecte le langage à risque et redirige vers des ressources cliniques (3114), se souvient de ton état émotionnel entre les sessions, propose des actions concrètes limitées dans le temps, et est supervisé par une professionnelle de la psychologie. ChatGPT répond à tout sans contexte ; Trois Milliards de Battements accompagne un processus.",
+    "faqQ3": "Quand vaut-il mieux une app de méditation comme Calm ou Headspace plutôt que Trois Milliards de Battements ?",
+    "faqA3": "Si ce que tu cherches est la relaxation guidée, l'hygiène du sommeil ou le mindfulness sans processus personnalisé, une app de méditation est plus directe. Trois Milliards de Battements est conversationnel et se concentre sur les blocages, les décisions et les transitions de vie — il ne remplace pas les exercices de respiration ou les séances de méditation guidée. Ils peuvent se compléter.",
+    "faqQ4": "Quand aller en thérapie plutôt que d'utiliser Trois Milliards de Battements ?",
+    "faqA4": "Chaque fois qu'il y a un diagnostic clinique préalable, des idées suicidaires persistantes, des troubles alimentaires graves, des dépendances sévères, une psychose, ou une suspicion de trauma complexe. Trois Milliards de Battements peut t'accompagner entre les séances, mais ne remplace pas le traitement professionnel 1:1. Si tu n'as pas de thérapeute et que tu crois en avoir besoin, Trois Milliards de Battements te le suggérera explicitement.",
+    "faqQ5": "Que se passe-t-il avec ma vie privée ? Qui peut lire mes conversations ?",
+    "faqA5": "Les conversations sont traitées par une IA externe (Anthropic Claude via OpenRouter) sous accord de confidentialité. Sur le serveur de Trois Milliards de Battements, le rôle clinical peut accéder aux conversations d'utilisateurs avec un riskLevel élevé ou une crise active dans le cadre du protocole de supervision clinique. Tes données sont chiffrées en transit (TLS) et tu peux demander l'effacement complet à tout moment (RGPD).",
+    "ctaTitle": "Tu veux voir comment ça fonctionne avant de décider ?",
+    "ctaSubtitle": "Lis la méthode avant de t'inscrire. Sans donner d'email.",
+    "ctaPrimary": "Lire la méthode",
+    "ctaSecondary": "Essayer gratuitement"
   }
 }

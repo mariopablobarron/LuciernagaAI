@@ -1,0 +1,28 @@
+prisma/migrations/20260516160000_add_user_locale/migration.sql
+  s_c72d0ada98a9af::t_15eff65565df0e 1-12
+src/app/api/user/locale/route.ts
+  s_c72d0ada98a9af::t_f6e0391569856d 1-40
+prisma/schema.prisma
+  s_c72d0ada98a9af::t_b0c3898f341272 98-103
+src/components/LocaleSwitcher.tsx
+  s_c72d0ada98a9af::t_3fc2aaebabce8d 93-103
+src/app/api/auth/signup/route.ts
+  s_c72d0ada98a9af::t_9da4d6df1bea84 173
+  s_c72d0ada98a9af::t_6d22e0a62d0aa6 151
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "1d49d7fb2184909dec7129f03cb92f0b091f899f",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

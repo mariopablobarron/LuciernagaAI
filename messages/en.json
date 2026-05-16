@@ -466,5 +466,86 @@
         "a": "Yes. We work with organisations and mental health professionals. More details at /para-profesionales."
       }
     }
+  },
+  "howTo": {
+    "eyebrow": "The method",
+    "title": "We don't give advice.",
+    "titleHighlight": "We ask questions",
+    "titleEnd": ".",
+    "subtitle": "Most wellbeing apps try to give you more information. We work the other way around: we hand back the question you aren't asking yourself. This is the framework the mentor uses in every conversation.",
+    "lastReviewed": "Reviewed by the Three Billion Heartbeats clinical team",
+    "pipelineTitle": "How the mentor processes every message",
+    "pipelineSubtitle": "Behind every reply there are five phases. It isn't improvisation: it's a process designed so that what we say to you makes sense here and now.",
+    "phase": {
+      "validar": {
+        "title": "Validate the emotion",
+        "desc": "Before thinking, feeling. We name what's happening inside without judgement and without rushing to fix it."
+      },
+      "ordenar": {
+        "title": "Sort the thinking",
+        "desc": "We separate fact from interpretation. What happened, what you tell yourself about what happened, and what you feel about what you tell yourself."
+      },
+      "interpelar": {
+        "title": "Challenge",
+        "desc": "The uncomfortable question no one is asking you. Not to judge you — so you see what you've been dodging for a while."
+      },
+      "actuar": {
+        "title": "Propose action",
+        "desc": "A small, concrete step, today. Not a perfect plan for next week. Real movement, not intention."
+      },
+      "cerrar": {
+        "title": "Close without dependency",
+        "desc": "We end leaving you with more clarity, not more need of us. The goal is for you to need us less, not more."
+      }
+    },
+    "principlesTitle": "The principles that hold it up",
+    "principle": {
+      "interpelar": {
+        "title": "Challenge before instructing",
+        "desc": "A well-placed question creates more change than the best instruction. Advice is forgotten; the answer you discover yourself is not."
+      },
+      "porque": {
+        "title": "Always the why",
+        "desc": "Acting without understanding why is obedience, not change. If you don't know what's moving you, the change won't last."
+      },
+      "localGlobal": {
+        "title": "From local to global",
+        "desc": "We start with what's concrete today — this block, this emotion — and from there we discover the larger pattern. Not the other way around."
+      },
+      "gafas": {
+        "title": "New glasses",
+        "desc": "What holds you back the most is usually what you've normalised. Part of the work is making you see what you no longer see."
+      },
+      "inside": {
+        "title": "Change comes from within",
+        "desc": "No one changes because they're told to. You change when you connect with your own reason. Our job is to accompany that process, not force it."
+      },
+      "progress": {
+        "title": "Progress, not perfection",
+        "desc": "An imperfect step today is worth more than a perfect plan tomorrow. Real movement beats good intentions."
+      }
+    },
+    "adaptTitle": "Adapting the accompaniment to you",
+    "adaptSubtitle": "The mentor by default already adapts to your emotional state, your dominant pattern, and the phase you're in. If you want to go a step further, there are two options — optional — to tune the experience to how you work.",
+    "enneagram": {
+      "title": "Enneagram test",
+      "desc": "90 statements in 10-12 minutes. The mentor adjusts its tone and questions to your type: with a perfectionist it avoids the «shoulds», with someone who tends to avoid conflict it asks directly what you want. It doesn't label you in the chat. It sits in your profile.",
+      "cta": "Take the test"
+    },
+    "teamLetter": {
+      "title": "Human letter from the team",
+      "desc": "After a few turns in the chat an offer appears: if you want, someone from the team reads your thread and writes you a personal note to your email over the following days. A real person signs it — not the AI. It's optional and you request it from the chat itself."
+    },
+    "notDoTitle": "What we don't do",
+    "notDoSubtitle": "So it's clear where the limits of the method are — and where a human professional begins.",
+    "notDo1": "We don't diagnose disorders. That's clinical work.",
+    "notDo2": "We don't prescribe treatments or medication.",
+    "notDo3": "We don't replace therapy or sessions with your psychologist.",
+    "notDo4": "We don't hand out empty motivational lines or magic recipes.",
+    "notDo5": "We don't tell you what to do with your life.",
+    "notDo6": "We don't expect you to change quickly. Real change takes time.",
+    "ctaNote": "The method only makes sense when you live it.",
+    "ctaPrimary": "Try it now",
+    "ctaSecondary": "Learn about the project"
   }
 }

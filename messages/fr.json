@@ -466,5 +466,86 @@
         "a": "Oui. Nous travaillons avec des organisations et des professionnels de la santé mentale. Plus de détails sur /para-profesionales."
       }
     }
+  },
+  "howTo": {
+    "eyebrow": "La méthode",
+    "title": "Nous ne donnons pas de conseils.",
+    "titleHighlight": "Nous posons des questions",
+    "titleEnd": ".",
+    "subtitle": "La plupart des applis de bien-être essaient de te donner plus d'information. Nous travaillons à l'envers : nous te renvoyons la question que tu ne te poses pas. Voici le cadre que le mentor utilise dans chaque conversation.",
+    "lastReviewed": "Revu par l'équipe clinique de Trois Milliards de Battements",
+    "pipelineTitle": "Comment le mentor traite chaque message",
+    "pipelineSubtitle": "Derrière chaque réponse, il y a cinq phases. Ce n'est pas de l'improvisation : c'est un processus pensé pour que ce que nous te disons ait du sens ici et maintenant.",
+    "phase": {
+      "validar": {
+        "title": "Valider l'émotion",
+        "desc": "Avant de penser, sentir. On nomme ce qui se passe à l'intérieur sans jugement et sans se précipiter pour le régler."
+      },
+      "ordenar": {
+        "title": "Trier la pensée",
+        "desc": "On sépare le fait de l'interprétation. Ce qui s'est passé, ce que tu te racontes sur ce qui s'est passé, et ce que tu ressens face à ce que tu te racontes."
+      },
+      "interpelar": {
+        "title": "Interpeller",
+        "desc": "La question inconfortable que personne ne te pose. Pas pour te juger — pour que tu voies ce que tu esquives depuis longtemps."
+      },
+      "actuar": {
+        "title": "Proposer une action",
+        "desc": "Un petit pas, concret, aujourd'hui. Pas un plan parfait pour la semaine prochaine. Du mouvement réel, pas une intention."
+      },
+      "cerrar": {
+        "title": "Clore sans dépendance",
+        "desc": "On termine en te laissant plus de clarté, pas plus besoin de nous. L'objectif est que tu aies moins besoin de nous, pas plus."
+      }
+    },
+    "principlesTitle": "Les principes qui le soutiennent",
+    "principle": {
+      "interpelar": {
+        "title": "Interpeller avant d'instruire",
+        "desc": "Une question bien posée produit plus de changement que la meilleure consigne. Le conseil s'oublie ; la réponse que tu trouves toi-même, non."
+      },
+      "porque": {
+        "title": "Toujours le pourquoi",
+        "desc": "Agir sans comprendre pourquoi, c'est de l'obéissance, pas du changement. Si tu ne sais pas ce qui te meut, le changement ne dure pas."
+      },
+      "localGlobal": {
+        "title": "Du local au global",
+        "desc": "On commence par le concret d'aujourd'hui — ce blocage, cette émotion — et à partir de là on découvre le grand schéma. Pas l'inverse."
+      },
+      "gafas": {
+        "title": "Des lunettes neuves",
+        "desc": "Ce qui te freine le plus est souvent ce que tu as normalisé. Une partie du travail consiste à te faire voir ce que tu ne vois plus."
+      },
+      "inside": {
+        "title": "Le changement vient de l'intérieur",
+        "desc": "Personne ne change parce qu'on le lui dit. Tu changes quand tu te relies à ta propre raison. Notre travail est d'accompagner ce processus, pas de le forcer."
+      },
+      "progress": {
+        "title": "Progrès, pas perfection",
+        "desc": "Un pas imparfait aujourd'hui vaut plus qu'un plan parfait demain. Mieux vaut du mouvement réel qu'une belle intention."
+      }
+    },
+    "adaptTitle": "Adapter l'accompagnement à toi",
+    "adaptSubtitle": "Par défaut, le mentor s'adapte déjà à ton état émotionnel, à ton schéma dominant et à la phase où tu te trouves. Si tu veux aller un cran plus loin, il y a deux options — facultatives — pour ajuster l'expérience à ton fonctionnement.",
+    "enneagram": {
+      "title": "Test de l'Ennéagramme",
+      "desc": "90 phrases en 10-12 minutes. Le mentor ajuste son ton et ses questions à ton type : avec un perfectionniste, il évite les « tu devrais », avec quelqu'un qui a tendance à éviter le conflit, il demande directement ce que tu veux, toi. Il ne te colle pas d'étiquette dans le chat. C'est dans ton profil.",
+      "cta": "Faire le test"
+    },
+    "teamLetter": {
+      "title": "Lettre humaine de l'équipe",
+      "desc": "Après quelques tours dans le chat, une offre apparaît : si tu veux, quelqu'un de l'équipe lit ton fil et t'écrit une note personnelle à ton email dans les jours qui suivent. Une vraie personne signe — pas l'IA. C'est facultatif et tu le demandes depuis le chat lui-même."
+    },
+    "notDoTitle": "Ce que nous ne faisons pas",
+    "notDoSubtitle": "Pour qu'il soit clair où s'arrêtent les limites de la méthode — et où commence un professionnel humain.",
+    "notDo1": "Nous ne diagnostiquons pas de troubles. C'est un travail clinique.",
+    "notDo2": "Nous ne prescrivons pas de traitements ni de médicaments.",
+    "notDo3": "Nous ne remplaçons pas la thérapie ni les séances avec ton psychologue.",
+    "notDo4": "Nous ne donnons pas de phrases motivantes vides ni de recettes magiques.",
+    "notDo5": "Nous ne te disons pas ce que tu dois faire de ta vie.",
+    "notDo6": "Nous n'attendons pas que tu changes vite. Le vrai changement prend du temps.",
+    "ctaNote": "La méthode ne prend sens que lorsqu'on la vit.",
+    "ctaPrimary": "Essayer maintenant",
+    "ctaSecondary": "Découvrir le projet"
   }
 }

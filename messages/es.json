@@ -466,5 +466,86 @@
         "a": "Sí. Trabajamos con organizaciones y profesionales de salud mental. Más detalles en /para-profesionales."
       }
     }
+  },
+  "howTo": {
+    "eyebrow": "El método",
+    "title": "No damos consejos.",
+    "titleHighlight": "Hacemos preguntas",
+    "titleEnd": ".",
+    "subtitle": "La mayoría de apps de bienestar intentan darte más información. Nosotros trabajamos al revés: te devolvemos la pregunta que no te estás haciendo. Este es el marco que usa el mentor en cada conversación.",
+    "lastReviewed": "Revisado por el equipo clínico de Tres Mil Millones de Latidos",
+    "pipelineTitle": "Cómo procesa el mentor cada mensaje",
+    "pipelineSubtitle": "Detrás de cada respuesta hay cinco fases. No es improvisación: es un proceso diseñado para que lo que te digamos tenga sentido aquí y ahora.",
+    "phase": {
+      "validar": {
+        "title": "Validar la emoción",
+        "desc": "Antes de pensar, sentir. Nombramos lo que está pasando dentro sin juicio ni prisa por arreglarlo."
+      },
+      "ordenar": {
+        "title": "Ordenar el pensamiento",
+        "desc": "Separamos hecho de interpretación. Lo que pasó, lo que te dices sobre lo que pasó, y lo que sientes sobre lo que te dices."
+      },
+      "interpelar": {
+        "title": "Interpelar",
+        "desc": "La pregunta incómoda que nadie te está haciendo. No para juzgarte — para que veas lo que llevas tiempo esquivando."
+      },
+      "actuar": {
+        "title": "Proponer acción",
+        "desc": "Un paso pequeño, concreto, hoy. No un plan perfecto para la semana que viene. Movimiento real, no intención."
+      },
+      "cerrar": {
+        "title": "Cerrar sin dependencia",
+        "desc": "Terminamos dejándote con más claridad, no con más necesidad de nosotros. El objetivo es que nos necesites menos, no más."
+      }
+    },
+    "principlesTitle": "Los principios que lo sostienen",
+    "principle": {
+      "interpelar": {
+        "title": "Interpelar antes de instruir",
+        "desc": "Una pregunta bien puesta genera más cambio que la mejor instrucción. El consejo se olvida; la respuesta que descubres tú, no."
+      },
+      "porque": {
+        "title": "Siempre el porqué",
+        "desc": "Actuar sin entender por qué es obediencia, no cambio. Si no sabes qué te está moviendo, el cambio no dura."
+      },
+      "localGlobal": {
+        "title": "De lo local a lo global",
+        "desc": "Empezamos por lo concreto de hoy — este bloqueo, esta emoción — y desde ahí descubrimos el patrón grande. No al revés."
+      },
+      "gafas": {
+        "title": "Gafas nuevas",
+        "desc": "Lo que más te frena suele ser lo que has normalizado. Parte del trabajo es hacerte ver lo que ya no ves."
+      },
+      "inside": {
+        "title": "El cambio viene de dentro",
+        "desc": "Nadie cambia porque se lo digan. Cambias cuando conectas con tu propio motivo. Nuestro trabajo es acompañar ese proceso, no forzarlo."
+      },
+      "progress": {
+        "title": "Progreso, no perfección",
+        "desc": "Un paso imperfecto hoy vale más que un plan perfecto mañana. Mejor movimiento real que intención bonita."
+      }
+    },
+    "adaptTitle": "Adaptar el acompañamiento a ti",
+    "adaptSubtitle": "El mentor por defecto ya se adapta a tu estado emocional, tu patrón dominante y la fase en la que estás. Si quieres ir un paso más allá, hay dos opciones — opcionales — para ajustar la experiencia a cómo funcionas tú.",
+    "enneagram": {
+      "title": "Test del Eneagrama",
+      "desc": "90 frases en 10-12 minutos. El mentor ajusta su tono y sus preguntas a tu tipo: con un perfeccionista evita el «deberías», con quien tiende a evitar conflicto pregunta directo qué quieres tú. No te etiqueta en el chat. Está en tu perfil.",
+      "cta": "Hacer el test"
+    },
+    "teamLetter": {
+      "title": "Carta humana del equipo",
+      "desc": "Tras unos turnos en el chat aparece un ofrecimiento: si quieres, alguien del equipo lee tu hilo y te escribe una nota personal a tu email en los siguientes días. La firma una persona real — no la IA. Es opcional y la pides desde el propio chat."
+    },
+    "notDoTitle": "Qué no hacemos",
+    "notDoSubtitle": "Para que quede claro dónde están los límites del método — y dónde empieza un profesional humano.",
+    "notDo1": "No diagnosticamos trastornos. Eso es trabajo clínico.",
+    "notDo2": "No prescribimos tratamientos ni medicación.",
+    "notDo3": "No sustituimos terapia ni sesiones con tu psicólogo.",
+    "notDo4": "No damos frases motivacionales vacías ni recetas mágicas.",
+    "notDo5": "No te decimos qué tienes que hacer con tu vida.",
+    "notDo6": "No pretendemos que cambies rápido. El cambio real lleva tiempo.",
+    "ctaNote": "El método sólo cobra sentido cuando lo vives.",
+    "ctaPrimary": "Probarlo ahora",
+    "ctaSecondary": "Conocer el proyecto"
   }
 }

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ArrowRight, CheckCircle2, Link2 } from "lucide-react";
 import { COMPONENTS } from "@/styles/design-system";
 import PrivacyCheckbox from "@/components/PrivacyCheckbox";
@@ -10,153 +11,72 @@ import { trackMetaEvent } from "@/lib/meta-pixel";
 
 type EmotionalState = "bloqueo" | "ansiedad" | "duda" | "claridad" | "neutral";
 
-type Option = {
-  label: string;
-  scores: Partial<Record<EmotionalState, number>>;
-};
+// ─── Scoring table (no copy, solo lógica). El copy va por messages.test.*  ──
+// 5 preguntas × 4 opciones cada una. Por opción, qué estados puntúa.
+type ScoreMap = Partial<Record<EmotionalState, number>>;
 
-type Question = {
-  id: number;
-  text: string;
-  options: Option[];
-};
-
-const QUESTIONS: Question[] = [
+const QUESTIONS: { id: number; options: ScoreMap[] }[] = [
   {
     id: 1,
-    text: "¿Cómo describirías tu energía mental ahora mismo?",
     options: [
-      { label: "Estancada — no consigo avanzar", scores: { bloqueo: 3 } },
-      { label: "Acelerada — demasiados pensamientos a la vez", scores: { ansiedad: 3 } },
-      { label: "Difusa — no sé lo que quiero", scores: { duda: 3 } },
-      { label: "Fluida — sé lo que toca hacer", scores: { claridad: 3 } },
+      { bloqueo: 3 },
+      { ansiedad: 3 },
+      { duda: 3 },
+      { claridad: 3 },
     ],
   },
   {
     id: 2,
-    text: "Cuando piensas en tu objetivo principal, ¿qué ocurre?",
     options: [
-      { label: "Me paralizo antes de empezar", scores: { bloqueo: 3 } },
-      { label: "Me angustio pensando en lo que puede fallar", scores: { ansiedad: 3 } },
-      { label: "No sé por dónde empezar", scores: { duda: 3 } },
-      { label: "Tengo claro el siguiente paso", scores: { claridad: 3 } },
+      { bloqueo: 3 },
+      { ansiedad: 3 },
+      { duda: 3 },
+      { claridad: 3 },
     ],
   },
   {
     id: 3,
-    text: "¿Cuánto llevas dando vueltas al mismo tema sin avanzar?",
     options: [
-      { label: "Días o semanas — sigo en el mismo punto", scores: { bloqueo: 3, duda: 1 } },
-      { label: "Horas, con presión que no para", scores: { ansiedad: 3 } },
-      { label: "Poco tiempo, pero no encuentro la dirección", scores: { duda: 3 } },
-      { label: "Estoy avanzando, aunque lento", scores: { claridad: 2, neutral: 1 } },
+      { bloqueo: 3, duda: 1 },
+      { ansiedad: 3 },
+      { duda: 3 },
+      { claridad: 2, neutral: 1 },
     ],
   },
   {
     id: 4,
-    text: "¿Qué sientes en el cuerpo mientras respondes esto?",
     options: [
-      { label: "Tensión o pesadez", scores: { bloqueo: 3 } },
-      { label: "Inquietud o palpitaciones", scores: { ansiedad: 3 } },
-      { label: "Niebla mental, confusión", scores: { duda: 3 } },
-      { label: "Calma o presencia", scores: { claridad: 3 } },
+      { bloqueo: 3 },
+      { ansiedad: 3 },
+      { duda: 3 },
+      { claridad: 3 },
     ],
   },
   {
     id: 5,
-    text: "Si pudieras pedir una sola cosa ahora, ¿cuál sería?",
     options: [
-      { label: "Que alguien me desatasque", scores: { bloqueo: 3 } },
-      { label: "Silenciar el ruido en mi cabeza", scores: { ansiedad: 3 } },
-      { label: "Alguien que me ayude a ordenar mis ideas", scores: { duda: 3 } },
-      { label: "Mantener el impulso que ya tengo", scores: { claridad: 3 } },
+      { bloqueo: 3 },
+      { ansiedad: 3 },
+      { duda: 3 },
+      { claridad: 3 },
     ],
   },
 ];
 
-type StateResult = {
-  label: string;
+// ─── Estilos por estado (copy via messages.test.result.<state>.*) ────────────
+type StateStyle = {
   emoji: string;
-  tagline: string;
-  pattern: string;
-  signal: string;
-  action: string;
   accentColor: string;
   borderColor: string;
   badgeBg: string;
 };
 
-const STATE_RESULTS: Record<EmotionalState, StateResult> = {
-  bloqueo: {
-    label: "Bloqueo mental",
-    emoji: "🧱",
-    tagline: "Sabes lo que tienes que hacer — pero no puedes empezar.",
-    pattern:
-      "Tu mente actúa como si el primer paso fuera irreversible. No lo es. El bloqueo no es falta de voluntad: es un mecanismo de protección que se ha vuelto excesivo y que se activa antes de que hagas nada.",
-    signal:
-      "La tarea percibida como «enorme» se desactiva sola en cuanto la reduces a 10 minutos reales. No necesitas un plan completo.",
-    action:
-      "Abre ahora el documento, archivo o herramienta del proyecto. Solo abrirlo, sin hacer nada más. En los próximos 2 minutos.",
-    accentColor: "text-orange-400",
-    borderColor: "border-orange-500/40",
-    badgeBg: "bg-orange-500/15",
-  },
-  ansiedad: {
-    label: "Ansiedad de acción",
-    emoji: "⚡",
-    tagline: "Tienes energía — pero se convierte en presión, no en avance.",
-    pattern:
-      "Tu cabeza genera escenarios de fallo antes de que empieces. Cada vez que preparas más en lugar de actuar, la ansiedad crece. Más información no resuelve esto — lo amplifica.",
-    signal:
-      "La ansiedad baja al primer resultado concreto pequeño, no al primer plan perfecto. Actuar 5 minutos vale más que planificar 2 horas.",
-    action:
-      "Escribe en papel (o en un documento): «¿Qué es lo peor concreto que puede pasar?» Una frase. Sin adornos. Nómbralo.",
-    accentColor: "text-yellow-400",
-    borderColor: "border-yellow-500/40",
-    badgeBg: "bg-yellow-500/15",
-  },
-  duda: {
-    label: "Niebla de dirección",
-    emoji: "🌫️",
-    tagline: "Tienes ganas — pero no sabes hacia dónde.",
-    pattern:
-      "La duda crónica no es falta de información: es un exceso de opciones sin un criterio de decisión claro. Buscar más datos no resuelve esto — añade más variables a un sistema ya saturado.",
-    signal:
-      "Necesitas decidir algo pequeño, no todo a la vez. Una sola decisión concreta rompe la niebla mejor que cualquier análisis.",
-    action:
-      "Responde en 30 segundos: ¿Cuál es el UN objetivo que, si avanzara esta semana, sentiría que hay progreso real? Escríbelo ahora.",
-    accentColor: "text-blue-400",
-    borderColor: "border-blue-500/40",
-    badgeBg: "bg-blue-500/15",
-  },
-  claridad: {
-    label: "Momento de claridad",
-    emoji: "✨",
-    tagline: "Sabes lo que quieres y tienes energía para avanzar.",
-    pattern:
-      "Estás en un estado de flujo potencial. El riesgo ahora no es la parálisis — es la dispersión. Hacer demasiado y perder el foco es lo que convierte la claridad en caos.",
-    signal:
-      "La claridad es una ventana, no una posición permanente. Aprovéchala ahora, no mañana.",
-    action:
-      "Define en una frase el resultado concreto de hoy. No la lista entera: solo la cosa más importante que, si la haces, el día habrá valido.",
-    accentColor: "text-indigo-400",
-    borderColor: "border-indigo-500/40",
-    badgeBg: "bg-indigo-500/15",
-  },
-  neutral: {
-    label: "Estado neutro",
-    emoji: "🔵",
-    tagline: "Estás en punto muerto — ni bloqueado ni en impulso claro.",
-    pattern:
-      "El estado neutro puede ser recuperación necesaria o el inicio silencioso de un bloqueo. La diferencia está en si tienes un próximo paso definido o no.",
-    signal:
-      "No necesitas motivación — necesitas un ancla pequeña a la que volver. Un compromiso concreto de 20 minutos es suficiente.",
-    action:
-      "Elige una tarea de menos de 20 minutos que lleves postergando. Ponla en tu agenda de hoy con hora exacta.",
-    accentColor: "text-zinc-400",
-    borderColor: "border-zinc-500/40",
-    badgeBg: "bg-zinc-500/15",
-  },
+const STATE_STYLES: Record<EmotionalState, StateStyle> = {
+  bloqueo: { emoji: "🧱", accentColor: "text-orange-400", borderColor: "border-orange-500/40", badgeBg: "bg-orange-500/15" },
+  ansiedad: { emoji: "⚡", accentColor: "text-yellow-400", borderColor: "border-yellow-500/40", badgeBg: "bg-yellow-500/15" },
+  duda: { emoji: "🌫️", accentColor: "text-blue-400", borderColor: "border-blue-500/40", badgeBg: "bg-blue-500/15" },
+  claridad: { emoji: "✨", accentColor: "text-indigo-400", borderColor: "border-indigo-500/40", badgeBg: "bg-indigo-500/15" },
+  neutral: { emoji: "🔵", accentColor: "text-zinc-400", borderColor: "border-zinc-500/40", badgeBg: "bg-zinc-500/15" },
 };
 
 function calculateState(answers: (number | null)[]): EmotionalState {
@@ -170,9 +90,9 @@ function calculateState(answers: (number | null)[]): EmotionalState {
 
   answers.forEach((selectedIdx, qi) => {
     if (selectedIdx === null) return;
-    const option = QUESTIONS[qi]?.options[selectedIdx];
-    if (!option) return;
-    Object.entries(option.scores).forEach(([state, score]) => {
+    const scoreMap = QUESTIONS[qi]?.options[selectedIdx];
+    if (!scoreMap) return;
+    Object.entries(scoreMap).forEach(([state, score]) => {
       scores[state as EmotionalState] += score;
     });
   });
@@ -181,11 +101,12 @@ function calculateState(answers: (number | null)[]): EmotionalState {
 }
 
 function ShareButtons({ stateLabel, stateEmoji }: { stateLabel: string; stateEmoji: string }) {
+  const t = useTranslations("test");
   const [copied, setCopied] = useState(false);
 
-  const shareText = `${stateEmoji} Acabo de descubrir que estoy en estado de "${stateLabel}". ¿Y tú?`;
-  const shareUrl = `${window.location.origin}/test`;
-  const fullText = `${shareText} Test gratuito de diagnóstico mental: ${shareUrl}`;
+  const shareText = t("shareText", { emoji: stateEmoji, state: stateLabel });
+  const shareUrl = typeof window !== "undefined" ? `${window.location.origin}/test` : "/test";
+  const fullText = `${shareText} ${t("shareTagline")}: ${shareUrl}`;
 
   function handleTwitter() {
     window.open(
@@ -216,7 +137,7 @@ function ShareButtons({ stateLabel, stateEmoji }: { stateLabel: string; stateEmo
   return (
     <div className="space-y-3">
       <p className="text-xs text-zinc-500 text-center uppercase tracking-widest font-semibold">
-        Comparte tu resultado
+        {t("shareHeader")}
       </p>
       <div className="flex gap-2">
         <button
@@ -233,7 +154,7 @@ function ShareButtons({ stateLabel, stateEmoji }: { stateLabel: string; stateEmo
         </button>
         <button
           onClick={handleCopy}
-          title="Copiar link"
+          title={t("shareCopyTitle")}
           className="flex items-center justify-center gap-2 px-4 py-3 min-h-11 rounded-xl border border-zinc-700 bg-zinc-900/50 text-zinc-300 hover:border-zinc-500 hover:text-white transition-colors text-sm"
         >
           {copied ? <span className="text-violet-400">✓</span> : <Link2 className="w-4 h-4" />}
@@ -246,6 +167,7 @@ function ShareButtons({ stateLabel, stateEmoji }: { stateLabel: string; stateEmo
 type Screen = "intro" | "quiz" | "email" | "result";
 
 export default function TestPage() {
+  const t = useTranslations("test");
   const [screen, setScreen] = useState<Screen>("intro");
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<(number | null)[]>(Array(QUESTIONS.length).fill(null));
@@ -316,7 +238,6 @@ export default function TestPage() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: email.trim(), state: result }),
           }).catch(() => { /* Fire-and-forget email delivery */ });
-          // Schedule day-3 follow-up email
           fetch("/api/quiz/followup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -339,31 +260,29 @@ export default function TestPage() {
         <div className="max-w-xl w-full text-center space-y-8">
           <div className="space-y-4">
             <p className="text-sm font-semibold uppercase tracking-widest text-violet-400">
-              Diagnóstico gratuito
+              {t("introEyebrow")}
             </p>
             <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-              ¿Qué te está{" "}
+              {t("introTitle")}{" "}
               <span className="bg-linear-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
-                frenando ahora?
+                {t("introTitleHighlight")}
               </span>
             </h1>
             <p className="text-lg text-zinc-400 leading-relaxed">
-              5 preguntas. Resultado inmediato. Una acción concreta para hoy.
+              {t("introSubtitle")}
             </p>
           </div>
 
           <div className="grid grid-cols-3 gap-3 py-2">
-            {[
-              { emoji: "🧱", label: "Bloqueo" },
-              { emoji: "⚡", label: "Ansiedad" },
-              { emoji: "🌫️", label: "Niebla" },
-            ].map((s) => (
+            {(["bloqueo", "ansiedad", "duda"] as const).map((id) => (
               <div
-                key={s.label}
+                key={id}
                 className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 text-center space-y-2"
               >
-                <div className="text-2xl">{s.emoji}</div>
-                <div className="text-xs text-zinc-400 font-medium">{s.label}</div>
+                <div className="text-2xl">{STATE_STYLES[id].emoji}</div>
+                <div className="text-xs text-zinc-400 font-medium">
+                  {t(`introPreview.${id}`)}
+                </div>
               </div>
             ))}
           </div>
@@ -372,12 +291,10 @@ export default function TestPage() {
             onClick={() => setScreen("quiz")}
             className={`${COMPONENTS.buttonPrimary} inline-flex items-center justify-center gap-2 px-8 py-4 text-base w-full sm:w-auto`}
           >
-            Empezar diagnóstico <ArrowRight className="w-5 h-5" />
+            {t("introCta")} <ArrowRight className="w-5 h-5" />
           </button>
 
-          <p className="text-xs text-zinc-500">
-            Anónimo · Sin registro · 2 minutos
-          </p>
+          <p className="text-xs text-zinc-500">{t("introFootnote")}</p>
         </div>
       </div>
     );
@@ -385,13 +302,16 @@ export default function TestPage() {
 
   if (screen === "quiz") {
     const question = QUESTIONS[currentQ];
+    const qKey = `q${question.id}`;
     return (
       <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-12">
         <div className="max-w-xl w-full space-y-8">
           {/* Progress */}
           <div className="space-y-2">
             <div className="flex justify-between text-xs text-zinc-500">
-              <span>Pregunta {currentQ + 1} de {QUESTIONS.length}</span>
+              <span>
+                {t("quizProgress", { current: currentQ + 1, total: QUESTIONS.length })}
+              </span>
               <span>{Math.round(progress)}%</span>
             </div>
             <div className={COMPONENTS.progressBar}>
@@ -405,11 +325,11 @@ export default function TestPage() {
           {/* Question */}
           <div className="space-y-6">
             <h2 className="text-xl md:text-2xl font-semibold leading-snug">
-              {question.text}
+              {t(`question.${qKey}.text`)}
             </h2>
 
             <div className="space-y-3">
-              {question.options.map((option, idx) => (
+              {question.options.map((_scoreMap, idx) => (
                 <button
                   key={idx}
                   onClick={() => handleOptionSelect(idx)}
@@ -427,7 +347,9 @@ export default function TestPage() {
                           : "border-zinc-600"
                       }`}
                     />
-                    <span className="text-sm leading-relaxed">{option.label}</span>
+                    <span className="text-sm leading-relaxed">
+                      {t(`question.${qKey}.option${idx + 1}`)}
+                    </span>
                   </div>
                 </button>
               ))}
@@ -440,10 +362,10 @@ export default function TestPage() {
               onClick={handleBack}
               className="px-5 py-3 min-h-11 border border-zinc-700 text-zinc-400 font-medium rounded-xl hover:bg-zinc-900/50 transition-colors text-sm"
             >
-              ← Atrás
+              {t("quizBack")}
             </button>
             {currentAnswer !== null && (
-              <p className="text-xs text-zinc-600 animate-pulse">Continuando…</p>
+              <p className="text-xs text-zinc-600 animate-pulse">{t("quizContinuing")}</p>
             )}
           </div>
         </div>
@@ -457,10 +379,8 @@ export default function TestPage() {
         <div className="max-w-md w-full space-y-8 text-center">
           <div className="space-y-3">
             <div className="text-3xl">📬</div>
-            <h2 className="text-2xl font-bold">¿Te enviamos el diagnóstico?</h2>
-            <p className="text-zinc-400 text-sm leading-relaxed">
-              Recibe tu resultado completo por email y Tres Mil Millones de Latidos te ayudará a hacer seguimiento de tu estado.
-            </p>
+            <h2 className="text-2xl font-bold">{t("emailTitle")}</h2>
+            <p className="text-zinc-400 text-sm leading-relaxed">{t("emailDesc")}</p>
           </div>
 
           <div className="space-y-3">
@@ -468,7 +388,7 @@ export default function TestPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="tu@email.com"
+              placeholder={t("emailPlaceholder")}
               className={COMPONENTS.inputField}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && email.trim()) void handleEmailSubmit(false);
@@ -477,14 +397,14 @@ export default function TestPage() {
             <PrivacyCheckbox
               checked={emailConsent}
               onChange={setEmailConsent}
-              context="Tu email y resultado se usaran para enviarte el diagnostico y seguimiento."
+              context={t("emailConsent")}
             />
             <button
               onClick={() => void handleEmailSubmit(false)}
               disabled={!email.trim() || !emailConsent || emailStatus === "sending"}
               className={`${COMPONENTS.buttonPrimary} w-full py-3 text-sm disabled:opacity-40 disabled:cursor-not-allowed`}
             >
-              {emailStatus === "sending" ? "Enviando…" : "Ver resultado →"}
+              {emailStatus === "sending" ? t("emailSending") : t("emailSeeResult")}
             </button>
           </div>
 
@@ -492,7 +412,7 @@ export default function TestPage() {
             onClick={() => void handleEmailSubmit(true)}
             className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors py-3 min-h-11 block w-full"
           >
-            Continuar sin email
+            {t("emailSkip")}
           </button>
         </div>
       </div>
@@ -501,20 +421,19 @@ export default function TestPage() {
 
   // Result screen
   if (screen === "result" && result) {
-    const stateData = STATE_RESULTS[result];
+    const style = STATE_STYLES[result];
+    const stateLabel = t(`result.${result}.label`);
     return (
       <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-16">
         <div className="max-w-xl w-full space-y-8">
           {/* Header result */}
           <div className="text-center space-y-4">
-            <div className="text-5xl">{stateData.emoji}</div>
-            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border ${stateData.badgeBg} ${stateData.borderColor}`}>
-              <span className={`text-sm font-semibold ${stateData.accentColor}`}>
-                {stateData.label}
-              </span>
+            <div className="text-5xl">{style.emoji}</div>
+            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border ${style.badgeBg} ${style.borderColor}`}>
+              <span className={`text-sm font-semibold ${style.accentColor}`}>{stateLabel}</span>
             </div>
             <h2 className="text-xl md:text-2xl font-bold leading-snug">
-              {stateData.tagline}
+              {t(`result.${result}.tagline`)}
             </h2>
           </div>
 
@@ -522,61 +441,61 @@ export default function TestPage() {
           {previousState && previousState !== result && (
             <div className="rounded-xl border border-zinc-700 bg-zinc-900/60 p-5">
               <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-3">
-                Tu evolución
+                {t("evolutionTitle")}
               </p>
               <div className="flex items-center gap-3">
                 <div className="flex-1 text-center px-3 py-2.5 rounded-lg bg-zinc-800 border border-zinc-700">
-                  <div className="text-xl mb-1">{STATE_RESULTS[previousState].emoji}</div>
-                  <div className="text-xs text-zinc-400 font-medium">{STATE_RESULTS[previousState].label}</div>
-                  <div className="text-xs text-zinc-600 mt-0.5">antes</div>
+                  <div className="text-xl mb-1">{STATE_STYLES[previousState].emoji}</div>
+                  <div className="text-xs text-zinc-400 font-medium">{t(`result.${previousState}.label`)}</div>
+                  <div className="text-xs text-zinc-600 mt-0.5">{t("evolutionBefore")}</div>
                 </div>
                 <div className="text-zinc-600 text-lg">→</div>
-                <div className={`flex-1 text-center px-3 py-2.5 rounded-lg border ${stateData.badgeBg} ${stateData.borderColor}`}>
-                  <div className="text-xl mb-1">{stateData.emoji}</div>
-                  <div className={`text-xs font-semibold ${stateData.accentColor}`}>{stateData.label}</div>
-                  <div className="text-xs text-zinc-500 mt-0.5">ahora</div>
+                <div className={`flex-1 text-center px-3 py-2.5 rounded-lg border ${style.badgeBg} ${style.borderColor}`}>
+                  <div className="text-xl mb-1">{style.emoji}</div>
+                  <div className={`text-xs font-semibold ${style.accentColor}`}>{stateLabel}</div>
+                  <div className="text-xs text-zinc-500 mt-0.5">{t("evolutionNow")}</div>
                 </div>
               </div>
               {(previousState === "bloqueo" || previousState === "ansiedad") &&
                 (result === "claridad" || result === "duda") && (
                   <p className="text-xs text-zinc-400 mt-3 leading-relaxed">
-                    Eso no pasa solo. Has trabajado en esto.
+                    {t("evolutionImproved")}
                   </p>
                 )}
               {result === "bloqueo" || result === "ansiedad" ? (
                 <p className="text-xs text-zinc-400 mt-3 leading-relaxed">
-                  Esta semana es más difícil que la última. Es información, no fracaso.
+                  {t("evolutionHarder")}
                 </p>
               ) : null}
             </div>
           )}
 
           {/* Pattern */}
-          <div className={`rounded-xl border ${stateData.borderColor} ${stateData.badgeBg} p-5 space-y-2`}>
-            <p className={`text-xs font-semibold uppercase tracking-widest ${stateData.accentColor}`}>
-              Lo que está pasando
+          <div className={`rounded-xl border ${style.borderColor} ${style.badgeBg} p-5 space-y-2`}>
+            <p className={`text-xs font-semibold uppercase tracking-widest ${style.accentColor}`}>
+              {t("patternHeader")}
             </p>
-            <p className="text-sm text-zinc-300 leading-relaxed">{stateData.pattern}</p>
+            <p className="text-sm text-zinc-300 leading-relaxed">{t(`result.${result}.pattern`)}</p>
           </div>
 
           {/* Signal */}
           <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-2">
             <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
-              La señal clave
+              {t("signalHeader")}
             </p>
-            <p className="text-sm text-zinc-300 leading-relaxed">{stateData.signal}</p>
+            <p className="text-sm text-zinc-300 leading-relaxed">{t(`result.${result}.signal`)}</p>
           </div>
 
           {/* Action */}
           <div className="rounded-xl border border-violet-500/40 bg-violet-500/10 p-5 space-y-3">
             <p className="text-xs font-semibold uppercase tracking-widest text-violet-400">
-              Tu acción para ahora
+              {t("actionHeader")}
             </p>
-            <p className="text-sm text-white leading-relaxed font-medium">{stateData.action}</p>
+            <p className="text-sm text-white leading-relaxed font-medium">{t(`result.${result}.action`)}</p>
           </div>
 
           {/* Share buttons */}
-          <ShareButtons stateLabel={stateData.label} stateEmoji={stateData.emoji} />
+          <ShareButtons stateLabel={stateLabel} stateEmoji={style.emoji} />
 
           {/* Divider + CTA */}
           <div className="space-y-4 pt-2">
@@ -586,25 +505,19 @@ export default function TestPage() {
               </div>
               <div className="relative flex justify-center">
                 <span className="px-4 text-xs text-zinc-500 bg-background">
-                  Para seguimiento continuo
+                  {t("followupDivider")}
                 </span>
               </div>
             </div>
 
             <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-4">
               <div className="space-y-2">
-                <p className="text-sm font-semibold text-white">
-                  Tres Mil Millones de Latidos detecta tu estado en cada sesión
-                </p>
+                <p className="text-sm font-semibold text-white">{t("followupTitle")}</p>
                 <ul className="space-y-1.5">
-                  {[
-                    "Conversaciones orientadas a acción, no a charla",
-                    "Seguimiento de objetivos y bloqueos entre sesiones",
-                    "Señales de riesgo antes de que escalen",
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-xs text-zinc-400">
+                  {[1, 2, 3].map((n) => (
+                    <li key={n} className="flex items-start gap-2 text-xs text-zinc-400">
                       <CheckCircle2 className="w-3.5 h-3.5 text-violet-400 shrink-0 mt-0.5" />
-                      {item}
+                      {t(`followupBullet${n}`)}
                     </li>
                   ))}
                 </ul>
@@ -613,7 +526,7 @@ export default function TestPage() {
                 href="/signup"
                 className={`${COMPONENTS.buttonPrimary} inline-flex items-center justify-center gap-2 w-full py-3 text-sm`}
               >
-                Empezar gratis <ArrowRight className="w-4 h-4" />
+                {t("followupCta")} <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
@@ -631,7 +544,7 @@ export default function TestPage() {
               }}
               className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors py-2"
             >
-              Repetir el test
+              {t("retake")}
             </button>
           </div>
         </div>

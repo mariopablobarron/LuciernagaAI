@@ -1060,5 +1060,121 @@
     "nowWhatTitle": "So what now?",
     "nowWhatDesc": "Knowing how many heartbeats are left changes nothing. What changes is deciding what you do with the next one. Three Billion Heartbeats helps you take that step.",
     "nowWhatCta": "Start now →"
+  },
+  "test": {
+    "introEyebrow": "Free diagnostic",
+    "introTitle": "What's holding",
+    "introTitleHighlight": "you back right now?",
+    "introSubtitle": "5 questions. Instant result. One concrete action for today.",
+    "introPreview": {
+      "bloqueo": "Block",
+      "ansiedad": "Anxiety",
+      "duda": "Fog"
+    },
+    "introCta": "Start diagnostic",
+    "introFootnote": "Anonymous · No signup · 2 minutes",
+    "quizProgress": "Question {current} of {total}",
+    "quizBack": "← Back",
+    "quizContinuing": "Continuing…",
+    "question": {
+      "q1": {
+        "text": "How would you describe your mental energy right now?",
+        "option1": "Stuck — I can't move forward",
+        "option2": "Racing — too many thoughts at once",
+        "option3": "Hazy — I don't know what I want",
+        "option4": "Flowing — I know what to do next"
+      },
+      "q2": {
+        "text": "When you think about your main goal, what happens?",
+        "option1": "I freeze before I start",
+        "option2": "I get anxious about what could go wrong",
+        "option3": "I don't know where to start",
+        "option4": "I'm clear on the next step"
+      },
+      "q3": {
+        "text": "How long have you been circling the same issue without moving forward?",
+        "option1": "Days or weeks — I'm in the same spot",
+        "option2": "Hours, with non-stop pressure",
+        "option3": "Not long, but I can't find the direction",
+        "option4": "I'm moving forward, even if slowly"
+      },
+      "q4": {
+        "text": "What do you feel in your body as you answer this?",
+        "option1": "Tension or heaviness",
+        "option2": "Restlessness or a racing heart",
+        "option3": "Mental fog, confusion",
+        "option4": "Calm or presence"
+      },
+      "q5": {
+        "text": "If you could ask for just one thing right now, what would it be?",
+        "option1": "Someone to unstick me",
+        "option2": "To silence the noise in my head",
+        "option3": "Someone to help me sort out my ideas",
+        "option4": "To keep the momentum I already have"
+      }
+    },
+    "emailTitle": "Want us to send you the diagnostic?",
+    "emailDesc": "Get your full result by email and Three Billion Heartbeats will help you track your state over time.",
+    "emailPlaceholder": "you@email.com",
+    "emailConsent": "Your email and result will only be used to send the diagnostic and follow-up.",
+    "emailSending": "Sending…",
+    "emailSeeResult": "See result →",
+    "emailSkip": "Continue without email",
+    "result": {
+      "bloqueo": {
+        "label": "Mental Block",
+        "tagline": "You know what you need to do — but you can't start.",
+        "pattern": "Your mind acts as if the first step were irreversible. It isn't. The block isn't a lack of willpower: it's a protection mechanism that has become excessive and fires before you do anything.",
+        "signal": "The task you perceive as «huge» defuses itself the moment you shrink it to 10 real minutes. You don't need a full plan.",
+        "action": "Open the document, file, or tool for the project right now. Just open it, nothing else. In the next 2 minutes."
+      },
+      "ansiedad": {
+        "label": "Action Anxiety",
+        "tagline": "You have energy — but it turns into pressure, not progress.",
+        "pattern": "Your head generates failure scenarios before you start. Every time you prepare more instead of acting, anxiety grows. More information doesn't solve this — it amplifies it.",
+        "signal": "Anxiety drops with the first small concrete result, not with the first perfect plan. Acting for 5 minutes is worth more than planning for 2 hours.",
+        "action": "Write on paper (or in a document): «What's the worst concrete thing that could happen?» One sentence. No frills. Name it."
+      },
+      "duda": {
+        "label": "Direction Fog",
+        "tagline": "You want to move — but you don't know where.",
+        "pattern": "Chronic doubt isn't a lack of information: it's too many options without a clear decision criterion. Looking for more data doesn't solve this — it adds more variables to an already saturated system.",
+        "signal": "You need to decide something small, not everything at once. A single concrete decision breaks the fog better than any analysis.",
+        "action": "Answer in 30 seconds: What is the ONE goal that, if it moved forward this week, would feel like real progress? Write it down now."
+      },
+      "claridad": {
+        "label": "Clarity Moment",
+        "tagline": "You know what you want and you have the energy to move.",
+        "pattern": "You're in a state of potential flow. The risk now isn't paralysis — it's scatter. Doing too much and losing focus is what turns clarity into chaos.",
+        "signal": "Clarity is a window, not a permanent position. Use it now, not tomorrow.",
+        "action": "Define in one sentence today's concrete outcome. Not the whole list: just the most important thing that, if you do it, will make the day worth it."
+      },
+      "neutral": {
+        "label": "Neutral State",
+        "tagline": "You're in neutral — neither blocked nor in clear momentum.",
+        "pattern": "The neutral state can be necessary recovery or the silent start of a block. The difference is whether you have a defined next step or not.",
+        "signal": "You don't need motivation — you need a small anchor to come back to. A concrete 20-minute commitment is enough.",
+        "action": "Pick one task under 20 minutes that you've been putting off. Put it on today's calendar with an exact time."
+      }
+    },
+    "evolutionTitle": "Your evolution",
+    "evolutionBefore": "before",
+    "evolutionNow": "now",
+    "evolutionImproved": "That doesn't happen on its own. You've worked on this.",
+    "evolutionHarder": "This week is harder than last. That's information, not failure.",
+    "patternHeader": "What's happening",
+    "signalHeader": "The key signal",
+    "actionHeader": "Your action for now",
+    "shareHeader": "Share your result",
+    "shareText": "{emoji} I just discovered I'm in a state of \"{state}\". What about you?",
+    "shareTagline": "Free mental diagnostic test",
+    "shareCopyTitle": "Copy link",
+    "followupDivider": "For ongoing follow-up",
+    "followupTitle": "Three Billion Heartbeats detects your state in every session",
+    "followupBullet1": "Conversations focused on action, not chatter",
+    "followupBullet2": "Tracks goals and blocks across sessions",
+    "followupBullet3": "Risk signals before they escalate",
+    "followupCta": "Start free",
+    "retake": "Retake the test"
   }
 }

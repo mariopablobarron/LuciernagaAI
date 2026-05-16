@@ -1176,5 +1176,250 @@
     "followupBullet3": "Risk signals before they escalate",
     "followupCta": "Start free",
     "retake": "Retake the test"
+  },
+  "resources": {
+    "eyebrow": "Resources",
+    "title": "Everything in",
+    "titleHighlight": "one place",
+    "subtitle": "Guides, tools and reads organized by intent, not by date. Start wherever you are.",
+    "section": {
+      "empezar": {
+        "title": "To get started",
+        "subtitle": "If you just arrived, start here."
+      },
+      "herramientas": {
+        "title": "Free tools",
+        "subtitle": "No account, no card. Try them now."
+      },
+      "leer": {
+        "title": "Read in depth",
+        "subtitle": "Articles and reflections from the team."
+      },
+      "profesionales": {
+        "title": "If you're a professional",
+        "subtitle": "For psychologists, coaches and wellbeing professionals."
+      }
+    },
+    "item": {
+      "metodo": {
+        "title": "The method",
+        "desc": "How the mentor thinks and responds: challenge before instructing, the five phases, the six principles, and what it explicitly does not do."
+      },
+      "casos": {
+        "title": "Use cases",
+        "desc": "Four real ways to use it — blocks, everyday anxiety, life transitions, self-knowledge — so you can see where you fit in."
+      },
+      "guia": {
+        "title": "User guide",
+        "desc": "How to get the most out of it day by day: check-ins, journal, goals, conversations with the mentor."
+      },
+      "faq": {
+        "title": "Frequently asked questions",
+        "desc": "Direct answers about how it works, privacy, pricing and limits."
+      },
+      "calculadora": {
+        "title": "Heartbeat calculator",
+        "desc": "How many heartbeats you have left, statistically. A raw way to ask yourself what you're doing with yours."
+      },
+      "test": {
+        "title": "Free test",
+        "desc": "A short self-diagnosis to understand where you are before starting."
+      },
+      "reto": {
+        "title": "The 30-day challenge",
+        "desc": "How the challenge works, what to expect and who gets the most out of it."
+      },
+      "blog": {
+        "title": "Blog",
+        "desc": "Reflections on emotional wellbeing, human technology, support and personal change."
+      },
+      "sobre": {
+        "title": "About us",
+        "desc": "Where this project comes from, why and who's behind it. Startidea, Mario, 15 years of support work."
+      },
+      "panel": {
+        "title": "For psychologists and professionals",
+        "desc": "How the mentor fits between sessions, what the clinical panel sees, how clinical judgment is supervised and where the limits are."
+      },
+      "contacto": {
+        "title": "Talk to the team",
+        "desc": "If you want to explore a collaboration or try it with a client, drop us a line."
+      }
+    },
+    "footerLine": "The best resource is the one you use today.",
+    "footerCta": "Start now"
+  },
+  "guide": {
+    "title": "User",
+    "titleHighlight": "guide",
+    "subtitle": "Everything you need to know to get the most out of Three Billion Heartbeats. From start to finish, step by step.",
+    "cta": "Start now",
+    "faqTitle": "Frequently asked questions",
+    "section": {
+      "start": {
+        "shortLabel": "Your first heartbeat",
+        "title": "1. Your first heartbeat",
+        "subtitle": "Get started in under 60 seconds",
+        "step1": "Open the chat from the app.",
+        "step1LinkText": "Go to chat",
+        "step2": "Write what's going on, no filters. There's no right answer.",
+        "step3": "The mentor detects your emotional state and adapts the conversation.",
+        "step4": "When you're done, you get a concrete next step you can take today."
+      },
+      "chat": {
+        "shortLabel": "The Chat — your mentor",
+        "title": "2. The Chat — your mentor",
+        "subtitle": "Not a generic chatbot. A system that knows you.",
+        "feature1": {
+          "label": "Emotional detection",
+          "desc": "It identifies whether you're blocked, anxious, in doubt or clear-headed, and adapts its response."
+        },
+        "feature2": {
+          "label": "Goals and actions",
+          "desc": "When you express an intention, the system creates a goal with concrete 10-minute actions."
+        },
+        "feature3": {
+          "label": "Microactions",
+          "desc": "Every conversation ends with something you can do TODAY. Steps so small you can't say no."
+        },
+        "feature4": {
+          "label": "Full history",
+          "desc": "Every conversation is saved. The mentor remembers your story to give continuity."
+        }
+      },
+      "checkin": {
+        "shortLabel": "Daily check-in",
+        "title": "3. Daily check-in",
+        "subtitle": "Log how you feel in 30 seconds",
+        "step1": "Open the Check-in tab from the workspace or use the Telegram bot.",
+        "step2": "Log your emotional state for the day.",
+        "step3": "Build streaks: how many days in a row you've checked in.",
+        "step4": "Over time, you'll see patterns: which days are harder, which situations affect you."
+      },
+      "diario": {
+        "shortLabel": "Personal journal",
+        "title": "4. Personal journal",
+        "subtitle": "A private space to write without anyone replying",
+        "feature1": {
+          "label": "Free writing",
+          "desc": "Reflections, venting, ideas, gratitude. No required structure."
+        },
+        "feature2": {
+          "label": "Mood",
+          "desc": "Tag each entry: great, good, neutral, bad or terrible."
+        },
+        "feature3": {
+          "label": "Tags",
+          "desc": "Organize your entries with emotional tags."
+        }
+      },
+      "metas": {
+        "shortLabel": "Goals and progress",
+        "title": "5. Goals and progress",
+        "subtitle": "Turn intentions into executable actions",
+        "feature1": {
+          "label": "Concrete goal",
+          "desc": "Not \"improve my life\", but \"have an honest conversation with my boss\"."
+        },
+        "feature2": {
+          "label": "Linked actions",
+          "desc": "Each goal has 5-15 minute steps you can complete and check off."
+        },
+        "feature3": {
+          "label": "Streak and progress",
+          "desc": "Consecutive days of activity. Progress bar in the sidebar."
+        },
+        "feature4": {
+          "label": "Avoidance patterns",
+          "desc": "The system detects what you postpone or reject and shows it to you."
+        }
+      },
+      "respirar": {
+        "shortLabel": "Breathing",
+        "title": "6. Breathing exercises",
+        "subtitle": "Calm anxiety in 2 minutes",
+        "feature1": {
+          "label": "4-7-8 breathing",
+          "desc": "Inhale 4s, hold 7s, exhale 8s. Ideal for calming anxiety."
+        },
+        "feature2": {
+          "label": "Box breathing",
+          "desc": "Inhale 4s, hold 4s, exhale 4s, hold 4s. To center yourself."
+        }
+      },
+      "comunidad": {
+        "shortLabel": "Community",
+        "title": "7. Community",
+        "subtitle": "You're not alone in the process",
+        "feature1": {
+          "label": "Anonymous posts",
+          "desc": "Share reflections and progress without anyone knowing who you are."
+        },
+        "feature2": {
+          "label": "Mutual support",
+          "desc": "Like the posts that resonate with you."
+        },
+        "feature3": {
+          "label": "By phase",
+          "desc": "Posts are organized by the phase of the process you're in."
+        }
+      },
+      "journeys": {
+        "shortLabel": "Guided journeys",
+        "title": "8. Guided journeys",
+        "subtitle": "Structured step-by-step programs",
+        "step1": "Pick a journey based on your phase: self-knowledge, emotional management, purpose or action.",
+        "step2": "Each module has practical exercises with mentor guidance.",
+        "step3": "Your progress is tracked and you can pick up where you left off.",
+        "step4": "As you complete modules, you advance through your transformation phase."
+      },
+      "settings": {
+        "shortLabel": "Settings",
+        "title": "9. Settings",
+        "subtitle": "Customize your experience",
+        "feature1": {
+          "label": "Mentor tone",
+          "desc": "Choose between Direct, Socratic or Warm."
+        },
+        "feature2": {
+          "label": "Reminders",
+          "desc": "Daily check-ins, pending actions and weekly summary."
+        },
+        "feature3": {
+          "label": "Export data",
+          "desc": "Download your history as CSV or all your data as JSON (GDPR)."
+        },
+        "feature4": {
+          "label": "Privacy",
+          "desc": "Change password, manage consent and delete your account."
+        }
+      }
+    },
+    "faq": {
+      "psicologo": {
+        "q": "Does the AI replace a psychologist?",
+        "a": "No. Three Billion Heartbeats is a coaching and self-knowledge tool. It does not diagnose, prescribe or replace professional therapy. In case of crisis, it connects you with emergency lines (988 in the US, 112 in the EU)."
+      },
+      "datos": {
+        "q": "Is my data private?",
+        "a": "Yes. Your conversations are yours. The system complies with the European GDPR. You can export or delete all your data from Settings at any time."
+      },
+      "planes": {
+        "q": "What's the difference between Free and Pro?",
+        "a": "Free: 10 conversations/month, 20 messages per conversation. Pro (€9/month): unlimited conversations and messages, Boost Mode, Telegram bot, family portal and advanced insights. Right now everything is free during the MVP."
+      },
+      "telegram": {
+        "q": "Can I use Telegram?",
+        "a": "Yes. Go to Settings > Telegram. You can chat with your mentor and receive reminders directly on Telegram."
+      },
+      "impulso": {
+        "q": "What is Boost Mode?",
+        "a": "A 21-day intensive program with diagnosis, daily personalized challenges, check-ins and behavior analysis. Available on Pro plan (free during the MVP)."
+      },
+      "precio": {
+        "q": "How much does it cost?",
+        "a": "Right now everything is free. We're in MVP phase until October 2026. After that there will be a Free plan (10 conversations/month) and a Pro (€9/month). Early users will get special conditions."
+      }
+    }
   }
 }

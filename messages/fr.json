@@ -1176,5 +1176,250 @@
     "followupBullet3": "Des signaux de risque avant qu'ils ne s'aggravent",
     "followupCta": "Commencer gratuitement",
     "retake": "Refaire le test"
+  },
+  "resources": {
+    "eyebrow": "Ressources",
+    "title": "Tout au",
+    "titleHighlight": "même endroit",
+    "subtitle": "Guides, outils et lectures organisés par intention, pas par date. Commence là où tu en es.",
+    "section": {
+      "empezar": {
+        "title": "Pour commencer",
+        "subtitle": "Si tu viens d'arriver, c'est par ici."
+      },
+      "herramientas": {
+        "title": "Outils gratuits",
+        "subtitle": "Sans compte ni carte. Essaie-les maintenant."
+      },
+      "leer": {
+        "title": "Lire en profondeur",
+        "subtitle": "Articles et réflexions de l'équipe."
+      },
+      "profesionales": {
+        "title": "Si tu es professionnel",
+        "subtitle": "Pour les psychologues, coachs et professionnels du bien-être."
+      }
+    },
+    "item": {
+      "metodo": {
+        "title": "La méthode",
+        "desc": "Comment le mentor pense et répond : interpeller avant d'instruire, les cinq phases, les six principes, et ce qu'il ne fait explicitement pas."
+      },
+      "casos": {
+        "title": "Cas d'usage",
+        "desc": "Quatre façons réelles de l'utiliser — blocages, anxiété quotidienne, transitions de vie, connaissance de soi — pour que tu voies où tu te situes."
+      },
+      "guia": {
+        "title": "Guide d'utilisation",
+        "desc": "Comment en tirer parti au quotidien : check-ins, journal, objectifs, conversations avec le mentor."
+      },
+      "faq": {
+        "title": "Questions fréquentes",
+        "desc": "Réponses directes sur le fonctionnement, la confidentialité, les prix et les limites."
+      },
+      "calculadora": {
+        "title": "Calculatrice de battements",
+        "desc": "Combien de battements il te reste statistiquement. Une façon brute de te demander ce que tu fais des tiens."
+      },
+      "test": {
+        "title": "Test gratuit",
+        "desc": "Un auto-diagnostic court pour comprendre où tu en es avant de commencer."
+      },
+      "reto": {
+        "title": "Le défi de 30 jours",
+        "desc": "Comment fonctionne le défi, à quoi t'attendre et qui en profite le mieux."
+      },
+      "blog": {
+        "title": "Blog",
+        "desc": "Réflexions sur le bien-être émotionnel, la technologie humaine, l'accompagnement et le changement personnel."
+      },
+      "sobre": {
+        "title": "À propos de nous",
+        "desc": "D'où vient ce projet, pourquoi et qui se trouve derrière. Startidea, Mario, 15 ans d'accompagnement."
+      },
+      "panel": {
+        "title": "Pour les psychologues et professionnels",
+        "desc": "Comment le mentor s'intègre entre les séances, ce que voit le panneau clinique, comment le jugement clinique est supervisé et où se trouvent les limites."
+      },
+      "contacto": {
+        "title": "Parler à l'équipe",
+        "desc": "Si tu veux explorer une collaboration ou l'essayer avec un client, écris-nous."
+      }
+    },
+    "footerLine": "La meilleure ressource est celle que tu utilises aujourd'hui.",
+    "footerCta": "Commencer maintenant"
+  },
+  "guide": {
+    "title": "Guide",
+    "titleHighlight": "utilisateur",
+    "subtitle": "Tout ce que tu dois savoir pour tirer le meilleur parti de Trois Milliards de Battements. Du début à la fin, étape par étape.",
+    "cta": "Commencer maintenant",
+    "faqTitle": "Questions fréquentes",
+    "section": {
+      "start": {
+        "shortLabel": "Ton premier battement",
+        "title": "1. Ton premier battement",
+        "subtitle": "Commence en moins de 60 secondes",
+        "step1": "Entre dans le chat depuis l'app.",
+        "step1LinkText": "Aller au chat",
+        "step2": "Écris ce qui se passe, sans filtres. Il n'y a pas de bonne réponse.",
+        "step3": "Le mentor détecte ton état émotionnel et adapte la conversation.",
+        "step4": "À la fin, tu reçois une prochaine étape concrète que tu peux faire aujourd'hui."
+      },
+      "chat": {
+        "shortLabel": "Le Chat — ton mentor",
+        "title": "2. Le Chat — ton mentor",
+        "subtitle": "Ce n'est pas un chatbot générique. C'est un système qui te connaît.",
+        "feature1": {
+          "label": "Détection émotionnelle",
+          "desc": "Il identifie si tu es bloqué, anxieux, dans le doute ou clair, et adapte sa réponse."
+        },
+        "feature2": {
+          "label": "Objectifs et actions",
+          "desc": "Quand tu exprimes une intention, le système crée un objectif avec des actions concrètes de 10 minutes."
+        },
+        "feature3": {
+          "label": "Micro-actions",
+          "desc": "Chaque conversation se termine par quelque chose que tu peux faire AUJOURD'HUI. Des pas si petits que tu ne peux pas dire non."
+        },
+        "feature4": {
+          "label": "Historique complet",
+          "desc": "Toutes les conversations sont sauvegardées. Le mentor se souvient de ton histoire pour assurer la continuité."
+        }
+      },
+      "checkin": {
+        "shortLabel": "Check-in quotidien",
+        "title": "3. Check-in quotidien",
+        "subtitle": "Enregistre ce que tu ressens en 30 secondes",
+        "step1": "Ouvre l'onglet Check-in depuis le workspace ou utilise le bot Telegram.",
+        "step2": "Enregistre ton état émotionnel du jour.",
+        "step3": "Accumule des séries : combien de jours d'affilée tu t'enregistres.",
+        "step4": "Avec le temps, tu verras des motifs : quels jours sont plus difficiles, quelles situations t'affectent."
+      },
+      "diario": {
+        "shortLabel": "Journal personnel",
+        "title": "4. Journal personnel",
+        "subtitle": "Un espace privé pour écrire sans que personne ne réponde",
+        "feature1": {
+          "label": "Écriture libre",
+          "desc": "Réflexions, exutoires, idées, gratitude. Sans structure obligatoire."
+        },
+        "feature2": {
+          "label": "État d'esprit",
+          "desc": "Étiquette chaque entrée : super, bien, neutre, mal ou terrible."
+        },
+        "feature3": {
+          "label": "Étiquettes",
+          "desc": "Organise tes entrées avec des étiquettes émotionnelles."
+        }
+      },
+      "metas": {
+        "shortLabel": "Objectifs et progrès",
+        "title": "5. Objectifs et progrès",
+        "subtitle": "Transforme les intentions en actions exécutables",
+        "feature1": {
+          "label": "Objectif concret",
+          "desc": "Pas \"améliorer ma vie\", mais \"avoir une conversation honnête avec mon patron\"."
+        },
+        "feature2": {
+          "label": "Actions liées",
+          "desc": "Chaque objectif a des étapes de 5-15 minutes que tu peux compléter et cocher."
+        },
+        "feature3": {
+          "label": "Série et progrès",
+          "desc": "Jours consécutifs d'activité. Barre de progression dans la barre latérale."
+        },
+        "feature4": {
+          "label": "Motifs d'évitement",
+          "desc": "Le système détecte ce que tu reportes ou rejettes et te le montre."
+        }
+      },
+      "respirar": {
+        "shortLabel": "Respiration",
+        "title": "6. Exercices de respiration",
+        "subtitle": "Calme l'anxiété en 2 minutes",
+        "feature1": {
+          "label": "Respiration 4-7-8",
+          "desc": "Inspire 4s, retiens 7s, expire 8s. Idéal pour calmer l'anxiété."
+        },
+        "feature2": {
+          "label": "Respiration carrée",
+          "desc": "Inspire 4s, retiens 4s, expire 4s, retiens 4s. Pour te centrer."
+        }
+      },
+      "comunidad": {
+        "shortLabel": "Communauté",
+        "title": "7. Communauté",
+        "subtitle": "Tu n'es pas seul dans le processus",
+        "feature1": {
+          "label": "Posts anonymes",
+          "desc": "Partage des réflexions et des avancées sans que personne ne sache qui tu es."
+        },
+        "feature2": {
+          "label": "Soutien mutuel",
+          "desc": "Mets un \"J'aime\" aux posts qui te parlent."
+        },
+        "feature3": {
+          "label": "Par phases",
+          "desc": "Les posts sont organisés selon la phase du processus dans laquelle tu te trouves."
+        }
+      },
+      "journeys": {
+        "shortLabel": "Voyages guidés",
+        "title": "8. Voyages guidés",
+        "subtitle": "Programmes structurés pas à pas",
+        "step1": "Choisis un voyage selon ta phase : connaissance de soi, gestion émotionnelle, sens ou action.",
+        "step2": "Chaque module a des exercices pratiques avec le guide du mentor.",
+        "step3": "Ta progression est suivie et tu peux reprendre là où tu en étais.",
+        "step4": "En complétant les modules, tu avances dans ta phase de transformation."
+      },
+      "settings": {
+        "shortLabel": "Paramètres",
+        "title": "9. Paramètres",
+        "subtitle": "Personnalise ton expérience",
+        "feature1": {
+          "label": "Ton du mentor",
+          "desc": "Choisis entre Direct, Socratique ou Chaleureux."
+        },
+        "feature2": {
+          "label": "Rappels",
+          "desc": "Check-ins quotidiens, actions en attente et résumé hebdomadaire."
+        },
+        "feature3": {
+          "label": "Exporter les données",
+          "desc": "Télécharge ton historique en CSV ou toutes tes données en JSON (RGPD)."
+        },
+        "feature4": {
+          "label": "Confidentialité",
+          "desc": "Change ton mot de passe, gère le consentement et supprime ton compte."
+        }
+      }
+    },
+    "faq": {
+      "psicologo": {
+        "q": "L'IA remplace-t-elle un psychologue ?",
+        "a": "Non. Trois Milliards de Battements est un outil de coaching et de connaissance de soi. Il ne diagnostique pas, ne prescrit pas et ne remplace pas une thérapie professionnelle. En cas de crise, il te connecte avec des lignes d'urgence (3114, 112)."
+      },
+      "datos": {
+        "q": "Mes données sont-elles privées ?",
+        "a": "Oui. Tes conversations t'appartiennent. Le système est conforme au RGPD européen. Tu peux exporter ou supprimer toutes tes données depuis les Paramètres à tout moment."
+      },
+      "planes": {
+        "q": "Quelle est la différence entre Free et Pro ?",
+        "a": "Free : 10 conversations/mois, 20 messages par conversation. Pro (9 €/mois) : conversations et messages illimités, Mode Boost, bot Telegram, portail famille et insights avancés. Pour l'instant tout est gratuit pendant le MVP."
+      },
+      "telegram": {
+        "q": "Puis-je utiliser Telegram ?",
+        "a": "Oui. Va dans Paramètres > Telegram. Tu pourras discuter avec ton mentor et recevoir des rappels directement sur Telegram."
+      },
+      "impulso": {
+        "q": "Qu'est-ce que le Mode Boost ?",
+        "a": "Un programme intensif de 21 jours avec diagnostic, défis personnalisés quotidiens, check-ins et analyse comportementale. Disponible dans le plan Pro (gratuit pendant le MVP)."
+      },
+      "precio": {
+        "q": "Combien ça coûte ?",
+        "a": "Pour l'instant tout est gratuit. Nous sommes en phase MVP jusqu'en octobre 2026. Ensuite il y aura un plan Free (10 conversations/mois) et un Pro (9 €/mois). Les premiers utilisateurs auront des conditions spéciales."
+      }
+    }
   }
 }

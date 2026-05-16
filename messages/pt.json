@@ -839,5 +839,71 @@
       }
     },
     "ctaBottom": "Começar agora — é grátis"
+  },
+  "challenge": {
+    "badge": "O desafio dos 30 dias",
+    "title": "30 dias.",
+    "titleHighlight": "Uma mudança real.",
+    "subtitle": "Não é mais uma app. É um compromisso contigo próprio com a IA mais direta que existe. Cada dia em que ages, a tua streak cresce. Cada streak que cresce torna a mudança inevitável.",
+    "participantsLine": "{count} pessoas no desafio neste momento",
+    "ctaPrimary": "Aceita o desafio",
+    "ctaShare": "Partilhar desafio",
+    "ctaShareCopied": "Copiado",
+    "statRachas": "Streaks ativas",
+    "statObjetivos": "Objetivos concluídos",
+    "statDias": "Dias do desafio",
+    "stepsTitle": "Como funciona?",
+    "stepsSubtitle": "Três passos. Sem complicações.",
+    "step1": {
+      "title": "Completa as 3 missões",
+      "desc": "Responde às perguntas que mais ninguém te faz. Isto já é o primeiro passo real."
+    },
+    "step2": {
+      "title": "30 dias de ação diária",
+      "desc": "Cada dia conta. A tua streak atualiza-se sempre que abres Três Mil Milhões de Batidas e ages."
+    },
+    "step3": {
+      "title": "Partilha o teu progresso",
+      "desc": "Ao dia 7 desbloqueias um convite. Ao dia 30, mais três. A mudança real é contagiosa."
+    },
+    "milestonesTitle": "O que desbloqueias",
+    "milestonesSubtitle": "O progresso traz recompensas reais.",
+    "dayLabel": "Dia {n}",
+    "milestone1": {
+      "title": "Acesso completo",
+      "desc": "Desde o primeiro dia tens acesso à IA mais direta que existe."
+    },
+    "milestone7": {
+      "title": "Primeiro convite",
+      "desc": "Ganhas 1 convite para trazeres alguém que precise."
+    },
+    "milestone14": {
+      "title": "Modo avançado",
+      "desc": "A IA ajusta a sua intensidade ao teu progresso acumulado."
+    },
+    "milestone30": {
+      "title": "3 convites + certificado",
+      "desc": "Concluíres o desafio torna-te embaixador da mudança."
+    },
+    "testimonialsTitle": "O que dizem pelo caminho",
+    "testimonial1": {
+      "day": "12",
+      "text": "Pela primeira vez em meses sei exatamente o que tenho de fazer amanhã.",
+      "name": "Ana M."
+    },
+    "testimonial2": {
+      "day": "21",
+      "text": "A IA perguntou-me algo que me deixou sem palavras. Sem palavras no bom sentido.",
+      "name": "Carlos R."
+    },
+    "testimonial3": {
+      "day": "7",
+      "text": "Pensei que ia durar dois dias. Já vai uma semana e não quero parar.",
+      "name": "Sara L."
+    },
+    "ctaTitle": "Estás pronto para os 30 dias?",
+    "ctaSubtitle": "Três perguntas. Um compromisso. Trinta dias. A mudança que andas a adiar começa hoje.",
+    "ctaFinal": "Aceita o desafio agora",
+    "ctaFinalNote": "Sem cartão. Sem spam. Apenas 30 dias."
   }
 }

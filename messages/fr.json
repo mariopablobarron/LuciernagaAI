@@ -839,5 +839,71 @@
       }
     },
     "ctaBottom": "Commencer maintenant — c'est gratuit"
+  },
+  "challenge": {
+    "badge": "Le défi des 30 jours",
+    "title": "30 jours.",
+    "titleHighlight": "Un vrai changement.",
+    "subtitle": "Ce n'est pas une appli de plus. C'est un engagement envers toi-même avec l'IA la plus directe qui existe. Chaque jour où tu agis, ta série grandit. Chaque série qui grandit rend le changement inévitable.",
+    "participantsLine": "{count} personnes dans le défi en ce moment",
+    "ctaPrimary": "Relève le défi",
+    "ctaShare": "Partager le défi",
+    "ctaShareCopied": "Copié",
+    "statRachas": "Séries actives",
+    "statObjetivos": "Objectifs atteints",
+    "statDias": "Jours du défi",
+    "stepsTitle": "Comment ça marche ?",
+    "stepsSubtitle": "Trois étapes. Sans complications.",
+    "step1": {
+      "title": "Termine les 3 missions",
+      "desc": "Réponds aux questions que personne d'autre ne te pose. C'est déjà le premier vrai pas."
+    },
+    "step2": {
+      "title": "30 jours d'action quotidienne",
+      "desc": "Chaque jour compte. Ta série se met à jour chaque fois que tu ouvres Trois Milliards de Battements et que tu agis."
+    },
+    "step3": {
+      "title": "Partage ton progrès",
+      "desc": "Au jour 7 tu débloques une invitation. Au jour 30, trois de plus. Le vrai changement est contagieux."
+    },
+    "milestonesTitle": "Ce que tu débloques",
+    "milestonesSubtitle": "Le progrès apporte de vraies récompenses.",
+    "dayLabel": "Jour {n}",
+    "milestone1": {
+      "title": "Accès complet",
+      "desc": "Dès le premier jour tu as accès à l'IA la plus directe qui existe."
+    },
+    "milestone7": {
+      "title": "Première invitation",
+      "desc": "Tu gagnes 1 invitation pour amener quelqu'un qui en a besoin."
+    },
+    "milestone14": {
+      "title": "Mode avancé",
+      "desc": "L'IA ajuste son intensité à ton progrès accumulé."
+    },
+    "milestone30": {
+      "title": "3 invitations + certificat",
+      "desc": "Terminer le défi te transforme en ambassadeur du changement."
+    },
+    "testimonialsTitle": "Ce qu'on dit en chemin",
+    "testimonial1": {
+      "day": "12",
+      "text": "Pour la première fois depuis des mois, je sais exactement ce que je dois faire demain.",
+      "name": "Ana M."
+    },
+    "testimonial2": {
+      "day": "21",
+      "text": "L'IA m'a posé une question qui m'a laissé sans voix. Sans voix dans le bon sens.",
+      "name": "Carlos R."
+    },
+    "testimonial3": {
+      "day": "7",
+      "text": "Je pensais tenir deux jours. Ça fait une semaine et je ne veux pas m'arrêter.",
+      "name": "Sara L."
+    },
+    "ctaTitle": "Es-tu prêt pour les 30 jours ?",
+    "ctaSubtitle": "Trois questions. Un engagement. Trente jours. Le changement que tu repousses depuis longtemps commence aujourd'hui.",
+    "ctaFinal": "Relève le défi maintenant",
+    "ctaFinalNote": "Sans carte. Sans spam. Juste 30 jours."
   }
 }

@@ -839,5 +839,71 @@
       }
     },
     "ctaBottom": "Empezar ahora — es gratis"
+  },
+  "challenge": {
+    "badge": "El reto de los 30 días",
+    "title": "30 días.",
+    "titleHighlight": "Un cambio real.",
+    "subtitle": "No es una app más. Es un compromiso contigo mismo/a con la IA más directa que existe. Cada día que actúas, tu racha crece. Cada racha que crece, el cambio se vuelve inevitable.",
+    "participantsLine": "{count} personas en el reto ahora mismo",
+    "ctaPrimary": "Acepta el reto",
+    "ctaShare": "Compartir reto",
+    "ctaShareCopied": "Copiado",
+    "statRachas": "Rachas activas",
+    "statObjetivos": "Objetivos completados",
+    "statDias": "Días del reto",
+    "stepsTitle": "¿Cómo funciona?",
+    "stepsSubtitle": "Tres pasos. Sin complicaciones.",
+    "step1": {
+      "title": "Completa las 3 misiones",
+      "desc": "Responde las preguntas que nadie más te hace. Esto ya es el primer paso real."
+    },
+    "step2": {
+      "title": "30 días de acción diaria",
+      "desc": "Cada día cuenta. Tu racha se actualiza cada vez que abres Tres Mil Millones de Latidos y actúas."
+    },
+    "step3": {
+      "title": "Comparte tu progreso",
+      "desc": "Al día 7 desbloqueas una invitación. Al día 30, tres más. El cambio real se contagia."
+    },
+    "milestonesTitle": "Lo que desbloqueas",
+    "milestonesSubtitle": "El progreso tiene recompensas reales.",
+    "dayLabel": "Día {n}",
+    "milestone1": {
+      "title": "Acceso completo",
+      "desc": "Desde el primer día tienes acceso a la IA más directa que existe."
+    },
+    "milestone7": {
+      "title": "Primera invitación",
+      "desc": "Ganas 1 invitación para traer a alguien que lo necesite."
+    },
+    "milestone14": {
+      "title": "Modo avanzado",
+      "desc": "La IA ajusta su intensidad a tu progreso acumulado."
+    },
+    "milestone30": {
+      "title": "3 invitaciones + certificado",
+      "desc": "Completar el reto te convierte en embajador del cambio."
+    },
+    "testimonialsTitle": "Lo que dicen en el camino",
+    "testimonial1": {
+      "day": "12",
+      "text": "Por primera vez en meses sé exactamente qué tengo que hacer mañana.",
+      "name": "Ana M."
+    },
+    "testimonial2": {
+      "day": "21",
+      "text": "La IA me preguntó algo que me dejó sin palabras. Bien sin palabras.",
+      "name": "Carlos R."
+    },
+    "testimonial3": {
+      "day": "7",
+      "text": "Pensé que duraría dos días. Llevo una semana y no quiero parar.",
+      "name": "Sara L."
+    },
+    "ctaTitle": "¿Estás listo/a para los 30 días?",
+    "ctaSubtitle": "Tres preguntas. Un compromiso. Treinta días. El cambio que llevas tiempo aplazando empieza hoy.",
+    "ctaFinal": "Acepta el reto ahora",
+    "ctaFinalNote": "Sin tarjeta. Sin spam. Solo 30 días."
   }
 }

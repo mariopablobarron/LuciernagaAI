@@ -18,7 +18,26 @@ import {
   NUDGE_7D_STRINGS,
   REMINDER_STRINGS,
   WEEKLY_LETTER_STRINGS,
+  FAMILY_RELATION_GUIDANCE,
+  type FamilyRelationKey,
+  FAMILY_INVITE_STRINGS,
+  FAMILY_CRISIS_STRINGS,
+  FAMILY_INACTIVITY_STRINGS,
+  FAMILY_WIN_STRINGS,
+  SUPPORT_MESSAGE_STRINGS,
+  CIRCLE_PULSE_OPENED_STRINGS,
+  MENTOR_REFLECTION_STRINGS,
+  CIRCLE_CLOSING_STRINGS,
+  type CircleClosingReason,
 } from "@/lib/email-i18n";
+
+// Map locale → BCP47 for Intl.DateTimeFormat.
+const LOCALE_BCP47: Record<EmailLocale, string> = {
+  es: "es-ES",
+  en: "en-US",
+  pt: "pt-PT",
+  fr: "fr-FR",
+};
 
 export type QuizState = "bloqueo" | "ansiedad" | "duda" | "claridad" | "neutral";
 export type { EmailLocale } from "@/lib/email-i18n";
@@ -673,33 +692,14 @@ function familyLayout(title: string, body: string, cta?: { href: string; label: 
   });
 }
 
-const RELATION_GUIDANCE: Record<string, { role: string; doThis: string; dontDoThis: string }> = {
-  madre: {
-    role: "Tu hijo/a confía en ti para esto. Eso dice mucho de vuestra relación.",
-    doThis: "Estar disponible. Un mensaje natural de vez en cuando. Celebrar los pequeños avances.",
-    dontDoThis: "Intentar arreglarlo todo. Preguntar si ya entró a la app. Dar sermones.",
-  },
-  padre: {
-    role: "Tu hijo/a confía en ti para esto. Eso dice mucho de vuestra relación.",
-    doThis: "Estar disponible. Un mensaje natural de vez en cuando. Celebrar los pequeños avances.",
-    dontDoThis: "Intentar arreglarlo todo. Preguntar si ya entró a la app. Dar sermones.",
-  },
-  pareja: {
-    role: "Tu pareja ha elegido compartir este proceso contigo. Eso es un acto de confianza.",
-    doThis: "Acompañar sin controlar. Preguntar cómo está sin esperar que hable de la app.",
-    dontDoThis: "Usar esta información en discusiones. Vigilar su progreso. Presionar.",
-  },
-  "amigo/a": {
-    role: "Que te haya elegido como apoyo significa que confía en ti de verdad.",
-    doThis: "Ser natural. Proponer planes juntos. Enviar un mensaje cuando te acuerdes.",
-    dontDoThis: "Cambiar cómo le tratas. Dar consejos no pedidos. Hablar de su proceso con otros.",
-  },
-  terapeuta: {
-    role: "Esta información complementa tu trabajo clínico con consentimiento explícito.",
-    doThis: "Usar los datos como contexto entre sesiones. Observar patrones de evitación o crisis.",
-    dontDoThis: "Mencionar datos del portal sin que el paciente los traiga primero a sesión.",
-  },
-};
+// Mapea una `relation` libre (string del campo TrustedContact.relation) a la
+// clave del diccionario FAMILY_RELATION_GUIDANCE. Si no matchea, "default".
+function relationKey(relation: string): FamilyRelationKey {
+  const known: FamilyRelationKey[] = ["madre", "padre", "pareja", "amigo/a", "terapeuta"];
+  return (known as readonly string[]).includes(relation)
+    ? (relation as FamilyRelationKey)
+    : "default";
+}
 
 /** Invite sent to the trusted contact when the user adds them. */
 export function buildFamilyInviteEmail(params: {
@@ -707,55 +707,46 @@ export function buildFamilyInviteEmail(params: {
   contactName: string;
   relation: string;
   portalUrl: string;
+  locale?: EmailLocale;
 }): Pick<UserEmail, "subject" | "html" | "text"> {
   const { userName, contactName, relation, portalUrl } = params;
-  const guide = RELATION_GUIDANCE[relation] ?? {
-    role: "Has sido elegido/a como persona de confianza. Eso es un privilegio.",
-    doThis: "Estar presente. Un mensaje natural de vez en cuando. Celebrar avances.",
-    dontDoThis: "Presionar. Vigilar. Usar esta información para confrontar.",
-  };
+  const loc = pickEmailLocale(params.locale);
+  const s = FAMILY_INVITE_STRINGS[loc];
+  const guide = FAMILY_RELATION_GUIDANCE[loc][relationKey(relation)];
 
-  const subject = `${escapeHtml(userName)} confía en ti — portal de apoyo`;
+  const subject = s.subjectTpl(escapeHtml(userName));
   const body = `
-    <p style="color:#444;font-size:15px;line-height:1.6">Hola ${escapeHtml(contactName)},</p>
-    <p style="color:#444;font-size:15px;line-height:1.6">
-      <strong>${escapeHtml(userName)}</strong> te ha elegido como su <em>${escapeHtml(relation)}</em> de confianza
-      en Tres Mil Millones de Latidos. Está trabajando en su bienestar emocional y ha decidido
-      que tú formes parte de ese proceso.
-    </p>
+    <p style="color:#444;font-size:15px;line-height:1.6">${s.greeting(escapeHtml(contactName))},</p>
+    <p style="color:#444;font-size:15px;line-height:1.6">${escapeHtml(s.introTpl(userName, relation))}</p>
     <p style="color:#444;font-size:15px;line-height:1.6;font-style:italic;border-left:3px solid #d946ef;padding-left:12px;margin:16px 0">
       ${escapeHtml(guide.role)}
     </p>
-    <p style="color:#111;font-size:14px;font-weight:700;margin:20px 0 8px">🟢 Lo que sí puedes hacer:</p>
+    <p style="color:#111;font-size:14px;font-weight:700;margin:20px 0 8px">${s.doHeader}</p>
     <p style="color:#444;font-size:14px;line-height:1.6">${escapeHtml(guide.doThis)}</p>
-    <p style="color:#111;font-size:14px;font-weight:700;margin:20px 0 8px">🔴 Lo que no deberías hacer:</p>
+    <p style="color:#111;font-size:14px;font-weight:700;margin:20px 0 8px">${s.dontHeader}</p>
     <p style="color:#444;font-size:14px;line-height:1.6">${escapeHtml(guide.dontDoThis)}</p>
     <div style="background:#fffbeb;border-left:3px solid #f59e0b;border-radius:4px;padding:14px 16px;margin:20px 0">
-      <p style="margin:0;font-size:14px;color:#92400e;font-weight:600">Regla de oro</p>
-      <p style="margin:8px 0 0;font-size:14px;color:#78350f;line-height:1.6">
-        No le menciones lo que ves en el portal. Si le dices "vi que llevas días sin entrar",
-        rompes la confianza del proceso. El sistema ya le acompaña.
-        Tu papel es estar — no vigilar.
-      </p>
+      <p style="margin:0;font-size:14px;color:#92400e;font-weight:600">${escapeHtml(s.goldenRuleTitle)}</p>
+      <p style="margin:8px 0 0;font-size:14px;color:#78350f;line-height:1.6">${escapeHtml(s.goldenRuleBody)}</p>
     </div>
     <p style="color:#444;font-size:15px;line-height:1.6">
-      <strong>Guarda este enlace — es tu acceso permanente:</strong>
+      <strong>${escapeHtml(s.saveLink)}</strong>
     </p>`;
   const text = [
-    `Hola ${contactName},`,
+    `${s.greeting(contactName)},`,
     ``,
-    `${userName} te ha elegido como su ${relation} de confianza en Tres Mil Millones de Latidos.`,
+    s.introTpl(userName, relation),
     ``,
-    `${guide.role}`,
+    guide.role,
     ``,
-    `Lo que sí puedes hacer: ${guide.doThis}`,
-    `Lo que no deberías hacer: ${guide.dontDoThis}`,
+    `${s.doHeader.replace(/[🟢🔴]\s*/g, "")} ${guide.doThis}`,
+    `${s.dontHeader.replace(/[🟢🔴]\s*/g, "")} ${guide.dontDoThis}`,
     ``,
-    `REGLA DE ORO: No le menciones lo que ves en el portal. Tu papel es estar, no vigilar.`,
+    s.textGoldenRule,
     ``,
-    `Tu portal: ${portalUrl}`,
+    `${s.textPortalLabel} ${portalUrl}`,
   ].join("\n");
-  return { subject, html: familyLayout(subject, body, { href: portalUrl, label: "Abrir mi portal" }), text };
+  return { subject, html: familyLayout(subject, body, { href: portalUrl, label: s.cta }), text };
 }
 
 /** Sent when a crisis is detected for the user. */
@@ -764,23 +755,22 @@ export function buildFamilyCrisisEmail(params: {
   contactName: string;
   portalUrl: string;
   appBaseUrl: string;
+  locale?: EmailLocale;
 }): Pick<UserEmail, "subject" | "html" | "text"> {
   const { userName, contactName, portalUrl } = params;
-  const subject = `⚠️ ${escapeHtml(userName)} puede necesitar apoyo ahora`;
+  const loc = pickEmailLocale(params.locale);
+  const s = FAMILY_CRISIS_STRINGS[loc];
+
+  const subject = s.subjectTpl(escapeHtml(userName));
   const body = `
-    <p style="color:#444;font-size:15px;line-height:1.6">Hola ${escapeHtml(contactName)},</p>
+    <p style="color:#444;font-size:15px;line-height:1.6">${s.greeting(escapeHtml(contactName))},</p>
     <div style="background:#fff3f3;border-left:3px solid #e53e3e;border-radius:4px;padding:14px 16px;margin:16px 0">
-      <p style="margin:0;font-size:15px;color:#c53030;font-weight:600">
-        Tres Mil Millones de Latidos ha detectado una señal de crisis en la sesión de <strong>${escapeHtml(userName)}</strong>.
-      </p>
+      <p style="margin:0;font-size:15px;color:#c53030;font-weight:600">${escapeHtml(s.alertTpl(userName))}</p>
     </div>
-    <p style="color:#444;font-size:15px;line-height:1.6">
-      Esto no significa que esté en peligro inmediato, pero puede que agradezca una llamada o mensaje tuyo.
-      Un "Hola, estoy aquí" puede marcar la diferencia.
-    </p>
-    <p style="color:#555;font-size:13px">Si crees que hay riesgo real, contacta servicios de emergencia: <strong>112</strong> (España) / <strong>911</strong></p>`;
-  const text = `Hola ${contactName},\n\nTres Mil Millones de Latidos ha detectado una señal de crisis en la sesión de ${userName}.\n\nPuede que agradezca una llamada.\nEmergencias: 112\n\nTu portal: ${portalUrl}`;
-  return { subject, html: familyLayout(subject, body, { href: portalUrl, label: "Ver portal" }), text };
+    <p style="color:#444;font-size:15px;line-height:1.6">${escapeHtml(s.bodyAfter)}</p>
+    <p style="color:#555;font-size:13px">${escapeHtml(s.emergencyNote)}</p>`;
+  const text = `${s.greeting(contactName)},\n\n${s.textBodyTpl(userName, portalUrl)}`;
+  return { subject, html: familyLayout(subject, body, { href: portalUrl, label: s.cta }), text };
 }
 
 /** Sent when the user hasn't been active for N days. */
@@ -789,20 +779,19 @@ export function buildFamilyInactivityEmail(params: {
   contactName: string;
   daysSilent: number;
   portalUrl: string;
+  locale?: EmailLocale;
 }): Pick<UserEmail, "subject" | "html" | "text"> {
   const { userName, contactName, daysSilent, portalUrl } = params;
-  const subject = `${escapeHtml(userName)} lleva ${daysSilent} días sin actividad en Tres Mil Millones de Latidos`;
+  const loc = pickEmailLocale(params.locale);
+  const s = FAMILY_INACTIVITY_STRINGS[loc];
+
+  const subject = s.subjectTpl(escapeHtml(userName), daysSilent);
   const body = `
-    <p style="color:#444;font-size:15px;line-height:1.6">Hola ${escapeHtml(contactName)},</p>
-    <p style="color:#444;font-size:15px;line-height:1.6">
-      <strong>${escapeHtml(userName)}</strong> lleva <strong>${daysSilent} días</strong> sin abrir la app ni hacer check-in.
-      Puede que esté bien, pero tú pediste que te avisáramos si esto pasaba.
-    </p>
-    <p style="color:#444;font-size:15px;line-height:1.6">
-      A veces un mensaje corto de alguien de confianza es lo que necesita para retomar.
-    </p>`;
-  const text = `Hola ${contactName},\n\n${userName} lleva ${daysSilent} días sin actividad.\n\nTu portal: ${portalUrl}`;
-  return { subject, html: familyLayout(subject, body, { href: portalUrl, label: "Ver portal" }), text };
+    <p style="color:#444;font-size:15px;line-height:1.6">${s.greeting(escapeHtml(contactName))},</p>
+    <p style="color:#444;font-size:15px;line-height:1.6">${escapeHtml(s.introTpl(userName, daysSilent))}</p>
+    <p style="color:#444;font-size:15px;line-height:1.6">${escapeHtml(s.hint)}</p>`;
+  const text = `${s.greeting(contactName)},\n\n${s.textBodyTpl(userName, daysSilent, portalUrl)}`;
+  return { subject, html: familyLayout(subject, body, { href: portalUrl, label: s.cta }), text };
 }
 
 /** Sent when the user records a win with sharedWithFamily=true. */
@@ -811,20 +800,22 @@ export function buildFamilyWinEmail(params: {
   contactName: string;
   winNote: string;
   portalUrl: string;
+  locale?: EmailLocale;
 }): Pick<UserEmail, "subject" | "html" | "text"> {
   const { userName, contactName, winNote, portalUrl } = params;
-  const subject = `🎉 ${escapeHtml(userName)} ha anotado una victoria`;
+  const loc = pickEmailLocale(params.locale);
+  const s = FAMILY_WIN_STRINGS[loc];
+
+  const subject = s.subjectTpl(escapeHtml(userName));
   const body = `
-    <p style="color:#444;font-size:15px;line-height:1.6">Hola ${escapeHtml(contactName)},</p>
-    <p style="color:#444;font-size:15px;line-height:1.6">
-      <strong>${escapeHtml(userName)}</strong> acaba de registrar una victoria en Tres Mil Millones de Latidos y quiso compartirla contigo:
-    </p>
+    <p style="color:#444;font-size:15px;line-height:1.6">${s.greeting(escapeHtml(contactName))},</p>
+    <p style="color:#444;font-size:15px;line-height:1.6">${escapeHtml(s.introTpl(userName))}</p>
     <div style="background:#f0faf0;border-left:3px solid #38a169;border-radius:4px;padding:14px 16px;margin:16px 0">
       <p style="margin:0;font-size:16px;color:#276749;line-height:1.5">"${escapeHtml(winNote)}"</p>
     </div>
-    <p style="color:#444;font-size:15px;line-height:1.6">¡Vale la pena celebrarlo!</p>`;
-  const text = `Hola ${contactName},\n\n${userName} ha anotado una victoria: "${winNote}"\n\nTu portal: ${portalUrl}`;
-  return { subject, html: familyLayout(subject, body, { href: portalUrl, label: "Ver portal" }), text };
+    <p style="color:#444;font-size:15px;line-height:1.6">${escapeHtml(s.closing)}</p>`;
+  const text = `${s.greeting(contactName)},\n\n${s.textBodyTpl(userName, winNote, portalUrl)}`;
+  return { subject, html: familyLayout(subject, body, { href: portalUrl, label: s.cta }), text };
 }
 
 /** Sent to the user when a family support message arrives. */
@@ -875,19 +866,21 @@ export function buildSupportMessageEmail(params: {
   fromName: string;
   content: string;
   appUrl: string;
+  locale?: EmailLocale;
 }): Pick<UserEmail, "subject" | "html" | "text"> {
   const { fromName, content, appUrl } = params;
-  const subject = `💌 ${escapeHtml(fromName)} te ha enviado un mensaje de apoyo`;
+  const loc = pickEmailLocale(params.locale);
+  const s = SUPPORT_MESSAGE_STRINGS[loc];
+
+  const subject = s.subjectTpl(escapeHtml(fromName));
   const body = `
-    <p style="color:#444;font-size:15px;line-height:1.6">
-      <strong>${escapeHtml(fromName)}</strong> te ha dejado este mensaje:
-    </p>
+    <p style="color:#444;font-size:15px;line-height:1.6">${escapeHtml(s.introTpl(fromName))}</p>
     <div style="background:#fffbeb;border-left:3px solid #f59e0b;border-radius:4px;padding:14px 16px;margin:16px 0">
       <p style="margin:0;font-size:16px;color:#92400e;line-height:1.6">"${escapeHtml(content)}"</p>
     </div>
-    <p style="color:#444;font-size:15px;line-height:1.6">Puedes verlo en la app cuando quieras.</p>`;
-  const text = `${fromName} te ha enviado un mensaje:\n\n"${content}"\n\nVer en la app: ${appUrl}`;
-  return { subject, html: familyLayout(subject, body, { href: appUrl, label: "Ver en la app" }), text };
+    <p style="color:#444;font-size:15px;line-height:1.6">${escapeHtml(s.closing)}</p>`;
+  const text = s.textBodyTpl(fromName, content, appUrl);
+  return { subject, html: familyLayout(subject, body, { href: appUrl, label: s.cta }), text };
 }
 
 // ─── Circles v2 ──────────────────────────────────────────────────────────────
@@ -909,60 +902,67 @@ export function buildCirclePulseOpenedEmail(params: {
   prompt: string;
   weekEnd: Date;
   appUrl: string;
+  locale?: EmailLocale;
 }): Pick<UserEmail, "subject" | "html" | "text"> {
+  const loc = pickEmailLocale(params.locale);
+  const s = CIRCLE_PULSE_OPENED_STRINGS[loc];
   const firstName = params.name ? escapeHtml(params.name.trim().split(/\s+/)[0]) : null;
-  const greeting = firstName ? `Hola ${firstName}` : "Hola";
-  const subject = "Hay un nuevo pulso en tu círculo";
+  const greeting = s.greeting(firstName);
   const url = `${params.appUrl}/community?tab=circle`;
-  const closeDate = params.weekEnd.toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "short" });
+  const closeDate = params.weekEnd.toLocaleDateString(LOCALE_BCP47[loc], {
+    weekday: "long",
+    day: "numeric",
+    month: "short",
+  });
 
   const text = [
     `${greeting},`,
     ``,
-    `Hay un pulso abierto en tu círculo:`,
+    s.introTextTpl(closeDate),
     ``,
     `«${params.prompt}»`,
     ``,
-    `Tienes hasta el ${closeDate} para responder cuando quieras.`,
     `${url}`,
     ``,
-    `— Tres Mil Millones de Latidos`,
+    s.signature,
   ].join("\n");
 
   const body = `<p style="margin:0 0 16px;font-size:18px;color:#fff;font-weight:600">${greeting},</p>
-<p style="margin:0 0 12px;font-size:15px;line-height:1.7;color:#a1a1aa">Hay un pulso abierto en tu círculo. Responde cuando quieras antes del ${escapeHtml(closeDate)}.</p>
+<p style="margin:0 0 12px;font-size:15px;line-height:1.7;color:#a1a1aa">${escapeHtml(s.introHtmlTpl(closeDate))}</p>
 <blockquote style="margin:0 0 16px;padding:14px 18px;border-left:3px solid #06b6d4;background:#0e7490/10;color:#e4e4e7;font-style:italic;border-radius:4px;background-color:rgba(6,182,212,0.08)">${escapeHtml(params.prompt)}</blockquote>
-<p style="margin:0 0 4px;font-size:13px;color:#71717a">Tu respuesta desbloquea las del resto del círculo.</p>`;
+<p style="margin:0 0 4px;font-size:13px;color:#71717a">${escapeHtml(s.unlocks)}</p>`;
 
-  return { subject, html: circleLayout(subject, body, { href: url, label: "Responder al pulso" }), text };
+  return { subject: s.subject, html: circleLayout(s.subject, body, { href: url, label: s.cta }), text };
 }
 
 export function buildMentorReflectionEmail(params: {
   name: string | null;
   prompt: string;
   appUrl: string;
+  locale?: EmailLocale;
 }): Pick<UserEmail, "subject" | "html" | "text"> {
+  const loc = pickEmailLocale(params.locale);
+  const s = MENTOR_REFLECTION_STRINGS[loc];
   const firstName = params.name ? escapeHtml(params.name.trim().split(/\s+/)[0]) : null;
-  const greeting = firstName ? `Hola ${firstName}` : "Hola";
-  const subject = "Tienes una devolución privada del mentor";
+  const greeting = s.greeting(firstName);
   const url = `${params.appUrl}/community?tab=circle`;
 
   const text = [
     `${greeting},`,
     ``,
-    `El mentor te ha dejado una devolución privada sobre lo que se compartió en el último pulso del círculo.`,
-    `Pregunta de la semana: «${params.prompt}»`,
+    s.textPrefix,
+    `${s.weekQuestion} «${params.prompt}»`,
     ``,
-    `Léela en la app: ${url}`,
+    `${url}`,
     ``,
-    `— Tres Mil Millones de Latidos`,
+    s.signature,
   ].join("\n");
 
   const body = `<p style="margin:0 0 16px;font-size:18px;color:#fff;font-weight:600">${greeting},</p>
-<p style="margin:0 0 12px;font-size:15px;line-height:1.7;color:#a1a1aa">El mentor te ha dejado una devolución privada sobre el último pulso del círculo. Solo tú la ves.</p>
+<p style="margin:0 0 12px;font-size:15px;line-height:1.7;color:#a1a1aa">${escapeHtml(s.intro)}</p>
 <blockquote style="margin:0 0 4px;padding:14px 18px;border-left:3px solid #f59e0b;color:#e4e4e7;font-style:italic;border-radius:4px;background-color:rgba(245,158,11,0.08)">${escapeHtml(params.prompt)}</blockquote>`;
 
-  return { subject, html: circleLayout(subject, body, { href: url, label: "Leer la devolución" }), text };
+  return { subject: s.subject, html: circleLayout(s.subject, body, { href: url, label: s.cta }), text };
 }
 
 export function buildCircleClosingLetterEmail(params: {
@@ -971,34 +971,38 @@ export function buildCircleClosingLetterEmail(params: {
   reason: string;
   body: string;
   appUrl: string;
+  locale?: EmailLocale;
 }): Pick<UserEmail, "subject" | "html" | "text"> {
+  const loc = pickEmailLocale(params.locale);
+  const s = CIRCLE_CLOSING_STRINGS[loc];
   const firstName = params.name ? escapeHtml(params.name.trim().split(/\s+/)[0]) : null;
-  const greeting = firstName ? `Hola ${firstName}` : "Hola";
-  const reasonLabel: Record<string, string> = {
-    cycle_end: "El ciclo de seis semanas termina",
-    drift: "Tu fase ha cambiado",
-    left: "Has salido del círculo",
-    removed: "El círculo cierra",
-  };
-  const subject = `Carta de cierre — ${params.circleName}`;
+  const greeting = s.greeting(firstName);
+
+  // Acepta cualquier string; si no es uno conocido, usa reasonFallback.
+  const KNOWN_REASONS: CircleClosingReason[] = ["cycle_end", "drift", "left", "removed"];
+  const reasonLabel = (KNOWN_REASONS as readonly string[]).includes(params.reason)
+    ? s.reasonLabel[params.reason as CircleClosingReason]
+    : s.reasonFallback;
+
+  const subject = s.subjectTpl(params.circleName);
   const url = `${params.appUrl}/community/cartas`;
 
   const text = [
     `${greeting},`,
     ``,
-    `${reasonLabel[params.reason] ?? "Tu paso por el círculo termina"}.`,
+    `${reasonLabel}.`,
     ``,
     params.body,
     ``,
-    `Esta carta queda archivada en tu perfil: ${url}`,
+    `${s.textPathLabel} ${url}`,
     ``,
-    `— Tres Mil Millones de Latidos`,
+    s.signature,
   ].join("\n");
 
   const html = `<p style="margin:0 0 8px;font-size:18px;color:#fff;font-weight:600">${greeting},</p>
-<p style="margin:0 0 16px;font-size:13px;color:#a78bfa;text-transform:uppercase;letter-spacing:0.05em;font-weight:600">${escapeHtml(reasonLabel[params.reason] ?? "Cierre")}</p>
+<p style="margin:0 0 16px;font-size:13px;color:#a78bfa;text-transform:uppercase;letter-spacing:0.05em;font-weight:600">${escapeHtml(reasonLabel)}</p>
 <div style="margin:0 0 16px;padding:14px 18px;background:rgba(124,58,237,0.06);border-left:3px solid #7c3aed;border-radius:4px;color:#e4e4e7;font-size:15px;line-height:1.7;white-space:pre-wrap">${escapeHtml(params.body)}</div>
-<p style="margin:0;font-size:13px;color:#71717a">Esta carta queda archivada en tu perfil. Lo que dijiste y lo que callaste sigue siendo tuyo.</p>`;
+<p style="margin:0;font-size:13px;color:#71717a">${escapeHtml(s.closing)}</p>`;
 
-  return { subject, html: circleLayout(subject, html, { href: url, label: "Ver mis cartas" }), text };
+  return { subject, html: circleLayout(subject, html, { href: url, label: s.cta }), text };
 }

@@ -744,3 +744,580 @@ export const WEEKLY_LETTER_STRINGS: Record<EmailLocale, {
     signature: `— ${BRAND_NAME.fr}`,
   },
 };
+
+// ─── Family / trusted contact ────────────────────────────────────────────────
+// Estos emails se envían al CONTACTO de confianza del usuario, no al usuario.
+// El idioma se hereda del usuario titular: si Mario usa la app en EN, su
+// madre recibe el invite en EN (asumimos que comparten contexto lingüístico).
+
+/**
+ * Texto de orientación por tipo de relación, dentro del email de invitación
+ * familiar. Le explicamos al contacto qué se espera de él según su relación
+ * con el usuario.
+ */
+export type FamilyRelationKey = "madre" | "padre" | "pareja" | "amigo/a" | "terapeuta" | "default";
+
+export const FAMILY_RELATION_GUIDANCE: Record<EmailLocale, Record<FamilyRelationKey, {
+  role: string;
+  doThis: string;
+  dontDoThis: string;
+}>> = {
+  es: {
+    madre: {
+      role: "Tu hijo/a confía en ti para esto. Eso dice mucho de vuestra relación.",
+      doThis: "Estar disponible. Un mensaje natural de vez en cuando. Celebrar los pequeños avances.",
+      dontDoThis: "Intentar arreglarlo todo. Preguntar si ya entró a la app. Dar sermones.",
+    },
+    padre: {
+      role: "Tu hijo/a confía en ti para esto. Eso dice mucho de vuestra relación.",
+      doThis: "Estar disponible. Un mensaje natural de vez en cuando. Celebrar los pequeños avances.",
+      dontDoThis: "Intentar arreglarlo todo. Preguntar si ya entró a la app. Dar sermones.",
+    },
+    pareja: {
+      role: "Tu pareja ha elegido compartir este proceso contigo. Eso es un acto de confianza.",
+      doThis: "Acompañar sin controlar. Preguntar cómo está sin esperar que hable de la app.",
+      dontDoThis: "Usar esta información en discusiones. Vigilar su progreso. Presionar.",
+    },
+    "amigo/a": {
+      role: "Que te haya elegido como apoyo significa que confía en ti de verdad.",
+      doThis: "Ser natural. Proponer planes juntos. Enviar un mensaje cuando te acuerdes.",
+      dontDoThis: "Cambiar cómo le tratas. Dar consejos no pedidos. Hablar de su proceso con otros.",
+    },
+    terapeuta: {
+      role: "Esta información complementa tu trabajo clínico con consentimiento explícito.",
+      doThis: "Usar los datos como contexto entre sesiones. Observar patrones de evitación o crisis.",
+      dontDoThis: "Mencionar datos del portal sin que el paciente los traiga primero a sesión.",
+    },
+    default: {
+      role: "Has sido elegido/a como persona de confianza. Eso es un privilegio.",
+      doThis: "Estar presente. Un mensaje natural de vez en cuando. Celebrar avances.",
+      dontDoThis: "Presionar. Vigilar. Usar esta información para confrontar.",
+    },
+  },
+  en: {
+    madre: {
+      role: "Your child trusts you with this. That says a lot about your relationship.",
+      doThis: "Be available. A natural message every once in a while. Celebrate the small steps.",
+      dontDoThis: "Try to fix everything. Ask whether they've opened the app. Give lectures.",
+    },
+    padre: {
+      role: "Your child trusts you with this. That says a lot about your relationship.",
+      doThis: "Be available. A natural message every once in a while. Celebrate the small steps.",
+      dontDoThis: "Try to fix everything. Ask whether they've opened the app. Give lectures.",
+    },
+    pareja: {
+      role: "Your partner has chosen to share this process with you. That's an act of trust.",
+      doThis: "Accompany without controlling. Ask how they are without expecting them to talk about the app.",
+      dontDoThis: "Use this information in arguments. Monitor their progress. Push.",
+    },
+    "amigo/a": {
+      role: "Being chosen as support means they truly trust you.",
+      doThis: "Be natural. Suggest plans together. Send a message when they come to mind.",
+      dontDoThis: "Change how you treat them. Give unsolicited advice. Talk about their process with others.",
+    },
+    terapeuta: {
+      role: "This information complements your clinical work with explicit consent.",
+      doThis: "Use the data as context between sessions. Watch for avoidance or crisis patterns.",
+      dontDoThis: "Mention portal data unless the patient brings it up in session first.",
+    },
+    default: {
+      role: "You've been chosen as a trusted person. That's a privilege.",
+      doThis: "Be present. A natural message every once in a while. Celebrate progress.",
+      dontDoThis: "Push. Monitor. Use this information to confront.",
+    },
+  },
+  pt: {
+    madre: {
+      role: "O teu filho/a confia em ti para isto. Isso diz muito sobre a vossa relação.",
+      doThis: "Estar disponível. Uma mensagem natural de vez em quando. Celebrar os pequenos passos.",
+      dontDoThis: "Tentar resolver tudo. Perguntar se já entrou na app. Dar sermões.",
+    },
+    padre: {
+      role: "O teu filho/a confia em ti para isto. Isso diz muito sobre a vossa relação.",
+      doThis: "Estar disponível. Uma mensagem natural de vez em quando. Celebrar os pequenos passos.",
+      dontDoThis: "Tentar resolver tudo. Perguntar se já entrou na app. Dar sermões.",
+    },
+    pareja: {
+      role: "O teu/A tua parceiro/a escolheu partilhar este processo contigo. É um ato de confiança.",
+      doThis: "Acompanhar sem controlar. Perguntar como está sem esperar que fale da app.",
+      dontDoThis: "Usar esta informação em discussões. Vigiar o progresso. Pressionar.",
+    },
+    "amigo/a": {
+      role: "Que te tenha escolhido como apoio significa que confia mesmo em ti.",
+      doThis: "Ser natural. Propor planos juntos. Enviar uma mensagem quando te lembrares.",
+      dontDoThis: "Mudar a forma como o/a tratas. Dar conselhos não pedidos. Falar do processo com outros.",
+    },
+    terapeuta: {
+      role: "Esta informação complementa o teu trabalho clínico com consentimento explícito.",
+      doThis: "Usar os dados como contexto entre sessões. Observar padrões de evitação ou crise.",
+      dontDoThis: "Mencionar dados do portal sem que o/a paciente os traga primeiro a sessão.",
+    },
+    default: {
+      role: "Foste escolhido/a como pessoa de confiança. É um privilégio.",
+      doThis: "Estar presente. Uma mensagem natural de vez em quando. Celebrar avanços.",
+      dontDoThis: "Pressionar. Vigiar. Usar esta informação para confrontar.",
+    },
+  },
+  fr: {
+    madre: {
+      role: "Ton enfant te fait confiance pour cela. Ça en dit long sur votre relation.",
+      doThis: "Être disponible. Un message naturel de temps en temps. Célébrer les petits pas.",
+      dontDoThis: "Essayer de tout réparer. Demander s'il/elle a ouvert l'app. Faire la morale.",
+    },
+    padre: {
+      role: "Ton enfant te fait confiance pour cela. Ça en dit long sur votre relation.",
+      doThis: "Être disponible. Un message naturel de temps en temps. Célébrer les petits pas.",
+      dontDoThis: "Essayer de tout réparer. Demander s'il/elle a ouvert l'app. Faire la morale.",
+    },
+    pareja: {
+      role: "Ton/Ta partenaire a choisi de partager ce processus avec toi. C'est un acte de confiance.",
+      doThis: "Accompagner sans contrôler. Demander comment il/elle va sans attendre qu'il/elle parle de l'app.",
+      dontDoThis: "Utiliser cette information dans des disputes. Surveiller ses progrès. Mettre la pression.",
+    },
+    "amigo/a": {
+      role: "T'avoir choisi comme soutien signifie qu'il/elle te fait vraiment confiance.",
+      doThis: "Être naturel(le). Proposer des plans ensemble. Envoyer un message quand tu y penses.",
+      dontDoThis: "Changer ta façon de le/la traiter. Donner des conseils non sollicités. Parler de son processus avec d'autres.",
+    },
+    terapeuta: {
+      role: "Cette information complète ton travail clinique avec consentement explicite.",
+      doThis: "Utiliser les données comme contexte entre les séances. Repérer les schémas d'évitement ou de crise.",
+      dontDoThis: "Mentionner les données du portail sans que le/la patient(e) les amène d'abord en séance.",
+    },
+    default: {
+      role: "Tu as été choisi(e) comme personne de confiance. C'est un privilège.",
+      doThis: "Être présent(e). Un message naturel de temps en temps. Célébrer les progrès.",
+      dontDoThis: "Mettre la pression. Surveiller. Utiliser cette information pour confronter.",
+    },
+  },
+};
+
+/** Email de invitación al contacto de confianza. */
+export const FAMILY_INVITE_STRINGS: Record<EmailLocale, {
+  subjectTpl: (userName: string) => string;
+  greeting: (contactName: string) => string;
+  introTpl: (userName: string, relation: string) => string;
+  doHeader: string;
+  dontHeader: string;
+  goldenRuleTitle: string;
+  goldenRuleBody: string;
+  saveLink: string;
+  cta: string;
+  textGoldenRule: string;
+  textPortalLabel: string;
+}> = {
+  es: {
+    subjectTpl: (userName) => `${userName} confía en ti — portal de apoyo`,
+    greeting: (n) => `Hola ${n}`,
+    introTpl: (userName, relation) => `${userName} te ha elegido como su ${relation} de confianza en ${BRAND_NAME.es}. Está trabajando en su bienestar emocional y ha decidido que tú formes parte de ese proceso.`,
+    doHeader: "🟢 Lo que sí puedes hacer:",
+    dontHeader: "🔴 Lo que no deberías hacer:",
+    goldenRuleTitle: "Regla de oro",
+    goldenRuleBody: "No le menciones lo que ves en el portal. Si le dices \"vi que llevas días sin entrar\", rompes la confianza del proceso. El sistema ya le acompaña. Tu papel es estar — no vigilar.",
+    saveLink: "Guarda este enlace — es tu acceso permanente:",
+    cta: "Abrir mi portal",
+    textGoldenRule: "REGLA DE ORO: No le menciones lo que ves en el portal. Tu papel es estar, no vigilar.",
+    textPortalLabel: "Tu portal:",
+  },
+  en: {
+    subjectTpl: (userName) => `${userName} trusts you — support portal`,
+    greeting: (n) => `Hi ${n}`,
+    introTpl: (userName, relation) => `${userName} has chosen you as their trusted ${relation} on ${BRAND_NAME.en}. They're working on their emotional wellbeing and have decided you should be part of that process.`,
+    doHeader: "🟢 What you can do:",
+    dontHeader: "🔴 What you shouldn't do:",
+    goldenRuleTitle: "Golden rule",
+    goldenRuleBody: "Don't mention what you see in the portal. If you say \"I noticed you haven't been on in days\", you break the trust of the process. The system is already with them. Your role is to be there — not to monitor.",
+    saveLink: "Save this link — it's your permanent access:",
+    cta: "Open my portal",
+    textGoldenRule: "GOLDEN RULE: Don't mention what you see in the portal. Your role is to be there, not monitor.",
+    textPortalLabel: "Your portal:",
+  },
+  pt: {
+    subjectTpl: (userName) => `${userName} confia em ti — portal de apoio`,
+    greeting: (n) => `Olá ${n}`,
+    introTpl: (userName, relation) => `${userName} escolheu-te como o teu/a tua ${relation} de confiança em ${BRAND_NAME.pt}. Está a trabalhar no seu bem-estar emocional e decidiu que tu fizesses parte desse processo.`,
+    doHeader: "🟢 O que podes fazer:",
+    dontHeader: "🔴 O que não deves fazer:",
+    goldenRuleTitle: "Regra de ouro",
+    goldenRuleBody: "Não lhe menciones o que vês no portal. Se lhe disseres \"vi que não entras há dias\", quebras a confiança do processo. O sistema já o/a acompanha. O teu papel é estar — não vigiar.",
+    saveLink: "Guarda este link — é o teu acesso permanente:",
+    cta: "Abrir o meu portal",
+    textGoldenRule: "REGRA DE OURO: Não lhe menciones o que vês no portal. O teu papel é estar, não vigiar.",
+    textPortalLabel: "O teu portal:",
+  },
+  fr: {
+    subjectTpl: (userName) => `${userName} te fait confiance — portail de soutien`,
+    greeting: (n) => `Salut ${n}`,
+    introTpl: (userName, relation) => `${userName} t'a choisi(e) comme son/sa ${relation} de confiance sur ${BRAND_NAME.fr}. Il/Elle travaille sur son bien-être émotionnel et a décidé que tu fasses partie de ce processus.`,
+    doHeader: "🟢 Ce que tu peux faire :",
+    dontHeader: "🔴 Ce que tu ne devrais pas faire :",
+    goldenRuleTitle: "Règle d'or",
+    goldenRuleBody: "Ne lui mentionne pas ce que tu vois dans le portail. Si tu lui dis \"j'ai vu que tu n'es pas venu depuis des jours\", tu brises la confiance du processus. Le système l'accompagne déjà. Ton rôle, c'est d'être là — pas de surveiller.",
+    saveLink: "Garde ce lien — c'est ton accès permanent :",
+    cta: "Ouvrir mon portail",
+    textGoldenRule: "RÈGLE D'OR : Ne lui mentionne pas ce que tu vois dans le portail. Ton rôle, c'est d'être là, pas de surveiller.",
+    textPortalLabel: "Ton portail :",
+  },
+};
+
+/** Email de crisis a la familia. */
+export const FAMILY_CRISIS_STRINGS: Record<EmailLocale, {
+  subjectTpl: (userName: string) => string;
+  greeting: (contactName: string) => string;
+  alertTpl: (userName: string) => string;
+  bodyAfter: string;
+  emergencyNote: string;
+  cta: string;
+  textBodyTpl: (userName: string, portalUrl: string) => string;
+}> = {
+  es: {
+    subjectTpl: (userName) => `⚠️ ${userName} puede necesitar apoyo ahora`,
+    greeting: (n) => `Hola ${n}`,
+    alertTpl: (userName) => `${BRAND_NAME.es} ha detectado una señal de crisis en la sesión de ${userName}.`,
+    bodyAfter: "Esto no significa que esté en peligro inmediato, pero puede que agradezca una llamada o mensaje tuyo. Un \"Hola, estoy aquí\" puede marcar la diferencia.",
+    emergencyNote: "Si crees que hay riesgo real, contacta servicios de emergencia: 112 (España) / 911",
+    cta: "Ver portal",
+    textBodyTpl: (userName, portalUrl) =>
+      `${BRAND_NAME.es} ha detectado una señal de crisis en la sesión de ${userName}.\n\nPuede que agradezca una llamada.\nEmergencias: 112\n\nTu portal: ${portalUrl}`,
+  },
+  en: {
+    subjectTpl: (userName) => `⚠️ ${userName} may need support now`,
+    greeting: (n) => `Hi ${n}`,
+    alertTpl: (userName) => `${BRAND_NAME.en} has detected a crisis signal in ${userName}'s session.`,
+    bodyAfter: "This doesn't mean they're in immediate danger, but they may welcome a call or message from you. A simple \"Hey, I'm here\" can make the difference.",
+    emergencyNote: "If you believe there's real risk, contact emergency services: 911 (US) / 112 (EU)",
+    cta: "View portal",
+    textBodyTpl: (userName, portalUrl) =>
+      `${BRAND_NAME.en} has detected a crisis signal in ${userName}'s session.\n\nThey may welcome a call.\nEmergencies: 911 / 112\n\nYour portal: ${portalUrl}`,
+  },
+  pt: {
+    subjectTpl: (userName) => `⚠️ ${userName} pode precisar de apoio agora`,
+    greeting: (n) => `Olá ${n}`,
+    alertTpl: (userName) => `${BRAND_NAME.pt} detetou um sinal de crise na sessão de ${userName}.`,
+    bodyAfter: "Isto não significa que esteja em perigo imediato, mas pode agradecer uma chamada ou mensagem tua. Um \"Olá, estou aqui\" pode fazer a diferença.",
+    emergencyNote: "Se achas que há risco real, contacta serviços de emergência: 112 (Portugal) / SNS 24: 808 24 24 24",
+    cta: "Ver portal",
+    textBodyTpl: (userName, portalUrl) =>
+      `${BRAND_NAME.pt} detetou um sinal de crise na sessão de ${userName}.\n\nPode agradecer uma chamada.\nEmergências: 112 / SNS 24: 808 24 24 24\n\nO teu portal: ${portalUrl}`,
+  },
+  fr: {
+    subjectTpl: (userName) => `⚠️ ${userName} a peut-être besoin de soutien maintenant`,
+    greeting: (n) => `Salut ${n}`,
+    alertTpl: (userName) => `${BRAND_NAME.fr} a détecté un signal de crise dans la session de ${userName}.`,
+    bodyAfter: "Cela ne veut pas dire qu'il/elle est en danger immédiat, mais un appel ou un message de ta part pourrait être apprécié. Un simple \"Salut, je suis là\" peut faire la différence.",
+    emergencyNote: "Si tu penses qu'il y a un risque réel, contacte les services d'urgence : 112 (France/UE) / 3114 (Numéro national de prévention du suicide)",
+    cta: "Voir le portail",
+    textBodyTpl: (userName, portalUrl) =>
+      `${BRAND_NAME.fr} a détecté un signal de crise dans la session de ${userName}.\n\nIl/Elle pourrait apprécier un appel.\nUrgences : 112 / 3114\n\nTon portail : ${portalUrl}`,
+  },
+};
+
+/** Email de inactividad a la familia. */
+export const FAMILY_INACTIVITY_STRINGS: Record<EmailLocale, {
+  subjectTpl: (userName: string, days: number) => string;
+  greeting: (contactName: string) => string;
+  introTpl: (userName: string, days: number) => string;
+  hint: string;
+  cta: string;
+  textBodyTpl: (userName: string, days: number, portalUrl: string) => string;
+}> = {
+  es: {
+    subjectTpl: (userName, days) => `${userName} lleva ${days} días sin actividad en ${BRAND_NAME.es}`,
+    greeting: (n) => `Hola ${n}`,
+    introTpl: (userName, days) => `${userName} lleva ${days} días sin abrir la app ni hacer check-in. Puede que esté bien, pero tú pediste que te avisáramos si esto pasaba.`,
+    hint: "A veces un mensaje corto de alguien de confianza es lo que necesita para retomar.",
+    cta: "Ver portal",
+    textBodyTpl: (userName, days, portalUrl) =>
+      `${userName} lleva ${days} días sin actividad.\n\nTu portal: ${portalUrl}`,
+  },
+  en: {
+    subjectTpl: (userName, days) => `${userName} has been ${days} days inactive on ${BRAND_NAME.en}`,
+    greeting: (n) => `Hi ${n}`,
+    introTpl: (userName, days) => `${userName} hasn't opened the app or done a check-in for ${days} days. They may be fine, but you asked us to let you know if this happened.`,
+    hint: "Sometimes a short message from someone they trust is what they need to come back.",
+    cta: "View portal",
+    textBodyTpl: (userName, days, portalUrl) =>
+      `${userName} has been ${days} days inactive.\n\nYour portal: ${portalUrl}`,
+  },
+  pt: {
+    subjectTpl: (userName, days) => `${userName} está há ${days} dias sem atividade em ${BRAND_NAME.pt}`,
+    greeting: (n) => `Olá ${n}`,
+    introTpl: (userName, days) => `${userName} está há ${days} dias sem abrir a app nem fazer check-in. Pode estar bem, mas tu pediste para te avisarmos se isto acontecesse.`,
+    hint: "Às vezes uma mensagem curta de alguém de confiança é o que é preciso para retomar.",
+    cta: "Ver portal",
+    textBodyTpl: (userName, days, portalUrl) =>
+      `${userName} está há ${days} dias sem atividade.\n\nO teu portal: ${portalUrl}`,
+  },
+  fr: {
+    subjectTpl: (userName, days) => `${userName} est inactif/ve depuis ${days} jours sur ${BRAND_NAME.fr}`,
+    greeting: (n) => `Salut ${n}`,
+    introTpl: (userName, days) => `${userName} n'a pas ouvert l'app ni fait de check-in depuis ${days} jours. Il/Elle va peut-être bien, mais tu nous avais demandé de te prévenir si ça arrivait.`,
+    hint: "Parfois un court message d'une personne de confiance, c'est tout ce qu'il faut pour reprendre.",
+    cta: "Voir le portail",
+    textBodyTpl: (userName, days, portalUrl) =>
+      `${userName} est inactif/ve depuis ${days} jours.\n\nTon portail : ${portalUrl}`,
+  },
+};
+
+/** Email cuando el usuario comparte una victoria con la familia. */
+export const FAMILY_WIN_STRINGS: Record<EmailLocale, {
+  subjectTpl: (userName: string) => string;
+  greeting: (contactName: string) => string;
+  introTpl: (userName: string) => string;
+  closing: string;
+  cta: string;
+  textBodyTpl: (userName: string, winNote: string, portalUrl: string) => string;
+}> = {
+  es: {
+    subjectTpl: (userName) => `🎉 ${userName} ha anotado una victoria`,
+    greeting: (n) => `Hola ${n}`,
+    introTpl: (userName) => `${userName} acaba de registrar una victoria en ${BRAND_NAME.es} y quiso compartirla contigo:`,
+    closing: "¡Vale la pena celebrarlo!",
+    cta: "Ver portal",
+    textBodyTpl: (userName, winNote, portalUrl) =>
+      `${userName} ha anotado una victoria: "${winNote}"\n\nTu portal: ${portalUrl}`,
+  },
+  en: {
+    subjectTpl: (userName) => `🎉 ${userName} just logged a win`,
+    greeting: (n) => `Hi ${n}`,
+    introTpl: (userName) => `${userName} just recorded a win on ${BRAND_NAME.en} and wanted to share it with you:`,
+    closing: "Worth celebrating!",
+    cta: "View portal",
+    textBodyTpl: (userName, winNote, portalUrl) =>
+      `${userName} logged a win: "${winNote}"\n\nYour portal: ${portalUrl}`,
+  },
+  pt: {
+    subjectTpl: (userName) => `🎉 ${userName} acabou de registar uma vitória`,
+    greeting: (n) => `Olá ${n}`,
+    introTpl: (userName) => `${userName} acabou de registar uma vitória em ${BRAND_NAME.pt} e quis partilhá-la contigo:`,
+    closing: "Vale a pena celebrar!",
+    cta: "Ver portal",
+    textBodyTpl: (userName, winNote, portalUrl) =>
+      `${userName} registou uma vitória: "${winNote}"\n\nO teu portal: ${portalUrl}`,
+  },
+  fr: {
+    subjectTpl: (userName) => `🎉 ${userName} vient de noter une victoire`,
+    greeting: (n) => `Salut ${n}`,
+    introTpl: (userName) => `${userName} vient d'enregistrer une victoire sur ${BRAND_NAME.fr} et a voulu la partager avec toi :`,
+    closing: "Ça vaut le coup de fêter !",
+    cta: "Voir le portail",
+    textBodyTpl: (userName, winNote, portalUrl) =>
+      `${userName} a noté une victoire : "${winNote}"\n\nTon portail : ${portalUrl}`,
+  },
+};
+
+/** Email cuando el usuario recibe un mensaje de apoyo de su contacto. */
+export const SUPPORT_MESSAGE_STRINGS: Record<EmailLocale, {
+  subjectTpl: (fromName: string) => string;
+  introTpl: (fromName: string) => string;
+  closing: string;
+  cta: string;
+  textBodyTpl: (fromName: string, content: string, appUrl: string) => string;
+}> = {
+  es: {
+    subjectTpl: (fromName) => `💌 ${fromName} te ha enviado un mensaje de apoyo`,
+    introTpl: (fromName) => `${fromName} te ha dejado este mensaje:`,
+    closing: "Puedes verlo en la app cuando quieras.",
+    cta: "Ver en la app",
+    textBodyTpl: (fromName, content, appUrl) =>
+      `${fromName} te ha enviado un mensaje:\n\n"${content}"\n\nVer en la app: ${appUrl}`,
+  },
+  en: {
+    subjectTpl: (fromName) => `💌 ${fromName} sent you a message of support`,
+    introTpl: (fromName) => `${fromName} left you this message:`,
+    closing: "You can read it in the app whenever you want.",
+    cta: "View in the app",
+    textBodyTpl: (fromName, content, appUrl) =>
+      `${fromName} sent you a message:\n\n"${content}"\n\nView in the app: ${appUrl}`,
+  },
+  pt: {
+    subjectTpl: (fromName) => `💌 ${fromName} enviou-te uma mensagem de apoio`,
+    introTpl: (fromName) => `${fromName} deixou-te esta mensagem:`,
+    closing: "Podes vê-la na app quando quiseres.",
+    cta: "Ver na app",
+    textBodyTpl: (fromName, content, appUrl) =>
+      `${fromName} enviou-te uma mensagem:\n\n"${content}"\n\nVer na app: ${appUrl}`,
+  },
+  fr: {
+    subjectTpl: (fromName) => `💌 ${fromName} t'a envoyé un message de soutien`,
+    introTpl: (fromName) => `${fromName} t'a laissé ce message :`,
+    closing: "Tu peux le voir dans l'app quand tu veux.",
+    cta: "Voir dans l'app",
+    textBodyTpl: (fromName, content, appUrl) =>
+      `${fromName} t'a envoyé un message :\n\n"${content}"\n\nVoir dans l'app : ${appUrl}`,
+  },
+};
+
+// ─── Circles ─────────────────────────────────────────────────────────────────
+
+/** Email cuando se abre un nuevo pulso en el círculo del usuario. */
+export const CIRCLE_PULSE_OPENED_STRINGS: Record<EmailLocale, {
+  subject: string;
+  greeting: (firstName: string | null) => string;
+  introHtmlTpl: (closeDate: string) => string;
+  introTextTpl: (closeDate: string) => string;
+  unlocks: string;
+  cta: string;
+  signature: string;
+  // Formato de fecha BCP47 — el caller lo formatea con Intl.DateTimeFormat(loc)
+}> = {
+  es: {
+    subject: "Hay un nuevo pulso en tu círculo",
+    greeting: (n) => (n ? `Hola ${n}` : "Hola"),
+    introHtmlTpl: (closeDate) => `Hay un pulso abierto en tu círculo. Responde cuando quieras antes del ${closeDate}.`,
+    introTextTpl: (closeDate) => `Hay un pulso abierto en tu círculo.\n\nTienes hasta el ${closeDate} para responder cuando quieras.`,
+    unlocks: "Tu respuesta desbloquea las del resto del círculo.",
+    cta: "Responder al pulso",
+    signature: `— ${BRAND_NAME.es}`,
+  },
+  en: {
+    subject: "There's a new pulse in your circle",
+    greeting: (n) => (n ? `Hi ${n}` : "Hi"),
+    introHtmlTpl: (closeDate) => `There's a pulse open in your circle. Respond whenever you want before ${closeDate}.`,
+    introTextTpl: (closeDate) => `There's a pulse open in your circle.\n\nYou have until ${closeDate} to respond whenever you want.`,
+    unlocks: "Your response unlocks the rest of the circle's.",
+    cta: "Respond to the pulse",
+    signature: `— ${BRAND_NAME.en}`,
+  },
+  pt: {
+    subject: "Há um novo pulso no teu círculo",
+    greeting: (n) => (n ? `Olá ${n}` : "Olá"),
+    introHtmlTpl: (closeDate) => `Há um pulso aberto no teu círculo. Responde quando quiseres antes de ${closeDate}.`,
+    introTextTpl: (closeDate) => `Há um pulso aberto no teu círculo.\n\nTens até ${closeDate} para responder quando quiseres.`,
+    unlocks: "A tua resposta desbloqueia as do resto do círculo.",
+    cta: "Responder ao pulso",
+    signature: `— ${BRAND_NAME.pt}`,
+  },
+  fr: {
+    subject: "Il y a un nouveau pulse dans ton cercle",
+    greeting: (n) => (n ? `Salut ${n}` : "Salut"),
+    introHtmlTpl: (closeDate) => `Il y a un pulse ouvert dans ton cercle. Réponds quand tu veux avant le ${closeDate}.`,
+    introTextTpl: (closeDate) => `Il y a un pulse ouvert dans ton cercle.\n\nTu as jusqu'au ${closeDate} pour répondre quand tu veux.`,
+    unlocks: "Ta réponse débloque celles du reste du cercle.",
+    cta: "Répondre au pulse",
+    signature: `— ${BRAND_NAME.fr}`,
+  },
+};
+
+/** Email cuando el mentor publica una devolución privada para el usuario. */
+export const MENTOR_REFLECTION_STRINGS: Record<EmailLocale, {
+  subject: string;
+  greeting: (firstName: string | null) => string;
+  intro: string;
+  weekQuestion: string;
+  textPrefix: string;
+  cta: string;
+  signature: string;
+}> = {
+  es: {
+    subject: "Tienes una devolución privada del mentor",
+    greeting: (n) => (n ? `Hola ${n}` : "Hola"),
+    intro: "El mentor te ha dejado una devolución privada sobre el último pulso del círculo. Solo tú la ves.",
+    weekQuestion: "Pregunta de la semana:",
+    textPrefix: "El mentor te ha dejado una devolución privada sobre lo que se compartió en el último pulso del círculo.",
+    cta: "Leer la devolución",
+    signature: `— ${BRAND_NAME.es}`,
+  },
+  en: {
+    subject: "You have a private reflection from the mentor",
+    greeting: (n) => (n ? `Hi ${n}` : "Hi"),
+    intro: "The mentor has left you a private reflection on the latest circle pulse. Only you can see it.",
+    weekQuestion: "This week's question:",
+    textPrefix: "The mentor has left you a private reflection on what was shared in the latest circle pulse.",
+    cta: "Read the reflection",
+    signature: `— ${BRAND_NAME.en}`,
+  },
+  pt: {
+    subject: "Tens uma devolução privada do mentor",
+    greeting: (n) => (n ? `Olá ${n}` : "Olá"),
+    intro: "O mentor deixou-te uma devolução privada sobre o último pulso do círculo. Só tu a vês.",
+    weekQuestion: "Pergunta da semana:",
+    textPrefix: "O mentor deixou-te uma devolução privada sobre o que foi partilhado no último pulso do círculo.",
+    cta: "Ler a devolução",
+    signature: `— ${BRAND_NAME.pt}`,
+  },
+  fr: {
+    subject: "Tu as un retour privé du mentor",
+    greeting: (n) => (n ? `Salut ${n}` : "Salut"),
+    intro: "Le mentor t'a laissé un retour privé sur le dernier pulse du cercle. Toi seul(e) peux le voir.",
+    weekQuestion: "Question de la semaine :",
+    textPrefix: "Le mentor t'a laissé un retour privé sur ce qui a été partagé dans le dernier pulse du cercle.",
+    cta: "Lire le retour",
+    signature: `— ${BRAND_NAME.fr}`,
+  },
+};
+
+/** Email de cierre de círculo (carta final). */
+export type CircleClosingReason = "cycle_end" | "drift" | "left" | "removed";
+
+export const CIRCLE_CLOSING_STRINGS: Record<EmailLocale, {
+  subjectTpl: (circleName: string) => string;
+  greeting: (firstName: string | null) => string;
+  reasonLabel: Record<CircleClosingReason, string>;
+  reasonFallback: string;
+  closing: string;
+  textPathLabel: string;
+  cta: string;
+  signature: string;
+}> = {
+  es: {
+    subjectTpl: (circleName) => `Carta de cierre — ${circleName}`,
+    greeting: (n) => (n ? `Hola ${n}` : "Hola"),
+    reasonLabel: {
+      cycle_end: "El ciclo de seis semanas termina",
+      drift: "Tu fase ha cambiado",
+      left: "Has salido del círculo",
+      removed: "El círculo cierra",
+    },
+    reasonFallback: "Tu paso por el círculo termina",
+    closing: "Esta carta queda archivada en tu perfil. Lo que dijiste y lo que callaste sigue siendo tuyo.",
+    textPathLabel: "Esta carta queda archivada en tu perfil:",
+    cta: "Ver mis cartas",
+    signature: `— ${BRAND_NAME.es}`,
+  },
+  en: {
+    subjectTpl: (circleName) => `Closing letter — ${circleName}`,
+    greeting: (n) => (n ? `Hi ${n}` : "Hi"),
+    reasonLabel: {
+      cycle_end: "The six-week cycle ends",
+      drift: "Your phase has changed",
+      left: "You've left the circle",
+      removed: "The circle is closing",
+    },
+    reasonFallback: "Your time in the circle ends",
+    closing: "This letter is archived in your profile. What you said and what you didn't is still yours.",
+    textPathLabel: "This letter is archived in your profile:",
+    cta: "View my letters",
+    signature: `— ${BRAND_NAME.en}`,
+  },
+  pt: {
+    subjectTpl: (circleName) => `Carta de fecho — ${circleName}`,
+    greeting: (n) => (n ? `Olá ${n}` : "Olá"),
+    reasonLabel: {
+      cycle_end: "O ciclo de seis semanas termina",
+      drift: "A tua fase mudou",
+      left: "Saíste do círculo",
+      removed: "O círculo fecha",
+    },
+    reasonFallback: "A tua passagem pelo círculo termina",
+    closing: "Esta carta fica arquivada no teu perfil. O que disseste e o que calaste continua a ser teu.",
+    textPathLabel: "Esta carta fica arquivada no teu perfil:",
+    cta: "Ver as minhas cartas",
+    signature: `— ${BRAND_NAME.pt}`,
+  },
+  fr: {
+    subjectTpl: (circleName) => `Lettre de clôture — ${circleName}`,
+    greeting: (n) => (n ? `Salut ${n}` : "Salut"),
+    reasonLabel: {
+      cycle_end: "Le cycle de six semaines se termine",
+      drift: "Ta phase a changé",
+      left: "Tu as quitté le cercle",
+      removed: "Le cercle ferme",
+    },
+    reasonFallback: "Ton passage dans le cercle se termine",
+    closing: "Cette lettre reste archivée dans ton profil. Ce que tu as dit et ce que tu as tu reste tien.",
+    textPathLabel: "Cette lettre reste archivée dans ton profil :",
+    cta: "Voir mes lettres",
+    signature: `— ${BRAND_NAME.fr}`,
+  },
+};

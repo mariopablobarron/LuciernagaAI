@@ -1,6 +1,7 @@
 import { getPrismaClient } from "@/db/prisma";
 import { logInfo, logError } from "@/lib/logger";
 import { buildCircleClosingLetterEmail, sendUserEmail } from "@/lib/email";
+import { pickEmailLocale } from "@/lib/email-i18n";
 
 const APP_URL = process.env.APP_BASE_URL?.trim() ?? "https://tresmilmillonesdelatidos.es";
 
@@ -261,7 +262,7 @@ export async function closeCircleAndGenerateLetters(
     try {
       const user = await prisma.user.findUnique({
         where: { id: member.userId },
-        select: { email: true, name: true },
+        select: { email: true, name: true, locale: true },
       });
       if (user?.email) {
         await sendUserEmail({
@@ -274,6 +275,7 @@ export async function closeCircleAndGenerateLetters(
             reason,
             body,
             appUrl: APP_URL,
+            locale: pickEmailLocale(user.locale),
           }),
         });
         await prisma.circleClosingLetter.update({

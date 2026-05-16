@@ -3,6 +3,7 @@ import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { buildMentorReflectionEmail, sendUserEmail } from "@/lib/email";
+import { pickEmailLocale } from "@/lib/email-i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -70,7 +71,7 @@ export async function POST(req: NextRequest, { params }: Params) {
           id: true,
           userId: true,
           pulseId: true,
-          user: { select: { email: true, name: true } },
+          user: { select: { email: true, name: true, locale: true } },
           pulse: { select: { prompt: true } },
         },
       });
@@ -87,6 +88,7 @@ export async function POST(req: NextRequest, { params }: Params) {
               name: updated.user.name,
               prompt: updated.pulse.prompt,
               appUrl: APP_URL,
+              locale: pickEmailLocale(updated.user.locale),
             }),
           });
         } catch (error) {

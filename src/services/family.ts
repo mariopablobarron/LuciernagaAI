@@ -18,6 +18,7 @@ import {
   buildFamilyInviteEmail,
   buildSupportMessageEmail,
 } from "@/lib/email";
+import { pickEmailLocale } from "@/lib/email-i18n";
 import { sendTelegramNotification } from "@/services/telegram";
 
 const APP_BASE_URL = process.env.APP_BASE_URL ?? "http://localhost:3000";
@@ -33,13 +34,17 @@ export async function notifyTrustedContactOnCrisis(userId: string): Promise<void
 
   const contact = await prisma.trustedContact.findUnique({
     where: { userId },
-    include: { user: { select: { name: true, email: true } } },
+    include: { user: { select: { name: true, email: true, locale: true } } },
   });
 
   if (!contact || !contact.notifyOnCrisis) return;
 
   const userName = contact.user.name ?? contact.user.email ?? "Tu familiar";
   const url = portalUrl(contact.accessToken);
+  // El email al CONTACTO se envía en el idioma del USUARIO titular —
+  // asumimos contexto lingüístico compartido. No tenemos locale en
+  // TrustedContact, ni queremos pedirlo (extra fricción para el invitee).
+  const locale = pickEmailLocale(contact.user.locale);
 
   // Email notification
   const emailPayload = buildFamilyCrisisEmail({
@@ -47,6 +52,7 @@ export async function notifyTrustedContactOnCrisis(userId: string): Promise<void
     contactName: contact.name,
     portalUrl: url,
     appBaseUrl: APP_BASE_URL,
+    locale,
   });
   void sendUserEmail({ to: contact.email, userId, template: "family_crisis", ...emailPayload });
 
@@ -77,19 +83,21 @@ export async function notifyTrustedContactOnWin(
 
   const contact = await prisma.trustedContact.findUnique({
     where: { userId },
-    include: { user: { select: { name: true, email: true } } },
+    include: { user: { select: { name: true, email: true, locale: true } } },
   });
 
   if (!contact || !contact.shareWins) return;
 
   const userName = contact.user.name ?? contact.user.email ?? "Tu familiar";
   const url = portalUrl(contact.accessToken);
+  const locale = pickEmailLocale(contact.user.locale);
 
   const emailPayload = buildFamilyWinEmail({
     userName,
     contactName: contact.name,
     winNote,
     portalUrl: url,
+    locale,
   });
   void sendUserEmail({ to: contact.email, userId, template: "family_win", ...emailPayload });
 
@@ -110,19 +118,21 @@ export async function sendFamilyInviteEmail(
 
   const contact = await prisma.trustedContact.findUnique({
     where: { id: contactId },
-    include: { user: { select: { name: true, email: true } } },
+    include: { user: { select: { name: true, email: true, locale: true } } },
   });
 
   if (!contact) return;
 
   const userName = contact.user.name ?? contact.user.email ?? "Tu familiar";
   const url = portalUrl(contact.accessToken);
+  const locale = pickEmailLocale(contact.user.locale);
 
   const emailPayload = buildFamilyInviteEmail({
     userName,
     contactName: contact.name,
     relation: contact.relation ?? "persona de confianza",
     portalUrl: url,
+    locale,
   });
 
   const sent = await sendUserEmail({ to: contact.email, userId: contact.userId, template: "family_invite", ...emailPayload });
@@ -142,7 +152,7 @@ export async function deliverSupportMessage(messageId: string): Promise<void> {
 
   const msg = await prisma.supportMessage.findUnique({
     where: { id: messageId },
-    include: { user: { select: { email: true } } },
+    include: { user: { select: { email: true, locale: true } } },
   });
 
   if (!msg || msg.deliveredAt) return;
@@ -158,6 +168,7 @@ export async function deliverSupportMessage(messageId: string): Promise<void> {
     fromName: msg.fromName,
     content: msg.content,
     appUrl: `${APP_BASE_URL}/app`,
+    locale: pickEmailLocale(msg.user.locale),
   });
   void sendUserEmail({ to: msg.user.email, userId: msg.userId, template: "support_message", ...emailPayload });
 
@@ -185,6 +196,7 @@ export async function checkInactiveUsers(): Promise<InactivityResult> {
           email: true,
           lastSeen: true,
           lastMessageAt: true,
+          locale: true,
         },
       },
     },
@@ -217,6 +229,7 @@ export async function checkInactiveUsers(): Promise<InactivityResult> {
       contactName: contact.name,
       daysSilent,
       portalUrl: url,
+      locale: pickEmailLocale(user.locale),
     });
 
     void sendUserEmail({ to: contact.email, userId: user.id, template: "family_inactivity", ...emailPayload });

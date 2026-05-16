@@ -547,5 +547,151 @@
     "ctaNote": "The method only makes sense when you live it.",
     "ctaPrimary": "Try it now",
     "ctaSecondary": "Learn about the project"
+  },
+  "comparison": {
+    "eyebrow": "Comparison",
+    "title": "Three Billion Heartbeats vs ChatGPT, therapy and wellness apps",
+    "subtitle": "If you're deciding which tool to use to sort out what's going on with you, this honestly compares what each one does and when to pick which. Without inflating ours. Without hiding what we don't do.",
+    "lastUpdated": "Last updated: {date} · Reviewed by the Three Billion Heartbeats clinical team.",
+    "lastUpdatedDate": "April 2026",
+    "tableTitle": "Point-by-point comparison",
+    "colCriterio": "Criterion",
+    "colProducto": "Three Billion Heartbeats",
+    "colChatGPT": "ChatGPT / Claude",
+    "colTerapia": "Traditional therapy",
+    "colMeditacion": "Meditation apps",
+    "row": {
+      "purpose": {
+        "criterio": "Main purpose",
+        "producto": "Supporting blocks, decisions and action",
+        "chatgpt": "Generic conversational assistant",
+        "terapia": "1:1 clinical treatment",
+        "meditacion": "Relaxation, sleep, mindfulness"
+      },
+      "framework": {
+        "criterio": "Proprietary pedagogical framework",
+        "producto": "Yes — it questions, it doesn't instruct",
+        "chatgpt": "No — answers whatever you ask",
+        "terapia": "Depends on the therapist",
+        "meditacion": "Exercises, not dialogue"
+      },
+      "crisisDetection": {
+        "criterio": "Automatic crisis detection",
+        "producto": "Yes — risk language → clinical resources",
+        "chatgpt": "Partial, not structured",
+        "terapia": "Only during the session",
+        "meditacion": "No"
+      },
+      "clinicalSupervision": {
+        "criterio": "Human clinical supervision",
+        "producto": "Yes — psychologist responsible for the system",
+        "chatgpt": "No",
+        "terapia": "Yes — directly human",
+        "meditacion": "No"
+      },
+      "context": {
+        "criterio": "Persistent context across sessions",
+        "producto": "Yes — emotional state + goals + history",
+        "chatgpt": "Partial (depends on the plan)",
+        "terapia": "Yes — therapist's clinical notes",
+        "meditacion": "No"
+      },
+      "actions": {
+        "criterio": "Concrete, measurable actions",
+        "producto": "Yes — 10-15 min micro-actions, goals, follow-up",
+        "chatgpt": "If you ask for them",
+        "terapia": "If the therapist assigns them",
+        "meditacion": "Not applicable"
+      },
+      "community": {
+        "criterio": "Peer community",
+        "producto": "Yes — circles of 4 people, asynchronous, 6-week cycles, matched by emotional pattern",
+        "chatgpt": "No",
+        "terapia": "Optional — group therapy",
+        "meditacion": "Light forums in some apps"
+      },
+      "availability": {
+        "criterio": "Availability",
+        "producto": "24/7 — web and Telegram",
+        "chatgpt": "24/7",
+        "terapia": "Only at appointments",
+        "meditacion": "24/7"
+      },
+      "privacy": {
+        "criterio": "Privacy and GDPR erasure",
+        "producto": "Yes — hard delete, encryption in transit, clear policy",
+        "chatgpt": "Standard OpenAI/Anthropic policy",
+        "terapia": "Professional confidentiality",
+        "meditacion": "Varies by provider"
+      },
+      "price": {
+        "criterio": "Reference monthly price",
+        "producto": "€0 Free · €9 Pro",
+        "chatgpt": "€0-20 (ChatGPT Plus)",
+        "terapia": "€40-80 per session",
+        "meditacion": "€10-15/month"
+      },
+      "replaceTherapy": {
+        "criterio": "Does it replace a professional therapist?",
+        "producto": "NO — it says so explicitly",
+        "chatgpt": "Doesn't take a stand",
+        "terapia": "It is therapy",
+        "meditacion": "NO"
+      }
+    },
+    "section1": {
+      "title": "When to choose Three Billion Heartbeats and when to choose therapy?",
+      "p1Strong": "Choose professional therapy",
+      "p1": "if you have a prior clinical diagnosis, persistent suicidal ideation, severe eating disorders, untreated dependencies, suspected psychosis or complex trauma. In those cases the platform isn't enough and we'll tell you so explicitly from the chat.",
+      "p2Strong": "Choose Three Billion Heartbeats",
+      "p2": "if you're dealing with blocks, doubts, life transitions, procrastination or need a structured space to sort your thinking and move into action. Also if you already have a therapist and need support between sessions.",
+      "p3Strong": "Use both",
+      "p3": "when your therapist finds it useful: many professionals work with us as structured complement between their consultations. See",
+      "p3Link": "/para-profesionales",
+      "p3Suffix": "."
+    },
+    "section2": {
+      "title": "Why not just use ChatGPT or Claude?",
+      "p1": "Because",
+      "p1Strong": "ChatGPT and Claude are generic assistants",
+      "p1Cont": ", not mentors. They answer whatever you ask: if you ask for cheap motivation, they give it; if you ask for clinical advice, they do too (and there's a real risk there). Three Billion Heartbeats has a hardcoded pedagogical framework: hollow imperatives like \"you can do it\" or \"keep it up\" are forbidden, ending in a question is mandatory, and when it detects self-harm or suicidal ideation language,",
+      "p1Strong2": "it stops conversing as a coach",
+      "p1End": "and redirects to emergency resources + alerts the clinical team.",
+      "p2": "On top of that, Three Billion Heartbeats remembers your emotional state across sessions, your active goals and the actions you completed or postponed. ChatGPT, by default, starts from scratch every conversation."
+    },
+    "section3": {
+      "title": "What does Three Billion Heartbeats offer that Calm, Headspace or other meditation apps don't?",
+      "p1": "Calm and Headspace are excellent for",
+      "p1Strong": "guided relaxation, sleep hygiene and mindfulness practice",
+      "p1Cont": ". They're pre-recorded exercises you execute. There's no conversation, no tracking of your context, no action outside the meditation moment.",
+      "p2": "Three Billion Heartbeats does the opposite:",
+      "p2Strong": "structured conversation + concrete actions outside the app",
+      "p2Cont": ". The focus isn't lowering momentary stress, it's moving forward on what you have stuck. They're not mutually exclusive: you can use Calm to sleep better and Three Billion Heartbeats to decide whether to leave your job. They're different tools."
+    },
+    "section4": {
+      "title": "Privacy and clinical supervision — what you should know",
+      "item1Strong": "Your conversations",
+      "item1": "are processed by external AI (Anthropic Claude) under a privacy agreement with the provider.",
+      "item2Strong": "The clinical role",
+      "item2": "on the team can access histories of users with elevated risk (protocol supervised by the responsible psychologist). This is documented in the consent when you register.",
+      "item3Strong": "Data in transit is encrypted",
+      "item3": "(TLS). There's no additional column-level encryption in the database — we recommend not sharing information you wouldn't share with a standard software provider.",
+      "item4Strong": "Complete GDPR erasure",
+      "item4": "(hard delete) available at any time from your account settings."
+    },
+    "faqQ1": "Is Three Billion Heartbeats a substitute for psychological therapy?",
+    "faqA1": "No. Three Billion Heartbeats does not diagnose, does not prescribe, and does not replace a professional therapist. It's a support between sessions or a first point of contact for people who don't yet have access to therapy. It has a psychologist responsible for clinical criteria who supervises risk detection and interventions.",
+    "faqQ2": "Why not just use ChatGPT or Claude?",
+    "faqA2": "ChatGPT and Claude are generic assistants. Three Billion Heartbeats applies a specific pedagogical framework (question before instructing, questions before answers), detects risk language and redirects to clinical resources, remembers your emotional state across sessions, proposes concrete time-bounded actions, and is supervised by a psychology professional. ChatGPT answers anything without context; Three Billion Heartbeats accompanies a process.",
+    "faqQ3": "When is a meditation app like Calm or Headspace better than Three Billion Heartbeats?",
+    "faqA3": "If what you're looking for is guided relaxation, sleep hygiene or mindfulness without a personalized process, a meditation app is more direct. Three Billion Heartbeats is conversational and focuses on blocks, decisions and life transitions — it doesn't replace breathing exercises or guided meditation sessions. They can complement each other.",
+    "faqQ4": "When to go to therapy instead of using Three Billion Heartbeats?",
+    "faqA4": "Whenever there's a prior clinical diagnosis, persistent suicidal ideation, severe eating disorders, severe dependencies, psychosis, or suspected complex trauma. Three Billion Heartbeats can support you between sessions, but it doesn't replace professional 1:1 treatment. If you don't have a therapist and you believe you need one, Three Billion Heartbeats will explicitly suggest it.",
+    "faqQ5": "What happens with my privacy? Who can read my conversations?",
+    "faqA5": "Conversations are processed by external AI (Anthropic Claude via OpenRouter) under a privacy agreement. On the Three Billion Heartbeats server, the clinical role can access conversations of users with high riskLevel or active crisis as part of the clinical supervision protocol. Your data is encrypted in transit (TLS) and you can request complete erasure at any time (GDPR).",
+    "ctaTitle": "Want to see how it works before deciding?",
+    "ctaSubtitle": "Read the method before registering. Without giving your email.",
+    "ctaPrimary": "Read the method",
+    "ctaSecondary": "Try it free"
   }
 }

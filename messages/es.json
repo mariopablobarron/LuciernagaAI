@@ -547,5 +547,151 @@
     "ctaNote": "El método sólo cobra sentido cuando lo vives.",
     "ctaPrimary": "Probarlo ahora",
     "ctaSecondary": "Conocer el proyecto"
+  },
+  "comparison": {
+    "eyebrow": "Comparativa",
+    "title": "Tres Mil Millones de Latidos vs ChatGPT, terapia y apps de bienestar",
+    "subtitle": "Si estás decidiendo qué herramienta usar para ordenar lo que te pasa, esto compara honestamente qué hace cada una y cuándo conviene elegir cuál. Sin exagerar lo nuestro. Sin ocultar lo que no hacemos.",
+    "lastUpdated": "Última actualización: {date} · Revisado por el equipo clínico de Tres Mil Millones de Latidos.",
+    "lastUpdatedDate": "Abril 2026",
+    "tableTitle": "Comparativa punto a punto",
+    "colCriterio": "Criterio",
+    "colProducto": "Tres Mil Millones de Latidos",
+    "colChatGPT": "ChatGPT / Claude",
+    "colTerapia": "Terapia tradicional",
+    "colMeditacion": "Apps meditación",
+    "row": {
+      "purpose": {
+        "criterio": "Propósito principal",
+        "producto": "Acompañar bloqueos, decisiones y acción",
+        "chatgpt": "Asistente conversacional genérico",
+        "terapia": "Tratamiento clínico 1:1",
+        "meditacion": "Relajación, sueño, mindfulness"
+      },
+      "framework": {
+        "criterio": "Marco pedagógico propio",
+        "producto": "Sí — interpela, no instruye",
+        "chatgpt": "No — responde lo que se le pida",
+        "terapia": "Según el terapeuta",
+        "meditacion": "Ejercicios, no diálogo"
+      },
+      "crisisDetection": {
+        "criterio": "Detección automática de crisis",
+        "producto": "Sí — lenguaje de riesgo → recursos clínicos",
+        "chatgpt": "Parcial, no estructurada",
+        "terapia": "Solo en la sesión",
+        "meditacion": "No"
+      },
+      "clinicalSupervision": {
+        "criterio": "Supervisión clínica humana",
+        "producto": "Sí — psicóloga responsable del sistema",
+        "chatgpt": "No",
+        "terapia": "Sí — es humana directamente",
+        "meditacion": "No"
+      },
+      "context": {
+        "criterio": "Contexto persistente entre sesiones",
+        "producto": "Sí — estado emocional + objetivos + historial",
+        "chatgpt": "Parcial (depende del plan)",
+        "terapia": "Sí — notas clínicas del terapeuta",
+        "meditacion": "No"
+      },
+      "actions": {
+        "criterio": "Acciones concretas y medibles",
+        "producto": "Sí — microacciones de 10-15 min, objetivos, seguimiento",
+        "chatgpt": "Si se lo pides",
+        "terapia": "Si el terapeuta las asigna",
+        "meditacion": "No aplica"
+      },
+      "community": {
+        "criterio": "Comunidad entre pares",
+        "producto": "Sí — círculos de 4 personas, asíncronos, ciclos de 6 semanas, emparejados por patrón emocional",
+        "chatgpt": "No",
+        "terapia": "Opcional — terapia grupal",
+        "meditacion": "Foros ligeros en algunas apps"
+      },
+      "availability": {
+        "criterio": "Disponibilidad",
+        "producto": "24/7 — web y Telegram",
+        "chatgpt": "24/7",
+        "terapia": "Solo en citas",
+        "meditacion": "24/7"
+      },
+      "privacy": {
+        "criterio": "Privacidad y borrado RGPD",
+        "producto": "Sí — hard delete, cifrado en tránsito, política clara",
+        "chatgpt": "Política OpenAI/Anthropic estándar",
+        "terapia": "Secreto profesional",
+        "meditacion": "Variable por proveedor"
+      },
+      "price": {
+        "criterio": "Precio mensual referencia",
+        "producto": "0€ Free · 9€ Pro",
+        "chatgpt": "0-20€ (ChatGPT Plus)",
+        "terapia": "40-80€ por sesión",
+        "meditacion": "10-15€/mes"
+      },
+      "replaceTherapy": {
+        "criterio": "¿Sustituye a un terapeuta profesional?",
+        "producto": "NO — lo dice explícitamente",
+        "chatgpt": "No se pronuncia",
+        "terapia": "Es terapia",
+        "meditacion": "NO"
+      }
+    },
+    "section1": {
+      "title": "¿Cuándo elegir Tres Mil Millones de Latidos y cuándo elegir terapia?",
+      "p1Strong": "Elige terapia profesional",
+      "p1": "si tienes diagnóstico clínico previo, ideación suicida persistente, trastornos alimenticios graves, dependencias sin tratamiento, sospecha de psicosis o trauma complejo. En esos casos la plataforma no es suficiente y te lo diremos explícitamente desde el chat.",
+      "p2Strong": "Elige Tres Mil Millones de Latidos",
+      "p2": "si estás en bloqueos, dudas, transiciones vitales, procrastinación o necesitas un espacio estructurado para ordenar pensamiento y pasar a acción. También si ya tienes terapeuta y necesitas acompañamiento entre sesiones.",
+      "p3Strong": "Usa ambos",
+      "p3": "cuando tu terapeuta lo vea útil: muchos profesionales trabajan con nosotros como complemento estructurado entre sus consultas. Ver",
+      "p3Link": "/para-profesionales",
+      "p3Suffix": "."
+    },
+    "section2": {
+      "title": "¿Por qué no simplemente usar ChatGPT o Claude?",
+      "p1": "Porque",
+      "p1Strong": "ChatGPT y Claude son asistentes genéricos",
+      "p1Cont": ", no mentores. Responden lo que les pidas: si les pides motivación barata, te la dan; si les pides consejo clínico, también (y ahí hay un riesgo real). Tres Mil Millones de Latidos tiene un marco pedagógico hardcoded: prohibido dar imperativos huecos como \"tú puedes\" o \"sigue así\", obligatorio terminar en pregunta, y cuando detecta lenguaje de autolesión o ideación suicida,",
+      "p1Strong2": "deja de conversar como coach",
+      "p1End": "y deriva a recursos de emergencia + alerta al equipo clínico.",
+      "p2": "Además, Tres Mil Millones de Latidos recuerda tu estado emocional entre sesiones, tus objetivos activos y las acciones que completaste o postergaste. ChatGPT, por defecto, empieza de cero cada conversación."
+    },
+    "section3": {
+      "title": "¿Qué aporta Tres Mil Millones de Latidos que no aportan Calm, Headspace u otras apps de meditación?",
+      "p1": "Calm y Headspace son excelentes para",
+      "p1Strong": "relajación guiada, higiene del sueño y práctica de mindfulness",
+      "p1Cont": ". Son ejercicios pre-grabados que tú ejecutas. No hay conversación, no hay seguimiento de tu contexto, no hay acción fuera del momento de la meditación.",
+      "p2": "Tres Mil Millones de Latidos hace lo contrario:",
+      "p2Strong": "conversación estructurada + acciones concretas fuera de la app",
+      "p2Cont": ". El foco no es bajar el estrés del momento, es avanzar en lo que tienes parado. No son excluyentes: puedes usar Calm para dormir mejor y Tres Mil Millones de Latidos para decidir si dejas tu trabajo. Son herramientas distintas."
+    },
+    "section4": {
+      "title": "Privacidad y supervisión clínica — lo que debes saber",
+      "item1Strong": "Tus conversaciones",
+      "item1": "se procesan por IA externa (Anthropic Claude) bajo acuerdo de privacidad con el proveedor.",
+      "item2Strong": "El rol clínico",
+      "item2": "del equipo puede acceder al historial de usuarios con riesgo elevado (protocolo supervisado por la psicóloga responsable). Esto se documenta en el consentimiento al registrarte.",
+      "item3Strong": "Datos en tránsito cifrados",
+      "item3": "(TLS). No hay cifrado adicional a nivel de columna en la base de datos — recomendamos no compartir información que no compartirías con un proveedor de software estándar.",
+      "item4Strong": "Borrado completo RGPD",
+      "item4": "(hard delete) disponible en cualquier momento desde los ajustes de cuenta."
+    },
+    "faqQ1": "¿Es Tres Mil Millones de Latidos un sustituto de la terapia psicológica?",
+    "faqA1": "No. Tres Mil Millones de Latidos no diagnostica, no prescribe, y no sustituye a un terapeuta profesional. Es un acompañamiento entre sesiones o un primer punto de contacto para personas que aún no acceden a terapia. Tiene una psicóloga responsable del criterio clínico que supervisa detección de riesgo e intervenciones.",
+    "faqQ2": "¿Por qué no usar simplemente ChatGPT o Claude?",
+    "faqA2": "ChatGPT y Claude son asistentes genéricos. Tres Mil Millones de Latidos aplica un marco pedagógico específico (interpelar antes que instruir, preguntas antes que respuestas), detecta lenguaje de riesgo y deriva a recursos clínicos, recuerda tu estado emocional entre sesiones, propone acciones concretas acotadas en tiempo, y está supervisado por una profesional de la psicología. ChatGPT responde a cualquier cosa sin contexto; Tres Mil Millones de Latidos acompaña un proceso.",
+    "faqQ3": "¿Cuándo conviene una app de meditación como Calm o Headspace en lugar de Tres Mil Millones de Latidos?",
+    "faqA3": "Si lo que buscas es relajación guiada, higiene del sueño o mindfulness sin un proceso personalizado, una app de meditación es más directa. Tres Mil Millones de Latidos es conversacional y se centra en bloqueos, decisiones y transiciones vitales — no reemplaza ejercicios de respiración o sesiones de meditación guiada. Pueden complementarse.",
+    "faqQ4": "¿Cuándo ir a terapia en lugar de usar Tres Mil Millones de Latidos?",
+    "faqA4": "Siempre que haya diagnóstico clínico previo, ideación suicida persistente, trastornos alimenticios graves, dependencias severas, psicosis, o sospecha de trauma complejo. Tres Mil Millones de Latidos puede acompañar entre sesiones, pero no sustituye el tratamiento profesional 1:1. Si no tienes terapeuta y crees que lo necesitas, Tres Mil Millones de Latidos te lo sugerirá explícitamente.",
+    "faqQ5": "¿Qué pasa con mi privacidad? ¿Quién puede leer mis conversaciones?",
+    "faqA5": "Las conversaciones se procesan por IA externa (Anthropic Claude vía OpenRouter) bajo acuerdo de privacidad. En el servidor de Tres Mil Millones de Latidos, el rol clinical puede acceder a conversaciones de usuarios con riskLevel alto o crisis activa como parte del protocolo de supervisión clínica. Tus datos están cifrados en tránsito (TLS) y puedes pedir borrado completo en cualquier momento (RGPD).",
+    "ctaTitle": "¿Quieres ver cómo funciona antes de decidir?",
+    "ctaSubtitle": "Lee el método antes de registrarte. Sin dar email.",
+    "ctaPrimary": "Leer el método",
+    "ctaSecondary": "Probar gratis"
   }
 }

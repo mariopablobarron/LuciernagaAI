@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { sendUserEmail, build24hNudgeEmail } from "@/lib/email";
+import { pickEmailLocale } from "@/lib/email-i18n";
 import { logError, logInfo } from "@/lib/logger";
 import { sendAutomatedAlert } from "@/lib/alerts";
 import { isSyntheticEmail } from "@/services/user";
@@ -30,7 +31,7 @@ const dedupedHandler = withCronDedup("24h-nudge", () => dailyUtcKey(), async () 
         messageCount: 0,
         isActive: true,
       },
-      select: { id: true, email: true, name: true },
+      select: { id: true, email: true, name: true, locale: true },
       take: 200,
     });
 
@@ -46,7 +47,11 @@ const dedupedHandler = withCronDedup("24h-nudge", () => dailyUtcKey(), async () 
       }
 
       try {
-        const email = build24hNudgeEmail({ name: user.name, appUrl });
+        const email = build24hNudgeEmail({
+          name: user.name,
+          appUrl,
+          locale: pickEmailLocale(user.locale),
+        });
         const ok = await sendUserEmail({
           to: user.email,
           ...email,

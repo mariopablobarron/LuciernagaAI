@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
 import { build7dNudgeEmail, sendUserEmail } from "@/lib/email";
+import { pickEmailLocale } from "@/lib/email-i18n";
 import { logError, logInfo } from "@/lib/logger";
 import { sendAutomatedAlert } from "@/lib/alerts";
 import { isSyntheticEmail } from "@/services/user";
@@ -55,7 +56,7 @@ const dedupedHandler = withCronDedup("7d-nudge", () => dailyUtcKey(), async () =
           },
         },
       },
-      select: { id: true, email: true, name: true },
+      select: { id: true, email: true, name: true, locale: true },
       take: TAKE_LIMIT,
     });
 
@@ -87,6 +88,7 @@ const dedupedHandler = withCronDedup("7d-nudge", () => dailyUtcKey(), async () =
           name: user.name,
           lastUserPhrase: lastUserMessage.content,
           appUrl,
+          locale: pickEmailLocale(user.locale),
         });
         const ok = await sendUserEmail({
           to: user.email,

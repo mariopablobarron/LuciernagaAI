@@ -7,6 +7,9 @@ export type WeeklyLetterCandidate = {
   emailVerified: boolean;
   emailDisabled: boolean;
   name: string | null;
+  // Idioma preferido del usuario (User.locale). El cron lo pasa al builder
+  // para que la notificación llegue en el idioma correcto.
+  locale: string;
 };
 
 /**
@@ -45,6 +48,7 @@ export async function listEligibleUsers(params: {
       name: true,
       email: true,
       emailVerified: true,
+      locale: true,
       preferences: {
         select: { weeklyLetterEmailDisabled: true },
       },
@@ -59,6 +63,7 @@ export async function listEligibleUsers(params: {
       email: u.email ?? null,
       emailVerified: Boolean(u.emailVerified),
       emailDisabled: Boolean(u.preferences?.weeklyLetterEmailDisabled),
+      locale: u.locale,
     }));
 }
 

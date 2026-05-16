@@ -7,6 +7,7 @@ import {
   buildWeeklyLetterNotificationEmail,
   sendUserEmail,
 } from "@/lib/email";
+import { pickEmailLocale } from "@/lib/email-i18n";
 import {
   buildWeeklyDigest,
   computeWeekWindow,
@@ -125,6 +126,7 @@ export const GET = withCronLog("weekly-letter", async (req) => {
             name: candidate.name,
             letterId: saved.id,
             appUrl: process.env.APP_BASE_URL ?? "https://tresmilmillonesdelatidos.es",
+            locale: pickEmailLocale(candidate.locale),
           });
           const ok = await sendUserEmail({
             to: candidate.email!, // shouldSendNotification guaranteed non-null

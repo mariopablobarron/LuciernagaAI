@@ -1,0 +1,19 @@
+src/services/chatOrchestrator.ts
+  s_c72d0ada98a9af::t_c1f503bcb98014 134-141,144-145,148-151,154-155,157-169
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "56bba82e0c2b4b57fec3f3bd375f70a9d62a898a",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

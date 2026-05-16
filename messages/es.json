@@ -1421,5 +1421,131 @@
         "a": "Ahora mismo todo es gratis. Estamos en fase MVP hasta octubre de 2026. Después habrá un plan Free (10 conv/mes) y un Pro (9 €/mes). Los primeros usuarios tendrán condiciones especiales."
       }
     }
+  },
+  "landing": {
+    "eyebrow": "⚡ Transformación Real",
+    "title": "Cambia tu vida",
+    "titleHighlight": "un hábito a la vez",
+    "subtitle": "Un mentor con inteligencia artificial supervisado por una psicóloga responsable. Te acompaña a pasar de la parálisis a la acción, con la opción de pedir una carta humana del equipo cuando quieras un mensaje personal.",
+    "ctaPrimary": "Crear cuenta gratis",
+    "ctaSecondary": "Probar sin cuenta",
+    "chatMock": {
+      "m1": "Estoy bloqueado con mi proyecto",
+      "m2": "¿Qué es lo más pequeño que podrías hacer en 10 minutos?",
+      "m3": "Abrir el archivo y escribir un párrafo",
+      "m4": "Eso es. Hazlo ahora. Luego volveremos."
+    },
+    "howEyebrow": "Cómo funciona",
+    "howTitle": "Tu transformación en 3 pasos",
+    "step": {
+      "describe": {
+        "title": "Describes cómo te sientes",
+        "desc": "Elige tu estado emocional actual. No hay respuesta correcta."
+      },
+      "detect": {
+        "title": "La IA detecta tu patrón",
+        "desc": "Bloqueado / Ansioso / Dudoso / Claro — adaptamos la conversación."
+      },
+      "next": {
+        "title": "Recibes un próximo paso",
+        "desc": "Específico, accionable, que puedes hacer hoy en 10 minutos."
+      }
+    },
+    "plansEyebrow": "Planes",
+    "plansTitle": "Elige tu camino",
+    "plan": {
+      "free": {
+        "title": "Gratuito",
+        "description": "Perfecto para empezar",
+        "price": "Gratis",
+        "feature1": "Chat ilimitado",
+        "feature2": "Detección de estado",
+        "feature3": "Primer reto gratis",
+        "feature4": "Acceso exploración",
+        "cta": "Crear cuenta gratis"
+      },
+      "impulso": {
+        "title": "Impulso",
+        "description": "Programa intensivo 21 días",
+        "price": "Próximamente",
+        "feature1": "Todo lo del plan Gratuito",
+        "feature2": "Programa Impulso 21 días",
+        "feature3": "Check-ins diarios",
+        "feature4": "Retos personalizados",
+        "feature5": "Mensajes futuros",
+        "feature6": "Soporte prioritario",
+        "cta": "Unirse a lista de espera"
+      }
+    },
+    "finalTitle": "¿Listo para tu primer paso?",
+    "finalSubtitle": "Crea tu cuenta en menos de 60 segundos. Gratis.",
+    "finalCta": "Crear cuenta gratis",
+    "finalDisclaimer": "Tres Mil Millones de Latidos no sustituye terapia ni intervención psicológica profesional."
+  },
+  "contact": {
+    "metaTitle": "Contacto — Tres Mil Millones de Latidos",
+    "metaDescription": "¿Tienes dudas o quieres saber más? Escríbenos y te respondemos en menos de 24 horas.",
+    "title": "Contáctanos",
+    "subtitle": "Respondemos en menos de 24 horas.",
+    "starter": {
+      "header": "Motivo",
+      "note": "Hemos preparado un mensaje de partida abajo. Edítalo antes de enviar.",
+      "profesional": {
+        "label": "Psicóloga, coach o profesional del bienestar",
+        "message": "Hola, soy [profesión + colegiación si aplica] y me gustaría explorar cómo Tres Mil Millones de Latidos podría encajar con mi consulta. Me interesa especialmente:\n\n- "
+      },
+      "etica": {
+        "label": "Reportar un fallo ético",
+        "message": "Hola, he detectado algo en la plataforma que creo que va en contra de lo que prometéis en /etica. Contexto:\n\n- Qué pasó:\n- Dónde (URL o sección):\n- Cuándo:\n"
+      },
+      "sugerencia": {
+        "label": "Sugerencia o feedback de producto",
+        "message": "Hola, echo en falta / me gustaría que…\n\n"
+      }
+    },
+    "nameLabel": "Nombre",
+    "namePlaceholder": "Tu nombre completo",
+    "emailLabel": "Email",
+    "emailPlaceholder": "tu@email.com",
+    "messageLabel": "Mensaje",
+    "messagePlaceholder": "Cuéntanos qué tienes en mente...",
+    "statusSuccess": "¡Mensaje enviado! Nos pondremos en contacto pronto.",
+    "statusError": "Por favor, completa todos los campos correctamente.",
+    "privacyContext": "Tus datos se usarán solo para responder tu mensaje.",
+    "submit": "Enviar mensaje",
+    "submitSending": "Enviando..."
+  },
+  "changelog": {
+    "eyebrow": "Novedades",
+    "title": "Qué",
+    "titleHighlight": "está cambiando",
+    "subtitle": "Cada cambio explicado sin marketing. Lo que es nuevo, lo que hemos mejorado, lo que hemos reforzado en seguridad, y lo que hemos ajustado por cuidado del usuario.",
+    "kind": {
+      "nuevo": "Nuevo",
+      "mejora": "Mejora",
+      "seguridad": "Seguridad",
+      "cuidado": "Cuidado"
+    },
+    "entry": {
+      "helpPage": {
+        "title": "Página de ayuda urgente",
+        "body": "Incorporamos dentro de la app una página con los recursos oficiales de emergencia en España (112, 024, Teléfono de la Esperanza, ANAR, 016) y una guía corta para esos minutos críticos en los que alguien está esperando a que le atiendan. No sustituye a ningún servicio — hace más fácil llegar a ellos."
+      },
+      "referrals": {
+        "title": "Programa de referidos",
+        "body": "Ya puedes invitar a alguien a quien crees que esto le vendría bien, y compartir con esa persona el acompañamiento. Las métricas quedan visibles en tu perfil. No es un sistema de afiliación pagada: es una forma de que lo que te funciona llegue a quien tú eliges."
+      },
+      "rateLimit": {
+        "title": "Rate limiting en recuperación de contraseña",
+        "body": "Añadimos límites de intento a los endpoints de recuperación de contraseña y reenvío de verificación. Protege a los usuarios frente a ataques de fuerza bruta y hace más ruido cuando alguien intenta suplantar."
+      },
+      "clinicalNotes": {
+        "title": "Panel clínico: notas y seguimientos",
+        "body": "La psicóloga responsable ya puede tomar notas clínicas dentro del panel, marcar seguimientos pendientes y ver cuándo una nota se resuelve automáticamente por evolución del caso. Mejor trazabilidad para el trabajo de fondo."
+      }
+    },
+    "suggestionTitle": "¿Echas en falta algo?",
+    "suggestionDesc": "Si hay algo que te haría la vida más fácil, cuéntanoslo. No prometemos construirlo todo, pero leemos cada sugerencia.",
+    "suggestionCta": "Enviar sugerencia"
   }
 }

@@ -1421,5 +1421,131 @@
         "a": "Pour l'instant tout est gratuit. Nous sommes en phase MVP jusqu'en octobre 2026. Ensuite il y aura un plan Free (10 conversations/mois) et un Pro (9 €/mois). Les premiers utilisateurs auront des conditions spéciales."
       }
     }
+  },
+  "landing": {
+    "eyebrow": "⚡ Transformation Réelle",
+    "title": "Change ta vie",
+    "titleHighlight": "une habitude à la fois",
+    "subtitle": "Un mentor avec intelligence artificielle supervisé par une psychologue responsable. Il t'accompagne pour passer de la paralysie à l'action, avec la possibilité de demander une lettre humaine de l'équipe quand tu souhaites un message personnel.",
+    "ctaPrimary": "Créer un compte gratuit",
+    "ctaSecondary": "Essayer sans compte",
+    "chatMock": {
+      "m1": "Je suis bloqué avec mon projet",
+      "m2": "Quelle est la plus petite chose que tu pourrais faire en 10 minutes ?",
+      "m3": "Ouvrir le fichier et écrire un paragraphe",
+      "m4": "Voilà. Fais-le maintenant. On reviendra ensuite."
+    },
+    "howEyebrow": "Comment ça marche",
+    "howTitle": "Ta transformation en 3 étapes",
+    "step": {
+      "describe": {
+        "title": "Tu décris comment tu te sens",
+        "desc": "Choisis ton état émotionnel actuel. Il n'y a pas de bonne réponse."
+      },
+      "detect": {
+        "title": "L'IA détecte ton schéma",
+        "desc": "Bloqué / Anxieux / Dans le doute / Clair — nous adaptons la conversation."
+      },
+      "next": {
+        "title": "Tu reçois une prochaine étape",
+        "desc": "Spécifique, actionnable, que tu peux faire aujourd'hui en 10 minutes."
+      }
+    },
+    "plansEyebrow": "Plans",
+    "plansTitle": "Choisis ton chemin",
+    "plan": {
+      "free": {
+        "title": "Gratuit",
+        "description": "Parfait pour commencer",
+        "price": "Gratuit",
+        "feature1": "Chat illimité",
+        "feature2": "Détection d'état",
+        "feature3": "Premier défi gratuit",
+        "feature4": "Accès exploration",
+        "cta": "Créer un compte gratuit"
+      },
+      "impulso": {
+        "title": "Impulso",
+        "description": "Programme intensif de 21 jours",
+        "price": "Bientôt",
+        "feature1": "Tout ce que contient le plan Gratuit",
+        "feature2": "Programme Impulso 21 jours",
+        "feature3": "Check-ins quotidiens",
+        "feature4": "Défis personnalisés",
+        "feature5": "Messages futurs",
+        "feature6": "Support prioritaire",
+        "cta": "Rejoindre la liste d'attente"
+      }
+    },
+    "finalTitle": "Prêt pour ta première étape ?",
+    "finalSubtitle": "Crée ton compte en moins de 60 secondes. Gratuit.",
+    "finalCta": "Créer un compte gratuit",
+    "finalDisclaimer": "Trois Milliards de Battements ne remplace pas une thérapie ni une intervention psychologique professionnelle."
+  },
+  "contact": {
+    "metaTitle": "Contact — Trois Milliards de Battements",
+    "metaDescription": "Tu as des questions ou tu veux en savoir plus ? Écris-nous et nous te répondons en moins de 24 heures.",
+    "title": "Contacte-nous",
+    "subtitle": "Nous répondons en moins de 24 heures.",
+    "starter": {
+      "header": "Motif",
+      "note": "Nous avons préparé un message de départ ci-dessous. Modifie-le avant d'envoyer.",
+      "profesional": {
+        "label": "Psychologue, coach ou professionnel du bien-être",
+        "message": "Bonjour, je suis [profession + numéro ADELI si applicable] et j'aimerais explorer comment Trois Milliards de Battements pourrait s'intégrer dans ma pratique. Ce qui m'intéresse particulièrement :\n\n- "
+      },
+      "etica": {
+        "label": "Signaler un problème éthique",
+        "message": "Bonjour, j'ai repéré quelque chose sur la plateforme qui me semble aller à l'encontre de ce que vous promettez sur /etica. Contexte :\n\n- Ce qui s'est passé :\n- Où (URL ou section) :\n- Quand :\n"
+      },
+      "sugerencia": {
+        "label": "Suggestion ou retour produit",
+        "message": "Bonjour, il me manque / j'aimerais que…\n\n"
+      }
+    },
+    "nameLabel": "Nom",
+    "namePlaceholder": "Ton nom complet",
+    "emailLabel": "Email",
+    "emailPlaceholder": "toi@email.com",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Dis-nous ce que tu as en tête...",
+    "statusSuccess": "Message envoyé ! Nous te recontactons bientôt.",
+    "statusError": "Merci de remplir tous les champs correctement.",
+    "privacyContext": "Tes données seront utilisées uniquement pour répondre à ton message.",
+    "submit": "Envoyer le message",
+    "submitSending": "Envoi..."
+  },
+  "changelog": {
+    "eyebrow": "Nouveautés",
+    "title": "Ce qui",
+    "titleHighlight": "est en train de changer",
+    "subtitle": "Chaque changement expliqué sans marketing. Ce qui est nouveau, ce que nous avons amélioré, ce que nous avons renforcé en sécurité, et ce que nous avons ajusté par soin pour l'utilisateur.",
+    "kind": {
+      "nuevo": "Nouveau",
+      "mejora": "Amélioration",
+      "seguridad": "Sécurité",
+      "cuidado": "Soin"
+    },
+    "entry": {
+      "helpPage": {
+        "title": "Page d'aide urgente",
+        "body": "Nous avons intégré dans l'app une page avec les ressources officielles d'urgence (3114, 112, SOS Amitié, 119 Allô Enfance en Danger) et un court guide pour ces minutes critiques où quelqu'un attend d'être pris en charge. Cela ne remplace aucun service — cela facilite simplement l'accès."
+      },
+      "referrals": {
+        "title": "Programme de parrainage",
+        "body": "Tu peux désormais inviter quelqu'un à qui tu penses que cela ferait du bien, et partager avec cette personne l'accompagnement. Les métriques restent visibles dans ton profil. Ce n'est pas un système d'affiliation payée : c'est une façon pour ce qui te fonctionne d'atteindre les personnes que tu choisis."
+      },
+      "rateLimit": {
+        "title": "Rate limiting sur la récupération de mot de passe",
+        "body": "Nous avons ajouté des limites de tentatives aux endpoints de récupération de mot de passe et de renvoi de vérification. Cela protège les utilisateurs contre les attaques par force brute et fait plus de bruit quand quelqu'un tente une usurpation."
+      },
+      "clinicalNotes": {
+        "title": "Panneau clinique : notes et suivis",
+        "body": "La psychologue responsable peut désormais prendre des notes cliniques dans le panneau, marquer des suivis en attente et voir quand une note se résout automatiquement avec l'évolution du cas. Une meilleure traçabilité pour le travail de fond."
+      }
+    },
+    "suggestionTitle": "Il te manque quelque chose ?",
+    "suggestionDesc": "S'il y a quelque chose qui te faciliterait la vie, dis-le-nous. Nous ne promettons pas de tout construire, mais nous lisons chaque suggestion.",
+    "suggestionCta": "Envoyer une suggestion"
   }
 }

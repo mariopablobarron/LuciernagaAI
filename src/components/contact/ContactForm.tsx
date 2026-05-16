@@ -2,41 +2,36 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { COMPONENTS, TYPOGRAPHY } from "@/styles/design-system";
 import PrivacyCheckbox from "@/components/PrivacyCheckbox";
 
-const MOTIVO_STARTERS: Record<string, { label: string; message: string }> = {
-  profesional: {
-    label: "Psicóloga, coach o profesional del bienestar",
-    message:
-      "Hola, soy [profesión + colegiación si aplica] y me gustaría explorar cómo Tres Mil Millones de Latidos podría encajar con mi consulta. Me interesa especialmente:\n\n- ",
-  },
-  etica: {
-    label: "Reportar un fallo ético",
-    message:
-      "Hola, he detectado algo en la plataforma que creo que va en contra de lo que prometéis en /etica. Contexto:\n\n- Qué pasó:\n- Dónde (URL o sección):\n- Cuándo:\n",
-  },
-  sugerencia: {
-    label: "Sugerencia o feedback de producto",
-    message: "Hola, echo en falta / me gustaría que…\n\n",
-  },
-};
+// Tipos de motivo soportados como query string ?motivo=<id>.
+// El copy del starter (label + plantilla del mensaje) está en messages.contact.starter.<id>.
+const MOTIVO_IDS = ["profesional", "etica", "sugerencia"] as const;
+type MotivoId = (typeof MOTIVO_IDS)[number];
 
 export default function ContactForm() {
+  const t = useTranslations("contact");
   const searchParams = useSearchParams();
-  const motivo = searchParams.get("motivo");
-  const starter = motivo && MOTIVO_STARTERS[motivo] ? MOTIVO_STARTERS[motivo] : null;
+  const motivoParam = searchParams.get("motivo");
+  const motivo: MotivoId | null =
+    motivoParam && (MOTIVO_IDS as readonly string[]).includes(motivoParam)
+      ? (motivoParam as MotivoId)
+      : null;
+
+  const initialMessage = motivo ? t(`starter.${motivo}.message`) : "";
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState(starter?.message ?? "");
+  const [message, setMessage] = useState(initialMessage);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    
+
     if (!name.trim() || !email.trim() || !message.trim()) {
       setSubmitStatus("error");
       return;
@@ -77,29 +72,27 @@ export default function ContactForm() {
   return (
     <div className="flex items-center justify-center">
       <div className={`w-full max-w-md ${COMPONENTS.card}`}>
-        {starter && (
+        {motivo && (
           <div className="mb-5 rounded-xl border border-emerald-500/30 bg-emerald-500/5 px-4 py-3">
             <p className="text-xs font-semibold uppercase tracking-wider text-emerald-400">
-              Motivo
+              {t("starter.header")}
             </p>
-            <p className="mt-1 text-sm text-zinc-200">{starter.label}</p>
-            <p className="mt-1 text-xs text-zinc-500">
-              Hemos preparado un mensaje de partida abajo. Edítalo antes de enviar.
-            </p>
+            <p className="mt-1 text-sm text-zinc-200">{t(`starter.${motivo}.label`)}</p>
+            <p className="mt-1 text-xs text-zinc-500">{t("starter.note")}</p>
           </div>
         )}
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Name Field */}
           <div className="space-y-2">
             <label htmlFor="name" className={`block ${TYPOGRAPHY.label}`}>
-              Nombre
+              {t("nameLabel")}
             </label>
             <input
               id="name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Tu nombre completo"
+              placeholder={t("namePlaceholder")}
               disabled={isSubmitting}
               className={COMPONENTS.inputField}
               required
@@ -109,14 +102,14 @@ export default function ContactForm() {
           {/* Email Field */}
           <div className="space-y-2">
             <label htmlFor="email" className={`block ${TYPOGRAPHY.label}`}>
-              Email
+              {t("emailLabel")}
             </label>
             <input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="tu@email.com"
+              placeholder={t("emailPlaceholder")}
               disabled={isSubmitting}
               className={COMPONENTS.inputField}
               required
@@ -126,13 +119,13 @@ export default function ContactForm() {
           {/* Message Field */}
           <div className="space-y-2">
             <label htmlFor="message" className={`block ${TYPOGRAPHY.label}`}>
-              Mensaje
+              {t("messageLabel")}
             </label>
             <textarea
               id="message"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Cuéntanos qué tienes en mente..."
+              placeholder={t("messagePlaceholder")}
               disabled={isSubmitting}
               rows={5}
               className={`${COMPONENTS.inputField} resize-none`}
@@ -142,22 +135,18 @@ export default function ContactForm() {
 
           {/* Status Messages */}
           {submitStatus === "success" && (
-            <div className={COMPONENTS.badgeSuccess}>
-              ¡Mensaje enviado! Nos pondremos en contacto pronto.
-            </div>
+            <div className={COMPONENTS.badgeSuccess}>{t("statusSuccess")}</div>
           )}
 
           {submitStatus === "error" && (
-            <div className={COMPONENTS.badgeError}>
-              Por favor, completa todos los campos correctamente.
-            </div>
+            <div className={COMPONENTS.badgeError}>{t("statusError")}</div>
           )}
 
           {/* Privacy consent */}
           <PrivacyCheckbox
             checked={privacyAccepted}
             onChange={setPrivacyAccepted}
-            context="Tus datos se usaran solo para responder tu mensaje."
+            context={t("privacyContext")}
           />
 
           {/* Submit Button */}
@@ -166,7 +155,7 @@ export default function ContactForm() {
             disabled={isSubmitting || !privacyAccepted || !name.trim() || !email.trim() || !message.trim()}
             className={`${COMPONENTS.buttonPrimary} w-full py-2`}
           >
-            {isSubmitting ? "Enviando..." : "Enviar mensaje"}
+            {isSubmitting ? t("submitSending") : t("submit")}
           </button>
         </form>
       </div>

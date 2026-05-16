@@ -905,5 +905,76 @@
     "ctaSubtitle": "Three questions. One commitment. Thirty days. The change you've been putting off starts today.",
     "ctaFinal": "Accept the challenge now",
     "ctaFinalNote": "No card. No spam. Just 30 days."
+  },
+  "professionals": {
+    "eyebrow": "For mental health and wellbeing professionals",
+    "title": "Your client,",
+    "titleHighlight": "between sessions",
+    "subtitle": "Three Billion Heartbeats doesn't replace your work. It complements it. An AI mentor that accompanies your clients between sessions, within a clinically reviewed pedagogical framework and with a professional panel so you have real visibility.",
+    "honestyTitle": "What we want to make clear before starting",
+    "honesty1Strong": "It's not therapy.",
+    "honesty1": "It doesn't diagnose, doesn't prescribe, doesn't replace the clinical relationship. If a case needs intervention, the human professional is the one handling it.",
+    "honesty2Strong": "The mentor has lines it won't cross.",
+    "honesty2": "When risk signals appear, it stops coaching and refers to emergency resources and professional help.",
+    "honesty3Strong": "There's a psychology professional responsible for clinical criteria",
+    "honesty3": "who supervises risk detection, interventions and mentor templates.",
+    "benefitsTitle": "What it brings to your practice",
+    "benefit": {
+      "panel": {
+        "title": "Clinical panel",
+        "desc": "You see progression, emotional state, detected patterns and completed actions of the clients who link you as their reference professional."
+      },
+      "risk": {
+        "title": "Early risk detection",
+        "desc": "The system monitors signals (suicidal ideation, self-harm, acute crisis) and escalates them to your panel before they reach your next session."
+      },
+      "notes": {
+        "title": "Integrated clinical notes",
+        "desc": "You can take notes about the client within the panel, link them to specific moments, and review them before each session."
+      },
+      "diary": {
+        "title": "Client diary and patterns",
+        "desc": "The client works on their diary, check-ins and goals between sessions. You arrive at the session with a map, not a blank page."
+      },
+      "interventions": {
+        "title": "Supervised interventions",
+        "desc": "You can activate specific interventions (messages, pauses, mentor refocuses) for your specific client, always at your discretion."
+      },
+      "privacy": {
+        "title": "Privacy and consent",
+        "desc": "The client decides what they share with you. You see what they authorize — we don't read conversations without their explicit consent."
+      }
+    },
+    "frameworkTitle": "The framework the mentor uses",
+    "frameworkIntro": "Four principles hardcoded into the system prompts and watched by automatic validators:",
+    "principle1Title": "Challenge before instructing",
+    "principle1Desc": "The mentor doesn't say \"you have to do X\". It asks. It makes visible what the client isn't seeing.",
+    "principle2Title": "Questions before answers",
+    "principle2Desc": "Answers close. Questions open.",
+    "principle3Title": "From local to global",
+    "principle3Desc": "We start from the concrete data of the day, not from generic frameworks.",
+    "principle4Title": "Change comes from within",
+    "principle4Desc": "We don't push the client — we accompany them to the place where they can see themselves.",
+    "frameworkProhibitedPre": "The system is",
+    "frameworkProhibitedStrong": "explicitly prohibited",
+    "frameworkProhibitedCont": "from using hollow imperatives, validating without context, congratulating quickly when goals are completed or reinforcing emotional dependence on the platform. Read the full method at",
+    "frameworkLinkText": "/como-funciona",
+    "useCasesTitle": "Where it fits in your practice",
+    "useCase1": {
+      "title": "Between sessions",
+      "desc": "Clients who need orderly containment outside the office, without turning it into 24/7 therapy."
+    },
+    "useCase2": {
+      "title": "Waiting list",
+      "desc": "People who can't yet access in-person sessions have a first structured point of contact."
+    },
+    "useCase3": {
+      "title": "Low-intensity cases",
+      "desc": "People with blocks, doubts or life transitions that don't require formal clinical intervention."
+    },
+    "ctaTitle": "Want to explore it?",
+    "ctaDesc": "If you work in psychology, coaching or professional accompaniment and you're interested in trying the clinical panel with a client, write to us. We review every collaboration case by case — we don't work with just anyone.",
+    "ctaPrimary": "Talk to the team",
+    "ctaSecondary": "Read the full method"
   }
 }

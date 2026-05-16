@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { ArrowRight, Heart, Clock, Calendar, Baby, Sparkles } from "lucide-react";
 import { COMPONENTS, GRADIENTS, TYPOGRAPHY, LAYOUTS } from "@/styles/design-system";
 import { trackEvent } from "@/lib/analytics";
@@ -16,83 +17,56 @@ const BEATS_PER_HOUR = BEATS_PER_MIN * 60;
 const BEATS_PER_DAY = BEATS_PER_HOUR * 24;
 const BEATS_PER_YEAR = BEATS_PER_DAY * 365.25;
 const THREE_BILLION = 3_000_000_000;
-// Life years reference kept for SEO text (~79 years at 72 bpm)
 
-// ─── Presets: everyday moments measured in heartbeats ────────────────────────
-
-type Preset = {
-  label: string;
-  icon: typeof Heart;
-  beats: number;
-  description: string;
+// Map locale → BCP47 number-format locale.
+const LOCALE_MAP: Record<string, string> = {
+  es: "es-ES",
+  en: "en-US",
+  pt: "pt-PT",
+  fr: "fr-FR",
 };
 
-const PRESETS: Preset[] = [
-  {
-    label: "Un abrazo largo",
-    icon: Heart,
-    beats: Math.round(AVG_BPM * 0.33), // ~20 seconds
-    description: "20 segundos de contacto real",
-  },
-  {
-    label: "Una canción favorita",
-    icon: Sparkles,
-    beats: Math.round(AVG_BPM * 3.5), // 3.5 min
-    description: "3 minutos y medio de pausa",
-  },
-  {
-    label: "Una buena conversación",
-    icon: Clock,
-    beats: BEATS_PER_HOUR, // 1 hour
-    description: "1 hora que puede cambiar tu día",
-  },
-  {
-    label: "Una noche de sueño",
-    icon: Clock,
-    beats: Math.round(55 * 60 * 8), // 8h at lower resting ~55 bpm
-    description: "8 horas restaurando tu cuerpo",
-  },
-  {
-    label: "Un año de tu vida",
-    icon: Calendar,
-    beats: Math.round(BEATS_PER_YEAR),
-    description: `${Math.round(BEATS_PER_YEAR / 1_000_000)}M de latidos invertidos`,
-  },
-  {
-    label: "Desde que naciste",
-    icon: Baby,
-    beats: 0, // calculated from age
-    description: "Cada uno cuenta",
-  },
-];
+// ─── Presets: everyday moments measured in heartbeats ────────────────────────
+// Estructura visual fija. Copy desde messages.calculator.preset.<id>.{label,description}.
+const PRESETS = [
+  { id: "hug", icon: Heart, beats: Math.round(AVG_BPM * 0.33) },
+  { id: "song", icon: Sparkles, beats: Math.round(AVG_BPM * 3.5) },
+  { id: "talk", icon: Clock, beats: BEATS_PER_HOUR },
+  { id: "sleep", icon: Clock, beats: Math.round(55 * 60 * 8) },
+  { id: "year", icon: Calendar, beats: Math.round(BEATS_PER_YEAR) },
+  { id: "birth", icon: Baby, beats: 0 }, // calculated from age
+] as const;
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function formatBeats(n: number): string {
-  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)} mil millones`;
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return n.toLocaleString("es-ES");
-}
-
-function beatsToTime(beats: number): string {
-  const totalMinutes = beats / AVG_BPM;
-  if (totalMinutes < 60) return `${Math.round(totalMinutes)} min`;
-  const hours = totalMinutes / 60;
-  if (hours < 24) return `${hours.toFixed(1)} horas`;
-  const days = hours / 24;
-  if (days < 365) return `${Math.round(days)} días`;
-  const years = days / 365.25;
-  return `${years.toFixed(1)} años`;
-}
-
-function percentOfLife(beats: number): number {
-  return Math.min(100, (beats / THREE_BILLION) * 100);
+// Locale-aware number formatter — "1.5K" / "2.3M" / "3.00 bn" según idioma.
+function makeFormatter(locale: string, t: (k: string, vals?: Record<string, string | number>) => string) {
+  const bcp = LOCALE_MAP[locale] ?? "en-US";
+  return (n: number): string => {
+    if (n >= 1_000_000_000) {
+      return t("format.billion", { n: (n / 1_000_000_000).toFixed(2) });
+    }
+    if (n >= 1_000_000) {
+      return t("format.million", { n: (n / 1_000_000).toFixed(1) });
+    }
+    if (n >= 1_000) {
+      return t("format.thousand", { n: (n / 1_000).toFixed(1) });
+    }
+    return n.toLocaleString(bcp);
+  };
 }
 
 // ─── Animated counter ────────────────────────────────────────────────────────
 
-function AnimatedNumber({ value, duration = 1200 }: { value: number; duration?: number }) {
+function AnimatedNumber({
+  value,
+  duration = 1200,
+  format,
+}: {
+  value: number;
+  duration?: number;
+  format: (n: number) => string;
+}) {
   const [display, setDisplay] = useState(0);
   const frameRef = useRef(0);
 
@@ -105,7 +79,6 @@ function AnimatedNumber({ value, duration = 1200 }: { value: number; duration?: 
     function tick(now: number) {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // ease-out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       setDisplay(Math.round(start + diff * eased));
       if (progress < 1) {
@@ -118,31 +91,33 @@ function AnimatedNumber({ value, duration = 1200 }: { value: number; duration?: 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, duration]);
 
-  return <>{formatBeats(display)}</>;
+  return <>{format(display)}</>;
 }
 
 // ─── Live heartbeat counter ──────────────────────────────────────────────────
 
-function LiveCounter({ baseBeats }: { baseBeats: number }) {
+function LiveCounter({
+  baseBeats,
+  format,
+}: {
+  baseBeats: number;
+  format: (n: number) => string;
+}) {
   const [extra, setExtra] = useState(0);
   const startRef = useRef(0);
 
   useEffect(() => {
     startRef.current = Date.now();
-    // Reset accumulated extra when baseBeats changes, to avoid a stale
-    // display for up to 830ms until the first interval tick.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setExtra(0);
     const id = setInterval(() => {
       const elapsed = (Date.now() - startRef.current) / 1000;
       setExtra(Math.round(elapsed * (AVG_BPM / 60)));
-    }, 830); // slightly irregular like a real heartbeat
+    }, 830);
     return () => clearInterval(id);
   }, [baseBeats]);
 
-  return (
-    <span className="tabular-nums">{formatBeats(baseBeats + extra)}</span>
-  );
+  return <span className="tabular-nums">{format(baseBeats + extra)}</span>;
 }
 
 // ─── Heartbeat pulse animation ───────────────────────────────────────────────
@@ -165,7 +140,13 @@ function PulsingHeart({ active }: { active: boolean }) {
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function CalculadoraLatidosPage() {
+  const t = useTranslations("calculator");
+  const locale = useLocale();
   const sfx = useSfx();
+
+  const bcp = LOCALE_MAP[locale] ?? "en-US";
+  const formatBeats = useMemo(() => makeFormatter(locale, t), [locale, t]);
+  const localeNum = useCallback((n: number) => n.toLocaleString(bcp), [bcp]);
 
   // Mode: "age" or "custom"
   const [mode, setMode] = useState<"age" | "custom">("age");
@@ -208,7 +189,6 @@ export default function CalculadoraLatidosPage() {
   }, [customValue, customUnit]);
 
   const currentBeats = mode === "age" ? ageBeats : customBeats;
-  // remaining / pct removed — positive framing only
 
   const handleCalculate = useCallback(() => {
     if (currentBeats <= 0) return;
@@ -232,14 +212,14 @@ export default function CalculadoraLatidosPage() {
       <div className={`${LAYOUTS.sectionInner} py-12 md:py-20`}>
         {/* Header */}
         <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <p className={`${TYPOGRAPHY.label} text-fuchsia-400`}>Herramienta gratuita</p>
+          <p className={`${TYPOGRAPHY.label} text-fuchsia-400`}>{t("eyebrow")}</p>
           <h1 className={`${TYPOGRAPHY.h2} md:text-5xl bg-linear-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent`}>
-            Calculadora de Latidos
+            {t("title")}
           </h1>
           <p className={`${TYPOGRAPHY.body} text-zinc-400 max-w-2xl mx-auto`}>
-            Tu corazón late unas {AVG_BPM} veces por minuto. En toda una vida, son cerca de{" "}
-            <span className="text-fuchsia-300 font-semibold">3 mil millones de latidos</span>.
-            Descubre cuántos llevas y cuántos te quedan.
+            {t("introPre", { bpm: AVG_BPM })}{" "}
+            <span className="text-fuchsia-300 font-semibold">{t("introHighlight")}</span>{" "}
+            {t("introPost")}
           </p>
         </div>
 
@@ -257,7 +237,7 @@ export default function CalculadoraLatidosPage() {
                     : "border border-zinc-800 text-zinc-500 hover:text-zinc-300 hover:border-zinc-700"
                 }`}
               >
-                Mi edad
+                {t("modeAge")}
               </button>
               <button
                 type="button"
@@ -268,14 +248,14 @@ export default function CalculadoraLatidosPage() {
                     : "border border-zinc-800 text-zinc-500 hover:text-zinc-300 hover:border-zinc-700"
                 }`}
               >
-                Tiempo personalizado
+                {t("modeCustom")}
               </button>
             </div>
 
             {/* Input */}
             {mode === "age" ? (
               <div className="space-y-3">
-                <label className="text-sm text-zinc-400">Fecha de nacimiento</label>
+                <label className="text-sm text-zinc-400">{t("birthDateLabel")}</label>
                 <input
                   type="date"
                   value={birthDate}
@@ -286,7 +266,7 @@ export default function CalculadoraLatidosPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                <label className="text-sm text-zinc-400">Cantidad de tiempo</label>
+                <label className="text-sm text-zinc-400">{t("amountLabel")}</label>
                 <div className="flex gap-3">
                   <input
                     type="number"
@@ -294,7 +274,7 @@ export default function CalculadoraLatidosPage() {
                     step="any"
                     value={customValue}
                     onChange={(e) => { setCustomValue(e.target.value); setCalculated(false); }}
-                    placeholder="Ej: 2"
+                    placeholder={t("amountPlaceholder")}
                     className={`${COMPONENTS.inputField} flex-1`}
                   />
                   <select
@@ -302,10 +282,10 @@ export default function CalculadoraLatidosPage() {
                     onChange={(e) => { setCustomUnit(e.target.value as typeof customUnit); setCalculated(false); }}
                     className={`${COMPONENTS.inputField} w-32`}
                   >
-                    <option value="minutes">Minutos</option>
-                    <option value="hours">Horas</option>
-                    <option value="days">Días</option>
-                    <option value="years">Años</option>
+                    <option value="minutes">{t("unitMinutes")}</option>
+                    <option value="hours">{t("unitHours")}</option>
+                    <option value="days">{t("unitDays")}</option>
+                    <option value="years">{t("unitYears")}</option>
                   </select>
                 </div>
                 <button
@@ -314,7 +294,7 @@ export default function CalculadoraLatidosPage() {
                   disabled={customBeats <= 0}
                   className={`${COMPONENTS.buttonPrimary} w-full mt-2 disabled:opacity-40 disabled:cursor-not-allowed`}
                 >
-                  Calcular latidos
+                  {t("calculateButton")}
                 </button>
               </div>
             )}
@@ -329,19 +309,17 @@ export default function CalculadoraLatidosPage() {
               <PulsingHeart active />
               <div>
                 <p className="text-sm text-zinc-500 mb-1">
-                  {mode === "age" ? "Latidos que te han traido hasta aqui" : "Latidos en ese tiempo"}
+                  {mode === "age" ? t("resultLabelAge") : t("resultLabelCustom")}
                 </p>
                 <p className="text-4xl md:text-5xl font-bold bg-linear-to-r from-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
                   {mode === "age" ? (
-                    <LiveCounter baseBeats={ageBeats} />
+                    <LiveCounter baseBeats={ageBeats} format={formatBeats} />
                   ) : (
-                    <AnimatedNumber value={customBeats} />
+                    <AnimatedNumber value={customBeats} format={formatBeats} />
                   )}
                 </p>
                 {mode === "age" && (
-                  <p className="mt-2 text-sm text-zinc-400">
-                    Cada uno de ellos te sostuvo para llegar a este momento.
-                  </p>
+                  <p className="mt-2 text-sm text-zinc-400">{t("resultCaptionAge")}</p>
                 )}
               </div>
             </div>
@@ -349,35 +327,35 @@ export default function CalculadoraLatidosPage() {
             {/* Positive reframe — what you've built */}
             {mode === "age" && (
               <div className={COMPONENTS.card}>
-                <p className="text-sm font-semibold text-white mb-3">Lo que representan tus latidos</p>
+                <p className="text-sm font-semibold text-white mb-3">{t("reframeTitle")}</p>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-3 text-center">
                     <p className="text-2xl font-bold text-violet-300">
-                      {Math.round(currentBeats / BEATS_PER_DAY).toLocaleString("es-ES")}
+                      {localeNum(Math.round(currentBeats / BEATS_PER_DAY))}
                     </p>
-                    <p className="text-xs text-zinc-500 mt-1">amaneceres vividos</p>
+                    <p className="text-xs text-zinc-500 mt-1">{t("reframeSunrises")}</p>
                   </div>
                   <div className="rounded-xl border border-fuchsia-500/20 bg-fuchsia-500/5 p-3 text-center">
                     <p className="text-2xl font-bold text-fuchsia-300">
-                      {Math.round(currentBeats / (AVG_BPM * 3.5)).toLocaleString("es-ES")}
+                      {localeNum(Math.round(currentBeats / (AVG_BPM * 3.5)))}
                     </p>
-                    <p className="text-xs text-zinc-500 mt-1">canciones que cabrian</p>
+                    <p className="text-xs text-zinc-500 mt-1">{t("reframeSongs")}</p>
                   </div>
                   <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-3 text-center">
                     <p className="text-2xl font-bold text-cyan-300">
-                      {Math.round(currentBeats / BEATS_PER_HOUR).toLocaleString("es-ES")}
+                      {localeNum(Math.round(currentBeats / BEATS_PER_HOUR))}
                     </p>
-                    <p className="text-xs text-zinc-500 mt-1">horas de experiencia</p>
+                    <p className="text-xs text-zinc-500 mt-1">{t("reframeHours")}</p>
                   </div>
                   <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3 text-center">
                     <p className="text-2xl font-bold text-emerald-300">
-                      {Math.round(currentBeats / (AVG_BPM * 0.33)).toLocaleString("es-ES")}
+                      {localeNum(Math.round(currentBeats / (AVG_BPM * 0.33)))}
                     </p>
-                    <p className="text-xs text-zinc-500 mt-1">abrazos posibles</p>
+                    <p className="text-xs text-zinc-500 mt-1">{t("reframeHugs")}</p>
                   </div>
                 </div>
                 <p className="mt-4 text-xs text-zinc-600 text-center">
-                  Tu corazón late {AVG_BPM} veces por minuto sin que se lo pidas. Esa constancia ya la tienes dentro.
+                  {t("reframeFooter", { bpm: AVG_BPM })}
                 </p>
               </div>
             )}
@@ -386,8 +364,8 @@ export default function CalculadoraLatidosPage() {
             <div className={COMPONENTS.card}>
               <p className="text-sm font-semibold text-zinc-300 mb-4">
                 {mode === "age"
-                  ? "Tus latidos en perspectiva"
-                  : `${formatBeats(customBeats)} latidos equivalen a...`}
+                  ? t("perspectiveTitleAge")
+                  : t("perspectiveTitleCustom", { beats: formatBeats(customBeats) })}
               </p>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {PRESETS.map((preset) => {
@@ -398,16 +376,18 @@ export default function CalculadoraLatidosPage() {
                   const Icon = preset.icon;
                   return (
                     <div
-                      key={preset.label}
+                      key={preset.id}
                       className="rounded-xl border border-zinc-800 bg-black/20 p-3 space-y-1.5 hover:border-fuchsia-500/30 transition-colors"
                     >
                       <Icon className="w-4 h-4 text-fuchsia-400/70" />
-                      <p className="text-xs font-semibold text-zinc-300">{preset.label}</p>
+                      <p className="text-xs font-semibold text-zinc-300">
+                        {t(`preset.${preset.id}.label`)}
+                      </p>
                       <p className="text-lg font-bold text-white">{formatBeats(beats)}</p>
                       <p className="text-[11px] text-zinc-600">
                         {ratio && ratio > 1
-                          ? `x${ratio.toLocaleString("es-ES")} veces en tu vida`
-                          : preset.description}
+                          ? t("perspectiveRatio", { n: localeNum(ratio) })
+                          : t(`preset.${preset.id}.description`)}
                       </p>
                     </div>
                   );
@@ -418,18 +398,14 @@ export default function CalculadoraLatidosPage() {
             {/* Email capture */}
             {!emailSent ? (
               <div className={COMPONENTS.card}>
-                <p className="text-sm font-semibold text-zinc-300">
-                  Recibe tu informe de latidos por email
-                </p>
-                <p className="mt-1 text-xs text-zinc-500">
-                  Tu calculo, perspectiva y un primer paso de accion personalizado.
-                </p>
+                <p className="text-sm font-semibold text-zinc-300">{t("emailTitle")}</p>
+                <p className="mt-1 text-xs text-zinc-500">{t("emailDesc")}</p>
                 <div className="mt-3 flex gap-2">
                   <input
                     type="email"
                     value={captureEmail}
                     onChange={(e) => setCaptureEmail(e.target.value)}
-                    placeholder="tu@email.com"
+                    placeholder={t("emailPlaceholder")}
                     className={`${COMPONENTS.inputField} flex-1`}
                   />
                   <button
@@ -453,40 +429,35 @@ export default function CalculadoraLatidosPage() {
                     }}
                     className={`${COMPONENTS.buttonPrimary} shrink-0 disabled:opacity-40`}
                   >
-                    {emailSending ? "..." : "Enviar"}
+                    {emailSending ? "..." : t("emailSend")}
                   </button>
                 </div>
                 <div className="mt-3">
                   <PrivacyCheckbox
                     checked={emailConsent}
                     onChange={setEmailConsent}
-                    context="Tu email se usara solo para enviar este informe."
+                    context={t("emailConsent")}
                   />
                 </div>
               </div>
             ) : (
               <div className={COMPONENTS.card}>
                 <p className="text-sm text-emerald-400 font-medium text-center">
-                  Enviado — revisa tu bandeja de entrada
+                  {t("emailSent")}
                 </p>
               </div>
             )}
 
             {/* CTA */}
             <div className="rounded-2xl border border-fuchsia-500/20 bg-fuchsia-500/5 p-6 text-center space-y-4">
-              <p className="text-lg font-bold text-white">
-                Tu corazón ya hace su parte. Ahora te toca a ti.
-              </p>
-              <p className="text-sm text-zinc-400 max-w-md mx-auto">
-                Con la misma constancia con la que late tu corazón, puedes avanzar un paso cada día.
-                Tres Mil Millones de Latidos te ayuda a convertir la intención en acción.
-              </p>
+              <p className="text-lg font-bold text-white">{t("ctaTitle")}</p>
+              <p className="text-sm text-zinc-400 max-w-md mx-auto">{t("ctaDesc")}</p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link href="/app" className={COMPONENTS.buttonPrimary}>
-                  Empezar ahora <ArrowRight className="w-4 h-4 ml-2 inline" />
+                  {t("ctaPrimary")} <ArrowRight className="w-4 h-4 ml-2 inline" />
                 </Link>
                 <Link href="/test" className={COMPONENTS.buttonSecondary}>
-                  Hacer el test gratuito
+                  {t("ctaSecondary")}
                 </Link>
               </div>
             </div>
@@ -497,42 +468,36 @@ export default function CalculadoraLatidosPage() {
         <div className="mt-16 max-w-3xl mx-auto space-y-8 text-zinc-500">
           <div className={COMPONENTS.divider} />
           <div className="space-y-4">
-            <h2 className={`${TYPOGRAPHY.h4} text-zinc-300`}>
-              Por que contar latidos
-            </h2>
+            <h2 className={`${TYPOGRAPHY.h4} text-zinc-300`}>{t("seoTitle")}</h2>
             <div className="grid md:grid-cols-2 gap-6 text-sm leading-relaxed">
               <div className="space-y-2">
                 <p>
-                  Tu corazón late unas <strong className="text-zinc-300">{AVG_BPM} veces por minuto</strong> sin
-                  que se lo pidas. Son {BEATS_PER_HOUR.toLocaleString("es-ES")} por hora,{" "}
-                  {BEATS_PER_DAY.toLocaleString("es-ES")} al dia. Cada uno sostiene todo lo que haces,
-                  piensas y sientes.
+                  {t("seo1aPre")}{" "}
+                  <strong className="text-zinc-300">{t("seo1aBpm", { bpm: AVG_BPM })}</strong>{" "}
+                  {t("seo1aPost", {
+                    perHour: localeNum(BEATS_PER_HOUR),
+                    perDay: localeNum(BEATS_PER_DAY),
+                  })}
                 </p>
                 <p>
-                  A lo largo de una vida, el corazón late cerca de{" "}
-                  <strong className="text-fuchsia-300">3 mil millones de veces</strong>.
-                  No es una cuenta atras — es un recordatorio de lo que ya has construido latido a latido.
+                  {t("seo1bPre")}{" "}
+                  <strong className="text-fuchsia-300">{t("seo1bStrong")}</strong>.{" "}
+                  {t("seo1bPost")}
                 </p>
               </div>
               <div className="space-y-2">
+                <p>{t("seo2a")}</p>
                 <p>
-                  Esta calculadora usa la frecuencia cardiaca en reposo promedio de un adulto sano.
-                  Tu frecuencia real varia con la edad, el ejercicio y la genetica.
-                </p>
-                <p>
-                  El objetivo no es la precision clinica: es la <strong className="text-zinc-300">perspectiva</strong>.
-                  Darte cuenta de que ya cargas con millones de latidos de experiencia
-                  puede ser el empujon que necesitas para dar el siguiente paso.
+                  {t("seo2bPre")}{" "}
+                  <strong className="text-zinc-300">{t("seo2bStrong")}</strong>.{" "}
+                  {t("seo2bPost")}
                 </p>
               </div>
               <div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-4 space-y-2">
-                <p className="text-sm font-semibold text-white">¿Y ahora que?</p>
-                <p className="text-sm text-zinc-400 leading-relaxed">
-                  Saber cuantos latidos quedan no cambia nada. Lo que cambia es decidir que haces con el siguiente.
-                  Tres Mil Millones de Latidos te ayuda a dar ese paso.
-                </p>
+                <p className="text-sm font-semibold text-white">{t("nowWhatTitle")}</p>
+                <p className="text-sm text-zinc-400 leading-relaxed">{t("nowWhatDesc")}</p>
                 <Link href="/app" className="inline-flex items-center gap-2 mt-1 text-sm font-semibold text-violet-400 hover:text-violet-300 transition-colors">
-                  Empezar ahora →
+                  {t("nowWhatCta")}
                 </Link>
               </div>
             </div>

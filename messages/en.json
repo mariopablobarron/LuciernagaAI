@@ -976,5 +976,89 @@
     "ctaDesc": "If you work in psychology, coaching or professional accompaniment and you're interested in trying the clinical panel with a client, write to us. We review every collaboration case by case — we don't work with just anyone.",
     "ctaPrimary": "Talk to the team",
     "ctaSecondary": "Read the full method"
+  },
+  "calculator": {
+    "eyebrow": "Free tool",
+    "title": "Heartbeat Calculator",
+    "introPre": "Your heart beats about {bpm} times per minute. Over a lifetime, that's close to",
+    "introHighlight": "3 billion heartbeats",
+    "introPost": "Find out how many you've already lived and how many are still ahead.",
+    "modeAge": "My age",
+    "modeCustom": "Custom time",
+    "birthDateLabel": "Date of birth",
+    "amountLabel": "Amount of time",
+    "amountPlaceholder": "E.g.: 2",
+    "unitMinutes": "Minutes",
+    "unitHours": "Hours",
+    "unitDays": "Days",
+    "unitYears": "Years",
+    "calculateButton": "Calculate heartbeats",
+    "format": {
+      "billion": "{n} billion",
+      "million": "{n}M",
+      "thousand": "{n}K"
+    },
+    "resultLabelAge": "Heartbeats that brought you here",
+    "resultLabelCustom": "Heartbeats in that time",
+    "resultCaptionAge": "Each one of them held you up to reach this moment.",
+    "reframeTitle": "What your heartbeats represent",
+    "reframeSunrises": "sunrises lived",
+    "reframeSongs": "songs that would fit",
+    "reframeHours": "hours of experience",
+    "reframeHugs": "possible hugs",
+    "reframeFooter": "Your heart beats {bpm} times per minute without you asking. That steadiness is already inside you.",
+    "perspectiveTitleAge": "Your heartbeats in perspective",
+    "perspectiveTitleCustom": "{beats} heartbeats are equivalent to...",
+    "perspectiveRatio": "x{n} times in your life",
+    "preset": {
+      "hug": {
+        "label": "A long hug",
+        "description": "20 seconds of real contact"
+      },
+      "song": {
+        "label": "A favorite song",
+        "description": "3 and a half minutes of pause"
+      },
+      "talk": {
+        "label": "A good conversation",
+        "description": "1 hour that can change your day"
+      },
+      "sleep": {
+        "label": "A night of sleep",
+        "description": "8 hours restoring your body"
+      },
+      "year": {
+        "label": "A year of your life",
+        "description": "About 37M heartbeats invested"
+      },
+      "birth": {
+        "label": "Since you were born",
+        "description": "Every one counts"
+      }
+    },
+    "emailTitle": "Get your heartbeat report by email",
+    "emailDesc": "Your calculation, perspective, and a first personalized action step.",
+    "emailPlaceholder": "you@email.com",
+    "emailSend": "Send",
+    "emailSent": "Sent — check your inbox",
+    "emailConsent": "Your email will only be used to send this report.",
+    "ctaTitle": "Your heart already does its part. Now it's your turn.",
+    "ctaDesc": "With the same steadiness with which your heart beats, you can move forward one step every day. Three Billion Heartbeats helps you turn intention into action.",
+    "ctaPrimary": "Start now",
+    "ctaSecondary": "Take the free test",
+    "seoTitle": "Why count heartbeats",
+    "seo1aPre": "Your heart beats about",
+    "seo1aBpm": "{bpm} times per minute",
+    "seo1aPost": "without you asking. That's {perHour} per hour, {perDay} per day. Each one sustains everything you do, think and feel.",
+    "seo1bPre": "Over a lifetime, the heart beats close to",
+    "seo1bStrong": "3 billion times",
+    "seo1bPost": "It's not a countdown — it's a reminder of what you've already built beat by beat.",
+    "seo2a": "This calculator uses the average resting heart rate of a healthy adult. Your real rate varies with age, exercise and genetics.",
+    "seo2bPre": "The goal isn't clinical precision: it's",
+    "seo2bStrong": "perspective",
+    "seo2bPost": "Realizing you already carry millions of heartbeats of experience can be the push you need to take the next step.",
+    "nowWhatTitle": "So what now?",
+    "nowWhatDesc": "Knowing how many heartbeats are left changes nothing. What changes is deciding what you do with the next one. Three Billion Heartbeats helps you take that step.",
+    "nowWhatCta": "Start now →"
   }
 }

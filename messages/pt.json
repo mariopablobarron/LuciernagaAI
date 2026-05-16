@@ -976,5 +976,89 @@
     "ctaDesc": "Se te dedicas à psicologia, ao coaching ou ao acompanhamento profissional e te interessa experimentar o painel clínico com algum cliente, escreve-nos. Revemos cada colaboração caso a caso — não trabalhamos com qualquer pessoa.",
     "ctaPrimary": "Falar com a equipa",
     "ctaSecondary": "Ler o método completo"
+  },
+  "calculator": {
+    "eyebrow": "Ferramenta gratuita",
+    "title": "Calculadora de Batidas",
+    "introPre": "O teu coração bate cerca de {bpm} vezes por minuto. Numa vida inteira, são perto de",
+    "introHighlight": "3 mil milhões de batidas",
+    "introPost": "Descobre quantas já levas e quantas te restam.",
+    "modeAge": "A minha idade",
+    "modeCustom": "Tempo personalizado",
+    "birthDateLabel": "Data de nascimento",
+    "amountLabel": "Quantidade de tempo",
+    "amountPlaceholder": "Ex: 2",
+    "unitMinutes": "Minutos",
+    "unitHours": "Horas",
+    "unitDays": "Dias",
+    "unitYears": "Anos",
+    "calculateButton": "Calcular batidas",
+    "format": {
+      "billion": "{n} mil milhões",
+      "million": "{n}M",
+      "thousand": "{n}K"
+    },
+    "resultLabelAge": "Batidas que te trouxeram até aqui",
+    "resultLabelCustom": "Batidas nesse tempo",
+    "resultCaptionAge": "Cada uma delas amparou-te para chegares a este momento.",
+    "reframeTitle": "O que representam as tuas batidas",
+    "reframeSunrises": "amanheceres vividos",
+    "reframeSongs": "canções que caberiam",
+    "reframeHours": "horas de experiência",
+    "reframeHugs": "abraços possíveis",
+    "reframeFooter": "O teu coração bate {bpm} vezes por minuto sem que lho peças. Essa constância já a tens dentro de ti.",
+    "perspectiveTitleAge": "As tuas batidas em perspetiva",
+    "perspectiveTitleCustom": "{beats} batidas equivalem a...",
+    "perspectiveRatio": "x{n} vezes na tua vida",
+    "preset": {
+      "hug": {
+        "label": "Um abraço longo",
+        "description": "20 segundos de contacto real"
+      },
+      "song": {
+        "label": "Uma canção favorita",
+        "description": "3 minutos e meio de pausa"
+      },
+      "talk": {
+        "label": "Uma boa conversa",
+        "description": "1 hora que pode mudar-te o dia"
+      },
+      "sleep": {
+        "label": "Uma noite de sono",
+        "description": "8 horas a restaurar o teu corpo"
+      },
+      "year": {
+        "label": "Um ano da tua vida",
+        "description": "Cerca de 37M de batidas investidas"
+      },
+      "birth": {
+        "label": "Desde que nasceste",
+        "description": "Cada uma conta"
+      }
+    },
+    "emailTitle": "Recebe o teu relatório de batidas por email",
+    "emailDesc": "O teu cálculo, perspetiva e um primeiro passo de ação personalizado.",
+    "emailPlaceholder": "tu@email.com",
+    "emailSend": "Enviar",
+    "emailSent": "Enviado — verifica a tua caixa de entrada",
+    "emailConsent": "O teu email só será usado para enviar este relatório.",
+    "ctaTitle": "O teu coração já faz a parte dele. Agora é a tua vez.",
+    "ctaDesc": "Com a mesma constância com que te bate o coração, podes avançar um passo todos os dias. Três Mil Milhões de Batidas ajuda-te a transformar a intenção em ação.",
+    "ctaPrimary": "Começar agora",
+    "ctaSecondary": "Fazer o teste gratuito",
+    "seoTitle": "Porquê contar batidas",
+    "seo1aPre": "O teu coração bate cerca de",
+    "seo1aBpm": "{bpm} vezes por minuto",
+    "seo1aPost": "sem que lho peças. São {perHour} por hora, {perDay} por dia. Cada uma sustenta tudo o que fazes, pensas e sentes.",
+    "seo1bPre": "Ao longo de uma vida, o coração bate perto de",
+    "seo1bStrong": "3 mil milhões de vezes",
+    "seo1bPost": "Não é uma contagem decrescente — é um lembrete do que já construíste batida a batida.",
+    "seo2a": "Esta calculadora usa a frequência cardíaca em repouso média de um adulto saudável. A tua frequência real varia com a idade, o exercício e a genética.",
+    "seo2bPre": "O objetivo não é a precisão clínica: é a",
+    "seo2bStrong": "perspetiva",
+    "seo2bPost": "Dares-te conta de que já carregas milhões de batidas de experiência pode ser o empurrão de que precisas para dar o próximo passo.",
+    "nowWhatTitle": "E agora?",
+    "nowWhatDesc": "Saber quantas batidas restam não muda nada. O que muda é decidires o que fazes com a próxima. Três Mil Milhões de Batidas ajuda-te a dar esse passo.",
+    "nowWhatCta": "Começar agora →"
   }
 }

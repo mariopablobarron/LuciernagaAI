@@ -1,0 +1,27 @@
+messages/pt.json
+  s_c72d0ada98a9af::t_4d9dcde2f9b5ea 1063-1178
+messages/es.json
+  s_c72d0ada98a9af::t_4362c338e2ab8b 1063-1178
+messages/fr.json
+  s_c72d0ada98a9af::t_1e8a0bf943a18e 1063-1178
+src/app/(public)/test/page.tsx
+  s_c72d0ada98a9af::t_9ff287ba20e69f 5,14-16,18,22-25,31-34,40-43,49-52,58-61,66-67,74-79,93-95,104,107-109,140,157,170,263,266,268,272,277,279,282-285,294,297,305,312-314,328,332,350-352,365,368,382-383,391,400,407,415,424-425,431-433,436,444,448-450,453-456,462,467,474-476,478,484,486,492,494,498,508,515,517-518,520,529,547
+messages/en.json
+  s_c72d0ada98a9af::t_d14748db5edaaf 1063-1178
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "9662cd3c3bca67c5191bb0b1d1efd52028d48828",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

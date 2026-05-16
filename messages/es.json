@@ -1060,5 +1060,121 @@
     "nowWhatTitle": "¿Y ahora qué?",
     "nowWhatDesc": "Saber cuántos latidos quedan no cambia nada. Lo que cambia es decidir qué haces con el siguiente. Tres Mil Millones de Latidos te ayuda a dar ese paso.",
     "nowWhatCta": "Empezar ahora →"
+  },
+  "test": {
+    "introEyebrow": "Diagnóstico gratuito",
+    "introTitle": "¿Qué te está",
+    "introTitleHighlight": "frenando ahora?",
+    "introSubtitle": "5 preguntas. Resultado inmediato. Una acción concreta para hoy.",
+    "introPreview": {
+      "bloqueo": "Bloqueo",
+      "ansiedad": "Ansiedad",
+      "duda": "Niebla"
+    },
+    "introCta": "Empezar diagnóstico",
+    "introFootnote": "Anónimo · Sin registro · 2 minutos",
+    "quizProgress": "Pregunta {current} de {total}",
+    "quizBack": "← Atrás",
+    "quizContinuing": "Continuando…",
+    "question": {
+      "q1": {
+        "text": "¿Cómo describirías tu energía mental ahora mismo?",
+        "option1": "Estancada — no consigo avanzar",
+        "option2": "Acelerada — demasiados pensamientos a la vez",
+        "option3": "Difusa — no sé lo que quiero",
+        "option4": "Fluida — sé lo que toca hacer"
+      },
+      "q2": {
+        "text": "Cuando piensas en tu objetivo principal, ¿qué ocurre?",
+        "option1": "Me paralizo antes de empezar",
+        "option2": "Me angustio pensando en lo que puede fallar",
+        "option3": "No sé por dónde empezar",
+        "option4": "Tengo claro el siguiente paso"
+      },
+      "q3": {
+        "text": "¿Cuánto llevas dando vueltas al mismo tema sin avanzar?",
+        "option1": "Días o semanas — sigo en el mismo punto",
+        "option2": "Horas, con presión que no para",
+        "option3": "Poco tiempo, pero no encuentro la dirección",
+        "option4": "Estoy avanzando, aunque lento"
+      },
+      "q4": {
+        "text": "¿Qué sientes en el cuerpo mientras respondes esto?",
+        "option1": "Tensión o pesadez",
+        "option2": "Inquietud o palpitaciones",
+        "option3": "Niebla mental, confusión",
+        "option4": "Calma o presencia"
+      },
+      "q5": {
+        "text": "Si pudieras pedir una sola cosa ahora, ¿cuál sería?",
+        "option1": "Que alguien me desatasque",
+        "option2": "Silenciar el ruido en mi cabeza",
+        "option3": "Alguien que me ayude a ordenar mis ideas",
+        "option4": "Mantener el impulso que ya tengo"
+      }
+    },
+    "emailTitle": "¿Te enviamos el diagnóstico?",
+    "emailDesc": "Recibe tu resultado completo por email y Tres Mil Millones de Latidos te ayudará a hacer seguimiento de tu estado.",
+    "emailPlaceholder": "tu@email.com",
+    "emailConsent": "Tu email y resultado se usarán para enviarte el diagnóstico y seguimiento.",
+    "emailSending": "Enviando…",
+    "emailSeeResult": "Ver resultado →",
+    "emailSkip": "Continuar sin email",
+    "result": {
+      "bloqueo": {
+        "label": "Bloqueo mental",
+        "tagline": "Sabes lo que tienes que hacer — pero no puedes empezar.",
+        "pattern": "Tu mente actúa como si el primer paso fuera irreversible. No lo es. El bloqueo no es falta de voluntad: es un mecanismo de protección que se ha vuelto excesivo y que se activa antes de que hagas nada.",
+        "signal": "La tarea percibida como «enorme» se desactiva sola en cuanto la reduces a 10 minutos reales. No necesitas un plan completo.",
+        "action": "Abre ahora el documento, archivo o herramienta del proyecto. Solo abrirlo, sin hacer nada más. En los próximos 2 minutos."
+      },
+      "ansiedad": {
+        "label": "Ansiedad de acción",
+        "tagline": "Tienes energía — pero se convierte en presión, no en avance.",
+        "pattern": "Tu cabeza genera escenarios de fallo antes de que empieces. Cada vez que preparas más en lugar de actuar, la ansiedad crece. Más información no resuelve esto — lo amplifica.",
+        "signal": "La ansiedad baja al primer resultado concreto pequeño, no al primer plan perfecto. Actuar 5 minutos vale más que planificar 2 horas.",
+        "action": "Escribe en papel (o en un documento): «¿Qué es lo peor concreto que puede pasar?» Una frase. Sin adornos. Nómbralo."
+      },
+      "duda": {
+        "label": "Niebla de dirección",
+        "tagline": "Tienes ganas — pero no sabes hacia dónde.",
+        "pattern": "La duda crónica no es falta de información: es un exceso de opciones sin un criterio de decisión claro. Buscar más datos no resuelve esto — añade más variables a un sistema ya saturado.",
+        "signal": "Necesitas decidir algo pequeño, no todo a la vez. Una sola decisión concreta rompe la niebla mejor que cualquier análisis.",
+        "action": "Responde en 30 segundos: ¿Cuál es el UN objetivo que, si avanzara esta semana, sentiría que hay progreso real? Escríbelo ahora."
+      },
+      "claridad": {
+        "label": "Momento de claridad",
+        "tagline": "Sabes lo que quieres y tienes energía para avanzar.",
+        "pattern": "Estás en un estado de flujo potencial. El riesgo ahora no es la parálisis — es la dispersión. Hacer demasiado y perder el foco es lo que convierte la claridad en caos.",
+        "signal": "La claridad es una ventana, no una posición permanente. Aprovéchala ahora, no mañana.",
+        "action": "Define en una frase el resultado concreto de hoy. No la lista entera: solo la cosa más importante que, si la haces, el día habrá valido."
+      },
+      "neutral": {
+        "label": "Estado neutro",
+        "tagline": "Estás en punto muerto — ni bloqueado ni en impulso claro.",
+        "pattern": "El estado neutro puede ser recuperación necesaria o el inicio silencioso de un bloqueo. La diferencia está en si tienes un próximo paso definido o no.",
+        "signal": "No necesitas motivación — necesitas un ancla pequeña a la que volver. Un compromiso concreto de 20 minutos es suficiente.",
+        "action": "Elige una tarea de menos de 20 minutos que lleves postergando. Ponla en tu agenda de hoy con hora exacta."
+      }
+    },
+    "evolutionTitle": "Tu evolución",
+    "evolutionBefore": "antes",
+    "evolutionNow": "ahora",
+    "evolutionImproved": "Eso no pasa solo. Has trabajado en esto.",
+    "evolutionHarder": "Esta semana es más difícil que la última. Es información, no fracaso.",
+    "patternHeader": "Lo que está pasando",
+    "signalHeader": "La señal clave",
+    "actionHeader": "Tu acción para ahora",
+    "shareHeader": "Comparte tu resultado",
+    "shareText": "{emoji} Acabo de descubrir que estoy en estado de \"{state}\". ¿Y tú?",
+    "shareTagline": "Test gratuito de diagnóstico mental",
+    "shareCopyTitle": "Copiar link",
+    "followupDivider": "Para seguimiento continuo",
+    "followupTitle": "Tres Mil Millones de Latidos detecta tu estado en cada sesión",
+    "followupBullet1": "Conversaciones orientadas a acción, no a charla",
+    "followupBullet2": "Seguimiento de objetivos y bloqueos entre sesiones",
+    "followupBullet3": "Señales de riesgo antes de que escalen",
+    "followupCta": "Empezar gratis",
+    "retake": "Repetir el test"
   }
 }

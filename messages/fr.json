@@ -1060,5 +1060,121 @@
     "nowWhatTitle": "Et maintenant ?",
     "nowWhatDesc": "Savoir combien de battements il te reste ne change rien. Ce qui change, c'est de décider ce que tu fais du prochain. Trois Milliards de Battements t'aide à faire ce pas.",
     "nowWhatCta": "Commencer maintenant →"
+  },
+  "test": {
+    "introEyebrow": "Diagnostic gratuit",
+    "introTitle": "Qu'est-ce qui te",
+    "introTitleHighlight": "freine en ce moment ?",
+    "introSubtitle": "5 questions. Résultat immédiat. Une action concrète pour aujourd'hui.",
+    "introPreview": {
+      "bloqueo": "Blocage",
+      "ansiedad": "Anxiété",
+      "duda": "Brouillard"
+    },
+    "introCta": "Commencer le diagnostic",
+    "introFootnote": "Anonyme · Sans inscription · 2 minutes",
+    "quizProgress": "Question {current} sur {total}",
+    "quizBack": "← Retour",
+    "quizContinuing": "On continue…",
+    "question": {
+      "q1": {
+        "text": "Comment décrirais-tu ton énergie mentale en ce moment ?",
+        "option1": "Bloquée — je n'arrive pas à avancer",
+        "option2": "Accélérée — trop de pensées en même temps",
+        "option3": "Diffuse — je ne sais pas ce que je veux",
+        "option4": "Fluide — je sais ce qu'il faut faire"
+      },
+      "q2": {
+        "text": "Quand tu penses à ton objectif principal, qu'est-ce qui se passe ?",
+        "option1": "Je me paralyse avant de commencer",
+        "option2": "Je m'angoisse en pensant à ce qui pourrait échouer",
+        "option3": "Je ne sais pas par où commencer",
+        "option4": "Je vois clairement le prochain pas"
+      },
+      "q3": {
+        "text": "Depuis combien de temps tournes-tu autour du même sujet sans avancer ?",
+        "option1": "Des jours ou des semaines — je suis au même point",
+        "option2": "Des heures, avec une pression qui ne s'arrête pas",
+        "option3": "Peu de temps, mais je ne trouve pas la direction",
+        "option4": "J'avance, même lentement"
+      },
+      "q4": {
+        "text": "Que ressens-tu dans ton corps en répondant à ça ?",
+        "option1": "Tension ou lourdeur",
+        "option2": "Agitation ou palpitations",
+        "option3": "Brouillard mental, confusion",
+        "option4": "Calme ou présence"
+      },
+      "q5": {
+        "text": "Si tu pouvais demander une seule chose maintenant, ce serait quoi ?",
+        "option1": "Que quelqu'un me débloque",
+        "option2": "Faire taire le bruit dans ma tête",
+        "option3": "Quelqu'un qui m'aide à mettre de l'ordre dans mes idées",
+        "option4": "Garder l'élan que j'ai déjà"
+      }
+    },
+    "emailTitle": "On t'envoie le diagnostic ?",
+    "emailDesc": "Reçois ton résultat complet par email et Trois Milliards de Battements t'aidera à suivre ton état dans le temps.",
+    "emailPlaceholder": "toi@email.com",
+    "emailConsent": "Ton email et ton résultat ne serviront qu'à t'envoyer le diagnostic et le suivi.",
+    "emailSending": "Envoi en cours…",
+    "emailSeeResult": "Voir le résultat →",
+    "emailSkip": "Continuer sans email",
+    "result": {
+      "bloqueo": {
+        "label": "Blocage mental",
+        "tagline": "Tu sais ce que tu dois faire — mais tu n'arrives pas à commencer.",
+        "pattern": "Ton esprit agit comme si le premier pas était irréversible. Il ne l'est pas. Le blocage n'est pas un manque de volonté : c'est un mécanisme de protection devenu excessif qui s'active avant même que tu fasses quoi que ce soit.",
+        "signal": "La tâche perçue comme « énorme » se désamorce d'elle-même dès que tu la réduis à 10 minutes réelles. Tu n'as pas besoin d'un plan complet.",
+        "action": "Ouvre maintenant le document, le fichier ou l'outil du projet. Juste l'ouvrir, rien d'autre. Dans les 2 prochaines minutes."
+      },
+      "ansiedad": {
+        "label": "Anxiété d'action",
+        "tagline": "Tu as de l'énergie — mais elle se transforme en pression, pas en progrès.",
+        "pattern": "Ta tête génère des scénarios d'échec avant que tu commences. Chaque fois que tu prépares davantage au lieu d'agir, l'anxiété grandit. Plus d'information ne résout pas ça — ça l'amplifie.",
+        "signal": "L'anxiété baisse au premier petit résultat concret, pas au premier plan parfait. Agir 5 minutes vaut mieux que planifier 2 heures.",
+        "action": "Écris sur papier (ou dans un document) : « Quelle est la pire chose concrète qui puisse arriver ? » Une phrase. Sans fioritures. Nomme-la."
+      },
+      "duda": {
+        "label": "Brouillard de direction",
+        "tagline": "Tu as envie — mais tu ne sais pas vers où.",
+        "pattern": "Le doute chronique n'est pas un manque d'information : c'est un excès d'options sans critère de décision clair. Chercher plus de données ne résout pas ça — ça ajoute plus de variables à un système déjà saturé.",
+        "signal": "Tu dois décider quelque chose de petit, pas tout d'un coup. Une seule décision concrète brise le brouillard mieux que n'importe quelle analyse.",
+        "action": "Réponds en 30 secondes : Quel est le SEUL objectif qui, s'il avançait cette semaine, te donnerait le sentiment d'un progrès réel ? Écris-le maintenant."
+      },
+      "claridad": {
+        "label": "Moment de clarté",
+        "tagline": "Tu sais ce que tu veux et tu as l'énergie pour avancer.",
+        "pattern": "Tu es dans un état de flux potentiel. Le risque maintenant n'est pas la paralysie — c'est la dispersion. Faire trop et perdre le focus, c'est ce qui transforme la clarté en chaos.",
+        "signal": "La clarté est une fenêtre, pas une position permanente. Profites-en maintenant, pas demain.",
+        "action": "Définis en une phrase le résultat concret d'aujourd'hui. Pas toute la liste : juste la chose la plus importante qui, si tu la fais, fera que la journée aura valu le coup."
+      },
+      "neutral": {
+        "label": "État neutre",
+        "tagline": "Tu es au point mort — ni bloqué, ni dans un élan clair.",
+        "pattern": "L'état neutre peut être une récupération nécessaire ou le début silencieux d'un blocage. La différence se joue selon que tu as ou non un prochain pas défini.",
+        "signal": "Tu n'as pas besoin de motivation — tu as besoin d'une petite ancre vers laquelle revenir. Un engagement concret de 20 minutes suffit.",
+        "action": "Choisis une tâche de moins de 20 minutes que tu repousses. Mets-la dans ton agenda d'aujourd'hui avec une heure précise."
+      }
+    },
+    "evolutionTitle": "Ton évolution",
+    "evolutionBefore": "avant",
+    "evolutionNow": "maintenant",
+    "evolutionImproved": "Ça n'arrive pas tout seul. Tu as travaillé là-dessus.",
+    "evolutionHarder": "Cette semaine est plus difficile que la précédente. C'est une information, pas un échec.",
+    "patternHeader": "Ce qui se passe",
+    "signalHeader": "Le signal clé",
+    "actionHeader": "Ton action pour maintenant",
+    "shareHeader": "Partage ton résultat",
+    "shareText": "{emoji} Je viens de découvrir que je suis dans un état de \"{state}\". Et toi ?",
+    "shareTagline": "Test gratuit de diagnostic mental",
+    "shareCopyTitle": "Copier le lien",
+    "followupDivider": "Pour un suivi continu",
+    "followupTitle": "Trois Milliards de Battements détecte ton état à chaque session",
+    "followupBullet1": "Des conversations orientées vers l'action, pas vers le bavardage",
+    "followupBullet2": "Suivi des objectifs et des blocages d'une session à l'autre",
+    "followupBullet3": "Des signaux de risque avant qu'ils ne s'aggravent",
+    "followupCta": "Commencer gratuitement",
+    "retake": "Refaire le test"
   }
 }

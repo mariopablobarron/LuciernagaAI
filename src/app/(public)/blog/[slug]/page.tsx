@@ -3,6 +3,7 @@
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import { useLocale, useTranslations } from "next-intl";
 import { ArrowLeft, BookOpen, Calendar, User, Tag } from "lucide-react";
 import type { Block } from "@blocknote/core";
 
@@ -24,16 +25,26 @@ type BlogPost = {
   publishedAt: string | null;
 };
 
-function formatDate(iso: string | null) {
-  if (!iso) return "";
-  return new Date(iso).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
-}
+const LOCALE_BCP47: Record<string, string> = {
+  es: "es-ES",
+  en: "en-US",
+  pt: "pt-PT",
+  fr: "fr-FR",
+};
 
 export default function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const t = useTranslations("blog");
+  const locale = useLocale();
   const { slug } = use(params);
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+
+  const bcp = LOCALE_BCP47[locale] ?? "en-US";
+  function formatDate(iso: string | null) {
+    if (!iso) return "";
+    return new Date(iso).toLocaleDateString(bcp, { day: "numeric", month: "long", year: "numeric" });
+  }
 
   useEffect(() => {
     fetch(`/api/blog/${slug}`)
@@ -59,9 +70,9 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
     return (
       <div className="max-w-3xl mx-auto px-4 py-20 text-center space-y-4">
         <BookOpen className="w-12 h-12 text-zinc-700 mx-auto" />
-        <h1 className="text-2xl font-bold text-white">Articulo no encontrado</h1>
+        <h1 className="text-2xl font-bold text-white">{t("notFoundTitle")}</h1>
         <Link href="/blog" className="inline-flex items-center gap-2 text-sm text-violet-400 hover:text-violet-300 transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Volver al blog
+          <ArrowLeft className="w-4 h-4" /> {t("backToBlog")}
         </Link>
       </div>
     );
@@ -73,7 +84,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
     <article className="max-w-3xl mx-auto px-4 py-16 space-y-8">
       {/* Back */}
       <Link href="/blog" className="inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-white transition-colors">
-        <ArrowLeft className="w-4 h-4" /> Blog
+        <ArrowLeft className="w-4 h-4" /> {t("backShort")}
       </Link>
 
       {/* Cover */}
@@ -109,7 +120,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
         )}
       </div>
 
-      {/* Content */}
+      {/* Content (contenido del post — actualmente solo ES en BD) */}
       <div className="prose-custom">
         {hasBlocks ? (
           <BlockEditor
@@ -126,20 +137,20 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
 
       {/* CTA */}
       <div className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-8 text-center space-y-4">
-        <p className="text-lg font-semibold text-white">¿Quieres pasar del bloqueo a la accion?</p>
-        <p className="text-sm text-zinc-400">Tres Mil Millones de Latidos te acompana con IA. Gratis durante el MVP.</p>
+        <p className="text-lg font-semibold text-white">{t("ctaTitle")}</p>
+        <p className="text-sm text-zinc-400">{t("ctaDesc")}</p>
         <Link
           href="/signup"
           className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 px-6 py-3 font-bold text-white hover:from-violet-400 hover:to-fuchsia-400 transition-all"
         >
-          Empezar ahora
+          {t("ctaButton")}
         </Link>
       </div>
 
       {/* Back to blog */}
       <div className="text-center">
         <Link href="/blog" className="text-sm text-zinc-500 hover:text-violet-400 transition-colors">
-          ← Volver al blog
+          {t("backArrow")}
         </Link>
       </div>
     </article>

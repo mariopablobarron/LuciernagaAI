@@ -1773,5 +1773,20 @@
         "intro": "For inquiries about these terms write to us at <mailto>hola@tresmilmillonesdelatidos.es</mailto>."
       }
     }
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Articles, reflections and recommendations on emotional wellbeing, personal growth and artificial intelligence.",
+    "empty": "We'll be publishing articles here soon.",
+    "emptyBack": "Back to home",
+    "prev": "Previous",
+    "next": "Next",
+    "notFoundTitle": "Article not found",
+    "backToBlog": "Back to blog",
+    "backShort": "Blog",
+    "backArrow": "← Back to blog",
+    "ctaTitle": "Want to move from stuck to action?",
+    "ctaDesc": "Three Billion Heartbeats walks with you using AI. Free during the MVP.",
+    "ctaButton": "Start now"
   }
 }

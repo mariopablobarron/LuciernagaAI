@@ -1,0 +1,31 @@
+src/services/coach.ts
+  s_c72d0ada98a9af::t_d008864bb416b1 558-560
+  s_c72d0ada98a9af::t_910e79947b61c3 146-150,153-198
+  s_c72d0ada98a9af::t_8d0d7953729a38 662-664,666
+src/application/chat/processMessage.ts
+  s_c72d0ada98a9af::t_effd0a47b27f26 40-42
+  s_c72d0ada98a9af::t_1f9c23c9a03c2c 88
+  s_c72d0ada98a9af::t_cb067888650006 238-240
+src/components/LocaleSwitcher.tsx
+  s_c72d0ada98a9af::t_75594e3119acbb 6,8-31,33-36,38-39,50-51,53-60,62-135
+src/services/chatOrchestrator.ts
+  s_c72d0ada98a9af::t_4e59bbb3a9aa5b 134-143,147-159
+  s_c72d0ada98a9af::t_915b8620dee7a7 144-146
+  s_c72d0ada98a9af::t_bfca7dcce5d77b 176
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "992eccf4394106f329aaf901d53615899de18b88",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

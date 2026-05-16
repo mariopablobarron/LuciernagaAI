@@ -4,6 +4,7 @@ import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
 import { syndicatePost } from "@/services/syndication";
 import { notifyIndexNowSingle } from "@/services/seo/indexnow";
+import { pickEmailLocale } from "@/lib/email-i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -40,16 +41,48 @@ export async function PUT(
     const body = await req.json();
     const prisma = getPrismaClient();
 
-    const existing = await prisma.blogPost.findUnique({ where: { id }, select: { id: true, status: true } });
+    const existing = await prisma.blogPost.findUnique({
+      where: { id },
+      select: { id: true, status: true, slug: true, locale: true },
+    });
     if (!existing) return NextResponse.json({ error: "Post no encontrado" }, { status: 404 });
 
     const data: Record<string, unknown> = {};
     if (typeof body.title === "string") data.title = body.title.trim();
+
+    // Locale change (opcional): el admin puede recategorizar un post a otro
+    // idioma. Validamos junto al slug porque ambos forman el unique compuesto.
+    const newLocale = typeof body.locale === "string"
+      ? pickEmailLocale(body.locale)
+      : existing.locale;
+    if (newLocale !== existing.locale) data.locale = newLocale;
+
     if (typeof body.slug === "string") {
       const newSlug = body.slug.trim().toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/(^-|-$)/g, "");
-      const conflict = await prisma.blogPost.findFirst({ where: { slug: newSlug, id: { not: id } }, select: { id: true } });
-      if (conflict) return NextResponse.json({ error: "Slug ya existe" }, { status: 409 });
+      const conflict = await prisma.blogPost.findFirst({
+        where: { slug: newSlug, locale: newLocale, id: { not: id } },
+        select: { id: true },
+      });
+      if (conflict) {
+        return NextResponse.json(
+          { error: `Slug ya existe en idioma ${newLocale}` },
+          { status: 409 },
+        );
+      }
       data.slug = newSlug;
+    } else if (newLocale !== existing.locale) {
+      // Si solo cambia el locale (sin slug nuevo), verificamos que el slug
+      // actual no choque en el locale destino.
+      const conflict = await prisma.blogPost.findFirst({
+        where: { slug: existing.slug, locale: newLocale, id: { not: id } },
+        select: { id: true },
+      });
+      if (conflict) {
+        return NextResponse.json(
+          { error: `Ya hay un post con slug "${existing.slug}" en idioma ${newLocale}` },
+          { status: 409 },
+        );
+      }
     }
     if (typeof body.content === "string") data.content = body.content.trim();
     if (body.blocks !== undefined) data.blocks = Array.isArray(body.blocks) ? body.blocks : null;

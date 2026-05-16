@@ -12,6 +12,7 @@ import { toast } from "sonner";
 type BlogPost = {
   id: string;
   slug: string;
+  locale: string;
   title: string;
   excerpt: string | null;
   status: string;
@@ -19,6 +20,13 @@ type BlogPost = {
   tags: string[];
   publishedAt: string | null;
   createdAt: string;
+};
+
+const LOCALE_FLAG: Record<string, string> = {
+  es: "🇪🇸",
+  en: "🇬🇧",
+  pt: "🇵🇹",
+  fr: "🇫🇷",
 };
 
 type Pagination = { page: number; pageSize: number; total: number; totalPages: number };
@@ -40,6 +48,7 @@ export default function AdminBlogPage() {
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("");
+  const [localeFilter, setLocaleFilter] = useState("");
   const [page, setPage] = useState(1);
 
   const load = useCallback(async () => {
@@ -47,6 +56,7 @@ export default function AdminBlogPage() {
     try {
       const params = new URLSearchParams({ page: String(page), pageSize: "20" });
       if (filter) params.set("status", filter);
+      if (localeFilter) params.set("locale", localeFilter);
       const res = await fetch(`/api/admin/blog?${params}`, { credentials: "include" });
       if (res.status === 401) { router.push("/admin/login"); return; }
       if (!res.ok) { toast.error("Error cargando posts"); return; }
@@ -58,7 +68,7 @@ export default function AdminBlogPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, filter, router]);
+  }, [page, filter, localeFilter, router]);
 
   useEffect(() => { void load(); }, [load]);
 
@@ -98,8 +108,8 @@ export default function AdminBlogPage() {
       showSectionNav={false}
     >
       {/* Top bar */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex gap-2">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex gap-2 flex-wrap">
           {[
             { value: "", label: "Todos" },
             { value: "draft", label: "Borradores" },
@@ -112,6 +122,27 @@ export default function AdminBlogPage() {
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                 filter === f.value
                   ? "border-violet-500/30 bg-violet-500 text-white"
+                  : "border-zinc-800 bg-zinc-950/70 text-zinc-500 hover:bg-zinc-800"
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+          {/* Locale filter — separado visualmente */}
+          <span className="text-zinc-700 mx-1 self-center">·</span>
+          {[
+            { value: "", label: "Todos idiomas" },
+            { value: "es", label: "🇪🇸 ES" },
+            { value: "en", label: "🇬🇧 EN" },
+            { value: "pt", label: "🇵🇹 PT" },
+            { value: "fr", label: "🇫🇷 FR" },
+          ].map((f) => (
+            <button
+              key={`loc-${f.value}`}
+              onClick={() => { setLocaleFilter(f.value); setPage(1); }}
+              className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                localeFilter === f.value
+                  ? "border-cyan-500/40 bg-cyan-500/15 text-cyan-200"
                   : "border-zinc-800 bg-zinc-950/70 text-zinc-500 hover:bg-zinc-800"
               }`}
             >
@@ -159,6 +190,7 @@ export default function AdminBlogPage() {
               <div key={post.id} className="flex items-center justify-between gap-4 rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 hover:border-zinc-700 transition-colors">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 mb-1">
+                    <span title={post.locale} className="shrink-0 text-sm leading-none">{LOCALE_FLAG[post.locale] ?? "🌐"}</span>
                     <Link href={`/admin/blog/${post.id}`} className="text-sm font-semibold text-white hover:text-violet-300 transition-colors truncate">
                       {post.title}
                     </Link>

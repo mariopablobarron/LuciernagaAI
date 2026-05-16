@@ -1459,7 +1459,12 @@ model DiaryEntry {
 
 model BlogPost {
   id          String    @id @default(cuid())
-  slug        String    @unique
+  slug        String
+  /// Idioma del post (es/en/pt/fr). Cada post pertenece a UN locale.
+  /// Para traducir, crea otro BlogPost con el mismo slug pero distinto locale.
+  /// El API público filtra por locale activo del usuario y hace fallback a
+  /// "es" cuando no existe versión en ese idioma.
+  locale      String    @default("es")
   title       String
   excerpt     String?   @db.Text // short summary for cards / SEO
   content     String    @db.Text // plain-text fallback / search
@@ -1474,6 +1479,10 @@ model BlogPost {
 
   syndications BlogSyndication[]
 
+  // Mismo slug puede existir en distintos idiomas (ej: "/blog/mi-articulo"
+  // en es y "/blog/mi-articulo" en en). El frontend resuelve por (slug, locale).
+  @@unique([slug, locale])
+  @@index([locale, status, publishedAt])
   @@index([status, publishedAt])
   @@index([slug])
 }

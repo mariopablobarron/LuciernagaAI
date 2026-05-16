@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
+import { pickEmailLocale } from "@/lib/email-i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -14,10 +15,14 @@ export async function GET(req: NextRequest) {
     const prisma = getPrismaClient();
     const { searchParams } = req.nextUrl;
     const status = searchParams.get("status") ?? "";
+    const localeFilter = searchParams.get("locale") ?? ""; // "" = todos los idiomas
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
     const pageSize = Math.min(50, Math.max(1, parseInt(searchParams.get("pageSize") ?? "20", 10)));
 
-    const where = status ? { status } : {};
+    const where = {
+      ...(status ? { status } : {}),
+      ...(localeFilter ? { locale: localeFilter } : {}),
+    };
     const [posts, total] = await Promise.all([
       prisma.blogPost.findMany({
         where,
@@ -61,18 +66,28 @@ export async function POST(req: NextRequest) {
     const tags = Array.isArray(body.tags) ? body.tags.filter((t: unknown) => typeof t === "string") : [];
     const authorName = typeof body.authorName === "string" ? body.authorName.trim() : "Equipo Tres Mil Millones de Latidos";
     const status = body.status === "published" ? "published" : "draft";
+    // Idioma del post — admin lo selecciona en el form. Default "es".
+    const locale = pickEmailLocale(typeof body.locale === "string" ? body.locale : null);
 
     const prisma = getPrismaClient();
 
-    // Check slug uniqueness
-    const existing = await prisma.blogPost.findUnique({ where: { slug }, select: { id: true } });
+    // Unique compuesto (slug, locale): mismo slug puede existir en distintos
+    // idiomas. Solo bloqueamos si ya hay un post con ese slug en ESTE locale.
+    const existing = await prisma.blogPost.findUnique({
+      where: { slug_locale: { slug, locale } },
+      select: { id: true },
+    });
     if (existing) {
-      return NextResponse.json({ error: "Slug ya existe. Elige otro." }, { status: 409 });
+      return NextResponse.json(
+        { error: `Slug ya existe en idioma ${locale}. Elige otro o cambia el idioma.` },
+        { status: 409 },
+      );
     }
 
     const post = await prisma.blogPost.create({
       data: {
         slug,
+        locale,
         title,
         excerpt,
         content,

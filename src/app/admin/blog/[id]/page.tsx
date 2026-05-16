@@ -19,6 +19,7 @@ const BlockEditor = dynamic(() => import("@/components/BlockEditor"), {
 type BlogPost = {
   id: string;
   slug: string;
+  locale: string;
   title: string;
   excerpt: string | null;
   content: string;
@@ -30,6 +31,14 @@ type BlogPost = {
   publishedAt: string | null;
 };
 
+// Locales soportados — orden visual del selector.
+const LOCALE_OPTIONS = [
+  { code: "es", label: "Español", flag: "🇪🇸" },
+  { code: "en", label: "English", flag: "🇬🇧" },
+  { code: "pt", label: "Português (PT)", flag: "🇵🇹" },
+  { code: "fr", label: "Français", flag: "🇫🇷" },
+] as const;
+
 export default function BlogEditorPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const isNew = id === "new";
@@ -40,6 +49,7 @@ export default function BlogEditorPage({ params }: { params: Promise<{ id: strin
 
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
+  const [locale, setLocale] = useState<"es" | "en" | "pt" | "fr">("es");
   const [excerpt, setExcerpt] = useState("");
   const [coverImage, setCoverImage] = useState("");
   const [tagsInput, setTagsInput] = useState("");
@@ -71,6 +81,11 @@ export default function BlogEditorPage({ params }: { params: Promise<{ id: strin
       const post: BlogPost = data.post;
       setTitle(post.title);
       setSlug(post.slug);
+      // Defensive: si el post tiene locale válido, úsalo; si no, "es".
+      const loc = post.locale === "en" || post.locale === "pt" || post.locale === "fr"
+        ? post.locale
+        : "es";
+      setLocale(loc);
       setExcerpt(post.excerpt ?? "");
       setCoverImage(post.coverImage ?? "");
       setTagsInput(post.tags.join(", "));
@@ -101,6 +116,7 @@ export default function BlogEditorPage({ params }: { params: Promise<{ id: strin
       const body = {
         title: title.trim(),
         slug: finalSlug,
+        locale,
         excerpt: excerpt.trim() || null,
         content,
         blocks,
@@ -215,6 +231,25 @@ export default function BlogEditorPage({ params }: { params: Promise<{ id: strin
             )}
           </div>
 
+          {/* Idioma del post */}
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 space-y-2">
+            <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Idioma</label>
+            <select
+              value={locale}
+              onChange={(e) => setLocale(e.target.value as typeof locale)}
+              className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-1.5 text-xs text-white focus:border-violet-500/50 focus:outline-none"
+            >
+              {LOCALE_OPTIONS.map((opt) => (
+                <option key={opt.code} value={opt.code}>
+                  {opt.flag} {opt.label}
+                </option>
+              ))}
+            </select>
+            <p className="text-[10px] text-zinc-600">
+              El mismo slug puede coexistir en distintos idiomas. El blog público filtra por idioma del visitante.
+            </p>
+          </div>
+
           {/* Slug */}
           <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 space-y-2">
             <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Slug (URL)</label>
@@ -227,7 +262,7 @@ export default function BlogEditorPage({ params }: { params: Promise<{ id: strin
               />
               <button onClick={generateSlug} className="rounded-lg border border-zinc-700 px-2 py-1.5 text-[10px] text-zinc-400 hover:text-white transition-colors">Auto</button>
             </div>
-            {slug && <p className="text-[10px] text-zinc-600">/blog/{slug}</p>}
+            {slug && <p className="text-[10px] text-zinc-600">/blog/{slug} <span className="opacity-60">({locale})</span></p>}
           </div>
 
           {/* Excerpt */}

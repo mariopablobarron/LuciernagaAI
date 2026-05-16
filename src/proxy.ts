@@ -123,14 +123,22 @@ export function proxy(request: NextRequest) {
   }
 
   // ── i18n locale routing ─────────────────────────────────────────────
-  // Only apply i18n to: /, /en, /es (the landing page)
-  // Everything else passes through to Next.js normally
-  if (pathname === "/" || pathname === "/en" || pathname === "/es") {
+  // Solo aplicamos i18n routing al landing (/, /en, /es, /pt, /fr).
+  // El resto de páginas viven fuera del segmento [locale] y leen el
+  // locale activo de la cookie NEXT_LOCALE en src/i18n/request.ts.
+  if (
+    pathname === "/" ||
+    pathname === "/en" ||
+    pathname === "/es" ||
+    pathname === "/pt" ||
+    pathname === "/fr"
+  ) {
     return intlMiddleware(request);
   }
 
-  // Redirect /en/anything or /es/anything → /anything (strip locale prefix)
-  const localeMatch = pathname.match(/^\/(es|en)(\/.*)/);
+  // Redirigir /<locale>/anything → /anything (strip prefix). Las páginas
+  // detrás de (public) consumen la cookie NEXT_LOCALE para traducir.
+  const localeMatch = pathname.match(/^\/(es|en|pt|fr)(\/.*)/);
   if (localeMatch) {
     const url = request.nextUrl.clone();
     url.pathname = localeMatch[2];

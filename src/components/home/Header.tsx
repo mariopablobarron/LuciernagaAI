@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Menu, X, User, Settings, LogOut, BarChart3 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import ClinicalDisclaimer from "@/components/ClinicalDisclaimer";
@@ -9,17 +10,20 @@ import NotificationBell from "@/components/NotificationBell";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
 import { useSession } from "@/lib/useSession";
 
-const NAV = [
-  { label: "Chat", href: "/app" },
-  { label: "Comunidad", href: "/community" },
-  { label: "Cómo funciona", href: "/como-funciona" },
-  { label: "Comparativa", href: "/comparativa" },
-  { label: "Precios", href: "/precios" },
-  { label: "FAQ", href: "/faq" },
-  { label: "Test gratuito", href: "/test", highlight: true },
+// Estructura visual fija. IDs estables → label desde messages.nav.<id>.
+type NavItem = { id: string; href: string; highlight?: boolean };
+const NAV: readonly NavItem[] = [
+  { id: "chat", href: "/app" },
+  { id: "community", href: "/community" },
+  { id: "how", href: "/como-funciona" },
+  { id: "compare", href: "/comparativa" },
+  { id: "pricing", href: "/precios" },
+  { id: "faq", href: "/faq" },
+  { id: "test", href: "/test", highlight: true },
 ];
 
 export default function Header() {
+  const t = useTranslations("nav");
   const [open, setOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -65,7 +69,7 @@ export default function Header() {
           </Link>
 
           {/* Desktop nav */}
-          <nav aria-label="Navegacion principal" className="hidden md:flex items-center gap-1 flex-1">
+          <nav aria-label={t("ariaMain")} className="hidden md:flex items-center gap-1 flex-1">
             {NAV.map((link) => {
               const active = pathname === link.href || pathname.startsWith(link.href + "/");
               if (link.highlight) {
@@ -76,7 +80,7 @@ export default function Header() {
                     aria-current={active ? "page" : undefined}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border border-cyan-500/40 bg-cyan-500/8 text-cyan-300 hover:bg-cyan-500/15 hover:border-cyan-500/60 transition-all"
                   >
-                    {link.label}
+                    {t(link.id)}
                   </Link>
                 );
               }
@@ -91,7 +95,7 @@ export default function Header() {
                       : "text-zinc-300 hover:text-white hover:bg-white/6"
                   }`}
                 >
-                  {link.label}
+                  {t(link.id)}
                 </Link>
               );
             })}
@@ -112,30 +116,30 @@ export default function Header() {
                     <div className="w-7 h-7 rounded-full bg-violet-500/20 border border-violet-500/40 flex items-center justify-center text-xs font-bold text-violet-300">
                       {initials || <User className="w-3.5 h-3.5" />}
                     </div>
-                    <span className="max-w-[120px] truncate">{user.name || "Mi cuenta"}</span>
+                    <span className="max-w-[120px] truncate">{user.name || t("myAccount")}</span>
                   </button>
                   {userMenuOpen && (
                     <div className="absolute right-0 top-full mt-2 w-48 rounded-xl border border-zinc-700 bg-zinc-900 shadow-2xl shadow-black/40 z-50 overflow-hidden">
                       <div className="px-4 py-3 border-b border-zinc-800">
-                        <p className="text-sm font-semibold text-white truncate">{user.name || "Usuario"}</p>
+                        <p className="text-sm font-semibold text-white truncate">{user.name || t("user")}</p>
                       </div>
                       <div className="py-1">
                         <Link href="/app" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/6 transition-colors">
-                          <span className="text-base">💓</span> Chat
+                          <span className="text-base">💓</span> {t("chat")}
                         </Link>
                         <Link href="/profile" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/6 transition-colors">
-                          <User className="w-4 h-4 text-zinc-500" /> Perfil
+                          <User className="w-4 h-4 text-zinc-500" /> {t("profile")}
                         </Link>
                         <Link href="/dashboard" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/6 transition-colors">
-                          <BarChart3 className="w-4 h-4 text-zinc-500" /> Mi acompañamiento
+                          <BarChart3 className="w-4 h-4 text-zinc-500" /> {t("dashboard")}
                         </Link>
                         <Link href="/settings" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/6 transition-colors">
-                          <Settings className="w-4 h-4 text-zinc-500" /> Ajustes
+                          <Settings className="w-4 h-4 text-zinc-500" /> {t("settings")}
                         </Link>
                       </div>
                       <div className="border-t border-zinc-800 py-1">
                         <button onClick={() => void handleLogout()} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors w-full text-left">
-                          <LogOut className="w-4 h-4" /> Cerrar sesion
+                          <LogOut className="w-4 h-4" /> {t("logout")}
                         </button>
                       </div>
                     </div>
@@ -148,13 +152,13 @@ export default function Header() {
                   href="/login"
                   className="px-4 py-2 rounded-lg text-sm font-medium text-zinc-300 hover:text-white transition-colors"
                 >
-                  Entrar
+                  {t("login")}
                 </Link>
                 <Link
                   href="/signup"
                   className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-linear-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-sm shadow-fuchsia-500/20"
                 >
-                  Crear cuenta
+                  {t("signup")}
                 </Link>
               </>
             ) : null}
@@ -175,13 +179,13 @@ export default function Header() {
                 href="/signup"
                 className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-violet-600 hover:bg-violet-500 transition-all"
               >
-                Crear cuenta
+                {t("signup")}
               </Link>
             ) : null}
             <button
               onClick={() => setOpen((v) => !v)}
               className="p-2.5 min-h-11 min-w-11 flex items-center justify-center rounded-lg text-zinc-300 hover:text-white hover:bg-white/8 transition-colors"
-              aria-label={open ? "Cerrar menú" : "Abrir menú"}
+              aria-label={open ? t("menuClose") : t("menuOpen")}
             >
               {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -192,7 +196,7 @@ export default function Header() {
       {/* Mobile nav */}
       {open && (
         <div className="md:hidden border-t border-white/8 bg-background/98">
-          <nav aria-label="Navegacion movil" className="max-w-7xl mx-auto px-4 py-4 space-y-1">
+          <nav aria-label={t("ariaMobile")} className="max-w-7xl mx-auto px-4 py-4 space-y-1">
             {NAV.map((link) => {
               const active = pathname === link.href;
               return (
@@ -207,7 +211,7 @@ export default function Header() {
                       : "text-zinc-300 hover:text-white hover:bg-white/6"
                   }`}
                 >
-                  {link.label}
+                  {t(link.id)}
                 </Link>
               );
             })}
@@ -218,19 +222,19 @@ export default function Header() {
                     <div className="w-6 h-6 rounded-full bg-violet-500/20 border border-violet-500/40 flex items-center justify-center text-[10px] font-bold text-violet-300">
                       {initials || <User className="w-3 h-3" />}
                     </div>
-                    <span className="truncate">{user.name || "Mi cuenta"}</span>
+                    <span className="truncate">{user.name || t("myAccount")}</span>
                   </div>
                   <Link href="/profile" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm text-zinc-300 hover:text-white hover:bg-white/6">
-                    <User className="w-4 h-4 text-zinc-500" /> Perfil
+                    <User className="w-4 h-4 text-zinc-500" /> {t("profile")}
                   </Link>
                   <Link href="/dashboard" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm text-zinc-300 hover:text-white hover:bg-white/6">
-                    <BarChart3 className="w-4 h-4 text-zinc-500" /> Mi acompañamiento
+                    <BarChart3 className="w-4 h-4 text-zinc-500" /> {t("dashboard")}
                   </Link>
                   <Link href="/settings" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm text-zinc-300 hover:text-white hover:bg-white/6">
-                    <Settings className="w-4 h-4 text-zinc-500" /> Ajustes
+                    <Settings className="w-4 h-4 text-zinc-500" /> {t("settings")}
                   </Link>
                   <button onClick={() => { setOpen(false); void handleLogout(); }} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm text-red-400 hover:bg-red-500/10 w-full text-left">
-                    <LogOut className="w-4 h-4" /> Cerrar sesion
+                    <LogOut className="w-4 h-4" /> {t("logout")}
                   </button>
                 </div>
               ) : (
@@ -240,14 +244,14 @@ export default function Header() {
                     onClick={() => setOpen(false)}
                     className="py-2.5 rounded-xl text-center text-sm font-medium text-zinc-300 border border-white/12 hover:text-white hover:border-white/20 transition-all"
                   >
-                    Entrar
+                    {t("login")}
                   </Link>
                   <Link
                     href="/signup"
                     onClick={() => setOpen(false)}
                     className="py-2.5 rounded-xl text-center text-sm font-semibold text-white bg-linear-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 transition-all"
                   >
-                    Crear cuenta
+                    {t("signup")}
                   </Link>
                 </div>
               )}

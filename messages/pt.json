@@ -764,5 +764,80 @@
         "limit": "Este caso não tem contraindicações particulares para além dos limites gerais: o mentor acompanha, não diagnostica."
       }
     }
+  },
+  "pricing": {
+    "metaTitle": "Preços — Três Mil Milhões de Batidas",
+    "metaDescription": "Três Mil Milhões de Batidas: acesso completo gratuito durante a fase MVP. Regista-te e acede a mentoria com IA, check-ins, diário, Modo Impulso e mais. Sem cartão de crédito.",
+    "metaOgDescription": "Fase MVP: acesso Pro gratuito. Mentoria com IA, check-ins, diário e Modo Impulso. Sem custo.",
+    "metaTwitterDescription": "Mentoria com IA grátis durante o MVP. Sem cartão de crédito.",
+    "eyebrow": "tresmilmillonesdelatidos.es",
+    "title": "Acesso completo. Gratuito. Agora.",
+    "subtitle": "Estamos em fase MVP. Os primeiros utilizadores acedem a todo o plano Pro sem custo até outubro 2026. Sem cartão. Sem compromisso.",
+    "mvpBadge": "FASE MVP — ACESSO ABERTO",
+    "mvpPlanLabel": "Plano Pro completo",
+    "mvpPriceMain": "0 euros",
+    "mvpPriceUnit": "/6 meses",
+    "mvpSubnote": "Sem cartão. Sem compromisso. Só o teu registo.",
+    "mvpCta": "Criar conta gratuita",
+    "mvpCtaFootnote": "Ao registares-te acedes automaticamente ao plano Pro completo. Não te será pedido cartão de crédito.",
+    "feature1": "Conversas ilimitadas com o coach IA",
+    "feature2": "Mensagens ilimitadas",
+    "feature3": "Modo Impulso completo — 21 dias de transformação",
+    "feature4": "Diagnósticos avançados e desafios personalizados",
+    "feature5": "Insights semanais de comportamento",
+    "feature6": "Check-in diário com sequência",
+    "feature7": "Mapa de padrões de evitação",
+    "feature8": "Histórico de conversas completo",
+    "feature9": "Bot de Telegram integrado",
+    "feature10": "Portal para pessoas de confiança",
+    "whyTitle": "Porque é grátis (e até quando)",
+    "whyP1": "Três Mil Milhões de Batidas está em fase de produto mínimo viável. Funciona, mas ainda está a aprender. E para aprender precisa de pessoas reais a usá-lo a sério — não betas fechadas nem demos que ninguém toca.",
+    "whyP2": "Durante estes 6 meses (até outubro 2026), todo o plano Pro está aberto sem custo. Em troca, as tuas interações ajudam-nos a melhorar o produto. Não vendemos os teus dados. Não os partilhamos. Usamo-los, de forma anónima, para que a ferramenta seja melhor para ti e para os que vierem depois.",
+    "whyP3": "Quando a fase MVP terminar, o plano gratuito mantém o chat sem limite. O Pro será para quem quiser continuidade cross-device, memória persistente entre sessões e Modo Impulso. Sem surpresas.",
+    "futureTitle": "Preços após a fase MVP",
+    "futureSubtitle": "Estes serão os preços quando terminar o período de acesso aberto. Os utilizadores MVP terão condições especiais.",
+    "futurePlan": {
+      "free": {
+        "name": "Free",
+        "price": "0 euros/mês",
+        "desc": "Conversas sem limite com o mentor IA. Sem cap diário."
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "9 euros/mês",
+        "desc": "Continuidade cross-device, memória persistente, Modo Impulso e prioridade"
+      },
+      "proAnnual": {
+        "name": "Pro anual",
+        "price": "79 euros/ano",
+        "desc": "Igual ao Pro, poupando 2 meses"
+      }
+    },
+    "whyProTitle": "Porque é que existe o plano Pro?",
+    "whyProDesc": "A mudança real não acontece numa conversa — acontece quando mantens o fio durante semanas. A continuidade é o que transforma uma ideia num hábito. O Pro existe para que não percas esse fio: conversas ilimitadas, seguimento de ações, e um mentor que se lembra da tua história completa.",
+    "faqTitle": "Perguntas frequentes",
+    "faq": {
+      "free": {
+        "q": "É mesmo grátis?",
+        "a": "Sim. Durante a fase MVP (até outubro 2026) não se cobra nada. Não precisas de cartão de crédito. Basta registares-te com o teu email."
+      },
+      "data": {
+        "q": "O que acontece com os meus dados?",
+        "a": "As tuas conversas e dados emocionais são processados de forma anónima para melhorar o produto. Nunca são vendidos nem partilhados com terceiros. Podes apagar tudo a qualquer momento nas Definições."
+      },
+      "afterMvp": {
+        "q": "O que acontece quando o MVP terminar?",
+        "a": "Poderás continuar a usar o plano gratuito com chat sem limite, ou escolher Pro ao preço regular para extras (continuidade cross-device, memória persistente, Modo Impulso). Os utilizadores MVP terão condições especiais."
+      },
+      "psy": {
+        "q": "Três Mil Milhões de Batidas substitui um psicólogo?",
+        "a": "Não. É uma ferramenta de mentoria conversacional com IA. Ajuda-te a ordenar ideias e a passar à ação, mas não substitui terapia profissional. Em caso de crise, contacta o SNS 24 (808 24 24 24)."
+      },
+      "mobile": {
+        "q": "Posso usá-lo a partir do telemóvel?",
+        "a": "Sim. A web está otimizada para telemóvel e podes adicioná-la ao ecrã inicial. Também podes usar o bot de Telegram para conversares diretamente a partir daí."
+      }
+    },
+    "ctaBottom": "Começar agora — é grátis"
   }
 }

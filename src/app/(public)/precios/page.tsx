@@ -1,87 +1,106 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
+import { useTranslations } from 'next-intl';
 import { Check, Gift, ArrowRight } from 'lucide-react';
 
-export const metadata: Metadata = {
-  title: 'Precios — Tres Mil Millones de Latidos',
-  description: 'Tres Mil Millones de Latidos: acceso completo gratuito durante la fase MVP. Regístrate y accede a mentoría con IA, check-ins, diario, Modo Impulso y más. Sin tarjeta de crédito.',
-  alternates: {
-    canonical: 'https://tresmilmillonesdelatidos.es/precios',
-  },
-  openGraph: {
-    title: 'Precios — Tres Mil Millones de Latidos',
-    description: 'Fase MVP: acceso Pro gratuito. Mentoría con IA, check-ins, diario y Modo Impulso. Sin coste.',
-    type: 'website',
-    locale: 'es_ES',
-    siteName: 'Tres Mil Millones de Latidos',
-    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Precios — Tres Mil Millones de Latidos' }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Precios — Tres Mil Millones de Latidos',
-    description: 'Mentoría con IA gratis durante el MVP. Sin tarjeta de crédito.',
-    images: ['/opengraph-image'],
-  },
-  robots: { index: true, follow: true },
-};
+// generateMetadata dinámica: lee del locale activo (cookie NEXT_LOCALE) y
+// devuelve title/description traducidos. Sin esto, los SEO de /precios
+// siempre serían en español aunque el usuario navegue por /pt o /fr.
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('pricing');
+  const title = t('metaTitle');
+  const description = t('metaDescription');
+  const ogDescription = t('metaOgDescription');
+  const twitterDescription = t('metaTwitterDescription');
 
-const PRO_FEATURES = [
-  'Conversaciones ilimitadas con el coach IA',
-  'Mensajes ilimitados',
-  'Modo Impulso completo — 21 días de transformación',
-  'Diagnósticos avanzados y retos personalizados',
-  'Insights semanales de comportamiento',
-  'Check-in diario con racha',
-  'Mapa de patrones de evitación',
-  'Historial de conversaciones completo',
-  'Bot de Telegram integrado',
-  'Portal para personas de confianza',
-];
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: 'https://tresmilmillonesdelatidos.es/precios',
+    },
+    openGraph: {
+      title,
+      description: ogDescription,
+      type: 'website',
+      siteName: 'Tres Mil Millones de Latidos',
+      images: [
+        {
+          url: '/opengraph-image',
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description: twitterDescription,
+      images: ['/opengraph-image'],
+    },
+    robots: { index: true, follow: true },
+  };
+}
 
-const FUTURE_PRICE = [
-  { plan: 'Free', price: '0 euros/mes', features: 'Conversaciones sin límite con el mentor IA. Sin cap diario.' },
-  { plan: 'Pro', price: '9 euros/mes', features: 'Continuidad cross-device, memoria persistente, Modo Impulso y prioridad' },
-  { plan: 'Pro anual', price: '79 euros/año', features: 'Mismo que Pro, ahorrando 2 meses' },
-];
+// 10 features del plan Pro, mapeadas a feature1..10 en messages.
+const FEATURE_KEYS = [
+  'feature1',
+  'feature2',
+  'feature3',
+  'feature4',
+  'feature5',
+  'feature6',
+  'feature7',
+  'feature8',
+  'feature9',
+  'feature10',
+] as const;
+
+// 3 planes futuros y 5 preguntas frecuentes — IDs estables.
+const FUTURE_PLANS = ['free', 'pro', 'proAnnual'] as const;
+const FAQ_KEYS = ['free', 'data', 'afterMvp', 'psy', 'mobile'] as const;
 
 export default function PreciosPage() {
+  const t = useTranslations('pricing');
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-16 space-y-12">
       {/* Header */}
       <div className="text-center space-y-4">
-        <p className="text-xs font-semibold uppercase tracking-widest text-violet-400">tresmilmillonesdelatidos.es</p>
-        <h1 className="text-3xl sm:text-4xl font-bold">Acceso completo. Gratuito. Ahora.</h1>
-        <p className="text-zinc-400 text-lg max-w-xl mx-auto">
-          Estamos en fase MVP. Los primeros usuarios acceden a todo el plan Pro
-          sin coste hasta octubre 2026. Sin tarjeta. Sin compromiso.
+        <p className="text-xs font-semibold uppercase tracking-widest text-violet-400">
+          {t('eyebrow')}
         </p>
+        <h1 className="text-3xl sm:text-4xl font-bold">{t('title')}</h1>
+        <p className="text-zinc-400 text-lg max-w-xl mx-auto">{t('subtitle')}</p>
       </div>
 
       {/* MVP offer card */}
       <div className="rounded-2xl border-2 border-violet-500/60 bg-violet-500/5 p-8 sm:p-10 space-y-6 relative">
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
           <span className="bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-xs font-bold px-4 py-1.5 rounded-full">
-            FASE MVP — ACCESO ABIERTO
+            {t('mvpBadge')}
           </span>
         </div>
 
         <div className="text-center space-y-2 pt-4">
           <div className="flex items-center justify-center gap-3">
             <Gift className="w-6 h-6 text-violet-400" />
-            <p className="text-sm font-medium text-violet-400">Plan Pro completo</p>
+            <p className="text-sm font-medium text-violet-400">{t('mvpPlanLabel')}</p>
           </div>
           <div className="flex items-baseline justify-center gap-2">
-            <span className="text-5xl font-black text-white">0 euros</span>
-            <span className="text-zinc-500">/6 meses</span>
+            <span className="text-5xl font-black text-white">{t('mvpPriceMain')}</span>
+            <span className="text-zinc-500">{t('mvpPriceUnit')}</span>
           </div>
-          <p className="text-sm text-zinc-400">Sin tarjeta. Sin compromiso. Solo tu registro.</p>
+          <p className="text-sm text-zinc-400">{t('mvpSubnote')}</p>
         </div>
 
         <ul className="grid sm:grid-cols-2 gap-3 pt-2">
-          {PRO_FEATURES.map((f) => (
-            <li key={f} className="flex items-start gap-3 text-sm text-zinc-300">
+          {FEATURE_KEYS.map((key) => (
+            <li key={key} className="flex items-start gap-3 text-sm text-zinc-300">
               <Check className="w-4 h-4 text-violet-400 shrink-0 mt-0.5" />
-              {f}
+              {t(key)}
             </li>
           ))}
         </ul>
@@ -91,12 +110,9 @@ export default function PreciosPage() {
             href="/signup"
             className="flex items-center justify-center gap-2 w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 transition-all text-base"
           >
-            Crear cuenta gratuita <ArrowRight className="w-5 h-5" />
+            {t('mvpCta')} <ArrowRight className="w-5 h-5" />
           </Link>
-          <p className="text-xs text-zinc-600 text-center mt-3">
-            Al registrarte accedes automáticamente al plan Pro completo.
-            No se te pedirá tarjeta de crédito.
-          </p>
+          <p className="text-xs text-zinc-600 text-center mt-3">{t('mvpCtaFootnote')}</p>
         </div>
       </div>
 
@@ -105,83 +121,45 @@ export default function PreciosPage() {
         <div className="flex items-start gap-3">
           <span className="text-2xl">🧪</span>
           <div className="space-y-3">
-            <h3 className="text-lg font-bold text-white">Por qué es gratis (y hasta cuándo)</h3>
-            <p className="text-sm text-zinc-300 leading-relaxed">
-              Tres Mil Millones de Latidos está en fase de producto mínimo viable.
-              Funciona, pero todavía está aprendiendo. Y para aprender necesita
-              personas reales usándolo de verdad — no betas cerradas ni demos
-              que nadie toca.
-            </p>
-            <p className="text-sm text-zinc-300 leading-relaxed">
-              Durante estos 6 meses (hasta octubre 2026), todo el plan Pro está abierto
-              sin coste. A cambio, tus interacciones nos ayudan a mejorar el producto.
-              No vendemos tus datos. No los compartimos. Los usamos, anonimizados,
-              para que la herramienta sea mejor para ti y para los que vengan después.
-            </p>
-            <p className="text-sm text-zinc-300 leading-relaxed">
-              Cuando termine la fase MVP, el plan gratuito mantendrá el chat
-              sin límite. Pro será para quien quiera continuidad cross-device,
-              memoria persistente entre sesiones y Modo Impulso. Sin sorpresas.
-            </p>
+            <h3 className="text-lg font-bold text-white">{t('whyTitle')}</h3>
+            <p className="text-sm text-zinc-300 leading-relaxed">{t('whyP1')}</p>
+            <p className="text-sm text-zinc-300 leading-relaxed">{t('whyP2')}</p>
+            <p className="text-sm text-zinc-300 leading-relaxed">{t('whyP3')}</p>
           </div>
         </div>
       </div>
 
       {/* Future pricing reference */}
       <div className="space-y-4">
-        <h2 className="text-xl font-bold text-center">Precios tras la fase MVP</h2>
+        <h2 className="text-xl font-bold text-center">{t('futureTitle')}</h2>
         <p className="text-sm text-zinc-500 text-center max-w-md mx-auto">
-          Estos serán los precios cuando termine el período de acceso abierto.
-          Los usuarios MVP tendrán condiciones especiales.
+          {t('futureSubtitle')}
         </p>
         <div className="grid sm:grid-cols-3 gap-4 pt-2">
-          {FUTURE_PRICE.map((p) => (
-            <div key={p.plan} className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 space-y-2">
-              <p className="text-sm font-semibold text-white">{p.plan}</p>
-              <p className="text-lg font-bold text-violet-400">{p.price}</p>
-              <p className="text-xs text-zinc-500">{p.features}</p>
+          {FUTURE_PLANS.map((planKey) => (
+            <div
+              key={planKey}
+              className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 space-y-2"
+            >
+              <p className="text-sm font-semibold text-white">{t(`futurePlan.${planKey}.name`)}</p>
+              <p className="text-lg font-bold text-violet-400">{t(`futurePlan.${planKey}.price`)}</p>
+              <p className="text-xs text-zinc-500">{t(`futurePlan.${planKey}.desc`)}</p>
             </div>
           ))}
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-6 space-y-3 max-w-lg mx-auto">
-          <p className="text-sm font-semibold text-white text-center">¿Por qué existe el plan Pro?</p>
-          <p className="text-xs text-zinc-400 leading-relaxed text-center">
-            El cambio real no ocurre en una conversación — ocurre cuando mantienes el hilo durante semanas.
-            La continuidad es lo que transforma una idea en un hábito. Pro existe para que no pierdas
-            ese hilo: conversaciones ilimitadas, seguimiento de acciones, y un mentor que recuerda
-            tu historia completa.
-          </p>
+          <p className="text-sm font-semibold text-white text-center">{t('whyProTitle')}</p>
+          <p className="text-xs text-zinc-400 leading-relaxed text-center">{t('whyProDesc')}</p>
         </div>
       </div>
 
       {/* FAQ */}
       <div className="space-y-4 pt-4">
-        <h2 className="text-xl font-bold text-center mb-6">Preguntas frecuentes</h2>
-        {[
-          {
-            q: '¿Es realmente gratis?',
-            a: 'Sí. Durante la fase MVP (hasta octubre 2026) no se cobra nada. No necesitas tarjeta de crédito. Solo registrarte con tu email.',
-          },
-          {
-            q: '¿Qué pasa con mis datos?',
-            a: 'Tus conversaciones y datos emocionales se procesan de forma anonimizada para mejorar el producto. Nunca se venden ni comparten con terceros. Puedes borrar todo en cualquier momento desde Ajustes.',
-          },
-          {
-            q: '¿Qué pasa cuando termine el MVP?',
-            a: 'Podrás seguir usando el plan gratuito con chat sin límite, o elegir Pro a su precio regular para extras (continuidad cross-device, memoria persistente, Modo Impulso). Los usuarios MVP tendrán condiciones especiales.',
-          },
-          {
-            q: '¿Tres Mil Millones de Latidos reemplaza a un psicólogo?',
-            a: 'No. Es una herramienta de mentoría conversacional con IA. Ayuda a ordenar ideas y pasar a la acción, pero no sustituye terapia profesional. En caso de crisis, conecta con el 024.',
-          },
-          {
-            q: '¿Puedo usarlo desde el móvil?',
-            a: 'Sí. La web está optimizada para móvil y puedes añadirla a tu pantalla de inicio. También puedes usar el bot de Telegram para conversar directamente desde ahí.',
-          },
-        ].map(({ q, a }) => (
-          <div key={q} className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
-            <p className="font-semibold text-white text-sm mb-2">{q}</p>
-            <p className="text-sm text-zinc-400">{a}</p>
+        <h2 className="text-xl font-bold text-center mb-6">{t('faqTitle')}</h2>
+        {FAQ_KEYS.map((key) => (
+          <div key={key} className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
+            <p className="font-semibold text-white text-sm mb-2">{t(`faq.${key}.q`)}</p>
+            <p className="text-sm text-zinc-400">{t(`faq.${key}.a`)}</p>
           </div>
         ))}
       </div>
@@ -192,7 +170,7 @@ export default function PreciosPage() {
           href="/signup"
           className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 transition-all text-lg"
         >
-          Empezar ahora — es gratis <ArrowRight className="w-5 h-5" />
+          {t('ctaBottom')} <ArrowRight className="w-5 h-5" />
         </Link>
       </div>
     </div>

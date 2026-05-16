@@ -764,5 +764,80 @@
         "limit": "This case has no particular contraindications beyond the general limits: the mentor accompanies, doesn't diagnose."
       }
     }
+  },
+  "pricing": {
+    "metaTitle": "Pricing — Three Billion Heartbeats",
+    "metaDescription": "Three Billion Heartbeats: full access free during the MVP phase. Sign up and get AI mentoring, check-ins, journal, Impulse Mode and more. No credit card required.",
+    "metaOgDescription": "MVP phase: free Pro access. AI mentoring, check-ins, journal and Impulse Mode. At no cost.",
+    "metaTwitterDescription": "AI mentoring free during the MVP. No credit card.",
+    "eyebrow": "tresmilmillonesdelatidos.es",
+    "title": "Full access. Free. Now.",
+    "subtitle": "We're in MVP phase. Early users get the entire Pro plan at no cost until October 2026. No card. No commitment.",
+    "mvpBadge": "MVP PHASE — OPEN ACCESS",
+    "mvpPlanLabel": "Full Pro plan",
+    "mvpPriceMain": "0 euros",
+    "mvpPriceUnit": "/6 months",
+    "mvpSubnote": "No card. No commitment. Just sign up.",
+    "mvpCta": "Create free account",
+    "mvpCtaFootnote": "When you sign up you get automatic access to the full Pro plan. You will not be asked for a credit card.",
+    "feature1": "Unlimited conversations with the AI coach",
+    "feature2": "Unlimited messages",
+    "feature3": "Full Impulse Mode — 21 days of transformation",
+    "feature4": "Advanced diagnostics and personalized challenges",
+    "feature5": "Weekly behavioral insights",
+    "feature6": "Daily check-in with streak",
+    "feature7": "Avoidance pattern map",
+    "feature8": "Full conversation history",
+    "feature9": "Integrated Telegram bot",
+    "feature10": "Portal for trusted contacts",
+    "whyTitle": "Why it's free (and for how long)",
+    "whyP1": "Three Billion Heartbeats is in minimum viable product phase. It works, but it's still learning. And to learn it needs real people actually using it — not closed betas or demos no one touches.",
+    "whyP2": "During these 6 months (until October 2026), the entire Pro plan is open at no cost. In exchange, your interactions help us improve the product. We don't sell your data. We don't share it. We use it, anonymized, so the tool gets better for you and for those who come next.",
+    "whyP3": "When the MVP phase ends, the free plan will keep unlimited chat. Pro will be for whoever wants cross-device continuity, persistent memory between sessions and Impulse Mode. No surprises.",
+    "futureTitle": "Pricing after the MVP phase",
+    "futureSubtitle": "These will be the prices once the open-access period ends. MVP users will get special conditions.",
+    "futurePlan": {
+      "free": {
+        "name": "Free",
+        "price": "0 euros/month",
+        "desc": "Unlimited conversations with the AI mentor. No daily cap."
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "9 euros/month",
+        "desc": "Cross-device continuity, persistent memory, Impulse Mode and priority"
+      },
+      "proAnnual": {
+        "name": "Pro annual",
+        "price": "79 euros/year",
+        "desc": "Same as Pro, saving 2 months"
+      }
+    },
+    "whyProTitle": "Why does the Pro plan exist?",
+    "whyProDesc": "Real change doesn't happen in one conversation — it happens when you keep the thread going for weeks. Continuity is what turns an idea into a habit. Pro exists so you don't lose that thread: unlimited conversations, action tracking, and a mentor that remembers your full story.",
+    "faqTitle": "Frequently asked questions",
+    "faq": {
+      "free": {
+        "q": "Is it really free?",
+        "a": "Yes. During the MVP phase (until October 2026) there's no charge. You don't need a credit card. Just sign up with your email."
+      },
+      "data": {
+        "q": "What happens with my data?",
+        "a": "Your conversations and emotional data are processed anonymously to improve the product. They are never sold or shared with third parties. You can delete everything at any time from Settings."
+      },
+      "afterMvp": {
+        "q": "What happens when the MVP ends?",
+        "a": "You'll be able to keep using the free plan with unlimited chat, or choose Pro at its regular price for extras (cross-device continuity, persistent memory, Impulse Mode). MVP users will get special conditions."
+      },
+      "psy": {
+        "q": "Does Three Billion Heartbeats replace a psychologist?",
+        "a": "No. It's a conversational AI mentoring tool. It helps you organize ideas and take action, but it does not replace professional therapy. In case of crisis, contact 988 or your local emergency line."
+      },
+      "mobile": {
+        "q": "Can I use it from my phone?",
+        "a": "Yes. The site is optimized for mobile and you can add it to your home screen. You can also use the Telegram bot to chat directly from there."
+      }
+    },
+    "ctaBottom": "Start now — it's free"
   }
 }

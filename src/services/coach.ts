@@ -143,7 +143,59 @@ export type CoachContext = {
   audience?: {
     tier: "minor" | "adult" | "elder";
   } | null;
+  // Locale activo del usuario en la sesión (es/en/pt/fr). Determina:
+  //   - el idioma EN EL QUE responde el mentor (no se traduce desde español)
+  //   - los recursos de crisis a sugerir (024 ES, 988 EN/US, SNS 24 PT, 3114 FR)
+  // Si null o ausente → se asume "es" (default histórico).
+  locale?: "es" | "en" | "pt" | "fr" | null;
 };
+
+/**
+ * Devuelve el bloque de prompt que dice al LLM (1) en qué idioma responder
+ * y (2) qué recursos de crisis sugerir en derivación. Por defecto: español.
+ *
+ * El locale se inyecta al PRINCIPIO del prompt — la regla de idioma debe
+ * dominar sobre cualquier instrucción posterior que esté escrita en español.
+ */
+function buildLocaleGuidance(locale: CoachContext["locale"] | undefined): string {
+  const norm = locale ?? "es";
+
+  const blocks: Record<NonNullable<CoachContext["locale"]>, string> = {
+    es: `IDIOMA DE RESPUESTA: español de España. Responde SIEMPRE en español, sin importar el idioma del input del usuario.
+
+RECURSOS DE CRISIS (España) — invócalos solo si detectas ideación, autolesión o riesgo agudo (no para malestar genérico):
+- 024 — Línea de Atención a la Conducta Suicida (24/7, gratuita).
+- 717 003 717 — Teléfono de la Esperanza (escucha profesional, 24/7).
+- 112 — Emergencias.
+NUNCA des el número como remate motivacional; dilo solo cuando la conversación lo necesite.`,
+
+    en: `RESPONSE LANGUAGE: English. ALWAYS reply in English, regardless of the language of the user's input.
+
+CRISIS RESOURCES (US/International) — only invoke if you detect ideation, self-harm or acute risk (not for generic distress):
+- 988 — Suicide & Crisis Lifeline (US, 24/7).
+- International Association for Suicide Prevention: https://www.iasp.info/resources/Crisis_Centres/
+- If the user is in another country, tell them to contact their local emergency number.
+NEVER deliver the number as motivational closure; only when the conversation requires it.`,
+
+    pt: `IDIOMA DE RESPOSTA: português de Portugal (pt-PT). Responde SEMPRE em pt-PT, independentemente do idioma do input do utilizador. Usa "tu", enclise (fá-lo, dizemos-te) e léxico português europeu (telemóvel, ficheiro, ecrã, definições, palavra-passe, anónimo, deteta).
+
+RECURSOS DE CRISE (Portugal) — só invoca se detetares ideação, autolesão ou risco agudo (não para mal-estar genérico):
+- 808 24 24 24 — SNS 24 (24/7, gratuito).
+- 213 544 545 / 912 802 669 / 963 524 660 — SOS Voz Amiga.
+- 112 — Emergências.
+NUNCA dês o número como remate motivacional; di-lo apenas quando a conversa o exigir.`,
+
+    fr: `LANGUE DE RÉPONSE: français de France (fr-FR). Réponds TOUJOURS en français, peu importe la langue d'entrée de l'utilisateur. Utilise le tutoiement (tu), pas le vouvoiement.
+
+RESSOURCES DE CRISE (France) — invoque-les uniquement si tu détectes idéation, automutilation ou risque aigu (pas pour mal-être générique):
+- 3114 — Numéro national de prévention du suicide (24/7, gratuit).
+- 09 72 39 40 50 — SOS Amitié.
+- 15 / 112 — Urgences.
+N'utilise JAMAIS le numéro comme conclusion motivationnelle; donne-le seulement quand la conversation l'exige.`,
+  };
+
+  return blocks[norm];
+}
 
 type ResponseFinalizationContext = {
   state: UserState;
@@ -503,6 +555,9 @@ export function buildCoachPrompt(
   emotionalProfile: EmotionalProfile = DEFAULT_EMOTIONAL_PROFILE,
   context: CoachContext = {}
 ): string {
+  // Locale guidance va PRIMERO — gana sobre cualquier instrucción en español
+  // que venga después en el BASE_PROMPT.
+  const localeGuidance = buildLocaleGuidance(context.locale);
   const empatheticResponseGuidance = buildEmpatheticResponse(userState, context);
   const mentorProtocolGuidance = buildMentorProtocolGuidance(context);
   const transformationGuidance = buildTransformationGuidance(context);
@@ -604,8 +659,11 @@ Consulta: ${context.web.query}
 No se pudo verificar información externa suficiente. No afirmes datos actuales como si estuvieran confirmados.`
     : "";
 
-  // Build compact context — only include non-empty sections
+  // Build compact context — only include non-empty sections.
+  // localeGuidance va PRIMERO para dominar sobre cualquier instrucción
+  // posterior escrita en español dentro del BASE_PROMPT.
   const sections = [
+    localeGuidance,
     BASE_PROMPT,
     `Estado: ${userState}. ${STATE_GUIDANCE[userState]}`,
     `Perfil: emoción=${emotionalProfile.primaryEmotion}, patrón=${emotionalProfile.dominantPattern}, energía=${emotionalProfile.energyLevel}, riesgo=${emotionalProfile.riskLevel}, tendencia=${emotionalProfile.progressTrend}.`,

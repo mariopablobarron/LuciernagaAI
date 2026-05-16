@@ -37,6 +37,9 @@ export interface ProcessMessageInput {
   jsonMode: boolean;
   /** ISO 3166-1 alpha-2 country code from edge proxy headers (cf-ipcountry / x-vercel-ip-country). */
   countryCode?: string | null;
+  /** Locale activo del usuario (es/en/pt/fr). Determina el idioma de respuesta
+   *  del mentor y los recursos de crisis a sugerir. */
+  locale?: "es" | "en" | "pt" | "fr";
 }
 
 export type ProcessMessageResult =
@@ -82,7 +85,7 @@ function serializeFlow(flow: {
 // ─── main use case ─────────────────────────────────────────────────────────
 
 export async function processMessage(input: ProcessMessageInput): Promise<ProcessMessageResult> {
-  const { userId, message, session, jsonMode, countryCode } = input;
+  const { userId, message, session, jsonMode, countryCode, locale } = input;
 
   // Free es ilimitado: no hay soft paywall ni recuento de "mensajes que quedan".
   // Pro se vende por extras (continuidad, memoria, Modo Impulso), no por cap.
@@ -232,6 +235,9 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
       ? { contextualInterpretation: reformulation.standalone }
       : {}),
     ...(detectedDomain ? { problemDomain: detectedDomain } : {}),
+    // Locale activo del usuario → coach.ts lo usa para responder en ese
+    // idioma + sugerir el recurso de crisis del país correcto.
+    ...(locale ? { locale } : {}),
   };
 
   // ── 9. Impulse mode (non-streaming JSON) ──────────────────────────────

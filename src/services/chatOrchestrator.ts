@@ -131,6 +131,32 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
   const countryCode =
     countryHeader && /^[A-Za-z]{2}$/.test(countryHeader) ? countryHeader.toUpperCase() : null;
 
+  // Detect active locale (es/en/pt/fr) from:
+  //   1. Explicit body.locale (cliente lo puede mandar)
+  //   2. Referer URL path (/en/*, /pt/*, /fr/* → locale; otherwise → es)
+  //
+  // Determina el idioma EN EL QUE responde el mentor + qué recursos de crisis
+  // sugerir (024 ES, 988 EN, SNS 24 PT, 3114 FR). No depende del país real del
+  // usuario sino de la versión del sitio que está usando.
+  const SUPPORTED_LOCALES = ["es", "en", "pt", "fr"] as const;
+  type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
+  let locale: SupportedLocale = "es";
+  const bodyLocale = (body as Record<string, unknown>).locale;
+  if (typeof bodyLocale === "string" && SUPPORTED_LOCALES.includes(bodyLocale as SupportedLocale)) {
+    locale = bodyLocale as SupportedLocale;
+  } else {
+    const referer = req.headers.get("referer") ?? "";
+    try {
+      const path = new URL(referer).pathname;
+      const seg = path.split("/")[1];
+      if (seg && SUPPORTED_LOCALES.includes(seg as SupportedLocale)) {
+        locale = seg as SupportedLocale;
+      }
+    } catch {
+      // Referer ausente o malformado — mantener default "es"
+    }
+  }
+
   const result = await processMessage({
     userId: identity.userId,
     message,
@@ -147,6 +173,7 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
     },
     jsonMode,
     countryCode,
+    locale,
   });
 
   // ── 7. Return ──────────────────────────────────────────────────────────

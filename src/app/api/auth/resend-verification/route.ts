@@ -4,6 +4,7 @@ import { resolveIdentity } from "@/lib/auth";
 import { getPrismaClient } from "@/db/prisma";
 import { logError, logInfo } from "@/lib/logger";
 import { buildVerificationEmail, sendUserEmail } from "@/lib/email";
+import { pickEmailLocale } from "@/lib/email-i18n";
 import { checkRateLimit } from "@/lib/rate-limit";
 
 /**
@@ -53,12 +54,15 @@ export async function POST(req: NextRequest) {
 
     const baseUrl = process.env.APP_BASE_URL ?? "http://localhost:3000";
     const verifyUrl = `${baseUrl}/api/auth/verify-email?token=${verifyToken}`;
+    // Locale: cookie NEXT_LOCALE → "es". User.locale aún no existe en BD.
+    const locale = pickEmailLocale(req.cookies.get("NEXT_LOCALE")?.value);
 
     const sent = await sendUserEmail({
       ...buildVerificationEmail({
         to: user.email,
         verifyUrl,
         name: user.name ?? undefined,
+        locale,
       }),
       userId: user.id,
       template: "verification",

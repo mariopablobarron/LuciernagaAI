@@ -129,7 +129,9 @@ describe("buildPasswordResetEmail", () => {
       resetUrl: `${APP_URL}/r?t=1`,
       name: null,
     });
-    expect(email.text).toMatch(/válido 1 hora/i);
+    // Tras la i18n-ización del copy (PASSWORD_RESET_STRINGS), tanto el body
+    // text como el HTML usan la misma frase "El enlace caduca en 1 hora".
+    expect(email.text).toMatch(/caduca en 1 hora/i);
     expect(email.html).toMatch(/caduca en 1 hora/i);
   });
 
@@ -172,5 +174,50 @@ describe("buildVerificationEmail", () => {
     expect(email.html).not.toContain("<script>alert");
     // Sí debe contener la versión escapada
     expect(email.html).toContain("&lt;script&gt;");
+  });
+
+  describe("i18n", () => {
+    it("respeta locale=en (subject y body en inglés)", () => {
+      const email = buildVerificationEmail({
+        to: "u@x.com",
+        verifyUrl: `${APP_URL}/v?t=1`,
+        locale: "en",
+      });
+      expect(email.subject).toBe("Verify your email — Three Billion Heartbeats");
+      expect(email.text).toContain("Thanks for signing up");
+      expect(email.html).toContain("Verify my email");
+    });
+
+    it("respeta locale=pt (PT-PT, sin Brasil)", () => {
+      const email = buildVerificationEmail({
+        to: "u@x.com",
+        verifyUrl: `${APP_URL}/v?t=1`,
+        locale: "pt",
+      });
+      expect(email.subject).toBe("Verifica o teu email — Três Mil Milhões de Batidas");
+      // Tuteo + enclisis PT-PT: "te registaste" / "o teu" / "o link"
+      expect(email.text).toMatch(/o teu email/i);
+      expect(email.text).not.toMatch(/você/i);
+    });
+
+    it("respeta locale=fr (tutoiement)", () => {
+      const email = buildVerificationEmail({
+        to: "u@x.com",
+        verifyUrl: `${APP_URL}/v?t=1`,
+        locale: "fr",
+      });
+      expect(email.subject).toBe("Vérifie ton email — Trois Milliards de Battements");
+      expect(email.text).toMatch(/ton email/i);
+      // Sin vouvoiement
+      expect(email.text).not.toMatch(/votre email/i);
+    });
+
+    it("defaultea a español cuando locale es inválido o ausente", () => {
+      const email = buildVerificationEmail({
+        to: "u@x.com",
+        verifyUrl: `${APP_URL}/v?t=1`,
+      });
+      expect(email.subject).toBe("Verifica tu email — Tres Mil Millones de Latidos");
+    });
   });
 });

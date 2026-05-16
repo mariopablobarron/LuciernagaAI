@@ -18,6 +18,8 @@
     "eval:judge": "tsx eval/judge-counselling.ts",
     "system-check": "bash scripts/system-check.sh",
     "hardening:auto": "node scripts/auto-update-hardening-board.mjs",
+    "i18n:sync": "node scripts/i18n-sync.mjs",
+    "i18n:sync:dry": "node scripts/i18n-sync.mjs --dry-run",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "tg-tasks": "node scripts/tg-tasks.mjs",

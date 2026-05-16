@@ -1421,5 +1421,131 @@
         "a": "Right now everything is free. We're in MVP phase until October 2026. After that there will be a Free plan (10 conversations/month) and a Pro (€9/month). Early users will get special conditions."
       }
     }
+  },
+  "landing": {
+    "eyebrow": "⚡ Real Transformation",
+    "title": "Change your life",
+    "titleHighlight": "one habit at a time",
+    "subtitle": "An AI-powered mentor supervised by a responsible psychologist. It helps you move from paralysis to action, with the option to request a human letter from the team whenever you want a personal message.",
+    "ctaPrimary": "Create free account",
+    "ctaSecondary": "Try without an account",
+    "chatMock": {
+      "m1": "I'm stuck with my project",
+      "m2": "What's the smallest thing you could do in 10 minutes?",
+      "m3": "Open the file and write one paragraph",
+      "m4": "That's it. Do it now. Then we'll come back."
+    },
+    "howEyebrow": "How it works",
+    "howTitle": "Your transformation in 3 steps",
+    "step": {
+      "describe": {
+        "title": "You describe how you feel",
+        "desc": "Pick your current emotional state. There's no right answer."
+      },
+      "detect": {
+        "title": "The AI detects your pattern",
+        "desc": "Stuck / Anxious / Doubtful / Clear — we adapt the conversation."
+      },
+      "next": {
+        "title": "You get a next step",
+        "desc": "Specific, actionable, something you can do today in 10 minutes."
+      }
+    },
+    "plansEyebrow": "Plans",
+    "plansTitle": "Choose your path",
+    "plan": {
+      "free": {
+        "title": "Free",
+        "description": "Perfect to get started",
+        "price": "Free",
+        "feature1": "Unlimited chat",
+        "feature2": "State detection",
+        "feature3": "First challenge free",
+        "feature4": "Exploration access",
+        "cta": "Create free account"
+      },
+      "impulso": {
+        "title": "Impulso",
+        "description": "21-day intensive program",
+        "price": "Coming soon",
+        "feature1": "Everything in Free",
+        "feature2": "21-day Impulso program",
+        "feature3": "Daily check-ins",
+        "feature4": "Personalized challenges",
+        "feature5": "Future messages",
+        "feature6": "Priority support",
+        "cta": "Join the waitlist"
+      }
+    },
+    "finalTitle": "Ready for your first step?",
+    "finalSubtitle": "Create your account in under 60 seconds. Free.",
+    "finalCta": "Create free account",
+    "finalDisclaimer": "Three Billion Heartbeats does not replace therapy or professional psychological intervention."
+  },
+  "contact": {
+    "metaTitle": "Contact — Three Billion Heartbeats",
+    "metaDescription": "Got questions or want to know more? Write to us and we'll reply in under 24 hours.",
+    "title": "Contact us",
+    "subtitle": "We reply in under 24 hours.",
+    "starter": {
+      "header": "Reason",
+      "note": "We've prepared a starter message below. Edit it before sending.",
+      "profesional": {
+        "label": "Psychologist, coach or wellbeing professional",
+        "message": "Hi, I'm a [profession + license number if applicable] and I'd like to explore how Three Billion Heartbeats could fit into my practice. I'm particularly interested in:\n\n- "
+      },
+      "etica": {
+        "label": "Report an ethical issue",
+        "message": "Hi, I've spotted something on the platform that I think goes against what you promise in /etica. Context:\n\n- What happened:\n- Where (URL or section):\n- When:\n"
+      },
+      "sugerencia": {
+        "label": "Product suggestion or feedback",
+        "message": "Hi, I'm missing / I'd love to see…\n\n"
+      }
+    },
+    "nameLabel": "Name",
+    "namePlaceholder": "Your full name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@email.com",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Tell us what's on your mind...",
+    "statusSuccess": "Message sent! We'll get back to you soon.",
+    "statusError": "Please fill out all fields correctly.",
+    "privacyContext": "Your data will only be used to reply to your message.",
+    "submit": "Send message",
+    "submitSending": "Sending..."
+  },
+  "changelog": {
+    "eyebrow": "What's new",
+    "title": "What",
+    "titleHighlight": "is changing",
+    "subtitle": "Every change explained without marketing. What's new, what we've improved, what we've hardened on security, and what we've adjusted out of care for our users.",
+    "kind": {
+      "nuevo": "New",
+      "mejora": "Improvement",
+      "seguridad": "Security",
+      "cuidado": "Care"
+    },
+    "entry": {
+      "helpPage": {
+        "title": "Urgent help page",
+        "body": "We added a page inside the app with official emergency resources (988 in the US, 112 in the EU, Crisis Text Line, Samaritans) and a short guide for those critical minutes while someone waits to be attended to. It doesn't replace any service — it just makes it easier to reach them."
+      },
+      "referrals": {
+        "title": "Referrals program",
+        "body": "You can now invite someone you think this would help, and share the accompaniment with them. The metrics stay visible in your profile. It's not a paid affiliate scheme: it's a way for what works for you to reach the people you choose."
+      },
+      "rateLimit": {
+        "title": "Rate limiting on password recovery",
+        "body": "We added attempt limits to the password recovery and verification resend endpoints. It protects users against brute-force attacks and makes more noise when someone tries to impersonate."
+      },
+      "clinicalNotes": {
+        "title": "Clinical panel: notes and follow-ups",
+        "body": "The responsible psychologist can now take clinical notes inside the panel, mark pending follow-ups and see when a note resolves automatically as the case evolves. Better traceability for the deeper work."
+      }
+    },
+    "suggestionTitle": "Is something missing?",
+    "suggestionDesc": "If there's something that would make your life easier, tell us. We don't promise to build everything, but we read every suggestion.",
+    "suggestionCta": "Send suggestion"
   }
 }

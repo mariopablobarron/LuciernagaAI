@@ -1,0 +1,27 @@
+messages/es.json
+  s_c72d0ada98a9af::t_c49e0f4efc429f 1791-1901
+src/components/Chat.tsx
+  s_c72d0ada98a9af::t_0bc2dc5ed14ac1 4,152-159,164-182,184,186-193,195-197,200-218,220-244,246-261,297,307,316,320,329,342,344,350,361,372,390-392,411,422,430,437,448,464,473,476,480,483,487,490,518,559,562,574,595,601,615,623,630,637-638,641-642,644,680,795,800,827,832,849,859,863,880,887,894-895,905,921,949,959,961,986,997,1003,1009,1035,1048,1053-1054,1070,1077,1081,1093,1108,1113,1130,1145,1150,1160,1162-1163,1182-1183,1200,1203,1229,1239,1248,1255,1258,1269,1272,1278,1283,1286,1289
+messages/fr.json
+  s_c72d0ada98a9af::t_c9d0f5c23e0286 1791-1901
+messages/en.json
+  s_c72d0ada98a9af::t_c9d0f5c23e0286 1791-1901
+messages/pt.json
+  s_c72d0ada98a9af::t_c9d0f5c23e0286 1791-1901
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "e8fbe9bacc3bc79701496da460780fef3392526a",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

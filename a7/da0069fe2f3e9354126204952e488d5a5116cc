@@ -1,0 +1,29 @@
+messages/pt.json
+  s_d2308f25c4747c::t_12349897c616ac 21-26,385-389,642-648,930-940,2025-2028
+messages/es.json
+  s_d2308f25c4747c::t_12349897c616ac 21-26,385-389,642-648,930-940,2025-2028
+messages/fr.json
+  s_d2308f25c4747c::t_12349897c616ac 21-26,385-389,642-648,930-940,2025-2028
+messages/en.json
+  s_d2308f25c4747c::t_12349897c616ac 21-26,385-389,642-648,930-940,2025-2028
+scripts/i18n-check.mjs
+  s_d2308f25c4747c::t_4067b958d5a86f 182-185
+  s_d2308f25c4747c::t_d70ad09c4ec9ec 162-170,176-179
+  s_d2308f25c4747c::t_caf7d1b2ac94de 188,199-204,215,219-225,230,239-245
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "a7da0069fe2f3e9354126204952e488d5a5116cc",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

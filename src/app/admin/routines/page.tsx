@@ -62,7 +62,7 @@ export default function AdminRoutinesPage() {
   const [newCron, setNewCron] = useState("");
   const [newPrompt, setNewPrompt] = useState("");
   const [newModel, setNewModel] = useState("claude-sonnet-4-6");
-  const [newRepo, setNewRepo] = useState("https://github.com/mariopablobarron/LuciernagaAI");
+  const [newRepo, setNewRepo] = useState("https://github.com/mariopablobarron/tresmilmillonesdelatidos");
   const [savingNew, setSavingNew] = useState(false);
 
   // Per-row state

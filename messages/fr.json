@@ -2324,5 +2324,98 @@
       "breathing": "Respiration",
       "visualization": "Visualisation"
     }
+  },
+  "auth": {
+    "shared": {
+      "emailLabel": "Email",
+      "emailPlaceholder": "tu@email.com",
+      "passwordLabel": "Mot de passe",
+      "passwordPlaceholder": "••••••••",
+      "passwordMinPlaceholder": "Minimum 8 caractères",
+      "showPassword": "Afficher le mot de passe",
+      "hidePassword": "Masquer le mot de passe",
+      "continueWithGoogle": "Continuer avec Google",
+      "signupWithGoogle": "S'inscrire avec Google",
+      "orWithEmail": "ou avec email",
+      "passwordsMismatch": "Les mots de passe ne correspondent pas.",
+      "errors": {
+        "EMAIL_INVALID": "L'email n'est pas valide.",
+        "INVALID_CREDENTIALS": "Email ou mot de passe incorrect.",
+        "LOGIN_FAILED": "Erreur lors de la connexion. Réessaye.",
+        "EMAIL_TAKEN": "Un compte existe déjà avec cet email.",
+        "PASSWORD_TOO_SHORT": "Le mot de passe doit contenir au moins 8 caractères.",
+        "CONSENT_REQUIRED": "Tu dois accepter les Conditions et la Confidentialité pour créer ton compte.",
+        "CONSENT_VERSION_MISMATCH": "Les Conditions ont été mises à jour. Recharge la page et accepte à nouveau.",
+        "SIGNUP_FAILED": "Erreur lors de la création du compte. Réessaye.",
+        "TOKEN_REQUIRED": "Le lien n'est pas valide.",
+        "INVALID_TOKEN": "Le lien n'est pas valide ou a déjà été utilisé.",
+        "EXPIRED_TOKEN": "Le lien a expiré. Demande-en un nouveau.",
+        "RESET_FAILED": "Erreur lors de la réinitialisation. Réessaye.",
+        "oauth_invalid_state": "Ta session Google a expiré. Réessaye.",
+        "oauth_failed": "Erreur de connexion avec Google. Réessaye.",
+        "google_not_configured": "La connexion avec Google n'est pas disponible pour le moment. Utilise email et mot de passe.",
+        "generic": "Erreur d'authentification."
+      }
+    },
+    "login": {
+      "title": "Ton cœur connaissait déjà le chemin.",
+      "subtitle": "Reviens battre.",
+      "justVerified": "Email vérifié avec succès. Tu peux maintenant te connecter.",
+      "forgotLink": "Tu as oublié ton mot de passe ?",
+      "submitting": "Connexion…",
+      "submit": "Se connecter",
+      "noAccount": "Tu n'as pas de compte ?",
+      "signupLink": "Inscris-toi ici",
+      "termsLine": "En te connectant, tu acceptes nos",
+      "termsLink": "Conditions",
+      "and": "et",
+      "privacyLink": "Confidentialité"
+    },
+    "signup": {
+      "title": "Premier battement.",
+      "subtitle": "Le premier de beaucoup qui vont compter.",
+      "nameLabel": "Nom",
+      "namePlaceholder": "Ton nom",
+      "phoneLabel": "Téléphone / Telegram",
+      "phoneHint": "(optionnel — pour les rappels)",
+      "phonePlaceholder": "+33 6 12 34 56 78",
+      "confirmPasswordLabel": "Confirme ton mot de passe",
+      "mvpDisclaimer": "Nous sommes en phase MVP — chaque conversation que tu as nous aide à améliorer le mentor pour toi et pour ceux qui viendront après. Tes données sont traitées de manière confidentielle et tu peux les supprimer à tout moment.",
+      "consentTpl": "J'accepte les <terms>Conditions</terms> et la <privacy>Confidentialité</privacy> (version {version}) et je comprends que c'est un produit en phase de test qui ne remplace pas un professionnel de la santé mentale.",
+      "submitting": "Création du compte…",
+      "submit": "Créer un compte",
+      "alreadyAccount": "Tu as déjà un compte ?",
+      "loginLink": "Se connecter",
+      "createdTitle": "Compte créé",
+      "createdBodyTpl": "On a envoyé un lien de vérification à {email}.",
+      "telegramCta": "Emmène-moi sur Telegram",
+      "telegramCtaDesc": "Clique pour connecter ton compte. Je serai là — sans ouvrir le web.",
+      "spamHint": "Tu ne trouves pas l'email ? Vérifie ton dossier spam.",
+      "continueToApp": "Continuer vers l'app"
+    },
+    "forgot": {
+      "back": "Retour à la connexion",
+      "title": "Tu as oublié ton mot de passe ?",
+      "subtitle": "Écris ton email et on t'envoie un lien pour le réinitialiser.",
+      "doneTitle": "Vérifie ton courrier",
+      "doneBody": "S'il existe un compte avec cet email, tu recevras un lien pour réinitialiser ton mot de passe dans les prochaines minutes.",
+      "submitting": "Envoi en cours…",
+      "submit": "Envoyer le lien de récupération",
+      "errorSend": "Erreur lors de l'envoi de l'email. Réessaye."
+    },
+    "reset": {
+      "title": "Nouveau mot de passe",
+      "subtitle": "Choisis un mot de passe sécurisé pour ton compte.",
+      "loading": "Chargement…",
+      "invalidLinkTitle": "Lien invalide. Demande-en un nouveau.",
+      "requestNewLink": "Récupérer mon mot de passe",
+      "doneTitle": "Mot de passe mis à jour !",
+      "doneSubtitle": "Redirection vers l'app…",
+      "newPasswordLabel": "Nouveau mot de passe",
+      "confirmLabel": "Confirmer le mot de passe",
+      "submitting": "Enregistrement…",
+      "submit": "Définir le nouveau mot de passe",
+      "requestNewSuffix": "Demande-en un nouveau"
+    }
   }
 }

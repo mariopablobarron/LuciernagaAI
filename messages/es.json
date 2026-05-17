@@ -2190,5 +2190,93 @@
       "impulse": "Programa Impulso",
       "explore": "Explorar ahora"
     }
+  },
+  "minors": {
+    "metaTitle": "Estamos esperándote — Tres Mil Millones de Latidos",
+    "metaDescription": "Esta plataforma necesita que tengas al menos 14 años. Mientras tanto te dejamos recursos pensados para ti.",
+    "heading": "Estamos esperándote.",
+    "p1": "Esta plataforma está pensada para personas a partir de 14 años. No es porque no nos importes — es porque para acompañarte como mereces necesitamos que un adulto de confianza esté cerca.",
+    "p2": "Si lo que sientes ahora pesa, hay personas escuchando. Llamar es gratis y confidencial.",
+    "resourceTitle": "Fundación ANAR — Ayuda a niños y adolescentes",
+    "resourcePhone": "900 20 20 10",
+    "resourceHint": "24 horas, gratis y confidencial. Atienden personas formadas que van a escucharte sin juzgar.",
+    "emergency": "Si hay riesgo inmediato para tu vida o la de alguien cerca, llama al 112.",
+    "comeBack": "Cuando cumplas 14 años, vuelve y hablamos.",
+    "backHome": "← Volver a la portada"
+  },
+  "invite": {
+    "verifying": "Verificando invitación...",
+    "badge": "Invitación personal",
+    "headlineTpl": "{name} te ha invitado a Tres Mil Millones de Latidos",
+    "intro": "Esta invitación es tuya. No es publicidad — es alguien que cree que puedes cambiar y quiere que tengas acceso.",
+    "fallbackInviter": "alguien de Tres Mil Millones de Latidos",
+    "whatIsTitle": "¿Qué es Tres Mil Millones de Latidos?",
+    "feature1": "Una IA que te hace las preguntas que nadie más se atreve a hacerte",
+    "feature2": "Un sistema que detecta cuando evitas lo importante y te lo dice directamente",
+    "feature3": "30 días para hacer el cambio que llevas aplazando demasiado tiempo",
+    "accept": "Aceptar la invitación",
+    "learnMore": "Ver más sobre Tres Mil Millones de Latidos primero",
+    "exclusiveAccess": "Acceso exclusivo. Sin tarjeta de crédito.",
+    "invalidTitle": "Invitación no válida",
+    "invalidBody": "Este link de invitación ha caducado o ya ha sido utilizado.",
+    "fallbackPath": "Puedes solicitar acceso igual completando las 3 misiones de la lista de espera.",
+    "goWaitlist": "Ir a la lista de espera"
+  },
+  "family": {
+    "metaTitle": "Portal de Apoyo | Tres Mil Millones de Latidos",
+    "metaDescription": "Portal privado para contactos de confianza.",
+    "heading": "Portal de Apoyo",
+    "subtitleTpl": "Red de confianza de {name}",
+    "protocolTitle": "Protocolo de confidencialidad",
+    "protocolBody": "Lo que ves aquí es confidencial. No le menciones lo que sabes de su progreso, su racha o su estado. Si el sistema necesita que actúes, te avisará. Tu papel es estar — no vigilar.",
+    "relationTips": {
+      "madre": "Tu presencia importa más que tus consejos. No intentes arreglarlo — solo está.",
+      "padre": "Tu presencia importa más que tus consejos. No intentes arreglarlo — solo está.",
+      "pareja": "Acompaña sin controlar. No uses lo que ves aquí en discusiones.",
+      "amigo": "Sé natural. Un plan juntos vale más que un consejo. No cambies cómo le tratas.",
+      "terapeuta": "Usa esta información como contexto entre sesiones, no como agenda.",
+      "default": "Tu presencia importa más que tus consejos."
+    },
+    "whatToDo": "Qué hacer ahora",
+    "actions": {
+      "crisisTitle": "Llámale ahora",
+      "crisisSub": "No escribas — llama. Un 'estoy aquí' es suficiente. No intentes resolver nada por teléfono.",
+      "weekTitle": "Envía un mensaje natural",
+      "weekSub": "Sin mencionar la app. Un '¿quedamos?' o '¿cómo estás?' sin agenda oculta. La normalidad es apoyo.",
+      "fewDaysTitle": "Un mensaje corto basta",
+      "fewDaysSub": "No preguntes por la app. Un 'pensé en ti' o un meme vale más que un '¿ya entraste?'",
+      "winsTitle": "Celebra con ella/él",
+      "winsSub": "Ha compartido una victoria contigo. Este paso le ha costado más de lo que parece. Díselo.",
+      "calmTitle": "No hacer nada",
+      "calmSub": "Todo va bien. La ausencia de presión es la mejor forma de apoyo ahora mismo."
+    },
+    "metrics": {
+      "streakTitle": "Constancia",
+      "streakUnit": "días",
+      "streakNone": "Sin racha activa. No le preguntes por qué — simplemente escríbele algo bonito.",
+      "streakLongHint": "Lleva buena racha. La constancia le está costando — reconócelo si surge naturalmente.",
+      "streakBestTpl": "Mejor racha: {n} días.",
+      "lastActivityTitle": "Última actividad",
+      "lastActivityToday": "Hoy",
+      "lastActivityYesterday": "Ayer",
+      "lastActivityDaysTpl": "Hace {n} días",
+      "lastActivityWeekHint": "Puede que esté bien o puede que no. Un mensaje natural sin mencionar la app es lo mejor.",
+      "lastActivityFewDaysHint": "Lleva unos días sin entrar. No pasa nada — a veces se necesita descanso.",
+      "lastActivityRecentHint": "Actividad reciente. Todo parece en orden.",
+      "goalTitle": "Objetivo activo",
+      "goalProgress": "Progreso",
+      "goalAllDone": "Ha completado todas las acciones. Si surge, celebra con ella/él.",
+      "goalNotStarted": "Aún no ha empezado. No presiones — el momento llegará.",
+      "goalInProgress": "Va avanzando a su ritmo. Eso ya es mucho."
+    },
+    "wins": {
+      "title": "Victorias compartidas",
+      "intro": "Ha querido compartir estos logros contigo. Cada uno le ha costado más de lo que parece."
+    },
+    "footer": "Tres Mil Millones de Latidos — Red de apoyo",
+    "footerConfidential": "Este portal es confidencial. No lo compartas ni lo reenvíes."
+  },
+  "journey": {
+    "loading": "Cargando…"
   }
 }

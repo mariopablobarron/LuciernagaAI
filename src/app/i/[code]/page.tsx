@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ArrowRight, Sparkles, Lock } from "lucide-react";
 import { COMPONENTS } from "@/styles/design-system";
 
 type InviteStatus = "loading" | "valid" | "invalid" | "used";
 
 export default function InvitePage() {
+  const t = useTranslations("invite");
   const params = useParams<{ code: string }>();
   const router = useRouter();
   const code = params.code;
@@ -21,7 +23,7 @@ export default function InvitePage() {
       .then((r) => r.json())
       .then((data: { valid: boolean; inviterName?: string }) => {
         if (data.valid) {
-          setInviterName(data.inviterName ?? "alguien de Tres Mil Millones de Latidos");
+          setInviterName(data.inviterName ?? t("fallbackInviter"));
           setStatus("valid");
           // Store invite code for use during waitlist/app join
           localStorage.setItem("luc_invite_code", code);
@@ -31,7 +33,7 @@ export default function InvitePage() {
         }
       })
       .catch(() => setStatus("invalid"));
-  }, [code]);
+  }, [code, t]);
 
   function acceptInvite() {
     // Redirect to /unirse with invite code pre-filled — bypasses waitlist barrier
@@ -49,7 +51,7 @@ export default function InvitePage() {
       {status === "loading" && (
         <div className="text-center space-y-4">
           <div className="text-4xl animate-pulse">🌟</div>
-          <p className="text-zinc-500">Verificando invitación...</p>
+          <p className="text-zinc-500">{t("verifying")}</p>
         </div>
       )}
 
@@ -58,33 +60,26 @@ export default function InvitePage() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 rounded-full border border-fuchsia-500/30 bg-fuchsia-500/10 px-5 py-2 text-sm text-fuchsia-300">
             <Sparkles className="h-3.5 w-3.5" />
-            Invitación personal
+            {t("badge")}
           </div>
 
           {/* Hero */}
           <div className="space-y-3">
             <div className="text-6xl">💛</div>
             <h1 className="text-3xl md:text-4xl font-bold leading-tight">
-              {inviterName} te ha invitado a Tres Mil Millones de Latidos
+              {t("headlineTpl", { name: inviterName })}
             </h1>
-            <p className="text-zinc-400 text-lg leading-relaxed">
-              Esta invitación es tuya. No es publicidad — es alguien que cree que puedes
-              cambiar y quiere que tengas acceso.
-            </p>
+            <p className="text-zinc-400 text-lg leading-relaxed">{t("intro")}</p>
           </div>
 
           {/* What is it */}
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 text-left space-y-4">
-            <p className="text-sm font-semibold text-zinc-300">¿Qué es Tres Mil Millones de Latidos?</p>
+            <p className="text-sm font-semibold text-zinc-300">{t("whatIsTitle")}</p>
             <div className="space-y-3">
-              {[
-                "Una IA que te hace las preguntas que nadie más se atreve a hacerte",
-                "Un sistema que detecta cuando evitas lo importante y te lo dice directamente",
-                "30 días para hacer el cambio que llevas aplazando demasiado tiempo",
-              ].map((item, i) => (
-                <div key={i} className="flex items-start gap-3">
+              {[1, 2, 3].map((n) => (
+                <div key={n} className="flex items-start gap-3">
                   <div className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" />
-                  <p className="text-sm text-zinc-400">{item}</p>
+                  <p className="text-sm text-zinc-400">{t(`feature${n}`)}</p>
                 </div>
               ))}
             </div>
@@ -97,20 +92,20 @@ export default function InvitePage() {
               onClick={acceptInvite}
               className={`${COMPONENTS.buttonPrimary} w-full flex items-center justify-center gap-2 py-3 text-base`}
             >
-              Aceptar la invitación <ArrowRight className="h-4 w-4" />
+              {t("accept")} <ArrowRight className="h-4 w-4" />
             </button>
             <button
               type="button"
               onClick={() => router.push("/")}
               className="text-sm text-zinc-600 hover:text-zinc-400 transition-colors"
             >
-              Ver más sobre Tres Mil Millones de Latidos primero
+              {t("learnMore")}
             </button>
           </div>
 
           <div className="flex items-center gap-2 justify-center text-xs text-zinc-700">
             <Lock className="h-3 w-3" />
-            <span>Acceso exclusivo. Sin tarjeta de crédito.</span>
+            <span>{t("exclusiveAccess")}</span>
           </div>
         </div>
       )}
@@ -118,20 +113,16 @@ export default function InvitePage() {
       {status === "invalid" && (
         <div className="w-full max-w-md space-y-6 text-center animate-in fade-in duration-500">
           <div className="text-5xl">😔</div>
-          <h1 className="text-2xl font-bold">Invitación no válida</h1>
-          <p className="text-zinc-400">
-            Este link de invitación ha caducado o ya ha sido utilizado.
-          </p>
+          <h1 className="text-2xl font-bold">{t("invalidTitle")}</h1>
+          <p className="text-zinc-400">{t("invalidBody")}</p>
           <div className="space-y-3">
-            <p className="text-sm text-zinc-500">
-              Puedes solicitar acceso igual completando las 3 misiones de la lista de espera.
-            </p>
+            <p className="text-sm text-zinc-500">{t("fallbackPath")}</p>
             <button
               type="button"
               onClick={() => router.push("/unirse")}
               className={`${COMPONENTS.buttonSecondary} flex items-center gap-2 mx-auto px-6 py-2`}
             >
-              Ir a la lista de espera <ArrowRight className="h-4 w-4" />
+              {t("goWaitlist")} <ArrowRight className="h-4 w-4" />
             </button>
           </div>
         </div>

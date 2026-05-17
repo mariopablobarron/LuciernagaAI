@@ -2150,5 +2150,93 @@
       "impulse": "Programa Impulso",
       "explore": "Explorar agora"
     }
+  },
+  "minors": {
+    "metaTitle": "Estamos à tua espera — Três Mil Milhões de Batidas",
+    "metaDescription": "Esta plataforma requer que tenhas pelo menos 14 anos. Enquanto isso, deixamos-te recursos pensados para ti.",
+    "heading": "Estamos à tua espera.",
+    "p1": "Esta plataforma é pensada para pessoas a partir dos 14 anos. Não é porque não nos importes — é porque para te acompanharmos como mereces precisamos que um adulto de confiança esteja perto.",
+    "p2": "Se o que sentes agora pesa, há pessoas a ouvir. Ligar é grátis e confidencial.",
+    "resourceTitle": "Fundação ANAR — Ajuda a crianças e adolescentes",
+    "resourcePhone": "900 20 20 10",
+    "resourceHint": "24 horas, grátis e confidencial. Atendem pessoas formadas que vão ouvir-te sem julgar.",
+    "emergency": "Se há risco imediato para a tua vida ou a de alguém perto, liga para o 112.",
+    "comeBack": "Quando completares 14 anos, volta e falamos.",
+    "backHome": "← Voltar à portada"
+  },
+  "invite": {
+    "verifying": "A verificar convite...",
+    "badge": "Convite pessoal",
+    "headlineTpl": "{name} convidou-te para Três Mil Milhões de Batidas",
+    "intro": "Este convite é teu. Não é publicidade — é alguém que acredita que podes mudar e quer que tenhas acesso.",
+    "fallbackInviter": "alguém de Três Mil Milhões de Batidas",
+    "whatIsTitle": "O que é Três Mil Milhões de Batidas?",
+    "feature1": "Uma IA que te faz as perguntas que ninguém mais se atreve a fazer-te",
+    "feature2": "Um sistema que deteta quando evitas o importante e to diz diretamente",
+    "feature3": "30 dias para fazer a mudança que levas a adiar há demasiado tempo",
+    "accept": "Aceitar o convite",
+    "learnMore": "Ver mais sobre Três Mil Milhões de Batidas primeiro",
+    "exclusiveAccess": "Acesso exclusivo. Sem cartão de crédito.",
+    "invalidTitle": "Convite inválido",
+    "invalidBody": "Este link de convite expirou ou já foi utilizado.",
+    "fallbackPath": "Podes solicitar acesso completando as 3 missões da lista de espera.",
+    "goWaitlist": "Ir para a lista de espera"
+  },
+  "family": {
+    "metaTitle": "Portal de Apoio | Três Mil Milhões de Batidas",
+    "metaDescription": "Portal privado para contactos de confiança.",
+    "heading": "Portal de Apoio",
+    "subtitleTpl": "Rede de confiança de {name}",
+    "protocolTitle": "Protocolo de confidencialidade",
+    "protocolBody": "O que vês aqui é confidencial. Não lhe menciones o que sabes do seu progresso, da sua sequência ou do seu estado. Se o sistema precisar que atues, avisar-te-á. O teu papel é estar — não vigiar.",
+    "relationTips": {
+      "madre": "A tua presença importa mais do que os teus conselhos. Não tentes resolver — apenas está.",
+      "padre": "A tua presença importa mais do que os teus conselhos. Não tentes resolver — apenas está.",
+      "pareja": "Acompanha sem controlar. Não uses o que vês aqui em discussões.",
+      "amigo": "Sê natural. Um plano juntos vale mais do que um conselho. Não mudes como o tratas.",
+      "terapeuta": "Usa esta informação como contexto entre sessões, não como agenda.",
+      "default": "A tua presença importa mais do que os teus conselhos."
+    },
+    "whatToDo": "O que fazer agora",
+    "actions": {
+      "crisisTitle": "Liga-lhe agora",
+      "crisisSub": "Não escreva — liga. Um 'estou aqui' é suficiente. Não tentes resolver nada por telefone.",
+      "weekTitle": "Envia uma mensagem natural",
+      "weekSub": "Sem mencionar a app. Um 'marcamos?' ou 'como estás?' sem agenda oculta. A normalidade é apoio.",
+      "fewDaysTitle": "Uma mensagem curta chega",
+      "fewDaysSub": "Não perguntes pela app. Um 'pensei em ti' ou um meme vale mais do que um 'já entraste?'",
+      "winsTitle": "Celebra com ela/ele",
+      "winsSub": "Partilhou uma vitória contigo. Este passo custou-lhe mais do que parece. Diz-lho.",
+      "calmTitle": "Não fazer nada",
+      "calmSub": "Tudo corre bem. A ausência de pressão é a melhor forma de apoio neste momento."
+    },
+    "metrics": {
+      "streakTitle": "Constância",
+      "streakUnit": "dias",
+      "streakNone": "Sem série ativa. Não lhe perguntes porquê — escreve-lhe simplesmente algo bonito.",
+      "streakLongHint": "Tem boa série. A constância está-lhe a custar — reconhece-o se surgir naturalmente.",
+      "streakBestTpl": "Melhor série: {n} dias.",
+      "lastActivityTitle": "Última atividade",
+      "lastActivityToday": "Hoje",
+      "lastActivityYesterday": "Ontem",
+      "lastActivityDaysTpl": "Há {n} dias",
+      "lastActivityWeekHint": "Pode estar bem ou pode não estar. Uma mensagem natural sem mencionar a app é o melhor.",
+      "lastActivityFewDaysHint": "Leva uns dias sem entrar. Não há problema — às vezes precisa-se de descanso.",
+      "lastActivityRecentHint": "Atividade recente. Tudo parece em ordem.",
+      "goalTitle": "Objetivo ativo",
+      "goalProgress": "Progresso",
+      "goalAllDone": "Completou todas as ações. Se surgir, celebra com ela/ele.",
+      "goalNotStarted": "Ainda não começou. Não pressiones — o momento chegará.",
+      "goalInProgress": "Vai avançando ao seu ritmo. Isso já é muito."
+    },
+    "wins": {
+      "title": "Vitórias partilhadas",
+      "intro": "Quis partilhar estes êxitos contigo. Cada um lhe custou mais do que parece."
+    },
+    "footer": "Três Mil Milhões de Batidas — Rede de apoio",
+    "footerConfidential": "Este portal é confidencial. Não o compartas nem o reencaminhas."
+  },
+  "journey": {
+    "loading": "A carregar…"
   }
 }

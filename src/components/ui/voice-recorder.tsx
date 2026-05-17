@@ -1,7 +1,17 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useLocale } from "next-intl";
 import { Mic, MicOff } from "lucide-react";
+
+// Web Speech API espera BCP-47 (es-ES, en-US, pt-PT, fr-FR).
+// Mapping locale del producto → tag completo.
+const LOCALE_TO_BCP47: Record<string, string> = {
+  es: "es-ES",
+  en: "en-US",
+  pt: "pt-PT",
+  fr: "fr-FR",
+};
 
 type SpeechRecognitionResult = { isFinal: boolean; 0: { transcript: string } };
 type SpeechRecognitionEvent = {
@@ -47,6 +57,11 @@ export function VoiceRecorder({ onTranscript, disabled, className = "" }: VoiceR
   // isSupported se deriva del entorno una sola vez en cliente — no es state.
   const isSupported = useMemo(() => getSpeechRecognitionCtor() !== null, []);
 
+  // Locale activo del usuario (cookie NEXT_LOCALE leída por next-intl).
+  // El dictado debe usar el idioma del usuario, no asumir es-ES.
+  const locale = useLocale();
+  const bcp47 = LOCALE_TO_BCP47[locale] ?? "es-ES";
+
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   // Guardamos el callback en una ref para evitar recrear la instancia en cada
   // render del padre (que típicamente pasa una closure nueva).
@@ -56,18 +71,18 @@ export function VoiceRecorder({ onTranscript, disabled, className = "" }: VoiceR
     onTranscriptRef.current = onTranscript;
   }, [onTranscript]);
 
-  // Inicialización + cleanup. Solo se ejecuta una vez (sin deps).
+  // Inicialización + cleanup. Se recrea si cambia el idioma.
   useEffect(() => {
     const Ctor = getSpeechRecognitionCtor();
     if (!Ctor) return;
 
     const recognition = new Ctor();
     // Continuous=true: no se corta en la primera pausa, ideal para dictado
-    // natural en español. interimResults=true para feedback visual rápido,
-    // pero SOLO emitimos el texto final al padre.
+    // natural. interimResults=true para feedback visual rápido, pero SOLO
+    // emitimos el texto final al padre para evitar duplicación.
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = "es-ES";
+    recognition.lang = bcp47;
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       // Recorremos solo los resultados nuevos (a partir de resultIndex) y
@@ -107,7 +122,7 @@ export function VoiceRecorder({ onTranscript, disabled, className = "" }: VoiceR
       }
       recognitionRef.current = null;
     };
-  }, []);
+  }, [bcp47]);
 
   const toggleListening = useCallback(() => {
     const rec = recognitionRef.current;

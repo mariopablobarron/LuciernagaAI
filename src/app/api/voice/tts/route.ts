@@ -25,7 +25,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { resolveIdentity } from "@/lib/auth";
+import { InvalidSessionTokenError, resolveIdentity } from "@/lib/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { logError, logInfo } from "@/lib/logger";
 import { synthesize } from "@/lib/elevenlabs/tts";
@@ -41,11 +41,21 @@ type TTSBody = { text?: unknown; locale?: unknown; voiceId?: unknown };
 
 export async function POST(req: NextRequest) {
   try {
-    const identity = await resolveIdentity(req);
-    const isAuth = !!identity.userId;
+    // resolveIdentity lanza InvalidSessionTokenError si no hay sesión.
+    // Para TTS aceptamos anónimos sin crear sesión nueva — solo rate
+    // limit más estricto por IP.
+    let userId: string | null = null;
+    try {
+      const identity = await resolveIdentity(req);
+      userId = identity.userId;
+    } catch (err) {
+      if (!(err instanceof InvalidSessionTokenError)) throw err;
+      // Sin sesión válida → anónimo. Sin error.
+    }
+    const isAuth = !!userId;
 
     const key = isAuth
-      ? `voice:tts:user:${identity.userId}`
+      ? `voice:tts:user:${userId}`
       : `voice:tts:ip:${getClientIp(req)}`;
     const limit = isAuth
       ? VOICE_RATE_LIMITS.TTS_PER_HOUR_AUTH
@@ -76,7 +86,7 @@ export async function POST(req: NextRequest) {
     const result = await synthesize(text, { voiceId });
 
     logInfo("VOICE", "tts_ok", {
-      userId: identity.userId ?? null,
+      userId: userId ?? null,
       cached: result.cached,
       bytes: result.audio.byteLength,
       textLen: text.length,

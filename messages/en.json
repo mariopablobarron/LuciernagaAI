@@ -2469,7 +2469,7 @@
       "completed": "Completed",
       "onTrack": "On track ✓",
       "tabs": {
-        "diagnóstico": "Diagnostic",
+        "diagnostico": "Diagnostics",
         "retos": "Challenges",
         "insights": "Insights",
         "mensajes": "Messages"
@@ -2654,6 +2654,164 @@
         "checkinSaved": "Check-in saved. The system updated your streak and active challenges.",
         "futureSaved": "Time capsule saved."
       }
+    }
+  },
+  "community": {
+    "header": {
+      "title": "Community",
+      "subtitle": "Transformation circles"
+    },
+    "gate": {
+      "title": "Community is for those who already have an account",
+      "description": "Here you share wins, doubts, and real commitments. To protect those who write, you can only read and reply with a created account — you can try the mentor chat without signing up.",
+      "bullets": {
+        "victories": "Weekly wins",
+        "mutualHelp": "Mutual support between members",
+        "circles": "Circles of 5-8 people in your same phase",
+        "sessions": "Live sessions with professionals"
+      },
+      "createAccount": "Create free account",
+      "haveAccount": "I already have an account",
+      "notTriedQuestion": "Haven't tried it yet?",
+      "tryChatNoAccount": "Enter chat without an account"
+    },
+    "stats": {
+      "members": "Members",
+      "victoriesWeek": "Wins 7d",
+      "helpsWeek": "Helps 7d",
+      "activeCircles": "Active circles"
+    },
+    "confidentiality": "Safe space. What's shared here is confidential. Post anonymously if you prefer.",
+    "tabs": {
+      "today": {
+        "label": "Today",
+        "hint": "Daily round + your wins"
+      },
+      "circle": {
+        "label": "My Circle",
+        "hint": "Group of 5-8 in your same phase"
+      },
+      "questions": {
+        "label": "Mutual support",
+        "hint": "Ask for help or answer someone who needs it"
+      },
+      "coaches": {
+        "label": "Sessions",
+        "hint": "Meetings with professionals"
+      },
+      "spaces": {
+        "label": "Spaces",
+        "hint": "Themed rooms"
+      }
+    },
+    "cafeteria": {
+      "title": "The Cafeteria — today's round",
+      "description": "One question. Your answer first, then see how others live it.",
+      "enter": "Enter →"
+    },
+    "victories": {
+      "shareTitle": "Share a victory",
+      "placeholder": "Today I achieved...",
+      "loading": "Loading victories...",
+      "empty": "No victories yet. Be the first.",
+      "shared": "Victory shared"
+    },
+    "spaces": {
+      "emptyTitle": "No spaces open yet",
+      "emptyDescription": "Spaces are themed rooms (habits, decisions, relationships, work…) where everyone shares their step of the day. We'll open them as the community grows.",
+      "notifyMe": "Let me know when they open",
+      "postCount": "{count} posts",
+      "back": "← Back to spaces",
+      "shareReflection": "Share your reflection",
+      "feelingPlaceholder": "Today I feel...",
+      "blockerPlaceholder": "What holds me back is...",
+      "stepPlaceholder": "My step today is..."
+    },
+    "circle": {
+      "commitmentRegistered": "Commitment registered"
+    },
+    "questions": {
+      "filters": {
+        "community": "Asking for help",
+        "personal": "They wrote to you",
+        "mine": "I asked"
+      },
+      "chainContinues": {
+        "label": "The chain continues",
+        "message": "Someone else needs what you needed just now.",
+        "helpNow": "Help now",
+        "notNow": "Not now"
+      },
+      "askTitle": "Ask for help. Someone's been through something like this.",
+      "askDescription": "Your request is anonymous — nobody knows who's asking. Whoever answers can use their name or stay anonymous too. If you help someone down the line, the chain keeps going.",
+      "askPlaceholder": "Tell us what you're stuck on or what's on your mind right now…",
+      "charsAnonymous": "{count}/500 · Anonymous",
+      "askSuccess": "Request posted. Someone who's been through something similar will see it.",
+      "loading": "Loading…",
+      "empty": {
+        "mine": "You haven't asked the community for help yet.",
+        "personal": "Nobody's written to you directly yet.",
+        "community": "Nobody's asking for help right now. Check back soon to help someone."
+      },
+      "noAnswers": "No one's answered yet",
+      "oneHelped": "1 person helped",
+      "manyHelped": "{count} people helped",
+      "writtenToYou": "Written to you",
+      "answersFull": "Already got plenty of help",
+      "referredProfessional": "Referred to professional care",
+      "someoneWaiting": "Someone's waiting for help",
+      "crisisNotice": "This question shows signs of crisis. Community responses disabled. If you're in crisis, call <strong>988</strong>.",
+      "mostHelpful": "Most helpful",
+      "anonymous": "Anonymous",
+      "cantVoteOwn": "You can't vote on your own answer",
+      "helpedMeTitle": "Helped me",
+      "helpedMe": "helped me",
+      "answerPlaceholder": "What question would you ask?",
+      "answerPublished": "Answer published"
+    },
+    "guardian": {
+      "pedagogicalSuggestion": "Pedagogical suggestion",
+      "directAdviceHint": "Sounds like direct advice. What if you framed it as a question instead?",
+      "publishReformulated": "Publish reformulated",
+      "publishOriginal": "Publish original",
+      "prescriptiveNoAlt": "Your message sounds directive. We couldn't generate an alternative, but you can publish it if you think it's appropriate.",
+      "reviewing": "Reviewing...",
+      "reviewAndAnswer": "Review and answer",
+      "blockedFlagged": "Your message was flagged by our safety filter. If you think it's a false positive, you can publish it anyway or adjust the text.",
+      "blockedRateLimit": "You've done a lot of checks in a short time. You can publish anyway or wait a few minutes.",
+      "blockedReview": "We couldn't review your answer right now. You can publish anyway.",
+      "blockedNetwork": "There was an error reviewing your answer. You can publish anyway."
+    },
+    "coaches": {
+      "intro": "Group sessions with professionals. Open to the whole community or specific to your circle.",
+      "loading": "Loading sessions...",
+      "empty": "No sessions scheduled",
+      "emptyHint": "Sessions are announced via email and Telegram",
+      "roleCoach": "Coach",
+      "rolePsychologist": "Psychologist",
+      "live": "Live",
+      "minutes": "{min} min",
+      "openToAll": "Open to all",
+      "circleLabel": "Circle: {name}",
+      "joinNow": "Join now"
+    },
+    "posts": {
+      "published": "Published"
+    },
+    "actions": {
+      "share": "Share",
+      "publish": "Publish",
+      "publishAnyway": "Publish anyway",
+      "cancel": "Cancel",
+      "help": "Help",
+      "askHelp": "Ask for help"
+    },
+    "errors": {
+      "loadFailed": "Failed to load community",
+      "postFailed": "Failed to publish",
+      "network": "Network error",
+      "answerFailed": "Couldn't publish your answer",
+      "selfVoteForbidden": "You can't vote on your own answer."
     }
   }
 }

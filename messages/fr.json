@@ -2655,5 +2655,163 @@
         "futureSaved": "Capsule temporelle enregistrée."
       }
     }
+  },
+  "community": {
+    "header": {
+      "title": "Communauté",
+      "subtitle": "Cercles de transformation"
+    },
+    "gate": {
+      "title": "La communauté est réservée à ceux qui ont déjà un compte",
+      "description": "Ici on partage les victoires, les doutes et les vrais engagements. Pour protéger ceux qui écrivent, tu ne peux lire et répondre qu'avec un compte créé — tu peux tester le chat avec le mentor sans t'inscrire.",
+      "bullets": {
+        "victories": "Victoires de la semaine",
+        "mutualHelp": "Entraide entre membres",
+        "circles": "Cercles de 5-8 personnes à ta même phase",
+        "sessions": "Sessions en direct avec des professionnels"
+      },
+      "createAccount": "Créer un compte gratuit",
+      "haveAccount": "J'ai déjà un compte",
+      "notTriedQuestion": "Tu n'as pas encore essayé ?",
+      "tryChatNoAccount": "Entre dans le chat sans compte"
+    },
+    "stats": {
+      "members": "Membres",
+      "victoriesWeek": "Victoires 7j",
+      "helpsWeek": "Aides 7j",
+      "activeCircles": "Cercles actifs"
+    },
+    "confidentiality": "Espace sécurisé. Ce qui se partage ici est confidentiel. Publie de manière anonyme si tu préfères.",
+    "tabs": {
+      "today": {
+        "label": "Aujourd'hui",
+        "hint": "Tour du jour + tes victoires"
+      },
+      "circle": {
+        "label": "Mon Cercle",
+        "hint": "Groupe de 5-8 à ta même phase"
+      },
+      "questions": {
+        "label": "Entraide",
+        "hint": "Demande de l'aide ou réponds à quelqu'un qui en a besoin"
+      },
+      "coaches": {
+        "label": "Sessions",
+        "hint": "Rencontres avec des professionnels"
+      },
+      "spaces": {
+        "label": "Espaces",
+        "hint": "Salons thématiques"
+      }
+    },
+    "cafeteria": {
+      "title": "La Cafétéria — question du jour",
+      "description": "Une question. Ta réponse d'abord, puis tu vois comment les autres la vivent.",
+      "enter": "Entrer →"
+    },
+    "victories": {
+      "shareTitle": "Partage une victoire",
+      "placeholder": "Aujourd'hui j'ai réussi à...",
+      "loading": "Chargement des victoires...",
+      "empty": "Aucune victoire pour l'instant. Sois le premier.",
+      "shared": "Victoire partagée"
+    },
+    "spaces": {
+      "emptyTitle": "Aucun espace ouvert pour le moment",
+      "emptyDescription": "Les espaces sont des salons thématiques (habitudes, décisions, couple, travail…) où chacun partage son pas du jour. On les ouvrira au fur et à mesure que la communauté grandit.",
+      "notifyMe": "Préviens-moi à l'ouverture",
+      "postCount": "{count} publications",
+      "back": "← Retour aux espaces",
+      "shareReflection": "Partage ta réflexion",
+      "feelingPlaceholder": "Aujourd'hui je me sens...",
+      "blockerPlaceholder": "Ce qui me bloque c'est...",
+      "stepPlaceholder": "Mon pas d'aujourd'hui c'est..."
+    },
+    "circle": {
+      "commitmentRegistered": "Engagement enregistré"
+    },
+    "questions": {
+      "filters": {
+        "community": "Demandent de l'aide",
+        "personal": "T'écrivent",
+        "mine": "J'ai demandé"
+      },
+      "chainContinues": {
+        "label": "La chaîne continue",
+        "message": "Quelqu'un d'autre a besoin de ce dont tu avais besoin il y a peu.",
+        "helpNow": "Aider maintenant",
+        "notNow": "Pas maintenant"
+      },
+      "askTitle": "Demande de l'aide. Quelqu'un d'autre a vécu quelque chose de similaire.",
+      "askDescription": "Ta demande est anonyme — personne ne sait qui la pose. Celui qui répond peut le faire avec son nom ou en anonyme. Si tu aides un jour, la chaîne continue.",
+      "askPlaceholder": "Raconte-nous sur quoi tu bloques ou quelle question tu te poses en ce moment…",
+      "charsAnonymous": "{count}/500 · Anonyme",
+      "askSuccess": "Demande publiée. Quelqu'un qui a vécu quelque chose de similaire la verra.",
+      "loading": "Chargement…",
+      "empty": {
+        "mine": "Tu n'as pas encore demandé d'aide à la communauté.",
+        "personal": "Personne ne t'a encore écrit directement.",
+        "community": "Pour l'instant, personne ne demande d'aide. Reviens bientôt pour aider quelqu'un."
+      },
+      "noAnswers": "Personne n'a encore répondu",
+      "oneHelped": "1 personne a aidé",
+      "manyHelped": "{count} personnes ont aidé",
+      "writtenToYou": "On t'écrit directement",
+      "answersFull": "Elle a déjà reçu beaucoup d'aide",
+      "referredProfessional": "Orientée vers une prise en charge professionnelle",
+      "someoneWaiting": "Quelqu'un attend de l'aide",
+      "crisisNotice": "Cette question contient des signaux de crise. Les réponses communautaires sont désactivées. Si tu es en crise, appelle le <strong>024</strong>.",
+      "mostHelpful": "Plus utile",
+      "anonymous": "Anonyme",
+      "cantVoteOwn": "Tu ne peux pas voter pour ta propre réponse",
+      "helpedMeTitle": "M'a aidé",
+      "helpedMe": "m'a aidé",
+      "answerPlaceholder": "Quelle question lui poserais-tu ?",
+      "answerPublished": "Réponse publiée"
+    },
+    "guardian": {
+      "pedagogicalSuggestion": "Suggestion pédagogique",
+      "directAdviceHint": "Ça ressemble à un conseil direct. Et si tu le posais sous forme de question ?",
+      "publishReformulated": "Publier reformulée",
+      "publishOriginal": "Publier l'original",
+      "prescriptiveNoAlt": "Ton message sonne directif. On n'a pas pu générer d'alternative, mais tu peux le publier si tu le juges approprié.",
+      "reviewing": "Révision en cours...",
+      "reviewAndAnswer": "Réviser et répondre",
+      "blockedFlagged": "Ton message a été signalé par le filtre de sécurité. Si tu penses que c'est un faux positif, tu peux le publier quand même ou ajuster le texte.",
+      "blockedRateLimit": "Tu as fait beaucoup de vérifications en peu de temps. Tu peux publier quand même ou attendre quelques minutes.",
+      "blockedReview": "On n'a pas pu réviser ta réponse maintenant. Tu peux la publier quand même.",
+      "blockedNetwork": "Il y a eu un souci en révisant ta réponse. Tu peux la publier quand même."
+    },
+    "coaches": {
+      "intro": "Sessions collectives avec des professionnels. Ouvertes à toute la communauté ou spécifiques à ton cercle.",
+      "loading": "Chargement des sessions...",
+      "empty": "Aucune session programmée",
+      "emptyHint": "Les sessions sont annoncées par email et Telegram",
+      "roleCoach": "Coach",
+      "rolePsychologist": "Psychologue",
+      "live": "En direct",
+      "minutes": "{min} min",
+      "openToAll": "Ouverte à tous",
+      "circleLabel": "Cercle : {name}",
+      "joinNow": "Rejoindre maintenant"
+    },
+    "posts": {
+      "published": "Publié"
+    },
+    "actions": {
+      "share": "Partager",
+      "publish": "Publier",
+      "publishAnyway": "Publier quand même",
+      "cancel": "Annuler",
+      "help": "Aider",
+      "askHelp": "Demander de l'aide"
+    },
+    "errors": {
+      "loadFailed": "Erreur au chargement de la communauté",
+      "postFailed": "Erreur à la publication",
+      "network": "Erreur réseau",
+      "answerFailed": "Impossible de publier ta réponse",
+      "selfVoteForbidden": "Tu ne peux pas voter pour ta propre réponse."
+    }
   }
 }

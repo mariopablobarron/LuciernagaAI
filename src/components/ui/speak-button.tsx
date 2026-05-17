@@ -1,17 +1,22 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Volume2, VolumeX } from "lucide-react";
+import { Volume2, VolumeX, Sparkles } from "lucide-react";
 
 /**
- * Botón "escuchar" — usa la Web Speech Synthesis API nativa del navegador
- * para leer un texto en voz alta. Cero dependencias externas.
+ * Botón "escuchar" — lee el texto en voz alta.
  *
- * Si el navegador no soporta speechSynthesis, no renderiza nada (degrade silent).
+ * Estrategia:
+ *  - Si `preferElevenLabs=true` y el endpoint /api/voice/tts responde,
+ *    reproducimos la voz HD del mentor (Eva Dorado por default).
+ *  - Si ese fetch falla (quota agotada, sin red, timeout, etc.), fallback
+ *    transparente al `speechSynthesis` nativo del navegador. No rompe.
+ *  - Si el navegador tampoco soporta synth, el componente NO renderiza
+ *    nada (degrade silencioso).
  *
- * - Idioma por defecto: es-ES.
- * - Click toggle: si ya está hablando, lo detiene.
- * - Limpia markdown básico antes de leer (asteriscos, _, links, headers).
+ * El fallback es importante: la cuota ElevenLabs del plan Creator es
+ * limitada (~250k chars/mes). Cuando se agote, la voz baja a sintética
+ * del SO pero el botón sigue funcionando.
  */
 
 function stripMarkdown(text: string): string {
@@ -30,73 +35,147 @@ function stripMarkdown(text: string): string {
     .trim();
 }
 
+type SpeakState = "idle" | "loading" | "playing-hd" | "playing-native" | "error";
+
 export function SpeakButton({
   text,
   lang = "es-ES",
   className,
+  preferElevenLabs = false,
 }: {
   text: string;
   lang?: string;
   className?: string;
+  /**
+   * Si true, intenta usar /api/voice/tts para voz HD (ElevenLabs).
+   * Si la llamada falla por cualquier razón (red, quota, etc.), cae
+   * silenciosamente al synth nativo del navegador.
+   */
+  preferElevenLabs?: boolean;
 }) {
-  const [supported] = useState<boolean>(() => {
+  const [synthSupported] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     return typeof window.speechSynthesis !== "undefined" && typeof SpeechSynthesisUtterance !== "undefined";
   });
-  const [speaking, setSpeaking] = useState(false);
+  const [state, setState] = useState<SpeakState>("idle");
   const utterRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
-  // Si el componente se desmonta, parar reproducción
+  // Cleanup al desmontar — para audio HD y synth nativo.
   useEffect(() => {
     return () => {
       if (typeof window !== "undefined" && window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+      }
+      abortRef.current?.abort();
     };
   }, []);
 
-  const handleClick = useCallback(() => {
-    if (typeof window === "undefined") return;
-    const synth = window.speechSynthesis;
-    if (!synth) return;
-
-    // Si ya está hablando esta utterance, parar
-    if (speaking) {
-      synth.cancel();
-      setSpeaking(false);
+  // Reproducción nativa (fallback siempre disponible si el synth está).
+  const playNative = useCallback((cleaned: string) => {
+    if (!synthSupported) {
+      setState("error");
       return;
     }
-
-    // Cancelar cualquier otra reproducción en curso (ej. otro mensaje hablando)
+    const synth = window.speechSynthesis;
     synth.cancel();
-
-    const cleaned = stripMarkdown(text || "");
-    if (!cleaned) return;
-
     const utter = new SpeechSynthesisUtterance(cleaned);
     utter.lang = lang;
     utter.rate = 1;
     utter.pitch = 1;
-    utter.onend = () => setSpeaking(false);
-    utter.onerror = () => setSpeaking(false);
+    utter.onend = () => setState("idle");
+    utter.onerror = () => setState("idle");
     utterRef.current = utter;
-
-    setSpeaking(true);
+    setState("playing-native");
     synth.speak(utter);
-  }, [speaking, text, lang]);
+  }, [lang, synthSupported]);
 
-  if (!supported) return null;
+  // Reproducción HD (ElevenLabs). Si falla, llama a playNative.
+  const playHD = useCallback(async (cleaned: string) => {
+    setState("loading");
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    try {
+      const res = await fetch("/api/voice/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: cleaned }),
+        credentials: "include",
+        signal: controller.signal,
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audioRef.current = audio;
+      audio.onended = () => {
+        setState("idle");
+        URL.revokeObjectURL(url);
+      };
+      audio.onerror = () => {
+        setState("idle");
+        URL.revokeObjectURL(url);
+      };
+      setState("playing-hd");
+      await audio.play();
+    } catch (err) {
+      // Fallback transparente al synth nativo.
+      if (err instanceof DOMException && err.name === "AbortError") {
+        setState("idle");
+        return;
+      }
+      playNative(cleaned);
+    }
+  }, [playNative]);
+
+  const handleClick = useCallback(() => {
+    // Si ya está reproduciendo, parar todo.
+    if (state === "playing-hd" || state === "playing-native" || state === "loading") {
+      if (typeof window !== "undefined") {
+        window.speechSynthesis?.cancel();
+      }
+      audioRef.current?.pause();
+      abortRef.current?.abort();
+      setState("idle");
+      return;
+    }
+
+    const cleaned = stripMarkdown(text || "");
+    if (!cleaned) return;
+
+    if (preferElevenLabs) {
+      void playHD(cleaned);
+    } else {
+      playNative(cleaned);
+    }
+  }, [state, text, preferElevenLabs, playHD, playNative]);
+
+  // Si el navegador no soporta NADA, no renderizamos. El usuario verá un
+  // chat sin botón de escuchar — preferible a un botón roto.
+  if (!synthSupported && !preferElevenLabs) return null;
+
+  const isActive = state === "playing-hd" || state === "playing-native";
+  const isLoading = state === "loading";
+  const isHD = state === "playing-hd";
 
   return (
     <button
       type="button"
       onClick={handleClick}
-      aria-label={speaking ? "Detener lectura" : "Escuchar respuesta"}
-      title={speaking ? "Detener lectura" : "Escuchar respuesta"}
+      aria-label={isActive ? "Detener lectura" : "Escuchar respuesta"}
+      title={isActive ? "Detener lectura" : (preferElevenLabs ? "Escuchar (voz HD)" : "Escuchar respuesta")}
       className={className ?? "p-2 transition-opacity"}
     >
-      {speaking ? (
-        <VolumeX className="h-3.5 w-3.5 text-fuchsia-400" />
+      {isLoading ? (
+        <Sparkles className="h-3.5 w-3.5 animate-pulse text-fuchsia-400" />
+      ) : isActive ? (
+        <VolumeX className={`h-3.5 w-3.5 ${isHD ? "text-fuchsia-400" : "text-fuchsia-300"}`} />
       ) : (
         <Volume2 className="h-3.5 w-3.5 text-zinc-600 hover:text-zinc-400" />
       )}

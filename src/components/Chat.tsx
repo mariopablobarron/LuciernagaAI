@@ -378,6 +378,17 @@ function SignupPromptBubble({
 
 // ─── Message bubble ───────────────────────────────────────────────────────────
 
+// Mapping del locale next-intl al tag BCP-47 que espera speechSynthesis.
+// Sin esto, todos los mensajes se leen con voz española aunque el usuario
+// esté en EN/PT/FR. ElevenLabs (multilingual) lo gestiona internamente
+// con `lang_code` o detectándolo, pero el fallback nativo SÍ lo necesita.
+const SPEECH_BCP47: Record<string, string> = {
+  es: "es-ES",
+  en: "en-US",
+  pt: "pt-PT",
+  fr: "fr-FR",
+};
+
 function MessageBubble({
   message,
   isStreaming,
@@ -390,6 +401,8 @@ function MessageBubble({
   const t = useTranslations("chat");
   const formatMsgTime = useFormatMsgTime();
   const renderMarkdown = useRenderMarkdown();
+  const locale = useLocale();
+  const speakLang = SPEECH_BCP47[locale] ?? "es-ES";
   const [copied, setCopied] = useState(false);
   const isUser = message.role === "user";
 
@@ -580,7 +593,12 @@ function MessageBubble({
                   <Copy className="h-3.5 w-3.5 text-zinc-600 hover:text-zinc-400" />
                 )}
               </button>
-              <SpeakButton text={message.content} className="p-2" />
+              <SpeakButton
+                text={message.content}
+                lang={speakLang}
+                preferElevenLabs
+                className="p-2"
+              />
             </div>
           </>
         )}

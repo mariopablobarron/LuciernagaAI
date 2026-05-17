@@ -3092,5 +3092,79 @@
   },
   "chatToolsMenu": {
     "trigger": "Más"
+  },
+  "enneagram": {
+    "loading": "Cargando…",
+    "backToProfile": "Volver a mi perfil",
+    "likert": {
+      "1": "Nada de acuerdo",
+      "2": "Un poco",
+      "3": "Regular",
+      "4": "Bastante",
+      "5": "Totalmente"
+    },
+    "intro": {
+      "eyebrow": "Test del Eneagrama",
+      "title": "¿Cómo te entiende mejor el mentor?",
+      "description": "90 frases. Marcas en cuánto te identificas. Al final tendrás tu tipo dominante y, lo más importante, el mentor adaptará su tono y sus preguntas a cómo funcionas tú.",
+      "bullets": {
+        "duration": "Tarda unos 10-12 minutos.",
+        "pause": "Puedes pausar y volver: tus respuestas quedan guardadas en este navegador.",
+        "storage": "Guardamos tu resultado y tus respuestas para que tu mentor pueda ajustar el tono y para que tú puedas revisar tu test cuando quieras. Puedes borrarlo desde aquí mismo."
+      },
+      "existing": {
+        "title": "Ya hiciste el test antes",
+        "dominantLabel": "Tipo dominante:",
+        "typeFormat": "{name} (tipo {n})",
+        "wingSuffix": " · ala {n}",
+        "completedAt": "Hecho el {date}",
+        "deleting": "Borrando…",
+        "delete": "Borrar mi test (incluye las respuestas individuales)",
+        "deleteConfirm": "¿Borrar tu test del eneagrama? Se eliminarán también las respuestas individuales. No se puede deshacer."
+      },
+      "actions": {
+        "continue": "Continuar ({answered}/{total})",
+        "start": "Empezar el test",
+        "restart": "Empezar de cero"
+      },
+      "declare": {
+        "prompt": "¿Ya conoces tu tipo (lo hiciste en otro test, libro o terapia)?",
+        "open": "Declarar mi tipo sin hacer el test",
+        "helper": "Selecciona tu tipo dominante. Si conoces tu ala, añádela.",
+        "typeLabel": "Tipo dominante",
+        "typePlaceholder": "Elige…",
+        "typeOption": "{n} — {name}",
+        "wingLabel": "Ala (opcional)",
+        "wingNone": "Sin ala",
+        "wingOption": "{n} — {name}",
+        "submitting": "Guardando…",
+        "submit": "Confirmar",
+        "cancel": "Cancelar",
+        "saveError": "No pudimos guardar tu tipo. Prueba en un rato.",
+        "offlineError": "Sin conexión. Prueba en un rato."
+      }
+    },
+    "running": {
+      "blockProgress": "Bloque {page} de {total}",
+      "answeredCount": "{answered}/{total} respondidas",
+      "autosave": "Tu progreso se guarda automáticamente en este dispositivo. Puedes cerrar y volver cuando quieras.",
+      "submitError": "No pudimos guardar el resultado. Prueba de nuevo en un rato.",
+      "offlineError": "Sin conexión. Tus respuestas siguen guardadas localmente.",
+      "prev": "Anterior",
+      "next": "Siguiente",
+      "submitting": "Calculando…",
+      "submit": "Ver mi resultado"
+    },
+    "result": {
+      "eyebrow": "Tu tipo dominante",
+      "typeSuffix": "— tipo {n}",
+      "wingSuffix": "con ala {n}",
+      "mentorTitle": "Cómo lo va a usar el mentor",
+      "mentorBody": "A partir de ahora ajustará el tono y el tipo de preguntas a cómo funcionas tú. Si en algún momento no te encaja, puedes repetir el test cuando quieras.",
+      "topTitle": "Top 3 — los 3 con más score",
+      "rankingItem": "Tipo {n} — {name}",
+      "backToChat": "Volver al chat",
+      "repeat": "Repetir el test"
+    }
   }
 }

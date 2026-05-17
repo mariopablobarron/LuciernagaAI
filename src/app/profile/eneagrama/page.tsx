@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, CheckCircle2, RotateCcw, Sparkles } from "lucide-react";
 import {
@@ -15,12 +16,11 @@ import {
 const STORAGE_KEY = "enneagram:draft:v1";
 const PAGE_SIZE = 10;
 
-const LIKERT_LABELS: Record<LikertAnswer, string> = {
-  1: "Nada de acuerdo",
-  2: "Un poco",
-  3: "Regular",
-  4: "Bastante",
-  5: "Totalmente",
+const LOCALE_BCP47: Record<string, string> = {
+  es: "es-ES",
+  en: "en-US",
+  pt: "pt-PT",
+  fr: "fr-FR",
 };
 
 type ResultPayload = {
@@ -41,8 +41,22 @@ type ExistingAssessment = {
 
 export default function EnneagramPage() {
   const router = useRouter();
+  const t = useTranslations("enneagram");
+  const locale = useLocale();
+  const bcp = LOCALE_BCP47[locale] ?? "es-ES";
   const items = useMemo(() => getOrderedItems(), []);
   const totalPages = Math.ceil(items.length / PAGE_SIZE);
+
+  const likertLabels: Record<LikertAnswer, string> = useMemo(
+    () => ({
+      1: t("likert.1"),
+      2: t("likert.2"),
+      3: t("likert.3"),
+      4: t("likert.4"),
+      5: t("likert.5"),
+    }),
+    [t],
+  );
 
   const [phase, setPhase] = useState<"loading" | "intro" | "running" | "submitting" | "result">(
     "loading"
@@ -127,7 +141,7 @@ export default function EnneagramPage() {
       });
       const data = (await res.json()) as Partial<ResultPayload> & { success?: boolean; error?: string };
       if (!res.ok || !data.success || !data.dominantType) {
-        setError("No pudimos guardar el resultado. Prueba de nuevo en un rato.");
+        setError(t("running.submitError"));
         setPhase("running");
         return;
       }
@@ -145,10 +159,10 @@ export default function EnneagramPage() {
       }
       setPhase("result");
     } catch {
-      setError("Sin conexión. Tus respuestas siguen guardadas localmente.");
+      setError(t("running.offlineError"));
       setPhase("running");
     }
-  }, [answers]);
+  }, [answers, t]);
 
   const handleReset = useCallback(() => {
     setAnswers({});
@@ -170,7 +184,7 @@ export default function EnneagramPage() {
   const [deleteSubmitting, setDeleteSubmitting] = useState(false);
 
   const handleDeleteExisting = useCallback(async () => {
-    if (!confirm("¿Borrar tu test del eneagrama? Se eliminarán también las respuestas individuales. No se puede deshacer.")) return;
+    if (!confirm(t("intro.existing.deleteConfirm"))) return;
     setDeleteSubmitting(true);
     try {
       const res = await fetch("/api/enneagram/me/delete", {
@@ -185,7 +199,7 @@ export default function EnneagramPage() {
     } finally {
       setDeleteSubmitting(false);
     }
-  }, []);
+  }, [t]);
 
   const handleDeclare = useCallback(async () => {
     if (!declareType) return;
@@ -203,7 +217,7 @@ export default function EnneagramPage() {
       });
       const data = (await res.json()) as { success?: boolean; assessmentId?: string };
       if (!res.ok || !data.success) {
-        setDeclareError("No pudimos guardar tu tipo. Prueba en un rato.");
+        setDeclareError(t("intro.declare.saveError"));
         return;
       }
       setExisting({
@@ -215,16 +229,16 @@ export default function EnneagramPage() {
       });
       setDeclareOpen(false);
     } catch {
-      setDeclareError("Sin conexión. Prueba en un rato.");
+      setDeclareError(t("intro.declare.offlineError"));
     } finally {
       setDeclareSubmitting(false);
     }
-  }, [declareType, declareWing]);
+  }, [declareType, declareWing, t]);
 
   if (phase === "loading") {
     return (
       <main className="mx-auto max-w-2xl px-4 py-12 text-center text-zinc-400">
-        Cargando…
+        {t("loading")}
       </main>
     );
   }
@@ -241,41 +255,46 @@ export default function EnneagramPage() {
             href="/profile"
             className="inline-flex items-center gap-1 text-sm text-zinc-400 hover:text-zinc-200"
           >
-            <ArrowLeft className="h-4 w-4" /> Volver a mi perfil
+            <ArrowLeft className="h-4 w-4" /> {t("backToProfile")}
           </Link>
         </div>
         <header className="space-y-3">
           <p className="text-xs font-semibold uppercase tracking-widest text-fuchsia-300">
-            Test del Eneagrama
+            {t("intro.eyebrow")}
           </p>
           <h1 className="text-3xl sm:text-4xl font-bold text-white leading-tight">
-            ¿Cómo te entiende mejor el mentor?
+            {t("intro.title")}
           </h1>
           <p className="text-base sm:text-lg text-zinc-300 leading-relaxed">
-            90 frases. Marcas en cuánto te identificas. Al final tendrás tu tipo dominante y, lo
-            más importante, el mentor adaptará su tono y sus preguntas a cómo funcionas tú.
+            {t("intro.description")}
           </p>
         </header>
 
         <ul className="space-y-2 text-sm text-zinc-400">
-          <li>• Tarda unos 10-12 minutos.</li>
-          <li>• Puedes pausar y volver: tus respuestas quedan guardadas en este navegador.</li>
-          <li>• Guardamos tu resultado y tus respuestas para que tu mentor pueda ajustar el tono y para que tú puedas revisar tu test cuando quieras. Puedes borrarlo desde aquí mismo.</li>
+          <li>• {t("intro.bullets.duration")}</li>
+          <li>• {t("intro.bullets.pause")}</li>
+          <li>• {t("intro.bullets.storage")}</li>
         </ul>
 
         {existing ? (
           <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-4 space-y-2">
             <p className="text-sm text-emerald-200 font-semibold">
-              Ya hiciste el test antes
+              {t("intro.existing.title")}
             </p>
             <p className="text-sm text-zinc-300">
-              Tipo dominante: <span className="font-bold text-white">
-                {ENNEAGRAM_TYPE_NAMES[existing.dominantType as EnneagramType]} (tipo {existing.dominantType})
+              {t("intro.existing.dominantLabel")}{" "}
+              <span className="font-bold text-white">
+                {t("intro.existing.typeFormat", {
+                  name: ENNEAGRAM_TYPE_NAMES[existing.dominantType as EnneagramType],
+                  n: existing.dominantType,
+                })}
               </span>
-              {existing.wing ? <> · ala {existing.wing}</> : null}
+              {existing.wing ? t("intro.existing.wingSuffix", { n: existing.wing }) : null}
             </p>
             <p className="text-xs text-zinc-500">
-              Hecho el {new Date(existing.completedAt).toLocaleDateString("es-ES", { dateStyle: "long" })}
+              {t("intro.existing.completedAt", {
+                date: new Date(existing.completedAt).toLocaleDateString(bcp, { dateStyle: "long" }),
+              })}
             </p>
             <button
               type="button"
@@ -283,7 +302,7 @@ export default function EnneagramPage() {
               disabled={deleteSubmitting}
               className="text-xs text-red-400 hover:text-red-300 underline underline-offset-2 disabled:opacity-50"
             >
-              {deleteSubmitting ? "Borrando…" : "Borrar mi test (incluye las respuestas individuales)"}
+              {deleteSubmitting ? t("intro.existing.deleting") : t("intro.existing.delete")}
             </button>
           </div>
         ) : null}
@@ -294,7 +313,9 @@ export default function EnneagramPage() {
             onClick={() => setPhase("running")}
             className="rounded-xl bg-fuchsia-600 hover:bg-fuchsia-500 px-5 py-3 text-base font-bold text-white transition-colors"
           >
-            {answeredCount > 0 ? `Continuar (${answeredCount}/${totalCount})` : "Empezar el test"}
+            {answeredCount > 0
+              ? t("intro.actions.continue", { answered: answeredCount, total: totalCount })
+              : t("intro.actions.start")}
           </button>
           {answeredCount > 0 ? (
             <button
@@ -302,7 +323,7 @@ export default function EnneagramPage() {
               onClick={handleReset}
               className="rounded-xl border border-zinc-700 hover:bg-zinc-800 px-4 py-3 text-sm text-zinc-300 inline-flex items-center gap-1.5"
             >
-              <RotateCcw className="h-4 w-4" /> Empezar de cero
+              <RotateCcw className="h-4 w-4" /> {t("intro.actions.restart")}
             </button>
           ) : null}
         </div>
@@ -310,51 +331,51 @@ export default function EnneagramPage() {
         <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4 space-y-3">
           {!declareOpen ? (
             <>
-              <p className="text-sm text-zinc-300">
-                ¿Ya conoces tu tipo (lo hiciste en otro test, libro o terapia)?
-              </p>
+              <p className="text-sm text-zinc-300">{t("intro.declare.prompt")}</p>
               <button
                 type="button"
                 onClick={() => setDeclareOpen(true)}
                 className="text-sm font-semibold text-fuchsia-300 hover:text-fuchsia-200 underline underline-offset-2"
               >
-                Declarar mi tipo sin hacer el test
+                {t("intro.declare.open")}
               </button>
             </>
           ) : (
             <div className="space-y-3">
-              <p className="text-sm text-zinc-300">
-                Selecciona tu tipo dominante. Si conoces tu ala, añádela.
-              </p>
+              <p className="text-sm text-zinc-300">{t("intro.declare.helper")}</p>
               <div className="flex flex-wrap items-end gap-3">
                 <label className="flex flex-col gap-1 text-xs text-zinc-400">
-                  <span>Tipo dominante</span>
+                  <span>{t("intro.declare.typeLabel")}</span>
                   <select
                     value={declareType}
                     onChange={(e) => setDeclareType(e.target.value === "" ? "" : (Number(e.target.value) as EnneagramType))}
                     className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 focus:border-fuchsia-500 focus:outline-none"
                   >
-                    <option value="">Elige…</option>
-                    {([1, 2, 3, 4, 5, 6, 7, 8, 9] as const).map((t) => (
-                      <option key={t} value={t}>{t} — {ENNEAGRAM_TYPE_NAMES[t]}</option>
+                    <option value="">{t("intro.declare.typePlaceholder")}</option>
+                    {([1, 2, 3, 4, 5, 6, 7, 8, 9] as const).map((typeNum) => (
+                      <option key={typeNum} value={typeNum}>
+                        {t("intro.declare.typeOption", { n: typeNum, name: ENNEAGRAM_TYPE_NAMES[typeNum] })}
+                      </option>
                     ))}
                   </select>
                 </label>
                 <label className="flex flex-col gap-1 text-xs text-zinc-400">
-                  <span>Ala (opcional)</span>
+                  <span>{t("intro.declare.wingLabel")}</span>
                   <select
                     value={declareWing}
                     onChange={(e) => setDeclareWing(e.target.value === "" ? "" : Number(e.target.value))}
                     className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 focus:border-fuchsia-500 focus:outline-none"
                     disabled={!declareType}
                   >
-                    <option value="">Sin ala</option>
+                    <option value="">{t("intro.declare.wingNone")}</option>
                     {declareType
                       ? [
                           declareType === 1 ? 9 : declareType - 1,
                           declareType === 9 ? 1 : declareType + 1,
                         ].map((w) => (
-                          <option key={w} value={w}>{w} — {ENNEAGRAM_TYPE_NAMES[w as EnneagramType]}</option>
+                          <option key={w} value={w}>
+                            {t("intro.declare.wingOption", { n: w, name: ENNEAGRAM_TYPE_NAMES[w as EnneagramType] })}
+                          </option>
                         ))
                       : null}
                   </select>
@@ -372,7 +393,7 @@ export default function EnneagramPage() {
                   disabled={!declareType || declareSubmitting}
                   className="rounded-lg bg-fuchsia-600 hover:bg-fuchsia-500 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50 transition-colors"
                 >
-                  {declareSubmitting ? "Guardando…" : "Confirmar"}
+                  {declareSubmitting ? t("intro.declare.submitting") : t("intro.declare.submit")}
                 </button>
                 <button
                   type="button"
@@ -380,7 +401,7 @@ export default function EnneagramPage() {
                   disabled={declareSubmitting}
                   className="rounded-lg px-3 py-2 text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
                 >
-                  Cancelar
+                  {t("intro.declare.cancel")}
                 </button>
               </div>
               {declareError ? <p className="text-xs text-red-400">{declareError}</p> : null}
@@ -395,8 +416,8 @@ export default function EnneagramPage() {
     <main className="mx-auto max-w-2xl px-4 py-6 space-y-6">
       <div className="sticky top-0 z-10 -mx-4 px-4 py-3 bg-zinc-950/90 backdrop-blur border-b border-zinc-800">
         <div className="flex items-center justify-between text-sm text-zinc-400">
-          <span>Bloque {page + 1} de {totalPages}</span>
-          <span>{answeredCount}/{totalCount} respondidas</span>
+          <span>{t("running.blockProgress", { page: page + 1, total: totalPages })}</span>
+          <span>{t("running.answeredCount", { answered: answeredCount, total: totalCount })}</span>
         </div>
         <div className="mt-2 h-1 rounded-full bg-zinc-800 overflow-hidden">
           <div
@@ -404,9 +425,7 @@ export default function EnneagramPage() {
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="mt-2 text-[11px] text-zinc-500">
-          Tu progreso se guarda automáticamente en este dispositivo. Puedes cerrar y volver cuando quieras.
-        </p>
+        <p className="mt-2 text-[11px] text-zinc-500">{t("running.autosave")}</p>
       </div>
 
       <ol className="space-y-5">
@@ -437,7 +456,7 @@ export default function EnneagramPage() {
                     }`}
                   >
                     <span className="block text-base font-bold">{v}</span>
-                    <span className="block text-[10px] opacity-80">{LIKERT_LABELS[v]}</span>
+                    <span className="block text-[10px] opacity-80">{likertLabels[v]}</span>
                   </button>
                 );
               })}
@@ -457,7 +476,7 @@ export default function EnneagramPage() {
           disabled={page === 0}
           className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700 hover:bg-zinc-800 px-3 py-2 text-sm text-zinc-300 disabled:opacity-30"
         >
-          <ArrowLeft className="h-4 w-4" /> Anterior
+          <ArrowLeft className="h-4 w-4" /> {t("running.prev")}
         </button>
 
         {page < totalPages - 1 ? (
@@ -467,7 +486,7 @@ export default function EnneagramPage() {
             disabled={!allCurrentAnswered}
             className="inline-flex items-center gap-1.5 rounded-lg bg-fuchsia-600 hover:bg-fuchsia-500 px-4 py-2 text-sm font-bold text-white disabled:opacity-40"
           >
-            Siguiente <ArrowRight className="h-4 w-4" />
+            {t("running.next")} <ArrowRight className="h-4 w-4" />
           </button>
         ) : (
           <button
@@ -476,7 +495,7 @@ export default function EnneagramPage() {
             disabled={!allCurrentAnswered || phase === "submitting"}
             className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 px-4 py-2 text-sm font-bold text-white disabled:opacity-40"
           >
-            {phase === "submitting" ? "Calculando…" : "Ver mi resultado"}
+            {phase === "submitting" ? t("running.submitting") : t("running.submit")}
             <CheckCircle2 className="h-4 w-4" />
           </button>
         )}
@@ -486,6 +505,7 @@ export default function EnneagramPage() {
 }
 
 function ResultView({ result, onReset }: { result: ResultPayload; onReset: () => void }) {
+  const t = useTranslations("enneagram.result");
   const dominantName = ENNEAGRAM_TYPE_NAMES[result.dominantType];
   const dominantDesc = ENNEAGRAM_TYPE_DESCRIPTIONS[result.dominantType];
   const top3 = result.ranking.slice(0, 3);
@@ -494,25 +514,25 @@ function ResultView({ result, onReset }: { result: ResultPayload; onReset: () =>
     <main className="mx-auto max-w-2xl px-4 py-8 sm:py-12 space-y-6">
       <div className="rounded-2xl border border-fuchsia-500/30 bg-gradient-to-br from-fuchsia-500/10 to-violet-500/5 p-6 space-y-3">
         <p className="text-xs font-semibold uppercase tracking-widest text-fuchsia-300 inline-flex items-center gap-1.5">
-          <Sparkles className="h-3.5 w-3.5" /> Tu tipo dominante
+          <Sparkles className="h-3.5 w-3.5" /> {t("eyebrow")}
         </p>
         <h1 className="text-3xl sm:text-4xl font-bold text-white">
-          {dominantName} <span className="text-fuchsia-300">— tipo {result.dominantType}</span>
-          {result.wing ? <span className="text-zinc-400 text-2xl"> con ala {result.wing}</span> : null}
+          {dominantName}{" "}
+          <span className="text-fuchsia-300">{t("typeSuffix", { n: result.dominantType })}</span>
+          {result.wing ? (
+            <span className="text-zinc-400 text-2xl"> {t("wingSuffix", { n: result.wing })}</span>
+          ) : null}
         </h1>
         <p className="text-base text-zinc-200 leading-relaxed">{dominantDesc}</p>
       </div>
 
       <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 space-y-3">
-        <p className="text-sm font-semibold text-zinc-300">Cómo lo va a usar el mentor</p>
-        <p className="text-sm text-zinc-400 leading-relaxed">
-          A partir de ahora ajustará el tono y el tipo de preguntas a cómo funcionas tú.
-          Si en algún momento no te encaja, puedes repetir el test cuando quieras.
-        </p>
+        <p className="text-sm font-semibold text-zinc-300">{t("mentorTitle")}</p>
+        <p className="text-sm text-zinc-400 leading-relaxed">{t("mentorBody")}</p>
       </div>
 
       <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 space-y-3">
-        <p className="text-sm font-semibold text-zinc-300">Top 3 — los 3 con más score</p>
+        <p className="text-sm font-semibold text-zinc-300">{t("topTitle")}</p>
         <ul className="space-y-2">
           {top3.map((r) => {
             const max = top3[0].score;
@@ -521,7 +541,7 @@ function ResultView({ result, onReset }: { result: ResultPayload; onReset: () =>
               <li key={r.type} className="space-y-1">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-zinc-200">
-                    Tipo {r.type} — {ENNEAGRAM_TYPE_NAMES[r.type]}
+                    {t("rankingItem", { n: r.type, name: ENNEAGRAM_TYPE_NAMES[r.type] })}
                   </span>
                   <span className="text-zinc-500 font-mono">{r.score}</span>
                 </div>
@@ -539,14 +559,14 @@ function ResultView({ result, onReset }: { result: ResultPayload; onReset: () =>
           href="/app"
           className="rounded-xl bg-fuchsia-600 hover:bg-fuchsia-500 px-5 py-3 text-base font-bold text-white transition-colors"
         >
-          Volver al chat
+          {t("backToChat")}
         </Link>
         <button
           type="button"
           onClick={onReset}
           className="rounded-xl border border-zinc-700 hover:bg-zinc-800 px-4 py-3 text-sm text-zinc-300 inline-flex items-center gap-1.5"
         >
-          <RotateCcw className="h-4 w-4" /> Repetir el test
+          <RotateCcw className="h-4 w-4" /> {t("repeat")}
         </button>
       </div>
     </main>

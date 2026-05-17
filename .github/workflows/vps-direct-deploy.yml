@@ -79,7 +79,7 @@ jobs:
               git reset --hard origin/main
             else
               rm -rf "$BUILD_DIR"
-              git clone --depth 1 https://github.com/mariopablobarron/LuciernagaAI.git "$BUILD_DIR"
+              git clone --depth 1 https://github.com/mariopablobarron/tresmilmillonesdelatidos.git "$BUILD_DIR"
               cd "$BUILD_DIR"
             fi
             COMMIT=$(git rev-parse --short HEAD)

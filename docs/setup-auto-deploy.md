@@ -56,7 +56,7 @@ cat ~/.ssh/vps_deploy_luciernaga
 ```
 
 En GitHub:
-1. Ve a https://github.com/mariopablobarron/LuciernagaAI/settings/secrets/actions
+1. Ve a https://github.com/mariopablobarron/tresmilmillonesdelatidos/settings/secrets/actions
 2. Click **New repository secret**.
 3. Name: `VPS_SSH_KEY`
 4. Value: pega TODO el contenido de la privada.
@@ -74,7 +74,7 @@ Sin esos secrets, el workflow corre igual pero sin notificar.
 
 Lanza el workflow manualmente sin esperar a un push:
 
-1. https://github.com/mariopablobarron/LuciernagaAI/actions
+1. https://github.com/mariopablobarron/tresmilmillonesdelatidos/actions
 2. Click en **VPS Direct Deploy (luciernaga-ai)** en el sidebar.
 3. **Run workflow** → branch `main` → **Run workflow**.
 

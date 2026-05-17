@@ -45,6 +45,8 @@ import { TeamLetterCta } from "@/components/TeamLetterCta";
 import { AudioRecorder } from "@/components/ui/audio-recorder";
 import { SpeakButton } from "@/components/ui/speak-button";
 import EmergencyShelter, { EmergencyShelterTrigger } from "@/components/EmergencyShelter";
+import { IncognitoToggle, IncognitoBanner } from "@/components/IncognitoToggle";
+import { useIncognitoMode } from "@/lib/useIncognitoMode";
 import { CHAT_STARTER_PICKS, MENTOR_MODES, getMentorMode } from "@/lib/onboarding";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -712,22 +714,27 @@ export default function Chat({
   const [audioDuration, setAudioDuration] = useState(0);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
+  // Modo incógnito: si está activo, NO restauramos drafts ni guardamos
+  // nuevos en localStorage. La conversación se mantiene en memoria del
+  // componente pero se evapora al recargar.
+  const { enabled: incognitoMode } = useIncognitoMode();
+
   // ── Draft save / restore ──────────────────────────────────────────────────
 
   useEffect(() => {
-    if (!draftKey) return;
+    if (!draftKey || incognitoMode) return;
     const saved = localStorage.getItem(draftKey);
     if (saved && !input) {
       if (setInput) setInput(saved);
       else onInputChange?.(saved);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [draftKey]);
+  }, [draftKey, incognitoMode]);
 
   useEffect(() => {
-    if (!draftKey) return;
+    if (!draftKey || incognitoMode) return;
     if (input === "") localStorage.removeItem(draftKey);
-  }, [draftKey, input]);
+  }, [draftKey, input, incognitoMode]);
 
   // ── Auto-scroll to bottom ─────────────────────────────────────────────────
 
@@ -748,7 +755,7 @@ export default function Chat({
   // ── Input handlers ────────────────────────────────────────────────────────
 
   const handleInputChange = (value: string) => {
-    if (draftKey) {
+    if (draftKey && !incognitoMode) {
       if (saveTimer.current) clearTimeout(saveTimer.current);
       saveTimer.current = setTimeout(() => {
         if (value) localStorage.setItem(draftKey, value);
@@ -847,6 +854,10 @@ export default function Chat({
 
   return (
     <div className="flex flex-1 min-h-0 flex-col bg-zinc-950" role="region" aria-label={t("ariaRegion")}>
+      {/* ── Modo incógnito banner ────────────────────────────────────────── */}
+      {/* Visible siempre cuando incognito está ON, no se puede cerrar. */}
+      <IncognitoBanner />
+
       {/* ── Flow indicator ──────────────────────────────────────────────── */}
       {flowActive && (
         <div className="shrink-0 border-b border-zinc-800/60 bg-cyan-950/30 px-4 py-2">
@@ -1157,11 +1168,11 @@ export default function Chat({
         )}
       </div>
 
-      {/* ── "Demasiado mal para escribir" — trigger del shelter de emergencia ─ */}
-      {/* Siempre visible justo encima del input. Sin esconder en menús. Si el */}
-      {/* usuario está demasiado abajo para escribir, esta es la salida. */}
-      <div className="shrink-0 flex justify-center bg-zinc-950 pt-2 pb-1">
+      {/* ── Barra de controles discretos: shelter de emergencia + incógnito ── */}
+      {/* Siempre visible justo encima del input. Sin esconder en menús. */}
+      <div className="shrink-0 flex flex-wrap items-center justify-center gap-2 bg-zinc-950 pt-2 pb-1">
         <EmergencyShelterTrigger onClick={() => setShelterOpen(true)} />
+        <IncognitoToggle />
       </div>
 
       {/* ── Input area ──────────────────────────────────────────────────── */}

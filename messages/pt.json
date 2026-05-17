@@ -2807,5 +2807,12 @@
       "hold": "Segura (7s)",
       "exhale": "Expira (8s)"
     }
+  },
+  "incognito": {
+    "activeLabel": "Modo incógnito",
+    "inactiveLabel": "Modo incógnito",
+    "tooltipOn": "Modo incógnito ativo — desativar (voltaremos a guardar rascunhos neste dispositivo)",
+    "tooltipOff": "Ativar modo incógnito — não guardaremos nada neste dispositivo",
+    "bannerText": "Modo incógnito · não estamos a guardar rascunhos neste dispositivo"
   }
 }

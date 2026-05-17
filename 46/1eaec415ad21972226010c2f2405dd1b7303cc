@@ -1,0 +1,31 @@
+OPERATIONS.md
+  s_d2308f25c4747c::t_cb412e73f45c4d 1-112,114-117,120-133,136,145-256
+  s_d2308f25c4747c::t_c04e6cd34abc7c 113,118-119
+  s_d2308f25c4747c::t_9dc001c950cdcb 134-135,137-144
+src/app/api/admin/check-pending-deploy/route.ts
+  s_d2308f25c4747c::t_87f1b863e60d52 29
+src/lib/admin-tg/deploy-info.ts
+  s_d2308f25c4747c::t_969c71962c11c7 1
+.github/workflows/vps-direct-deploy.yml
+  s_d2308f25c4747c::t_c4ad89b5828584 82
+docs/setup-auto-deploy.md
+  s_d2308f25c4747c::t_cdf2a027d04338 59,77
+src/app/admin/routines/page.tsx
+  s_d2308f25c4747c::t_818b25391b92fd 65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "461eaec415ad21972226010c2f2405dd1b7303cc",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

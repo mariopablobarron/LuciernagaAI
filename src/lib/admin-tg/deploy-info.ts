@@ -1,4 +1,4 @@
-const REPO = "mariopablobarron/LuciernagaAI";
+const REPO = "mariopablobarron/tresmilmillonesdelatidos";
 
 const fmtDate = (d: string | Date | null | undefined) =>
   d

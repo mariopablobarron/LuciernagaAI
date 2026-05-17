@@ -26,7 +26,7 @@ export const dynamic = "force-dynamic";
 
 const PENDING_THRESHOLD_MS = 2 * 60 * 60 * 1000; // 2 horas
 const ALERT_COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6 horas — re-avisa si sigue pendiente
-const REPO = "mariopablobarron/LuciernagaAI";
+const REPO = "mariopablobarron/tresmilmillonesdelatidos";
 
 type GitHubCommit = {
   sha: string;

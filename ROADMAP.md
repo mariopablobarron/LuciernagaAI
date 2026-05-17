@@ -11,6 +11,8 @@
 | 6 | Modo lectura tranquila (reduce vibrancia + animaciones) | ✅ Producción |
 | 30 | Botón "esto no me sirvió" por respuesta del mentor | ✅ Producción |
 | 10 | Salida de emergencia siempre visible | ✅ Cubierta por #14 (trigger encima del input) |
+| 22 | Reconocer cuando NO puede ayudar — detector + banner profesional | ✅ Producción |
+| 18 | Hitos sin gamificación — texto humilde en empty state | ✅ Producción |
 
 ## Pendientes — ordenadas por área
 
@@ -46,7 +48,6 @@
 | 15 | Resumen al volver tras 24h+ | 6-8h | Modificar pipeline `processMessage` para inyectar resumen automático si última conversación >24h. Memoria semántica light. |
 | 16 | Citar lo que dijiste antes | 6-8h | Mejorar retrieval del historial en el LLM. Prompt engineering + few-shot examples. |
 | 17 | Detectar y nombrar bucles | 8-12h | Análisis cross-conversación de tópicos. Heurística semantic embedding o keyword. Solo activar si bucle ≥3. |
-| 18 | Hitos sin gamificación | 2-3h | Texto pequeño en sidebar "Esta es tu conversación 3". Sin badges, sin streaks. |
 | 19 | Marcar mensaje "para volver luego" | 4-6h | Bookmark UI + lista persistida + sección "guardado" en /journey. |
 
 ### Calidad del mentor
@@ -55,7 +56,6 @@
 |---|---|---|---|
 | 20 | Modo "no me interpretes" | 2-3h | Setting en /settings → flag pasa al system prompt del LLM. "No analices. No digas lo que oigo es...". |
 | 21 | Slider de verbosidad | 2-3h | 1-5 escala. Modifica system prompt para más/menos verbosidad. |
-| 22 | Reconocer cuando NO puede ayudar | 4-6h | Detectar keywords ("psicólogo", "terapia", "psiquiatra", síntomas graves) → respuesta scripted con directorio profesional. |
 | 23 | Pausa deliberada en mensajes serios | 1-2h | Si el mensaje del usuario tiene marcadores emocionales, delay artificial 3-5s antes de stream. Vía pipeline. |
 | 24 | Sin saludos genéricos | 2-3h | System prompt update: prohibir "¡hola! ¿cómo estás?" en respuestas. Validación regex en pipeline. |
 

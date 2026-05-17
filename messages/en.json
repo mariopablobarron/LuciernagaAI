@@ -18,7 +18,12 @@
     "compare": "Compare",
     "pricing": "Pricing",
     "faq": "FAQ",
-    "test": "Free test"
+    "test": "Free test",
+    "journeys": "Journeys",
+    "freeTest": "Free test",
+    "cta": "Start beating",
+    "brand": "Three Billion",
+    "brandFull": "Heartbeats"
   },
   "hero": {
     "badge": "AI mentor · No email to start · Human clinical oversight",
@@ -377,7 +382,11 @@
     "ctaPrimary": "Start now",
     "ctaSecondary": "About Startidea",
     "profNote": "Psychology, coaching, or accompaniment professional?",
-    "profLink": "See how it complements your practice"
+    "profLink": "See how it complements your practice",
+    "commitment1": "We don't replace professional help. If we detect risk, we connect with emergency lines.",
+    "commitment2": "Your conversations are yours. We don't sell data or use it for advertising.",
+    "commitment3": "You can export or delete all your data at any time.",
+    "commitment4": "AI accompanies — it doesn't diagnose, prescribe, or judge."
   },
   "faq": {
     "eyebrow": "Frequently asked questions",
@@ -630,7 +639,13 @@
     "notDoSubtitle": "So it's clear where the limits of the method are — and where a human professional begins.",
     "ctaNote": "The method only makes sense when you live it.",
     "ctaPrimary": "Try it now",
-    "ctaSecondary": "Learn about the project"
+    "ctaSecondary": "Learn about the project",
+    "notDo1": "We don't diagnose disorders. That's clinical work.",
+    "notDo2": "We don't prescribe treatments or medication.",
+    "notDo3": "We don't replace therapy or sessions with your psychologist.",
+    "notDo4": "We don't hand out empty motivational lines or magic recipes.",
+    "notDo5": "We don't tell you what to do with your life.",
+    "notDo6": "We don't expect you to change quickly. Real change takes time."
   },
   "comparison": {
     "eyebrow": "Comparison",
@@ -912,7 +927,17 @@
         "a": "Yes. The site is optimized for mobile and you can add it to your home screen. You can also use the Telegram bot to chat directly from there."
       }
     },
-    "ctaBottom": "Start now — it's free"
+    "ctaBottom": "Start now — it's free",
+    "feature1": "Unlimited conversations with the AI coach",
+    "feature2": "Unlimited messages",
+    "feature3": "Full Impulse Mode — 21 days of transformation",
+    "feature4": "Advanced diagnostics and personalized challenges",
+    "feature5": "Weekly behavioral insights",
+    "feature6": "Daily check-in with streak",
+    "feature7": "Avoidance pattern map",
+    "feature8": "Full conversation history",
+    "feature9": "Integrated Telegram bot",
+    "feature10": "Portal for trusted contacts"
   },
   "challenge": {
     "badge": "The 30-day challenge",
@@ -1997,7 +2022,10 @@
       "saving": "Saving…",
       "save": "Save progress",
       "completeUpgradeTitle": "Full continuity",
-      "openUpgrade": "View Pro plan"
+      "openUpgrade": "View Pro plan",
+      "descNoSession": "Session starting up. Progress and plan will sync once your identity is ready.",
+      "descPro": "Full continuity across devices, persistent memory, and Impulse Mode unlocked.",
+      "descFreeTpl": "Chat without limits. Plan {plan}: when you want cross-device continuity and Impulse Mode, Pro unlocks it."
     },
     "responsibility": {
       "title": "Active Accountability",

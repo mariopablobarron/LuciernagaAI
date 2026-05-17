@@ -159,17 +159,33 @@ function extractUsedKeys(source) {
   const dynamicPatterns = [];
 
   // Recolectar todos los bindings de useTranslations/getTranslations.
-  const bindings = new Map();
-  bindings.set("t", ""); // default si llaman `t(` sin re-bind explícito
+  // Si la misma variable (típicamente `t`) se reasigna a un namespace
+  // distinto en otro componente del mismo archivo, acumulamos TODOS los
+  // namespaces — no sabemos cuál usa cada llamada sin AST/scope analysis.
+  // Incidente 2026-05-17: HomeWorkspace.tsx tiene
+  //   const t = useTranslations("workspace.continuity");  // línea 106
+  //   const t = useTranslations("workspace");              // línea 152
+  // El detector veía workspace.continuity.descNoSession como huérfana
+  // porque el último binding pisaba al anterior.
+  const bindings = new Map(); // varName → Set<namespace>
 
   const bindingRegex =
     /(?:const|let|var)\s+(\w+)\s*=\s*(?:await\s+)?(?:useTranslations|getTranslations)\s*\(\s*(?:["']([^"']*)["'])?\s*\)/g;
   let bm;
   while ((bm = bindingRegex.exec(source)) !== null) {
-    bindings.set(bm[1], bm[2] ?? "");
+    const varName = bm[1];
+    const ns = bm[2] ?? "";
+    if (!bindings.has(varName)) bindings.set(varName, new Set());
+    bindings.get(varName).add(ns);
   }
 
-  for (const [varName, namespace] of bindings) {
+  // El default `t = ""` solo aplica si NO hay binding explícito de `t`.
+  // De otro modo el namespace vacío matchearía cualquier key → 0 huérfanas.
+  if (!bindings.has("t")) {
+    bindings.set("t", new Set([""]));
+  }
+
+  for (const [varName, namespaces] of bindings) {
     const escapedVar = escapeRegex(varName);
 
     // Llamadas estáticas: tVar("key") y variantes (.rich, .markup, .raw).
@@ -180,12 +196,15 @@ function extractUsedKeys(source) {
     let cm;
     while ((cm = callRegex.exec(source)) !== null) {
       const key = cm[1];
-      const full = namespace ? `${namespace}.${key}` : key;
-      used.add(full);
+      // Si la variable tiene múltiples namespaces, la key puede pertenecer
+      // a cualquiera. Marcamos todas las posibilidades como usadas.
+      for (const namespace of namespaces) {
+        const full = namespace ? `${namespace}.${key}` : key;
+        used.add(full);
+      }
     }
 
     // Template literals dinámicos: tVar(`tpl${expr}rest`).
-    // Construimos un regex que matchee la familia entera de keys posibles.
     const tmplRegex = new RegExp(
       `\\b${escapedVar}(?:\\.(?:rich|markup|raw))?\\s*\\(\\s*\`([^\`]+)\``,
       "g",
@@ -193,33 +212,22 @@ function extractUsedKeys(source) {
     let dm;
     while ((dm = tmplRegex.exec(source)) !== null) {
       const tmpl = dm[1];
-      if (!tmpl.includes("${")) continue; // sin interpolación lo gestiona callRegex (con backticks no, pero es raro)
-
-      // Sustituye cada ${...} por "[\w.-]+?" (al menos un char, no greedy).
-      // Preserva los segmentos estáticos literales.
+      if (!tmpl.includes("${")) continue;
       const parts = tmpl.split(/\$\{[^}]*\}/);
       const escapedParts = parts.map(escapeRegex);
       const body = escapedParts.join("[\\w.-]+?");
-      const fullPattern = namespace
-        ? `^${escapeRegex(namespace)}\\.${body}$`
-        : `^${body}$`;
-      try {
-        dynamicPatterns.push(new RegExp(fullPattern));
-      } catch {
-        // Pattern inválido (raro) — ignorar para no romper el script.
+      for (const namespace of namespaces) {
+        const fullPattern = namespace
+          ? `^${escapeRegex(namespace)}\\.${body}$`
+          : `^${body}$`;
+        try {
+          dynamicPatterns.push(new RegExp(fullPattern));
+        } catch { /* pattern inválido */ }
       }
     }
 
     // Variables como argumento: tVar(item.id) / tVar(link.key) / tVar(variable).
-    // No sabemos qué valores toma la variable en runtime, así que marcamos
-    // TODO el namespace como dinámico (cubre cualquier key directa de él).
-    //
-    // Detección: tVar( seguido de algo que NO empiece por comilla o backtick.
-    // Si dentro hay algún { o `, es estático/template ya cubierto arriba.
-    //
-    // Patrón previo a este fix marcaba como huérfanas keys que SÍ se usan
-    // con t(item.id) — incidente Header.tsx 2026-05-17 que rompió la home
-    // con MISSING_MESSAGE: nav.pricing/faq/test.
+    // Marca TODO el namespace como dinámico (cubre cualquier key directa).
     const variableArgRegex = new RegExp(
       `\\b${escapedVar}(?:\\.(?:rich|markup|raw))?\\s*\\(\\s*([a-zA-Z_$][\\w$.]*)\\s*[,)]`,
       "g",
@@ -227,16 +235,14 @@ function extractUsedKeys(source) {
     let vm;
     while ((vm = variableArgRegex.exec(source)) !== null) {
       const argName = vm[1];
-      // Excluir keywords y casos triviales que no son identificadores reales.
       if (["true", "false", "null", "undefined", "void"].includes(argName)) continue;
-      // El argumento es una expresión variable. No sabemos su valor → ns dinámico.
-      const fullPattern = namespace
-        ? `^${escapeRegex(namespace)}\\.[\\w-]+$`
-        : `^[\\w.-]+$`;
-      try {
-        dynamicPatterns.push(new RegExp(fullPattern));
-      } catch {
-        // Ignorar regex inválido
+      for (const namespace of namespaces) {
+        const fullPattern = namespace
+          ? `^${escapeRegex(namespace)}\\.[\\w-]+$`
+          : `^[\\w.-]+$`;
+        try {
+          dynamicPatterns.push(new RegExp(fullPattern));
+        } catch { /* ignorar */ }
       }
     }
   }

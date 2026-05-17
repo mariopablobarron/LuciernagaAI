@@ -18,7 +18,12 @@
     "compare": "Comparativa",
     "pricing": "Precios",
     "faq": "FAQ",
-    "test": "Test gratuito"
+    "test": "Test gratuito",
+    "journeys": "Itinerarios",
+    "freeTest": "Test gratuito",
+    "cta": "Empieza a latir",
+    "brand": "Tres Mil Millones",
+    "brandFull": "de Latidos"
   },
   "hero": {
     "badge": "Mentor IA en español · Sin email para empezar · Custodia clínica humana",
@@ -377,7 +382,11 @@
     "ctaPrimary": "Empezar ahora",
     "ctaSecondary": "Conocer Startidea",
     "profNote": "¿Profesional de la psicología, coaching o acompañamiento?",
-    "profLink": "Mira cómo complementa tu consulta"
+    "profLink": "Mira cómo complementa tu consulta",
+    "commitment1": "No sustituimos ayuda profesional. Si detectamos riesgo, conectamos con líneas de emergencia.",
+    "commitment2": "Tus conversaciones son tuyas. No vendemos datos ni los usamos con fines publicitarios.",
+    "commitment3": "Puedes exportar o eliminar todos tus datos en cualquier momento.",
+    "commitment4": "La IA acompaña — no diagnostica, no prescribe, no juzga."
   },
   "faq": {
     "eyebrow": "Preguntas frecuentes",
@@ -630,7 +639,13 @@
     "notDoSubtitle": "Para que quede claro dónde están los límites del método — y dónde empieza un profesional humano.",
     "ctaNote": "El método sólo cobra sentido cuando lo vives.",
     "ctaPrimary": "Probarlo ahora",
-    "ctaSecondary": "Conocer el proyecto"
+    "ctaSecondary": "Conocer el proyecto",
+    "notDo1": "No diagnosticamos trastornos. Eso es trabajo clínico.",
+    "notDo2": "No prescribimos tratamientos ni medicación.",
+    "notDo3": "No sustituimos terapia ni sesiones con tu psicólogo.",
+    "notDo4": "No damos frases motivacionales vacías ni recetas mágicas.",
+    "notDo5": "No te decimos qué tienes que hacer con tu vida.",
+    "notDo6": "No pretendemos que cambies rápido. El cambio real lleva tiempo."
   },
   "comparison": {
     "eyebrow": "Comparativa",
@@ -912,7 +927,17 @@
         "a": "Sí. La web está optimizada para móvil y puedes añadirla a tu pantalla de inicio. También puedes usar el bot de Telegram para conversar directamente desde ahí."
       }
     },
-    "ctaBottom": "Empezar ahora — es gratis"
+    "ctaBottom": "Empezar ahora — es gratis",
+    "feature1": "Conversaciones ilimitadas con el coach IA",
+    "feature2": "Mensajes ilimitados",
+    "feature3": "Modo Impulso completo — 21 días de transformación",
+    "feature4": "Diagnósticos avanzados y retos personalizados",
+    "feature5": "Insights semanales de comportamiento",
+    "feature6": "Check-in diario con racha",
+    "feature7": "Mapa de patrones de evitación",
+    "feature8": "Historial de conversaciones completo",
+    "feature9": "Bot de Telegram integrado",
+    "feature10": "Portal para personas de confianza"
   },
   "challenge": {
     "badge": "El reto de los 30 días",
@@ -1997,7 +2022,10 @@
       "saving": "Guardando…",
       "save": "Guardar progreso",
       "completeUpgradeTitle": "Continuidad completa",
-      "openUpgrade": "Ver plan Pro"
+      "openUpgrade": "Ver plan Pro",
+      "descNoSession": "Sesión iniciándose. El progreso y el plan se sincronizarán cuando la identidad esté lista.",
+      "descPro": "Continuidad completa entre dispositivos, memoria persistente y Modo Impulso desbloqueado.",
+      "descFreeTpl": "Conversa sin límite. Plan {plan}: cuando quieras continuidad cross-device y Modo Impulso, Pro lo desbloquea."
     },
     "responsibility": {
       "title": "Responsabilidad activa",

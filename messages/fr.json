@@ -18,7 +18,12 @@
     "compare": "Comparatif",
     "pricing": "Tarifs",
     "faq": "FAQ",
-    "test": "Test gratuit"
+    "test": "Test gratuit",
+    "journeys": "Parcours",
+    "freeTest": "Test gratuit",
+    "cta": "Commence à battre",
+    "brand": "Trois Milliards",
+    "brandFull": "de Battements"
   },
   "hero": {
     "badge": "Mentor IA en français · Sans e-mail pour commencer · Custodie clinique humaine",
@@ -377,7 +382,11 @@
     "ctaPrimary": "Commencer maintenant",
     "ctaSecondary": "À propos de Startidea",
     "profNote": "Tu es psychologue, coach ou professionnel de l'accompagnement ?",
-    "profLink": "Vois comment ça complète ton activité"
+    "profLink": "Vois comment ça complète ton activité",
+    "commitment1": "Nous ne remplaçons pas l'aide professionnelle. Si nous détectons un risque, nous connectons aux lignes d'urgence.",
+    "commitment2": "Tes conversations sont à toi. Nous ne vendons pas tes données et ne les utilisons pas à des fins publicitaires.",
+    "commitment3": "Tu peux exporter ou supprimer toutes tes données à tout moment.",
+    "commitment4": "L'IA accompagne — elle ne diagnostique pas, ne prescrit pas, ne juge pas."
   },
   "faq": {
     "eyebrow": "Questions fréquentes",
@@ -630,7 +639,13 @@
     "notDoSubtitle": "Pour qu'il soit clair où s'arrêtent les limites de la méthode — et où commence un professionnel humain.",
     "ctaNote": "La méthode ne prend sens que lorsqu'on la vit.",
     "ctaPrimary": "Essayer maintenant",
-    "ctaSecondary": "Découvrir le projet"
+    "ctaSecondary": "Découvrir le projet",
+    "notDo1": "Nous ne diagnostiquons pas de troubles. C'est un travail clinique.",
+    "notDo2": "Nous ne prescrivons pas de traitements ni de médicaments.",
+    "notDo3": "Nous ne remplaçons pas la thérapie ni les séances avec ton psychologue.",
+    "notDo4": "Nous ne donnons pas de phrases motivantes vides ni de recettes magiques.",
+    "notDo5": "Nous ne te disons pas ce que tu dois faire de ta vie.",
+    "notDo6": "Nous n'attendons pas que tu changes vite. Le vrai changement prend du temps."
   },
   "comparison": {
     "eyebrow": "Comparatif",
@@ -912,7 +927,17 @@
         "a": "Oui. Le site est optimisé pour mobile et tu peux l'ajouter à ton écran d'accueil. Tu peux aussi utiliser le bot Telegram pour discuter directement depuis là."
       }
     },
-    "ctaBottom": "Commencer maintenant — c'est gratuit"
+    "ctaBottom": "Commencer maintenant — c'est gratuit",
+    "feature1": "Conversations illimitées avec le coach IA",
+    "feature2": "Messages illimités",
+    "feature3": "Mode Impulse complet — 21 jours de transformation",
+    "feature4": "Diagnostics avancés et défis personnalisés",
+    "feature5": "Insights hebdomadaires de comportement",
+    "feature6": "Check-in quotidien avec série",
+    "feature7": "Carte des schémas d'évitement",
+    "feature8": "Historique complet des conversations",
+    "feature9": "Bot Telegram intégré",
+    "feature10": "Portail pour personnes de confiance"
   },
   "challenge": {
     "badge": "Le défi des 30 jours",
@@ -1997,7 +2022,10 @@
       "saving": "Sauvegarde en cours…",
       "save": "Sauvegarder la progression",
       "completeUpgradeTitle": "Continuité complète",
-      "openUpgrade": "Voir le plan Pro"
+      "openUpgrade": "Voir le plan Pro",
+      "descNoSession": "Session en cours de démarrage. La progression et le plan se synchroniseront quand l'identité sera prête.",
+      "descPro": "Continuité complète entre appareils, mémoire persistante et Mode Impulsion déverrouillé.",
+      "descFreeTpl": "Discute sans limite. Plan {plan} : quand tu veux la continuité cross-device et le Mode Impulsion, Pro les déverrouille."
     },
     "responsibility": {
       "title": "Responsabilité active",

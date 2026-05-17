@@ -1,0 +1,33 @@
+messages/pt.json
+  s_c72d0ada98a9af::t_ba66f3eeac7f59 2420-2657
+src/components/impulse/ImpulseDashboard.tsx
+  s_c72d0ada98a9af::t_08ff5f7e78d750 4,85-109,161,186,191,211,228,233,235,243,265,282,292,300,321,327,330,344,348,353,359,362,369,371-373,378,381,393,398,401,410,416-419,428,434,459-462,468,470,475,513,520,530,534-540,542,546,561,563,572,579-580,593,596,606-609,611,625,627,635,639,645-647,651,670,677-678,683,693,699,714,717,724,730,742,751,754-757,763,773,795,797,806,808,817,819
+messages/es.json
+  s_c72d0ada98a9af::t_c7be3d70c9fdcb 2512
+  s_c72d0ada98a9af::t_3e72c712f2b842 2460-2511,2513-2697
+src/app/impulso/page.tsx
+  s_c72d0ada98a9af::t_e3bf543f701ce1 140
+  s_c72d0ada98a9af::t_afcc6fbe9cbf31 5,54-55,121,123-126,139,190-192,219,221,227,230-232,235-237,243-244,248-249,253-254,257,262-265,267,269-270,276,278-281,293,295,305,307-308,315,356,358,367,381,384,387,396-398,401-402,410,436,439,446,448,452-454,464-465,473-474,477,485,488,493,507,515,521,542,579-580,603,617,622,631,645,661,664,698-731,735-736
+  s_c72d0ada98a9af::t_2fcb620d26d4b3 117,119,122
+  s_c72d0ada98a9af::t_782a7a230f2d4f 419
+messages/en.json
+  s_c72d0ada98a9af::t_0b9ba4e7ac9304 2420-2657
+messages/fr.json
+  s_c72d0ada98a9af::t_ba66f3eeac7f59 2420-2657
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "0bb35309b51eefccea8485a3c4a5851d2d524607",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

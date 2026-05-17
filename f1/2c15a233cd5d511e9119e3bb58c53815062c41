@@ -1,0 +1,33 @@
+src/app/(auth)/reset-password/page.tsx
+  s_c72d0ada98a9af::t_c34a03ec93a3bd 6,10-16,19,29-31,34-38,42,44,48-49,62-63,69-70,79,81,91-92,102-103,110,117,123,132,138,147,154-160,165-166,168
+src/app/(auth)/forgot-password/page.tsx
+  s_c72d0ada98a9af::t_ababc6fa7be4bd 5,10,29,41,43-44,50-51,53,64,68,76
+src/app/(auth)/signup/page.tsx
+  s_c72d0ada98a9af::t_a4c73b39fb24e6 6,16-20,31,52-56,61,65,94,108,122,124-126,139,141,146,151,164-165,175,179,192,196,202,206,213,218,224,230,236,245,251,257,267-275,284,290,292
+messages/pt.json
+  s_c72d0ada98a9af::t_bda137e7962fc9 2327-2419
+messages/en.json
+  s_c72d0ada98a9af::t_bda137e7962fc9 2327-2419
+src/app/(auth)/login/page.tsx
+  s_c72d0ada98a9af::t_b9c996ba5f49c4 6,13-17,28,38-46,61,69,80-81,87,98,102,115,119,125,131,137,146,154,160,162,167-170
+messages/es.json
+  s_c72d0ada98a9af::t_21f21e1911d216 2367-2459
+messages/fr.json
+  s_c72d0ada98a9af::t_bda137e7962fc9 2327-2419
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "f12c15a233cd5d511e9119e3bb58c53815062c41",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

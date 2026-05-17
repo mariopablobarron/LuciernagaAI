@@ -135,43 +135,139 @@
   },
   "settings": {
     "title": "Definições",
-    "coach": "Coach IA",
-    "coachDesc": "Personaliza como o teu mentor te fala",
-    "tone": "Tom da conversa",
-    "toneDirect": "Direto",
-    "toneDirectDesc": "Vai direto ao assunto, sem rodeios",
-    "toneSocratic": "Socrático",
-    "toneSocraticDesc": "Guia-te com perguntas",
-    "toneWarm": "Caloroso",
-    "toneWarmDesc": "Empático e próximo",
-    "notifications": "Notificações",
-    "notificationsDesc": "Controla o que enviamos e quando",
-    "dailyReminders": "Lembretes diários",
-    "dailyRemindersDesc": "Check-in e ações pendentes",
-    "reminderTime": "Hora do lembrete",
-    "reminderTimeDesc": "Receberás o lembrete a esta hora",
-    "weeklyEmail": "Resumo semanal por e-mail",
-    "weeklyEmailDesc": "O teu progresso da semana todos os domingos",
-    "insights": "Novos insights",
-    "insightsDesc": "Quando tiveres novas recomendações",
-    "goals": "Objetivos concluídos",
-    "goalsDesc": "Celebrações quando terminas um objetivo",
-    "updates": "Atualizações do produto",
-    "updatesDesc": "Novas funcionalidades e melhorias",
-    "telegram": "Telegram",
-    "telegramDesc": "Recebe lembretes e conversa fora da app",
-    "region": "Região",
-    "regionDesc": "Afeta a hora dos lembretes",
-    "security": "Segurança",
-    "changePassword": "Mudar palavra-passe",
-    "data": "Os teus dados",
-    "dataDesc": "Direito à portabilidade (Art. 20 RGPD)",
-    "exportCsv": "Histórico do chat (CSV)",
-    "exportJson": "Dados completos (JSON)",
-    "dangerZone": "Zona de perigo",
-    "dangerDesc": "Estas ações são irreversíveis.",
-    "deleteAccount": "Apagar a minha conta e todos os meus dados",
-    "saved": "Guardado"
+    "saved": "Guardado",
+    "saveError": "Erro ao guardar",
+    "loadErrorProfile": "Não foi possível carregar o teu perfil",
+    "loadErrorPrefs": "Não foi possível carregar as preferências",
+    "profile": {
+      "title": "O teu perfil",
+      "subtitle": "Nome, foto e dados pessoais",
+      "saved": "Perfil guardado",
+      "saveError": "Erro ao guardar o perfil",
+      "avatarRemoved": "Avatar removido",
+      "avatarTooLarge": "A imagem deve ter menos de 200 KB",
+      "avatarInvalidType": "Apenas imagens são permitidas",
+      "avatarAlt": "Avatar",
+      "changePhoto": "Alterar foto",
+      "removePhoto": "Remover foto",
+      "avatarHint": "PNG, JPEG ou WebP. Máx. 200 KB.",
+      "nameLabel": "Nome",
+      "namePlaceholder": "O teu nome",
+      "bioLabel": "Bio",
+      "bioPlaceholder": "Conta-nos sobre ti...",
+      "bioCounterTpl": "{n}/500",
+      "phoneLabel": "Telemóvel",
+      "phonePlaceholder": "+34 612 345 678",
+      "saving": "A guardar...",
+      "save": "Guardar perfil"
+    },
+    "coach": {
+      "title": "Coach IA",
+      "subtitle": "Personaliza como o teu mentor te fala",
+      "toneTitle": "Tom de conversa",
+      "tones": {
+        "directo": {
+          "label": "Direto",
+          "desc": "Vai ao essencial, sem rodeios"
+        },
+        "socratico": {
+          "label": "Socrático",
+          "desc": "Guia-te com perguntas"
+        },
+        "calido": {
+          "label": "Caloroso",
+          "desc": "Empático e próximo"
+        }
+      },
+      "genderTitle": "Como preferes que te falemos?",
+      "genderHint": "Define a conjugação gramatical do mentor quando se dirige a ti. Podes alterá-lo quando quiseres.",
+      "genders": {
+        "feminine": {
+          "label": "Feminino",
+          "desc": "\"estás cansada\""
+        },
+        "masculine": {
+          "label": "Masculino",
+          "desc": "\"estás cansado\""
+        },
+        "neutral": {
+          "label": "Neutro",
+          "desc": "Sem conjugações de género (\"estás num momento de cansaço\")"
+        }
+      },
+      "clearGender": "Remover preferência (voltar a indefinido)"
+    },
+    "notifications": {
+      "title": "Notificações",
+      "subtitle": "Controla o que te enviamos e quando",
+      "dailyReminders": "Lembretes diários",
+      "dailyRemindersDesc": "Check-in e ações pendentes",
+      "reminderTime": "Hora do lembrete",
+      "reminderTimeDesc": "Receberás o lembrete a esta hora",
+      "weeklyEmail": "Resumo semanal por email",
+      "weeklyEmailDesc": "O teu progresso da semana cada domingo",
+      "sundayLetter": "Carta do domingo",
+      "sundayLetterDesc": "Uma carta breve do mentor cada domingo com as tuas próprias palavras da semana. O conteúdo está sempre na app.",
+      "letterEmailNotice": "Aviso por email da carta",
+      "letterEmailNoticeDesc": "Avisamo-te quando a carta estiver pronta. O email não contém a carta — apenas uma ligação.",
+      "insights": "Novos insights",
+      "insightsDesc": "Quando tiveres novas recomendações",
+      "goals": "Objetivos completados",
+      "goalsDesc": "Celebrações quando terminares um objetivo",
+      "updates": "Atualizações do produto",
+      "updatesDesc": "Novas funcionalidades e melhorias"
+    },
+    "telegram": {
+      "title": "Telegram",
+      "subtitle": "Recebe lembretes e conversa fora da app",
+      "linkedTitle": "Conta conectada",
+      "linkedDesc": "Já recebes mensagens e lembretes no Telegram.",
+      "howToConnect": "Como conectar",
+      "step1": "Abre o bot no Telegram",
+      "step2": "Carrega em Iniciar ou escreve /start",
+      "step3": "Envia o comando /vincular",
+      "step4": "Clica na ligação que o bot te enviar",
+      "openBot": "Abrir bot no Telegram"
+    },
+    "region": {
+      "title": "Região",
+      "subtitle": "Afeta a hora dos lembretes",
+      "timezones": {
+        "madrid": "Madrid (GMT+1)",
+        "london": "Londres (GMT+0)",
+        "mexico": "Cidade do México (GMT-6)",
+        "bogota": "Bogotá (GMT-5)",
+        "lima": "Lima (GMT-5)",
+        "santiago": "Santiago (GMT-4)",
+        "buenosAires": "Buenos Aires (GMT-3)",
+        "newYork": "Nova Iorque (GMT-5)",
+        "losAngeles": "Los Angeles (GMT-8)"
+      }
+    },
+    "security": {
+      "title": "Segurança",
+      "changePassword": "Alterar palavra-passe",
+      "changePasswordForm": "Alterar palavra-passe",
+      "currentLabel": "Palavra-passe atual",
+      "newLabel": "Nova palavra-passe",
+      "confirmLabel": "Confirmar nova",
+      "passwordPlaceholder": "••••••••",
+      "newPasswordPlaceholder": "Mínimo 8 caracteres",
+      "saving": "A guardar…",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "errorMismatch": "As novas palavras-passe não coincidem.",
+      "errorTooShort": "Mínimo 8 caracteres.",
+      "errorCurrentRequired": "Introduz a tua palavra-passe atual.",
+      "errorInvalidCredentials": "A palavra-passe atual não está correta.",
+      "errorGeneric": "Erro ao alterar a palavra-passe.",
+      "successChanged": "Palavra-passe atualizada com sucesso."
+    },
+    "help": {
+      "title": "Ajuda",
+      "repeatTour": "Repetir o tour guiado",
+      "tourReset": "Tour reiniciado — volta ao chat para o veres"
+    }
   },
   "ethics": {
     "eyebrow": "Ética e limites",

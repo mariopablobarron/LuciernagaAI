@@ -135,43 +135,139 @@
   },
   "settings": {
     "title": "Settings",
-    "coach": "AI Coach",
-    "coachDesc": "Customize how your mentor talks to you",
-    "tone": "Conversation tone",
-    "toneDirect": "Direct",
-    "toneDirectDesc": "Gets to the point, no fluff",
-    "toneSocratic": "Socratic",
-    "toneSocraticDesc": "Guides you with questions",
-    "toneWarm": "Warm",
-    "toneWarmDesc": "Empathetic and close",
-    "notifications": "Notifications",
-    "notificationsDesc": "Control what we send you and when",
-    "dailyReminders": "Daily reminders",
-    "dailyRemindersDesc": "Check-in and pending actions",
-    "reminderTime": "Reminder time",
-    "reminderTimeDesc": "You'll receive the reminder at this time",
-    "weeklyEmail": "Weekly email summary",
-    "weeklyEmailDesc": "Your weekly progress every Sunday",
-    "insights": "New insights",
-    "insightsDesc": "When you have new recommendations",
-    "goals": "Completed goals",
-    "goalsDesc": "Celebrations when you finish a goal",
-    "updates": "Product updates",
-    "updatesDesc": "New features and improvements",
-    "telegram": "Telegram",
-    "telegramDesc": "Receive reminders and chat outside the app",
-    "region": "Region",
-    "regionDesc": "Affects reminder times",
-    "security": "Security",
-    "changePassword": "Change password",
-    "data": "Your data",
-    "dataDesc": "Right to portability (GDPR Art. 20)",
-    "exportCsv": "Chat History (CSV)",
-    "exportJson": "Full Data (JSON)",
-    "dangerZone": "Danger zone",
-    "dangerDesc": "These actions cannot be undone.",
-    "deleteAccount": "Delete my account and all my data",
-    "saved": "Saved"
+    "saved": "Saved",
+    "saveError": "Save error",
+    "loadErrorProfile": "Couldn't load your profile",
+    "loadErrorPrefs": "Couldn't load your preferences",
+    "profile": {
+      "title": "Your profile",
+      "subtitle": "Name, photo, and personal info",
+      "saved": "Profile saved",
+      "saveError": "Error saving profile",
+      "avatarRemoved": "Avatar removed",
+      "avatarTooLarge": "Image must be under 200 KB",
+      "avatarInvalidType": "Images only",
+      "avatarAlt": "Avatar",
+      "changePhoto": "Change photo",
+      "removePhoto": "Remove photo",
+      "avatarHint": "PNG, JPEG, or WebP. Max 200 KB.",
+      "nameLabel": "Name",
+      "namePlaceholder": "Your name",
+      "bioLabel": "Bio",
+      "bioPlaceholder": "Tell us about yourself...",
+      "bioCounterTpl": "{n}/500",
+      "phoneLabel": "Phone",
+      "phonePlaceholder": "+34 612 345 678",
+      "saving": "Saving...",
+      "save": "Save profile"
+    },
+    "coach": {
+      "title": "AI Coach",
+      "subtitle": "Customize how your mentor talks to you",
+      "toneTitle": "Conversation tone",
+      "tones": {
+        "directo": {
+          "label": "Direct",
+          "desc": "Straight to the point, no fluff"
+        },
+        "socratico": {
+          "label": "Socratic",
+          "desc": "Guides you with questions"
+        },
+        "calido": {
+          "label": "Warm",
+          "desc": "Empathetic and close"
+        }
+      },
+      "genderTitle": "How do you prefer we speak to you?",
+      "genderHint": "Sets the grammatical gender your mentor uses when addressing you. You can change it anytime.",
+      "genders": {
+        "feminine": {
+          "label": "Feminine",
+          "desc": "\"you're tired\""
+        },
+        "masculine": {
+          "label": "Masculine",
+          "desc": "\"you're tired\""
+        },
+        "neutral": {
+          "label": "Neutral",
+          "desc": "No gender conjugations (\"you're in a moment of fatigue\")"
+        }
+      },
+      "clearGender": "Remove preference (back to undefined)"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Control what we send and when",
+      "dailyReminders": "Daily reminders",
+      "dailyRemindersDesc": "Check-ins and pending actions",
+      "reminderTime": "Reminder time",
+      "reminderTimeDesc": "You'll get your reminder at this time",
+      "weeklyEmail": "Weekly email summary",
+      "weeklyEmailDesc": "Your week's progress every Sunday",
+      "sundayLetter": "Sunday letter",
+      "sundayLetterDesc": "A brief letter from your mentor every Sunday with your own words from the week. Content always lives in the app.",
+      "letterEmailNotice": "Email notification for the letter",
+      "letterEmailNoticeDesc": "We'll let you know when the letter is ready. The email doesn't contain the letter — just a link.",
+      "insights": "New insights",
+      "insightsDesc": "When you get new recommendations",
+      "goals": "Goals completed",
+      "goalsDesc": "Celebrations when you finish a goal",
+      "updates": "Product updates",
+      "updatesDesc": "New features and improvements"
+    },
+    "telegram": {
+      "title": "Telegram",
+      "subtitle": "Get reminders and chat outside the app",
+      "linkedTitle": "Account connected",
+      "linkedDesc": "You're already getting messages and reminders on Telegram.",
+      "howToConnect": "How to connect",
+      "step1": "Open the bot on Telegram",
+      "step2": "Tap Start or type /start",
+      "step3": "Send the /link command",
+      "step4": "Click the link the bot sends you",
+      "openBot": "Open bot on Telegram"
+    },
+    "region": {
+      "title": "Region",
+      "subtitle": "Affects your reminder times",
+      "timezones": {
+        "madrid": "Madrid (GMT+1)",
+        "london": "London (GMT+0)",
+        "mexico": "Mexico City (GMT-6)",
+        "bogota": "Bogotá (GMT-5)",
+        "lima": "Lima (GMT-5)",
+        "santiago": "Santiago (GMT-4)",
+        "buenosAires": "Buenos Aires (GMT-3)",
+        "newYork": "New York (GMT-5)",
+        "losAngeles": "Los Angeles (GMT-8)"
+      }
+    },
+    "security": {
+      "title": "Security",
+      "changePassword": "Change password",
+      "changePasswordForm": "Change password",
+      "currentLabel": "Current password",
+      "newLabel": "New password",
+      "confirmLabel": "Confirm new",
+      "passwordPlaceholder": "••••••••",
+      "newPasswordPlaceholder": "Minimum 8 characters",
+      "saving": "Saving…",
+      "save": "Save",
+      "cancel": "Cancel",
+      "errorMismatch": "New passwords don't match.",
+      "errorTooShort": "Minimum 8 characters.",
+      "errorCurrentRequired": "Enter your current password.",
+      "errorInvalidCredentials": "Current password is incorrect.",
+      "errorGeneric": "Error changing password.",
+      "successChanged": "Password updated successfully."
+    },
+    "help": {
+      "title": "Help",
+      "repeatTour": "Repeat guided tour",
+      "tourReset": "Tour reset — go back to chat to see it"
+    }
   },
   "ethics": {
     "eyebrow": "Ethics and limits",

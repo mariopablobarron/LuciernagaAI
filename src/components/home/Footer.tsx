@@ -1,9 +1,39 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Heart } from "lucide-react";
 
+// Stable config (href/key), labels come from i18n
+const PRODUCT_LINKS = [
+  { key: "blog", href: "/blog" },
+  { key: "pricing", href: "/precios" },
+  { key: "join", href: "/unirse" },
+  { key: "challenge", href: "/reto" },
+  { key: "test", href: "/test" },
+  { key: "calculator", href: "/calculadora-latidos" },
+  { key: "guide", href: "/guia" },
+  { key: "method", href: "/como-funciona" },
+  { key: "compare", href: "/comparativa" },
+  { key: "useCases", href: "/casos-de-uso" },
+  { key: "resources", href: "/recursos" },
+  { key: "faq", href: "/faq" },
+  { key: "access", href: "/app" },
+] as const;
+
+const INFO_LINKS = [
+  { key: "about", href: "/sobre-nosotros" },
+  { key: "forPros", href: "/para-profesionales" },
+  { key: "ethics", href: "/etica" },
+  { key: "changelog", href: "/changelog" },
+  { key: "privacy", href: "/privacy" },
+  { key: "terms", href: "/terms" },
+  { key: "contact", href: "/contact" },
+] as const;
+
 export default function Footer() {
+  const t = useTranslations("footerLinks");
+
   return (
     <footer className="border-t border-white/10 bg-background/50 backdrop-blur-sm py-12 md:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -15,11 +45,11 @@ export default function Footer() {
               <span className="font-black text-foreground tracking-tight">Tres Mil Millones de Latidos</span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Cada latido es una elección. Tres Mil Millones de Latidos existe para que los tuyos tengan dirección real.
+              {t("tagline")}
             </p>
             <a href="https://startidea.es" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-muted-foreground font-medium hover:text-cyan-400 transition-colors">
               <Heart className="w-3 h-3 text-cyan-500" />
-              Comprometidos con el bienestar emocional a través de la tecnología
+              {t("commitment")}
             </a>
 
             {/* Social */}
@@ -80,115 +110,29 @@ export default function Footer() {
 
           {/* Product */}
           <div className="space-y-4">
-            <h4 className="font-semibold text-foreground">Producto</h4>
+            <h4 className="font-semibold text-foreground">{t("productHeading")}</h4>
             <ul className="space-y-2.5">
-              <li>
-                <Link href="/blog" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link href="/precios" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Precios
-                </Link>
-              </li>
-              <li>
-                <Link href="/unirse" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Unirse al reto
-                </Link>
-              </li>
-              <li>
-                <Link href="/reto" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  El reto 30 días
-                </Link>
-              </li>
-              <li>
-                <Link href="/test" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Test gratuito
-                </Link>
-              </li>
-              <li>
-                <Link href="/calculadora-latidos" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Calculadora de latidos
-                </Link>
-              </li>
-              <li>
-                <Link href="/guia" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Guía de uso
-                </Link>
-              </li>
-              <li>
-                <Link href="/como-funciona" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  El método
-                </Link>
-              </li>
-              <li>
-                <Link href="/comparativa" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Comparativa
-                </Link>
-              </li>
-              <li>
-                <Link href="/casos-de-uso" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Casos de uso
-                </Link>
-              </li>
-              <li>
-                <Link href="/recursos" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Recursos
-                </Link>
-              </li>
-              <li>
-                <Link href="/faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Preguntas frecuentes
-                </Link>
-              </li>
-              <li>
-                <Link href="/app" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Acceder
-                </Link>
-              </li>
+              {PRODUCT_LINKS.map((link) => (
+                <li key={link.key}>
+                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    {t(`product.${link.key}`)}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
           {/* Legal & Contact */}
           <div className="space-y-4">
-            <h4 className="font-semibold text-foreground">Información</h4>
+            <h4 className="font-semibold text-foreground">{t("infoHeading")}</h4>
             <ul className="space-y-2.5">
-              <li>
-                <Link href="/sobre-nosotros" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Sobre nosotros
-                </Link>
-              </li>
-              <li>
-                <Link href="/para-profesionales" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Para profesionales
-                </Link>
-              </li>
-              <li>
-                <Link href="/etica" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Ética y límites
-                </Link>
-              </li>
-              <li>
-                <Link href="/changelog" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Novedades
-                </Link>
-              </li>
-              <li>
-                <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Política de privacidad
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Términos de servicio
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Contacto
-                </Link>
-              </li>
+              {INFO_LINKS.map((link) => (
+                <li key={link.key}>
+                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    {t(`info.${link.key}`)}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
@@ -196,17 +140,20 @@ export default function Footer() {
         {/* Bottom */}
         <div className="border-t border-border/30 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()}{" "}
-            <a
-              href="https://tresmilmillonesdelatidos.es"
-              className="hover:text-foreground transition-colors"
-            >
-              tresmilmillonesdelatidos.es
-            </a>{" "}
-            — Todos los derechos reservados.
+            {t.rich("copyright", {
+              year: new Date().getFullYear(),
+              domain: (c) => (
+                <a
+                  href="https://tresmilmillonesdelatidos.es"
+                  className="hover:text-foreground transition-colors"
+                >
+                  {c}
+                </a>
+              ),
+            })}
           </p>
           <p className="text-xs text-muted-foreground">
-            No sustituye terapia ni intervención psicológica profesional.
+            {t("disclaimer")}
           </p>
         </div>
       </div>

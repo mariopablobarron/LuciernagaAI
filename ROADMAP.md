@@ -13,6 +13,7 @@
 | 10 | Salida de emergencia siempre visible | ✅ Cubierta por #14 (trigger encima del input) |
 | 22 | Reconocer cuando NO puede ayudar — detector + banner profesional | ✅ Producción |
 | 18 | Hitos sin gamificación — texto humilde en empty state | ✅ Producción |
+| 24 | Sin saludos genéricos — regla en BASE_PROMPT | ✅ Producción |
 
 ## Pendientes — ordenadas por área
 
@@ -56,8 +57,7 @@
 |---|---|---|---|
 | 20 | Modo "no me interpretes" | 2-3h | Setting en /settings → flag pasa al system prompt del LLM. "No analices. No digas lo que oigo es...". |
 | 21 | Slider de verbosidad | 2-3h | 1-5 escala. Modifica system prompt para más/menos verbosidad. |
-| 23 | Pausa deliberada en mensajes serios | 1-2h | Si el mensaje del usuario tiene marcadores emocionales, delay artificial 3-5s antes de stream. Vía pipeline. |
-| 24 | Sin saludos genéricos | 2-3h | System prompt update: prohibir "¡hola! ¿cómo estás?" en respuestas. Validación regex en pipeline. |
+| 23 | Pausa deliberada en mensajes serios | 4-6h reales | Requiere buffering de stream tokens en frontend (más complejo de lo estimado). Valor marginal vs latencia natural + typing indicator. Reevaluar si feedback lo pide. |
 
 ### Inclusividad material
 

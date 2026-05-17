@@ -2150,5 +2150,93 @@
       "impulse": "Programme Impulsion",
       "explore": "Explorer maintenant"
     }
+  },
+  "minors": {
+    "metaTitle": "On t'attend — Trois Milliards de Battements",
+    "metaDescription": "Cette plateforme demande que tu aies au moins 14 ans. En attendant, on te laisse des ressources pensées pour toi.",
+    "heading": "On t'attend.",
+    "p1": "Cette plateforme est pensée pour les personnes à partir de 14 ans. Ce n'est pas parce qu'on ne tient pas à toi — c'est parce que pour t'accompagner comme tu le mérites, on a besoin qu'un adulte de confiance soit près de toi.",
+    "p2": "Si ce que tu ressens pèse, il y a des gens qui écoutent. Appeler est gratuit et confidentiel.",
+    "resourceTitle": "Fondation ANAR — Aide à l'enfance et l'adolescence",
+    "resourcePhone": "900 20 20 10",
+    "resourceHint": "24 heures, gratuit et confidentiel. Des personnes formées t'écoutent sans juger.",
+    "emergency": "S'il y a un risque immédiat pour ta vie ou celle de quelqu'un près de toi, appelle le 112.",
+    "comeBack": "Quand tu auras 14 ans, reviens et on en parle.",
+    "backHome": "← Retour à l'accueil"
+  },
+  "invite": {
+    "verifying": "Vérification de l'invitation...",
+    "badge": "Invitation personnelle",
+    "headlineTpl": "{name} t'a invité à Trois Milliards de Battements",
+    "intro": "Cette invitation est la tienne. Ce n'est pas de la pub — c'est quelqu'un qui croit que tu peux changer et qui veut que tu aies accès.",
+    "fallbackInviter": "quelqu'un de Trois Milliards de Battements",
+    "whatIsTitle": "C'est quoi Trois Milliards de Battements ?",
+    "feature1": "Une IA qui te pose les questions que personne d'autre n'ose te poser",
+    "feature2": "Un système qui détecte quand tu esquives l'essentiel et te le dit directement",
+    "feature3": "30 jours pour faire le changement que tu repousses depuis trop longtemps",
+    "accept": "Accepter l'invitation",
+    "learnMore": "En savoir plus sur Trois Milliards de Battements d'abord",
+    "exclusiveAccess": "Accès exclusif. Sans carte de crédit.",
+    "invalidTitle": "Invitation non valide",
+    "invalidBody": "Ce lien d'invitation a expiré ou a déjà été utilisé.",
+    "fallbackPath": "Tu peux demander l'accès en complétant les 3 missions de la liste d'attente.",
+    "goWaitlist": "Aller à la liste d'attente"
+  },
+  "family": {
+    "metaTitle": "Portail de Soutien | Trois Milliards de Battements",
+    "metaDescription": "Portail privé pour les contacts de confiance.",
+    "heading": "Portail de Soutien",
+    "subtitleTpl": "Réseau de confiance de {name}",
+    "protocolTitle": "Protocole de confidentialité",
+    "protocolBody": "Ce que tu vois ici est confidentiel. Ne lui mentionne pas ce que tu sais de sa progression, sa série ou son état. Si le système a besoin que tu agisses, il te le dira. Ton rôle c'est d'être là — pas de surveiller.",
+    "relationTips": {
+      "madre": "Ta présence compte plus que tes conseils. N'essaie pas d'arranger les choses — sois juste là.",
+      "padre": "Ta présence compte plus que tes conseils. N'essaie pas d'arranger les choses — sois juste là.",
+      "pareja": "Accompagne sans contrôler. N'utilise pas ce que tu vois ici dans vos discussions.",
+      "amigo": "Sois naturel. Un plan ensemble vaut plus qu'un conseil. Ne change pas ta façon de le traiter.",
+      "terapeuta": "Utilise cette information comme contexte entre les séances, pas comme agenda.",
+      "default": "Ta présence compte plus que tes conseils."
+    },
+    "whatToDo": "Quoi faire maintenant",
+    "actions": {
+      "crisisTitle": "Appelle-le maintenant",
+      "crisisSub": "N'écris pas — appelle. Un 'je suis là' suffit. N'essaie pas de résoudre quoi que ce soit au téléphone.",
+      "weekTitle": "Envoie un message naturel",
+      "weekSub": "Sans mentionner l'app. Un 'on se voit ?' ou 'ça va ?' sans agenda caché. La normalité c'est du soutien.",
+      "fewDaysTitle": "Un court message suffit",
+      "fewDaysSub": "Ne demande pas pour l'app. Un 'j'ai pensé à toi' ou un mème vaut plus qu'un 'tu as ouvert ?'",
+      "winsTitle": "Célèbre avec lui/elle",
+      "winsSub": "Il/elle a partagé une victoire avec toi. Ce pas lui/elle a coûté plus qu'il n'y paraît. Dis-le-lui.",
+      "calmTitle": "Ne rien faire",
+      "calmSub": "Tout va bien. L'absence de pression c'est la meilleure forme de soutien en ce moment."
+    },
+    "metrics": {
+      "streakTitle": "Constance",
+      "streakUnit": "jours",
+      "streakNone": "Pas de série active. Ne lui demande pas pourquoi — écris-lui juste quelque chose de beau.",
+      "streakLongHint": "Elle tient une bonne série. La constance lui coûte — reconnais-le si ça vient naturellement.",
+      "streakBestTpl": "Meilleure série : {n} jours.",
+      "lastActivityTitle": "Dernière activité",
+      "lastActivityToday": "Aujourd'hui",
+      "lastActivityYesterday": "Hier",
+      "lastActivityDaysTpl": "Il y a {n} jours",
+      "lastActivityWeekHint": "Ça peut aller ou pas. Un message naturel sans mentionner l'app, c'est le mieux.",
+      "lastActivityFewDaysHint": "Elle n'a pas ouvert depuis quelques jours. C'est normal — parfois il faut souffler.",
+      "lastActivityRecentHint": "Activité récente. Tout semble bon.",
+      "goalTitle": "Objectif actif",
+      "goalProgress": "Progression",
+      "goalAllDone": "Elle a complété toutes les actions. Si l'occasion se présente, célèbre avec elle.",
+      "goalNotStarted": "Elle n'a pas encore commencé. Ne force pas — le moment viendra.",
+      "goalInProgress": "Elle avance à son rythme. C'est déjà beaucoup."
+    },
+    "wins": {
+      "title": "Victoires partagées",
+      "intro": "Elle a voulu partager ces réussites avec toi. Chacune lui a coûté plus qu'il n'y paraît."
+    },
+    "footer": "Trois Milliards de Battements — Réseau de soutien",
+    "footerConfidential": "Ce portail est confidentiel. Ne le partage pas et ne le transfère pas."
+  },
+  "journey": {
+    "loading": "Chargement…"
   }
 }

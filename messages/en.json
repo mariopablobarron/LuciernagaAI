@@ -2150,5 +2150,93 @@
       "impulse": "Impulse Program",
       "explore": "Explore now"
     }
+  },
+  "minors": {
+    "metaTitle": "We're waiting for you — Three Billion Heartbeats",
+    "metaDescription": "This platform requires you to be at least 14 years old. In the meantime, here are resources made for you.",
+    "heading": "We're waiting for you.",
+    "p1": "This platform is designed for people 14 and older. Not because we don't care about you — it's because to support you the way you deserve, we need a trusted adult nearby.",
+    "p2": "If what you're feeling weighs on you, there are people listening. Calling is free and confidential.",
+    "resourceTitle": "ANAR Foundation — Help for Children and Adolescents",
+    "resourcePhone": "900 20 20 10",
+    "resourceHint": "24 hours, free and confidential. Trained people will listen to you without judgment.",
+    "emergency": "If there's immediate risk to your life or someone near you, call 112.",
+    "comeBack": "When you turn 14, come back and let's talk.",
+    "backHome": "← Back to home"
+  },
+  "invite": {
+    "verifying": "Verifying invitation...",
+    "badge": "Personal invitation",
+    "headlineTpl": "{name} invited you to Three Billion Heartbeats",
+    "intro": "This invitation is yours. It's not an ad — it's someone who believes you can change and wants you to have access.",
+    "fallbackInviter": "someone from Three Billion Heartbeats",
+    "whatIsTitle": "What is Three Billion Heartbeats?",
+    "feature1": "An AI that asks you the questions no one else dares to ask",
+    "feature2": "A system that catches when you're avoiding what matters and tells you straight",
+    "feature3": "30 days to make the change you've been putting off too long",
+    "accept": "Accept the invitation",
+    "learnMore": "Learn more about Three Billion Heartbeats first",
+    "exclusiveAccess": "Exclusive access. No credit card.",
+    "invalidTitle": "Invalid invitation",
+    "invalidBody": "This invitation link has expired or already been used.",
+    "fallbackPath": "You can still request access by completing the 3 missions on the waitlist.",
+    "goWaitlist": "Go to waitlist"
+  },
+  "family": {
+    "metaTitle": "Support Portal | Three Billion Heartbeats",
+    "metaDescription": "Private portal for trusted contacts.",
+    "heading": "Support Portal",
+    "subtitleTpl": "Trust network for {name}",
+    "protocolTitle": "Confidentiality protocol",
+    "protocolBody": "What you see here is confidential. Don't mention what you know about their progress, streak, or status. If the system needs you to act, it will tell you. Your role is to be there — not to watch.",
+    "relationTips": {
+      "madre": "Your presence matters more than your advice. Don't try to fix it — just be there.",
+      "padre": "Your presence matters more than your advice. Don't try to fix it — just be there.",
+      "pareja": "Support without controlling. Don't use what you see here in arguments.",
+      "amigo": "Be natural. A plan together is worth more than advice. Don't change how you treat them.",
+      "terapeuta": "Use this information as context between sessions, not as an agenda.",
+      "default": "Your presence matters more than your advice."
+    },
+    "whatToDo": "What to do now",
+    "actions": {
+      "crisisTitle": "Call them now",
+      "crisisSub": "Don't text — call. An 'I'm here' is enough. Don't try to solve anything on the phone.",
+      "weekTitle": "Send a natural message",
+      "weekSub": "Without mentioning the app. A 'want to hang out?' or 'how are you?' with no hidden agenda. Normalcy is support.",
+      "fewDaysTitle": "A short message is enough",
+      "fewDaysSub": "Don't ask about the app. A 'I thought of you' or a meme is worth more than 'have you logged in?'",
+      "winsTitle": "Celebrate with them",
+      "winsSub": "They shared a win with you. This step cost them more than it looks. Tell them.",
+      "calmTitle": "Do nothing",
+      "calmSub": "Everything's going well. The absence of pressure is the best support right now."
+    },
+    "metrics": {
+      "streakTitle": "Consistency",
+      "streakUnit": "days",
+      "streakNone": "No active streak. Don't ask why — just send something kind.",
+      "streakLongHint": "They're on a good streak. Consistency is costing them — acknowledge it if it comes up naturally.",
+      "streakBestTpl": "Best streak: {n} days.",
+      "lastActivityTitle": "Last activity",
+      "lastActivityToday": "Today",
+      "lastActivityYesterday": "Yesterday",
+      "lastActivityDaysTpl": "{n} days ago",
+      "lastActivityWeekHint": "Could be fine, could not be. A natural message without mentioning the app works best.",
+      "lastActivityFewDaysHint": "Haven't checked in for a few days. It's okay — sometimes you need a break.",
+      "lastActivityRecentHint": "Recent activity. Everything looks good.",
+      "goalTitle": "Active goal",
+      "goalProgress": "Progress",
+      "goalAllDone": "They've completed all actions. If it comes up, celebrate with them.",
+      "goalNotStarted": "Haven't started yet. Don't push — the moment will come.",
+      "goalInProgress": "Moving at their own pace. That's already a lot."
+    },
+    "wins": {
+      "title": "Shared wins",
+      "intro": "They wanted to share these wins with you. Each one cost them more than it looks."
+    },
+    "footer": "Three Billion Heartbeats — Support Network",
+    "footerConfidential": "This portal is confidential. Don't share it or forward it."
+  },
+  "journey": {
+    "loading": "Loading…"
   }
 }

@@ -1,0 +1,27 @@
+messages/fr.json
+  s_d2308f25c4747c::t_8e1523a74ca37c 2254,2257,2260,2263
+.github/workflows/ci.yml
+  s_d2308f25c4747c::t_105cafd66e68d4 108
+messages/es.json
+  s_d2308f25c4747c::t_8e1523a74ca37c 115-247,2254,2257,2260,2263,2773-2804
+messages/en.json
+  s_d2308f25c4747c::t_8e1523a74ca37c 2254,2257,2260,2263
+messages/pt.json
+  s_d2308f25c4747c::t_8e1523a74ca37c 2254,2257,2260,2263
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "38157e1c224473a75a105a149cdfd1616bc179ed",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

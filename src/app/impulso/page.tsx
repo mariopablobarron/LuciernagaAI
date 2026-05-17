@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   Flame,
   Zap,
@@ -50,7 +51,8 @@ type InsightsData = {
 
 // ─── Config Maps ─────────────────────────────────────────────────────────────
 
-const PROFILE_CONFIG: Record<
+// Estilo visual estable; emoji es universal por código
+const PROFILE_STYLE: Record<
   ImpulseProfileCode,
   { emoji: string; gradient: string; border: string; badge: string }
 > = {
@@ -112,14 +114,16 @@ const CHALLENGE_BAR: Record<ChallengeType, string> = {
 
 // ─── Tab type ─────────────────────────────────────────────────────────────────
 
-type TabId = "diagnóstico" | "retos" | "insights" | "mensajes";
+type TabId = "diagnostico" | "retos" | "insights" | "mensajes";
 
-const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
-  { id: "diagnóstico", label: "Diagnóstico", icon: Brain },
-  { id: "retos", label: "Retos", icon: Target },
-  { id: "insights", label: "Insights", icon: Zap },
-  { id: "mensajes", label: "Mensajes", icon: CalendarDays },
-];
+const TAB_IDS: TabId[] = ["diagnostico", "retos", "insights", "mensajes"];
+
+const TAB_ICONS: Record<TabId, React.ElementType> = {
+  diagnostico: Brain,
+  retos: Target,
+  insights: Zap,
+  mensajes: CalendarDays,
+};
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
@@ -132,7 +136,8 @@ function Skeleton({ className }: { className?: string }) {
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 export default function ImpulsoPage() {
-  const [activeTab, setActiveTab] = useState<TabId>("diagnóstico");
+  const t = useTranslations("impulso.page");
+  const [activeTab, setActiveTab] = useState<TabId>("diagnostico");
   const [data, setData] = useState<InsightsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -182,9 +187,9 @@ export default function ImpulsoPage() {
 
   const profile = data?.profile ?? null;
   const streak = data?.streak ?? null;
-  const profileCfg = profile
-    ? PROFILE_CONFIG[profile.code]
-    : PROFILE_CONFIG.POTENCIAL_ALTO;
+  const profileStyle = profile
+    ? PROFILE_STYLE[profile.code]
+    : PROFILE_STYLE.POTENCIAL_ALTO;
 
   // Derive program days from streak
   const programDays = streak?.currentDays ?? 0;
@@ -211,79 +216,69 @@ export default function ImpulsoPage() {
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 border border-violet-500/30">
                 <Zap className="w-10 h-10 text-violet-400" />
               </div>
-              <h1 className="text-4xl font-black text-white">Modo Impulso</h1>
+              <h1 className="text-4xl font-black text-white">{t("welcomeTitle")}</h1>
               <p className="text-lg text-zinc-400 max-w-lg mx-auto leading-relaxed">
-                21 días para romper los patrones que te frenan.
-                No es motivación — es estructura, acción y evidencia.
+                {t("welcomeSubtitle")}
               </p>
             </div>
 
             {/* Why 21 days */}
             <div className="rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-500/5 to-fuchsia-500/5 p-6 sm:p-8 space-y-4">
-              <h2 className="text-lg font-bold text-white">¿Por que 21 días?</h2>
+              <h2 className="text-lg font-bold text-white">{t("why21Title")}</h2>
               <div className="space-y-3 text-sm text-zinc-400 leading-relaxed">
                 <p>
-                  La investigación en psicología del comportamiento muestra que un hábito no se forma en un día
-                  ni se rompe con una decisión. Se necesita <strong className="text-white">repetición sostenida</strong> en
-                  un entorno con estructura y retroalimentación.
+                  {t.rich("why21P1", {
+                    strong: (c) => <strong className="text-white">{c}</strong>,
+                  })}
                 </p>
                 <p>
-                  21 días es el punto donde lo que empezó como esfuerzo consciente empieza a convertirse en
-                  <strong className="text-white"> inercia positiva</strong>. No es magia — es neuroplasticidad: tu cerebro
-                  crea nuevas conexiones cuando repites una acción con intención.
+                  {t.rich("why21P2", {
+                    strong: (c) => <strong className="text-white">{c}</strong>,
+                  })}
                 </p>
               </div>
               <div className="grid grid-cols-3 gap-3 pt-2">
                 <div className="text-center p-3 rounded-xl bg-zinc-900/50 border border-zinc-800">
                   <p className="text-2xl font-black text-cyan-400">7</p>
-                  <p className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider mt-1">Primer ciclo</p>
-                  <p className="text-[10px] text-zinc-600 mt-0.5">Rompes la inercia</p>
+                  <p className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider mt-1">{t("cycle1Title")}</p>
+                  <p className="text-[10px] text-zinc-600 mt-0.5">{t("cycle1Desc")}</p>
                 </div>
                 <div className="text-center p-3 rounded-xl bg-zinc-900/50 border border-zinc-800">
                   <p className="text-2xl font-black text-violet-400">14</p>
-                  <p className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider mt-1">Segundo ciclo</p>
-                  <p className="text-[10px] text-zinc-600 mt-0.5">Ves tus patrones</p>
+                  <p className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider mt-1">{t("cycle2Title")}</p>
+                  <p className="text-[10px] text-zinc-600 mt-0.5">{t("cycle2Desc")}</p>
                 </div>
                 <div className="text-center p-3 rounded-xl bg-zinc-900/50 border border-zinc-800">
                   <p className="text-2xl font-black text-fuchsia-400">21</p>
-                  <p className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider mt-1">Transformación</p>
-                  <p className="text-[10px] text-zinc-600 mt-0.5">El cambio es tuyo</p>
+                  <p className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider mt-1">{t("cycle3Title")}</p>
+                  <p className="text-[10px] text-zinc-600 mt-0.5">{t("cycle3Desc")}</p>
                 </div>
               </div>
-              <p className="text-xs text-zinc-500 italic">
-                No se trata de ser perfecto 21 días. Se trata de no abandonar cuando fallas en el día 4.
-                El sistema te acompaña para que el día 5 vuelvas.
-              </p>
+              <p className="text-xs text-zinc-500 italic">{t("why21Note")}</p>
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
               {[
-                { icon: Brain, color: "text-cyan-400", bg: "bg-cyan-500/10", border: "border-cyan-500/20", title: "Diagnóstico", desc: "12 preguntas para identificar tu perfil: alto potencial, bloqueado, ansioso o desmotivado." },
-                { icon: Target, color: "text-violet-400", bg: "bg-violet-500/10", border: "border-violet-500/20", title: "Retos personalizados", desc: "Retos de 3 a 7 días adaptados a tu perfil. Cada uno rompe un patrón específico." },
-                { icon: Flame, color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20", title: "Check-in diario", desc: "Registra tu avance cada día. La constancia es lo que genera el cambio, no la intensidad." },
-                { icon: TrendingUp, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20", title: "Insights de comportamiento", desc: "Análisis de tus patrones en ventanas de 14 días. Ve lo que no ves." },
+                { key: "diagnostic", icon: Brain, color: "text-cyan-400", bg: "bg-cyan-500/10", border: "border-cyan-500/20" },
+                { key: "challenges", icon: Target, color: "text-violet-400", bg: "bg-violet-500/10", border: "border-violet-500/20" },
+                { key: "checkin", icon: Flame, color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20" },
+                { key: "insights", icon: TrendingUp, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
               ].map((item) => (
-                <div key={item.title} className={`rounded-xl border ${item.border} ${item.bg} p-5 space-y-2`}>
+                <div key={item.key} className={`rounded-xl border ${item.border} ${item.bg} p-5 space-y-2`}>
                   <item.icon className={`w-6 h-6 ${item.color}`} />
-                  <p className="text-sm font-bold text-white">{item.title}</p>
-                  <p className="text-xs text-zinc-400 leading-relaxed">{item.desc}</p>
+                  <p className="text-sm font-bold text-white">{t(`pillar.${item.key}.title`)}</p>
+                  <p className="text-xs text-zinc-400 leading-relaxed">{t(`pillar.${item.key}.desc`)}</p>
                 </div>
               ))}
             </div>
 
             <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-3">
-              <p className="text-sm font-semibold text-white">¿Cómo funciona?</p>
+              <p className="text-sm font-semibold text-white">{t("howTitle")}</p>
               <div className="space-y-2">
-                {[
-                  "Haces el diagnóstico (5 min) — identificamos tu punto de partida.",
-                  "Recibes tu primer reto personalizado — adaptado a lo que te bloquea.",
-                  "Cada día haces check-in — registras si avanzaste y cómo te sientes.",
-                  "A los 14 días, el sistema te muestra tus patrones reales.",
-                  "A los 21 días, lo que empezó como esfuerzo es hábito.",
-                ].map((step, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <span className="shrink-0 w-6 h-6 rounded-full bg-violet-500/15 border border-violet-500/30 flex items-center justify-center text-xs font-bold text-violet-300">{i + 1}</span>
-                    <p className="text-sm text-zinc-400 leading-relaxed">{step}</p>
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <div key={n} className="flex items-start gap-3">
+                    <span className="shrink-0 w-6 h-6 rounded-full bg-violet-500/15 border border-violet-500/30 flex items-center justify-center text-xs font-bold text-violet-300">{n}</span>
+                    <p className="text-sm text-zinc-400 leading-relaxed">{t(`howStep${n}`)}</p>
                   </div>
                 ))}
               </div>
@@ -295,9 +290,9 @@ export default function ImpulsoPage() {
                 data-tour="impulso-diagnóstico"
                 className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-bold text-lg shadow-xl shadow-fuchsia-500/25 hover:from-violet-400 hover:to-fuchsia-400 active:scale-95 transition-all"
               >
-                <Brain className="w-5 h-5" /> Empezar diagnóstico
+                <Brain className="w-5 h-5" /> {t("startDiagnosticCta")}
               </Link>
-              <p className="text-xs text-zinc-600">5 minutos · 12 preguntas · gratuito</p>
+              <p className="text-xs text-zinc-600">{t("startDiagnosticHint")}</p>
             </div>
           </div>
         )}
@@ -307,17 +302,17 @@ export default function ImpulsoPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-violet-400 mb-1">
-              Programa
+              {t("programLabel")}
             </p>
-            <h1 className="text-3xl font-bold text-white">Impulso</h1>
-            <p className="text-zinc-400 text-sm mt-1">21 días de acción consistente</p>
+            <h1 className="text-3xl font-bold text-white">{t("programTitle")}</h1>
+            <p className="text-zinc-400 text-sm mt-1">{t("programSubtitle")}</p>
           </div>
           <Link
             href="/impulso/checkin"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-linear-to-r from-violet-500 to-fuchsia-500 text-white font-semibold hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-fuchsia-500/20 hover:shadow-fuchsia-500/40 text-sm"
           >
             <Flame className="w-4 h-4" />
-            Check-in de hoy
+            {t("checkinToday")}
           </Link>
         </div>
         )}
@@ -358,9 +353,9 @@ export default function ImpulsoPage() {
                     <span className="text-sm font-bold text-white">{streak?.currentDays ?? 0}</span>
                   </div>
                 </div>
-                <p className="text-xs text-zinc-400">días seguidos</p>
+                <p className="text-xs text-zinc-400">{t("daysInARow")}</p>
                 {streak?.bestDays ? (
-                  <p className="text-xs text-zinc-600">Mejor: {streak.bestDays}</p>
+                  <p className="text-xs text-zinc-600">{t("bestStreak", { days: streak.bestDays })}</p>
                 ) : null}
               </div>
 
@@ -369,7 +364,7 @@ export default function ImpulsoPage() {
                 <p className="text-2xl font-bold bg-linear-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
                   {programProgress}%
                 </p>
-                <p className="text-xs text-zinc-400">Progreso del programa</p>
+                <p className="text-xs text-zinc-400">{t("programProgress")}</p>
                 <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-linear-to-r from-violet-500 to-fuchsia-500 transition-all"
@@ -383,13 +378,13 @@ export default function ImpulsoPage() {
                 <p className="text-2xl font-bold text-white">
                   {programDays}/{programTotal}
                 </p>
-                <p className="text-xs text-zinc-400">Días completados</p>
+                <p className="text-xs text-zinc-400">{t("daysCompleted")}</p>
                 {programDays >= programTotal ? (
                   <p className="text-xs text-emerald-400 font-semibold flex items-center justify-center gap-1">
-                    <Trophy className="w-3 h-3" /> Completado
+                    <Trophy className="w-3 h-3" /> {t("completed")}
                   </p>
                 ) : programProgress >= 40 ? (
-                  <p className="text-xs text-cyan-400 font-semibold">En track ✓</p>
+                  <p className="text-xs text-cyan-400 font-semibold">{t("onTrack")}</p>
                 ) : null}
               </div>
             </>
@@ -398,13 +393,13 @@ export default function ImpulsoPage() {
 
         {/* ── Tab Navigation ─────────────────────────────────────── */}
         <div className="flex gap-1 border-b border-zinc-800/80 overflow-x-auto scrollbar-none">
-          {TABS.map((tab) => {
-            const Icon = tab.icon;
-            const active = activeTab === tab.id;
+          {TAB_IDS.map((tabId) => {
+            const Icon = TAB_ICONS[tabId];
+            const active = activeTab === tabId;
             return (
               <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                key={tabId}
+                onClick={() => setActiveTab(tabId)}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold transition-all border-b-2 -mb-px ${
                   active
                     ? "text-white border-b-violet-500"
@@ -412,7 +407,7 @@ export default function ImpulsoPage() {
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
-                {tab.label}
+                {t(`tabs.${tabId}`)}
               </button>
             );
           })}
@@ -421,7 +416,7 @@ export default function ImpulsoPage() {
         {/* ── Tab Content ────────────────────────────────────────── */}
 
         {/* DIAGNÓSTICO */}
-        {activeTab === "diagnóstico" && (
+        {activeTab === "diagnostico" && (
           <div className="space-y-6">
             {loading ? (
               <>
@@ -438,26 +433,25 @@ export default function ImpulsoPage() {
                     <span className="text-3xl">⚡</span>
                   </div>
                   <h2 className="text-2xl font-bold text-white mb-2">
-                    Aún no tienes un perfil activo
+                    {t("noProfileTitle")}
                   </h2>
                   <p className="text-zinc-400 text-base leading-relaxed max-w-md mx-auto mb-8">
-                    Haz el diagnóstico de 12 preguntas para descubrir tu patrón de bloqueo
-                    y recibir un programa personalizado de 21 días.
+                    {t("noProfileDesc")}
                   </p>
                   <Link
                     href="/impulso/diagnóstico"
                     className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-bold text-white bg-linear-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-fuchsia-500/20 text-base"
                   >
                     <Brain className="w-4 h-4" />
-                    Hacer diagnóstico ahora
+                    {t("doDiagnosticNow")}
                   </Link>
-                  <p className="text-xs text-zinc-600 mt-4">5 minutos · Resultados inmediatos · Sin registro</p>
+                  <p className="text-xs text-zinc-600 mt-4">{t("doDiagnosticHint")}</p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {[
-                    { num: "01", icon: Brain, title: "Diagnóstico", desc: "12 preguntas sobre claridad, energía y disciplina.", color: "text-violet-400", bg: "bg-violet-500/10" },
-                    { num: "02", icon: Zap, title: "Tu perfil", desc: "BLOQUEADO, ANSIOSO, DESMOTIVADO, PERDIDO o POTENCIAL_ALTO.", color: "text-amber-400", bg: "bg-amber-500/10" },
-                    { num: "03", icon: Target, title: "Retos 21 días", desc: "Check-in diario con progresión personalizada.", color: "text-cyan-400", bg: "bg-cyan-500/10" },
+                    { num: "01", key: "diagnostic", icon: Brain, color: "text-violet-400", bg: "bg-violet-500/10" },
+                    { num: "02", key: "profile", icon: Zap, color: "text-amber-400", bg: "bg-amber-500/10" },
+                    { num: "03", key: "challenges", icon: Target, color: "text-cyan-400", bg: "bg-cyan-500/10" },
                   ].map((step) => {
                     const Icon = step.icon;
                     return (
@@ -467,8 +461,8 @@ export default function ImpulsoPage() {
                         </div>
                         <div>
                           <p className="text-xs font-bold text-zinc-600 mb-1">{step.num}</p>
-                          <h3 className="font-bold text-white text-sm mb-1">{step.title}</h3>
-                          <p className="text-xs text-zinc-400 leading-relaxed">{step.desc}</p>
+                          <h3 className="font-bold text-white text-sm mb-1">{t(`flowStep.${step.key}.title`)}</h3>
+                          <p className="text-xs text-zinc-400 leading-relaxed">{t(`flowStep.${step.key}.desc`)}</p>
                         </div>
                       </div>
                     );
@@ -476,11 +470,11 @@ export default function ImpulsoPage() {
                 </div>
                 <div className="card-surface p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div>
-                    <p className="font-semibold text-white text-sm mb-1">¿Prefieres empezar con el chat?</p>
-                    <p className="text-xs text-zinc-400">El coach también puede ayudarte sin diagnóstico previo.</p>
+                    <p className="font-semibold text-white text-sm mb-1">{t("preferChatTitle")}</p>
+                    <p className="text-xs text-zinc-400">{t("preferChatDesc")}</p>
                   </div>
                   <Link href="/app" className="shrink-0 px-5 py-2.5 rounded-xl border border-zinc-700 text-sm font-semibold text-zinc-300 hover:text-white hover:border-zinc-500 transition-all">
-                    Ir al chat →
+                    {t("goToChat")}
                   </Link>
                 </div>
               </div>
@@ -488,15 +482,15 @@ export default function ImpulsoPage() {
               <>
                 {/* Profile Card */}
                 <div
-                  className={`rounded-2xl border bg-linear-to-br ${profileCfg.gradient} ${profileCfg.border} p-6 sm:p-8 space-y-5`}
+                  className={`rounded-2xl border bg-linear-to-br ${profileStyle.gradient} ${profileStyle.border} p-6 sm:p-8 space-y-5`}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                    <div className="text-5xl">{profileCfg.emoji}</div>
+                    <div className="text-5xl">{profileStyle.emoji}</div>
                     <div className="flex-1 space-y-1.5">
                       <div className="flex flex-wrap items-center gap-2">
                         <h2 className="text-2xl font-bold text-white">{profile.title}</h2>
                         <span
-                          className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${profileCfg.badge}`}
+                          className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${profileStyle.badge}`}
                         >
                           {profile.type}
                         </span>
@@ -510,7 +504,7 @@ export default function ImpulsoPage() {
                   {/* Focus */}
                   <div className="border-t border-white/10 pt-4">
                     <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-2">
-                      Foco operativo
+                      {t("operationalFocus")}
                     </p>
                     <p className="text-sm text-zinc-300">{profile.operationalFocus}</p>
                   </div>
@@ -518,21 +512,13 @@ export default function ImpulsoPage() {
                   {/* Scores */}
                   {profile.scores && (
                     <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-2">
-                      {(
-                        [
-                          ["claridad", "Claridad"],
-                          ["autoestima", "Autoestima"],
-                          ["energia", "Energía"],
-                          ["disciplina", "Disciplina"],
-                          ["social", "Social"],
-                        ] as const
-                      ).map(([key, label]) => {
+                      {(["claridad", "autoestima", "energia", "disciplina", "social"] as const).map((key) => {
                         const score = (profile.scores as Record<string, number>)[key] ?? 0;
                         const pct = Math.round((score / 5) * 100);
                         return (
                           <div key={key} className="space-y-1.5">
                             <div className="flex justify-between items-center">
-                              <p className="text-xs text-zinc-400">{label}</p>
+                              <p className="text-xs text-zinc-400">{t(`scoreLabels.${key}`)}</p>
                               <p className="text-xs font-bold text-white">{score.toFixed(1)}</p>
                             </div>
                             <div className="h-1.5 bg-black/30 rounded-full overflow-hidden">
@@ -553,7 +539,7 @@ export default function ImpulsoPage() {
                   <div className="card-surface p-6 space-y-4">
                     <h3 className="text-sm font-semibold text-zinc-300 flex items-center gap-2">
                       <CalendarDays className="w-4 h-4 text-violet-400" />
-                      Últimos 7 días
+                      {t("last7Days")}
                     </h3>
                     <div className="flex gap-2 items-end">
                       {data.logs.slice(0, 7).map((log, i) => {
@@ -590,10 +576,8 @@ export default function ImpulsoPage() {
             ) : (data?.challenges ?? []).length === 0 ? (
               <div className="card-surface p-8 text-center space-y-4">
                 <Target className="w-10 h-10 text-zinc-700 mx-auto" />
-                <p className="text-zinc-400 text-sm">No tienes retos activos aún.</p>
-                <p className="text-xs text-zinc-600">
-                  Completa el diagnóstico para recibir retos personalizados.
-                </p>
+                <p className="text-zinc-400 text-sm">{t("noActiveChallenges")}</p>
+                <p className="text-xs text-zinc-600">{t("noActiveChallengesHint")}</p>
               </div>
             ) : (
               <>
@@ -616,7 +600,7 @@ export default function ImpulsoPage() {
                           <div>
                             <h3 className="font-bold text-white">{reto.title}</h3>
                             <p className="text-xs text-zinc-500 mt-0.5">
-                              {reto.completedDays}/{reto.totalDays} días
+                              {t("daysOf", { done: reto.completedDays, total: reto.totalDays })}
                             </p>
                           </div>
                         </div>
@@ -630,12 +614,12 @@ export default function ImpulsoPage() {
                           {done ? (
                             <>
                               <CheckCircle2 className="w-3 h-3" />
-                              Completado
+                              {t("statusCompleted")}
                             </>
                           ) : (
                             <>
                               <TrendingUp className="w-3 h-3" />
-                              En progreso
+                              {t("statusInProgress")}
                             </>
                           )}
                         </span>
@@ -644,7 +628,7 @@ export default function ImpulsoPage() {
                       <div className="space-y-1.5">
                         <div className="flex justify-between text-xs">
                           <span className={color}>{pct}%</span>
-                          <span className="text-zinc-600">{reto.totalDays} días total</span>
+                          <span className="text-zinc-600">{t("totalDays", { total: reto.totalDays })}</span>
                         </div>
                         <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
                           <div
@@ -658,7 +642,7 @@ export default function ImpulsoPage() {
                 })}
 
                 <button className="w-full py-3 px-4 rounded-xl border border-violet-500/40 text-violet-400 text-sm font-semibold hover:bg-violet-500/10 hover:border-violet-500/60 transition-all">
-                  + Solicitar nuevo reto
+                  {t("requestNewChallenge")}
                 </button>
               </>
             )}
@@ -674,10 +658,10 @@ export default function ImpulsoPage() {
               <div className="card-surface p-8 text-center space-y-3">
                 <Brain className="w-10 h-10 text-zinc-700 mx-auto" />
                 <p className="text-zinc-400 text-sm">
-                  Aún no hay suficientes datos para generar insights.
+                  {t("noInsights")}
                 </p>
                 <p className="text-xs text-zinc-600">
-                  Haz check-in diario durante varios días para ver patrones.
+                  {t("noInsightsHint")}
                 </p>
               </div>
             ) : (
@@ -711,64 +695,45 @@ export default function ImpulsoPage() {
         {/* MENSAJES */}
         {activeTab === "mensajes" && (
           <div className="space-y-4">
-            {[
-              {
-                day: 7,
-                title: "Tu primera semana",
-                preview:
-                  "Hiciste algo que la mayoría no hace: aparecer. Siete días seguidos ya dicen algo de ti.",
-                locked: programDays < 7,
-              },
-              {
-                day: 14,
-                title: "Punto de quiebre",
-                preview:
-                  "Aquí es donde muchos se rinden. Tú no. Eso es lo que separa a quienes cambian de los que solo lo intentan.",
-                locked: programDays < 14,
-              },
-              {
-                day: 21,
-                title: "Tu nuevo hábito",
-                preview:
-                  "Veintiún días. Ya no es un esfuerzo, es parte de ti. Lo que construiste aquí no desaparece.",
-                locked: programDays < 21,
-              },
-            ].map((msg) => (
-              <div
-                key={msg.day}
-                className={`card-surface p-6 relative overflow-hidden transition-all ${
-                  msg.locked ? "opacity-60" : ""
-                }`}
-              >
-                {msg.locked && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-zinc-950/50 backdrop-blur-[1px] rounded-xl">
-                    <div className="flex flex-col items-center gap-2">
-                      <Lock className="w-6 h-6 text-zinc-500" />
-                      <p className="text-xs text-zinc-500">Se desbloquea el día {msg.day}</p>
+            {[7, 14, 21].map((day) => {
+              const locked = programDays < day;
+              return (
+                <div
+                  key={day}
+                  className={`card-surface p-6 relative overflow-hidden transition-all ${
+                    locked ? "opacity-60" : ""
+                  }`}
+                >
+                  {locked && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-zinc-950/50 backdrop-blur-[1px] rounded-xl">
+                      <div className="flex flex-col items-center gap-2">
+                        <Lock className="w-6 h-6 text-zinc-500" />
+                        <p className="text-xs text-zinc-500">{t("unlocksOnDay", { day })}</p>
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex items-start gap-4">
+                    <div
+                      className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
+                        locked
+                          ? "bg-zinc-800 text-zinc-500"
+                          : "bg-linear-to-br from-violet-500 to-fuchsia-500 text-white"
+                      }`}
+                    >
+                      {day}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-white">{t(`milestoneMessages.day${day}.title`)}</h3>
+                      {!locked && (
+                        <p className="text-sm text-zinc-400 mt-1.5 leading-relaxed italic">
+                          &ldquo;{t(`milestoneMessages.day${day}.preview`)}&rdquo;
+                        </p>
+                      )}
                     </div>
                   </div>
-                )}
-                <div className="flex items-start gap-4">
-                  <div
-                    className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
-                      msg.locked
-                        ? "bg-zinc-800 text-zinc-500"
-                        : "bg-linear-to-br from-violet-500 to-fuchsia-500 text-white"
-                    }`}
-                  >
-                    {msg.day}
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-white">{msg.title}</h3>
-                    {!msg.locked && (
-                      <p className="text-sm text-zinc-400 mt-1.5 leading-relaxed italic">
-                        &ldquo;{msg.preview}&rdquo;
-                      </p>
-                    )}
-                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 

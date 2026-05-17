@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Flame, Hourglass, Mail, ShieldCheck, Sparkles, Target, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -74,27 +75,6 @@ async function parseJson<T>(response: Response): Promise<Partial<T>> {
   return (await response.json().catch(() => ({}))) as Partial<T>;
 }
 
-function formatDate(value: string | null | undefined): string {
-  if (!value) {
-    return "Sin registrar";
-  }
-
-  return new Date(value).toLocaleDateString("es-ES", {
-    day: "2-digit",
-    month: "short",
-  });
-}
-
-function getScaleLabel(value: number): string {
-  return ["Nada", "Poco", "Algo", "Bastante", "Mucho"][value - 1] || String(value);
-}
-
-function getMomentumLabel(value: number): string {
-  if (value <= 2) return "Baja";
-  if (value === 3) return "Media";
-  return "Alta";
-}
-
 function sectionVariant(code?: string): "warning" | "success" | "secondary" {
   if (code === "POTENCIAL_ALTO") return "success";
   if (code === "BLOQUEADO" || code === "ANSIOSO" || code === "DESMOTIVADO") return "warning";
@@ -102,6 +82,31 @@ function sectionVariant(code?: string): "warning" | "success" | "secondary" {
 }
 
 export default function ImpulseDashboard() {
+  const t = useTranslations("impulso.dashboard");
+
+  function formatDate(value: string | null | undefined): string {
+    if (!value) {
+      return t("notRegistered");
+    }
+
+    return new Date(value).toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "short",
+    });
+  }
+
+  function getScaleLabel(value: number): string {
+    const keys = ["nothing", "little", "some", "quite", "much"];
+    const key = keys[value - 1];
+    return key ? t(`scale.${key}`) : String(value);
+  }
+
+  function getMomentumLabel(value: number): string {
+    if (value <= 2) return t("momentum.low");
+    if (value === 3) return t("momentum.medium");
+    return t("momentum.high");
+  }
+
   const [sessionUser, setSessionUser] = useState<BrowserSessionUser | null>(null);
   const [questions, setQuestions] = useState<DiagnosticQuestion[]>([]);
   const [answers, setAnswers] = useState<Record<string, number>>({});
@@ -153,7 +158,7 @@ export default function ImpulseDashboard() {
       setFutureMessages(futurePayload.availableMessages ?? []);
       setLockedFutureMessages(futurePayload.lockedCount ?? 0);
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "No se pudo cargar Modo Impulso.");
+      setStatus(error instanceof Error ? error.message : t("errors.loadDashboard"));
     } finally {
       setLoading(false);
     }
@@ -178,12 +183,12 @@ export default function ImpulseDashboard() {
       });
       const payload = await parseJson<DiagnosticGetResponse>(response);
       if (!response.ok || !payload.success || !payload.profile) {
-        throw new Error(payload.error || "No se pudo guardar el diagnóstico.");
+        throw new Error(payload.error || t("errors.saveDiagnostic"));
       }
 
       setProfile(payload.profile);
       setStreak(payload.streak ?? null);
-      setStatus(`Perfil asignado: ${payload.profile.title}. Ahora vamos a activar tus retos.`);
+      setStatus(t("status.profileAssigned", { title: payload.profile.title }));
 
       const challengeResponse = await fetch("/api/challenge/assign", {
         method: "POST",
@@ -203,7 +208,7 @@ export default function ImpulseDashboard() {
       setInsights(insightsPayload.insights ?? []);
       setLogs(insightsPayload.logs ?? []);
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "No se pudo guardar el diagnóstico.");
+      setStatus(error instanceof Error ? error.message : t("errors.saveDiagnostic"));
     } finally {
       setDiagnosticLoading(false);
     }
@@ -220,14 +225,14 @@ export default function ImpulseDashboard() {
       });
       const payload = await parseJson<ChallengeResponse>(response);
       if (!response.ok || !payload.success) {
-        throw new Error(payload.error || "No se pudieron asignar retos.");
+        throw new Error(payload.error || t("errors.assignChallenges"));
       }
 
       setChallenges(payload.challenges ?? []);
       setStreak(payload.streak ?? null);
-      setStatus("Retos activos actualizados.");
+      setStatus(t("status.activeChallengesUpdated"));
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "No se pudieron asignar retos.");
+      setStatus(error instanceof Error ? error.message : t("errors.assignChallenges"));
     } finally {
       setChallengeLoading(false);
     }
@@ -235,7 +240,7 @@ export default function ImpulseDashboard() {
 
   const submitCheckin = async () => {
     if (!checkinText.trim()) {
-      setStatus("Escribe tu check-in antes de guardarlo.");
+      setStatus(t("errors.checkinEmpty"));
       return;
     }
 
@@ -257,7 +262,7 @@ export default function ImpulseDashboard() {
       });
       const payload = await parseJson<CheckinResponse>(response);
       if (!response.ok || !payload.ok) {
-        throw new Error(payload.error || "No se pudo guardar el check-in.");
+        throw new Error(payload.error || t("errors.saveCheckin"));
       }
 
       if (payload.streak) {
@@ -274,7 +279,7 @@ export default function ImpulseDashboard() {
       }
 
       setCheckinText("");
-      setStatus("Check-in guardado. El sistema actualizó racha y retos activos.");
+      setStatus(t("status.checkinSaved"));
 
       const insightsResponse = await fetch("/api/insights", {
         cache: "no-store",
@@ -284,7 +289,7 @@ export default function ImpulseDashboard() {
       setInsights(insightsPayload.insights ?? []);
       setLogs(insightsPayload.logs ?? []);
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "No se pudo guardar el check-in.");
+      setStatus(error instanceof Error ? error.message : t("errors.saveCheckin"));
     } finally {
       setCheckinLoading(false);
     }
@@ -292,7 +297,7 @@ export default function ImpulseDashboard() {
 
   const saveFutureMessage = async () => {
     if (!futureTitle.trim() || !futureContent.trim() || !futureUnlockAt) {
-      setStatus("Completa título, mensaje y fecha de desbloqueo.");
+      setStatus(t("errors.futureIncomplete"));
       return;
     }
 
@@ -313,16 +318,16 @@ export default function ImpulseDashboard() {
       });
       const payload = await parseJson<FutureMessageResponse>(response);
       if (!response.ok || !payload.success || !payload.futureMessage) {
-        throw new Error(payload.error || "No se pudo guardar el mensaje futuro.");
+        throw new Error(payload.error || t("errors.saveFuture"));
       }
 
       setFutureTitle("");
       setFutureContent("");
       setFutureUnlockAt("");
-      setStatus("Cápsula del tiempo guardada.");
+      setStatus(t("status.futureSaved"));
       await loadDashboard();
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "No se pudo guardar el mensaje futuro.");
+      setStatus(error instanceof Error ? error.message : t("errors.saveFuture"));
     } finally {
       setFutureLoading(false);
     }
@@ -336,43 +341,44 @@ export default function ImpulseDashboard() {
             <div className="space-y-3">
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="secondary" className="rounded-full px-3 py-1">
-                  Modo Impulso
+                  {t("modeLabel")}
                 </Badge>
                 {profile ? (
                   <Badge variant={sectionVariant(profile.code)} className="rounded-full px-3 py-1">
-                    Perfil {profile.title}
+                    {t("profileBadge", { title: profile.title })}
                   </Badge>
                 ) : null}
                 {streak ? (
                   <Badge variant="secondary" className="rounded-full px-3 py-1">
-                    Racha {streak.currentDays} días
+                    {t("streakBadge", { days: streak.currentDays })}
                   </Badge>
                 ) : null}
               </div>
               <div>
                 <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-                  Entrena claridad, no solo conversación
+                  {t("headlineTitle")}
                 </h1>
                 <p className="mt-2 max-w-3xl text-sm text-muted-foreground md:text-base">
-                  Diagnóstico inicial, perfil operativo, retos cortos, check-in diario y señales de
-                  comportamiento para convertir pensamiento en ejecución.
+                  {t("headlineDesc")}
                 </p>
               </div>
             </div>
 
             <div className="grid min-w-60 gap-3 text-sm">
               <div className="rounded-2xl border border-border bg-muted/30 p-3">
-                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Cuenta</p>
+                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{t("account")}</p>
                 <p className="mt-1 font-medium text-foreground">
-                  {sessionUser?.isAnonymous ? "Sesión anónima" : sessionUser?.email || "Pendiente"}
+                  {sessionUser?.isAnonymous
+                    ? t("anonymousSession")
+                    : sessionUser?.email || t("pending")}
                 </p>
               </div>
               <div className="rounded-2xl border border-border bg-muted/30 p-3">
                 <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                  Plan actual
+                  {t("currentPlan")}
                 </p>
                 <p className="mt-1 font-medium text-foreground">
-                  {sessionUser?.planLabel || "Free"}
+                  {sessionUser?.planLabel || t("planFree")}
                 </p>
               </div>
             </div>
@@ -384,16 +390,15 @@ export default function ImpulseDashboard() {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base">
                 <ShieldCheck className="size-4" />
-                Perfil operativo
+                {t("operationalProfile")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <p className="font-medium text-foreground">
-                {profile?.title || "Sin diagnóstico aún"}
+                {profile?.title || t("noDiagnosticYet")}
               </p>
               <p className="text-muted-foreground">
-                {profile?.operationalFocus ||
-                  "Completa el test inicial y el sistema te asignará un perfil de trabajo."}
+                {profile?.operationalFocus || t("noDiagnosticDesc")}
               </p>
             </CardContent>
           </Card>
@@ -402,14 +407,16 @@ export default function ImpulseDashboard() {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base">
                 <Flame className="size-4" />
-                Racha activa
+                {t("activeStreak")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <p className="text-2xl font-semibold text-foreground">{streak?.currentDays ?? 0}</p>
               <p className="text-muted-foreground">
-                Mejor racha: {streak?.bestDays ?? 0}. Último check-in:{" "}
-                {formatDate(streak?.lastCheckInDate)}
+                {t("bestStreakLine", {
+                  best: streak?.bestDays ?? 0,
+                  date: formatDate(streak?.lastCheckInDate),
+                })}
               </p>
             </CardContent>
           </Card>
@@ -418,13 +425,13 @@ export default function ImpulseDashboard() {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base">
                 <Sparkles className="size-4" />
-                Insights automáticos
+                {t("automaticInsights")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               {insights.length === 0 ? (
                 <p className="text-muted-foreground">
-                  Aquí aparecerán patrones reales cuando el sistema tenga actividad suficiente.
+                  {t("insightsEmpty")}
                 </p>
               ) : (
                 insights.slice(0, 2).map((insight) => (
@@ -449,23 +456,23 @@ export default function ImpulseDashboard() {
 
         <Tabs defaultValue="diagnostic" className="space-y-4">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="diagnostic">Diagnóstico</TabsTrigger>
-            <TabsTrigger value="challenges">Retos</TabsTrigger>
-            <TabsTrigger value="checkin">Check-in</TabsTrigger>
-            <TabsTrigger value="future">Cápsula</TabsTrigger>
+            <TabsTrigger value="diagnostic">{t("tabs.diagnostic")}</TabsTrigger>
+            <TabsTrigger value="challenges">{t("tabs.challenges")}</TabsTrigger>
+            <TabsTrigger value="checkin">{t("tabs.checkin")}</TabsTrigger>
+            <TabsTrigger value="future">{t("tabs.future")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="diagnostic" className="space-y-4">
             <Card className="border-border/80 bg-card/95 shadow-sm">
               <CardHeader>
-                <CardTitle>Test inicial de impulso</CardTitle>
+                <CardTitle>{t("diagnostic.title")}</CardTitle>
                 <CardDescription>
-                  12 preguntas, escala 1-5. Esto define cómo debe empujarte Tres Mil Millones de Latidos.
+                  {t("diagnostic.desc")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-5">
                 {loading ? (
-                  <p className="text-sm text-muted-foreground">Cargando diagnóstico...</p>
+                  <p className="text-sm text-muted-foreground">{t("diagnostic.loading")}</p>
                 ) : (
                   questions.map((question, index) => (
                     <div
@@ -503,14 +510,14 @@ export default function ImpulseDashboard() {
                     onClick={() => void submitDiagnostic()}
                     disabled={diagnosticLoading || questions.length === 0}
                   >
-                    {profile ? "Recalcular perfil" : "Guardar diagnóstico"}
+                    {profile ? t("diagnostic.recalculate") : t("diagnostic.save")}
                   </Button>
                   {profile ? (
                     <Badge
                       variant={sectionVariant(profile.code)}
                       className="rounded-full px-3 py-1"
                     >
-                      {profile.title} · Total {profile.scores.total}/100
+                      {profile.title} · {t("diagnostic.totalScore", { score: profile.scores.total })}
                     </Badge>
                   ) : null}
                 </div>
@@ -520,23 +527,23 @@ export default function ImpulseDashboard() {
             {profile ? (
               <Card className="border-border/80 bg-card/95 shadow-sm">
                 <CardHeader>
-                  <CardTitle>Perfil detectado</CardTitle>
+                  <CardTitle>{t("diagnostic.detected")}</CardTitle>
                   <CardDescription>{profile.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-4 md:grid-cols-5">
-                  {[
-                    ["Claridad", profile.scores.claridad],
-                    ["Autoestima", profile.scores.autoestima],
-                    ["Energía", profile.scores.energia],
-                    ["Disciplina", profile.scores.disciplina],
-                    ["Social", profile.scores.social],
-                  ].map(([label, value]) => (
+                  {([
+                    ["claridad", profile.scores.claridad],
+                    ["autoestima", profile.scores.autoestima],
+                    ["energia", profile.scores.energia],
+                    ["disciplina", profile.scores.disciplina],
+                    ["social", profile.scores.social],
+                  ] as const).map(([key, value]) => (
                     <div
-                      key={label as string}
+                      key={key}
                       className="rounded-2xl border border-border bg-muted/20 p-4"
                     >
                       <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                        {label}
+                        {t(`scoreLabels.${key}`)}
                       </p>
                       <p className="mt-2 text-lg font-semibold text-foreground">{value}/100</p>
                       <Progress value={Number(value)} className="mt-3" />
@@ -551,9 +558,9 @@ export default function ImpulseDashboard() {
             <Card className="border-border/80 bg-card/95 shadow-sm">
               <CardHeader className="md:flex-row md:items-center md:justify-between">
                 <div>
-                  <CardTitle>Retos activos</CardTitle>
+                  <CardTitle>{t("challenges.title")}</CardTitle>
                   <CardDescription>
-                    Retos cortos, progresivos y alineados a tu perfil operativo.
+                    {t("challenges.desc")}
                   </CardDescription>
                 </div>
                 <Button
@@ -562,15 +569,15 @@ export default function ImpulseDashboard() {
                   onClick={() => void assignChallenges()}
                   disabled={challengeLoading || !profile}
                 >
-                  {challengeLoading ? "Asignando..." : "Asignar / refrescar retos"}
+                  {challengeLoading ? t("challenges.assigning") : t("challenges.assignRefresh")}
                 </Button>
               </CardHeader>
               <CardContent className="grid gap-4 md:grid-cols-2">
                 {challenges.length === 0 ? (
                   <div className="rounded-2xl border border-dashed border-border p-6 text-sm text-muted-foreground">
                     {profile
-                      ? "Aún no hay retos activos. Asigna los primeros y empieza hoy."
-                      : "Completa primero el diagnóstico para desbloquear retos personalizados."}
+                      ? t("challenges.noneAssigned")
+                      : t("challenges.needsDiagnostic")}
                   </div>
                 ) : (
                   challenges.map((challenge) => (
@@ -583,10 +590,10 @@ export default function ImpulseDashboard() {
                           {challenge.type}
                         </Badge>
                         <Badge variant="secondary" className="rounded-full px-3 py-1">
-                          Dificultad {challenge.difficulty}
+                          {t("challenges.difficulty", { level: challenge.difficulty })}
                         </Badge>
                         <Badge variant="secondary" className="rounded-full px-3 py-1">
-                          {challenge.durationDays} días
+                          {t("challenges.daysDuration", { days: challenge.durationDays })}
                         </Badge>
                       </div>
                       <h3 className="mt-3 text-base font-semibold text-foreground">
@@ -596,9 +603,12 @@ export default function ImpulseDashboard() {
                       <Progress value={challenge.progress} className="mt-4" />
                       <div className="mt-3 flex flex-wrap justify-between gap-2 text-xs text-muted-foreground">
                         <span>
-                          {challenge.completedDays}/{challenge.totalDays} días
+                          {t("challenges.daysProgress", {
+                            done: challenge.completedDays,
+                            total: challenge.totalDays,
+                          })}
                         </span>
-                        <span>{challenge.estimatedMinutes} min/día</span>
+                        <span>{t("challenges.minPerDay", { minutes: challenge.estimatedMinutes })}</span>
                       </div>
                       <p className="mt-3 text-sm text-foreground">{challenge.instructions}</p>
                     </div>
@@ -612,9 +622,9 @@ export default function ImpulseDashboard() {
             <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
               <Card className="border-border/80 bg-card/95 shadow-sm">
                 <CardHeader>
-                  <CardTitle>Check-in diario</CardTitle>
+                  <CardTitle>{t("checkin.title")}</CardTitle>
                   <CardDescription>
-                    El objetivo no es contar cómo te sientes sin más. Es entrenar continuidad.
+                    {t("checkin.desc")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -622,23 +632,23 @@ export default function ImpulseDashboard() {
                     value={checkinText}
                     onChange={(event) => setCheckinText(event.target.value)}
                     rows={6}
-                    placeholder="Qué hiciste hoy, qué evitaste y cuál es tu siguiente acción."
+                    placeholder={t("checkin.placeholder")}
                   />
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">Estado del reto</label>
+                      <label className="text-sm font-medium text-foreground">{t("checkin.challengeStateLabel")}</label>
                       <select
                         value={challengeStatus}
                         onChange={(event) => setChallengeStatus(event.target.value)}
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                       >
-                        <option value="cumplido">Cumplido</option>
-                        <option value="parcial">Parcial</option>
-                        <option value="bloqueado">Bloqueado</option>
+                        <option value="cumplido">{t("checkin.statusFulfilled")}</option>
+                        <option value="parcial">{t("checkin.statusPartial")}</option>
+                        <option value="bloqueado">{t("checkin.statusBlocked")}</option>
                       </select>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">Energía de hoy</label>
+                      <label className="text-sm font-medium text-foreground">{t("checkin.energyLabel")}</label>
                       <Input
                         type="number"
                         min={1}
@@ -657,20 +667,20 @@ export default function ImpulseDashboard() {
                     onClick={() => void submitCheckin()}
                     disabled={checkinLoading}
                   >
-                    {checkinLoading ? "Guardando..." : "Guardar check-in"}
+                    {checkinLoading ? t("checkin.saving") : t("checkin.save")}
                   </Button>
                 </CardContent>
               </Card>
 
               <Card className="border-border/80 bg-card/95 shadow-sm">
                 <CardHeader>
-                  <CardTitle>Últimos registros</CardTitle>
-                  <CardDescription>Patrón emocional reciente y continuidad real.</CardDescription>
+                  <CardTitle>{t("logs.title")}</CardTitle>
+                  <CardDescription>{t("logs.desc")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {logs.length === 0 ? (
                     <p className="text-sm text-muted-foreground">
-                      Todavía no hay logs. El primer check-in activará esta vista.
+                      {t("logs.empty")}
                     </p>
                   ) : (
                     logs.slice(0, 5).map((log) => (
@@ -680,13 +690,13 @@ export default function ImpulseDashboard() {
                       >
                         <div className="flex flex-wrap items-center gap-2">
                           <Badge variant="secondary" className="rounded-full px-3 py-1">
-                            {log.emotionalState || "neutral"}
+                            {log.emotionalState || t("logs.neutral")}
                           </Badge>
                           <Badge variant="secondary" className="rounded-full px-3 py-1">
                             {formatDate(log.createdAt)}
                           </Badge>
                         </div>
-                        <p className="mt-2 text-sm text-foreground">{log.note || "Sin nota"}</p>
+                        <p className="mt-2 text-sm text-foreground">{log.note || t("logs.noNote")}</p>
                       </div>
                     ))
                   )}
@@ -701,23 +711,23 @@ export default function ImpulseDashboard() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Mail className="size-4" />
-                    Cápsula del tiempo
+                    {t("future.title")}
                   </CardTitle>
                   <CardDescription>
-                    Déjate un mensaje que el sistema abrirá cuando llegue la fecha.
+                    {t("future.desc")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <Input
                     value={futureTitle}
                     onChange={(event) => setFutureTitle(event.target.value)}
-                    placeholder="Título del mensaje"
+                    placeholder={t("future.titlePlaceholder")}
                   />
                   <Textarea
                     value={futureContent}
                     onChange={(event) => setFutureContent(event.target.value)}
                     rows={5}
-                    placeholder="Qué necesitas recordar cuando llegue ese momento."
+                    placeholder={t("future.contentPlaceholder")}
                   />
                   <Input
                     type="datetime-local"
@@ -729,7 +739,7 @@ export default function ImpulseDashboard() {
                     onClick={() => void saveFutureMessage()}
                     disabled={futureLoading}
                   >
-                    {futureLoading ? "Guardando..." : "Guardar cápsula"}
+                    {futureLoading ? t("future.saving") : t("future.save")}
                   </Button>
                 </CardContent>
               </Card>
@@ -738,16 +748,19 @@ export default function ImpulseDashboard() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Hourglass className="size-4" />
-                    Mensajes desbloqueados
+                    {t("future.unlockedTitle")}
                   </CardTitle>
                   <CardDescription>
-                    Disponibles ahora: {futureMessages.length}. Bloqueados: {lockedFutureMessages}.
+                    {t("future.availableSummary", {
+                      available: futureMessages.length,
+                      locked: lockedFutureMessages,
+                    })}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {futureMessages.length === 0 ? (
                     <p className="text-sm text-muted-foreground">
-                      Aún no tienes mensajes disponibles. Crea uno para más adelante.
+                      {t("future.empty")}
                     </p>
                   ) : (
                     futureMessages.map((message) => (
@@ -757,7 +770,7 @@ export default function ImpulseDashboard() {
                       >
                         <div className="flex flex-wrap items-center gap-2">
                           <Badge variant="secondary" className="rounded-full px-3 py-1">
-                            Disponible
+                            {t("future.available")}
                           </Badge>
                           <Badge variant="secondary" className="rounded-full px-3 py-1">
                             {formatDate(message.unlockAt)}
@@ -779,9 +792,9 @@ export default function ImpulseDashboard() {
             <CardContent className="flex items-center gap-3 p-4">
               <Zap className="size-4 text-muted-foreground" />
               <div>
-                <p className="text-sm font-medium text-foreground">Diagnóstico rápido</p>
+                <p className="text-sm font-medium text-foreground">{t("footer.diagnostic.title")}</p>
                 <p className="text-xs text-muted-foreground">
-                  12 preguntas para detectar cómo hay que empujarte.
+                  {t("footer.diagnostic.desc")}
                 </p>
               </div>
             </CardContent>
@@ -790,9 +803,9 @@ export default function ImpulseDashboard() {
             <CardContent className="flex items-center gap-3 p-4">
               <Target className="size-4 text-muted-foreground" />
               <div>
-                <p className="text-sm font-medium text-foreground">Reto activo</p>
+                <p className="text-sm font-medium text-foreground">{t("footer.challenge.title")}</p>
                 <p className="text-xs text-muted-foreground">
-                  El progreso se mide en días cumplidos, no en conversación bonita.
+                  {t("footer.challenge.desc")}
                 </p>
               </div>
             </CardContent>
@@ -801,9 +814,9 @@ export default function ImpulseDashboard() {
             <CardContent className="flex items-center gap-3 p-4">
               <ShieldCheck className="size-4 text-muted-foreground" />
               <div>
-                <p className="text-sm font-medium text-foreground">Contención y continuidad</p>
+                <p className="text-sm font-medium text-foreground">{t("footer.containment.title")}</p>
                 <p className="text-xs text-muted-foreground">
-                  El sistema mantiene seguimiento sin sustituir ayuda profesional.
+                  {t("footer.containment.desc")}
                 </p>
               </div>
             </CardContent>

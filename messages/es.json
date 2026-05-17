@@ -2457,5 +2457,243 @@
       "submit": "Establecer nueva contraseña",
       "requestNewSuffix": "Solicita uno nuevo"
     }
+  },
+  "impulso": {
+    "page": {
+      "welcomeTitle": "Modo Impulso",
+      "welcomeSubtitle": "21 días para romper los patrones que te frenan. No es motivación — es estructura, acción y evidencia.",
+      "why21Title": "¿Por qué 21 días?",
+      "why21P1": "La investigación en psicología del comportamiento muestra que un hábito no se forma en un día ni se rompe con una decisión. Se necesita <strong>repetición sostenida</strong> en un entorno con estructura y retroalimentación.",
+      "why21P2": "21 días es el punto donde lo que empezó como esfuerzo consciente empieza a convertirse en <strong>inercia positiva</strong>. No es magia — es neuroplasticidad: tu cerebro crea nuevas conexiones cuando repites una acción con intención.",
+      "cycle1Title": "Primer ciclo",
+      "cycle1Desc": "Rompes la inercia",
+      "cycle2Title": "Segundo ciclo",
+      "cycle2Desc": "Ves tus patrones",
+      "cycle3Title": "Transformación",
+      "cycle3Desc": "El cambio es tuyo",
+      "why21Note": "No se trata de ser perfecto 21 días. Se trata de no abandonar cuando fallas en el día 4. El sistema te acompaña para que el día 5 vuelvas.",
+      "pillar": {
+        "diagnostic": {
+          "title": "Diagnóstico",
+          "desc": "12 preguntas para identificar tu perfil: alto potencial, bloqueado, ansioso o desmotivado."
+        },
+        "challenges": {
+          "title": "Retos personalizados",
+          "desc": "Retos de 3 a 7 días adaptados a tu perfil. Cada uno rompe un patrón específico."
+        },
+        "checkin": {
+          "title": "Check-in diario",
+          "desc": "Registra tu avance cada día. La constancia es lo que genera el cambio, no la intensidad."
+        },
+        "insights": {
+          "title": "Insights de comportamiento",
+          "desc": "Análisis de tus patrones en ventanas de 14 días. Ve lo que no ves."
+        }
+      },
+      "howTitle": "¿Cómo funciona?",
+      "howStep1": "Haces el diagnóstico (5 min) — identificamos tu punto de partida.",
+      "howStep2": "Recibes tu primer reto personalizado — adaptado a lo que te bloquea.",
+      "howStep3": "Cada día haces check-in — registras si avanzaste y cómo te sientes.",
+      "howStep4": "A los 14 días, el sistema te muestra tus patrones reales.",
+      "howStep5": "A los 21 días, lo que empezó como esfuerzo es hábito.",
+      "startDiagnosticCta": "Empezar diagnóstico",
+      "startDiagnosticHint": "5 minutos · 12 preguntas · gratuito",
+      "programLabel": "Programa",
+      "programTitle": "Impulso",
+      "programSubtitle": "21 días de acción consistente",
+      "checkinToday": "Check-in de hoy",
+      "daysInARow": "días seguidos",
+      "bestStreak": "Mejor: {days}",
+      "programProgress": "Progreso del programa",
+      "daysCompleted": "Días completados",
+      "completed": "Completado",
+      "onTrack": "En track ✓",
+      "tabs": {
+        "diagnostico": "Diagnóstico",
+        "retos": "Retos",
+        "insights": "Insights",
+        "mensajes": "Mensajes"
+      },
+      "noProfileTitle": "Aún no tienes un perfil activo",
+      "noProfileDesc": "Haz el diagnóstico de 12 preguntas para descubrir tu patrón de bloqueo y recibir un programa personalizado de 21 días.",
+      "doDiagnosticNow": "Hacer diagnóstico ahora",
+      "doDiagnosticHint": "5 minutos · Resultados inmediatos · Sin registro",
+      "flowStep": {
+        "diagnostic": {
+          "title": "Diagnóstico",
+          "desc": "12 preguntas sobre claridad, energía y disciplina."
+        },
+        "profile": {
+          "title": "Tu perfil",
+          "desc": "BLOQUEADO, ANSIOSO, DESMOTIVADO, PERDIDO o POTENCIAL_ALTO."
+        },
+        "challenges": {
+          "title": "Retos 21 días",
+          "desc": "Check-in diario con progresión personalizada."
+        }
+      },
+      "preferChatTitle": "¿Prefieres empezar con el chat?",
+      "preferChatDesc": "El coach también puede ayudarte sin diagnóstico previo.",
+      "goToChat": "Ir al chat →",
+      "operationalFocus": "Foco operativo",
+      "scoreLabels": {
+        "claridad": "Claridad",
+        "autoestima": "Autoestima",
+        "energia": "Energía",
+        "disciplina": "Disciplina",
+        "social": "Social"
+      },
+      "last7Days": "Últimos 7 días",
+      "noActiveChallenges": "No tienes retos activos aún.",
+      "noActiveChallengesHint": "Completa el diagnóstico para recibir retos personalizados.",
+      "daysOf": "{done}/{total} días",
+      "statusCompleted": "Completado",
+      "statusInProgress": "En progreso",
+      "totalDays": "{total} días total",
+      "requestNewChallenge": "+ Solicitar nuevo reto",
+      "noInsights": "Aún no hay suficientes datos para generar insights.",
+      "noInsightsHint": "Haz check-in diario durante varios días para ver patrones.",
+      "unlocksOnDay": "Se desbloquea el día {day}",
+      "milestoneMessages": {
+        "day7": {
+          "title": "Tu primera semana",
+          "preview": "Hiciste algo que la mayoría no hace: aparecer. Siete días seguidos ya dicen algo de ti."
+        },
+        "day14": {
+          "title": "Punto de quiebre",
+          "preview": "Aquí es donde muchos se rinden. Tú no. Eso es lo que separa a quienes cambian de los que solo lo intentan."
+        },
+        "day21": {
+          "title": "Tu nuevo hábito",
+          "preview": "Veintiún días. Ya no es un esfuerzo, es parte de ti. Lo que construiste aquí no desaparece."
+        }
+      }
+    },
+    "dashboard": {
+      "modeLabel": "Modo Impulso",
+      "profileBadge": "Perfil {title}",
+      "streakBadge": "Racha {days} días",
+      "headlineTitle": "Entrena claridad, no solo conversación",
+      "headlineDesc": "Diagnóstico inicial, perfil operativo, retos cortos, check-in diario y señales de comportamiento para convertir pensamiento en ejecución.",
+      "account": "Cuenta",
+      "anonymousSession": "Sesión anónima",
+      "pending": "Pendiente",
+      "currentPlan": "Plan actual",
+      "planFree": "Free",
+      "operationalProfile": "Perfil operativo",
+      "noDiagnosticYet": "Sin diagnóstico aún",
+      "noDiagnosticDesc": "Completa el test inicial y el sistema te asignará un perfil de trabajo.",
+      "activeStreak": "Racha activa",
+      "bestStreakLine": "Mejor racha: {best}. Último check-in: {date}",
+      "automaticInsights": "Insights automáticos",
+      "insightsEmpty": "Aquí aparecerán patrones reales cuando el sistema tenga actividad suficiente.",
+      "notRegistered": "Sin registrar",
+      "scale": {
+        "nothing": "Nada",
+        "little": "Poco",
+        "some": "Algo",
+        "quite": "Bastante",
+        "much": "Mucho"
+      },
+      "momentum": {
+        "low": "Baja",
+        "medium": "Media",
+        "high": "Alta"
+      },
+      "tabs": {
+        "diagnostic": "Diagnóstico",
+        "challenges": "Retos",
+        "checkin": "Check-in",
+        "future": "Cápsula"
+      },
+      "diagnostic": {
+        "title": "Test inicial de impulso",
+        "desc": "12 preguntas, escala 1-5. Esto define cómo debe empujarte Tres Mil Millones de Latidos.",
+        "loading": "Cargando diagnóstico...",
+        "recalculate": "Recalcular perfil",
+        "save": "Guardar diagnóstico",
+        "totalScore": "Total {score}/100",
+        "detected": "Perfil detectado"
+      },
+      "scoreLabels": {
+        "claridad": "Claridad",
+        "autoestima": "Autoestima",
+        "energia": "Energía",
+        "disciplina": "Disciplina",
+        "social": "Social"
+      },
+      "challenges": {
+        "title": "Retos activos",
+        "desc": "Retos cortos, progresivos y alineados a tu perfil operativo.",
+        "assigning": "Asignando...",
+        "assignRefresh": "Asignar / refrescar retos",
+        "noneAssigned": "Aún no hay retos activos. Asigna los primeros y empieza hoy.",
+        "needsDiagnostic": "Completa primero el diagnóstico para desbloquear retos personalizados.",
+        "difficulty": "Dificultad {level}",
+        "daysDuration": "{days} días",
+        "daysProgress": "{done}/{total} días",
+        "minPerDay": "{minutes} min/día"
+      },
+      "checkin": {
+        "title": "Check-in diario",
+        "desc": "El objetivo no es contar cómo te sientes sin más. Es entrenar continuidad.",
+        "placeholder": "Qué hiciste hoy, qué evitaste y cuál es tu siguiente acción.",
+        "challengeStateLabel": "Estado del reto",
+        "statusFulfilled": "Cumplido",
+        "statusPartial": "Parcial",
+        "statusBlocked": "Bloqueado",
+        "energyLabel": "Energía de hoy",
+        "saving": "Guardando...",
+        "save": "Guardar check-in"
+      },
+      "logs": {
+        "title": "Últimos registros",
+        "desc": "Patrón emocional reciente y continuidad real.",
+        "empty": "Todavía no hay logs. El primer check-in activará esta vista.",
+        "neutral": "neutral",
+        "noNote": "Sin nota"
+      },
+      "future": {
+        "title": "Cápsula del tiempo",
+        "desc": "Déjate un mensaje que el sistema abrirá cuando llegue la fecha.",
+        "titlePlaceholder": "Título del mensaje",
+        "contentPlaceholder": "Qué necesitas recordar cuando llegue ese momento.",
+        "saving": "Guardando...",
+        "save": "Guardar cápsula",
+        "unlockedTitle": "Mensajes desbloqueados",
+        "availableSummary": "Disponibles ahora: {available}. Bloqueados: {locked}.",
+        "empty": "Aún no tienes mensajes disponibles. Crea uno para más adelante.",
+        "available": "Disponible"
+      },
+      "footer": {
+        "diagnostic": {
+          "title": "Diagnóstico rápido",
+          "desc": "12 preguntas para detectar cómo hay que empujarte."
+        },
+        "challenge": {
+          "title": "Reto activo",
+          "desc": "El progreso se mide en días cumplidos, no en conversación bonita."
+        },
+        "containment": {
+          "title": "Contención y continuidad",
+          "desc": "El sistema mantiene seguimiento sin sustituir ayuda profesional."
+        }
+      },
+      "errors": {
+        "loadDashboard": "No se pudo cargar Modo Impulso.",
+        "saveDiagnostic": "No se pudo guardar el diagnóstico.",
+        "assignChallenges": "No se pudieron asignar retos.",
+        "checkinEmpty": "Escribe tu check-in antes de guardarlo.",
+        "saveCheckin": "No se pudo guardar el check-in.",
+        "futureIncomplete": "Completa título, mensaje y fecha de desbloqueo.",
+        "saveFuture": "No se pudo guardar el mensaje futuro."
+      },
+      "status": {
+        "profileAssigned": "Perfil asignado: {title}. Ahora vamos a activar tus retos.",
+        "activeChallengesUpdated": "Retos activos actualizados.",
+        "checkinSaved": "Check-in guardado. El sistema actualizó racha y retos activos.",
+        "futureSaved": "Cápsula del tiempo guardada."
+      }
+    }
   }
 }

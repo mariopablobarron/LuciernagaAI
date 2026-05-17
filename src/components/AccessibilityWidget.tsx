@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import {
   Accessibility, X, Type, Contrast, MonitorOff,
   BookOpenText, Link2, MousePointer, Space, RotateCcw,
-  Plus, Minus,
+  Plus, Minus, Coffee,
 } from "lucide-react";
 import { useAccessibility } from "@/lib/accessibility";
 
@@ -207,6 +207,14 @@ export default function AccessibilityWidget() {
               description={t("textSpacingDesc")}
               checked={prefs.textSpacing}
               onChange={(v) => update({ textSpacing: v })}
+            />
+
+            <ToggleOption
+              icon={<Coffee className="w-4 h-4 text-amber-400" />}
+              label={t("quietRead")}
+              description={t("quietReadDesc")}
+              checked={prefs.quietRead}
+              onChange={(v) => update({ quietRead: v })}
             />
 
             {/* Reset button */}

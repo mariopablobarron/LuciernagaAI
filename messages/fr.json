@@ -2814,5 +2814,9 @@
     "tooltipOn": "Mode incognito actif — désactiver (les brouillons seront à nouveau enregistrés sur cet appareil)",
     "tooltipOff": "Activer le mode incognito — nous n'enregistrerons rien sur cet appareil",
     "bannerText": "Mode incognito · nous n'enregistrons pas de brouillons sur cet appareil"
+  },
+  "accessibility": {
+    "quietRead": "Lecture calme",
+    "quietReadDesc": "Réduit les couleurs vives et les animations. Pour les jours difficiles."
   }
 }

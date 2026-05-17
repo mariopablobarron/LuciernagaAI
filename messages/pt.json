@@ -2814,5 +2814,9 @@
     "tooltipOn": "Modo incógnito ativo — desativar (voltaremos a guardar rascunhos neste dispositivo)",
     "tooltipOff": "Ativar modo incógnito — não guardaremos nada neste dispositivo",
     "bannerText": "Modo incógnito · não estamos a guardar rascunhos neste dispositivo"
+  },
+  "accessibility": {
+    "quietRead": "Leitura tranquila",
+    "quietReadDesc": "Reduz cores vibrantes e animações. Para dias difíceis."
   }
 }

@@ -10,6 +10,14 @@ export type A11yPreferences = {
   linkHighlight: boolean;
   bigCursor: boolean;
   textSpacing: boolean;
+  /**
+   * Modo "lectura tranquila": para usuarios con migraña, ansiedad visual,
+   * autismo, fotofobia o tras un episodio de crisis emocional.
+   * - Reduce saturación de colores vibrantes (gradientes → tonos suaves)
+   * - Oculta animaciones decorativas (Sparkles, pulse)
+   * - Aumenta line-height del chat
+   */
+  quietRead: boolean;
 };
 
 const STORAGE_KEY = "a11y-preferences";
@@ -22,6 +30,7 @@ const DEFAULT_PREFS: A11yPreferences = {
   linkHighlight: false,
   bigCursor: false,
   textSpacing: false,
+  quietRead: false,
 };
 
 function loadPrefs(): A11yPreferences {
@@ -57,6 +66,7 @@ function applyToDOM(prefs: A11yPreferences) {
   root.classList.toggle("a11y-link-highlight", prefs.linkHighlight);
   root.classList.toggle("a11y-big-cursor", prefs.bigCursor);
   root.classList.toggle("a11y-text-spacing", prefs.textSpacing);
+  root.classList.toggle("a11y-quiet-read", prefs.quietRead);
 }
 
 export function useAccessibility() {

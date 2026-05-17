@@ -1,0 +1,21 @@
+messages/es.json
+  s_c72d0ada98a9af::t_0b15b656068934 3046-3119
+src/app/profile/eneagrama/page.tsx
+  s_c72d0ada98a9af::t_be6d1dacbd28fd 5,19-23,44-46,50-60,144,162,165,187,202,220,232,236,241,258,263,266,269,274-276,282,285-290,292,295-297,305,316-318,326,334,340,345,348,354-358,363,370,376-378,396,404,419-420,428,459,479,489,498,508,517,520-524,530-531,535,544,562,569
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "9fed4567383b4f39044bc770597769498465c35b",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

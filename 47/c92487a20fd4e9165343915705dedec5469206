@@ -1,0 +1,35 @@
+messages/pt.json
+  s_d2308f25c4747c::t_fb704d93500d8c 2810-2816
+messages/fr.json
+  s_d2308f25c4747c::t_fb704d93500d8c 2810-2816
+messages/en.json
+  s_d2308f25c4747c::t_fb704d93500d8c 2810-2816
+src/components/Chat.tsx
+  s_d2308f25c4747c::t_54a682157bed6c 758
+  s_d2308f25c4747c::t_e915fbc63b834a 48-49
+  s_d2308f25c4747c::t_ab7d019ee23400 857-860
+  s_d2308f25c4747c::t_7ad98b5552eacc 717-721,725,732,735,737
+  s_d2308f25c4747c::t_3dc90ca5fa95ca 1171-1173,1175
+src/lib/useIncognitoMode.ts
+  s_d2308f25c4747c::t_af9e3415fb090d 1-71
+messages/es.json
+  s_d2308f25c4747c::t_fb704d93500d8c 2963-2969
+src/components/IncognitoToggle.tsx
+  s_d2308f25c4747c::t_13146b4179ffdf 1-62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "47c92487a20fd4e9165343915705dedec5469206",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

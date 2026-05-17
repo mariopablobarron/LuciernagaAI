@@ -2947,5 +2947,18 @@
     },
     "copyright": "© {year} <domain>tresmilmillonesdelatidos.es</domain> — Todos los derechos reservados.",
     "disclaimer": "No sustituye terapia ni intervención psicológica profesional."
+  },
+  "emergencyShelter": {
+    "trigger": "Demasiado mal para escribir",
+    "ariaLabel": "Espacio de calma de emergencia",
+    "phrase": "Estás aquí. Eso ya es algo. Respira.",
+    "callNow": "Llamar ahora",
+    "back": "Volver al chat",
+    "close": "Cerrar",
+    "breath": {
+      "inhale": "Inhala (4s)",
+      "hold": "Retén (7s)",
+      "exhale": "Exhala (8s)"
+    }
   }
 }

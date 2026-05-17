@@ -54,6 +54,12 @@ jobs:
           fi
           echo "OK"
 
+      # El script vive en /root/deploy-mentor-web.sh en el VPS (ver
+      # docs/setup-auto-deploy.md). Mantenerlo en el host permite
+      # restringir la SSH key con command="/root/deploy-mentor-web.sh"
+      # en authorized_keys, evitando acceso root pleno para GH Actions.
+      # Modificaciones al deploy se hacen editando ese script en el VPS,
+      # no este YAML.
       - name: Deploy via SSH al VPS
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -62,58 +68,7 @@ jobs:
           username: root
           key: ${{ secrets.VPS_SSH_KEY }}
           command_timeout: 20m
-          script: |
-            set -e
-            echo "════════════════════════════════════════"
-            echo "  VPS Direct Deploy — luciernaga-ai"
-            echo "════════════════════════════════════════"
-
-            BUILD_DIR=/tmp/build-luciernaga
-            APP_DIR=/docker/luciernaga-ai-traefik
-
-            echo ""
-            echo "▶ 1/5  Sincronizar repo"
-            if [ -d "$BUILD_DIR/.git" ]; then
-              cd "$BUILD_DIR"
-              git fetch --quiet --depth 1 origin main
-              git reset --hard origin/main
-            else
-              rm -rf "$BUILD_DIR"
-              git clone --depth 1 https://github.com/mariopablobarron/tresmilmillonesdelatidos.git "$BUILD_DIR"
-              cd "$BUILD_DIR"
-            fi
-            COMMIT=$(git rev-parse --short HEAD)
-            echo "   Commit: $COMMIT"
-
-            echo ""
-            echo "▶ 2/5  Build imagen Docker (~6-10 min)"
-            docker build -t luciernaga-ai:$COMMIT . 2>&1 | tail -10
-
-            echo ""
-            echo "▶ 3/5  Actualizar compose con tag nuevo"
-            cd "$APP_DIR"
-            sed -i "s|image: luciernaga-ai[^\"]*|image: luciernaga-ai:$COMMIT|" docker-compose.yml
-            grep "image:" docker-compose.yml
-
-            echo ""
-            echo "▶ 4/5  Recrear contenedor con imagen nueva"
-            docker compose up -d
-            sleep 12
-
-            echo ""
-            echo "▶ 5/5  Estado runtime"
-            docker ps --filter name=luciernaga-ai --format '{{.Names}} {{.Status}}'
-            echo ""
-            echo "── Últimos logs ──────────────────────────"
-            docker logs --tail 25 luciernaga-ai 2>&1 | tail -25
-            echo "──────────────────────────────────────────"
-
-            echo ""
-            echo "▶ 6/5  Limpieza imágenes viejas (>7 días)"
-            docker images luciernaga-ai --format "{{.Tag}}" | sort -r | tail -n +4 | xargs -r -I{} docker rmi luciernaga-ai:{} 2>/dev/null || true
-
-            echo ""
-            echo "✅ Deploy completado ($COMMIT)"
+          script: /root/deploy-mentor-web.sh
 
       - name: Verificar que la web responde
         run: |

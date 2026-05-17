@@ -43,17 +43,15 @@ Otros proyectos comparten VPS: `startidea-web`, `hub-app`, `merch-app`, `chatwoo
 Mecanismo real (confirmado 5+ runs verdes consecutivos):
 
 1. Push a `main` en https://github.com/mariopablobarron/tresmilmillonesdelatidos
-2. GH Actions workflow [`vps-direct-deploy.yml`](.github/workflows/vps-direct-deploy.yml):
-   - SSH al VPS con `secrets.VPS_SSH_KEY`
-   - `git pull` en `/tmp/build-luciernaga`
-   - `docker build -t luciernaga-ai:<short-sha>`
-   - `sed` para apuntar el compose al nuevo tag
-   - `docker compose up -d` en `/docker/luciernaga-ai-traefik/`
-   - Health check contra `/api/health` (6 reintentos, ~60s)
-   - Notifica Telegram al ADMIN_TELEGRAM_ID
-3. Tiempo total: ~4-5 minutos.
+2. GH Actions workflow [`vps-direct-deploy.yml`](.github/workflows/vps-direct-deploy.yml) hace SSH al VPS con `secrets.VPS_SSH_KEY` y ejecuta `/root/deploy-mentor-web.sh` (toda la lógica vive en el VPS, no en el YAML — permite restringir la SSH key con `command="..."`).
+3. El script ejecuta: `git pull`, `docker build` (con `NODE_OPTIONS --max-old-space-size=2048` para evitar OOM tipo merch-2026-05-16), `sed` para tag nuevo en compose, `docker compose up -d`, smoke test `/api/health` (6 reintentos, ~60s), notif Telegram.
+4. Tiempo total: ~4-5 minutos.
 
 `paths-ignore` evita redeploy en `docs/**`, `*.md`, workflows de dev-journal/hardening-board/user-manual-pdf.
+
+**Modificar la lógica de deploy**: editar `/root/deploy-mentor-web.sh` en el VPS (no el YAML). El YAML sólo invoca al script.
+
+**Restringir SSH key de GH Actions (recomendado, ver `docs/setup-auto-deploy.md`)**: añadir `restrict,...,command="/root/deploy-mentor-web.sh"` antes de la pública en `/root/.ssh/authorized_keys`. Sin esto la key tiene root pleno.
 
 ### Deploy manual de emergencia
 Si GH Actions cae, replicar a mano:

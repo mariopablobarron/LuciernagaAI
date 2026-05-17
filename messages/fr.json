@@ -2818,5 +2818,20 @@
   "accessibility": {
     "quietRead": "Lecture calme",
     "quietReadDesc": "Réduit les couleurs vives et les animations. Pour les jours difficiles."
+  },
+  "feedback": {
+    "message": {
+      "trigger": "Ça ne m'a pas aidé",
+      "modalTitle": "Pourquoi ça ne t'a pas aidé ?",
+      "modalSubtitle": "Optionnel. Nous aide à améliorer les futures réponses.",
+      "placeholder": "Par exemple : n'a pas compris ce que j'ai dit, manquait d'humanité, m'a fait sentir jugé...",
+      "send": "Envoyer",
+      "sending": "Envoi…",
+      "cancel": "Annuler",
+      "close": "Fermer",
+      "alreadySent": "Avis envoyé",
+      "errorRetry": "Échec de l'envoi. Réessaie.",
+      "disclosure": "Nous gardons seulement ce que tu écris ici et un identifiant du message. Pas de nom, pas d'email."
+    }
   }
 }

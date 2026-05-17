@@ -47,6 +47,7 @@ import { SpeakButton } from "@/components/ui/speak-button";
 import EmergencyShelter, { EmergencyShelterTrigger } from "@/components/EmergencyShelter";
 import { IncognitoToggle, IncognitoBanner } from "@/components/IncognitoToggle";
 import { useIncognitoMode } from "@/lib/useIncognitoMode";
+import { NegativeFeedbackButton } from "@/components/NegativeFeedbackButton";
 import { CHAT_STARTER_PICKS, MENTOR_MODES, getMentorMode } from "@/lib/onboarding";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -602,6 +603,11 @@ function MessageBubble({
                 preferElevenLabs
                 className="p-2"
               />
+              {/* Feedback negativo específico sobre esta respuesta. Solo si el */}
+              {/* mensaje tiene id (los mocks de demo no, los reales sí). */}
+              {message.id ? (
+                <NegativeFeedbackButton messageId={message.id} className="p-2" />
+              ) : null}
             </div>
           </>
         )}

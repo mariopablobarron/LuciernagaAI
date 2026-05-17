@@ -2969,5 +2969,20 @@
     "tooltipOn": "Modo incógnito activo — desactivar (volverá a recordar drafts en este dispositivo)",
     "tooltipOff": "Activar modo incógnito — no recordaremos nada en este dispositivo",
     "bannerText": "Modo incógnito · no estamos guardando drafts en este dispositivo"
+  },
+  "feedback": {
+    "message": {
+      "trigger": "Esto no me sirvió",
+      "modalTitle": "¿Por qué no te sirvió?",
+      "modalSubtitle": "Opcional. Nos ayuda a mejorar respuestas futuras.",
+      "placeholder": "Por ejemplo: no entendió lo que dije, fue impersonal, me hizo sentir juzgado...",
+      "send": "Enviar",
+      "sending": "Enviando…",
+      "cancel": "Cancelar",
+      "close": "Cerrar",
+      "alreadySent": "Feedback enviado",
+      "errorRetry": "Error al enviar. Intenta otra vez.",
+      "disclosure": "Solo guardamos lo que escribas aquí y un identificador del mensaje. Sin nombre, sin email."
+    }
   }
 }

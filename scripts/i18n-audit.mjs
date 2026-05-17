@@ -34,7 +34,10 @@
  *
  * Argumentos:
  *   --json              salida en JSON (para consumo programático)
- *   --path=src/app/app  escanear solo un subdirectorio
+ *   --path=...          escanear solo este path. Acepta directorio
+ *                       (src/app/app) o archivo individual
+ *                       (src/components/foo.tsx). Si es archivo, el
+ *                       auditor lo procesa aunque ya importe next-intl.
  *   --show-strings      imprime cada string detectado (verbose)
  *   --max-per-file=N    corta lista de strings por archivo a N (default 5)
  */
@@ -59,7 +62,28 @@ const DEFAULT_SCAN_DIRS = [
   path.join(ROOT, "src/components"),
 ];
 
-const SCAN_DIRS = SCAN_ROOT ? [SCAN_ROOT] : DEFAULT_SCAN_DIRS;
+// SCAN_ROOT puede ser archivo o directorio. Si es archivo, lo separamos
+// en SCAN_FILE para procesarlo aunque ya importe next-intl (en modo
+// "audit este archivo concreto" queremos ver TODAS las strings, no
+// asumir que está cubierto).
+let SCAN_DIRS = DEFAULT_SCAN_DIRS;
+let SCAN_FILE = null;
+if (SCAN_ROOT) {
+  if (!fs.existsSync(SCAN_ROOT)) {
+    console.error(`Path no existe: ${SCAN_ROOT}`);
+    process.exit(64);
+  }
+  const stat = fs.statSync(SCAN_ROOT);
+  if (stat.isFile()) {
+    SCAN_FILE = SCAN_ROOT;
+    SCAN_DIRS = [];
+  } else if (stat.isDirectory()) {
+    SCAN_DIRS = [SCAN_ROOT];
+  } else {
+    console.error(`Path no es archivo ni directorio: ${SCAN_ROOT}`);
+    process.exit(64);
+  }
+}
 
 // ─── Filtros ─────────────────────────────────────────────────────────────────
 
@@ -210,29 +234,38 @@ function categorize(relPath) {
 
 // ─── Main ────────────────────────────────────────────────────────────────────
 
+function processFile(file, fileResults, stringCounter) {
+  const source = fs.readFileSync(file, "utf8");
+  const candidates = extractCandidates(source);
+  const hits = [];
+  for (const s of candidates) {
+    if (looksSpanish(s)) {
+      hits.push(s);
+      stringCounter.set(s, (stringCounter.get(s) ?? 0) + 1);
+    }
+  }
+  if (hits.length > 0) {
+    const rel = path.relative(ROOT, file);
+    fileResults.push({
+      file: rel,
+      category: categorize(rel),
+      alreadyI18n: alreadyI18nized(source),
+      hits,
+    });
+  }
+}
+
 function scan() {
   const fileResults = []; // { file, category, alreadyI18n, hits: string[] }
   const stringCounter = new Map(); // string → count
 
-  for (const scanDir of SCAN_DIRS) {
-    for (const file of walk(scanDir)) {
-      const source = fs.readFileSync(file, "utf8");
-      const candidates = extractCandidates(source);
-      const hits = [];
-      for (const s of candidates) {
-        if (looksSpanish(s)) {
-          hits.push(s);
-          stringCounter.set(s, (stringCounter.get(s) ?? 0) + 1);
-        }
-      }
-      if (hits.length > 0) {
-        const rel = path.relative(ROOT, file);
-        fileResults.push({
-          file: rel,
-          category: categorize(rel),
-          alreadyI18n: alreadyI18nized(source),
-          hits,
-        });
+  if (SCAN_FILE) {
+    // Modo archivo individual: procesa siempre, incluso si ya importa next-intl.
+    processFile(SCAN_FILE, fileResults, stringCounter);
+  } else {
+    for (const scanDir of SCAN_DIRS) {
+      for (const file of walk(scanDir)) {
+        processFile(file, fileResults, stringCounter);
       }
     }
   }

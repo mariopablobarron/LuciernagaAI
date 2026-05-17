@@ -1,0 +1,32 @@
+.github/workflows/ci.yml
+  s_d2308f25c4747c::t_0ed0419369994c 93-120
+scripts/i18n-audit.mjs
+  s_d2308f25c4747c::t_2f42d3d4b8aca8 237-257,262-268
+  s_d2308f25c4747c::t_8acebd5d9272f1 37-40
+  s_d2308f25c4747c::t_4027ffee81bf08 65-86
+scripts/i18n-check.mjs
+  s_d2308f25c4747c::t_533b75b6413551 144,159
+  s_d2308f25c4747c::t_5aef9e41041712 1-143,147-148,151-153,156-158,160-164,166-168,172,174-181,185,187-190,206-209,211-214,217,225-228,231-238,240-297,299-300,302-307,309-371
+  s_d2308f25c4747c::t_0f60a0d444160e 298,301,308
+  s_d2308f25c4747c::t_10da6968966f51 215-216,218-224,229-230,239
+package.json
+  s_d2308f25c4747c::t_568bb5a82f8420 25-27
+e2e/i18n-locale-switch.spec.ts
+  s_d2308f25c4747c::t_36a3ea57069fe6 1-123
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "2a419117b07864c4e21b1a2cccae502afd9ee219",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

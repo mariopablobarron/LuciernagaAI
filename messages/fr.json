@@ -12,7 +12,13 @@
     "menuOpen": "Ouvrir le menu",
     "menuClose": "Fermer le menu",
     "ariaMain": "Navigation principale",
-    "ariaMobile": "Navigation mobile"
+    "ariaMobile": "Navigation mobile",
+    "community": "Communauté",
+    "how": "Comment ça marche",
+    "compare": "Comparatif",
+    "pricing": "Tarifs",
+    "faq": "FAQ",
+    "test": "Test gratuit"
   },
   "hero": {
     "badge": "Mentor IA en français · Sans e-mail pour commencer · Custodie clinique humaine",

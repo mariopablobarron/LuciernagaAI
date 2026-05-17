@@ -12,7 +12,13 @@
     "menuOpen": "Open menu",
     "menuClose": "Close menu",
     "ariaMain": "Main navigation",
-    "ariaMobile": "Mobile navigation"
+    "ariaMobile": "Mobile navigation",
+    "community": "Community",
+    "how": "How it works",
+    "compare": "Compare",
+    "pricing": "Pricing",
+    "faq": "FAQ",
+    "test": "Free test"
   },
   "hero": {
     "badge": "AI mentor · No email to start · Human clinical oversight",

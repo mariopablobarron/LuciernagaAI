@@ -2655,5 +2655,163 @@
         "futureSaved": "Cápsula do tempo guardada."
       }
     }
+  },
+  "community": {
+    "header": {
+      "title": "Comunidade",
+      "subtitle": "Círculos de transformação"
+    },
+    "gate": {
+      "title": "A comunidade é para quem já tem conta",
+      "description": "Aqui partilham-se vitórias, dúvidas e compromissos reais. Para cuidar de quem escreve, só podes ler e responder com conta criada — o chat com o mentor podes experimentá-lo sem te registares.",
+      "bullets": {
+        "victories": "Vitórias da semana",
+        "mutualHelp": "Ajuda mútua entre membros",
+        "circles": "Círculos de 5-8 pessoas na tua mesma fase",
+        "sessions": "Sessões em direto com profissionais"
+      },
+      "createAccount": "Criar conta grátis",
+      "haveAccount": "Já tenho conta",
+      "notTriedQuestion": "Ainda não experimentaste?",
+      "tryChatNoAccount": "Entra no chat sem conta"
+    },
+    "stats": {
+      "members": "Membros",
+      "victoriesWeek": "Vitórias 7d",
+      "helpsWeek": "Ajudas 7d",
+      "activeCircles": "Círculos ativos"
+    },
+    "confidentiality": "Espaço seguro. O que se partilha aqui é confidencial. Publica de forma anónima se preferires.",
+    "tabs": {
+      "today": {
+        "label": "Hoje",
+        "hint": "Ronda do dia + as tuas vitórias"
+      },
+      "circle": {
+        "label": "O Meu Círculo",
+        "hint": "Grupo de 5-8 na tua mesma fase"
+      },
+      "questions": {
+        "label": "Ajuda mútua",
+        "hint": "Pede ajuda ou responde a alguém que a necessite"
+      },
+      "coaches": {
+        "label": "Sessões",
+        "hint": "Encontros com profissionais"
+      },
+      "spaces": {
+        "label": "Espaços",
+        "hint": "Salas temáticas"
+      }
+    },
+    "cafeteria": {
+      "title": "A Cafetaria — ronda do dia",
+      "description": "Uma pergunta. A tua resposta primeiro, depois vês como a vivem os outros.",
+      "enter": "Entrar →"
+    },
+    "victories": {
+      "shareTitle": "Partilha uma vitória",
+      "placeholder": "Hoje consegui...",
+      "loading": "A carregar vitórias...",
+      "empty": "Ainda não há vitórias. Sê o primeiro.",
+      "shared": "Vitória partilhada"
+    },
+    "spaces": {
+      "emptyTitle": "Ainda não há espaços abertos",
+      "emptyDescription": "Os espaços são salas temáticas (hábitos, decisões, casal, trabalho…) onde cada um partilha o seu passo do dia. Iremos abrindo-os à medida que a comunidade crescer.",
+      "notifyMe": "Avisa-me quando abrirem",
+      "postCount": "{count} publicações",
+      "back": "← Voltar aos espaços",
+      "shareReflection": "Partilha a tua reflexão",
+      "feelingPlaceholder": "Hoje sinto-me...",
+      "blockerPlaceholder": "O que me freia é...",
+      "stepPlaceholder": "O meu passo de hoje é..."
+    },
+    "circle": {
+      "commitmentRegistered": "Compromisso registado"
+    },
+    "questions": {
+      "filters": {
+        "community": "Pedem ajuda",
+        "personal": "Escrevem-te",
+        "mine": "Pedi eu"
+      },
+      "chainContinues": {
+        "label": "A cadeia continua",
+        "message": "Outra pessoa precisa do que tu precisaste há pouco.",
+        "helpNow": "Ajudar agora",
+        "notNow": "Agora não"
+      },
+      "askTitle": "Pede ajuda. Alguém já passou por algo parecido.",
+      "askDescription": "O teu pedido é anónimo — ninguém sabe quem pede. Quem responde pode fazê-lo com nome ou anonimamente. Se outro dia ajudas tu, a cadeia continua.",
+      "askPlaceholder": "Conta em que estás preso ou que dúvida tens agora mesmo…",
+      "charsAnonymous": "{count}/500 · Anónima",
+      "askSuccess": "Pedido publicado. Verá-o alguém que tenha passado por algo parecido.",
+      "loading": "A carregar…",
+      "empty": {
+        "mine": "Ainda não pediste ajuda à comunidade.",
+        "personal": "Ninguém te escreveu diretamente ainda.",
+        "community": "Neste momento ninguém está a pedir ajuda. Volta em breve para ajudares alguém."
+      },
+      "noAnswers": "Ninguém respondeu ainda",
+      "oneHelped": "1 pessoa ajudou",
+      "manyHelped": "{count} pessoas ajudaram",
+      "writtenToYou": "Escrevem-te a ti",
+      "answersFull": "Já recebeu muitas ajudas",
+      "referredProfessional": "Encaminhada para atendimento profissional",
+      "someoneWaiting": "Alguém espera ajuda",
+      "crisisNotice": "Esta pergunta contém sinais de crise. Respostas comunitárias desativadas. Se estás em crise, liga para <strong>024</strong>.",
+      "mostHelpful": "Mais útil",
+      "anonymous": "Anónimo",
+      "cantVoteOwn": "Não podes votar a tua própria resposta",
+      "helpedMeTitle": "Ajudou-me",
+      "helpedMe": "ajudou-me",
+      "answerPlaceholder": "Que pergunta lhe farias tu?",
+      "answerPublished": "Resposta publicada"
+    },
+    "guardian": {
+      "pedagogicalSuggestion": "Sugestão pedagógica",
+      "directAdviceHint": "Parece um conselho direto. E se o colocasses como pergunta?",
+      "publishReformulated": "Publicar reformulada",
+      "publishOriginal": "Publicar original",
+      "prescriptiveNoAlt": "A tua mensagem soa diretiva. Não conseguimos gerar uma alternativa, mas podes publicá-la se achares apropriado.",
+      "reviewing": "A rever...",
+      "reviewAndAnswer": "Rever e responder",
+      "blockedFlagged": "A tua mensagem foi marcada pelo filtro de segurança. Se achas que é um falso positivo, podes publicá-la de qualquer forma ou ajusta o texto.",
+      "blockedRateLimit": "Fizeste muitas verificações em pouco tempo. Podes publicar de qualquer forma ou espera alguns minutos.",
+      "blockedReview": "Não conseguimos rever a tua resposta neste momento. Podes publicá-la de qualquer forma.",
+      "blockedNetwork": "Houve uma falha ao rever a tua resposta. Podes publicá-la de qualquer forma."
+    },
+    "coaches": {
+      "intro": "Sessões em grupo com profissionais. Abertas para toda a comunidade ou específicas do teu círculo.",
+      "loading": "A carregar sessões...",
+      "empty": "Não há sessões agendadas",
+      "emptyHint": "As sessões são anunciadas por email e Telegram",
+      "roleCoach": "Coach",
+      "rolePsychologist": "Psicólogo/a",
+      "live": "Em direto",
+      "minutes": "{min} min",
+      "openToAll": "Aberta a todos",
+      "circleLabel": "Círculo: {name}",
+      "joinNow": "Aderir agora"
+    },
+    "posts": {
+      "published": "Publicado"
+    },
+    "actions": {
+      "share": "Partilhar",
+      "publish": "Publicar",
+      "publishAnyway": "Publicar de qualquer forma",
+      "cancel": "Cancelar",
+      "help": "Ajudar",
+      "askHelp": "Pedir ajuda"
+    },
+    "errors": {
+      "loadFailed": "Erro ao carregar a comunidade",
+      "postFailed": "Erro ao publicar",
+      "network": "Erro de rede",
+      "answerFailed": "Não foi possível publicar a resposta",
+      "selfVoteForbidden": "Não podes votar na tua própria resposta."
+    }
   }
 }

@@ -48,7 +48,7 @@ const TARGET_LOCALES_ALL = ["en", "pt", "fr"];
 const MODEL = process.env.OPENROUTER_MODEL?.trim() || "anthropic/claude-haiku-4-5";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const REQUEST_TIMEOUT_MS = 60_000;
-const BATCH_MAX_KEYS = 50; // chunks para no pasar context window
+const BATCH_MAX_KEYS = 25; // chunks pequeños — reduce coste por llamada y evita topes de crédito
 
 // ─── Args ────────────────────────────────────────────────────────────────────
 
@@ -215,7 +215,7 @@ async function callOpenRouter(systemPrompt, userPrompt, feature) {
           { role: "user", content: userPrompt },
         ],
         temperature: 0.2,
-        max_tokens: 4096,
+        max_tokens: 2048,
         response_format: { type: "json_object" },
       }),
     });

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   ArrowLeft,
   Heart,
@@ -91,6 +92,7 @@ function timeAgo(iso: string): string {
 // ─── Main Component ─────────────────────────────────────────────────────────
 
 export default function CommunityPage() {
+  const t = useTranslations('community');
   const { user, loading: sessionLoading } = useSession();
   const [tab, setTab] = useState<Tab>("today");
   const [stats, setStats] = useState<{
@@ -128,19 +130,19 @@ export default function CommunityPage() {
   const [commitText, setCommitText] = useState("");
   const [posting, setPosting] = useState(false);
 
-  const fetchData = useCallback(async (t: Tab) => {
+  const fetchData = useCallback(async (currentTab: Tab) => {
     setLoading(true);
     try {
-      if (t === "today") {
+      if (currentTab === "today") {
         // Today bundles the Cafetería card + the Victorias feed
         const res = await fetch("/api/community/victories", { credentials: "include" });
         const data = (await res.json()) as { victories: Victory[] };
         setVictories(data.victories ?? []);
-      } else if (t === "spaces") {
+      } else if (currentTab === "spaces") {
         const res = await fetch("/api/community/spaces", { credentials: "include" });
         const data = (await res.json()) as { spaces: Space[] };
         setSpaces(data.spaces ?? []);
-      } else if (t === "circle") {
+      } else if (currentTab === "circle") {
         const res = await fetch("/api/community/circles", { credentials: "include" });
         const data = (await res.json()) as { myCircle: CircleData | null; available: AvailableCircle[] };
         setMyCircle(data.myCircle);
@@ -155,23 +157,23 @@ export default function CommunityPage() {
           setCirclePosts(postsData.posts ?? []);
           setCommitments(commitsData.commitments ?? []);
         }
-      } else if (t === "questions") {
+      } else if (currentTab === "questions") {
         const res = await fetch(`/api/community/questions?filter=${questionsFilter}`, {
           credentials: "include",
         });
         const data = (await res.json()) as { questions: Question[] };
         setQuestions(data.questions ?? []);
-      } else if (t === "coaches") {
+      } else if (currentTab === "coaches") {
         const res = await fetch("/api/community/sessions", { credentials: "include" });
         const data = (await res.json()) as { sessions: Session[] };
         setSessions(data.sessions ?? []);
       }
     } catch {
-      toast.error("Error al cargar la comunidad");
+      toast.error(t('errors.loadFailed'));
     } finally {
       setLoading(false);
     }
-  }, [questionsFilter]);
+  }, [questionsFilter, t]);
 
   useEffect(() => { if (user) void fetchData(tab); }, [tab, fetchData, user]);
 
@@ -231,13 +233,13 @@ export default function CommunityPage() {
       });
       if (!res.ok) {
         const data = (await res.json().catch(() => null)) as { message?: string; error?: string } | null;
-        toast.error(data?.message || data?.error || "Error al publicar");
+        toast.error(data?.message || data?.error || t('errors.postFailed'));
         return;
       }
       onSuccess();
       toast.success(successText);
     } catch {
-      toast.error("Error de red");
+      toast.error(t('errors.network'));
     }
   }
 
@@ -253,7 +255,7 @@ export default function CommunityPage() {
         setPostFeeling(""); setPostBlocker(""); setPostStep("");
         void fetchData(tab);
       },
-      "Publicado",
+      t('posts.published'),
     );
     setPosting(false);
   }
@@ -267,7 +269,7 @@ export default function CommunityPage() {
         setPostFeeling("");
         void fetchData("today");
       },
-      "Victoria compartida",
+      t('victories.shared'),
     );
     setPosting(false);
   }
@@ -289,7 +291,7 @@ export default function CommunityPage() {
       body: JSON.stringify({ circleId: myCircle.id, text: commitText }),
     });
     setCommitText("");
-    toast.success("Compromiso registrado");
+    toast.success(t('circle.commitmentRegistered'));
     void fetchData("circle");
   }
 
@@ -303,9 +305,9 @@ export default function CommunityPage() {
         body: JSON.stringify({ content: questionText }),
       });
       setQuestionText("");
-      toast.success("Petición publicada. La verá alguien que haya pasado por algo parecido.");
+      toast.success(t('questions.askSuccess'));
       void fetchData("questions");
-    } catch { toast.error("Error al publicar"); }
+    } catch { toast.error(t('errors.postFailed')); }
     finally { setPosting(false); }
   }
 
@@ -322,21 +324,21 @@ export default function CommunityPage() {
         body: JSON.stringify({ content: answerText }),
       });
       if (res.status === 422) {
-        setGuardianBlocked("Tu mensaje fue marcado por el filtro de seguridad. Si crees que es un falso positivo, puedes publicarlo de todas formas o ajustar el texto.");
+        setGuardianBlocked(t('guardian.blockedFlagged'));
         return;
       }
       if (res.status === 429) {
-        setGuardianBlocked("Has hecho muchos chequeos en poco tiempo. Puedes publicar de todas formas o esperar unos minutos.");
+        setGuardianBlocked(t('guardian.blockedRateLimit'));
         return;
       }
       if (!res.ok) {
-        setGuardianBlocked("No pudimos revisar tu respuesta ahora mismo. Puedes publicar de todas formas.");
+        setGuardianBlocked(t('guardian.blockedReview'));
         return;
       }
       const data = (await res.json()) as { classification: GuardianClassification | null };
       setGuardian(data.classification ?? null);
     } catch {
-      setGuardianBlocked("Hubo un fallo al revisar tu respuesta. Puedes publicar de todas formas.");
+      setGuardianBlocked(t('guardian.blockedNetwork'));
     } finally {
       setGuardianLoading(false);
     }
@@ -353,14 +355,14 @@ export default function CommunityPage() {
       });
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { error?: string; message?: string };
-        toast.error(data.message ?? "No se pudo publicar la respuesta");
+        toast.error(data.message ?? t('errors.answerFailed'));
         return;
       }
       setAnswerText("");
       setAnsweringId(null);
       setGuardian(null);
       setGuardianBlocked(null);
-      toast.success("Respuesta publicada");
+      toast.success(t('questions.answerPublished'));
       void fetchData("questions");
     } finally {
       setPosting(false);
@@ -375,7 +377,7 @@ export default function CommunityPage() {
     if (!res.ok) {
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (data.error === "SELF_VOTE_FORBIDDEN") {
-        toast.error("No puedes votar tu propia respuesta.");
+        toast.error(t('errors.selfVoteForbidden'));
       }
       return;
     }
@@ -406,13 +408,15 @@ export default function CommunityPage() {
     }
   }
 
-  const TABS: { key: Tab; label: string; hint: string; icon: React.ReactNode }[] = [
-    { key: "today", label: "Hoy", hint: "Ronda del día + tus victorias", icon: <Trophy className="w-4 h-4" /> },
-    { key: "circle", label: "Mi Círculo", hint: "Grupo de 5-8 en tu misma fase", icon: <Users className="w-4 h-4" /> },
-    { key: "questions", label: "Ayuda mutua", hint: "Pide ayuda o responde a alguien que lo necesita", icon: <HelpCircle className="w-4 h-4" /> },
-    { key: "coaches", label: "Sesiones", hint: "Encuentros con profesionales", icon: <Calendar className="w-4 h-4" /> },
-    { key: "spaces", label: "Espacios", hint: "Salas temáticas", icon: <BookOpen className="w-4 h-4" /> },
-  ];
+  const TAB_ICONS: Record<Tab, React.ReactNode> = {
+    today: <Trophy className="w-4 h-4" />,
+    circle: <Users className="w-4 h-4" />,
+    questions: <HelpCircle className="w-4 h-4" />,
+    coaches: <Calendar className="w-4 h-4" />,
+    spaces: <BookOpen className="w-4 h-4" />,
+  };
+
+  const TAB_KEYS: Tab[] = ["today", "circle", "questions", "coaches", "spaces"];
 
   if (!sessionLoading && !user) {
     return (
@@ -423,8 +427,8 @@ export default function CommunityPage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
-              <h1 className="text-2xl font-bold text-white">Comunidad</h1>
-              <p className="text-sm text-zinc-500">Círculos de transformación</p>
+              <h1 className="text-2xl font-bold text-white">{t('header.title')}</h1>
+              <p className="text-sm text-zinc-500">{t('header.subtitle')}</p>
             </div>
           </div>
 
@@ -435,20 +439,19 @@ export default function CommunityPage() {
               </div>
               <div className="space-y-2">
                 <h2 className="text-xl font-semibold text-white">
-                  La comunidad es para quienes ya tienen cuenta
+                  {t('gate.title')}
                 </h2>
                 <p className="text-sm text-zinc-400 leading-relaxed">
-                  Aquí se comparten victorias, dudas y compromisos reales. Para cuidar a quienes escriben,
-                  solo se puede leer y responder con cuenta creada — el chat con el mentor puedes probarlo sin registrarte.
+                  {t('gate.description')}
                 </p>
               </div>
             </div>
 
             <ul className="space-y-2 text-sm text-zinc-300">
-              <li className="flex items-center gap-2"><Trophy className="w-4 h-4 text-amber-400" /> Victorias de la semana</li>
-              <li className="flex items-center gap-2"><HelpCircle className="w-4 h-4 text-cyan-400" /> Ayuda mutua entre miembros</li>
-              <li className="flex items-center gap-2"><Users className="w-4 h-4 text-violet-400" /> Círculos de 5-8 personas en tu misma fase</li>
-              <li className="flex items-center gap-2"><Calendar className="w-4 h-4 text-fuchsia-400" /> Sesiones en vivo con profesionales</li>
+              <li className="flex items-center gap-2"><Trophy className="w-4 h-4 text-amber-400" /> {t('gate.bullets.victories')}</li>
+              <li className="flex items-center gap-2"><HelpCircle className="w-4 h-4 text-cyan-400" /> {t('gate.bullets.mutualHelp')}</li>
+              <li className="flex items-center gap-2"><Users className="w-4 h-4 text-violet-400" /> {t('gate.bullets.circles')}</li>
+              <li className="flex items-center gap-2"><Calendar className="w-4 h-4 text-fuchsia-400" /> {t('gate.bullets.sessions')}</li>
             </ul>
 
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
@@ -456,20 +459,20 @@ export default function CommunityPage() {
                 href="/signup"
                 className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 bg-linear-to-r from-violet-500 to-fuchsia-500 text-white font-semibold rounded-xl hover:from-violet-400 hover:to-fuchsia-400 transition-all"
               >
-                Crear cuenta gratis
+                {t('gate.createAccount')}
               </Link>
               <Link
                 href="/login"
                 className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 border border-zinc-700 text-white font-semibold rounded-xl hover:bg-zinc-900/50 hover:border-zinc-600 transition-colors"
               >
-                Ya tengo cuenta
+                {t('gate.haveAccount')}
               </Link>
             </div>
 
             <p className="text-xs text-zinc-500 text-center pt-2">
-              ¿Aún no lo has probado?{" "}
+              {t('gate.notTriedQuestion')}{" "}
               <Link href="/app" className="text-violet-400 hover:text-violet-300 underline">
-                Entra al chat sin cuenta
+                {t('gate.tryChatNoAccount')}
               </Link>
             </p>
           </div>
@@ -487,8 +490,8 @@ export default function CommunityPage() {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-white">Comunidad</h1>
-            <p className="text-sm text-zinc-500">Círculos de transformación</p>
+            <h1 className="text-2xl font-bold text-white">{t('header.title')}</h1>
+            <p className="text-sm text-zinc-500">{t('header.subtitle')}</p>
           </div>
         </div>
 
@@ -496,19 +499,19 @@ export default function CommunityPage() {
         {stats ? (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2">
-              <p className="text-[10px] uppercase tracking-wide text-zinc-500">Miembros</p>
+              <p className="text-[10px] uppercase tracking-wide text-zinc-500">{t('stats.members')}</p>
               <p className="text-lg font-semibold text-white">{stats.members}</p>
             </div>
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2">
-              <p className="text-[10px] uppercase tracking-wide text-zinc-500">Victorias 7d</p>
+              <p className="text-[10px] uppercase tracking-wide text-zinc-500">{t('stats.victoriesWeek')}</p>
               <p className="text-lg font-semibold text-white">{stats.victoriesWeek}</p>
             </div>
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2">
-              <p className="text-[10px] uppercase tracking-wide text-zinc-500">Ayudas 7d</p>
+              <p className="text-[10px] uppercase tracking-wide text-zinc-500">{t('stats.helpsWeek')}</p>
               <p className="text-lg font-semibold text-white">{stats.questionsWeek}</p>
             </div>
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2">
-              <p className="text-[10px] uppercase tracking-wide text-zinc-500">Círculos activos</p>
+              <p className="text-[10px] uppercase tracking-wide text-zinc-500">{t('stats.activeCircles')}</p>
               <p className="text-lg font-semibold text-white">{stats.activeCircles}</p>
             </div>
           </div>
@@ -518,29 +521,29 @@ export default function CommunityPage() {
         <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3">
           <Shield className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
           <p className="text-xs text-zinc-400">
-            Espacio seguro. Lo que se comparte aquí es confidencial. Publica de forma anónima si lo prefieres.
+            {t('confidentiality')}
           </p>
         </div>
 
         {/* Tabs */}
         <div>
           <div className="flex flex-wrap gap-2">
-            {TABS.map((t) => (
+            {TAB_KEYS.map((key) => (
               <button
-                key={t.key}
-                onClick={() => setTab(t.key)}
+                key={key}
+                onClick={() => setTab(key)}
                 className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all ${
-                  tab === t.key
+                  tab === key
                     ? "border-violet-500/40 bg-violet-500/15 text-violet-300"
                     : "border-zinc-700 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200"
                 }`}
               >
-                {t.icon} {t.label}
+                {TAB_ICONS[key]} {t(`tabs.${key}.label`)}
               </button>
             ))}
           </div>
           <p className="mt-2 text-xs text-zinc-500">
-            {TABS.find((t) => t.key === tab)?.hint}
+            {t(`tabs.${tab}.hint`)}
           </p>
         </div>
 
@@ -556,23 +559,23 @@ export default function CommunityPage() {
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">☕</span>
                   <div>
-                    <p className="text-sm font-semibold text-amber-100">La Cafetería — ronda del día</p>
+                    <p className="text-sm font-semibold text-amber-100">{t('cafeteria.title')}</p>
                     <p className="text-xs text-amber-300/80">
-                      Una pregunta. Tu respuesta primero, luego ves cómo la viven los demás.
+                      {t('cafeteria.description')}
                     </p>
                   </div>
                 </div>
-                <span className="text-xs font-semibold text-amber-400">Entrar →</span>
+                <span className="text-xs font-semibold text-amber-400">{t('cafeteria.enter')}</span>
               </div>
             </Link>
 
             {/* Post victory */}
             <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-3">
-              <p className="text-sm font-semibold text-white">Comparte una victoria</p>
+              <p className="text-sm font-semibold text-white">{t('victories.shareTitle')}</p>
               <textarea
                 value={postFeeling}
                 onChange={(e) => setPostFeeling(e.target.value)}
-                placeholder="Hoy logré..."
+                placeholder={t('victories.placeholder')}
                 rows={2}
                 maxLength={500}
                 className="w-full rounded-lg border border-zinc-700 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-zinc-600 resize-none focus:border-violet-500/50 focus:outline-none"
@@ -581,18 +584,18 @@ export default function CommunityPage() {
                 <AnonymousHint />
                 <button onClick={handleVictoryPost} disabled={!postFeeling.trim() || posting}
                   className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-xs font-semibold text-white hover:bg-violet-500 disabled:opacity-40 transition-all">
-                  <Trophy className="w-3.5 h-3.5" /> Compartir
+                  <Trophy className="w-3.5 h-3.5" /> {t('actions.share')}
                 </button>
               </div>
             </div>
 
             {/* Victories list */}
             {loading ? (
-              <p className="text-sm text-zinc-500 text-center py-8">Cargando victorias...</p>
+              <p className="text-sm text-zinc-500 text-center py-8">{t('victories.loading')}</p>
             ) : victories.length === 0 ? (
               <div className="text-center py-12 space-y-2">
                 <Trophy className="w-10 h-10 text-zinc-700 mx-auto" />
-                <p className="text-zinc-500">Aún no hay victorias. Sé el primero.</p>
+                <p className="text-zinc-500">{t('victories.empty')}</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -620,10 +623,9 @@ export default function CommunityPage() {
               spaces.length === 0 ? (
                 <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 text-center space-y-2">
                   <BookOpen className="w-10 h-10 text-zinc-700 mx-auto" />
-                  <p className="text-white font-semibold">Todavía no hay espacios abiertos</p>
+                  <p className="text-white font-semibold">{t('spaces.emptyTitle')}</p>
                   <p className="text-sm text-zinc-500">
-                    Los espacios son salas temáticas (hábitos, decisiones, pareja, trabajo…) donde cada uno
-                    comparte su paso del día. Los iremos abriendo a medida que la comunidad crezca.
+                    {t('spaces.emptyDescription')}
                   </p>
                   <a
                     href="https://t.me/TRESMILMILLONESDELATIDOSBOT"
@@ -631,7 +633,7 @@ export default function CommunityPage() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 rounded-lg border border-violet-500/30 bg-violet-500/10 px-3 py-1.5 text-xs font-semibold text-violet-300 hover:bg-violet-500/20 mt-2"
                   >
-                    Avísame cuando abran
+                    {t('spaces.notifyMe')}
                   </a>
                 </div>
               ) : (
@@ -643,7 +645,7 @@ export default function CommunityPage() {
                         <span className="text-2xl">{s.icon}</span>
                         <div>
                           <p className="text-sm font-semibold text-white">{s.name}</p>
-                          <p className="text-xs text-zinc-500">{s.postCount} publicaciones</p>
+                          <p className="text-xs text-zinc-500">{t('spaces.postCount', { count: s.postCount })}</p>
                         </div>
                       </div>
                       <p className="text-xs text-zinc-400">{s.description}</p>
@@ -654,23 +656,23 @@ export default function CommunityPage() {
             ) : (
               <div className="space-y-4">
                 <button onClick={() => setSelectedSpace(null)} className="text-sm text-violet-400 hover:text-violet-300">
-                  ← Volver a espacios
+                  {t('spaces.back')}
                 </button>
                 {/* Post form */}
                 <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-3">
-                  <p className="text-sm font-semibold text-white">Comparte tu reflexión</p>
+                  <p className="text-sm font-semibold text-white">{t('spaces.shareReflection')}</p>
                   <input value={postFeeling} onChange={(e) => setPostFeeling(e.target.value)}
-                    placeholder="Hoy me siento..." maxLength={500}
+                    placeholder={t('spaces.feelingPlaceholder')} maxLength={500}
                     className="w-full rounded-lg border border-zinc-700 bg-black/40 px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-violet-500/50 focus:outline-none" />
                   <input value={postBlocker} onChange={(e) => setPostBlocker(e.target.value)}
-                    placeholder="Lo que me frena es..." maxLength={500}
+                    placeholder={t('spaces.blockerPlaceholder')} maxLength={500}
                     className="w-full rounded-lg border border-zinc-700 bg-black/40 px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-violet-500/50 focus:outline-none" />
                   <input value={postStep} onChange={(e) => setPostStep(e.target.value)}
-                    placeholder="Mi paso de hoy es..." maxLength={500}
+                    placeholder={t('spaces.stepPlaceholder')} maxLength={500}
                     className="w-full rounded-lg border border-zinc-700 bg-black/40 px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-violet-500/50 focus:outline-none" />
                   <button onClick={() => void handlePost()} disabled={!postFeeling.trim() || posting}
                     className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-xs font-semibold text-white hover:bg-violet-500 disabled:opacity-40 transition-all">
-                    <Send className="w-3.5 h-3.5" /> Publicar
+                    <Send className="w-3.5 h-3.5" /> {t('actions.publish')}
                   </button>
                 </div>
                 {/* Space posts */}
@@ -701,21 +703,17 @@ export default function CommunityPage() {
           <div className="space-y-4">
             {/* Filter tabs */}
             <div className="flex gap-2">
-              {([
-                { key: "community", label: "Piden ayuda" },
-                { key: "personal", label: "Te escriben" },
-                { key: "mine", label: "Pedí yo" },
-              ] as const).map((f) => (
+              {(["community", "personal", "mine"] as const).map((key) => (
                 <button
-                  key={f.key}
-                  onClick={() => setQuestionsFilter(f.key)}
+                  key={key}
+                  onClick={() => setQuestionsFilter(key)}
                   className={`rounded-lg px-3 py-1.5 text-xs font-semibold border transition-colors ${
-                    questionsFilter === f.key
+                    questionsFilter === key
                       ? "border-violet-500/40 bg-violet-500/15 text-violet-300"
                       : "border-zinc-700 bg-zinc-900/60 text-zinc-400 hover:text-zinc-200"
                   }`}
                 >
-                  {f.label}
+                  {t(`questions.filters.${key}`)}
                 </button>
               ))}
             </div>
@@ -724,10 +722,10 @@ export default function CommunityPage() {
             {suggestedQuestion && (
               <div className="rounded-2xl border border-fuchsia-500/30 bg-gradient-to-br from-fuchsia-500/8 to-violet-500/5 p-5 space-y-3 animate-in fade-in slide-in-from-top-2 duration-400">
                 <p className="text-xs uppercase tracking-wider text-fuchsia-300 font-semibold">
-                  La cadena sigue
+                  {t('questions.chainContinues.label')}
                 </p>
                 <p className="text-sm text-zinc-200 leading-relaxed">
-                  Otra persona necesita lo que tú necesitaste hace un rato.
+                  {t('questions.chainContinues.message')}
                   <br />
                   <span className="text-zinc-400 italic">
                     «{suggestedQuestion.content.slice(0, 160)}{suggestedQuestion.content.length > 160 ? "…" : ""}»
@@ -750,14 +748,14 @@ export default function CommunityPage() {
                     }}
                     className="rounded-xl bg-fuchsia-500 hover:bg-fuchsia-400 px-4 py-2 text-xs font-semibold text-white transition-colors"
                   >
-                    Ayudar ahora
+                    {t('questions.chainContinues.helpNow')}
                   </button>
                   <button
                     type="button"
                     onClick={() => setSuggestedQuestion(null)}
                     className="rounded-xl px-3 py-2 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
                   >
-                    Ahora no
+                    {t('questions.chainContinues.notNow')}
                   </button>
                 </div>
               </div>
@@ -766,24 +764,22 @@ export default function CommunityPage() {
             {/* Ask — reframed as asking for help in a reciprocity chain */}
             <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-3">
               <p className="text-sm font-semibold text-white flex items-center gap-2">
-                <HelpCircle className="w-4 h-4 text-violet-400" /> Pide ayuda. Alguien ha pasado por algo parecido.
+                <HelpCircle className="w-4 h-4 text-violet-400" /> {t('questions.askTitle')}
               </p>
               <p className="text-xs text-zinc-500">
-                Tu petición es anónima — nadie sabe quién pide. Quien responde
-                puede hacerlo con nombre o en anónimo. Si otro día ayudas tú,
-                la cadena sigue.
+                {t('questions.askDescription')}
               </p>
               <textarea
                 value={questionText}
                 onChange={(e) => setQuestionText(e.target.value)}
-                placeholder="Cuenta en qué estás atascado o qué duda tienes ahora mismo…"
+                placeholder={t('questions.askPlaceholder')}
                 rows={2}
                 maxLength={500}
                 className="w-full rounded-lg border border-zinc-700 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-zinc-600 resize-none focus:border-violet-500/50 focus:outline-none"
               />
               <div className="flex justify-between items-center">
                 <div className="space-y-0.5">
-                  <p className="text-[10px] text-zinc-600">{questionText.length}/500 · Anónima</p>
+                  <p className="text-[10px] text-zinc-600">{t('questions.charsAnonymous', { count: questionText.length })}</p>
                   <AnonymousHint />
                 </div>
                 <button
@@ -791,23 +787,23 @@ export default function CommunityPage() {
                   disabled={!questionText.trim() || posting}
                   className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-xs font-semibold text-white hover:bg-violet-500 disabled:opacity-40 transition-all"
                 >
-                  <Send className="w-3.5 h-3.5" /> Pedir ayuda
+                  <Send className="w-3.5 h-3.5" /> {t('actions.askHelp')}
                 </button>
               </div>
             </div>
 
             {/* Questions list */}
             {loading ? (
-              <p className="text-sm text-zinc-500 text-center py-8">Cargando…</p>
+              <p className="text-sm text-zinc-500 text-center py-8">{t('questions.loading')}</p>
             ) : questions.length === 0 ? (
               <div className="text-center py-12 space-y-2">
                 <HelpCircle className="w-10 h-10 text-zinc-700 mx-auto" />
                 <p className="text-zinc-500">
                   {questionsFilter === "mine"
-                    ? "Todavía no has pedido ayuda a la comunidad."
+                    ? t('questions.empty.mine')
                     : questionsFilter === "personal"
-                      ? "Nadie te ha escrito directamente todavía."
-                      : "Ahora mismo nadie está pidiendo ayuda. Vuelve pronto para ayudar a alguien."}
+                      ? t('questions.empty.personal')
+                      : t('questions.empty.community')}
                 </p>
               </div>
             ) : (
@@ -820,31 +816,34 @@ export default function CommunityPage() {
                       <div className="flex flex-wrap items-center gap-3 mt-3 text-xs text-zinc-500">
                         <span>
                           {q.answerCount === 0
-                            ? "Nadie ha respondido aún"
-                            : `${q.answerCount} ${q.answerCount === 1 ? "persona ha ayudado" : "personas han ayudado"}`}
+                            ? t('questions.noAnswers')
+                            : q.answerCount === 1
+                              ? t('questions.oneHelped')
+                              : t('questions.manyHelped', { count: q.answerCount })}
                         </span>
                         <span>{timeAgo(q.createdAt)}</span>
-                        {q.isForMe && <span className="text-cyan-400 font-semibold">Te lo escriben a ti</span>}
+                        {q.isForMe && <span className="text-cyan-400 font-semibold">{t('questions.writtenToYou')}</span>}
                         {q.answersFull && (
                           <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-300">
-                            Ya ha recibido muchas ayudas
+                            {t('questions.answersFull')}
                           </span>
                         )}
                         {q.crisisDetected && (
                           <span className="rounded-full border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-[10px] font-semibold text-red-300">
-                            Derivada a atención profesional
+                            {t('questions.referredProfessional')}
                           </span>
                         )}
                         {q.answerCount === 0 && !q.crisisDetected && (
                           <span className="rounded-full border border-violet-500/30 bg-violet-500/10 px-2 py-0.5 text-[10px] font-semibold text-violet-300">
-                            Alguien espera ayuda
+                            {t('questions.someoneWaiting')}
                           </span>
                         )}
                       </div>
                       {q.crisisDetected && (
                         <div className="mt-3 rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-xs text-red-200">
-                          Esta pregunta contiene señales de crisis. Respuestas comunitarias
-                          deshabilitadas. Si estás en crisis, llama al <strong>024</strong>.
+                          {t.rich('questions.crisisNotice', {
+                            strong: (c) => <strong>{c}</strong>,
+                          })}
                         </div>
                       )}
                     </div>
@@ -865,14 +864,14 @@ export default function CommunityPage() {
                             >
                               {isTop && (
                                 <div className="mb-1 inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">
-                                  <CheckCircle2 className="h-3 w-3" /> Más útil
+                                  <CheckCircle2 className="h-3 w-3" /> {t('questions.mostHelpful')}
                                 </div>
                               )}
                               <p className="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap">
                                 {a.content}
                               </p>
                               <div className="flex items-center gap-3 mt-2 text-xs text-zinc-600">
-                                <span>{a.author ?? "Anónimo"}</span>
+                                <span>{a.author ?? t('questions.anonymous')}</span>
                                 <span>{timeAgo(a.createdAt)}</span>
                                 <button
                                   onClick={() => !a.isOwn && void handleVoteHelpful(a.id)}
@@ -884,13 +883,13 @@ export default function CommunityPage() {
                                         ? "text-zinc-700 cursor-not-allowed"
                                         : "hover:text-fuchsia-400"
                                   }`}
-                                  title={a.isOwn ? "No puedes votar tu propia respuesta" : "Me ayudó"}
+                                  title={a.isOwn ? t('questions.cantVoteOwn') : t('questions.helpedMeTitle')}
                                 >
                                   <Heart
                                     className={`w-3 h-3 ${a.helpfulByMe ? "fill-fuchsia-400" : ""}`}
                                   />
                                   {a.helpfulCount > 0 && <span>{a.helpfulCount}</span>}
-                                  <span className="ml-0.5">me ayudó</span>
+                                  <span className="ml-0.5">{t('questions.helpedMe')}</span>
                                 </button>
                               </div>
                             </div>
@@ -907,7 +906,7 @@ export default function CommunityPage() {
                             <textarea
                               value={answerText}
                               onChange={(e) => { setAnswerText(e.target.value); setGuardian(null); setGuardianBlocked(null); }}
-                              placeholder="¿Qué pregunta le harías tú?"
+                              placeholder={t('questions.answerPlaceholder')}
                               rows={3}
                               maxLength={1000}
                               className="w-full rounded-lg border border-zinc-700 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-zinc-600 resize-none focus:border-violet-500/50 focus:outline-none"
@@ -918,10 +917,10 @@ export default function CommunityPage() {
                             {guardian && guardian.isPrescriptive && guardian.suggestedReformulation && (
                               <div className="rounded-lg border border-fuchsia-500/30 bg-fuchsia-500/5 p-3 space-y-2">
                                 <p className="text-[10px] font-semibold uppercase tracking-wider text-fuchsia-300">
-                                  Sugerencia pedagógica
+                                  {t('guardian.pedagogicalSuggestion')}
                                 </p>
                                 <p className="text-xs text-zinc-400 italic">
-                                  Parece un consejo directo. ¿Y si lo plantearas como pregunta?
+                                  {t('guardian.directAdviceHint')}
                                 </p>
                                 <p className="text-sm text-white bg-black/40 rounded p-2 whitespace-pre-wrap">
                                   {guardian.suggestedReformulation}
@@ -934,14 +933,14 @@ export default function CommunityPage() {
                                     disabled={posting}
                                     className="rounded-lg bg-fuchsia-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-fuchsia-500 disabled:opacity-40"
                                   >
-                                    Publicar reformulada
+                                    {t('guardian.publishReformulated')}
                                   </button>
                                   <button
                                     onClick={() => void submitAnswer(q.id, answerText)}
                                     disabled={posting}
                                     className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs text-zinc-300 hover:text-white"
                                   >
-                                    Publicar original
+                                    {t('guardian.publishOriginal')}
                                   </button>
                                 </div>
                               </div>
@@ -951,7 +950,7 @@ export default function CommunityPage() {
                             {guardian && guardian.isPrescriptive && !guardian.suggestedReformulation && (
                               <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-1">
                                 <p className="text-xs text-amber-200">
-                                  Tu mensaje suena directivo. No pudimos generar una alternativa, pero puedes publicarlo si lo crees adecuado.
+                                  {t('guardian.prescriptiveNoAlt')}
                                 </p>
                               </div>
                             )}
@@ -970,7 +969,7 @@ export default function CommunityPage() {
                                   disabled={!answerText.trim() || guardianLoading || posting}
                                   className="rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500 disabled:opacity-40"
                                 >
-                                  {guardianLoading ? "Revisando..." : "Revisar y responder"}
+                                  {guardianLoading ? t('guardian.reviewing') : t('guardian.reviewAndAnswer')}
                                 </button>
                               ) : guardian && guardian.isPrescriptive && guardian.suggestedReformulation ? null : (
                                 <button
@@ -978,7 +977,7 @@ export default function CommunityPage() {
                                   disabled={posting || !answerText.trim()}
                                   className="rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500 disabled:opacity-40"
                                 >
-                                  {guardianBlocked || (guardian && guardian.isPrescriptive) ? "Publicar de todas formas" : "Publicar"}
+                                  {guardianBlocked || (guardian && guardian.isPrescriptive) ? t('actions.publishAnyway') : t('actions.publish')}
                                 </button>
                               )}
                               <button
@@ -990,7 +989,7 @@ export default function CommunityPage() {
                                 }}
                                 className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs text-zinc-400 hover:text-white"
                               >
-                                Cancelar
+                                {t('actions.cancel')}
                               </button>
                               <span className="ml-auto text-[10px] text-zinc-600">
                                 {answerText.length}/1000
@@ -1006,7 +1005,7 @@ export default function CommunityPage() {
                             }}
                             className="text-xs text-violet-400 hover:text-violet-300 font-medium transition-colors"
                           >
-                            Ayudar
+                            {t('actions.help')}
                           </button>
                         )}
                       </div>
@@ -1021,14 +1020,14 @@ export default function CommunityPage() {
         {/* ── Tab: Sessions ────────────────────────────────────────────── */}
         {tab === "coaches" && (
           <div className="space-y-4">
-            <p className="text-sm text-zinc-400">Sesiones grupales con profesionales. Abiertas para toda la comunidad o específicas de tu círculo.</p>
+            <p className="text-sm text-zinc-400">{t('coaches.intro')}</p>
             {loading ? (
-              <p className="text-sm text-zinc-500 text-center py-8">Cargando sesiones...</p>
+              <p className="text-sm text-zinc-500 text-center py-8">{t('coaches.loading')}</p>
             ) : sessions.length === 0 ? (
               <div className="text-center py-12 space-y-2">
                 <Calendar className="w-10 h-10 text-zinc-700 mx-auto" />
-                <p className="text-zinc-500">No hay sesiones programadas</p>
-                <p className="text-xs text-zinc-600">Las sesiones se anuncian por email y Telegram</p>
+                <p className="text-zinc-500">{t('coaches.empty')}</p>
+                <p className="text-xs text-zinc-600">{t('coaches.emptyHint')}</p>
               </div>
             ) : (
               sessions.map((s) => (
@@ -1037,25 +1036,25 @@ export default function CommunityPage() {
                     <div>
                       <p className="text-base font-semibold text-white">{s.title}</p>
                       <p className="text-xs text-zinc-400 mt-0.5">
-                        {s.hostName} · {s.hostRole === "coach" ? "Coach" : "Psicólogo/a"}
+                        {s.hostName} · {s.hostRole === "coach" ? t('coaches.roleCoach') : t('coaches.rolePsychologist')}
                       </p>
                     </div>
                     <span className={`text-xs px-2 py-1 rounded-full border ${
                       s.status === "live" ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300" : "border-zinc-700 text-zinc-400"
                     }`}>
-                      {s.status === "live" ? "En directo" : new Date(s.scheduledAt).toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                      {s.status === "live" ? t('coaches.live') : new Date(s.scheduledAt).toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
                     </span>
                   </div>
                   {s.description && <p className="text-sm text-zinc-400">{s.description}</p>}
                   <div className="flex items-center gap-3 text-xs text-zinc-500">
-                    <span>{s.durationMin} min</span>
-                    {s.isOpen && <span className="text-cyan-400">Abierta a todos</span>}
-                    {s.circle && <span>Círculo: {s.circle.name}</span>}
+                    <span>{t('coaches.minutes', { min: s.durationMin })}</span>
+                    {s.isOpen && <span className="text-cyan-400">{t('coaches.openToAll')}</span>}
+                    {s.circle && <span>{t('coaches.circleLabel', { name: s.circle.name })}</span>}
                   </div>
                   {s.meetingUrl && s.status === "live" && (
                     <a href={s.meetingUrl} target="_blank" rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 transition-all">
-                      Unirse ahora
+                      {t('coaches.joinNow')}
                     </a>
                   )}
                 </div>

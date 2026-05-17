@@ -1,0 +1,22 @@
+package.json
+  s_c72d0ada98a9af::t_abb135caed062e 23-24
+scripts/i18n-audit.mjs
+  s_c72d0ada98a9af::t_fcbbeca7a2850f 1-268,271,279-283,285-359
+  s_c72d0ada98a9af::t_c0c0ec5fd3c79d 269-270,272-278,284
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "ebea488381eb1f41c0a02c464d91b2072b34eb14",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

@@ -135,43 +135,139 @@
   },
   "settings": {
     "title": "Paramètres",
-    "coach": "Coach IA",
-    "coachDesc": "Personnalise la façon dont ton mentor te parle",
-    "tone": "Ton de la conversation",
-    "toneDirect": "Direct",
-    "toneDirectDesc": "Va droit au but, sans détours",
-    "toneSocratic": "Socratique",
-    "toneSocraticDesc": "Te guide par des questions",
-    "toneWarm": "Chaleureux",
-    "toneWarmDesc": "Empathique et proche",
-    "notifications": "Notifications",
-    "notificationsDesc": "Contrôle ce que nous t'envoyons et quand",
-    "dailyReminders": "Rappels quotidiens",
-    "dailyRemindersDesc": "Check-in et actions en attente",
-    "reminderTime": "Heure du rappel",
-    "reminderTimeDesc": "Tu recevras le rappel à cette heure",
-    "weeklyEmail": "Résumé hebdomadaire par e-mail",
-    "weeklyEmailDesc": "Ta progression de la semaine chaque dimanche",
-    "insights": "Nouveaux insights",
-    "insightsDesc": "Quand tu auras de nouvelles recommandations",
-    "goals": "Objectifs accomplis",
-    "goalsDesc": "Célébrations quand tu termines un objectif",
-    "updates": "Mises à jour du produit",
-    "updatesDesc": "Nouvelles fonctions et améliorations",
-    "telegram": "Telegram",
-    "telegramDesc": "Reçois des rappels et discute hors de l'app",
-    "region": "Région",
-    "regionDesc": "Affecte l'heure des rappels",
-    "security": "Sécurité",
-    "changePassword": "Changer de mot de passe",
-    "data": "Tes données",
-    "dataDesc": "Droit à la portabilité (Art. 20 RGPD)",
-    "exportCsv": "Historique du chat (CSV)",
-    "exportJson": "Données complètes (JSON)",
-    "dangerZone": "Zone de danger",
-    "dangerDesc": "Ces actions sont irréversibles.",
-    "deleteAccount": "Supprimer mon compte et toutes mes données",
-    "saved": "Enregistré"
+    "saved": "Enregistré",
+    "saveError": "Erreur lors de l'enregistrement",
+    "loadErrorProfile": "Impossible de charger ton profil",
+    "loadErrorPrefs": "Impossible de charger tes préférences",
+    "profile": {
+      "title": "Ton profil",
+      "subtitle": "Nom, photo et données personnelles",
+      "saved": "Profil enregistré",
+      "saveError": "Erreur lors de l'enregistrement du profil",
+      "avatarRemoved": "Avatar supprimé",
+      "avatarTooLarge": "L'image doit faire moins de 200 KB",
+      "avatarInvalidType": "Seules les images sont autorisées",
+      "avatarAlt": "Avatar",
+      "changePhoto": "Changer la photo",
+      "removePhoto": "Supprimer la photo",
+      "avatarHint": "PNG, JPEG ou WebP. Max 200 KB.",
+      "nameLabel": "Nom",
+      "namePlaceholder": "Ton nom",
+      "bioLabel": "Bio",
+      "bioPlaceholder": "Parle-nous de toi...",
+      "bioCounterTpl": "{n}/500",
+      "phoneLabel": "Téléphone",
+      "phonePlaceholder": "+33 6 12 34 56 78",
+      "saving": "Enregistrement...",
+      "save": "Enregistrer le profil"
+    },
+    "coach": {
+      "title": "Coach IA",
+      "subtitle": "Personnalise comment ton mentor te parle",
+      "toneTitle": "Ton de conversation",
+      "tones": {
+        "directo": {
+          "label": "Direct",
+          "desc": "Va droit au but, sans détours"
+        },
+        "socratico": {
+          "label": "Socratique",
+          "desc": "Te guide par des questions"
+        },
+        "calido": {
+          "label": "Chaleureux",
+          "desc": "Empathique et proche"
+        }
+      },
+      "genderTitle": "Comment préfères-tu qu'on te parle ?",
+      "genderHint": "Définis la conjugaison grammaticale du mentor quand il s'adresse à toi. Tu peux le changer quand tu veux.",
+      "genders": {
+        "feminine": {
+          "label": "Féminin",
+          "desc": "\"tu es fatiguée\""
+        },
+        "masculine": {
+          "label": "Masculin",
+          "desc": "\"tu es fatigué\""
+        },
+        "neutral": {
+          "label": "Neutre",
+          "desc": "Sans conjugaisons de genre (\"tu traverses un moment de fatigue\")"
+        }
+      },
+      "clearGender": "Retirer la préférence (revenir à non défini)"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Contrôle ce qu'on t'envoie et quand",
+      "dailyReminders": "Rappels quotidiens",
+      "dailyRemindersDesc": "Check-in et actions en attente",
+      "reminderTime": "Heure du rappel",
+      "reminderTimeDesc": "Tu recevras le rappel à cette heure",
+      "weeklyEmail": "Résumé hebdomadaire par email",
+      "weeklyEmailDesc": "Ta progression de la semaine chaque dimanche",
+      "sundayLetter": "Lettre du dimanche",
+      "sundayLetterDesc": "Une courte lettre de ton mentor chaque dimanche avec tes propres mots de la semaine. Le contenu est toujours dans l'app.",
+      "letterEmailNotice": "Notification email de la lettre",
+      "letterEmailNoticeDesc": "On te prévient quand la lettre est prête. L'email ne contient pas la lettre — juste un lien.",
+      "insights": "Nouveaux insights",
+      "insightsDesc": "Quand tu as de nouvelles recommandations",
+      "goals": "Objectifs complétés",
+      "goalsDesc": "Des célébrations quand tu termines un objectif",
+      "updates": "Mises à jour du produit",
+      "updatesDesc": "Nouvelles fonctionnalités et améliorations"
+    },
+    "telegram": {
+      "title": "Telegram",
+      "subtitle": "Reçois des rappels et discute en dehors de l'app",
+      "linkedTitle": "Compte connecté",
+      "linkedDesc": "Tu reçois déjà des messages et des rappels sur Telegram.",
+      "howToConnect": "Comment connecter",
+      "step1": "Ouvre le bot sur Telegram",
+      "step2": "Appuie sur Démarrer ou tape /start",
+      "step3": "Envoie la commande /vincular",
+      "step4": "Clique sur le lien que le bot t'envoie",
+      "openBot": "Ouvrir le bot sur Telegram"
+    },
+    "region": {
+      "title": "Région",
+      "subtitle": "Affecte l'heure de tes rappels",
+      "timezones": {
+        "madrid": "Madrid (GMT+1)",
+        "london": "Londres (GMT+0)",
+        "mexico": "Mexico (GMT-6)",
+        "bogota": "Bogotá (GMT-5)",
+        "lima": "Lima (GMT-5)",
+        "santiago": "Santiago (GMT-4)",
+        "buenosAires": "Buenos Aires (GMT-3)",
+        "newYork": "New York (GMT-5)",
+        "losAngeles": "Los Angeles (GMT-8)"
+      }
+    },
+    "security": {
+      "title": "Sécurité",
+      "changePassword": "Changer le mot de passe",
+      "changePasswordForm": "Changer le mot de passe",
+      "currentLabel": "Mot de passe actuel",
+      "newLabel": "Nouveau mot de passe",
+      "confirmLabel": "Confirmer le nouveau",
+      "passwordPlaceholder": "••••••••",
+      "newPasswordPlaceholder": "Minimum 8 caractères",
+      "saving": "Enregistrement…",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "errorMismatch": "Les nouveaux mots de passe ne correspondent pas.",
+      "errorTooShort": "Minimum 8 caractères.",
+      "errorCurrentRequired": "Saisis ton mot de passe actuel.",
+      "errorInvalidCredentials": "Le mot de passe actuel n'est pas correct.",
+      "errorGeneric": "Erreur lors du changement du mot de passe.",
+      "successChanged": "Mot de passe mis à jour avec succès."
+    },
+    "help": {
+      "title": "Aide",
+      "repeatTour": "Relancer la visite guidée",
+      "tourReset": "Visite réinitialisée — retourne au chat pour la voir"
+    }
   },
   "ethics": {
     "eyebrow": "Éthique et limites",

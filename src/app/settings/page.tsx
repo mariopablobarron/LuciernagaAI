@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import {
@@ -49,30 +50,24 @@ type Preferences = {
   timezone: string;
 };
 
-const GENDER_FORMS = [
-  { value: 'feminine', label: 'Femenino', desc: '"estás cansada"' },
-  { value: 'masculine', label: 'Masculino', desc: '"estás cansado"' },
-  { value: 'neutral', label: 'Neutro', desc: 'Sin conjugaciones de género ("estás en un momento de cansancio")' },
-] as const;
+// IDs estables — labels y descriptions vienen de messages.settings.coach.*
+const GENDER_FORM_IDS = ['feminine', 'masculine', 'neutral'] as const;
 
 type PasswordForm = { current: string; next: string; confirm: string };
 
-const AI_TONES = [
-  { value: 'directo', label: 'Directo', desc: 'Va al grano, sin rodeos' },
-  { value: 'socratico', label: 'Socrático', desc: 'Te guía con preguntas' },
-  { value: 'calido', label: 'Cálido', desc: 'Empático y cercano' },
-] as const;
+const AI_TONE_IDS = ['directo', 'socratico', 'calido'] as const;
 
+// IDs estables; labels vienen de messages.settings.region.timezones.<id>.
 const TIMEZONES = [
-  { value: 'Europe/Madrid', label: 'Madrid (GMT+1)' },
-  { value: 'Europe/London', label: 'Londres (GMT+0)' },
-  { value: 'America/Mexico_City', label: 'Ciudad de México (GMT-6)' },
-  { value: 'America/Bogota', label: 'Bogotá (GMT-5)' },
-  { value: 'America/Lima', label: 'Lima (GMT-5)' },
-  { value: 'America/Santiago', label: 'Santiago (GMT-4)' },
-  { value: 'America/Argentina/Buenos_Aires', label: 'Buenos Aires (GMT-3)' },
-  { value: 'America/New_York', label: 'Nueva York (GMT-5)' },
-  { value: 'America/Los_Angeles', label: 'Los Ángeles (GMT-8)' },
+  { value: 'Europe/Madrid', id: 'madrid' },
+  { value: 'Europe/London', id: 'london' },
+  { value: 'America/Mexico_City', id: 'mexico' },
+  { value: 'America/Bogota', id: 'bogota' },
+  { value: 'America/Lima', id: 'lima' },
+  { value: 'America/Santiago', id: 'santiago' },
+  { value: 'America/Argentina/Buenos_Aires', id: 'buenosAires' },
+  { value: 'America/New_York', id: 'newYork' },
+  { value: 'America/Los_Angeles', id: 'losAngeles' },
 ] as const;
 
 // ─── Toggle Component ─────────────────────────────────────────────────────────
@@ -101,6 +96,7 @@ function Toggle({ checked, onChange, disabled }: { checked: boolean; onChange: (
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
+  const t = useTranslations('settings');
   const [user, setUser] = useState<BrowserSessionUser | null>(null);
   const [telegram, setTelegram] = useState<TelegramStatus | null>(null);
   const [prefs, setPrefs] = useState<Preferences | null>(null);
@@ -134,7 +130,7 @@ export default function SettingsPage() {
     fetch('/api/auth/token', { credentials: 'include' })
       .then((r) => r.json())
       .then((d: { user?: BrowserSessionUser }) => { if (d.user) setUser(d.user); })
-      .catch(() => { toast.error('No se pudo cargar tu perfil'); });
+      .catch(() => { toast.error(t('loadErrorProfile')); });
 
     fetch('/api/user/telegram-status', { credentials: 'include' })
       .then((r) => r.ok ? r.json() : null)
@@ -144,7 +140,7 @@ export default function SettingsPage() {
     fetch('/api/user/preferences', { credentials: 'include' })
       .then((r) => r.ok ? r.json() : null)
       .then((d: { preferences?: Preferences } | null) => { if (d?.preferences) setPrefs(d.preferences); })
-      .catch(() => { toast.error('No se pudieron cargar las preferencias'); });
+      .catch(() => { toast.error(t('loadErrorPrefs')); });
 
     fetch('/api/user/profile', { credentials: 'include' })
       .then((r) => r.ok ? r.json() : null)
@@ -157,7 +153,7 @@ export default function SettingsPage() {
         }
       })
       .catch(() => {});
-  }, []);
+  }, [t]);
 
   // Save preferences
   const savePrefs = useCallback(async (patch: Partial<Preferences>) => {
@@ -173,16 +169,16 @@ export default function SettingsPage() {
       const data = (await res.json()) as { preferences: Preferences };
       if (res.ok) {
         setPrefs(data.preferences);
-        setSaveMsg('Guardado');
+        setSaveMsg(t('saved'));
         if (saveMsgTimerRef.current) clearTimeout(saveMsgTimerRef.current);
         saveMsgTimerRef.current = setTimeout(() => setSaveMsg(null), 2000);
       }
     } catch {
-      setSaveMsg('Error al guardar');
+      setSaveMsg(t('saveError'));
     } finally {
       setSaving(false);
     }
-  }, []);
+  }, [t]);
 
   // Update a single preference
   const updatePref = useCallback(<K extends keyof Preferences>(key: K, value: Preferences[K]) => {
@@ -195,11 +191,11 @@ export default function SettingsPage() {
     e.preventDefault();
     setPwMsg(null);
     if (pwForm.next !== pwForm.confirm) {
-      setPwMsg({ type: 'error', text: 'Las contraseñas nuevas no coinciden.' });
+      setPwMsg({ type: 'error', text: t('security.errorMismatch') });
       return;
     }
     if (pwForm.next.length < 8) {
-      setPwMsg({ type: 'error', text: 'Mínimo 8 caracteres.' });
+      setPwMsg({ type: 'error', text: t('security.errorTooShort') });
       return;
     }
     setPwLoading(true);
@@ -213,18 +209,18 @@ export default function SettingsPage() {
       const data = (await res.json()) as { success: boolean; error?: string };
       if (!res.ok || !data.success) {
         const msgs: Record<string, string> = {
-          CURRENT_REQUIRED: 'Introduce tu contraseña actual.',
-          INVALID_CREDENTIALS: 'La contraseña actual no es correcta.',
-          PASSWORD_TOO_SHORT: 'Mínimo 8 caracteres.',
+          CURRENT_REQUIRED: t('security.errorCurrentRequired'),
+          INVALID_CREDENTIALS: t('security.errorInvalidCredentials'),
+          PASSWORD_TOO_SHORT: t('security.errorTooShort'),
         };
-        setPwMsg({ type: 'error', text: msgs[data.error ?? ''] ?? 'Error al cambiar la contraseña.' });
+        setPwMsg({ type: 'error', text: msgs[data.error ?? ''] ?? t('security.errorGeneric') });
       } else {
-        setPwMsg({ type: 'success', text: 'Contraseña actualizada correctamente.' });
+        setPwMsg({ type: 'success', text: t('security.successChanged') });
         setPwForm({ current: '', next: '', confirm: '' });
         setShowPwForm(false);
       }
     } catch {
-      setPwMsg({ type: 'error', text: 'Error al cambiar la contraseña.' });
+      setPwMsg({ type: 'error', text: t('security.errorGeneric') });
     } finally {
       setPwLoading(false);
     }
@@ -252,14 +248,14 @@ export default function SettingsPage() {
         const d = (await res.json()) as { profile: { hasAvatar: boolean } };
         setHasAvatar(d.profile.hasAvatar);
         setAvatarPreview(null);
-        setProfileMsg('Perfil guardado');
+        setProfileMsg(t('profile.saved'));
         setTimeout(() => setProfileMsg(null), 2500);
       } else {
         const err = (await res.json().catch(() => ({}))) as { message?: string };
-        toast.error(err.message ?? 'Error al guardar el perfil');
+        toast.error(err.message ?? t('profile.saveError'));
       }
     } catch {
-      toast.error('Error al guardar el perfil');
+      toast.error(t('profile.saveError'));
     } finally {
       setProfileSaving(false);
     }
@@ -269,11 +265,11 @@ export default function SettingsPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 200 * 1024) {
-      toast.error('La imagen debe ser menor de 200 KB');
+      toast.error(t('profile.avatarTooLarge'));
       return;
     }
     if (!file.type.startsWith('image/')) {
-      toast.error('Solo se permiten imágenes');
+      toast.error(t('profile.avatarInvalidType'));
       return;
     }
     const reader = new FileReader();
@@ -295,7 +291,7 @@ export default function SettingsPage() {
       body: JSON.stringify({ avatarData: null }),
     }).then((res) => {
       if (res.ok) {
-        setProfileMsg('Avatar eliminado');
+        setProfileMsg(t('profile.avatarRemoved'));
         setTimeout(() => setProfileMsg(null), 2500);
       }
     }).catch(() => {}).finally(() => setProfileSaving(false));
@@ -321,7 +317,7 @@ export default function SettingsPage() {
             <Link href="/app" className="p-2 -ml-2 rounded-lg text-zinc-400 hover:text-cyan-400 hover:bg-white/5 transition-colors">
               <ArrowLeft className="w-5 h-5" />
             </Link>
-            <h1 className={`${TYPOGRAPHY.h1} text-white`}>Configuración</h1>
+            <h1 className={`${TYPOGRAPHY.h1} text-white`}>{t('title')}</h1>
           </div>
           {saveMsg && (
             <span className="flex items-center gap-1.5 text-xs text-emerald-400 animate-in fade-in">
@@ -338,8 +334,8 @@ export default function SettingsPage() {
                 <User className="w-4 h-4 text-cyan-400" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-white">Tu perfil</h2>
-                <p className="text-xs text-zinc-500">Nombre, foto y datos personales</p>
+                <h2 className="text-lg font-semibold text-white">{t('profile.title')}</h2>
+                <p className="text-xs text-zinc-500">{t('profile.subtitle')}</p>
               </div>
             </div>
             {profileMsg && (
@@ -353,7 +349,7 @@ export default function SettingsPage() {
           <div className="flex items-center gap-5">
             <div className="relative">
               {avatarSrc ? (
-                <img src={avatarSrc} alt="Avatar" className="w-20 h-20 rounded-full object-cover border-2 border-zinc-700" />
+                <img src={avatarSrc} alt={t('profile.avatarAlt')} className="w-20 h-20 rounded-full object-cover border-2 border-zinc-700" />
               ) : (
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-2xl font-bold text-white border-2 border-zinc-700">
                   {initials(profileName || user?.name || '')}
@@ -380,7 +376,7 @@ export default function SettingsPage() {
                 onClick={() => fileInputRef.current?.click()}
                 className="text-sm font-medium text-cyan-400 hover:text-cyan-300 transition-colors"
               >
-                Cambiar foto
+                {t('profile.changePhoto')}
               </button>
               {(hasAvatar || avatarPreview) && (
                 <button
@@ -388,48 +384,48 @@ export default function SettingsPage() {
                   onClick={handleRemoveAvatar}
                   className="block text-xs text-zinc-500 hover:text-red-400 transition-colors"
                 >
-                  Eliminar foto
+                  {t('profile.removePhoto')}
                 </button>
               )}
-              <p className="text-[10px] text-zinc-600">PNG, JPEG o WebP. Max 200 KB.</p>
+              <p className="text-[10px] text-zinc-600">{t('profile.avatarHint')}</p>
             </div>
           </div>
 
           {/* Fields */}
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-zinc-300">Nombre</label>
+              <label className="block text-sm font-medium text-zinc-300">{t('profile.nameLabel')}</label>
               <input
                 type="text"
                 value={profileName}
                 onChange={(e) => setProfileName(e.target.value)}
                 maxLength={100}
-                placeholder="Tu nombre"
+                placeholder={t('profile.namePlaceholder')}
                 className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-zinc-300">Bio</label>
+              <label className="block text-sm font-medium text-zinc-300">{t('profile.bioLabel')}</label>
               <textarea
                 value={profileBio}
                 onChange={(e) => setProfileBio(e.target.value)}
                 maxLength={500}
                 rows={3}
-                placeholder="Cuéntanos sobre ti..."
+                placeholder={t('profile.bioPlaceholder')}
                 className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-white placeholder:text-zinc-600 resize-none focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
               />
-              <p className="text-right text-[10px] text-zinc-600">{profileBio.length}/500</p>
+              <p className="text-right text-[10px] text-zinc-600">{t('profile.bioCounterTpl', { n: profileBio.length })}</p>
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-zinc-300">Teléfono</label>
+              <label className="block text-sm font-medium text-zinc-300">{t('profile.phoneLabel')}</label>
               <input
                 type="tel"
                 value={profilePhone}
                 onChange={(e) => setProfilePhone(e.target.value)}
                 maxLength={20}
-                placeholder="+34 612 345 678"
+                placeholder={t('profile.phonePlaceholder')}
                 className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
               />
             </div>
@@ -441,7 +437,7 @@ export default function SettingsPage() {
             disabled={profileSaving}
             className="w-full rounded-xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white hover:bg-violet-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {profileSaving ? 'Guardando...' : 'Guardar perfil'}
+            {profileSaving ? t('profile.saving') : t('profile.save')}
           </button>
         </div>
 
@@ -452,51 +448,49 @@ export default function SettingsPage() {
               <Sparkles className="w-4 h-4 text-violet-400" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white">Coach IA</h2>
-              <p className="text-xs text-zinc-500">Personaliza cómo te habla tu mentor</p>
+              <h2 className="text-lg font-semibold text-white">{t('coach.title')}</h2>
+              <p className="text-xs text-zinc-500">{t('coach.subtitle')}</p>
             </div>
           </div>
 
           <div className="space-y-2">
-            <p className="text-sm font-medium text-zinc-300">Tono de conversación</p>
+            <p className="text-sm font-medium text-zinc-300">{t('coach.toneTitle')}</p>
             <div className="grid grid-cols-3 gap-2">
-              {AI_TONES.map((tone) => (
+              {AI_TONE_IDS.map((id) => (
                 <button
-                  key={tone.value}
-                  onClick={() => updatePref('aiTone', tone.value)}
+                  key={id}
+                  onClick={() => updatePref('aiTone', id)}
                   disabled={saving}
                   className={`p-3 rounded-xl border text-left transition-all ${
-                    prefs?.aiTone === tone.value
+                    prefs?.aiTone === id
                       ? 'border-violet-500/60 bg-violet-500/10'
                       : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700'
                   }`}
                 >
-                  <p className="text-sm font-semibold text-white">{tone.label}</p>
-                  <p className="text-[11px] text-zinc-500 mt-0.5">{tone.desc}</p>
+                  <p className="text-sm font-semibold text-white">{t(`coach.tones.${id}.label`)}</p>
+                  <p className="text-[11px] text-zinc-500 mt-0.5">{t(`coach.tones.${id}.desc`)}</p>
                 </button>
               ))}
             </div>
           </div>
 
           <div className="space-y-2 mt-6">
-            <p className="text-sm font-medium text-zinc-300">¿Cómo prefieres que te hablemos?</p>
-            <p className="text-[11px] text-zinc-500">
-              Define la conjugación gramatical del mentor cuando se dirige a ti. Puedes cambiarlo cuando quieras.
-            </p>
+            <p className="text-sm font-medium text-zinc-300">{t('coach.genderTitle')}</p>
+            <p className="text-[11px] text-zinc-500">{t('coach.genderHint')}</p>
             <div className="grid grid-cols-3 gap-2">
-              {GENDER_FORMS.map((g) => (
+              {GENDER_FORM_IDS.map((id) => (
                 <button
-                  key={g.value}
-                  onClick={() => updatePref('genderForm', g.value)}
+                  key={id}
+                  onClick={() => updatePref('genderForm', id)}
                   disabled={saving}
                   className={`p-3 rounded-xl border text-left transition-all ${
-                    prefs?.genderForm === g.value
+                    prefs?.genderForm === id
                       ? 'border-violet-500/60 bg-violet-500/10'
                       : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700'
                   }`}
                 >
-                  <p className="text-sm font-semibold text-white">{g.label}</p>
-                  <p className="text-[11px] text-zinc-500 mt-0.5">{g.desc}</p>
+                  <p className="text-sm font-semibold text-white">{t(`coach.genders.${id}.label`)}</p>
+                  <p className="text-[11px] text-zinc-500 mt-0.5">{t(`coach.genders.${id}.desc`)}</p>
                 </button>
               ))}
             </div>
@@ -506,7 +500,7 @@ export default function SettingsPage() {
                 disabled={saving}
                 className="text-[11px] text-zinc-500 hover:text-zinc-300 underline mt-1"
               >
-                Quitar preferencia (volver a sin definir)
+                {t('coach.clearGender')}
               </button>
             )}
           </div>
@@ -525,8 +519,8 @@ export default function SettingsPage() {
               <Bell className="w-4 h-4 text-cyan-400" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white">Notificaciones</h2>
-              <p className="text-xs text-zinc-500">Controla qué te enviamos y cuándo</p>
+              <h2 className="text-lg font-semibold text-white">{t('notifications.title')}</h2>
+              <p className="text-xs text-zinc-500">{t('notifications.subtitle')}</p>
             </div>
           </div>
 
@@ -535,8 +529,8 @@ export default function SettingsPage() {
               {/* Reminder */}
               <div className="flex items-center justify-between py-3">
                 <div>
-                  <p className="text-sm font-semibold text-white">Recordatorios diarios</p>
-                  <p className="text-xs text-zinc-500">Check-in y acciones pendientes</p>
+                  <p className="text-sm font-semibold text-white">{t('notifications.dailyReminders')}</p>
+                  <p className="text-xs text-zinc-500">{t('notifications.dailyRemindersDesc')}</p>
                 </div>
                 <Toggle checked={prefs.reminderEnabled} onChange={(v) => updatePref('reminderEnabled', v)} disabled={saving} />
               </div>
@@ -547,8 +541,8 @@ export default function SettingsPage() {
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-zinc-500" />
                     <div>
-                      <p className="text-sm font-semibold text-white">Hora del recordatorio</p>
-                      <p className="text-xs text-zinc-500">Recibirás el recordatorio a esta hora</p>
+                      <p className="text-sm font-semibold text-white">{t('notifications.reminderTime')}</p>
+                      <p className="text-xs text-zinc-500">{t('notifications.reminderTimeDesc')}</p>
                     </div>
                   </div>
                   <input
@@ -564,8 +558,8 @@ export default function SettingsPage() {
               {/* Weekly email */}
               <div className="flex items-center justify-between py-3">
                 <div>
-                  <p className="text-sm font-semibold text-white">Resumen semanal por email</p>
-                  <p className="text-xs text-zinc-500">Tu progreso de la semana cada domingo</p>
+                  <p className="text-sm font-semibold text-white">{t('notifications.weeklyEmail')}</p>
+                  <p className="text-xs text-zinc-500">{t('notifications.weeklyEmailDesc')}</p>
                 </div>
                 <Toggle checked={prefs.weeklyEmailEnabled} onChange={(v) => updatePref('weeklyEmailEnabled', v)} disabled={saving} />
               </div>
@@ -573,11 +567,8 @@ export default function SettingsPage() {
               {/* Weekly letter — in-app */}
               <div className="flex items-center justify-between py-3">
                 <div className="pr-4">
-                  <p className="text-sm font-semibold text-white">Carta del domingo</p>
-                  <p className="text-xs text-zinc-500">
-                    Una carta breve del mentor cada domingo con tus propias palabras de la semana.
-                    El contenido siempre está en la app.
-                  </p>
+                  <p className="text-sm font-semibold text-white">{t('notifications.sundayLetter')}</p>
+                  <p className="text-xs text-zinc-500">{t('notifications.sundayLetterDesc')}</p>
                 </div>
                 <Toggle
                   checked={!prefs.weeklyLetterDisabled}
@@ -589,10 +580,8 @@ export default function SettingsPage() {
               {/* Weekly letter email notification */}
               <div className="flex items-center justify-between py-3">
                 <div className="pr-4">
-                  <p className="text-sm font-semibold text-white">Aviso por email de la carta</p>
-                  <p className="text-xs text-zinc-500">
-                    Te avisamos cuando la carta esté lista. El email no contiene la carta — solo un enlace.
-                  </p>
+                  <p className="text-sm font-semibold text-white">{t('notifications.letterEmailNotice')}</p>
+                  <p className="text-xs text-zinc-500">{t('notifications.letterEmailNoticeDesc')}</p>
                 </div>
                 <Toggle
                   checked={!prefs.weeklyLetterEmailDisabled}
@@ -604,8 +593,8 @@ export default function SettingsPage() {
               {/* Insights */}
               <div className="flex items-center justify-between py-3">
                 <div>
-                  <p className="text-sm font-semibold text-white">Nuevos insights</p>
-                  <p className="text-xs text-zinc-500">Cuando tengas nuevas recomendaciones</p>
+                  <p className="text-sm font-semibold text-white">{t('notifications.insights')}</p>
+                  <p className="text-xs text-zinc-500">{t('notifications.insightsDesc')}</p>
                 </div>
                 <Toggle checked={prefs.notifyInsights} onChange={(v) => updatePref('notifyInsights', v)} disabled={saving} />
               </div>
@@ -613,8 +602,8 @@ export default function SettingsPage() {
               {/* Goals */}
               <div className="flex items-center justify-between py-3">
                 <div>
-                  <p className="text-sm font-semibold text-white">Objetivos completados</p>
-                  <p className="text-xs text-zinc-500">Celebraciones cuando termines un objetivo</p>
+                  <p className="text-sm font-semibold text-white">{t('notifications.goals')}</p>
+                  <p className="text-xs text-zinc-500">{t('notifications.goalsDesc')}</p>
                 </div>
                 <Toggle checked={prefs.notifyGoals} onChange={(v) => updatePref('notifyGoals', v)} disabled={saving} />
               </div>
@@ -622,8 +611,8 @@ export default function SettingsPage() {
               {/* Updates */}
               <div className="flex items-center justify-between py-3">
                 <div>
-                  <p className="text-sm font-semibold text-white">Actualizaciones del producto</p>
-                  <p className="text-xs text-zinc-500">Nuevas funciones y mejoras</p>
+                  <p className="text-sm font-semibold text-white">{t('notifications.updates')}</p>
+                  <p className="text-xs text-zinc-500">{t('notifications.updatesDesc')}</p>
                 </div>
                 <Toggle checked={prefs.notifyUpdates} onChange={(v) => updatePref('notifyUpdates', v)} disabled={saving} />
               </div>
@@ -644,8 +633,8 @@ export default function SettingsPage() {
               <Send className="w-4 h-4 text-[#229ED9]" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white">Telegram</h2>
-              <p className="text-xs text-zinc-500">Recibe recordatorios y chatea fuera de la app</p>
+              <h2 className="text-lg font-semibold text-white">{t('telegram.title')}</h2>
+              <p className="text-xs text-zinc-500">{t('telegram.subtitle')}</p>
             </div>
           </div>
 
@@ -655,26 +644,21 @@ export default function SettingsPage() {
             <div className="flex items-center gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/8 px-4 py-3">
               <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
               <div>
-                <p className="text-sm font-semibold text-emerald-300">Cuenta conectada</p>
-                <p className="text-xs text-zinc-500 mt-0.5">Ya recibes mensajes y recordatorios en Telegram.</p>
+                <p className="text-sm font-semibold text-emerald-300">{t('telegram.linkedTitle')}</p>
+                <p className="text-xs text-zinc-500 mt-0.5">{t('telegram.linkedDesc')}</p>
               </div>
             </div>
           ) : (
             <div className="space-y-4">
               <div className="rounded-xl border border-zinc-700/50 bg-zinc-800/30 p-4 space-y-3">
-                <p className="text-sm font-semibold text-white">Cómo conectar</p>
+                <p className="text-sm font-semibold text-white">{t('telegram.howToConnect')}</p>
                 <ol className="space-y-2">
-                  {[
-                    'Abre el bot en Telegram',
-                    'Pulsa Iniciar o escribe /start',
-                    'Envía el comando /vincular',
-                    'Haz clic en el enlace que te mande el bot',
-                  ].map((text, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-zinc-300">
+                  {[1, 2, 3, 4].map((n) => (
+                    <li key={n} className="flex items-start gap-3 text-sm text-zinc-300">
                       <span className="shrink-0 w-5 h-5 rounded-full bg-violet-500/20 text-violet-400 text-xs font-bold flex items-center justify-center mt-0.5">
-                        {i + 1}
+                        {n}
                       </span>
-                      {text}
+                      {t(`telegram.step${n}`)}
                     </li>
                   ))}
                 </ol>
@@ -686,7 +670,7 @@ export default function SettingsPage() {
                 className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl font-semibold text-white bg-[#229ED9] hover:bg-[#1a8bc4] transition-colors"
               >
                 <Send className="w-4 h-4" />
-                Abrir bot en Telegram
+                {t('telegram.openBot')}
                 <ExternalLink className="w-3.5 h-3.5 opacity-70" />
               </a>
             </div>
@@ -700,8 +684,8 @@ export default function SettingsPage() {
               <Globe className="w-4 h-4 text-violet-400" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white">Región</h2>
-              <p className="text-xs text-zinc-500">Afecta a la hora de los recordatorios</p>
+              <h2 className="text-lg font-semibold text-white">{t('region.title')}</h2>
+              <p className="text-xs text-zinc-500">{t('region.subtitle')}</p>
             </div>
           </div>
 
@@ -713,7 +697,7 @@ export default function SettingsPage() {
               className={`${COMPONENTS.inputField} w-full`}
             >
               {TIMEZONES.map((tz) => (
-                <option key={tz.value} value={tz.value}>{tz.label}</option>
+                <option key={tz.value} value={tz.value}>{t(`region.timezones.${tz.id}`)}</option>
               ))}
             </select>
           )}
@@ -728,7 +712,7 @@ export default function SettingsPage() {
             <div className="w-9 h-9 rounded-xl bg-cyan-500/15 flex items-center justify-center">
               <Lock className="w-4 h-4 text-cyan-400" />
             </div>
-            <h2 className="text-lg font-semibold text-white">Seguridad</h2>
+            <h2 className="text-lg font-semibold text-white">{t('security.title')}</h2>
           </div>
 
           <div className="space-y-3 border-t border-zinc-800 pt-4">
@@ -737,23 +721,23 @@ export default function SettingsPage() {
                 onClick={() => { setShowPwForm(true); setPwMsg(null); }}
                 className={`${COMPONENTS.buttonSecondary} w-full`}
               >
-                Cambiar contraseña
+                {t('security.changePassword')}
               </button>
             ) : (
               <form onSubmit={handleChangePassword} className="space-y-4 rounded-xl border border-zinc-700/50 p-4">
-                <p className="text-sm font-semibold text-white">Cambiar contraseña</p>
+                <p className="text-sm font-semibold text-white">{t('security.changePasswordForm')}</p>
                 {pwMsg && (
                   <div className={`rounded-lg px-3 py-2 text-sm ${pwMsg.type === 'success' ? 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : 'border border-red-500/30 bg-red-500/10 text-red-300'}`}>
                     {pwMsg.text}
                   </div>
                 )}
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-zinc-400">Contraseña actual</label>
+                  <label className="text-xs font-semibold text-zinc-400">{t('security.currentLabel')}</label>
                   <div className="relative">
                     <input
                       type={showPw ? 'text' : 'password'} value={pwForm.current} required
                       onChange={(e) => setPwForm({ ...pwForm, current: e.target.value })}
-                      placeholder="••••••••" className={`${COMPONENTS.inputField} pr-10 py-2 text-sm`}
+                      placeholder={t('security.passwordPlaceholder')} className={`${COMPONENTS.inputField} pr-10 py-2 text-sm`}
                     />
                     <button type="button" onClick={() => setShowPw((v) => !v)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300">
@@ -762,29 +746,29 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-zinc-400">Nueva contraseña</label>
+                  <label className="text-xs font-semibold text-zinc-400">{t('security.newLabel')}</label>
                   <input
                     type={showPw ? 'text' : 'password'} value={pwForm.next} required minLength={8}
                     onChange={(e) => setPwForm({ ...pwForm, next: e.target.value })}
-                    placeholder="Mínimo 8 caracteres" className={`${COMPONENTS.inputField} py-2 text-sm`}
+                    placeholder={t('security.newPasswordPlaceholder')} className={`${COMPONENTS.inputField} py-2 text-sm`}
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-zinc-400">Confirmar nueva</label>
+                  <label className="text-xs font-semibold text-zinc-400">{t('security.confirmLabel')}</label>
                   <input
                     type={showPw ? 'text' : 'password'} value={pwForm.confirm} required
                     onChange={(e) => setPwForm({ ...pwForm, confirm: e.target.value })}
-                    placeholder="••••••••" className={`${COMPONENTS.inputField} py-2 text-sm`}
+                    placeholder={t('security.passwordPlaceholder')} className={`${COMPONENTS.inputField} py-2 text-sm`}
                   />
                 </div>
                 <div className="flex gap-2">
                   <button type="submit" disabled={pwLoading}
                     className={`${COMPONENTS.buttonPrimary} flex-1 py-2 text-sm disabled:opacity-60`}>
-                    {pwLoading ? 'Guardando…' : 'Guardar'}
+                    {pwLoading ? t('security.saving') : t('security.save')}
                   </button>
                   <button type="button" onClick={() => { setShowPwForm(false); setPwMsg(null); }}
                     className={`${COMPONENTS.buttonSecondary} px-4 py-2 text-sm`}>
-                    Cancelar
+                    {t('security.cancel')}
                   </button>
                 </div>
               </form>
@@ -798,16 +782,16 @@ export default function SettingsPage() {
             <div className="w-9 h-9 rounded-xl bg-fuchsia-500/15 flex items-center justify-center">
               <HelpCircle className="w-4 h-4 text-fuchsia-400" />
             </div>
-            <h2 className="text-lg font-semibold text-white">Ayuda</h2>
+            <h2 className="text-lg font-semibold text-white">{t('help.title')}</h2>
           </div>
           <button
             onClick={() => {
               resetAllTours();
-              toast.success('Tour reiniciado — vuelve al chat para verlo');
+              toast.success(t('help.tourReset'));
             }}
             className={`${COMPONENTS.buttonSecondary} w-full`}
           >
-            Repetir el tour guiado
+            {t('help.repeatTour')}
           </button>
         </div>
 

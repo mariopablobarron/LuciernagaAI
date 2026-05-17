@@ -1982,5 +1982,141 @@
       "anon": "Cuenta anónima",
       "noName": "Sin nombre — añádelo en Ajustes"
     }
+  },
+  "settings": {
+    "title": "Configuración",
+    "saved": "Guardado",
+    "saveError": "Error al guardar",
+    "loadErrorProfile": "No se pudo cargar tu perfil",
+    "loadErrorPrefs": "No se pudieron cargar las preferencias",
+    "profile": {
+      "title": "Tu perfil",
+      "subtitle": "Nombre, foto y datos personales",
+      "saved": "Perfil guardado",
+      "saveError": "Error al guardar el perfil",
+      "avatarRemoved": "Avatar eliminado",
+      "avatarTooLarge": "La imagen debe ser menor de 200 KB",
+      "avatarInvalidType": "Solo se permiten imágenes",
+      "avatarAlt": "Avatar",
+      "changePhoto": "Cambiar foto",
+      "removePhoto": "Eliminar foto",
+      "avatarHint": "PNG, JPEG o WebP. Max 200 KB.",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "bioLabel": "Bio",
+      "bioPlaceholder": "Cuéntanos sobre ti...",
+      "bioCounterTpl": "{n}/500",
+      "phoneLabel": "Teléfono",
+      "phonePlaceholder": "+34 612 345 678",
+      "saving": "Guardando...",
+      "save": "Guardar perfil"
+    },
+    "coach": {
+      "title": "Coach IA",
+      "subtitle": "Personaliza cómo te habla tu mentor",
+      "toneTitle": "Tono de conversación",
+      "tones": {
+        "directo": {
+          "label": "Directo",
+          "desc": "Va al grano, sin rodeos"
+        },
+        "socratico": {
+          "label": "Socrático",
+          "desc": "Te guía con preguntas"
+        },
+        "calido": {
+          "label": "Cálido",
+          "desc": "Empático y cercano"
+        }
+      },
+      "genderTitle": "¿Cómo prefieres que te hablemos?",
+      "genderHint": "Define la conjugación gramatical del mentor cuando se dirige a ti. Puedes cambiarlo cuando quieras.",
+      "genders": {
+        "feminine": {
+          "label": "Femenino",
+          "desc": "\"estás cansada\""
+        },
+        "masculine": {
+          "label": "Masculino",
+          "desc": "\"estás cansado\""
+        },
+        "neutral": {
+          "label": "Neutro",
+          "desc": "Sin conjugaciones de género (\"estás en un momento de cansancio\")"
+        }
+      },
+      "clearGender": "Quitar preferencia (volver a sin definir)"
+    },
+    "notifications": {
+      "title": "Notificaciones",
+      "subtitle": "Controla qué te enviamos y cuándo",
+      "dailyReminders": "Recordatorios diarios",
+      "dailyRemindersDesc": "Check-in y acciones pendientes",
+      "reminderTime": "Hora del recordatorio",
+      "reminderTimeDesc": "Recibirás el recordatorio a esta hora",
+      "weeklyEmail": "Resumen semanal por email",
+      "weeklyEmailDesc": "Tu progreso de la semana cada domingo",
+      "sundayLetter": "Carta del domingo",
+      "sundayLetterDesc": "Una carta breve del mentor cada domingo con tus propias palabras de la semana. El contenido siempre está en la app.",
+      "letterEmailNotice": "Aviso por email de la carta",
+      "letterEmailNoticeDesc": "Te avisamos cuando la carta esté lista. El email no contiene la carta — solo un enlace.",
+      "insights": "Nuevos insights",
+      "insightsDesc": "Cuando tengas nuevas recomendaciones",
+      "goals": "Objetivos completados",
+      "goalsDesc": "Celebraciones cuando termines un objetivo",
+      "updates": "Actualizaciones del producto",
+      "updatesDesc": "Nuevas funciones y mejoras"
+    },
+    "telegram": {
+      "title": "Telegram",
+      "subtitle": "Recibe recordatorios y chatea fuera de la app",
+      "linkedTitle": "Cuenta conectada",
+      "linkedDesc": "Ya recibes mensajes y recordatorios en Telegram.",
+      "howToConnect": "Cómo conectar",
+      "step1": "Abre el bot en Telegram",
+      "step2": "Pulsa Iniciar o escribe /start",
+      "step3": "Envía el comando /vincular",
+      "step4": "Haz clic en el enlace que te mande el bot",
+      "openBot": "Abrir bot en Telegram"
+    },
+    "region": {
+      "title": "Región",
+      "subtitle": "Afecta a la hora de los recordatorios",
+      "timezones": {
+        "madrid": "Madrid (GMT+1)",
+        "london": "Londres (GMT+0)",
+        "mexico": "Ciudad de México (GMT-6)",
+        "bogota": "Bogotá (GMT-5)",
+        "lima": "Lima (GMT-5)",
+        "santiago": "Santiago (GMT-4)",
+        "buenosAires": "Buenos Aires (GMT-3)",
+        "newYork": "Nueva York (GMT-5)",
+        "losAngeles": "Los Ángeles (GMT-8)"
+      }
+    },
+    "security": {
+      "title": "Seguridad",
+      "changePassword": "Cambiar contraseña",
+      "changePasswordForm": "Cambiar contraseña",
+      "currentLabel": "Contraseña actual",
+      "newLabel": "Nueva contraseña",
+      "confirmLabel": "Confirmar nueva",
+      "passwordPlaceholder": "••••••••",
+      "newPasswordPlaceholder": "Mínimo 8 caracteres",
+      "saving": "Guardando…",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "errorMismatch": "Las contraseñas nuevas no coinciden.",
+      "errorTooShort": "Mínimo 8 caracteres.",
+      "errorCurrentRequired": "Introduce tu contraseña actual.",
+      "errorInvalidCredentials": "La contraseña actual no es correcta.",
+      "errorGeneric": "Error al cambiar la contraseña.",
+      "successChanged": "Contraseña actualizada correctamente."
+    },
+    "help": {
+      "title": "Ayuda",
+      "repeatTour": "Repetir el tour guiado",
+      "tourReset": "Tour reiniciado — vuelve al chat para verlo"
+    }
   }
 }

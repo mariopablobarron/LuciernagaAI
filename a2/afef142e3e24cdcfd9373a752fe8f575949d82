@@ -1,0 +1,21 @@
+src/components/ui/trusted-contact-section.tsx
+  s_c72d0ada98a9af::t_c1cf66b1206885 4,27-46,48-51,91,93,115,119,122,137-138,140,150,165,167,176,186-187,212,218,223,232,240,248,254,260,267,271,276,281,289,293,298,305,316,327,339,349,353,360,367,378-380,382-384
+messages/es.json
+  s_c72d0ada98a9af::t_598ab90d2d62a3 2985-3045
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "a2afef142e3e24cdcfd9373a752fe8f575949d82",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

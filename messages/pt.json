@@ -1899,5 +1899,88 @@
       "errorFormat": "Revê o formato do email.",
       "errorGeneric": "Não foi possível guardar. Tenta outra vez."
     }
+  },
+  "workspace": {
+    "tabs": {
+      "chat": "Chat",
+      "plan": "Plano",
+      "checkin": "Check-in",
+      "espejo": "Espelho",
+      "espejoTooltip": "Mapa de padrões que adias"
+    },
+    "plan": {
+      "title": "Plano de execução",
+      "subtitle": "Converte a clareza em seguimento visível. Aqui vive o objetivo e a dívida real de ação.",
+      "badgeActive": "Seguimento ativo",
+      "badgeClear": "Sem dívida aberta",
+      "noGoal": "Não há um objetivo ativo ainda. Usa o chat para o definir e depois volta aqui para o converteres em sistema.",
+      "actionsCounter": "{done}/{total} ações",
+      "progressLine": "Progresso atual: {n}% concluído",
+      "checklistTitle": "Checklist de ações",
+      "checklistSubtitle": "Marca avanços sem saires do workspace central.",
+      "noActionsYet": "Ainda não há ações definidas para este objetivo.",
+      "actionDone": "Feita",
+      "actionPending": "Pendente",
+      "markPending": "Marcar pendente",
+      "markDone": "Marcar feita",
+      "remindTomorrow": "Lembra-me amanhã às 9:00",
+      "remindTomorrowToast": "Lembrar-te-emos amanhã às 9:00"
+    },
+    "continuity": {
+      "title": "Continuidade e conta",
+      "descNoSession": "Sessão a iniciar-se. O progresso e o plano sincronizar-se-ão quando a identidade estiver pronta.",
+      "descPro": "Continuidade completa entre dispositivos, memória persistente e Modo Impulso desbloqueado.",
+      "descFreeTpl": "Conversa sem limite. Plano {plan}: quando quiseres continuidade cross-device e Modo Impulso, Pro desbloqueia-o.",
+      "planFree": "Free",
+      "anonProgress": "Progresso sem guardar",
+      "savedProgress": "Progresso guardado",
+      "proUpsell": "Pro: continuidade entre dispositivos, memória persistente entre sessões e Modo Impulso.",
+      "saveProgressEyebrow": "Guardar progresso",
+      "saveProgressDefaultPrompt": "Vincula um email para conservares conversas, objetivos e continuidade entre dispositivos.",
+      "emailPlaceholder": "tu@email.com",
+      "saving": "A guardar…",
+      "save": "Guardar progresso",
+      "completeUpgradeTitle": "Continuidade completa",
+      "openUpgrade": "Ver plano Pro"
+    },
+    "responsibility": {
+      "title": "Responsabilidade ativa",
+      "subtitle": "O que não se faz hoje torna-se fricção amanhã.",
+      "priorityLabel": "Ação pendente prioritária",
+      "nextLabel": "Próxima ação sugerida",
+      "empty": "Não há dívida ativa aberta. Aproveita o chat para definir o próximo passo.",
+      "backToChat": "Voltar ao chat",
+      "goalsHistory": "Histórico de objetivos"
+    },
+    "checkin": {
+      "title": "Ritual diário",
+      "subtitle": "Usa-o para registar como chegas hoje, ainda que não necessites de uma conversa longa. Porquê cada dia? Porque a mudança não vem de um dia bom — vem de não perderes o fio. 30 segundos chegam. A constância pequena ganha sempre ao esforço perfeito.",
+      "placeholder": "Exemplo: Hoje estou bloqueado e custa-me arrancar.",
+      "lastSavedTpl": "Último guardado: {time} · estado {state}",
+      "noneThisSession": "Sem check-in registado nesta sessão.",
+      "saving": "A guardar…",
+      "save": "Guardar check-in",
+      "pulseTitle": "Pulso atual",
+      "pulseSubtitle": "Uma leitura rápida de onde estás hoje e como se encaixa com a tua continuidade.",
+      "currentStateTpl": "Estado atual: {state}",
+      "dominantTpl": "Dominante: {state}",
+      "checkinsTodayTpl": "{n} check-ins hoje",
+      "hintTitle": "Faz um check-in quando precisares registar o estado sem abrir uma sessão longa.",
+      "hintBody": "O objetivo não é explicar tudo. É deixar um sinal breve que mantenha o fio do processo.",
+      "shortcutsTitle": "Atalhos de continuidade",
+      "shortcutsSubtitle": "Salta para o modo que precisas sem perder o estado local desta vista.",
+      "goToChat": "Ir para o chat",
+      "viewPlan": "Ver plano ativo",
+      "checkinsHistory": "Histórico de check-ins"
+    },
+    "espejo": {
+      "title": "Mapa de evitação",
+      "subtitle": "Isto é o que levas a adiar e porquê. Olhar-lhe de frente é o primeiro passo.",
+      "fullAnalysis": "Ver análise completa de padrões"
+    },
+    "account": {
+      "anon": "Conta anónima",
+      "noName": "Sem nome — adiciona-o em Definições"
+    }
   }
 }

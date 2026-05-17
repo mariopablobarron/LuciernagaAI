@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   ArrowRight,
   ChartNoAxesColumn,
@@ -101,16 +102,17 @@ type HomeWorkspaceProps = {
   onCheckinSubmit: () => Promise<void> | void;
 };
 
-function normalizePlanDescription(sessionProfile: BrowserSessionUser | null): string {
-  if (!sessionProfile) {
-    return "Sesión iniciándose. El progreso y el plan se sincronizarán cuando la identidad esté lista.";
-  }
-
-  if (sessionProfile.hasPlan) {
-    return "Continuidad completa entre dispositivos, memoria persistente y Modo Impulso desbloqueado.";
-  }
-
-  return `Conversa sin límite. Plan ${sessionProfile.planLabel}: cuando quieras continuidad cross-device y Modo Impulso, Pro lo desbloquea.`;
+function useNormalizePlanDescription() {
+  const t = useTranslations("workspace.continuity");
+  return (sessionProfile: BrowserSessionUser | null): string => {
+    if (!sessionProfile) {
+      return t("descNoSession");
+    }
+    if (sessionProfile.hasPlan) {
+      return t("descPro");
+    }
+    return t("descFreeTpl", { plan: sessionProfile.planLabel });
+  };
 }
 
 function statusVariant(value: string): "secondary" | "success" | "warning" {
@@ -147,9 +149,13 @@ export default function HomeWorkspace({
   checkinStatus,
   onCheckinSubmit,
 }: HomeWorkspaceProps) {
-  const accountLabel = sessionProfile?.isAnonymous
-    ? "Cuenta anónima"
-    : sessionProfile?.name || "Sin nombre — añádelo en Ajustes";
+  const t = useTranslations("workspace");
+  const normalizePlanDescription = useNormalizePlanDescription();
+  // accountLabel se calcula pero no se renderiza en este componente —
+  // si más adelante se usa, lee de t('account.anon') o t('account.noName').
+  void (sessionProfile?.isAnonymous
+    ? t("account.anon")
+    : sessionProfile?.name || t("account.noName"));
 
   return (
     <Tabs
@@ -160,19 +166,19 @@ export default function HomeWorkspace({
       <TabsList className="grid w-full grid-cols-4 lg:w-140" data-tour="workspace-tabs">
         <TabsTrigger value="chat" className="gap-1.5">
           <MessageSquareText className="size-4" />
-          <span className="hidden sm:inline">Chat</span>
+          <span className="hidden sm:inline">{t("tabs.chat")}</span>
         </TabsTrigger>
         <TabsTrigger value="plan" className="gap-1.5">
           <Target className="size-4" />
-          <span className="hidden sm:inline">Plan</span>
+          <span className="hidden sm:inline">{t("tabs.plan")}</span>
         </TabsTrigger>
         <TabsTrigger value="checkin" className="gap-1.5">
           <ClipboardCheck className="size-4" />
-          <span className="hidden sm:inline">Check-in</span>
+          <span className="hidden sm:inline">{t("tabs.checkin")}</span>
         </TabsTrigger>
-        <TabsTrigger value="espejo" className="gap-1.5" title="Mapa de patrones que postergas">
+        <TabsTrigger value="espejo" className="gap-1.5" title={t("tabs.espejoTooltip")}>
           <Eye className="size-4" />
-          <span className="hidden sm:inline">Espejo</span>
+          <span className="hidden sm:inline">{t("tabs.espejo")}</span>
         </TabsTrigger>
       </TabsList>
 
@@ -186,25 +192,21 @@ export default function HomeWorkspace({
             <CardHeader className="pb-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <CardTitle className="text-xl">Plan de ejecución</CardTitle>
-                  <CardDescription className="mt-1">
-                    Convierte la claridad en seguimiento visible. Aquí vive el objetivo y la deuda
-                    real de acción.
-                  </CardDescription>
+                  <CardTitle className="text-xl">{t("plan.title")}</CardTitle>
+                  <CardDescription className="mt-1">{t("plan.subtitle")}</CardDescription>
                 </div>
                 <Badge
                   variant={actionLock || pendingGoalAction ? "warning" : "success"}
                   className="rounded-full px-3 py-1"
                 >
-                  {actionLock || pendingGoalAction ? "Seguimiento activo" : "Sin deuda abierta"}
+                  {actionLock || pendingGoalAction ? t("plan.badgeActive") : t("plan.badgeClear")}
                 </Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-5">
               {!activeGoal ? (
                 <div className="rounded-2xl border border-dashed border-border bg-muted/40 p-6 text-sm text-muted-foreground">
-                  No hay un objetivo activo todavía. Usa el chat para definirlo y luego vuelve aquí
-                  para convertirlo en sistema.
+                  {t("plan.noGoal")}
                 </div>
               ) : (
                 <>
@@ -214,30 +216,35 @@ export default function HomeWorkspace({
                         {activeGoal.status}
                       </Badge>
                       <Badge variant="secondary" className="rounded-full px-3 py-1">
-                        {activeGoal.completedCount}/{activeGoal.totalCount} acciones
+                        {t("plan.actionsCounter", {
+                          done: activeGoal.completedCount,
+                          total: activeGoal.totalCount,
+                        })}
                       </Badge>
                     </div>
                     <h3 className="mt-3 text-lg font-semibold text-foreground">
                       {activeGoal.title}
                     </h3>
                     <p className="mt-2 text-sm text-muted-foreground">
-                      Progreso actual: {activeGoal.progress}% completado
+                      {t("plan.progressLine", { n: activeGoal.progress })}
                     </p>
                     <Progress value={activeGoal.progress} className="mt-3 h-2.5" />
                   </div>
 
                   <div className="rounded-2xl border border-border">
                     <div className="border-b border-border px-4 py-3">
-                      <p className="text-sm font-semibold text-foreground">Checklist de acciones</p>
+                      <p className="text-sm font-semibold text-foreground">
+                        {t("plan.checklistTitle")}
+                      </p>
                       <p className="mt-1 text-sm text-muted-foreground">
-                        Marca avances sin salir del workspace central.
+                        {t("plan.checklistSubtitle")}
                       </p>
                     </div>
                     <ScrollArea className="h-72">
                       <div className="space-y-3 p-4">
                         {activeGoal.actions.length === 0 ? (
                           <div className="rounded-2xl border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-                            Aún no hay acciones definidas para este objetivo.
+                            {t("plan.noActionsYet")}
                           </div>
                         ) : (
                           activeGoal.actions.map((goalAction) => (
@@ -251,7 +258,7 @@ export default function HomeWorkspace({
                                     variant={goalAction.completed ? "success" : "secondary"}
                                     className="rounded-full px-2.5 py-0.5"
                                   >
-                                    {goalAction.completed ? "Hecha" : "Pendiente"}
+                                    {goalAction.completed ? t("plan.actionDone") : t("plan.actionPending")}
                                   </Badge>
                                 </div>
                                 <p
@@ -277,12 +284,12 @@ export default function HomeWorkspace({
                                   {goalAction.completed ? (
                                     <>
                                       <Compass className="size-4" />
-                                      <span className="hidden sm:inline">Marcar pendiente</span>
+                                      <span className="hidden sm:inline">{t("plan.markPending")}</span>
                                     </>
                                   ) : (
                                     <>
                                       <CheckCheck className="size-4" />
-                                      <span className="hidden sm:inline">Marcar hecha</span>
+                                      <span className="hidden sm:inline">{t("plan.markDone")}</span>
                                     </>
                                   )}
                                 </Button>
@@ -304,10 +311,10 @@ export default function HomeWorkspace({
                                           remindAt: tomorrow.toISOString(),
                                         }),
                                       }).then(() => {
-                                        toast.success("Te recordaremos mañana a las 9:00");
+                                        toast.success(t("plan.remindTomorrowToast"));
                                       }).catch(() => {});
                                     }}
-                                    title="Recordarme mañana a las 9:00"
+                                    title={t("plan.remindTomorrow")}
                                   >
                                     <Clock className="size-4" />
                                   </Button>
@@ -327,19 +334,19 @@ export default function HomeWorkspace({
           <div className="space-y-4">
             <Card className="border-border/80 bg-card/95 shadow-sm">
               <CardHeader className="pb-4">
-                <CardTitle className="text-base">Continuidad y cuenta</CardTitle>
+                <CardTitle className="text-base">{t("continuity.title")}</CardTitle>
                 <CardDescription>{normalizePlanDescription(sessionProfile)}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge variant="secondary" className="rounded-full px-3 py-1">
-                    {sessionProfile?.planLabel || "Free"}
+                    {sessionProfile?.planLabel || t("continuity.planFree")}
                   </Badge>
                   <Badge
                     variant={sessionProfile?.isAnonymous ? "warning" : "success"}
                     className="rounded-full px-3 py-1"
                   >
-                    {sessionProfile?.isAnonymous ? "Progreso sin guardar" : "Progreso guardado"}
+                    {sessionProfile?.isAnonymous ? t("continuity.anonProgress") : t("continuity.savedProgress")}
                   </Badge>
                   {sessionProfile?.subscriptionStatus ? (
                     <Badge variant="secondary" className="rounded-full px-3 py-1">
@@ -349,25 +356,24 @@ export default function HomeWorkspace({
                 </div>
 
                 {sessionProfile?.plan === "free" && (
-                  <UpgradeBanner message="Pro: continuidad entre dispositivos, memoria persistente entre sesiones y Modo Impulso." />
+                  <UpgradeBanner message={t("continuity.proUpsell")} />
                 )}
 
                 {(captureEmailRecommended ||
                   Boolean(sessionProfile && !sessionProfile.isAnonymous)) && (
                   <div className="rounded-2xl border border-border bg-muted/40 p-4">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                      Guardar progreso
+                      {t("continuity.saveProgressEyebrow")}
                     </p>
                     <p className="mt-2 text-sm text-muted-foreground">
-                      {captureEmailPrompt ||
-                        "Vincula un email para conservar conversaciones, objetivos y continuidad entre dispositivos."}
+                      {captureEmailPrompt || t("continuity.saveProgressDefaultPrompt")}
                     </p>
                     <div className="mt-4 flex flex-col gap-3">
                       <Input
                         type="email"
                         value={saveProgressEmail}
                         onChange={(event) => onSaveProgressEmailChange(event.target.value)}
-                        placeholder="tu@email.com"
+                        placeholder={t("continuity.emailPlaceholder")}
                         className="bg-background"
                       />
                       <Button
@@ -375,7 +381,7 @@ export default function HomeWorkspace({
                         onClick={() => void onSaveProgress()}
                         disabled={saveProgressLoading || !saveProgressEmail.trim()}
                       >
-                        {saveProgressLoading ? "Guardando..." : "Guardar progreso"}
+                        {saveProgressLoading ? t("continuity.saving") : t("continuity.save")}
                       </Button>
                     </div>
                     {saveProgressStatus ? (
@@ -389,7 +395,7 @@ export default function HomeWorkspace({
                 {showUpgradeCta && upgradeCopy ? (
                   <div className="rounded-2xl border border-border bg-background/80 p-4">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                      Continuidad completa
+                      {t("continuity.completeUpgradeTitle")}
                     </p>
                     <p className="mt-2 text-sm text-muted-foreground">{upgradeCopy}</p>
                     <Button
@@ -398,7 +404,7 @@ export default function HomeWorkspace({
                       className="mt-4 w-full"
                       onClick={onOpenUpgrade}
                     >
-                      Ver plan Pro
+                      {t("continuity.openUpgrade")}
                     </Button>
                   </div>
                 ) : null}
@@ -407,16 +413,14 @@ export default function HomeWorkspace({
 
             <Card className="border-border/80 bg-card/95 shadow-sm">
               <CardHeader className="pb-4">
-                <CardTitle className="text-base">Responsabilidad activa</CardTitle>
-                <CardDescription>
-                  Lo que no se hace hoy se convierte en fricción mañana.
-                </CardDescription>
+                <CardTitle className="text-base">{t("responsibility.title")}</CardTitle>
+                <CardDescription>{t("responsibility.subtitle")}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 {actionLock ? (
                   <div className="rounded-2xl border border-signal-warning/30 bg-signal-warning/12 p-4 text-sm text-foreground">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                      Acción pendiente prioritaria
+                      {t("responsibility.priorityLabel")}
                     </p>
                     <p className="mt-2 font-semibold">{actionLock.actionTitle}</p>
                     <p className="mt-1">{actionLock.message}</p>
@@ -424,13 +428,13 @@ export default function HomeWorkspace({
                 ) : pendingGoalAction ? (
                   <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-foreground">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                      Siguiente acción sugerida
+                      {t("responsibility.nextLabel")}
                     </p>
                     <p className="mt-2 font-medium">{pendingGoalAction.description}</p>
                   </div>
                 ) : (
                   <div className="rounded-2xl border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-                    No hay deuda activa abierta. Aprovecha el chat para definir el siguiente paso.
+                    {t("responsibility.empty")}
                   </div>
                 )}
 
@@ -441,10 +445,10 @@ export default function HomeWorkspace({
                     className="flex-1"
                     onClick={() => onTabChange("chat")}
                   >
-                    Volver al chat
+                    {t("responsibility.backToChat")}
                   </Button>
                   <Button asChild type="button" variant="outline" className="flex-1">
-                    <Link href="/app/goals">Historial de objetivos</Link>
+                    <Link href="/app/goals">{t("responsibility.goalsHistory")}</Link>
                   </Button>
                 </div>
               </CardContent>
@@ -457,12 +461,8 @@ export default function HomeWorkspace({
         <div className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
           <Card className="border-border/80 bg-card/95 shadow-sm">
             <CardHeader className="pb-4">
-              <CardTitle className="text-xl">Ritual diario</CardTitle>
-              <CardDescription>
-                Usalo para registrar como llegas hoy, aunque no necesites una conversacion larga.
-                ¿Por que cada dia? Porque el cambio no viene de un dia bueno — viene de no perder el hilo.
-                30 segundos bastan. La constancia pequena gana siempre al esfuerzo perfecto.
-              </CardDescription>
+              <CardTitle className="text-xl">{t("checkin.title")}</CardTitle>
+              <CardDescription>{t("checkin.subtitle")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Textarea
@@ -470,22 +470,23 @@ export default function HomeWorkspace({
                 onChange={(event) => onCheckinInputChange(event.target.value)}
                 rows={7}
                 disabled={checkinLoading}
-                placeholder="Ejemplo: Hoy estoy bloqueado y me cuesta arrancar."
+                placeholder={t("checkin.placeholder")}
                 className="min-h-56 resize-none bg-background"
               />
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="text-xs text-muted-foreground">
                   {checkinStatus ? (
                     <span>
-                      Último guardado:{" "}
-                      {new Date(checkinStatus.savedAt).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}{" "}
-                      · estado {checkinStatus.state}
+                      {t("checkin.lastSavedTpl", {
+                        time: new Date(checkinStatus.savedAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }),
+                        state: checkinStatus.state,
+                      })}
                     </span>
                   ) : (
-                    <span>Sin check-in registrado en esta sesión.</span>
+                    <span>{t("checkin.noneThisSession")}</span>
                   )}
                 </div>
                 <Button
@@ -493,7 +494,7 @@ export default function HomeWorkspace({
                   onClick={() => void onCheckinSubmit()}
                   disabled={checkinLoading || !checkinInput.trim()}
                 >
-                  {checkinLoading ? "Guardando..." : "Guardar check-in"}
+                  {checkinLoading ? t("checkin.saving") : t("checkin.save")}
                 </Button>
               </div>
               {checkinStatus ? (
@@ -507,10 +508,8 @@ export default function HomeWorkspace({
           <div className="space-y-4">
             <Card className="border-border/80 bg-card/95 shadow-sm">
               <CardHeader className="pb-4">
-                <CardTitle className="text-base">Pulso actual</CardTitle>
-                <CardDescription>
-                  Una lectura rápida de dónde estás hoy y cómo encaja con tu continuidad.
-                </CardDescription>
+                <CardTitle className="text-base">{t("checkin.pulseTitle")}</CardTitle>
+                <CardDescription>{t("checkin.pulseSubtitle")}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex flex-wrap items-center gap-2">
@@ -518,36 +517,29 @@ export default function HomeWorkspace({
                     variant={statusVariant(conversationState)}
                     className="rounded-full px-3 py-1"
                   >
-                    Estado actual: {conversationState}
+                    {t("checkin.currentStateTpl", { state: conversationState })}
                   </Badge>
                   <Badge variant="secondary" className="rounded-full px-3 py-1">
-                    Dominante: {progress.dominantState}
+                    {t("checkin.dominantTpl", { state: progress.dominantState })}
                   </Badge>
                   {checkinStatus ? (
                     <Badge variant="success" className="rounded-full px-3 py-1">
-                      {checkinStatus.checkinsToday} check-ins hoy
+                      {t("checkin.checkinsTodayTpl", { n: checkinStatus.checkinsToday })}
                     </Badge>
                   ) : null}
                 </div>
 
                 <div className="rounded-2xl border border-border bg-muted/40 p-4">
-                  <p className="text-sm font-medium text-foreground">
-                    Haz un check-in cuando necesites registrar el estado sin abrir una sesión larga.
-                  </p>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    El objetivo no es explicar todo. Es dejar una señal breve que mantenga el hilo
-                    del proceso.
-                  </p>
+                  <p className="text-sm font-medium text-foreground">{t("checkin.hintTitle")}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">{t("checkin.hintBody")}</p>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="border-border/80 bg-card/95 shadow-sm">
               <CardHeader className="pb-4">
-                <CardTitle className="text-base">Atajos de continuidad</CardTitle>
-                <CardDescription>
-                  Salta al modo que necesites sin perder el estado local de esta vista.
-                </CardDescription>
+                <CardTitle className="text-base">{t("checkin.shortcutsTitle")}</CardTitle>
+                <CardDescription>{t("checkin.shortcutsSubtitle")}</CardDescription>
               </CardHeader>
               <CardContent className="flex flex-col gap-3">
                 <Button
@@ -556,7 +548,7 @@ export default function HomeWorkspace({
                   className="justify-between"
                   onClick={() => onTabChange("chat")}
                 >
-                  Ir al chat
+                  {t("checkin.goToChat")}
                   <ArrowRight className="size-4" />
                 </Button>
                 <Button
@@ -565,12 +557,12 @@ export default function HomeWorkspace({
                   className="justify-between"
                   onClick={() => onTabChange("plan")}
                 >
-                  Ver plan activo
+                  {t("checkin.viewPlan")}
                   <ChartNoAxesColumn className="size-4" />
                 </Button>
                 <Button asChild type="button" variant="outline" size="sm" className="justify-between">
                   <Link href="/app/checkins">
-                    Historial de check-ins
+                    {t("checkin.checkinsHistory")}
                     <ArrowRight className="size-4" />
                   </Link>
                 </Button>
@@ -583,15 +575,13 @@ export default function HomeWorkspace({
       <TabsContent value="espejo" className="flex-1">
         <Card className="border-border/80 bg-card/95 shadow-sm">
           <CardHeader className="pb-4">
-            <CardTitle className="text-xl">Mapa de evitación</CardTitle>
-            <CardDescription>
-              Esto es lo que llevas posponiendo y por qué. Mirarlo de frente es el primer paso.
-            </CardDescription>
+            <CardTitle className="text-xl">{t("espejo.title")}</CardTitle>
+            <CardDescription>{t("espejo.subtitle")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <AvoidanceMap />
             <Button asChild type="button" variant="outline" size="sm">
-              <Link href="/app/patrones">Ver analisis completo de patrones</Link>
+              <Link href="/app/patrones">{t("espejo.fullAnalysis")}</Link>
             </Button>
           </CardContent>
         </Card>

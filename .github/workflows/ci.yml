@@ -90,6 +90,34 @@ jobs:
           ADMIN_USERNAME: "ci-admin"
           ADMIN_PASSWORD: "ci-password"
 
+  i18n-key-parity:
+    name: i18n / Key Parity
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Sin `npm ci` ni Prisma: el script sólo lee messages/*.json y src/.
+      # ~1-2s totales.
+      - name: Verificar que es.json ↔ en/pt/fr.json no se han desincronizado
+        run: |
+          # SOFT mode: emite ::warning:: pero no falla el CI mientras existan
+          # 125 keys pendientes de sync por saldo OpenRouter (Sidebar/Footer).
+          # Para endurecer: borrar este wrapper y dejar `node scripts/i18n-check.mjs`.
+          set +e
+          OUT="$(node scripts/i18n-check.mjs 2>&1)"
+          STATUS=$?
+          echo "$OUT"
+          if [ "$STATUS" != "0" ]; then
+            echo "::warning title=i18n key drift::Hay keys en es.json sin traducir a en/pt/fr. Ejecuta \`pnpm i18n:sync\` con OPENROUTER_API_KEY."
+          fi
+          exit 0
+
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest

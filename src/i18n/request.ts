@@ -31,8 +31,47 @@ export default getRequestConfig(async ({ requestLocale }) => {
   const baseMessages = (await import(`../../messages/${locale}.json`)).default;
   const messages = await applySiteContentOverrides(baseMessages, locale);
 
+  // Fallback automático a español para keys faltantes (común tras refactor
+  // donde se añaden keys nuevas y aún no se ejecutó pnpm i18n:sync). Hacemos
+  // un deep-merge con es.json como base — si la key existe en el destino,
+  // gana el destino; si no, cae al español. Evita ver paths crudos como
+  // "sidebar.workspace" en la UI cuando el sync no se ha corrido todavía.
+  let mergedMessages = messages;
+  if (locale !== routing.defaultLocale) {
+    const fallback = (await import(`../../messages/${routing.defaultLocale}.json`)).default;
+    mergedMessages = deepMerge(fallback as Record<string, unknown>, messages as Record<string, unknown>);
+  }
+
   return {
     locale,
-    messages,
+    messages: mergedMessages,
   };
 });
+
+/**
+ * Merge profundo: target gana sobre source en strings, pero hereda de source
+ * las keys/sub-keys que target no tiene. Solo recursa en objetos planos —
+ * arrays y primitivos los reemplaza.
+ */
+function deepMerge(
+  source: Record<string, unknown>,
+  target: Record<string, unknown>,
+): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...source };
+  for (const [key, value] of Object.entries(target)) {
+    const existing = source[key];
+    if (
+      existing &&
+      typeof existing === "object" &&
+      !Array.isArray(existing) &&
+      value &&
+      typeof value === "object" &&
+      !Array.isArray(value)
+    ) {
+      out[key] = deepMerge(existing as Record<string, unknown>, value as Record<string, unknown>);
+    } else {
+      out[key] = value;
+    }
+  }
+  return out;
+}

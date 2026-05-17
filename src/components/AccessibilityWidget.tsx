@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import {
   Accessibility, X, Type, Contrast, MonitorOff,
   BookOpenText, Link2, MousePointer, Space, RotateCcw,
@@ -9,6 +10,7 @@ import {
 import { useAccessibility } from "@/lib/accessibility";
 
 export default function AccessibilityWidget() {
+  const t = useTranslations("accessibility");
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -74,8 +76,8 @@ export default function AccessibilityWidget() {
       <button
         ref={buttonRef}
         onClick={() => setOpen((v) => !v)}
-        aria-label={open ? "Cerrar panel de accesibilidad" : "Abrir panel de accesibilidad"}
-        title={open ? "Cerrar panel de accesibilidad" : "Accesibilidad: tamaño de texto, contraste y movimiento"}
+        aria-label={open ? t("closePanel") : t("openPanel")}
+        title={open ? t("closePanel") : t("triggerTooltip")}
         aria-expanded={open}
         aria-controls="a11y-panel"
         className="fixed bottom-36 sm:bottom-20 left-4 z-[9998] flex items-center justify-center w-11 h-11 rounded-full bg-violet-600/90 hover:bg-violet-500 text-white shadow-lg shadow-violet-500/25 backdrop-blur-sm transition-all focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
@@ -94,7 +96,7 @@ export default function AccessibilityWidget() {
           ref={panelRef}
           id="a11y-panel"
           role="dialog"
-          aria-label="Opciones de accesibilidad"
+          aria-label={t("dialogLabel")}
           aria-modal="true"
           className="fixed bottom-48 sm:bottom-32 left-4 right-4 sm:right-auto z-[9998] sm:w-80 max-h-[70vh] overflow-y-auto rounded-2xl border border-zinc-700 bg-zinc-900 shadow-2xl shadow-black/40"
         >
@@ -102,11 +104,11 @@ export default function AccessibilityWidget() {
           <div className="sticky top-0 bg-zinc-900 border-b border-zinc-800 px-5 py-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Accessibility className="w-4 h-4 text-violet-400" />
-              <h2 className="text-sm font-bold text-white">Accesibilidad</h2>
+              <h2 className="text-sm font-bold text-white">{t("title")}</h2>
             </div>
             <button
               onClick={() => setOpen(false)}
-              aria-label="Cerrar"
+              aria-label={t("close")}
               className="p-1.5 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800 transition-colors"
             >
               <X className="w-4 h-4" />
@@ -119,23 +121,23 @@ export default function AccessibilityWidget() {
             <div className="rounded-xl border border-zinc-800 bg-zinc-800/40 p-4">
               <div className="flex items-center gap-2 mb-3">
                 <Type className="w-4 h-4 text-cyan-400" />
-                <span className="text-xs font-semibold text-white">Tamano de texto</span>
+                <span className="text-xs font-semibold text-white">{t("textSize")}</span>
               </div>
               <div className="flex items-center justify-between gap-2">
                 <button
                   onClick={() => update({ fontSize: Math.max(0, prefs.fontSize - 1) })}
                   disabled={prefs.fontSize <= 0}
-                  aria-label="Reducir tamano de texto"
+                  aria-label={t("reduceText")}
                   className="p-2 rounded-lg bg-zinc-700/50 text-zinc-300 hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   <Minus className="w-4 h-4" />
                 </button>
-                <div className="flex gap-1" role="group" aria-label="Nivel de tamano de texto">
+                <div className="flex gap-1" role="group" aria-label={t("textSizeLevel")}>
                   {[0, 1, 2, 3, 4].map((level) => (
                     <button
                       key={level}
                       onClick={() => update({ fontSize: level })}
-                      aria-label={level === 0 ? "Tamano normal" : `Tamano +${level}`}
+                      aria-label={level === 0 ? t("sizeNormal") : t("sizePlus", { level })}
                       aria-pressed={prefs.fontSize === level}
                       className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${
                         prefs.fontSize === level
@@ -150,7 +152,7 @@ export default function AccessibilityWidget() {
                 <button
                   onClick={() => update({ fontSize: Math.min(4, prefs.fontSize + 1) })}
                   disabled={prefs.fontSize >= 4}
-                  aria-label="Aumentar tamano de texto"
+                  aria-label={t("increaseText")}
                   className="p-2 rounded-lg bg-zinc-700/50 text-zinc-300 hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   <Plus className="w-4 h-4" />
@@ -161,48 +163,48 @@ export default function AccessibilityWidget() {
             {/* Toggle options */}
             <ToggleOption
               icon={<Contrast className="w-4 h-4 text-amber-400" />}
-              label="Alto contraste"
-              description="Aumenta el contraste de colores"
+              label={t("highContrast")}
+              description={t("highContrastDesc")}
               checked={prefs.highContrast}
               onChange={(v) => update({ highContrast: v })}
             />
 
             <ToggleOption
               icon={<MonitorOff className="w-4 h-4 text-red-400" />}
-              label="Reducir movimiento"
-              description="Desactiva animaciones y transiciones"
+              label={t("reduceMotion")}
+              description={t("reduceMotionDesc")}
               checked={prefs.reducedMotion}
               onChange={(v) => update({ reducedMotion: v })}
             />
 
             <ToggleOption
               icon={<BookOpenText className="w-4 h-4 text-emerald-400" />}
-              label="Fuente para dislexia"
-              description="Tipografia mas legible para dislexia"
+              label={t("dyslexiaFont")}
+              description={t("dyslexiaFontDesc")}
               checked={prefs.dyslexiaFont}
               onChange={(v) => update({ dyslexiaFont: v })}
             />
 
             <ToggleOption
               icon={<Link2 className="w-4 h-4 text-blue-400" />}
-              label="Resaltar enlaces"
-              description="Subraya todos los enlaces"
+              label={t("highlightLinks")}
+              description={t("highlightLinksDesc")}
               checked={prefs.linkHighlight}
               onChange={(v) => update({ linkHighlight: v })}
             />
 
             <ToggleOption
               icon={<MousePointer className="w-4 h-4 text-fuchsia-400" />}
-              label="Cursor grande"
-              description="Cursor mas grande y visible"
+              label={t("bigCursor")}
+              description={t("bigCursorDesc")}
               checked={prefs.bigCursor}
               onChange={(v) => update({ bigCursor: v })}
             />
 
             <ToggleOption
               icon={<Space className="w-4 h-4 text-violet-400" />}
-              label="Espaciado de texto"
-              description="Mas espacio entre letras y lineas"
+              label={t("textSpacing")}
+              description={t("textSpacingDesc")}
               checked={prefs.textSpacing}
               onChange={(v) => update({ textSpacing: v })}
             />
@@ -213,13 +215,13 @@ export default function AccessibilityWidget() {
               className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-zinc-700 text-xs font-medium text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              Restablecer todo
+              {t("resetAll")}
             </button>
 
             <p className="text-[10px] text-zinc-600 text-center pt-1">
-              Las preferencias se guardan en tu navegador
+              {t("savedInBrowser")}
               <br />
-              <kbd className="px-1 py-0.5 rounded bg-zinc-800 text-zinc-500 text-[9px] font-mono">Alt + A</kbd> para abrir/cerrar
+              <kbd className="px-1 py-0.5 rounded bg-zinc-800 text-zinc-500 text-[9px] font-mono">Alt + A</kbd> {t("toToggle")}
             </p>
           </div>
         </div>

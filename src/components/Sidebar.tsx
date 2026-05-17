@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ArrowRight, Check, Copy, Gift, LogOut, Pencil, Plus, Search, Share2, ShieldCheck, Trash2, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -78,6 +79,18 @@ function formatRelativeDate(isoDate: string): string {
   })}`;
 }
 
+// Stable config (icons/hrefs/keys), labels & requirement strings come from i18n
+const NAV_ITEMS_CONFIG = [
+  { key: "chat" as const, href: "/app", icon: "💬", tour: undefined },
+  { key: "checkin" as const, href: "/app/checkins", icon: "✅", tour: undefined },
+  { key: "comunidad" as const, href: "/community", icon: "👥", tour: "comunidad" },
+  { key: "plan" as const, href: "/app/goals", icon: "🎯", tour: undefined },
+  { key: "diario" as const, href: "/app/diario", icon: "📔", tour: undefined },
+  { key: "respirar" as const, href: "/app/respirar", icon: "🌬", tour: undefined },
+  { key: "logros" as const, href: "/app/logros", icon: "🏆", tour: undefined },
+  { key: "impulso" as const, href: "/impulso", icon: "⚡", tour: "modo-impulso" },
+];
+
 export default function Sidebar({
   conversations,
   activeConversationId,
@@ -94,6 +107,7 @@ export default function Sidebar({
   onDeleteConversation,
   onToggleAction,
 }: SidebarProps) {
+  const t = useTranslations("sidebar");
   const pathname = usePathname();
 
   // ── Progressive unlock system ──────────────────────────────────────────────
@@ -246,16 +260,16 @@ export default function Sidebar({
 
         <div className="rounded-2xl border border-border bg-muted/40 p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Workspace
+            {t("workspace")}
           </p>
           <Link href="/settings" className="mt-1 block text-sm font-medium text-foreground hover:text-primary transition-colors">
             {profile.name}
           </Link>
           <p className="mt-1 text-sm text-muted-foreground">
-            Conversaciones, continuidad y acceso rápido al producto.
+            {t("workspaceDesc")}
           </p>
           <Button type="button" className="mt-4 w-full justify-between" onClick={onNewConversation} data-tour="new-conversation">
-            Nueva conversación
+            {t("newConversation")}
             <Plus className="size-4" />
           </Button>
         </div>
@@ -265,15 +279,15 @@ export default function Sidebar({
           <div className="flex items-center justify-between">
             <p
               className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
-              title="Funciones desbloqueadas: el camino se va abriendo segun usas la app (racha, dias activos, etc)"
+              title={t("yourPathTooltip")}
             >
-              Tu camino
+              {t("yourPath")}
             </p>
             <Badge
               variant="secondary"
               className="rounded-full px-2 py-0.5 text-[10px]"
-              title={`${unlockedCount} de ${totalFeatures} funciones desbloqueadas`}
-              aria-label={`${unlockedCount} de ${totalFeatures} funciones desbloqueadas`}
+              title={t("unlockedFeaturesAria", { count: unlockedCount, total: totalFeatures })}
+              aria-label={t("unlockedFeaturesAria", { count: unlockedCount, total: totalFeatures })}
             >
               {unlockedCount}/{totalFeatures}
             </Badge>
@@ -289,18 +303,11 @@ export default function Sidebar({
 
           {/* Feature list */}
           <div className="space-y-1">
-            {([
-              { key: "chat" as const, label: "Chat", href: "/app", icon: "💬", req: "Siempre", tour: undefined },
-              { key: "checkin" as const, label: "Check-in", href: "/app/checkins", icon: "✅", req: "Siempre", tour: undefined },
-              { key: "comunidad" as const, label: "Comunidad", href: "/community", icon: "👥", req: "Siempre", tour: "comunidad" },
-              { key: "plan" as const, label: "Plan", href: "/app/goals", icon: "🎯", req: "Dia 3", tour: undefined },
-              { key: "diario" as const, label: "Diario", href: "/app/diario", icon: "📔", req: "Dia 7", tour: undefined },
-              { key: "respirar" as const, label: "Respirar", href: "/app/respirar", icon: "🌬", req: "Racha 3d", tour: undefined },
-              { key: "logros" as const, label: "Logros", href: "/app/logros", icon: "🏆", req: "Racha 7d", tour: undefined },
-              { key: "impulso" as const, label: "Impulso 21d", href: "/impulso", icon: "⚡", req: "Dia 21", tour: "modo-impulso" },
-            ]).map((item) => {
+            {NAV_ITEMS_CONFIG.map((item) => {
               const unlocked = unlocks[item.key];
               const active = item.href === "/app" ? pathname === "/app" : pathname?.startsWith(item.href);
+              const label = t(`nav.${item.key}.label`);
+              const req = t(`nav.${item.key}.req`);
 
               if (unlocked) {
                 return (
@@ -315,7 +322,7 @@ export default function Sidebar({
                     }`}
                   >
                     <span className="text-base">{item.icon}</span>
-                    <span className="font-medium">{item.label}</span>
+                    <span className="font-medium">{label}</span>
                   </Link>
                 );
               }
@@ -324,11 +331,11 @@ export default function Sidebar({
                 <div
                   key={item.key}
                   className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-muted-foreground/50 cursor-not-allowed"
-                  title={`Se desbloquea en: ${item.req}`}
+                  title={t("unlocksAt", { req })}
                 >
                   <span className="text-base grayscale opacity-40">🔒</span>
-                  <span className="font-medium">{item.label}</span>
-                  <span className="ml-auto text-[10px] text-muted-foreground/40">{item.req}</span>
+                  <span className="font-medium">{label}</span>
+                  <span className="ml-auto text-[10px] text-muted-foreground/40">{req}</span>
                 </div>
               );
             })}
@@ -336,7 +343,7 @@ export default function Sidebar({
 
           {/* Settings always accessible */}
           <Button asChild type="button" variant={pathname?.startsWith("/settings") ? "default" : "outline"} size="sm" className="w-full justify-center text-xs" data-tour="ajustes">
-            <Link href="/settings">Ajustes</Link>
+            <Link href="/settings">{t("settings")}</Link>
           </Button>
 
           {/* Método — always linked so registered users can return to the pedagogical frame */}
@@ -344,7 +351,7 @@ export default function Sidebar({
             href="/como-funciona"
             className="block text-center text-[11px] text-muted-foreground/70 hover:text-violet-300 transition-colors"
           >
-            Conoce el método
+            {t("knowMethod")}
           </Link>
         </div>
 
@@ -357,9 +364,9 @@ export default function Sidebar({
         >
           <span className="text-xl">💬</span>
           <div>
-            <p className="font-semibold text-cyan-300 leading-snug">Llevame en Telegram</p>
+            <p className="font-semibold text-cyan-300 leading-snug">{t("telegramTitle")}</p>
             <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">
-              Habla con tu mentor, recibe recordatorios y haz check-in sin abrir la web.
+              {t("telegramDesc")}
             </p>
           </div>
         </a>
@@ -373,10 +380,10 @@ export default function Sidebar({
 
       {hasPendingAssessment && (
         <div className="mt-3 rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-3">
-          <p className="text-xs font-semibold text-cyan-400">Evaluacion pendiente</p>
-          <p className="mt-1 text-xs text-muted-foreground">Tu profesional te ha asignado una evaluacion. Completala para que pueda hacer seguimiento.</p>
+          <p className="text-xs font-semibold text-cyan-400">{t("pendingAssessment")}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{t("pendingAssessmentDesc")}</p>
           <Button asChild type="button" size="sm" variant="outline" className="mt-2 w-full">
-            <Link href="/app/checkins">Completar evaluacion</Link>
+            <Link href="/app/checkins">{t("completeAssessment")}</Link>
           </Button>
         </div>
       )}
@@ -388,10 +395,10 @@ export default function Sidebar({
           <div className="flex items-center justify-between gap-2">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                Conversaciones
+                {t("conversations")}
               </p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Actividad reciente y continuidad.
+                {t("conversationsDesc")}
               </p>
             </div>
             <Badge variant="secondary" className="rounded-full px-3 py-1">
@@ -402,7 +409,7 @@ export default function Sidebar({
           <div className="relative">
             <Search className="absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Buscar conversación..."
+              placeholder={t("searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="h-8 rounded-xl pl-8 text-xs"
@@ -422,7 +429,7 @@ export default function Sidebar({
             <div className="space-y-2 p-2">
               {filteredConversations.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-border bg-background/60 p-4 text-sm text-muted-foreground">
-                  {searchQuery ? "Sin resultados." : "Todavía no hay conversaciones persistidas."}
+                  {searchQuery ? t("noResults") : t("noConversations")}
                 </div>
               ) : (
                 filteredConversations.map((conversation) => {
@@ -441,7 +448,7 @@ export default function Sidebar({
                     >
                       {isDeleting ? (
                         <div className="flex items-center gap-2 px-3 py-3">
-                          <p className="flex-1 truncate text-xs">¿Eliminar conversación?</p>
+                          <p className="flex-1 truncate text-xs">{t("deleteConfirm")}</p>
                           <button
                             type="button"
                             onClick={async () => {
@@ -450,14 +457,14 @@ export default function Sidebar({
                             }}
                             className="rounded-lg bg-destructive px-2 py-1 text-[11px] font-semibold text-destructive-foreground hover:opacity-90"
                           >
-                            Sí
+                            {t("yes")}
                           </button>
                           <button
                             type="button"
                             onClick={() => setDeletingId(null)}
                             className="rounded-lg border px-2 py-1 text-[11px] hover:bg-muted"
                           >
-                            No
+                            {t("no")}
                           </button>
                         </div>
                       ) : isEditing ? (
@@ -499,7 +506,7 @@ export default function Sidebar({
                               isActive ? "text-primary-foreground/80" : "text-muted-foreground"
                             }`}
                           >
-                            <span>{conversation.messageCount} mensajes</span>
+                            <span>{t("messageCount", { count: conversation.messageCount })}</span>
                             <span>{formatRelativeDate(conversation.updatedAt)}</span>
                           </div>
                         </button>
@@ -514,7 +521,7 @@ export default function Sidebar({
                               startEditing(conversation.id, conversation.title);
                             }}
                             className={`rounded-lg p-2 hover:bg-muted/60 ${isActive ? "text-primary-foreground/70 hover:text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
-                            title="Renombrar"
+                            title={t("rename")}
                           >
                             <Pencil className="size-3.5" />
                           </button>
@@ -525,7 +532,7 @@ export default function Sidebar({
                               setDeletingId(conversation.id);
                             }}
                             className={`rounded-lg p-2 hover:bg-destructive/10 ${isActive ? "text-primary-foreground/70 hover:text-primary-foreground" : "text-muted-foreground hover:text-destructive"}`}
-                            title="Eliminar"
+                            title={t("delete")}
                           >
                             <Trash2 className="size-3.5" />
                           </button>
@@ -543,16 +550,16 @@ export default function Sidebar({
           <div className="rounded-2xl border border-border bg-muted/40 p-4">
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="secondary" className="rounded-full px-3 py-1">
-                {progress.completedActions}/{progress.totalActions} acciones
+                {t("actionsProgress", { done: progress.completedActions, total: progress.totalActions })}
               </Badge>
               <Badge variant="secondary" className="rounded-full px-3 py-1 capitalize">
                 {progress.dominantState}
               </Badge>
             </div>
-            <p className="mt-3 text-sm font-medium text-foreground">Progreso del proceso</p>
+            <p className="mt-3 text-sm font-medium text-foreground">{t("processProgress")}</p>
             <Progress value={progressPercent} className="mt-3 h-2.5" />
             <p className="mt-2 text-sm text-muted-foreground">
-              Continuidad visible para que el trabajo no dependa solo de la memoria.
+              {t("processProgressDesc")}
             </p>
             {progress.emotionalState || progress.streakDays !== undefined ? (
               <div className="mt-3 flex flex-wrap gap-2">
@@ -572,19 +579,19 @@ export default function Sidebar({
                     }
                     className="rounded-full px-3 py-1"
                   >
-                    Tendencia: {progress.progressTrend}
+                    {t("trend", { value: progress.progressTrend })}
                   </Badge>
                 ) : null}
                 {(progress.streakDays ?? 0) > 0 ? (
                   <Badge variant="secondary" className="rounded-full px-3 py-1">
-                    🔥 {progress.streakDays} días racha
+                    {t("streakDays", { count: progress.streakDays ?? 0 })}
                   </Badge>
                 ) : null}
                 <button
                   onClick={() => setShowShareStory(true)}
                   className="inline-flex items-center gap-1 rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-[11px] font-semibold text-violet-300 hover:bg-violet-500/20 transition-colors"
                 >
-                  <Share2 className="w-3 h-3" /> Compartir
+                  <Share2 className="w-3 h-3" /> {t("share")}
                 </button>
               </div>
             ) : null}
@@ -594,10 +601,10 @@ export default function Sidebar({
             <div className="flex items-start justify-between gap-2">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Objetivo activo
+                  {t("activeGoal")}
                 </p>
                 <p className="mt-1 text-sm font-medium text-foreground">
-                  {activeGoal?.title || "Sin objetivo activo"}
+                  {activeGoal?.title || t("noActiveGoal")}
                 </p>
               </div>
               {activeGoal ? (
@@ -610,7 +617,7 @@ export default function Sidebar({
             {activeGoal ? (
               <>
                 <p className="mt-3 text-sm text-muted-foreground">
-                  {activeGoal.completedCount}/{activeGoal.totalCount} acciones completadas.
+                  {t("actionsCompleted", { done: activeGoal.completedCount, total: activeGoal.totalCount })}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Badge
@@ -618,8 +625,8 @@ export default function Sidebar({
                     className="rounded-full px-3 py-1"
                   >
                     {pendingActionsCount > 0
-                      ? `${pendingActionsCount} pendientes`
-                      : "Sin deuda abierta"}
+                      ? t("pendingCount", { count: pendingActionsCount })
+                      : t("noOpenDebt")}
                   </Badge>
                 </div>
                 <div className="mt-3 space-y-2">
@@ -631,8 +638,8 @@ export default function Sidebar({
                       disabled={!onToggleAction}
                       title={
                         action.completed
-                          ? "Marcar como pendiente otra vez"
-                          : "Marcar como hecha"
+                          ? t("markPendingAgain")
+                          : t("markDone")
                       }
                       className={`flex items-start gap-2 w-full text-left rounded-xl border border-border bg-background/80 px-3 py-2 text-sm transition-colors ${
                         onToggleAction
@@ -672,7 +679,7 @@ export default function Sidebar({
               </>
             ) : (
               <p className="mt-3 text-sm text-muted-foreground">
-                Usa el chat para definir un foco y convertirlo aquí en seguimiento.
+                {t("emptyGoalHint")}
               </p>
             )}
           </div>
@@ -690,11 +697,11 @@ export default function Sidebar({
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-2">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                Mensajes de apoyo
+                {t("supportMessages")}
               </p>
               {unreadSupport > 0 && (
                 <Badge variant="warning" className="rounded-full px-2 py-0.5 text-[10px]">
-                  {unreadSupport} nuevo{unreadSupport > 1 ? "s" : ""}
+                  {t("newCount", { count: unreadSupport })}
                 </Badge>
               )}
             </div>
@@ -727,12 +734,12 @@ export default function Sidebar({
         <div className="flex items-center justify-between gap-2">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              Invitaciones
+              {t("invitations")}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
               {availableInvites.length > 0
-                ? `${availableInvites.length} disponible${availableInvites.length > 1 ? "s" : ""}`
-                : "Gana invitaciones con tu racha"}
+                ? t("availableCount", { count: availableInvites.length })
+                : t("earnInvites")}
             </p>
           </div>
           <Gift className="size-4 shrink-0 text-fuchsia-400" />
@@ -754,21 +761,21 @@ export default function Sidebar({
                   className="flex shrink-0 items-center gap-1 rounded-lg border border-border px-2 py-1 text-[11px] font-medium hover:bg-muted transition-colors"
                 >
                   {copiedCode === inv.code ? (
-                    <><Check className="size-3 text-green-500" /> Copiado</>
+                    <><Check className="size-3 text-green-500" /> {t("copied")}</>
                   ) : (
-                    <><Copy className="size-3" /> Copiar</>
+                    <><Copy className="size-3" /> {t("copy")}</>
                   )}
                 </button>
               </div>
             ))}
             <Link href="/app/invitar" className="block text-center text-xs text-violet-400 hover:text-violet-300 transition-colors">
-              {availableInvites.length > 3 ? `+${availableInvites.length - 3} mas — ` : ""}Ver todas las invitaciones
+              {availableInvites.length > 3 ? t("moreInvites", { count: availableInvites.length - 3 }) : ""}{t("viewAllInvitations")}
             </Link>
           </div>
         ) : (
           <div className="rounded-xl border border-dashed border-border bg-muted/20 p-3 text-xs text-muted-foreground space-y-1">
-            <p>🔥 <strong>7 días de racha</strong> → 1 invitación</p>
-            <p>🏆 <strong>30 días de racha</strong> → 1 invitación más</p>
+            <p>{t.rich("streak7", { strong: (c) => <strong>{c}</strong> })}</p>
+            <p>{t.rich("streak30", { strong: (c) => <strong>{c}</strong> })}</p>
           </div>
         )}
       </div>
@@ -781,10 +788,10 @@ export default function Sidebar({
             <div className="flex items-center justify-between gap-2">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Acceso admin
+                  {t("adminAccess")}
                 </p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Sesión operativa activa.
+                  {t("adminSession")}
                 </p>
               </div>
               <Badge
@@ -792,14 +799,14 @@ export default function Sidebar({
                 className="rounded-full px-3 py-1"
               >
                 <ShieldCheck className="mr-1 size-3.5" />
-                Activa
+                {t("active")}
               </Badge>
             </div>
 
             <div className="grid grid-cols-2 gap-2">
               <Button asChild type="button" variant="outline" size="sm" className="justify-between">
                 <Link href="/admin">
-                  Panel admin
+                  {t("adminPanel")}
                   <ArrowRight className="size-4" />
                 </Link>
               </Button>
@@ -810,7 +817,7 @@ export default function Sidebar({
                 className="justify-between"
                 onClick={() => void onAdminLogout()}
               >
-                Cerrar sesión
+                {t("logout")}
                 <LogOut className="size-4" />
               </Button>
             </div>
@@ -837,15 +844,18 @@ export default function Sidebar({
       {/* Atribución sutil — el producto es Tres Mil Millones de Latidos pero
           en el fondo se reconoce que es proyecto de Startidea sin saturar la UI. */}
       <p className="mt-auto pt-3 text-center text-[10px] text-muted-foreground/60">
-        un proyecto de{" "}
-        <a
-          href="https://startidea.es"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:text-foreground/80 transition-colors underline decoration-dotted underline-offset-2"
-        >
-          Startidea
-        </a>
+        {t.rich("projectOf", {
+          startidea: (c) => (
+            <a
+              href="https://startidea.es"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground/80 transition-colors underline decoration-dotted underline-offset-2"
+            >
+              {c}
+            </a>
+          ),
+        })}
       </p>
     </aside>
   );

@@ -2914,7 +2914,9 @@
     "textSpacingDesc": "Más espacio entre letras y líneas",
     "resetAll": "Restablecer todo",
     "savedInBrowser": "Las preferencias se guardan en tu navegador",
-    "toToggle": "para abrir/cerrar"
+    "toToggle": "para abrir/cerrar",
+    "quietRead": "Lectura tranquila",
+    "quietReadDesc": "Reduce colores vibrantes y animaciones. Para días difíciles."
   },
   "footerLinks": {
     "tagline": "Cada latido es una elección. Tres Mil Millones de Latidos existe para que los tuyos tengan dirección real.",

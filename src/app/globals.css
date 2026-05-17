@@ -735,3 +735,44 @@ html.a11y-reduced-motion * {
   outline: 3px solid var(--ring);
   outline-offset: 2px;
 }
+
+/* ── Quiet read mode ─────────────────────────────────────────────── */
+/* Para usuarios con migraña, ansiedad visual, fotofobia, autismo, o */
+/* post-crisis. Reduce estímulos sin romper la usabilidad.            */
+html.a11y-quiet-read {
+  /* Aumenta line-height global del chat */
+  line-height: 1.7;
+}
+
+/* Apaga animaciones decorativas (mantiene transiciones cortas para
+   feedback de UI — los bounce/pulse infinitos se quitan). */
+html.a11y-quiet-read *,
+html.a11y-quiet-read *::before,
+html.a11y-quiet-read *::after {
+  animation: none !important;
+}
+
+/* Sustituye gradientes vibrantes por colores planos suaves. Pillamos
+   los gradientes Tailwind por nombre de clase (bg-gradient-*, from-*,
+   to-*, via-*) — los anula sin tocar los colores de UI legítimos.   */
+html.a11y-quiet-read [class*="bg-gradient-"],
+html.a11y-quiet-read [class*="from-"],
+html.a11y-quiet-read [class*="via-"],
+html.a11y-quiet-read [class*="to-"] {
+  background-image: none !important;
+}
+
+/* Reduce saturación de elementos vibrantes (cyan/fuchsia/violet
+   intensos del producto). */
+html.a11y-quiet-read [class*="text-cyan-"],
+html.a11y-quiet-read [class*="text-fuchsia-"],
+html.a11y-quiet-read [class*="text-violet-"] {
+  filter: saturate(0.5);
+}
+
+/* Oculta iconos puramente decorativos animados (los Sparkles del
+   empty state, indicadores de typing, etc.). aria-hidden="true"
+   suele marcar los decorativos vs los semánticos. */
+html.a11y-quiet-read .lucide-sparkles[aria-hidden="true"] {
+  opacity: 0.4;
+}

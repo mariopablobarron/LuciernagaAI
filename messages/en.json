@@ -2417,5 +2417,243 @@
       "submit": "Set new password",
       "requestNewSuffix": "Request a new one"
     }
+  },
+  "impulso": {
+    "page": {
+      "welcomeTitle": "Impulse Mode",
+      "welcomeSubtitle": "21 days to break the patterns holding you back. Not motivation — structure, action, and proof.",
+      "why21Title": "Why 21 days?",
+      "why21P1": "Behavioral psychology research shows a habit doesn't form in a day and doesn't break with a decision. It takes <strong>sustained repetition</strong> in an environment with structure and feedback.",
+      "why21P2": "21 days is the point where what started as conscious effort becomes <strong>positive momentum</strong>. It's not magic — it's neuroplasticity: your brain builds new connections when you repeat an action with intention.",
+      "cycle1Title": "First cycle",
+      "cycle1Desc": "You break the inertia",
+      "cycle2Title": "Second cycle",
+      "cycle2Desc": "You see your patterns",
+      "cycle3Title": "Transformation",
+      "cycle3Desc": "The change is yours",
+      "why21Note": "It's not about being perfect for 21 days. It's about not quitting when you slip on day 4. The system is there so you come back on day 5.",
+      "pillar": {
+        "diagnostic": {
+          "title": "Diagnostic",
+          "desc": "12 questions to identify your profile: high potential, blocked, anxious, or unmotivated."
+        },
+        "challenges": {
+          "title": "Personalized challenges",
+          "desc": "3 to 7-day challenges tailored to your profile. Each one breaks a specific pattern."
+        },
+        "checkin": {
+          "title": "Daily check-in",
+          "desc": "Log your progress every day. Consistency is what drives change, not intensity."
+        },
+        "insights": {
+          "title": "Behavior insights",
+          "desc": "Analysis of your patterns in 14-day windows. See what you're missing."
+        }
+      },
+      "howTitle": "How it works",
+      "howStep1": "You take the diagnostic (5 min) — we identify where you're starting.",
+      "howStep2": "You get your first personalized challenge — built for what's blocking you.",
+      "howStep3": "Every day you check in — you log if you moved forward and how you feel.",
+      "howStep4": "At 14 days, the system shows you your real patterns.",
+      "howStep5": "At 21 days, what started as effort becomes habit.",
+      "startDiagnosticCta": "Start diagnostic",
+      "startDiagnosticHint": "5 minutes · 12 questions · free",
+      "programLabel": "Program",
+      "programTitle": "Impulse",
+      "programSubtitle": "21 days of consistent action",
+      "checkinToday": "Today's check-in",
+      "daysInARow": "days in a row",
+      "bestStreak": "Best: {days}",
+      "programProgress": "Program progress",
+      "daysCompleted": "Days completed",
+      "completed": "Completed",
+      "onTrack": "On track ✓",
+      "tabs": {
+        "diagnóstico": "Diagnostic",
+        "retos": "Challenges",
+        "insights": "Insights",
+        "mensajes": "Messages"
+      },
+      "noProfileTitle": "You don't have an active profile yet",
+      "noProfileDesc": "Take the 12-question diagnostic to discover your blocking pattern and get a personalized 21-day program.",
+      "doDiagnosticNow": "Take diagnostic now",
+      "doDiagnosticHint": "5 minutes · Instant results · No sign-up",
+      "flowStep": {
+        "diagnostic": {
+          "title": "Diagnostic",
+          "desc": "12 questions about clarity, energy, and discipline."
+        },
+        "profile": {
+          "title": "Your profile",
+          "desc": "BLOCKED, ANXIOUS, UNMOTIVATED, LOST, or HIGH_POTENTIAL."
+        },
+        "challenges": {
+          "title": "21-Day Challenges",
+          "desc": "Daily check-in with personalized progression."
+        }
+      },
+      "preferChatTitle": "Prefer to start with chat?",
+      "preferChatDesc": "The coach can help you without a prior diagnosis.",
+      "goToChat": "Go to chat →",
+      "operationalFocus": "Operational focus",
+      "scoreLabels": {
+        "claridad": "Clarity",
+        "autoestima": "Self-esteem",
+        "energia": "Energy",
+        "disciplina": "Discipline",
+        "social": "Social"
+      },
+      "last7Days": "Last 7 days",
+      "noActiveChallenges": "You don't have active challenges yet.",
+      "noActiveChallengesHint": "Complete the diagnosis to get personalized challenges.",
+      "daysOf": "{done}/{total} days",
+      "statusCompleted": "Completed",
+      "statusInProgress": "In progress",
+      "totalDays": "{total} days total",
+      "requestNewChallenge": "+ Request new challenge",
+      "noInsights": "Not enough data yet to generate insights.",
+      "noInsightsHint": "Daily check-in for several days to see patterns.",
+      "unlocksOnDay": "Unlocks on day {day}",
+      "milestoneMessages": {
+        "day7": {
+          "title": "Your first week",
+          "preview": "You did what most don't: show up. Seven days straight already says something about you."
+        },
+        "day14": {
+          "title": "Breaking point",
+          "preview": "This is where most quit. You didn't. That's what separates those who change from those who just try."
+        },
+        "day21": {
+          "title": "Your new habit",
+          "preview": "Twenty-one days. It's not effort anymore, it's part of you. What you built here doesn't disappear."
+        }
+      }
+    },
+    "dashboard": {
+      "modeLabel": "Impulso Mode",
+      "profileBadge": "{title} Profile",
+      "streakBadge": "{days}-day streak",
+      "headlineTitle": "Train clarity, not just conversation",
+      "headlineDesc": "Initial diagnosis, operational profile, short challenges, daily check-in, and behavior signals to turn thinking into execution.",
+      "account": "Account",
+      "anonymousSession": "Anonymous session",
+      "pending": "Pending",
+      "currentPlan": "Current plan",
+      "planFree": "Free",
+      "operationalProfile": "Operational profile",
+      "noDiagnosticYet": "No diagnosis yet",
+      "noDiagnosticDesc": "Complete the initial test and the system will assign you a work profile.",
+      "activeStreak": "Active streak",
+      "bestStreakLine": "Best streak: {best}. Last check-in: {date}",
+      "automaticInsights": "Automatic insights",
+      "insightsEmpty": "Real patterns will appear here once the system has enough activity.",
+      "notRegistered": "Not registered",
+      "scale": {
+        "nothing": "Nothing",
+        "little": "Little",
+        "some": "Some",
+        "quite": "Quite a bit",
+        "much": "Much"
+      },
+      "momentum": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      },
+      "tabs": {
+        "diagnostic": "Diagnostic",
+        "challenges": "Challenges",
+        "checkin": "Check-in",
+        "future": "Time Capsule"
+      },
+      "diagnostic": {
+        "title": "Initial impulse test",
+        "desc": "12 questions, 1-5 scale. This defines how Three Billion Heartbeats should push you.",
+        "loading": "Loading diagnostic...",
+        "recalculate": "Recalculate profile",
+        "save": "Save diagnostic",
+        "totalScore": "Total {score}/100",
+        "detected": "Profile detected"
+      },
+      "scoreLabels": {
+        "claridad": "Clarity",
+        "autoestima": "Self-esteem",
+        "energia": "Energy",
+        "disciplina": "Discipline",
+        "social": "Social"
+      },
+      "challenges": {
+        "title": "Active challenges",
+        "desc": "Short, progressive challenges aligned to your operating profile.",
+        "assigning": "Assigning...",
+        "assignRefresh": "Assign / refresh challenges",
+        "noneAssigned": "No active challenges yet. Assign your first ones and start today.",
+        "needsDiagnostic": "Complete the diagnostic first to unlock personalized challenges.",
+        "difficulty": "Difficulty {level}",
+        "daysDuration": "{days} days",
+        "daysProgress": "{done}/{total} days",
+        "minPerDay": "{minutes} min/day"
+      },
+      "checkin": {
+        "title": "Daily check-in",
+        "desc": "The point isn't just to say how you feel. It's to train continuity.",
+        "placeholder": "What you did today, what you avoided, and your next move.",
+        "challengeStateLabel": "Challenge status",
+        "statusFulfilled": "Fulfilled",
+        "statusPartial": "Partial",
+        "statusBlocked": "Blocked",
+        "energyLabel": "Today's energy",
+        "saving": "Saving...",
+        "save": "Save check-in"
+      },
+      "logs": {
+        "title": "Recent logs",
+        "desc": "Recent emotional pattern and real continuity.",
+        "empty": "No logs yet. Your first check-in will activate this view.",
+        "neutral": "neutral",
+        "noNote": "No note"
+      },
+      "future": {
+        "title": "Time capsule",
+        "desc": "Leave yourself a message that the system will open when the date arrives.",
+        "titlePlaceholder": "Message title",
+        "contentPlaceholder": "What you need to remember when that moment comes.",
+        "saving": "Saving...",
+        "save": "Save capsule",
+        "unlockedTitle": "Unlocked messages",
+        "availableSummary": "Available now: {available}. Locked: {locked}.",
+        "empty": "No messages available yet. Create one for later.",
+        "available": "Available"
+      },
+      "footer": {
+        "diagnostic": {
+          "title": "Quick diagnostic",
+          "desc": "12 questions to figure out how to push you."
+        },
+        "challenge": {
+          "title": "Active challenge",
+          "desc": "Progress is measured in days completed, not pretty conversation."
+        },
+        "containment": {
+          "title": "Containment and continuity",
+          "desc": "The system keeps track without replacing professional help."
+        }
+      },
+      "errors": {
+        "loadDashboard": "Couldn't load Impulse Mode.",
+        "saveDiagnostic": "Couldn't save the diagnostic.",
+        "assignChallenges": "Couldn't assign challenges.",
+        "checkinEmpty": "Write your check-in before saving.",
+        "saveCheckin": "Couldn't save the check-in.",
+        "futureIncomplete": "Complete title, message, and unlock date.",
+        "saveFuture": "Couldn't save the future message."
+      },
+      "status": {
+        "profileAssigned": "Profile assigned: {title}. Now let's activate your challenges.",
+        "activeChallengesUpdated": "Active challenges updated.",
+        "checkinSaved": "Check-in saved. The system updated your streak and active challenges.",
+        "futureSaved": "Time capsule saved."
+      }
+    }
   }
 }

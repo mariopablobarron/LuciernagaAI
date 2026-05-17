@@ -2417,5 +2417,243 @@
       "submit": "Définir le nouveau mot de passe",
       "requestNewSuffix": "Demande-en un nouveau"
     }
+  },
+  "impulso": {
+    "page": {
+      "welcomeTitle": "Mode Impulsion",
+      "welcomeSubtitle": "21 jours pour casser les schémas qui te freinent. Ce n'est pas de la motivation — c'est de la structure, de l'action et de la preuve.",
+      "why21Title": "Pourquoi 21 jours ?",
+      "why21P1": "La recherche en psychologie du comportement montre qu'une habitude ne se forme pas en un jour et ne se casse pas avec une décision. Il faut <strong>une répétition soutenue</strong> dans un environnement structuré avec du feedback.",
+      "why21P2": "21 jours, c'est le moment où ce qui a commencé comme un effort conscient devient <strong>une inertie positive</strong>. Ce n'est pas de la magie — c'est de la neuroplasticité : ton cerveau crée de nouvelles connexions quand tu répètes une action avec intention.",
+      "cycle1Title": "Premier cycle",
+      "cycle1Desc": "Tu casses l'inertie",
+      "cycle2Title": "Deuxième cycle",
+      "cycle2Desc": "Tu vois tes schémas",
+      "cycle3Title": "Transformation",
+      "cycle3Desc": "Le changement est le tien",
+      "why21Note": "Il ne s'agit pas d'être parfait 21 jours. Il s'agit de ne pas abandonner quand tu échoues au jour 4. Le système t'accompagne pour que tu reviennes au jour 5.",
+      "pillar": {
+        "diagnostic": {
+          "title": "Diagnostic",
+          "desc": "12 questions pour identifier ton profil : haut potentiel, bloqué, anxieux ou démotivé."
+        },
+        "challenges": {
+          "title": "Défis personnalisés",
+          "desc": "Des défis de 3 à 7 jours adaptés à ton profil. Chacun casse un schéma spécifique."
+        },
+        "checkin": {
+          "title": "Check-in quotidien",
+          "desc": "Enregistre ta progression chaque jour. C'est la constance qui génère le changement, pas l'intensité."
+        },
+        "insights": {
+          "title": "Insights comportementaux",
+          "desc": "Analyse de tes schémas sur des fenêtres de 14 jours. Vois ce que tu ne vois pas."
+        }
+      },
+      "howTitle": "Comment ça marche ?",
+      "howStep1": "Tu fais le diagnostic (5 min) — on identifie ton point de départ.",
+      "howStep2": "Tu reçois ton premier défi personnalisé — adapté à ce qui te bloque.",
+      "howStep3": "Chaque jour tu fais un check-in — tu enregistres si tu as avancé et comment tu te sens.",
+      "howStep4": "À 14 jours, le système te montre tes vrais schémas.",
+      "howStep5": "À 21 jours, ce qui a commencé comme un effort devient une habitude.",
+      "startDiagnosticCta": "Commencer le diagnostic",
+      "startDiagnosticHint": "5 minutes · 12 questions · gratuit",
+      "programLabel": "Programme",
+      "programTitle": "Impulsion",
+      "programSubtitle": "21 jours d'action consistante",
+      "checkinToday": "Check-in d'aujourd'hui",
+      "daysInARow": "jours d'affilée",
+      "bestStreak": "Meilleur : {days}",
+      "programProgress": "Progression du programme",
+      "daysCompleted": "Jours complétés",
+      "completed": "Complété",
+      "onTrack": "En track ✓",
+      "tabs": {
+        "diagnostico": "Diagnostic",
+        "retos": "Défis",
+        "insights": "Insights",
+        "mensajes": "Messages"
+      },
+      "noProfileTitle": "Tu n'as pas encore de profil actif",
+      "noProfileDesc": "Fais le diagnostic de 12 questions pour découvrir ton schéma de blocage et reçois un programme personnalisé de 21 jours.",
+      "doDiagnosticNow": "Faire le diagnostic maintenant",
+      "doDiagnosticHint": "5 minutes · Résultats immédiats · Sans inscription",
+      "flowStep": {
+        "diagnostic": {
+          "title": "Diagnostic",
+          "desc": "12 questions sur la clarté, l'énergie et la discipline."
+        },
+        "profile": {
+          "title": "Ton profil",
+          "desc": "BLOQUÉ, ANXIEUX, DÉMOTIVÉ, PERDU ou HAUT_POTENTIEL."
+        },
+        "challenges": {
+          "title": "Défis 21 jours",
+          "desc": "Check-in quotidien avec progression personnalisée."
+        }
+      },
+      "preferChatTitle": "Tu préfères commencer par le chat ?",
+      "preferChatDesc": "Le coach peut aussi t'aider sans diagnostic préalable.",
+      "goToChat": "Aller au chat →",
+      "operationalFocus": "Foyer opérationnel",
+      "scoreLabels": {
+        "claridad": "Clarté",
+        "autoestima": "Estime de soi",
+        "energia": "Énergie",
+        "disciplina": "Discipline",
+        "social": "Social"
+      },
+      "last7Days": "7 derniers jours",
+      "noActiveChallenges": "Tu n'as pas encore de défis actifs.",
+      "noActiveChallengesHint": "Complète le diagnostic pour recevoir des défis personnalisés.",
+      "daysOf": "{done}/{total} jours",
+      "statusCompleted": "Complété",
+      "statusInProgress": "En cours",
+      "totalDays": "{total} jours au total",
+      "requestNewChallenge": "+ Demander un nouveau défi",
+      "noInsights": "Pas encore assez de données pour générer des insights.",
+      "noInsightsHint": "Fais un check-in quotidien pendant plusieurs jours pour voir les patterns.",
+      "unlocksOnDay": "Se déverrouille le jour {day}",
+      "milestoneMessages": {
+        "day7": {
+          "title": "Ta première semaine",
+          "preview": "Tu as fait quelque chose que la plupart ne font pas : te montrer. Sept jours d'affilée, ça dit déjà quelque chose sur toi."
+        },
+        "day14": {
+          "title": "Le point de rupture",
+          "preview": "C'est là que beaucoup abandonnent. Pas toi. C'est ça qui sépare ceux qui changent de ceux qui essaient juste."
+        },
+        "day21": {
+          "title": "Ton nouvel habit",
+          "preview": "Vingt-et-un jours. Ce n'est plus un effort, c'est partie de toi. Ce que tu as construit ici ne disparaît pas."
+        }
+      }
+    },
+    "dashboard": {
+      "modeLabel": "Mode Impulsion",
+      "profileBadge": "Profil {title}",
+      "streakBadge": "Racha {days} jours",
+      "headlineTitle": "Entraîne la clarté, pas juste la conversation",
+      "headlineDesc": "Diagnostic initial, profil opérationnel, défis courts, check-in quotidien et signaux comportementaux pour transformer la pensée en exécution.",
+      "account": "Compte",
+      "anonymousSession": "Session anonyme",
+      "pending": "En attente",
+      "currentPlan": "Plan actuel",
+      "planFree": "Gratuit",
+      "operationalProfile": "Profil opérationnel",
+      "noDiagnosticYet": "Pas encore de diagnostic",
+      "noDiagnosticDesc": "Complète le test initial et le système t'assignera un profil de travail.",
+      "activeStreak": "Racha active",
+      "bestStreakLine": "Meilleure racha : {best}. Dernier check-in : {date}",
+      "automaticInsights": "Insights automatiques",
+      "insightsEmpty": "Les patterns réels apparaîtront ici quand le système aura assez d'activité.",
+      "notRegistered": "Non enregistré",
+      "scale": {
+        "nothing": "Rien",
+        "little": "Peu",
+        "some": "Un peu",
+        "quite": "Pas mal",
+        "much": "Beaucoup"
+      },
+      "momentum": {
+        "low": "Basse",
+        "medium": "Moyenne",
+        "high": "Haute"
+      },
+      "tabs": {
+        "diagnostic": "Diagnostic",
+        "challenges": "Défis",
+        "checkin": "Check-in",
+        "future": "Capsule"
+      },
+      "diagnostic": {
+        "title": "Test initial d'impulsion",
+        "desc": "12 questions, échelle 1-5. Ça définit comment Trois Milliards de Battements doit te pousser.",
+        "loading": "Chargement du diagnostic...",
+        "recalculate": "Recalculer le profil",
+        "save": "Enregistrer le diagnostic",
+        "totalScore": "Total {score}/100",
+        "detected": "Profil détecté"
+      },
+      "scoreLabels": {
+        "claridad": "Clarté",
+        "autoestima": "Estime de soi",
+        "energia": "Énergie",
+        "disciplina": "Discipline",
+        "social": "Social"
+      },
+      "challenges": {
+        "title": "Défis actifs",
+        "desc": "Des défis courts, progressifs et alignés à ton profil opérationnel.",
+        "assigning": "Attribution en cours...",
+        "assignRefresh": "Attribuer / rafraîchir les défis",
+        "noneAssigned": "Pas encore de défis actifs. Attribue les premiers et commence aujourd'hui.",
+        "needsDiagnostic": "Termine d'abord le diagnostic pour débloquer des défis personnalisés.",
+        "difficulty": "Difficulté {level}",
+        "daysDuration": "{days} jours",
+        "daysProgress": "{done}/{total} jours",
+        "minPerDay": "{minutes} min/jour"
+      },
+      "checkin": {
+        "title": "Check-in quotidien",
+        "desc": "L'objectif n'est pas juste de raconter comment tu te sens. C'est d'entraîner la continuité.",
+        "placeholder": "Ce que tu as fait aujourd'hui, ce que tu as évité et ta prochaine action.",
+        "challengeStateLabel": "État du défi",
+        "statusFulfilled": "Accompli",
+        "statusPartial": "Partiel",
+        "statusBlocked": "Bloqué",
+        "energyLabel": "Énergie d'aujourd'hui",
+        "saving": "Enregistrement...",
+        "save": "Enregistrer le check-in"
+      },
+      "logs": {
+        "title": "Derniers enregistrements",
+        "desc": "Schéma émotionnel récent et continuité réelle.",
+        "empty": "Pas encore de logs. Ton premier check-in activera cette vue.",
+        "neutral": "neutre",
+        "noNote": "Sans note"
+      },
+      "future": {
+        "title": "Capsule du temps",
+        "desc": "Laisse-toi un message que le système ouvrira quand la date arrivera.",
+        "titlePlaceholder": "Titre du message",
+        "contentPlaceholder": "Ce que tu dois te rappeler quand ce moment arrivera.",
+        "saving": "Enregistrement...",
+        "save": "Enregistrer la capsule",
+        "unlockedTitle": "Messages déverrouillés",
+        "availableSummary": "Disponibles maintenant : {available}. Verrouillés : {locked}.",
+        "empty": "Tu n'as pas encore de messages disponibles. Crée-en un pour plus tard.",
+        "available": "Disponible"
+      },
+      "footer": {
+        "diagnostic": {
+          "title": "Diagnostic rapide",
+          "desc": "12 questions pour détecter comment te pousser."
+        },
+        "challenge": {
+          "title": "Défi actif",
+          "desc": "La progression se mesure en jours complétés, pas en belle conversation."
+        },
+        "containment": {
+          "title": "Contention et continuité",
+          "desc": "Le système assure le suivi sans remplacer l'aide professionnelle."
+        }
+      },
+      "errors": {
+        "loadDashboard": "Impossible de charger le Mode Impulsion.",
+        "saveDiagnostic": "Impossible d'enregistrer le diagnostic.",
+        "assignChallenges": "Impossible d'assigner les défis.",
+        "checkinEmpty": "Écris ton check-in avant de l'enregistrer.",
+        "saveCheckin": "Impossible d'enregistrer le check-in.",
+        "futureIncomplete": "Complète le titre, le message et la date de déverrouillage.",
+        "saveFuture": "Impossible d'enregistrer le message futur."
+      },
+      "status": {
+        "profileAssigned": "Profil assigné : {title}. Maintenant on active tes défis.",
+        "activeChallengesUpdated": "Défis actifs mis à jour.",
+        "checkinSaved": "Check-in enregistré. Le système a mis à jour ta série et tes défis actifs.",
+        "futureSaved": "Capsule temporelle enregistrée."
+      }
+    }
   }
 }

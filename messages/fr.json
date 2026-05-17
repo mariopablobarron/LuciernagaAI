@@ -2807,5 +2807,12 @@
       "hold": "Retiens (7s)",
       "exhale": "Expire (8s)"
     }
+  },
+  "incognito": {
+    "activeLabel": "Mode incognito",
+    "inactiveLabel": "Mode incognito",
+    "tooltipOn": "Mode incognito actif — désactiver (les brouillons seront à nouveau enregistrés sur cet appareil)",
+    "tooltipOff": "Activer le mode incognito — nous n'enregistrerons rien sur cet appareil",
+    "bannerText": "Mode incognito · nous n'enregistrons pas de brouillons sur cet appareil"
   }
 }

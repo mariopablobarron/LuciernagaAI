@@ -2960,5 +2960,12 @@
       "hold": "Retén (7s)",
       "exhale": "Exhala (8s)"
     }
+  },
+  "incognito": {
+    "activeLabel": "Modo incógnito",
+    "inactiveLabel": "Modo incógnito",
+    "tooltipOn": "Modo incógnito activo — desactivar (volverá a recordar drafts en este dispositivo)",
+    "tooltipOff": "Activar modo incógnito — no recordaremos nada en este dispositivo",
+    "bannerText": "Modo incógnito · no estamos guardando drafts en este dispositivo"
   }
 }

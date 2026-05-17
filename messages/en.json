@@ -1899,5 +1899,88 @@
       "errorFormat": "Check your email format.",
       "errorGeneric": "Couldn't save. Try again."
     }
+  },
+  "workspace": {
+    "tabs": {
+      "chat": "Chat",
+      "plan": "Plan",
+      "checkin": "Check-in",
+      "espejo": "Mirror",
+      "espejoTooltip": "Map of patterns you're putting off"
+    },
+    "plan": {
+      "title": "Execution Plan",
+      "subtitle": "Turn clarity into visible tracking. Your goal and real action debt live here.",
+      "badgeActive": "Active tracking",
+      "badgeClear": "No open debt",
+      "noGoal": "No active goal yet. Use chat to define it, then come back here to turn it into a system.",
+      "actionsCounter": "{done}/{total} actions",
+      "progressLine": "Current progress: {n}% complete",
+      "checklistTitle": "Action Checklist",
+      "checklistSubtitle": "Mark progress without leaving your central workspace.",
+      "noActionsYet": "No actions defined for this goal yet.",
+      "actionDone": "Done",
+      "actionPending": "Pending",
+      "markPending": "Mark pending",
+      "markDone": "Mark done",
+      "remindTomorrow": "Remind me tomorrow at 9:00 AM",
+      "remindTomorrowToast": "We'll remind you tomorrow at 9:00 AM"
+    },
+    "continuity": {
+      "title": "Continuity and Accountability",
+      "descNoSession": "Session starting up. Progress and plan will sync once your identity is ready.",
+      "descPro": "Full continuity across devices, persistent memory, and Impulse Mode unlocked.",
+      "descFreeTpl": "Chat without limits. Plan {plan}: when you want cross-device continuity and Impulse Mode, Pro unlocks it.",
+      "planFree": "Free",
+      "anonProgress": "Unsaved progress",
+      "savedProgress": "Progress saved",
+      "proUpsell": "Pro: continuity across devices, persistent memory between sessions, and Impulse Mode.",
+      "saveProgressEyebrow": "Save progress",
+      "saveProgressDefaultPrompt": "Link an email to keep conversations, goals, and continuity across devices.",
+      "emailPlaceholder": "your@email.com",
+      "saving": "Saving…",
+      "save": "Save progress",
+      "completeUpgradeTitle": "Full continuity",
+      "openUpgrade": "View Pro plan"
+    },
+    "responsibility": {
+      "title": "Active Accountability",
+      "subtitle": "What doesn't get done today becomes friction tomorrow.",
+      "priorityLabel": "Priority pending action",
+      "nextLabel": "Suggested next action",
+      "empty": "No active open debt. Use chat to define your next step.",
+      "backToChat": "Back to chat",
+      "goalsHistory": "Goals history"
+    },
+    "checkin": {
+      "title": "Daily Ritual",
+      "subtitle": "Use it to log how you're showing up today, even if you don't need a long conversation. Why every day? Because change doesn't come from one good day — it comes from not losing the thread. 30 seconds is enough. Small consistency always beats perfect effort.",
+      "placeholder": "Example: Today I'm stuck and struggling to get started.",
+      "lastSavedTpl": "Last saved: {time} · status {state}",
+      "noneThisSession": "No check-in recorded this session.",
+      "saving": "Saving…",
+      "save": "Save check-in",
+      "pulseTitle": "Current pulse",
+      "pulseSubtitle": "A quick read on where you are today and how it fits with your continuity.",
+      "currentStateTpl": "Current state: {state}",
+      "dominantTpl": "Dominant: {state}",
+      "checkinsTodayTpl": "{n} check-ins today",
+      "hintTitle": "Check in when you need to log your state without opening a full session.",
+      "hintBody": "The goal isn't to explain everything. It's to leave a brief signal that keeps the thread going.",
+      "shortcutsTitle": "Continuity shortcuts",
+      "shortcutsSubtitle": "Jump to the mode you need without losing the local state of this view.",
+      "goToChat": "Go to chat",
+      "viewPlan": "View active plan",
+      "checkinsHistory": "Check-ins history"
+    },
+    "espejo": {
+      "title": "Avoidance map",
+      "subtitle": "This is what you've been putting off and why. Looking it straight on is the first step.",
+      "fullAnalysis": "View full pattern analysis"
+    },
+    "account": {
+      "anon": "Anonymous account",
+      "noName": "No name — add it in Settings"
+    }
   }
 }

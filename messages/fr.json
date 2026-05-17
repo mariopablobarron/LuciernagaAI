@@ -1899,5 +1899,88 @@
       "errorFormat": "Vérifie le format de l'email.",
       "errorGeneric": "Impossible de sauvegarder. Réessaie."
     }
+  },
+  "workspace": {
+    "tabs": {
+      "chat": "Chat",
+      "plan": "Plan",
+      "checkin": "Check-in",
+      "espejo": "Miroir",
+      "espejoTooltip": "Carte des schémas que tu repousses"
+    },
+    "plan": {
+      "title": "Plan d'exécution",
+      "subtitle": "Transforme la clarté en suivi visible. C'est ici que vivent l'objectif et la vraie dette d'action.",
+      "badgeActive": "Suivi actif",
+      "badgeClear": "Aucune dette ouverte",
+      "noGoal": "Pas d'objectif actif pour le moment. Utilise le chat pour le définir, puis reviens ici pour en faire un système.",
+      "actionsCounter": "{done}/{total} actions",
+      "progressLine": "Progression actuelle : {n}% complété",
+      "checklistTitle": "Checklist d'actions",
+      "checklistSubtitle": "Marque tes avancées sans quitter l'espace de travail central.",
+      "noActionsYet": "Aucune action définie pour cet objectif pour le moment.",
+      "actionDone": "Faite",
+      "actionPending": "En attente",
+      "markPending": "Marquer en attente",
+      "markDone": "Marquer faite",
+      "remindTomorrow": "Me rappeler demain à 9:00",
+      "remindTomorrowToast": "On te rappellera demain à 9:00"
+    },
+    "continuity": {
+      "title": "Continuité et compte",
+      "descNoSession": "Session en cours de démarrage. La progression et le plan se synchroniseront quand l'identité sera prête.",
+      "descPro": "Continuité complète entre appareils, mémoire persistante et Mode Impulsion déverrouillé.",
+      "descFreeTpl": "Discute sans limite. Plan {plan} : quand tu veux la continuité cross-device et le Mode Impulsion, Pro les déverrouille.",
+      "planFree": "Free",
+      "anonProgress": "Progression non sauvegardée",
+      "savedProgress": "Progression sauvegardée",
+      "proUpsell": "Pro : continuité entre appareils, mémoire persistante entre sessions et Mode Impulsion.",
+      "saveProgressEyebrow": "Sauvegarder la progression",
+      "saveProgressDefaultPrompt": "Lie un email pour conserver tes conversations, objectifs et continuité entre appareils.",
+      "emailPlaceholder": "ton@email.com",
+      "saving": "Sauvegarde en cours…",
+      "save": "Sauvegarder la progression",
+      "completeUpgradeTitle": "Continuité complète",
+      "openUpgrade": "Voir le plan Pro"
+    },
+    "responsibility": {
+      "title": "Responsabilité active",
+      "subtitle": "Ce que tu ne fais pas aujourd'hui devient friction demain.",
+      "priorityLabel": "Action en attente prioritaire",
+      "nextLabel": "Prochaine action suggérée",
+      "empty": "Aucune dette active ouverte. Profite du chat pour définir la prochaine étape.",
+      "backToChat": "Retour au chat",
+      "goalsHistory": "Historique des objectifs"
+    },
+    "checkin": {
+      "title": "Rituel quotidien",
+      "subtitle": "Utilise-le pour enregistrer comment tu arrives aujourd'hui, même si tu n'as pas besoin d'une longue conversation. Pourquoi chaque jour ? Parce que le changement ne vient pas d'un bon jour — il vient de ne pas perdre le fil. 30 secondes suffisent. La petite constance bat toujours l'effort parfait.",
+      "placeholder": "Exemple : Aujourd'hui je suis bloqué et j'ai du mal à démarrer.",
+      "lastSavedTpl": "Dernière sauvegarde : {time} · état {state}",
+      "noneThisSession": "Aucun check-in enregistré dans cette session.",
+      "saving": "Sauvegarde en cours…",
+      "save": "Sauvegarder le check-in",
+      "pulseTitle": "Pouls actuel",
+      "pulseSubtitle": "Une lecture rapide de où tu es aujourd'hui et comment ça s'inscrit dans ta continuité.",
+      "currentStateTpl": "État actuel : {state}",
+      "dominantTpl": "Dominant : {state}",
+      "checkinsTodayTpl": "{n} check-ins aujourd'hui",
+      "hintTitle": "Fais un check-in quand tu dois enregistrer l'état sans ouvrir une longue session.",
+      "hintBody": "L'objectif n'est pas d'expliquer tout. C'est de laisser un signal bref qui maintient le fil du processus.",
+      "shortcutsTitle": "Raccourcis de continuité",
+      "shortcutsSubtitle": "Saute au mode dont tu as besoin sans perdre l'état local de cette vue.",
+      "goToChat": "Aller au chat",
+      "viewPlan": "Voir le plan actif",
+      "checkinsHistory": "Historique des check-ins"
+    },
+    "espejo": {
+      "title": "Carte d'évitement",
+      "subtitle": "C'est ce que tu repousses depuis un moment et pourquoi. Le regarder en face, c'est le premier pas.",
+      "fullAnalysis": "Voir l'analyse complète des patterns"
+    },
+    "account": {
+      "anon": "Compte anonyme",
+      "noName": "Sans nom — ajoute-le dans Paramètres"
+    }
   }
 }

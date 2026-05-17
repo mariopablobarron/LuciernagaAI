@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Flame,
   Plus,
@@ -17,6 +18,14 @@ import {
 import type { UserState } from "@/domain/types";
 import TuCamino from "@/components/TuCamino";
 import RealityLens from "@/components/effects/RealityLens";
+
+// Map locale → BCP47 para Intl.DateTimeFormat.
+const LOCALE_BCP47: Record<string, string> = {
+  es: "es-ES",
+  en: "en-US",
+  pt: "pt-PT",
+  fr: "fr-FR",
+};
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -35,49 +44,41 @@ type Win = { id: string; note: string; createdAt: string };
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
-const STATE_CONFIG: Record<
+// Estilos visuales del estado emocional (estables); el label y desc se leen
+// de messages.dashboard.state.<state> vía useTranslations.
+const STATE_STYLE: Record<
   UserState,
-  { label: string; emoji: string; gradient: string; border: string; badge: string; desc: string }
+  { emoji: string; gradient: string; border: string; badge: string }
 > = {
   claridad: {
-    label: "Claridad",
     emoji: "✨",
     gradient: "from-cyan-900/40 to-teal-900/20",
     border: "border-cyan-500/40",
     badge: "bg-cyan-500/15 text-cyan-300 border-cyan-500/30",
-    desc: "Latido en dirección. Aprovecha este impulso ahora.",
   },
   bloqueo: {
-    label: "Bloqueo",
     emoji: "🧱",
     gradient: "from-red-900/30 to-rose-900/10",
     border: "border-red-500/30",
     badge: "bg-red-500/15 text-red-300 border-red-500/30",
-    desc: "Latido pausado. Nombrarlo desbloquea el ritmo.",
   },
   ansiedad: {
-    label: "Ansiedad",
     emoji: "⚡",
     gradient: "from-amber-900/30 to-orange-900/10",
     border: "border-amber-500/30",
     badge: "bg-amber-500/15 text-amber-300 border-amber-500/30",
-    desc: "Demasiados latidos a la vez. Elige uno solo.",
   },
   duda: {
-    label: "Duda",
     emoji: "🧭",
     gradient: "from-violet-900/30 to-purple-900/10",
     border: "border-violet-500/30",
     badge: "bg-violet-500/15 text-violet-300 border-violet-500/30",
-    desc: "El latido busca ritmo. El chat puede orientarlo.",
   },
   neutral: {
-    label: "Neutral",
     emoji: "🌊",
     gradient: "from-zinc-800/40 to-zinc-900/20",
     border: "border-zinc-600/30",
     badge: "bg-zinc-700/40 text-zinc-300 border-zinc-600/30",
-    desc: "Latido en calma. Buen momento para elegir dirección.",
   },
 };
 
@@ -102,6 +103,9 @@ function Skeleton({ className }: { className?: string }) {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
+  const t = useTranslations("dashboard");
+  const locale = useLocale();
+  const bcp = LOCALE_BCP47[locale] ?? "en-US";
   const [stateData, setStateData] = useState<StateData | null>(null);
   const [wins, setWins] = useState<Win[]>([]);
   const [loading, setLoading] = useState(true);
@@ -153,10 +157,13 @@ export default function DashboardPage() {
   }, []);
 
   const state = stateData?.state ?? "neutral";
-  const cfg = STATE_CONFIG[state];
-  const TrendIcon = TREND_ICON[stateData?.progressTrend ?? "igual"];
-  const trendColor = TREND_COLOR[stateData?.progressTrend ?? "igual"];
-  const today = new Date().toLocaleDateString("es-ES", {
+  const style = STATE_STYLE[state];
+  const stateLabel = t(`state.${state}.label`);
+  const stateDesc = t(`state.${state}.desc`);
+  const trend = stateData?.progressTrend ?? "igual";
+  const TrendIcon = TREND_ICON[trend];
+  const trendColor = TREND_COLOR[trend];
+  const today = new Date().toLocaleDateString(bcp, {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -175,7 +182,7 @@ export default function DashboardPage() {
         {/* ── Header ───────────────────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-white">Tu acompañamiento</h1>
+            <h1 className="text-3xl font-bold text-white">{t("title")}</h1>
             <p className="text-zinc-500 text-sm capitalize mt-0.5">{today}</p>
           </div>
           <Link
@@ -183,7 +190,7 @@ export default function DashboardPage() {
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-linear-to-r from-violet-500 to-fuchsia-500 text-white font-semibold hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-fuchsia-500/20 text-sm"
           >
             <MessageCircle className="w-4 h-4" />
-            Ir al chat
+            {t("goToChat")}
           </Link>
         </div>
 
@@ -194,40 +201,38 @@ export default function DashboardPage() {
           ) : (
             <>
               {/* State */}
-              <div className={`rounded-xl border bg-linear-to-br ${cfg.gradient} ${cfg.border} p-4 space-y-2`}>
-                <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide">Estado</p>
+              <div className={`rounded-xl border bg-linear-to-br ${style.gradient} ${style.border} p-4 space-y-2`}>
+                <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide">{t("state.header")}</p>
                 <div className="flex items-center gap-2">
-                  <span className="text-xl">{cfg.emoji}</span>
-                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${cfg.badge}`}>
-                    {cfg.label}
+                  <span className="text-xl">{style.emoji}</span>
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${style.badge}`}>
+                    {stateLabel}
                   </span>
                 </div>
-                <p className="text-xs text-zinc-500 leading-tight">{cfg.desc}</p>
-                <p className="text-[10px] text-zinc-600 leading-snug mt-1">Tu estado cambia segun lo que escribes. El mentor adapta su tono y sus preguntas a como estas.</p>
+                <p className="text-xs text-zinc-500 leading-tight">{stateDesc}</p>
+                <p className="text-[10px] text-zinc-600 leading-snug mt-1">{t("state.hint")}</p>
               </div>
 
               {/* Constancia — espejo, no meta */}
               <div className="card-surface p-4 space-y-2">
-                <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide">Constancia</p>
+                <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide">{t("constancia.header")}</p>
                 <p className="text-sm text-zinc-300 leading-snug">
                   {(stateData?.streakDays ?? 0) === 0
-                    ? "Aún no has vuelto este mes."
+                    ? t("constancia.none")
                     : (stateData?.streakDays ?? 0) === 1
-                    ? "Has vuelto un día."
-                    : `Has vuelto ${stateData?.streakDays} días.`}
+                    ? t("constancia.one")
+                    : t("constancia.manyTpl", { n: stateData?.streakDays ?? 0 })}
                 </p>
-                <p className="text-[11px] text-zinc-600 leading-snug">
-                  No hay racha que mantener. Vuelve cuando lo necesites.
-                </p>
+                <p className="text-[11px] text-zinc-600 leading-snug">{t("constancia.hint")}</p>
               </div>
 
               {/* Tendencia */}
               <div className="card-surface p-4 space-y-2">
-                <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide">Tendencia</p>
+                <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide">{t("trend.header")}</p>
                 <div className="flex items-center gap-2">
                   <TrendIcon className={`w-5 h-5 ${trendColor}`} />
                   <p className={`text-sm font-semibold capitalize ${trendColor}`}>
-                    {stateData?.progressTrend ?? "igual"}
+                    {t(`trend.labels.${trend}`)}
                   </p>
                 </div>
                 <p className="text-xs text-zinc-600">{stateData?.primaryEmotion ?? "—"}</p>
@@ -241,23 +246,17 @@ export default function DashboardPage() {
           <RealityLens
             surface={
               <div className="space-y-2">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-600">Lo que ves</p>
-                <p className="text-lg font-semibold text-white">{cfg.emoji} {cfg.label}</p>
-                <p className="text-sm text-zinc-400">{cfg.desc}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-600">{t("lens.surfaceLabel")}</p>
+                <p className="text-lg font-semibold text-white">{style.emoji} {stateLabel}</p>
+                <p className="text-sm text-zinc-400">{stateDesc}</p>
               </div>
             }
             revealed={
               <div className="space-y-2">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-violet-400">Lo que hay detrás</p>
-                <p className="text-lg font-semibold text-cyan-300">
-                  {stateData.state === "bloqueo" && "No es falta de capacidad. Es miedo a que no sea suficiente."}
-                  {stateData.state === "ansiedad" && "La urgencia que sientes no es real. Es ruido disfrazado de acción."}
-                  {stateData.state === "duda" && "No te falta información. Te falta permiso para elegir mal."}
-                  {stateData.state === "claridad" && "Ahora lo ves claro. La pregunta es: ¿vas a actuar antes de que se nuble?"}
-                  {stateData.state === "neutral" && "La calma no siempre es paz. A veces es evitación silenciosa."}
-                </p>
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-violet-400">{t("lens.revealedLabel")}</p>
+                <p className="text-lg font-semibold text-cyan-300">{t(`lens.${stateData.state}`)}</p>
                 <p className="text-xs text-violet-400/70">
-                  Tendencia: {stateData.progressTrend} · Racha: {stateData.streakDays} días
+                  {t("lens.metaTpl", { trend: t(`trend.labels.${stateData.progressTrend}`), n: stateData.streakDays })}
                 </p>
               </div>
             }
@@ -273,14 +272,14 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Target className="w-4 h-4 text-violet-400" />
-                  <h2 className="font-bold text-white">Acciones pendientes</h2>
+                  <h2 className="font-bold text-white">{t("actions.title")}</h2>
                 </div>
                 <Link
                   href="/app"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-violet-500/40 text-violet-400 hover:text-fuchsia-300 hover:border-fuchsia-500/40 hover:bg-violet-500/10 transition-all text-xs font-semibold"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  Nueva en chat
+                  {t("actions.newInChat")}
                 </Link>
               </div>
 
@@ -293,10 +292,8 @@ export default function DashboardPage() {
               ) : (stateData?.pendingActions ?? []).length === 0 ? (
                 <div className="flex flex-col items-center py-8 space-y-3 text-center">
                   <CheckCircle2 className="w-8 h-8 text-emerald-500/50" />
-                  <p className="text-zinc-400 text-sm">Sin acciones pendientes.</p>
-                  <p className="text-xs text-zinc-600">
-                    Conversa con Tres Mil Millones de Latidos para definir tu próxima acción.
-                  </p>
+                  <p className="text-zinc-400 text-sm">{t("actions.emptyTitle")}</p>
+                  <p className="text-xs text-zinc-600">{t("actions.emptyHint")}</p>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -320,7 +317,7 @@ export default function DashboardPage() {
             <div className="card-surface p-6 space-y-5">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-amber-400" />
-                <h2 className="font-bold text-white">Lo que has querido guardar</h2>
+                <h2 className="font-bold text-white">{t("wins.title")}</h2>
               </div>
 
               {loading ? (
@@ -332,8 +329,8 @@ export default function DashboardPage() {
               ) : wins.length === 0 ? (
                 <div className="flex flex-col items-center py-6 space-y-2 text-center">
                   <Sparkles className="w-7 h-7 text-amber-500/30" />
-                  <p className="text-zinc-500 text-sm">Aún no has guardado nada aquí.</p>
-                  <p className="text-xs text-zinc-600">Cuando algo merezca quedarse, cuéntaselo al chat.</p>
+                  <p className="text-zinc-500 text-sm">{t("wins.emptyTitle")}</p>
+                  <p className="text-xs text-zinc-600">{t("wins.emptyHint")}</p>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -346,7 +343,7 @@ export default function DashboardPage() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-zinc-300 leading-snug">{win.note}</p>
                         <p className="text-xs text-zinc-600 mt-1">
-                          {new Date(win.createdAt).toLocaleDateString("es-ES", {
+                          {new Date(win.createdAt).toLocaleDateString(bcp, {
                             day: "numeric",
                             month: "short",
                           })}
@@ -366,20 +363,20 @@ export default function DashboardPage() {
               <Skeleton className="h-44" />
             ) : (
               <div
-                className={`rounded-xl border bg-linear-to-br ${cfg.gradient} ${cfg.border} p-5 space-y-4`}
+                className={`rounded-xl border bg-linear-to-br ${style.gradient} ${style.border} p-5 space-y-4`}
               >
-                <div className="text-4xl text-center">{cfg.emoji}</div>
+                <div className="text-4xl text-center">{style.emoji}</div>
                 <div className="text-center space-y-1">
                   <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                    Estado emocional
+                    {t("card.emotionalLabel")}
                   </p>
                   <span
-                    className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold border ${cfg.badge}`}
+                    className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold border ${style.badge}`}
                   >
-                    {cfg.label}
+                    {stateLabel}
                   </span>
                 </div>
-                <p className="text-xs text-zinc-400 text-center leading-relaxed">{cfg.desc}</p>
+                <p className="text-xs text-zinc-400 text-center leading-relaxed">{stateDesc}</p>
               </div>
             )}
 
@@ -391,7 +388,7 @@ export default function DashboardPage() {
               >
                 <MessageCircle className="w-4 h-4 text-violet-400" />
                 <span className="text-sm text-zinc-300 group-hover:text-white transition-colors">
-                  Abrir chat
+                  {t("quick.openChat")}
                 </span>
               </Link>
               <Link
@@ -400,7 +397,7 @@ export default function DashboardPage() {
               >
                 <Flame className="w-4 h-4 text-amber-400" />
                 <span className="text-sm text-zinc-300 group-hover:text-white transition-colors">
-                  Programa Impulso
+                  {t("quick.impulse")}
                 </span>
               </Link>
               <Link
@@ -409,7 +406,7 @@ export default function DashboardPage() {
               >
                 <Sparkles className="w-4 h-4 text-cyan-400" />
                 <span className="text-sm text-zinc-300 group-hover:text-white transition-colors">
-                  Explorar ahora
+                  {t("quick.explore")}
                 </span>
               </Link>
             </div>

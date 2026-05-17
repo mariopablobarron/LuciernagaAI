@@ -2794,5 +2794,18 @@
       "answerFailed": "Não foi possível publicar a resposta",
       "selfVoteForbidden": "Não podes votar na tua própria resposta."
     }
+  },
+  "emergencyShelter": {
+    "trigger": "Demasiado sobrecarregado para escrever",
+    "ariaLabel": "Espaço de calma de emergência",
+    "phrase": "Estás aqui. Isso já é alguma coisa. Respira.",
+    "callNow": "Ligar agora",
+    "back": "Voltar ao chat",
+    "close": "Fechar",
+    "breath": {
+      "inhale": "Inspira (4s)",
+      "hold": "Segura (7s)",
+      "exhale": "Expira (8s)"
+    }
   }
 }

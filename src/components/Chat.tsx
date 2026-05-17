@@ -44,6 +44,7 @@ import { VoiceRecorder } from "@/components/ui/voice-recorder";
 import { TeamLetterCta } from "@/components/TeamLetterCta";
 import { AudioRecorder } from "@/components/ui/audio-recorder";
 import { SpeakButton } from "@/components/ui/speak-button";
+import EmergencyShelter, { EmergencyShelterTrigger } from "@/components/EmergencyShelter";
 import { CHAT_STARTER_PICKS, MENTOR_MODES, getMentorMode } from "@/lib/onboarding";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -702,6 +703,9 @@ export default function Chat({
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [atBottom, setAtBottom] = useState(true);
   const [urgentMode, setUrgentMode] = useState(false);
+  // Modal "demasiado mal para escribir" — overlay calmo con respiración + crisis line.
+  // Disponible siempre vía botón discreto sobre el input, no escondido en menús.
+  const [shelterOpen, setShelterOpen] = useState(false);
   const [sessionRating, setSessionRating] = useState<1 | -1 | null>(null);
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
   const [attachedAudio, setAttachedAudio] = useState<string | null>(null);
@@ -1153,6 +1157,13 @@ export default function Chat({
         )}
       </div>
 
+      {/* ── "Demasiado mal para escribir" — trigger del shelter de emergencia ─ */}
+      {/* Siempre visible justo encima del input. Sin esconder en menús. Si el */}
+      {/* usuario está demasiado abajo para escribir, esta es la salida. */}
+      <div className="shrink-0 flex justify-center bg-zinc-950 pt-2 pb-1">
+        <EmergencyShelterTrigger onClick={() => setShelterOpen(true)} />
+      </div>
+
       {/* ── Input area ──────────────────────────────────────────────────── */}
       <div className="sticky bottom-0 z-10 shrink-0 border-t border-zinc-800/60 bg-zinc-950 px-3 py-3" data-tour="chat-input" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
         {/* Active mentor mode pill */}
@@ -1308,6 +1319,10 @@ export default function Chat({
           </a>
         </p>
       </div>
+
+      {/* Modal "demasiado mal para escribir" — montado al final del árbol para */}
+      {/* que el overlay z-100 cubra todo el chat sin conflicto con sticky bars. */}
+      <EmergencyShelter open={shelterOpen} onClose={() => setShelterOpen(false)} />
     </div>
   );
 }

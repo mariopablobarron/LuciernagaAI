@@ -2948,65 +2948,17 @@
     "copyright": "© {year} <domain>tresmilmillonesdelatidos.es</domain> — Todos los derechos reservados.",
     "disclaimer": "No sustituye terapia ni intervención psicológica profesional."
   },
-  "trustedContact": {
-    "loading": "Cargando…",
-    "title": "Contacto de confianza",
-    "description": "Una persona que recibe avisos si estás en crisis o llevas días sin aparecer. Puede ver solo lo que tú decidas.",
-    "feedback": {
-      "loadError": "No pudimos cargar tu contacto.",
-      "saved": "Cambios guardados.",
-      "created": "Contacto creado. Le enviamos un email con su enlace.",
-      "resent": "Email de invitación reenviado.",
-      "deleted": "Contacto eliminado.",
-      "saveError": "Error guardando",
-      "resendError": "No se pudo reenviar",
-      "deleteError": "No se pudo eliminar",
-      "genericError": "Error"
-    },
-    "form": {
-      "nameLabel": "Nombre",
-      "namePlaceholder": "Ej. Ana",
-      "relationLabel": "Relación",
-      "emailLabel": "Email",
-      "emailPlaceholder": "ana@ejemplo.com",
-      "phoneLabel": "Teléfono (opcional)",
-      "phonePlaceholder": "+34 600 000 000"
-    },
-    "relations": {
-      "madre": "madre",
-      "padre": "padre",
-      "pareja": "pareja",
-      "amigo": "amigo/a",
-      "hermano": "hermano/a",
-      "terapeuta": "terapeuta",
-      "otro": "otro"
-    },
-    "permissions": {
-      "legend": "Qué puede ver",
-      "shareProgress": "Progreso emocional y objetivos",
-      "shareWins": "Victorias que registras",
-      "shareStreak": "Hitos de racha"
-    },
-    "notifications": {
-      "legend": "Cuándo avisarle",
-      "onCrisis": "Si detectamos crisis",
-      "onInactivity": "Si llevas días sin aparecer",
-      "afterPrefix": "Tras",
-      "daysSuffix": "días sin actividad"
-    },
-    "actions": {
-      "saving": "Guardando…",
-      "saveChanges": "Guardar cambios",
-      "create": "Crear contacto",
-      "resend": "Reenviar invitación",
-      "delete": "Eliminar",
-      "confirmPrompt": "¿Seguro?",
-      "confirmYes": "Sí, eliminar",
-      "cancel": "Cancelar"
-    },
-    "status": {
-      "lastAccess": "Último acceso al portal: {date}",
-      "inviteSent": "Invitación enviada: {date} · aún no ha entrado"
+  "emergencyShelter": {
+    "trigger": "Demasiado mal para escribir",
+    "ariaLabel": "Espacio de calma de emergencia",
+    "phrase": "Estás aquí. Eso ya es algo. Respira.",
+    "callNow": "Llamar ahora",
+    "back": "Volver al chat",
+    "close": "Cerrar",
+    "breath": {
+      "inhale": "Inhala (4s)",
+      "hold": "Retén (7s)",
+      "exhale": "Exhala (8s)"
     }
   }
 }

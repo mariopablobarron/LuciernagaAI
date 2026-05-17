@@ -2794,5 +2794,18 @@
       "answerFailed": "Couldn't publish your answer",
       "selfVoteForbidden": "You can't vote on your own answer."
     }
+  },
+  "emergencyShelter": {
+    "trigger": "Too overwhelmed to type",
+    "ariaLabel": "Emergency calm space",
+    "phrase": "You're here. That's already something. Breathe.",
+    "callNow": "Call now",
+    "back": "Back to chat",
+    "close": "Close",
+    "breath": {
+      "inhale": "Inhale (4s)",
+      "hold": "Hold (7s)",
+      "exhale": "Exhale (8s)"
+    }
   }
 }

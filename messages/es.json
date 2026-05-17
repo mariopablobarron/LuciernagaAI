@@ -2364,5 +2364,98 @@
       "breathing": "Respiración",
       "visualization": "Visualización"
     }
+  },
+  "auth": {
+    "shared": {
+      "emailLabel": "Email",
+      "emailPlaceholder": "tu@email.com",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "••••••••",
+      "passwordMinPlaceholder": "Mínimo 8 caracteres",
+      "showPassword": "Mostrar contraseña",
+      "hidePassword": "Ocultar contraseña",
+      "continueWithGoogle": "Continuar con Google",
+      "signupWithGoogle": "Registrarse con Google",
+      "orWithEmail": "o con email",
+      "passwordsMismatch": "Las contraseñas no coinciden.",
+      "errors": {
+        "EMAIL_INVALID": "El email no es válido.",
+        "INVALID_CREDENTIALS": "Email o contraseña incorrectos.",
+        "LOGIN_FAILED": "Error al iniciar sesión. Inténtalo de nuevo.",
+        "EMAIL_TAKEN": "Ya existe una cuenta con ese email.",
+        "PASSWORD_TOO_SHORT": "La contraseña debe tener al menos 8 caracteres.",
+        "CONSENT_REQUIRED": "Tienes que aceptar los Términos y la Privacidad para crear la cuenta.",
+        "CONSENT_VERSION_MISMATCH": "Los Términos se han actualizado. Recarga la página y vuelve a aceptar.",
+        "SIGNUP_FAILED": "Error al crear la cuenta. Inténtalo de nuevo.",
+        "TOKEN_REQUIRED": "El enlace no es válido.",
+        "INVALID_TOKEN": "El enlace no es válido o ya fue usado.",
+        "EXPIRED_TOKEN": "El enlace ha caducado. Solicita uno nuevo.",
+        "RESET_FAILED": "Error al restablecer. Inténtalo de nuevo.",
+        "oauth_invalid_state": "La sesión de Google expiró. Inténtalo de nuevo.",
+        "oauth_failed": "Error al conectar con Google. Inténtalo de nuevo.",
+        "google_not_configured": "El inicio con Google no está disponible en este momento. Usa email y contraseña.",
+        "generic": "Error de autenticación."
+      }
+    },
+    "login": {
+      "title": "Tu corazón ya sabía el camino.",
+      "subtitle": "Vuelve a latir.",
+      "justVerified": "Email verificado correctamente. Ya puedes iniciar sesión.",
+      "forgotLink": "¿Olvidaste tu contraseña?",
+      "submitting": "Entrando…",
+      "submit": "Iniciar sesión",
+      "noAccount": "¿No tienes cuenta?",
+      "signupLink": "Regístrate aquí",
+      "termsLine": "Al ingresar, aceptas nuestros",
+      "termsLink": "Términos",
+      "and": "y",
+      "privacyLink": "Privacidad"
+    },
+    "signup": {
+      "title": "Primer latido.",
+      "subtitle": "El primero de muchos que van a contar.",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "phoneLabel": "Teléfono / Telegram",
+      "phoneHint": "(opcional — para recordatorios)",
+      "phonePlaceholder": "+34 612 345 678",
+      "confirmPasswordLabel": "Confirma tu contraseña",
+      "mvpDisclaimer": "Estamos en fase MVP — cada conversación que tienes nos ayuda a mejorar el mentor para ti y para los que vengan después. Tus datos se tratan de forma confidencial y puedes eliminarlos en cualquier momento.",
+      "consentTpl": "Acepto los <terms>Términos</terms> y la <privacy>Privacidad</privacy> (versión {version}) y entiendo que es un producto en fase de pruebas que no sustituye a un profesional de salud mental.",
+      "submitting": "Creando cuenta…",
+      "submit": "Crear cuenta",
+      "alreadyAccount": "¿Ya tienes cuenta?",
+      "loginLink": "Inicia sesión",
+      "createdTitle": "Cuenta creada",
+      "createdBodyTpl": "Hemos enviado un enlace de verificación a {email}.",
+      "telegramCta": "Llévame contigo en Telegram",
+      "telegramCtaDesc": "Haz clic para conectar tu cuenta. Te acompañaré desde ahí — sin abrir la web.",
+      "spamHint": "¿No encuentras el email? Revisa la carpeta de spam.",
+      "continueToApp": "Continuar a la app"
+    },
+    "forgot": {
+      "back": "Volver al inicio de sesión",
+      "title": "¿Olvidaste tu contraseña?",
+      "subtitle": "Escribe tu email y te enviamos un enlace para restablecerla.",
+      "doneTitle": "Revisa tu correo",
+      "doneBody": "Si existe una cuenta con ese email, recibirás un enlace para restablecer tu contraseña en los próximos minutos.",
+      "submitting": "Enviando…",
+      "submit": "Enviar enlace de recuperación",
+      "errorSend": "Error al enviar el correo. Inténtalo de nuevo."
+    },
+    "reset": {
+      "title": "Nueva contraseña",
+      "subtitle": "Elige una contraseña segura para tu cuenta.",
+      "loading": "Cargando…",
+      "invalidLinkTitle": "Enlace inválido. Solicita uno nuevo.",
+      "requestNewLink": "Recuperar contraseña",
+      "doneTitle": "¡Contraseña actualizada!",
+      "doneSubtitle": "Redirigiendo a la app…",
+      "newPasswordLabel": "Nueva contraseña",
+      "confirmLabel": "Confirmar contraseña",
+      "submitting": "Guardando…",
+      "submit": "Establecer nueva contraseña",
+      "requestNewSuffix": "Solicita uno nuevo"
+    }
   }
 }

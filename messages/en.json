@@ -2324,5 +2324,98 @@
       "breathing": "Breathing",
       "visualization": "Visualization"
     }
+  },
+  "auth": {
+    "shared": {
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@email.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "••••••••",
+      "passwordMinPlaceholder": "Minimum 8 characters",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "continueWithGoogle": "Continue with Google",
+      "signupWithGoogle": "Sign up with Google",
+      "orWithEmail": "or with email",
+      "passwordsMismatch": "Passwords don't match.",
+      "errors": {
+        "EMAIL_INVALID": "Email isn't valid.",
+        "INVALID_CREDENTIALS": "Email or password is wrong.",
+        "LOGIN_FAILED": "Login failed. Try again.",
+        "EMAIL_TAKEN": "An account with that email already exists.",
+        "PASSWORD_TOO_SHORT": "Password needs at least 8 characters.",
+        "CONSENT_REQUIRED": "You need to accept the Terms and Privacy to create your account.",
+        "CONSENT_VERSION_MISMATCH": "Terms have been updated. Reload the page and accept again.",
+        "SIGNUP_FAILED": "Account creation failed. Try again.",
+        "TOKEN_REQUIRED": "Link isn't valid.",
+        "INVALID_TOKEN": "Link isn't valid or already used.",
+        "EXPIRED_TOKEN": "Link expired. Request a new one.",
+        "RESET_FAILED": "Reset failed. Try again.",
+        "oauth_invalid_state": "Google session expired. Try again.",
+        "oauth_failed": "Couldn't connect with Google. Try again.",
+        "google_not_configured": "Google sign-in isn't available right now. Use email and password.",
+        "generic": "Authentication error."
+      }
+    },
+    "login": {
+      "title": "Your heart already knew the way.",
+      "subtitle": "Beat again.",
+      "justVerified": "Email verified. You can log in now.",
+      "forgotLink": "Forgot your password?",
+      "submitting": "Logging in…",
+      "submit": "Log in",
+      "noAccount": "No account yet?",
+      "signupLink": "Sign up here",
+      "termsLine": "By logging in, you accept our",
+      "termsLink": "Terms",
+      "and": "and",
+      "privacyLink": "Privacy"
+    },
+    "signup": {
+      "title": "First heartbeat.",
+      "subtitle": "The first of many that will count.",
+      "nameLabel": "Name",
+      "namePlaceholder": "Your name",
+      "phoneLabel": "Phone / Telegram",
+      "phoneHint": "(optional — for reminders)",
+      "phonePlaceholder": "+34 612 345 678",
+      "confirmPasswordLabel": "Confirm your password",
+      "mvpDisclaimer": "We're in MVP phase — every conversation you have helps us improve the mentor for you and everyone after. Your data is handled confidentially and you can delete it anytime.",
+      "consentTpl": "I accept the <terms>Terms</terms> and <privacy>Privacy</privacy> (version {version}) and understand this is a beta product that doesn't replace a mental health professional.",
+      "submitting": "Creating account…",
+      "submit": "Create account",
+      "alreadyAccount": "Already have an account?",
+      "loginLink": "Sign in",
+      "createdTitle": "Account created",
+      "createdBodyTpl": "We've sent a verification link to {email}.",
+      "telegramCta": "Take me with you on Telegram",
+      "telegramCtaDesc": "Click to connect your account. I'll be there with you — no web needed.",
+      "spamHint": "Can't find the email? Check your spam folder.",
+      "continueToApp": "Continue to app"
+    },
+    "forgot": {
+      "back": "Back to sign in",
+      "title": "Forgot your password?",
+      "subtitle": "Enter your email and we'll send you a link to reset it.",
+      "doneTitle": "Check your email",
+      "doneBody": "If an account exists with that email, you'll receive a password reset link in the next few minutes.",
+      "submitting": "Sending…",
+      "submit": "Send recovery link",
+      "errorSend": "Error sending email. Try again."
+    },
+    "reset": {
+      "title": "New password",
+      "subtitle": "Choose a strong password for your account.",
+      "loading": "Loading…",
+      "invalidLinkTitle": "Invalid link. Request a new one.",
+      "requestNewLink": "Reset password",
+      "doneTitle": "Password updated!",
+      "doneSubtitle": "Redirecting to app…",
+      "newPasswordLabel": "New password",
+      "confirmLabel": "Confirm password",
+      "submitting": "Saving…",
+      "submit": "Set new password",
+      "requestNewSuffix": "Request a new one"
+    }
   }
 }

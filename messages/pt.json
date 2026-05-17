@@ -2324,5 +2324,98 @@
       "breathing": "Respiração",
       "visualization": "Visualização"
     }
+  },
+  "auth": {
+    "shared": {
+      "emailLabel": "Email",
+      "emailPlaceholder": "tu@email.com",
+      "passwordLabel": "Palavra-passe",
+      "passwordPlaceholder": "••••••••",
+      "passwordMinPlaceholder": "Mínimo 8 caracteres",
+      "showPassword": "Mostrar palavra-passe",
+      "hidePassword": "Ocultar palavra-passe",
+      "continueWithGoogle": "Continuar com Google",
+      "signupWithGoogle": "Registar-te com Google",
+      "orWithEmail": "ou com email",
+      "passwordsMismatch": "As palavras-passe não coincidem.",
+      "errors": {
+        "EMAIL_INVALID": "O email não é válido.",
+        "INVALID_CREDENTIALS": "Email ou palavra-passe incorretos.",
+        "LOGIN_FAILED": "Erro ao iniciar sessão. Tenta novamente.",
+        "EMAIL_TAKEN": "Já existe uma conta com esse email.",
+        "PASSWORD_TOO_SHORT": "A palavra-passe deve ter pelo menos 8 caracteres.",
+        "CONSENT_REQUIRED": "Tens de aceitar os Termos e a Privacidade para criar a conta.",
+        "CONSENT_VERSION_MISMATCH": "Os Termos foram atualizados. Recarrega a página e volta a aceitar.",
+        "SIGNUP_FAILED": "Erro ao criar a conta. Tenta novamente.",
+        "TOKEN_REQUIRED": "A ligação não é válida.",
+        "INVALID_TOKEN": "A ligação não é válida ou já foi usada.",
+        "EXPIRED_TOKEN": "A ligação expirou. Solicita uma nova.",
+        "RESET_FAILED": "Erro ao restabelecer. Tenta novamente.",
+        "oauth_invalid_state": "A sessão do Google expirou. Tenta novamente.",
+        "oauth_failed": "Erro ao conectar com Google. Tenta novamente.",
+        "google_not_configured": "O início com Google não está disponível neste momento. Usa email e palavra-passe.",
+        "generic": "Erro de autenticação."
+      }
+    },
+    "login": {
+      "title": "O teu coração já sabia o caminho.",
+      "subtitle": "Volta a bater.",
+      "justVerified": "Email verificado com sucesso. Já podes iniciar sessão.",
+      "forgotLink": "Esqueceste a tua palavra-passe?",
+      "submitting": "Entrando…",
+      "submit": "Iniciar sessão",
+      "noAccount": "Não tens conta?",
+      "signupLink": "Regista-te aqui",
+      "termsLine": "Ao entrares, aceitas os nossos",
+      "termsLink": "Termos",
+      "and": "e",
+      "privacyLink": "Privacidade"
+    },
+    "signup": {
+      "title": "Primeira batida.",
+      "subtitle": "A primeira de muitas que vão contar.",
+      "nameLabel": "Nome",
+      "namePlaceholder": "O teu nome",
+      "phoneLabel": "Telemóvel / Telegram",
+      "phoneHint": "(opcional — para lembretes)",
+      "phonePlaceholder": "+34 612 345 678",
+      "confirmPasswordLabel": "Confirma a tua palavra-passe",
+      "mvpDisclaimer": "Estamos em fase MVP — cada conversa que tens nos ajuda a melhorar o mentor para ti e para os que vêm depois. Os teus dados são tratados de forma confidencial e podes eliminá-los em qualquer momento.",
+      "consentTpl": "Aceito os <terms>Termos</terms> e a <privacy>Privacidade</privacy> (versão {version}) e compreendo que é um produto em fase de testes que não substitui um profissional de saúde mental.",
+      "submitting": "Criando conta…",
+      "submit": "Criar conta",
+      "alreadyAccount": "Já tens conta?",
+      "loginLink": "Inicia sessão",
+      "createdTitle": "Conta criada",
+      "createdBodyTpl": "Enviámos uma ligação de verificação para {email}.",
+      "telegramCta": "Leva-me contigo no Telegram",
+      "telegramCtaDesc": "Clica para conectar a tua conta. Acompanho-te daí — sem abrires a web.",
+      "spamHint": "Não encontras o email? Verifica a pasta de spam.",
+      "continueToApp": "Continuar para a app"
+    },
+    "forgot": {
+      "back": "Voltar ao início de sessão",
+      "title": "Esqueceste-te da tua palavra-passe?",
+      "subtitle": "Escreve o teu email e enviamos-te uma ligação para a restabelecer.",
+      "doneTitle": "Verifica o teu correio",
+      "doneBody": "Se existe uma conta com esse email, receberás uma ligação para restabelecer a tua palavra-passe nos próximos minutos.",
+      "submitting": "A enviar…",
+      "submit": "Enviar ligação de recuperação",
+      "errorSend": "Erro ao enviar o email. Tenta novamente."
+    },
+    "reset": {
+      "title": "Nova palavra-passe",
+      "subtitle": "Escolhe uma palavra-passe segura para a tua conta.",
+      "loading": "A carregar…",
+      "invalidLinkTitle": "Ligação inválida. Solicita uma nova.",
+      "requestNewLink": "Recuperar palavra-passe",
+      "doneTitle": "Palavra-passe atualizada!",
+      "doneSubtitle": "A redirecionar para a app…",
+      "newPasswordLabel": "Nova palavra-passe",
+      "confirmLabel": "Confirmar palavra-passe",
+      "submitting": "A guardar…",
+      "submit": "Estabelecer nova palavra-passe",
+      "requestNewSuffix": "Solicita uma nova"
+    }
   }
 }

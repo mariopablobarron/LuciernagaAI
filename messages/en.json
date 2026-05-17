@@ -2814,5 +2814,9 @@
     "tooltipOn": "Incognito on — turn off (drafts will be remembered on this device again)",
     "tooltipOff": "Turn on incognito — we won't remember anything on this device",
     "bannerText": "Incognito mode · we're not saving drafts on this device"
+  },
+  "accessibility": {
+    "quietRead": "Quiet read",
+    "quietReadDesc": "Reduces vibrant colors and animations. For hard days."
   }
 }

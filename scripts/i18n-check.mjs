@@ -144,6 +144,10 @@ function escapeRegex(s) {
  *  - Re-bindings: const tFoo = useTranslations("foo"); tFoo("bar")  → "foo.bar"
  *  - Template literals: t(`honesty${n}Strong`) → patrón regex que matchea
  *    cualquier key con la forma "honesty.+Strong" dentro del namespace.
+ *  - Variables: t(item.id) / t(link.key) / t(variable) — registra el
+ *    namespace como "fully dynamic" (cubre todas las keys directas del ns).
+ *    Detectado por incidente 2026-05-17 cuando t(link.id) en Header.tsx
+ *    invocaba nav.pricing/faq/test y el detector las marcó como huérfanas.
  *
  * Limitaciones:
  *  - No AST: nesting de useTranslations en bloques con scope distinto no se
@@ -203,6 +207,36 @@ function extractUsedKeys(source) {
         dynamicPatterns.push(new RegExp(fullPattern));
       } catch {
         // Pattern inválido (raro) — ignorar para no romper el script.
+      }
+    }
+
+    // Variables como argumento: tVar(item.id) / tVar(link.key) / tVar(variable).
+    // No sabemos qué valores toma la variable en runtime, así que marcamos
+    // TODO el namespace como dinámico (cubre cualquier key directa de él).
+    //
+    // Detección: tVar( seguido de algo que NO empiece por comilla o backtick.
+    // Si dentro hay algún { o `, es estático/template ya cubierto arriba.
+    //
+    // Patrón previo a este fix marcaba como huérfanas keys que SÍ se usan
+    // con t(item.id) — incidente Header.tsx 2026-05-17 que rompió la home
+    // con MISSING_MESSAGE: nav.pricing/faq/test.
+    const variableArgRegex = new RegExp(
+      `\\b${escapedVar}(?:\\.(?:rich|markup|raw))?\\s*\\(\\s*([a-zA-Z_$][\\w$.]*)\\s*[,)]`,
+      "g",
+    );
+    let vm;
+    while ((vm = variableArgRegex.exec(source)) !== null) {
+      const argName = vm[1];
+      // Excluir keywords y casos triviales que no son identificadores reales.
+      if (["true", "false", "null", "undefined", "void"].includes(argName)) continue;
+      // El argumento es una expresión variable. No sabemos su valor → ns dinámico.
+      const fullPattern = namespace
+        ? `^${escapeRegex(namespace)}\\.[\\w-]+$`
+        : `^[\\w.-]+$`;
+      try {
+        dynamicPatterns.push(new RegExp(fullPattern));
+      } catch {
+        // Ignorar regex inválido
       }
     }
   }

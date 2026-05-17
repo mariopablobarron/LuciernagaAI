@@ -74,7 +74,7 @@ docker logs --tail 25 luciernaga-ai
 
 | Capa | Dónde | Notas |
 |---|---|---|
-| Runtime container | `docker exec luciernaga-ai env` | Inyectados desde el compose en `/docker/luciernaga-ai-traefik/.env` |
+| Runtime container | `docker exec luciernaga-ai env` | Inyectados desde el compose en `/docker/luciernaga-ai-traefik/.env-vars` (¡NO `.env`!). Ver sección 8b. |
 | Build time (Next.js NEXT_PUBLIC_*) | env del build durante `docker build` en VPS | Para añadir `NEXT_PUBLIC_*` requiere rebuild, no solo restart |
 | GH Actions (CI + deploy) | https://github.com/mariopablobarron/tresmilmillonesdelatidos/settings/secrets/actions | `VPS_SSH_KEY`, `TELEGRAM_BOT_TOKEN`, `ADMIN_TELEGRAM_ID` |
 | Local dev | `/Users/STARTIDEA/mentor-web/.env` (Mac de Mario) | Sólo lo mínimo; no replica todo lo de producción |
@@ -161,6 +161,58 @@ Configurados en `crontab -e` como root. Log: `/var/log/mentor-crons.log`.
 | Chat admin | `678888` | Mario (mariopablobarron) |
 
 Token en env del container (`TELEGRAM_BOT_TOKEN`). Para rotarlo: editar `/docker/luciernaga-ai-traefik/.env` + `docker compose up -d --force-recreate --no-deps app`.
+
+---
+
+## 8b. Voz (TTS + STT) — añadido 2026-05-17
+
+### STT (input por voz) — gratis, navegador
+- Componente: [`VoiceRecorder`](src/components/ui/voice-recorder.tsx)
+- API: Web Speech API nativa (`window.SpeechRecognition`)
+- Idioma: dinámico desde `useLocale()` mapeado a BCP-47 (es-ES, en-US, pt-PT, fr-FR)
+- **Sin coste** — todo el procesamiento ocurre en el navegador
+- Limitación: **Firefox no soporta** STT nativo. El botón se muestra deshabilitado con tooltip.
+- Permisos: el navegador pide permiso de micrófono la primera vez. Si lo deniega, el botón cambia a estado "denegado" con tooltip de cómo activarlo.
+
+### TTS (voz del mentor) — ElevenLabs con fallback nativo
+- Componente: [`SpeakButton`](src/components/ui/speak-button.tsx)
+- Prop `preferElevenLabs={true}` se pasa solo a respuestas del mentor (no a mensajes del usuario, no a crisis).
+- Endpoint: [`/api/voice/tts`](src/app/api/voice/tts/route.ts)
+- Provider: ElevenLabs (plan **Creator** $22/mes, 253k chars/mes)
+- API key: `ELEVENLABS_API_KEY` en `/docker/luciernaga-ai-traefik/.env-vars` (NO en `.env`).
+- Modelo: `eleven_multilingual_v2` (cubre los 4 idiomas con una sola voz)
+- Voz default: **Sarah** (`EXAVITQu4vr4xnSDxMaL`) — premade, reassuring + mature. Cambiar en [`src/lib/elevenlabs/voices.ts`](src/lib/elevenlabs/voices.ts).
+- Cache LRU server-side: 64MB en memoria. Mismas respuestas no consumen cuota. Se vacía en cada deploy.
+- Rate limits: anónimos 25 TTS/h por IP, logged-in 100 TTS/h por userId.
+- Tope por request: 1500 chars.
+- **Fallback transparente**: si ElevenLabs falla (quota, red, timeout), `SpeakButton` cae al `speechSynthesis` nativo del navegador sin romper. Solo cambia la calidad de voz (HD → robótica del SO).
+- **Crisis bypass automático**: las respuestas con `variant: "crisis"` no renderizan `SpeakButton` (early return preexistente).
+
+### Quirk operativo — añadir un secret nuevo a luciernaga-ai
+El compose lee `env_file: .env-vars`, NO `.env`. Añadir secrets al archivo equivocado falla silenciosamente. Procedimiento:
+```bash
+ssh root@72.61.195.108
+echo "NUEVA_VAR=valor" >> /docker/luciernaga-ai-traefik/.env-vars
+cd /docker/luciernaga-ai-traefik && docker compose up -d --force-recreate
+# Verificar:
+docker exec luciernaga-ai sh -c 'env | grep ^NUEVA_VAR='
+```
+**`--force-recreate` es obligatorio** — sin él compose ve misma imagen + config y no recrea, la env nueva no entra.
+
+### Voces disponibles (cambiar default)
+Premade (siempre disponibles, sin slot):
+- `EXAVITQu4vr4xnSDxMaL` — Sarah (reassuring) ⭐ default
+- `XB0fDUnXU5powFXDhCwa` — Charlotte (warm, conversational)
+- `21m00Tcm4TlvDq8ikWAM` — Rachel (clásica, smooth)
+- `cgSgspJ2msm6clMCkdW9` — Jessica (playful, bright)
+- `nPczCjzI2devNBz1zQrb` — Brian (deep, comforting, masculina)
+
+Voces del Voice Library (marketplace) requieren **"Add to my voices"** en el dashboard antes de funcionar — consume slot del límite 30 voces.
+
+### Auditoría / monitoreo
+- Quota: `curl -H "xi-api-key: $KEY" https://api.elevenlabs.io/v1/user | jq .subscription.character_count`
+- Cache stats: importar `getCacheStats()` de `@/lib/elevenlabs/tts` (no expuesto via HTTP hoy)
+- Logs: `tail -f /var/log/luciernaga-ai/*.log | grep VOICE` (si configurado) o `docker logs luciernaga-ai | grep VOICE`
 
 ---
 

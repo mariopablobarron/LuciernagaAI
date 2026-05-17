@@ -2078,5 +2078,77 @@
       "anon": "Compte anonyme",
       "noName": "Sans nom — ajoute-le dans Paramètres"
     }
+  },
+  "dashboard": {
+    "title": "Ton accompagnement",
+    "goToChat": "Aller au chat",
+    "state": {
+      "header": "État",
+      "hint": "Ton état change selon ce que tu écris. Le mentor adapte son ton et ses questions à comment tu vas.",
+      "claridad": {
+        "label": "Clarté",
+        "desc": "Battement en direction. Profite de cet élan maintenant."
+      },
+      "bloqueo": {
+        "label": "Blocage",
+        "desc": "Battement en pause. Le nommer déverrouille le rythme."
+      },
+      "ansiedad": {
+        "label": "Anxiété",
+        "desc": "Trop de battements à la fois. Choisis-en un seul."
+      },
+      "duda": {
+        "label": "Doute",
+        "desc": "Le battement cherche son rythme. Le chat peut l'orienter."
+      },
+      "neutral": {
+        "label": "Neutre",
+        "desc": "Battement au calme. Bon moment pour choisir une direction."
+      }
+    },
+    "constancia": {
+      "header": "Constance",
+      "none": "Tu n'es pas revenu ce mois-ci.",
+      "one": "Tu es revenu un jour.",
+      "manyTpl": "Tu es revenu {n} jours.",
+      "hint": "Pas de série à tenir. Reviens quand tu en as besoin."
+    },
+    "trend": {
+      "header": "Tendance",
+      "labels": {
+        "subiendo": "montante",
+        "bajando": "descendante",
+        "igual": "stable"
+      }
+    },
+    "lens": {
+      "surfaceLabel": "Ce que tu vois",
+      "revealedLabel": "Ce qu'il y a derrière",
+      "bloqueo": "Ce n'est pas un manque de capacité. C'est la peur de ne pas être assez.",
+      "ansiedad": "L'urgence que tu ressens n'est pas réelle. C'est du bruit déguisé en action.",
+      "duda": "Tu n'as pas besoin d'infos. Tu as besoin de permission pour mal choisir.",
+      "claridad": "Maintenant tu le vois clair. La question : vas-tu agir avant que ça s'embrouille ?",
+      "neutral": "Le calme n'est pas toujours la paix. Parfois c'est l'évitement silencieux.",
+      "metaTpl": "Tendance : {trend} · Série : {n} jours"
+    },
+    "actions": {
+      "title": "Actions en attente",
+      "newInChat": "Nouvelle au chat",
+      "emptyTitle": "Pas d'actions en attente.",
+      "emptyHint": "Discute avec Trois Milliards de Battements pour définir ta prochaine action."
+    },
+    "wins": {
+      "title": "Ce que tu as voulu garder",
+      "emptyTitle": "Tu n'as rien gardé ici pour l'instant.",
+      "emptyHint": "Quand quelque chose mérite de rester, raconte-le au chat."
+    },
+    "card": {
+      "emotionalLabel": "État émotionnel"
+    },
+    "quick": {
+      "openChat": "Ouvrir le chat",
+      "impulse": "Programme Impulsion",
+      "explore": "Explorer maintenant"
+    }
   }
 }

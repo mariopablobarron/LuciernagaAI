@@ -2078,5 +2078,77 @@
       "anon": "Conta anónima",
       "noName": "Sem nome — adiciona-o em Definições"
     }
+  },
+  "dashboard": {
+    "title": "O teu acompanhamento",
+    "goToChat": "Ir ao chat",
+    "state": {
+      "header": "Estado",
+      "hint": "O teu estado muda conforme aquilo que escreves. O mentor adapta o seu tom e as suas perguntas ao modo como te sentes.",
+      "claridad": {
+        "label": "Clareza",
+        "desc": "Batida em direção. Aproveita este impulso agora."
+      },
+      "bloqueo": {
+        "label": "Bloqueio",
+        "desc": "Batida pausada. Nomeá-la desbloqueia o ritmo."
+      },
+      "ansiedad": {
+        "label": "Ansiedade",
+        "desc": "Demasiadas batidas ao mesmo tempo. Escolhe uma só."
+      },
+      "duda": {
+        "label": "Dúvida",
+        "desc": "A batida procura ritmo. O chat pode orientá-la."
+      },
+      "neutral": {
+        "label": "Neutro",
+        "desc": "Batida em calma. Bom momento para escolheres direção."
+      }
+    },
+    "constancia": {
+      "header": "Constância",
+      "none": "Ainda não voltaste este mês.",
+      "one": "Voltaste um dia.",
+      "manyTpl": "Voltaste {n} dias.",
+      "hint": "Não há sequência que manter. Volta quando precisares."
+    },
+    "trend": {
+      "header": "Tendência",
+      "labels": {
+        "subiendo": "a subir",
+        "bajando": "a descer",
+        "igual": "igual"
+      }
+    },
+    "lens": {
+      "surfaceLabel": "O que vês",
+      "revealedLabel": "O que há por trás",
+      "bloqueo": "Não é falta de capacidade. É medo de que não seja suficiente.",
+      "ansiedad": "A urgência que sentes não é real. É ruído disfarçado de ação.",
+      "duda": "Não te falta informação. Falta-te permissão para escolheres mal.",
+      "claridad": "Agora vês claro. A pergunta é: vais agir antes de se embaçar?",
+      "neutral": "A calma nem sempre é paz. Às vezes é evitação silenciosa.",
+      "metaTpl": "Tendência: {trend} · Sequência: {n} dias"
+    },
+    "actions": {
+      "title": "Ações pendentes",
+      "newInChat": "Nova no chat",
+      "emptyTitle": "Sem ações pendentes.",
+      "emptyHint": "Conversa com Três Mil Milhões de Batidas para definires a tua próxima ação."
+    },
+    "wins": {
+      "title": "O que quiseste guardar",
+      "emptyTitle": "Ainda não guardaste nada aqui.",
+      "emptyHint": "Quando algo mereça ficar, conta-o ao chat."
+    },
+    "card": {
+      "emotionalLabel": "Estado emocional"
+    },
+    "quick": {
+      "openChat": "Abrir chat",
+      "impulse": "Programa Impulso",
+      "explore": "Explorar agora"
+    }
   }
 }

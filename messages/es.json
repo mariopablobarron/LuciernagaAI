@@ -2118,5 +2118,77 @@
       "repeatTour": "Repetir el tour guiado",
       "tourReset": "Tour reiniciado — vuelve al chat para verlo"
     }
+  },
+  "dashboard": {
+    "title": "Tu acompañamiento",
+    "goToChat": "Ir al chat",
+    "state": {
+      "header": "Estado",
+      "hint": "Tu estado cambia según lo que escribes. El mentor adapta su tono y sus preguntas a cómo estás.",
+      "claridad": {
+        "label": "Claridad",
+        "desc": "Latido en dirección. Aprovecha este impulso ahora."
+      },
+      "bloqueo": {
+        "label": "Bloqueo",
+        "desc": "Latido pausado. Nombrarlo desbloquea el ritmo."
+      },
+      "ansiedad": {
+        "label": "Ansiedad",
+        "desc": "Demasiados latidos a la vez. Elige uno solo."
+      },
+      "duda": {
+        "label": "Duda",
+        "desc": "El latido busca ritmo. El chat puede orientarlo."
+      },
+      "neutral": {
+        "label": "Neutral",
+        "desc": "Latido en calma. Buen momento para elegir dirección."
+      }
+    },
+    "constancia": {
+      "header": "Constancia",
+      "none": "Aún no has vuelto este mes.",
+      "one": "Has vuelto un día.",
+      "manyTpl": "Has vuelto {n} días.",
+      "hint": "No hay racha que mantener. Vuelve cuando lo necesites."
+    },
+    "trend": {
+      "header": "Tendencia",
+      "labels": {
+        "subiendo": "subiendo",
+        "bajando": "bajando",
+        "igual": "igual"
+      }
+    },
+    "lens": {
+      "surfaceLabel": "Lo que ves",
+      "revealedLabel": "Lo que hay detrás",
+      "bloqueo": "No es falta de capacidad. Es miedo a que no sea suficiente.",
+      "ansiedad": "La urgencia que sientes no es real. Es ruido disfrazado de acción.",
+      "duda": "No te falta información. Te falta permiso para elegir mal.",
+      "claridad": "Ahora lo ves claro. La pregunta es: ¿vas a actuar antes de que se nuble?",
+      "neutral": "La calma no siempre es paz. A veces es evitación silenciosa.",
+      "metaTpl": "Tendencia: {trend} · Racha: {n} días"
+    },
+    "actions": {
+      "title": "Acciones pendientes",
+      "newInChat": "Nueva en chat",
+      "emptyTitle": "Sin acciones pendientes.",
+      "emptyHint": "Conversa con Tres Mil Millones de Latidos para definir tu próxima acción."
+    },
+    "wins": {
+      "title": "Lo que has querido guardar",
+      "emptyTitle": "Aún no has guardado nada aquí.",
+      "emptyHint": "Cuando algo merezca quedarse, cuéntaselo al chat."
+    },
+    "card": {
+      "emotionalLabel": "Estado emocional"
+    },
+    "quick": {
+      "openChat": "Abrir chat",
+      "impulse": "Programa Impulso",
+      "explore": "Explorar ahora"
+    }
   }
 }

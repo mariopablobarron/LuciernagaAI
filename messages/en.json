@@ -2078,5 +2078,77 @@
       "anon": "Anonymous account",
       "noName": "No name — add it in Settings"
     }
+  },
+  "dashboard": {
+    "title": "Your accompaniment",
+    "goToChat": "Go to chat",
+    "state": {
+      "header": "State",
+      "hint": "Your state shifts with what you write. The mentor adapts their tone and questions to where you are.",
+      "claridad": {
+        "label": "Clarity",
+        "desc": "Heartbeat in direction. Use this momentum now."
+      },
+      "bloqueo": {
+        "label": "Block",
+        "desc": "Heartbeat paused. Naming it unblocks the rhythm."
+      },
+      "ansiedad": {
+        "label": "Anxiety",
+        "desc": "Too many heartbeats at once. Pick one."
+      },
+      "duda": {
+        "label": "Doubt",
+        "desc": "The heartbeat searches for rhythm. Chat can point it."
+      },
+      "neutral": {
+        "label": "Neutral",
+        "desc": "Heartbeat at rest. Good time to choose direction."
+      }
+    },
+    "constancia": {
+      "header": "Consistency",
+      "none": "You haven't been back this month.",
+      "one": "You've been back one day.",
+      "manyTpl": "You've been back {n} days.",
+      "hint": "No streak to keep. Come back when you need it."
+    },
+    "trend": {
+      "header": "Trend",
+      "labels": {
+        "subiendo": "rising",
+        "bajando": "falling",
+        "igual": "flat"
+      }
+    },
+    "lens": {
+      "surfaceLabel": "What you see",
+      "revealedLabel": "What's underneath",
+      "bloqueo": "It's not lack of ability. It's fear it won't be enough.",
+      "ansiedad": "The urgency you feel isn't real. It's noise dressed up as action.",
+      "duda": "You don't lack information. You lack permission to choose wrong.",
+      "claridad": "You see it clearly now. The question is: will you act before it clouds over?",
+      "neutral": "Calm isn't always peace. Sometimes it's silent avoidance.",
+      "metaTpl": "Trend: {trend} · Streak: {n} days"
+    },
+    "actions": {
+      "title": "Pending actions",
+      "newInChat": "New in chat",
+      "emptyTitle": "No pending actions.",
+      "emptyHint": "Talk with Three Billion Heartbeats to define your next move."
+    },
+    "wins": {
+      "title": "What you've wanted to keep",
+      "emptyTitle": "You haven't saved anything here yet.",
+      "emptyHint": "When something deserves to stay, tell the chat about it."
+    },
+    "card": {
+      "emotionalLabel": "Emotional state"
+    },
+    "quick": {
+      "openChat": "Open chat",
+      "impulse": "Impulse Program",
+      "explore": "Explore now"
+    }
   }
 }

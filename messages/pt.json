@@ -1944,7 +1944,8 @@
       "modesTitle": "Como queres que te acompanhe?",
       "modesHint": "Podes mudar o modo em qualquer momento.",
       "telegramCta": "💬 Leva-me no Telegram — mesmo mentor, desde o telemóvel",
-      "voiceHint": "Podes escrever ou usar o microfone 🎙️"
+      "voiceHint": "Podes escrever ou usar o microfone 🎙️",
+      "conversationNumber": "A tua conversa nº {n}"
     },
     "community": {
       "askTitle": "E se o consultares com quem já passou por aí?",

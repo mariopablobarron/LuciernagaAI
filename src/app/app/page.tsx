@@ -1983,6 +1983,7 @@ export default function HomePage() {
                   loading={loading || sessionLoading}
                   streamingMessageId={streamingMessageId}
                   error={error}
+                  totalConversations={sidebarConversations?.length}
                   responseSignals={{
                     searchUsed: safeConversation.searchUsed,
                     fallback: safeConversation.fallback,

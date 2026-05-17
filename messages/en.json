@@ -2833,5 +2833,19 @@
       "errorRetry": "Failed to send. Try again.",
       "disclosure": "We only store what you write here and a message ID. No name, no email."
     }
+  },
+  "escalation": {
+    "ariaLabel": "Professional support suggestion",
+    "title": "This may need more than what I can offer here",
+    "ctaFindProfessional": "Find a therapist",
+    "dismiss": "Dismiss this notice",
+    "disclaimer": "We're not leaving you. You can keep talking here — we just want you to know there are people who hold this better than an AI.",
+    "reason": {
+      "trauma": "What you've shared sounds like deep trauma. That needs sustained human accompaniment, not a chat.",
+      "eating_disorder": "What you describe fits an eating disorder. That requires specialized professional intervention.",
+      "psychotic_symptoms": "What you describe (hearing voices, feeling watched) calls for psychiatric evaluation. Not something to resolve in chat.",
+      "active_addiction": "An active addiction calls for professional support and a network of real people. We can talk here, but it's not enough.",
+      "explicit_request": "You're right. Looking for a therapist is what fits here. Meanwhile I'm still here."
+    }
   }
 }

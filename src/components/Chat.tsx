@@ -48,6 +48,8 @@ import EmergencyShelter, { EmergencyShelterTrigger } from "@/components/Emergenc
 import { IncognitoToggle, IncognitoBanner } from "@/components/IncognitoToggle";
 import { useIncognitoMode } from "@/lib/useIncognitoMode";
 import { NegativeFeedbackButton } from "@/components/NegativeFeedbackButton";
+import { EscalationBanner } from "@/components/EscalationBanner";
+import { detectEscalation } from "@/lib/escalation-detector";
 import { CHAT_STARTER_PICKS, MENTOR_MODES, getMentorMode } from "@/lib/onboarding";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -515,34 +517,42 @@ function MessageBubble({
 
   // User message — right-aligned
   if (isUser) {
+    // Detección de escalation (necesita profesional). Cero coste: regex
+    // local, sin LLM. Si dispara, mostramos banner amable debajo del bubble.
+    const escalation = detectEscalation(message.content, locale);
     return (
-      <div className="flex justify-end px-1">
-        <div className="group relative max-w-[78%]">
-          <div
-            className={`rounded-2xl rounded-tr-sm px-3.5 py-2.5 ${
-              message.isError
-                ? "border border-red-500/30 bg-red-950/30 text-red-200"
-                : "bg-cyan-600 text-white"
-            }`}
-          >
-            <div className="text-sm leading-relaxed">{renderMarkdown(message.content)}</div>
-          </div>
-          {message.createdAt && (
-            <p className="mt-0.5 text-right text-[10px] text-zinc-600">{formatMsgTime(message.createdAt)}</p>
-          )}
-          <button
-            onClick={() => void handleCopy()}
-            aria-label={copied ? t("copy.tooltipCopied") : t("copy.tooltipCopy")}
-            className="absolute -left-10 top-0 p-2 opacity-0 transition-opacity group-hover:opacity-100"
-          >
-            {copied ? (
-              <Check className="h-3.5 w-3.5 text-emerald-400" />
-            ) : (
-              <Copy className="h-3.5 w-3.5 text-zinc-600 hover:text-zinc-400" />
+      <>
+        <div className="flex justify-end px-1">
+          <div className="group relative max-w-[78%]">
+            <div
+              className={`rounded-2xl rounded-tr-sm px-3.5 py-2.5 ${
+                message.isError
+                  ? "border border-red-500/30 bg-red-950/30 text-red-200"
+                  : "bg-cyan-600 text-white"
+              }`}
+            >
+              <div className="text-sm leading-relaxed">{renderMarkdown(message.content)}</div>
+            </div>
+            {message.createdAt && (
+              <p className="mt-0.5 text-right text-[10px] text-zinc-600">{formatMsgTime(message.createdAt)}</p>
             )}
-          </button>
+            <button
+              onClick={() => void handleCopy()}
+              aria-label={copied ? t("copy.tooltipCopied") : t("copy.tooltipCopy")}
+              className="absolute -left-10 top-0 p-2 opacity-0 transition-opacity group-hover:opacity-100"
+            >
+              {copied ? (
+                <Check className="h-3.5 w-3.5 text-emerald-400" />
+              ) : (
+                <Copy className="h-3.5 w-3.5 text-zinc-600 hover:text-zinc-400" />
+              )}
+            </button>
+          </div>
         </div>
-      </div>
+        {escalation.category && escalation.confidence >= 0.5 && (
+          <EscalationBanner category={escalation.category} locale={locale} />
+        )}
+      </>
     );
   }
 

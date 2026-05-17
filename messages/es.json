@@ -2278,5 +2278,91 @@
   },
   "journey": {
     "loading": "Cargando…"
+  },
+  "profilePage": {
+    "title": "Tu perfil",
+    "noName": "Sin nombre — define uno",
+    "planFallback": "Plan gratuito",
+    "edit": "Editar",
+    "photoNudgeStrong": "Sube una foto · ",
+    "photoNudgeRest": "Tu mentor te acompaña mejor cuando te ve como persona, no como sesión.",
+    "emailLabel": "Email",
+    "planLabel": "Plan",
+    "streakLabel": "Racha actual (días)",
+    "currentStateLabel": "Estado actual",
+    "stateLabels": {
+      "claridad": "Claridad",
+      "bloqueo": "Bloqueo",
+      "ansiedad": "Ansiedad",
+      "duda": "Duda",
+      "neutral": "Neutral"
+    },
+    "adaptTitle": "Adaptar el acompañamiento",
+    "adaptDesc": "Tests y preferencias para que el mentor entienda mejor cómo funcionas tú.",
+    "enneagram": "Test del Eneagrama",
+    "enneagramDesc": "90 frases · 10-12 min · ajusta el tono y las preguntas del mentor a tu tipo",
+    "accountActions": "Acciones de cuenta",
+    "configAndSecurity": "Configuración y seguridad",
+    "viewProgress": "Ver mi progreso",
+    "deleteAccount": "Eliminar cuenta",
+    "avatarFallback": "Avatar"
+  },
+  "journeyPage": {
+    "title": "Tu itinerario",
+    "subtitle": "Cuatro fases para entenderte, regularte, encontrar dirección y actuar.",
+    "goToChat": "Ir al chat",
+    "activeLabel": "Itinerario activo",
+    "completed": "Completado",
+    "exercisesCountTpl": "{done}/{total} ejercicios",
+    "continue": "Continuar",
+    "viewFullMap": "Ver mapa completo →",
+    "emptyTitle": "Elige tu primer itinerario",
+    "emptyDesc": "Los itinerarios son programas guiados con ejercicios prácticos. Elige uno para empezar a trabajar en lo que más necesitas.",
+    "steps": {
+      "step1Title": "Elige un itinerario",
+      "step1Desc": "El que más conecte contigo ahora.",
+      "step2Title": "Haz los ejercicios",
+      "step2Desc": "Guiados, paso a paso, a tu ritmo.",
+      "step3Title": "Reflexiona",
+      "step3Desc": "Cada ejercicio cierra con una reflexión.",
+      "step4Title": "Habla con Tres Mil Millones de Latidos",
+      "step4Desc": "La IA adapta sus respuestas a tu progreso."
+    },
+    "availableHeader": "Itinerarios disponibles",
+    "active": "Activo",
+    "modulesTpl": "{n} módulos",
+    "exercisesTpl": "{n} ejercicios",
+    "weeksTpl": "{n} semanas",
+    "progress": "Progreso",
+    "viewMap": "Ver mapa",
+    "starting": "Iniciando...",
+    "start": "Comenzar itinerario",
+    "disclaimer": "Tres Mil Millones de Latidos no sustituye terapia ni intervención psicológica profesional.",
+    "phases": {
+      "autoconocimiento": {
+        "label": "Autoconocimiento",
+        "desc": "Identifica quién eres: patrones, emociones, fortalezas."
+      },
+      "gestion_emocional": {
+        "label": "Gestión Emocional",
+        "desc": "Herramientas para regular sin evitar ni explotar."
+      },
+      "proposito": {
+        "label": "Propósito y Dirección",
+        "desc": "Descubre tus valores y construye una dirección real."
+      },
+      "accion": {
+        "label": "Acción y Seguimiento",
+        "desc": "Convierte la claridad en ejecución y hábitos reales."
+      }
+    },
+    "exerciseTypes": {
+      "reflection": "Reflexión",
+      "writing": "Escritura",
+      "action": "Acción",
+      "assessment": "Evaluación",
+      "breathing": "Respiración",
+      "visualization": "Visualización"
+    }
   }
 }

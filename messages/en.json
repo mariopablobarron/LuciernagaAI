@@ -2238,5 +2238,91 @@
   },
   "journey": {
     "loading": "Loading…"
+  },
+  "profilePage": {
+    "title": "Your profile",
+    "noName": "No name — set one",
+    "planFallback": "Free plan",
+    "edit": "Edit",
+    "photoNudgeStrong": "Upload a photo · ",
+    "photoNudgeRest": "Your mentor gets you better when they see you as a person, not just a session.",
+    "emailLabel": "Email",
+    "planLabel": "Plan",
+    "streakLabel": "Current streak (days)",
+    "currentStateLabel": "Current state",
+    "stateLabels": {
+      "claridad": "Clarity",
+      "bloqueo": "Blocked",
+      "ansiedad": "Anxiety",
+      "duda": "Doubt",
+      "neutral": "Neutral"
+    },
+    "adaptTitle": "Tailor your mentoring",
+    "adaptDesc": "Tests and preferences so your mentor understands how you work.",
+    "enneagram": "Enneagram Test",
+    "enneagramDesc": "90 statements · 10-12 min · tunes your mentor's tone and questions to your type",
+    "accountActions": "Account actions",
+    "configAndSecurity": "Settings and security",
+    "viewProgress": "View my progress",
+    "deleteAccount": "Delete account",
+    "avatarFallback": "Avatar"
+  },
+  "journeyPage": {
+    "title": "Your journey",
+    "subtitle": "Four phases to understand yourself, regulate, find direction, and act.",
+    "goToChat": "Go to chat",
+    "activeLabel": "Active journey",
+    "completed": "Completed",
+    "exercisesCountTpl": "{done}/{total} exercises",
+    "continue": "Continue",
+    "viewFullMap": "View full map →",
+    "emptyTitle": "Pick your first journey",
+    "emptyDesc": "Journeys are guided programs with practical exercises. Pick one to start working on what you need most.",
+    "steps": {
+      "step1Title": "Pick a journey",
+      "step1Desc": "The one that resonates with you right now.",
+      "step2Title": "Do the exercises",
+      "step2Desc": "Guided, step by step, at your pace.",
+      "step3Title": "Reflect",
+      "step3Desc": "Each exercise closes with reflection.",
+      "step4Title": "Talk to Three Billion Heartbeats",
+      "step4Desc": "The AI adapts its responses to your progress."
+    },
+    "availableHeader": "Available journeys",
+    "active": "Active",
+    "modulesTpl": "{n} modules",
+    "exercisesTpl": "{n} exercises",
+    "weeksTpl": "{n} weeks",
+    "progress": "Progress",
+    "viewMap": "View map",
+    "starting": "Starting...",
+    "start": "Start your journey",
+    "disclaimer": "Three Billion Heartbeats is not a substitute for therapy or professional psychological intervention.",
+    "phases": {
+      "autoconocimiento": {
+        "label": "Self-Awareness",
+        "desc": "Identify who you are: your patterns, emotions, strengths."
+      },
+      "gestion_emocional": {
+        "label": "Emotional Regulation",
+        "desc": "Tools to regulate without avoiding or exploiting."
+      },
+      "proposito": {
+        "label": "Purpose and Direction",
+        "desc": "Discover your values and build real direction."
+      },
+      "accion": {
+        "label": "Action and Follow-Through",
+        "desc": "Turn clarity into execution and real habits."
+      }
+    },
+    "exerciseTypes": {
+      "reflection": "Reflection",
+      "writing": "Writing",
+      "action": "Action",
+      "assessment": "Assessment",
+      "breathing": "Breathing",
+      "visualization": "Visualization"
+    }
   }
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { ArrowLeft, Mail, Zap, Flame, Edit2, Sparkles } from 'lucide-react';
 import { TYPOGRAPHY, COMPONENTS, LAYOUTS, GRADIENTS } from '@/styles/design-system';
 import type { BrowserSessionUser } from '@/lib/session-client';
@@ -30,15 +31,15 @@ function initials(name: string | null | undefined, emailFallback?: string | null
   return '·';
 }
 
-const STATE_LABEL: Record<string, string> = {
-  claridad: 'Claridad',
-  bloqueo: 'Bloqueo',
-  ansiedad: 'Ansiedad',
-  duda: 'Duda',
-  neutral: 'Neutral',
-};
+// IDs estables — labels en messages.profilePage.stateLabels.<id>
+const STATE_IDS = ['claridad', 'bloqueo', 'ansiedad', 'duda', 'neutral'] as const;
+type StateId = (typeof STATE_IDS)[number];
+function isStateId(v: string | undefined): v is StateId {
+  return !!v && (STATE_IDS as readonly string[]).includes(v);
+}
 
 export default function ProfilePage() {
+  const t = useTranslations('profilePage');
   const [user, setUser] = useState<BrowserSessionUser | null>(null);
   const [stateData, setStateData] = useState<StateData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -96,7 +97,7 @@ export default function ProfilePage() {
           <Link href="/app" className="p-2 -ml-2 rounded-lg text-zinc-400 hover:text-cyan-400 hover:bg-white/5 transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <h1 className={`${TYPOGRAPHY.h1} text-white`}>Tu perfil</h1>
+          <h1 className={`${TYPOGRAPHY.h1} text-white`}>{t('title')}</h1>
         </div>
 
         {/* Profile Card */}
@@ -107,7 +108,7 @@ export default function ProfilePage() {
                 {!loading && user?.id ? (
                   <img
                     src={`/api/user/avatar/${user.id}`}
-                    alt={user?.name ?? 'Avatar'}
+                    alt={user?.name ?? t('avatarFallback')}
                     className={`w-20 h-20 rounded-full object-cover border-2 border-zinc-700 ${hasPhoto === false ? 'hidden' : ''}`}
                     onLoad={() => setHasPhoto(true)}
                     onError={() => setHasPhoto(false)}
@@ -132,10 +133,10 @@ export default function ProfilePage() {
                         href="/settings"
                         className={`${TYPOGRAPHY.h2} text-zinc-400 hover:text-white transition-colors underline decoration-dotted underline-offset-4`}
                       >
-                        Sin nombre — define uno
+                        {t('noName')}
                       </Link>
                     )}
-                    <p className="text-zinc-400 capitalize">{user?.planLabel ?? 'Plan gratuito'}</p>
+                    <p className="text-zinc-400 capitalize">{user?.planLabel ?? t('planFallback')}</p>
                     {user?.bio && <p className="text-sm text-zinc-500 mt-1">{user.bio}</p>}
                   </>
                 )}
@@ -146,7 +147,7 @@ export default function ProfilePage() {
               className={`${COMPONENTS.buttonSecondary} inline-flex items-center gap-2`}
             >
               <Edit2 className="w-4 h-4" />
-              Editar
+              {t('edit')}
             </Link>
           </div>
 
@@ -157,10 +158,8 @@ export default function ProfilePage() {
               href="/settings"
               className="block rounded-xl border border-violet-500/30 bg-violet-500/5 px-4 py-3 text-sm hover:bg-violet-500/10 transition-colors"
             >
-              <span className="font-semibold text-violet-300">Sube una foto · </span>
-              <span className="text-zinc-400">
-                Tu mentor te acompaña mejor cuando te ve como persona, no como sesión.
-              </span>
+              <span className="font-semibold text-violet-300">{t('photoNudgeStrong')}</span>
+              <span className="text-zinc-400">{t('photoNudgeRest')}</span>
             </Link>
           )}
 
@@ -169,7 +168,7 @@ export default function ProfilePage() {
             <div className="flex items-center gap-3">
               <Mail className="w-5 h-5 text-cyan-400 shrink-0" />
               <div className="min-w-0">
-                <p className="text-xs text-zinc-500 uppercase tracking-wide">Email</p>
+                <p className="text-xs text-zinc-500 uppercase tracking-wide">{t('emailLabel')}</p>
                 {loading ? (
                   <Skeleton className="h-5 w-40 mt-1" />
                 ) : (
@@ -180,7 +179,7 @@ export default function ProfilePage() {
             <div className="flex items-center gap-3">
               <Zap className="w-5 h-5 text-violet-400 shrink-0" />
               <div>
-                <p className="text-xs text-zinc-500 uppercase tracking-wide">Plan</p>
+                <p className="text-xs text-zinc-500 uppercase tracking-wide">{t('planLabel')}</p>
                 {loading ? (
                   <Skeleton className="h-5 w-24 mt-1" />
                 ) : (
@@ -191,8 +190,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Statistics — eliminado "Mensajes hoy" tras quitar el cap diario.
-            El recuento ya no aporta información accionable. */}
+        {/* Statistics — eliminado "Mensajes hoy" tras quitar el cap diario. */}
         <div className={`${LAYOUTS.gridTwoCol}`}>
           <div className={`${COMPONENTS.card} text-center space-y-2 p-6`}>
             {loading ? (
@@ -203,17 +201,17 @@ export default function ProfilePage() {
                 <p className="text-3xl font-bold text-amber-400">{stateData?.streakDays ?? 0}</p>
               </div>
             )}
-            <p className="text-sm text-zinc-400">Racha actual (días)</p>
+            <p className="text-sm text-zinc-400">{t('streakLabel')}</p>
           </div>
           <div className={`${COMPONENTS.card} text-center space-y-2 p-6`}>
             {loading ? (
               <Skeleton className="h-10 w-16 mx-auto" />
             ) : (
               <p className="text-3xl font-bold text-cyan-400">
-                {STATE_LABEL[stateData?.state ?? 'neutral'] ?? 'Neutral'}
+                {t(`stateLabels.${isStateId(stateData?.state) ? stateData!.state : 'neutral'}`)}
               </p>
             )}
-            <p className="text-sm text-zinc-400">Estado actual</p>
+            <p className="text-sm text-zinc-400">{t('currentStateLabel')}</p>
           </div>
         </div>
 
@@ -222,35 +220,31 @@ export default function ProfilePage() {
 
         {/* Adaptar el acompañamiento */}
         <div className={`${COMPONENTS.card} p-6 space-y-3`}>
-          <h3 className="font-semibold text-white">Adaptar el acompañamiento</h3>
-          <p className="text-sm text-zinc-400 leading-relaxed">
-            Tests y preferencias para que el mentor entienda mejor cómo funcionas tú.
-          </p>
+          <h3 className="font-semibold text-white">{t('adaptTitle')}</h3>
+          <p className="text-sm text-zinc-400 leading-relaxed">{t('adaptDesc')}</p>
           <Link
             href="/profile/eneagrama"
             className="flex items-center gap-3 rounded-xl border border-fuchsia-500/30 bg-fuchsia-500/5 hover:bg-fuchsia-500/10 px-4 py-3 transition-colors"
           >
             <Sparkles className="w-5 h-5 text-fuchsia-300 shrink-0" aria-hidden="true" />
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-white">Test del Eneagrama</p>
-              <p className="text-xs text-zinc-400">
-                90 frases · 10-12 min · ajusta el tono y las preguntas del mentor a tu tipo
-              </p>
+              <p className="font-semibold text-white">{t('enneagram')}</p>
+              <p className="text-xs text-zinc-400">{t('enneagramDesc')}</p>
             </div>
           </Link>
         </div>
 
         {/* Account Actions */}
         <div className={`${COMPONENTS.card} p-6 space-y-3`}>
-          <h3 className="font-semibold text-white mb-4">Acciones de cuenta</h3>
+          <h3 className="font-semibold text-white mb-4">{t('accountActions')}</h3>
           <Link href="/settings" className={`${COMPONENTS.buttonSecondary} w-full block text-center`}>
-            Configuración y seguridad
+            {t('configAndSecurity')}
           </Link>
           <Link href="/dashboard" className={`${COMPONENTS.buttonSecondary} w-full block text-center`}>
-            Ver mi progreso
+            {t('viewProgress')}
           </Link>
           <button className="w-full py-2 px-4 rounded-lg border border-red-500/50 text-red-400 hover:bg-red-500/10 transition-colors font-semibold">
-            Eliminar cuenta
+            {t('deleteAccount')}
           </button>
         </div>
       </div>

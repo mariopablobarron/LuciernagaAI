@@ -2238,5 +2238,91 @@
   },
   "journey": {
     "loading": "Chargement…"
+  },
+  "profilePage": {
+    "title": "Ton profil",
+    "noName": "Sans nom — définis-en un",
+    "planFallback": "Plan gratuit",
+    "edit": "Modifier",
+    "photoNudgeStrong": "Ajoute une photo · ",
+    "photoNudgeRest": "Ton mentor t'accompagne mieux quand il te voit comme personne, pas comme une session.",
+    "emailLabel": "Email",
+    "planLabel": "Plan",
+    "streakLabel": "Série actuelle (jours)",
+    "currentStateLabel": "État actuel",
+    "stateLabels": {
+      "claridad": "Clarté",
+      "bloqueo": "Blocage",
+      "ansiedad": "Anxiété",
+      "duda": "Doute",
+      "neutral": "Neutre"
+    },
+    "adaptTitle": "Adapter l'accompagnement",
+    "adaptDesc": "Tests et préférences pour que ton mentor comprenne mieux comment tu fonctionnes.",
+    "enneagram": "Test de l'Ennéagramme",
+    "enneagramDesc": "90 phrases · 10-12 min · ajuste le ton et les questions du mentor à ton type",
+    "accountActions": "Actions de compte",
+    "configAndSecurity": "Configuration et sécurité",
+    "viewProgress": "Voir ma progression",
+    "deleteAccount": "Supprimer le compte",
+    "avatarFallback": "Avatar"
+  },
+  "journeyPage": {
+    "title": "Ton itinéraire",
+    "subtitle": "Quatre phases pour te comprendre, te réguler, trouver une direction et agir.",
+    "goToChat": "Aller au chat",
+    "activeLabel": "Itinéraire actif",
+    "completed": "Complété",
+    "exercisesCountTpl": "{done}/{total} exercices",
+    "continue": "Continuer",
+    "viewFullMap": "Voir la carte complète →",
+    "emptyTitle": "Choisis ton premier itinéraire",
+    "emptyDesc": "Les itinéraires sont des programmes guidés avec des exercices pratiques. Choisis-en un pour commencer à travailler sur ce dont tu as le plus besoin.",
+    "steps": {
+      "step1Title": "Choisis un itinéraire",
+      "step1Desc": "Celui qui te parle le plus en ce moment.",
+      "step2Title": "Fais les exercices",
+      "step2Desc": "Guidés, étape par étape, à ton rythme.",
+      "step3Title": "Réfléchis",
+      "step3Desc": "Chaque exercice se termine par une réflexion.",
+      "step4Title": "Parle avec Trois Milliards de Battements",
+      "step4Desc": "L'IA adapte ses réponses à ta progression."
+    },
+    "availableHeader": "Itinéraires disponibles",
+    "active": "Actif",
+    "modulesTpl": "{n} modules",
+    "exercisesTpl": "{n} exercices",
+    "weeksTpl": "{n} semaines",
+    "progress": "Progression",
+    "viewMap": "Voir la carte",
+    "starting": "Démarrage...",
+    "start": "Commencer le parcours",
+    "disclaimer": "Trois Milliards de Battements ne remplace pas une thérapie ni une intervention psychologique professionnelle.",
+    "phases": {
+      "autoconocimiento": {
+        "label": "Connaissance de soi",
+        "desc": "Identifie qui tu es : tes schémas, tes émotions, tes forces."
+      },
+      "gestion_emocional": {
+        "label": "Gestion Émotionnelle",
+        "desc": "Des outils pour réguler sans éviter ni exploiter."
+      },
+      "proposito": {
+        "label": "Objectif et Direction",
+        "desc": "Découvre tes valeurs et construis une direction réelle."
+      },
+      "accion": {
+        "label": "Action et Suivi",
+        "desc": "Transforme la clarté en exécution et en vrais habits."
+      }
+    },
+    "exerciseTypes": {
+      "reflection": "Réflexion",
+      "writing": "Écriture",
+      "action": "Action",
+      "assessment": "Évaluation",
+      "breathing": "Respiration",
+      "visualization": "Visualisation"
+    }
   }
 }

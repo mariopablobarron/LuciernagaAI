@@ -1,0 +1,28 @@
+scripts/i18n-check.mjs
+  s_d2308f25c4747c::t_da815466d72967 212-241
+  s_d2308f25c4747c::t_3c13e40bb0e686 147-150
+messages/fr.json
+  s_d2308f25c4747c::t_a60fec5c0c239a 15-21
+messages/es.json
+  s_d2308f25c4747c::t_a60fec5c0c239a 15-21
+messages/en.json
+  s_d2308f25c4747c::t_a60fec5c0c239a 15-21
+messages/pt.json
+  s_d2308f25c4747c::t_a60fec5c0c239a 15-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "6025c6cf5bdd47c6abc004e9a49d9575312952ec",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

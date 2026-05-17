@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import { Users, Mail, Phone, Trash2, Send, CheckCircle2, AlertTriangle } from "lucide-react";
 
 type Relation = "madre" | "padre" | "pareja" | "amigo/a" | "hermano/a" | "terapeuta" | "otro";
@@ -23,7 +24,31 @@ type Contact = {
 
 const RELATIONS: Relation[] = ["madre", "padre", "pareja", "amigo/a", "hermano/a", "terapeuta", "otro"];
 
+// Mapeo de valores canónicos (en español, los que guarda la BD) a las
+// sub-keys del bloque trustedContact.relations. Mantenemos los valores en
+// español para no romper datos existentes; solo localizamos el label visible.
+const RELATION_KEYS: Record<Relation, string> = {
+  madre: "madre",
+  padre: "padre",
+  pareja: "pareja",
+  "amigo/a": "amigo",
+  "hermano/a": "hermano",
+  terapeuta: "terapeuta",
+  otro: "otro",
+};
+
+const LOCALE_BCP47: Record<string, string> = {
+  es: "es-ES",
+  en: "en-US",
+  pt: "pt-PT",
+  fr: "fr-FR",
+};
+
 export function TrustedContactSection() {
+  const t = useTranslations("trustedContact");
+  const locale = useLocale();
+  const bcp = LOCALE_BCP47[locale] ?? "es-ES";
+
   const [loading, setLoading] = useState(true);
   const [contact, setContact] = useState<Contact | null>(null);
   const [saving, setSaving] = useState(false);
@@ -63,8 +88,9 @@ export function TrustedContactSection() {
           });
         }
       })
-      .catch(() => setFeedback({ kind: "error", text: "No pudimos cargar tu contacto." }))
+      .catch(() => setFeedback({ kind: "error", text: t("feedback.loadError") }))
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function submit(e: React.FormEvent) {
@@ -86,14 +112,14 @@ export function TrustedContactSection() {
         body: JSON.stringify(body),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Error guardando");
+      if (!res.ok) throw new Error(data.error ?? t("feedback.saveError"));
       setContact(data.contact);
       setFeedback({
         kind: "ok",
-        text: contact ? "Cambios guardados." : "Contacto creado. Le enviamos un email con su enlace.",
+        text: contact ? t("feedback.saved") : t("feedback.created"),
       });
     } catch (err) {
-      setFeedback({ kind: "error", text: err instanceof Error ? err.message : "Error" });
+      setFeedback({ kind: "error", text: err instanceof Error ? err.message : t("feedback.genericError") });
     } finally {
       setSaving(false);
     }
@@ -108,10 +134,10 @@ export function TrustedContactSection() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ resendInvite: true }),
       });
-      if (!res.ok) throw new Error("No se pudo reenviar");
-      setFeedback({ kind: "ok", text: "Email de invitación reenviado." });
+      if (!res.ok) throw new Error(t("feedback.resendError"));
+      setFeedback({ kind: "ok", text: t("feedback.resent") });
     } catch (err) {
-      setFeedback({ kind: "error", text: err instanceof Error ? err.message : "Error" });
+      setFeedback({ kind: "error", text: err instanceof Error ? err.message : t("feedback.genericError") });
     } finally {
       setSaving(false);
     }
@@ -121,7 +147,7 @@ export function TrustedContactSection() {
     setSaving(true);
     try {
       const res = await fetch("/api/user/trusted-contact", { method: "DELETE" });
-      if (!res.ok) throw new Error("No se pudo eliminar");
+      if (!res.ok) throw new Error(t("feedback.deleteError"));
       setContact(null);
       setConfirmDelete(false);
       setForm({
@@ -136,9 +162,9 @@ export function TrustedContactSection() {
         notifyOnInactivity: true,
         inactivityDays: 3,
       });
-      setFeedback({ kind: "ok", text: "Contacto eliminado." });
+      setFeedback({ kind: "ok", text: t("feedback.deleted") });
     } catch (err) {
-      setFeedback({ kind: "error", text: err instanceof Error ? err.message : "Error" });
+      setFeedback({ kind: "error", text: err instanceof Error ? err.message : t("feedback.genericError") });
     } finally {
       setSaving(false);
     }
@@ -147,7 +173,7 @@ export function TrustedContactSection() {
   if (loading) {
     return (
       <section className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
-        <p className="text-sm text-zinc-500">Cargando…</p>
+        <p className="text-sm text-zinc-500">{t("loading")}</p>
       </section>
     );
   }
@@ -157,11 +183,8 @@ export function TrustedContactSection() {
       <header className="flex items-start gap-3">
         <Users className="w-5 h-5 text-fuchsia-400 mt-1 shrink-0" />
         <div>
-          <h2 className="text-lg font-semibold">Contacto de confianza</h2>
-          <p className="text-sm text-zinc-400 mt-1">
-            Una persona que recibe avisos si estás en crisis o llevas días sin aparecer.
-            Puede ver solo lo que tú decidas.
-          </p>
+          <h2 className="text-lg font-semibold">{t("title")}</h2>
+          <p className="text-sm text-zinc-400 mt-1">{t("description")}</p>
         </div>
       </header>
 
@@ -186,18 +209,18 @@ export function TrustedContactSection() {
       <form onSubmit={submit} className="space-y-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <label className="block">
-            <span className="text-xs text-zinc-400">Nombre</span>
+            <span className="text-xs text-zinc-400">{t("form.nameLabel")}</span>
             <input
               required
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               className="mt-1 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm"
-              placeholder="Ej. Ana"
+              placeholder={t("form.namePlaceholder")}
             />
           </label>
 
           <label className="block">
-            <span className="text-xs text-zinc-400">Relación</span>
+            <span className="text-xs text-zinc-400">{t("form.relationLabel")}</span>
             <select
               value={form.relation}
               onChange={(e) => setForm({ ...form, relation: e.target.value as "" | Relation })}
@@ -206,7 +229,7 @@ export function TrustedContactSection() {
               <option value="">—</option>
               {RELATIONS.map((r) => (
                 <option key={r} value={r}>
-                  {r}
+                  {t(`relations.${RELATION_KEYS[r]}`)}
                 </option>
               ))}
             </select>
@@ -214,7 +237,7 @@ export function TrustedContactSection() {
 
           <label className="block">
             <span className="text-xs text-zinc-400 flex items-center gap-1">
-              <Mail className="w-3 h-3" /> Email
+              <Mail className="w-3 h-3" /> {t("form.emailLabel")}
             </span>
             <input
               required
@@ -222,40 +245,40 @@ export function TrustedContactSection() {
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               className="mt-1 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm"
-              placeholder="ana@ejemplo.com"
+              placeholder={t("form.emailPlaceholder")}
             />
           </label>
 
           <label className="block">
             <span className="text-xs text-zinc-400 flex items-center gap-1">
-              <Phone className="w-3 h-3" /> Teléfono (opcional)
+              <Phone className="w-3 h-3" /> {t("form.phoneLabel")}
             </span>
             <input
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
               className="mt-1 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm"
-              placeholder="+34 600 000 000"
+              placeholder={t("form.phonePlaceholder")}
             />
           </label>
         </div>
 
         <fieldset className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
           <legend className="px-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
-            Qué puede ver
+            {t("permissions.legend")}
           </legend>
 
           <Toggle
-            label="Progreso emocional y objetivos"
+            label={t("permissions.shareProgress")}
             checked={form.shareProgress}
             onChange={(v) => setForm({ ...form, shareProgress: v })}
           />
           <Toggle
-            label="Victorias que registras"
+            label={t("permissions.shareWins")}
             checked={form.shareWins}
             onChange={(v) => setForm({ ...form, shareWins: v })}
           />
           <Toggle
-            label="Hitos de racha"
+            label={t("permissions.shareStreak")}
             checked={form.shareStreak}
             onChange={(v) => setForm({ ...form, shareStreak: v })}
           />
@@ -263,23 +286,23 @@ export function TrustedContactSection() {
 
         <fieldset className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
           <legend className="px-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
-            Cuándo avisarle
+            {t("notifications.legend")}
           </legend>
 
           <Toggle
-            label="Si detectamos crisis"
+            label={t("notifications.onCrisis")}
             checked={form.notifyOnCrisis}
             onChange={(v) => setForm({ ...form, notifyOnCrisis: v })}
           />
           <Toggle
-            label="Si llevas días sin aparecer"
+            label={t("notifications.onInactivity")}
             checked={form.notifyOnInactivity}
             onChange={(v) => setForm({ ...form, notifyOnInactivity: v })}
           />
 
           {form.notifyOnInactivity && (
             <label className="flex items-center gap-3 text-sm text-zinc-300">
-              <span>Tras</span>
+              <span>{t("notifications.afterPrefix")}</span>
               <input
                 type="number"
                 min={1}
@@ -290,7 +313,7 @@ export function TrustedContactSection() {
                 }
                 className="w-16 rounded-md border border-zinc-700 bg-zinc-950 px-2 py-1 text-sm text-center"
               />
-              <span>días sin actividad</span>
+              <span>{t("notifications.daysSuffix")}</span>
             </label>
           )}
         </fieldset>
@@ -301,7 +324,7 @@ export function TrustedContactSection() {
             disabled={saving}
             className="rounded-lg bg-fuchsia-600 px-4 py-2 text-sm font-medium text-white hover:bg-fuchsia-500 disabled:opacity-50"
           >
-            {saving ? "Guardando…" : contact ? "Guardar cambios" : "Crear contacto"}
+            {saving ? t("actions.saving") : contact ? t("actions.saveChanges") : t("actions.create")}
           </button>
 
           {contact && (
@@ -313,7 +336,7 @@ export function TrustedContactSection() {
                 className="flex items-center gap-1.5 rounded-lg border border-zinc-700 px-3 py-2 text-sm text-zinc-200 hover:bg-zinc-800 disabled:opacity-50"
               >
                 <Send className="w-3.5 h-3.5" />
-                Reenviar invitación
+                {t("actions.resend")}
               </button>
 
               {!confirmDelete ? (
@@ -323,25 +346,25 @@ export function TrustedContactSection() {
                   className="flex items-center gap-1.5 rounded-lg border border-red-900 px-3 py-2 text-sm text-red-300 hover:bg-red-950/50"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
-                  Eliminar
+                  {t("actions.delete")}
                 </button>
               ) : (
                 <div className="flex items-center gap-2 rounded-lg border border-red-800 bg-red-950/40 px-3 py-2 text-sm">
-                  <span className="text-red-200">¿Seguro?</span>
+                  <span className="text-red-200">{t("actions.confirmPrompt")}</span>
                   <button
                     type="button"
                     onClick={handleDelete}
                     disabled={saving}
                     className="rounded bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-500"
                   >
-                    Sí, eliminar
+                    {t("actions.confirmYes")}
                   </button>
                   <button
                     type="button"
                     onClick={() => setConfirmDelete(false)}
                     className="rounded border border-zinc-700 px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-800"
                   >
-                    Cancelar
+                    {t("actions.cancel")}
                   </button>
                 </div>
               )}
@@ -352,9 +375,13 @@ export function TrustedContactSection() {
         {contact && (
           <p className="text-xs text-zinc-500 pt-1">
             {contact.lastAccessAt
-              ? `Último acceso al portal: ${new Date(contact.lastAccessAt).toLocaleDateString("es-ES")}`
+              ? t("status.lastAccess", {
+                  date: new Date(contact.lastAccessAt).toLocaleDateString(bcp),
+                })
               : contact.inviteSentAt
-              ? `Invitación enviada: ${new Date(contact.inviteSentAt).toLocaleDateString("es-ES")} · aún no ha entrado`
+              ? t("status.inviteSent", {
+                  date: new Date(contact.inviteSentAt).toLocaleDateString(bcp),
+                })
               : null}
           </p>
         )}

@@ -2818,5 +2818,20 @@
   "accessibility": {
     "quietRead": "Leitura tranquila",
     "quietReadDesc": "Reduz cores vibrantes e animações. Para dias difíceis."
+  },
+  "feedback": {
+    "message": {
+      "trigger": "Isto não me ajudou",
+      "modalTitle": "Porque não te ajudou?",
+      "modalSubtitle": "Opcional. Ajuda-nos a melhorar respostas futuras.",
+      "placeholder": "Por exemplo: não percebeu o que disse, foi impessoal, fez-me sentir julgado...",
+      "send": "Enviar",
+      "sending": "A enviar…",
+      "cancel": "Cancelar",
+      "close": "Fechar",
+      "alreadySent": "Feedback enviado",
+      "errorRetry": "Falha ao enviar. Tenta outra vez.",
+      "disclosure": "Só guardamos o que escreveres aqui e um identificador da mensagem. Sem nome, sem email."
+    }
   }
 }

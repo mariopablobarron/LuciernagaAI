@@ -2818,5 +2818,20 @@
   "accessibility": {
     "quietRead": "Quiet read",
     "quietReadDesc": "Reduces vibrant colors and animations. For hard days."
+  },
+  "feedback": {
+    "message": {
+      "trigger": "This didn't help",
+      "modalTitle": "Why didn't it help?",
+      "modalSubtitle": "Optional. Helps us improve future responses.",
+      "placeholder": "For example: didn't understand what I said, felt impersonal, made me feel judged...",
+      "send": "Send",
+      "sending": "Sending…",
+      "cancel": "Cancel",
+      "close": "Close",
+      "alreadySent": "Feedback sent",
+      "errorRetry": "Failed to send. Try again.",
+      "disclosure": "We only store what you write here and a message ID. No name, no email."
+    }
   }
 }

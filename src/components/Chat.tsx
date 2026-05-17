@@ -100,6 +100,12 @@ export type ChatProps = {
   draftKey?: string;
   /** Conversation ID — used for rating. */
   conversationId?: string;
+  /**
+   * Número total de conversaciones del usuario. Si está y es ≥2, mostramos
+   * un texto humilde "Tu conversación nº N" en el empty state. Sin badges,
+   * sin streaks, sin celebración. Reconocimiento, no gamificación.
+   */
+  totalConversations?: number;
   /** Called when user rates the session. */
   onRateSession?: (rating: 1 | -1) => void;
   /** Journaling mode: AI doesn't respond, messages stored as notes. */
@@ -700,6 +706,7 @@ export default function Chat({
   onUseStarterExample,
   draftKey,
   conversationId,
+  totalConversations,
   onRateSession,
   journalMode = false,
   onToggleJournal,
@@ -940,6 +947,14 @@ export default function Chat({
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-cyan-500/10 ring-1 ring-cyan-500/20">
               <Sparkles className="h-5 w-5 text-cyan-400" />
             </div>
+            {/* Hito humilde: solo aparece desde la 2ª conversación. Sin badges,
+                sin streaks, sin colores festivos. Reconocer al usuario que
+                vuelve sin convertirlo en juego. */}
+            {totalConversations && totalConversations >= 2 ? (
+              <p className="mb-1.5 text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+                {t("empty.conversationNumber", { n: totalConversations })}
+              </p>
+            ) : null}
             <h3 className="mb-1 text-base font-semibold text-white">{t("empty.title")}</h3>
             <p className="mb-3 max-w-sm text-xs text-zinc-600 leading-relaxed">{t("empty.subtitle")}</p>
             {proactivePrompt ? (

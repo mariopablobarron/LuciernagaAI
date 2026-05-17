@@ -34,11 +34,16 @@ Abre **Web Console de Hostinger** (hpanel.hostinger.com → tu VPS → Browser t
 
 ```bash
 mkdir -p /root/.ssh && chmod 700 /root/.ssh
-echo "PEGA-AQUI-LA-PUBLICA-COMPLETA" >> /root/.ssh/authorized_keys
+# Recomendado: añadir restricciones para evitar acceso root pleno.
+# El workflow llama a /root/deploy-mentor-web.sh; cualquier otro
+# comando que intente ejecutarse vía esta key será ignorado.
+echo 'restrict,no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty,command="/root/deploy-mentor-web.sh" PEGA-AQUI-LA-PUBLICA-COMPLETA' >> /root/.ssh/authorized_keys
 chmod 600 /root/.ssh/authorized_keys
 ```
 
 (Reemplaza `PEGA-AQUI-LA-PUBLICA-COMPLETA` con la línea entera que sale de `cat ...pub`.)
+
+**Activar restricción en una key ya existente** (sin regenerar): edita `/root/.ssh/authorized_keys` y antepón `restrict,no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty,command="/root/deploy-mentor-web.sh" ` (con espacio final) a la línea de `github-actions-deploy`. **Probar el siguiente deploy** antes de cerrar la sesión SSH personal — si rompe, eliminar el prefijo desde tu acceso root.
 
 Verifica que SSH funciona desde tu Mac:
 

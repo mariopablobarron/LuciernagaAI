@@ -2833,5 +2833,19 @@
       "errorRetry": "Falha ao enviar. Tenta outra vez.",
       "disclosure": "Só guardamos o que escreveres aqui e um identificador da mensagem. Sem nome, sem email."
     }
+  },
+  "escalation": {
+    "ariaLabel": "Sugestão de apoio profissional",
+    "title": "Isto pode precisar de mais do que te posso oferecer aqui",
+    "ctaFindProfessional": "Procurar um terapeuta",
+    "dismiss": "Fechar este aviso",
+    "disclaimer": "Não te deixamos. Podes continuar a falar aqui — só queremos que saibas que há quem sustente isto melhor do que uma IA.",
+    "reason": {
+      "trauma": "O que partilhaste soa a trauma profundo. Isso precisa de acompanhamento humano sustentado, não de um chat.",
+      "eating_disorder": "O que descreves encaixa num distúrbio alimentar. Isso requer intervenção profissional especializada.",
+      "psychotic_symptoms": "O que descreves (ouvir vozes, sentires-te perseguido) pede avaliação de um psiquiatra. Não é algo que se resolva em chat.",
+      "active_addiction": "Uma dependência ativa pede apoio profissional e uma rede de pessoas reais. Aqui podemos falar mas não chega.",
+      "explicit_request": "Tens razão. Procurar um terapeuta é o que faz sentido. Entretanto continuo aqui."
+    }
   }
 }

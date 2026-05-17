@@ -2833,5 +2833,19 @@
       "errorRetry": "Échec de l'envoi. Réessaie.",
       "disclosure": "Nous gardons seulement ce que tu écris ici et un identifiant du message. Pas de nom, pas d'email."
     }
+  },
+  "escalation": {
+    "ariaLabel": "Suggestion de soutien professionnel",
+    "title": "Ça peut nécessiter plus que ce que je peux t'offrir ici",
+    "ctaFindProfessional": "Trouver un thérapeute",
+    "dismiss": "Fermer cet avis",
+    "disclaimer": "On ne te laisse pas. Tu peux continuer à parler ici — on veut juste que tu saches qu'il y a des gens qui tiennent ça mieux qu'une IA.",
+    "reason": {
+      "trauma": "Ce que tu as partagé évoque un traumatisme profond. Ça demande un accompagnement humain durable, pas un chat.",
+      "eating_disorder": "Ce que tu décris correspond à un trouble alimentaire. Ça nécessite une intervention professionnelle spécialisée.",
+      "psychotic_symptoms": "Ce que tu décris (entendre des voix, te sentir surveillé) appelle une évaluation psychiatrique. Pas quelque chose à résoudre en chat.",
+      "active_addiction": "Une addiction active demande un soutien professionnel et un réseau de personnes réelles. On peut parler ici, mais ce n'est pas suffisant.",
+      "explicit_request": "Tu as raison. Chercher un thérapeute est ce qui convient. En attendant je suis là."
+    }
   }
 }

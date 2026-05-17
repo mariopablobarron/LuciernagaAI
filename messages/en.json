@@ -1944,7 +1944,8 @@
       "modesTitle": "How do you want me to show up for you?",
       "modesHint": "You can switch modes anytime.",
       "telegramCta": "💬 Take me on Telegram — same mentor, on your phone",
-      "voiceHint": "You can type or use the mic 🎙️"
+      "voiceHint": "You can type or use the mic 🎙️",
+      "conversationNumber": "Your conversation #{n}"
     },
     "community": {
       "askTitle": "What if you asked people who've been through it?",

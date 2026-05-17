@@ -55,9 +55,6 @@ Mecanismo real (confirmado 5+ runs verdes consecutivos):
 
 `paths-ignore` evita redeploy en `docs/**`, `*.md`, workflows de dev-journal/hardening-board/user-manual-pdf.
 
-### Workflow legacy
-[`coolify-auto-deploy.yml`](.github/workflows/coolify-auto-deploy.yml) intenta notificar a Coolify como segunda vía. Sin secret `COOLIFY_DEPLOY_WEBHOOK_URL` es no-op (no falla). La app no está bajo gestión Coolify desde 2026-04-30 — borrar el workflow si quieres limpieza.
-
 ### Deploy manual de emergencia
 Si GH Actions cae, replicar a mano:
 ```bash
@@ -131,15 +128,17 @@ Configurados en `crontab -e` como root. Log: `/var/log/mentor-crons.log`.
 ## 6. Backups
 
 ### mentor-db (Postgres principal)
-- Script: `/root/scripts/mentor-db-backup.sh` (existente desde 2026-04-26)
+- Script: `/root/scripts/mentor-db-backup.sh` (existente desde 2026-04-26, upload a Telegram añadido 2026-05-17)
 - Cron: `/etc/cron.d/mentor-db-backup` → `30 3 * * *` (diario 03:30 UTC)
 - Output: `/root/backups/mentor-YYYYMMDD-HHMM.sql.gz`
-- Retención: 7 archivos (último ~semana)
+- Retención: 7 archivos en disco (última semana)
 - Log: `/var/log/mentor-db-backup.log`
-- Alerta Telegram **solo en fallos** (no sube el `.sql.gz` completo). Tokens en `/root/scripts/backup.env` (modo 600, creado 2026-05-17).
+- **Upload diario a Telegram** (`@TRESMILMILLONESDELATIDOSBOT` → chat `678888`): si el `.sql.gz` cabe en 50MB, se sube como documento; si pasa, sólo notifica path local. Tokens en `/root/scripts/backup.env` (modo 600).
+- **Alerta Telegram en fallo**: si `pg_dump` revienta, llega notificación al chat.
 - **Test manual**: `ssh root@72.61.195.108 /root/scripts/mentor-db-backup.sh`
 - **Recovery**: `gunzip < mentor-XXX.sql.gz | docker exec -i mentor-db psql -U mentor -d mentor_web`
-- **Mejora opcional**: subir el `.sql.gz` a Telegram cada día (el de merch sí lo hace, ver `/root/backup-merch.sh`). Ventaja: backup off-site accesible desde móvil. Trade-off: 1.8MB/día en el chat (~50MB/mes).
+
+> **Off-site real**: el chat de Telegram es backup independiente del VPS. Si el VPS se quema, los `.sql.gz` siguen accesibles desde el móvil. Sólo cubre ~7 días (retención del chat es indefinida, pero Telegram cliente paginariza viejos). Para histórico largo, considerar `rclone copy` a B2/S3.
 
 > **Trampa**: el cron NO aparece en `crontab -l` porque vive en `/etc/cron.d/`. Para auditar todos los crons del root: `cat /etc/cron.d/*; crontab -l`.
 

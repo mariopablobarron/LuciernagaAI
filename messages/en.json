@@ -1,20 +1,9 @@
 {
   "nav": {
     "chat": "Chat",
-    "journeys": "Journeys",
-    "community": "Community",
-    "how": "How it works",
-    "compare": "Compare",
-    "faq": "FAQ",
-    "test": "Free test",
     "dashboard": "Dashboard",
-    "pricing": "Pricing",
-    "freeTest": "Free test",
     "login": "Log in",
     "signup": "Create account",
-    "cta": "Start beating",
-    "brand": "Three Billion",
-    "brandFull": "Heartbeats",
     "profile": "Profile",
     "settings": "Settings",
     "logout": "Log out",
@@ -120,18 +109,6 @@
     "cta": "Start beating differently",
     "ctaSignup": "Or create an account to save your progress",
     "disclaimer": "Does not replace therapy or professional psychological intervention."
-  },
-  "chatMockup": {
-    "msg1User": "I've been stuck on my project for weeks",
-    "msg2Ai": "What's the smallest thing you could do in the next 10 minutes?",
-    "msg3User": "I guess open the file and write a paragraph",
-    "msg4Ai": "That's exactly what you need. Do it now. Then tell me about it.",
-    "placeholder": "Write what's on your mind…"
-  },
-  "footer": {
-    "rights": "All rights reserved.",
-    "privacy": "Privacy",
-    "terms": "Terms"
   },
   "settings": {
     "title": "Settings",
@@ -390,10 +367,6 @@
       "p3": "The answer to a question Mario has been asking himself for years: how do I help someone take the first step when they're stuck, without telling them what to do?"
     },
     "commitmentsTitle": "Commitments",
-    "commitment1": "We don't replace professional help. If we detect risk, we connect with emergency lines.",
-    "commitment2": "Your conversations are yours. We don't sell data or use it for advertising.",
-    "commitment3": "You can export or delete all your data at any time.",
-    "commitment4": "AI accompanies — it doesn't diagnose, prescribe, or judge.",
     "ctaNote": "Committed to emotional wellbeing through technology.",
     "ctaPrimary": "Start now",
     "ctaSecondary": "About Startidea",
@@ -649,12 +622,6 @@
     },
     "notDoTitle": "What we don't do",
     "notDoSubtitle": "So it's clear where the limits of the method are — and where a human professional begins.",
-    "notDo1": "We don't diagnose disorders. That's clinical work.",
-    "notDo2": "We don't prescribe treatments or medication.",
-    "notDo3": "We don't replace therapy or sessions with your psychologist.",
-    "notDo4": "We don't hand out empty motivational lines or magic recipes.",
-    "notDo5": "We don't tell you what to do with your life.",
-    "notDo6": "We don't expect you to change quickly. Real change takes time.",
     "ctaNote": "The method only makes sense when you live it.",
     "ctaPrimary": "Try it now",
     "ctaSecondary": "Learn about the project"
@@ -891,16 +858,6 @@
     "mvpSubnote": "No card. No commitment. Just sign up.",
     "mvpCta": "Create free account",
     "mvpCtaFootnote": "When you sign up you get automatic access to the full Pro plan. You will not be asked for a credit card.",
-    "feature1": "Unlimited conversations with the AI coach",
-    "feature2": "Unlimited messages",
-    "feature3": "Full Impulse Mode — 21 days of transformation",
-    "feature4": "Advanced diagnostics and personalized challenges",
-    "feature5": "Weekly behavioral insights",
-    "feature6": "Daily check-in with streak",
-    "feature7": "Avoidance pattern map",
-    "feature8": "Full conversation history",
-    "feature9": "Integrated Telegram bot",
-    "feature10": "Portal for trusted contacts",
     "whyTitle": "Why it's free (and for how long)",
     "whyP1": "Three Billion Heartbeats is in minimum viable product phase. It works, but it's still learning. And to learn it needs real people actually using it — not closed betas or demos no one touches.",
     "whyP2": "During these 6 months (until October 2026), the entire Pro plan is open at no cost. In exchange, your interactions help us improve the product. We don't sell your data. We don't share it. We use it, anonymized, so the tool gets better for you and for those who come next.",
@@ -2024,9 +1981,6 @@
     },
     "continuity": {
       "title": "Continuity and Accountability",
-      "descNoSession": "Session starting up. Progress and plan will sync once your identity is ready.",
-      "descPro": "Full continuity across devices, persistent memory, and Impulse Mode unlocked.",
-      "descFreeTpl": "Chat without limits. Plan {plan}: when you want cross-device continuity and Impulse Mode, Pro unlocks it.",
       "planFree": "Free",
       "anonProgress": "Unsaved progress",
       "savedProgress": "Progress saved",
@@ -2236,9 +2190,6 @@
     "footer": "Three Billion Heartbeats — Support Network",
     "footerConfidential": "This portal is confidential. Don't share it or forward it."
   },
-  "journey": {
-    "loading": "Loading…"
-  },
   "profilePage": {
     "title": "Your profile",
     "noName": "No name — set one",
@@ -2300,20 +2251,16 @@
     "disclaimer": "Three Billion Heartbeats is not a substitute for therapy or professional psychological intervention.",
     "phases": {
       "autoconocimiento": {
-        "label": "Self-Awareness",
-        "desc": "Identify who you are: your patterns, emotions, strengths."
+        "label": "Self-Awareness"
       },
       "gestion_emocional": {
-        "label": "Emotional Regulation",
-        "desc": "Tools to regulate without avoiding or exploiting."
+        "label": "Emotional Regulation"
       },
       "proposito": {
-        "label": "Purpose and Direction",
-        "desc": "Discover your values and build real direction."
+        "label": "Purpose and Direction"
       },
       "accion": {
-        "label": "Action and Follow-Through",
-        "desc": "Turn clarity into execution and real habits."
+        "label": "Action and Follow-Through"
       }
     },
     "exerciseTypes": {

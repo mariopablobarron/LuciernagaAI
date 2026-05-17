@@ -1,20 +1,9 @@
 {
   "nav": {
     "chat": "Chat",
-    "journeys": "Parcours",
-    "community": "Communauté",
-    "how": "Comment ça marche",
-    "compare": "Comparatif",
-    "faq": "FAQ",
-    "test": "Test gratuit",
     "dashboard": "Tableau de bord",
-    "pricing": "Tarifs",
-    "freeTest": "Test gratuit",
     "login": "Connexion",
     "signup": "Créer un compte",
-    "cta": "Commence à battre",
-    "brand": "Trois Milliards",
-    "brandFull": "de Battements",
     "profile": "Profil",
     "settings": "Paramètres",
     "logout": "Se déconnecter",
@@ -120,18 +109,6 @@
     "cta": "Commence à battre autrement",
     "ctaSignup": "Ou crée un compte pour sauvegarder ta progression",
     "disclaimer": "Ne remplace pas une thérapie ni une intervention psychologique professionnelle."
-  },
-  "chatMockup": {
-    "msg1User": "Ça fait des semaines que je n'avance pas sur le projet",
-    "msg2Ai": "Quelle est la plus petite chose que tu pourrais faire dans les 10 prochaines minutes ?",
-    "msg3User": "J'imagine ouvrir le fichier et écrire un paragraphe",
-    "msg4Ai": "C'est exactement ce dont tu as besoin. Fais-le maintenant. Tu me racontes après.",
-    "placeholder": "Écris ce qui t'arrive…"
-  },
-  "footer": {
-    "rights": "Tous droits réservés.",
-    "privacy": "Confidentialité",
-    "terms": "Conditions"
   },
   "settings": {
     "title": "Paramètres",
@@ -390,10 +367,6 @@
       "p3": "La réponse à une question que Mario se pose depuis des années : comment aider quelqu'un à faire le premier pas quand il est bloqué, sans lui dire ce qu'il doit faire ?"
     },
     "commitmentsTitle": "Engagements",
-    "commitment1": "Nous ne remplaçons pas l'aide professionnelle. Si nous détectons un risque, nous connectons aux lignes d'urgence.",
-    "commitment2": "Tes conversations sont à toi. Nous ne vendons pas tes données et ne les utilisons pas à des fins publicitaires.",
-    "commitment3": "Tu peux exporter ou supprimer toutes tes données à tout moment.",
-    "commitment4": "L'IA accompagne — elle ne diagnostique pas, ne prescrit pas, ne juge pas.",
     "ctaNote": "Engagés pour le bien-être émotionnel à travers la technologie.",
     "ctaPrimary": "Commencer maintenant",
     "ctaSecondary": "À propos de Startidea",
@@ -649,12 +622,6 @@
     },
     "notDoTitle": "Ce que nous ne faisons pas",
     "notDoSubtitle": "Pour qu'il soit clair où s'arrêtent les limites de la méthode — et où commence un professionnel humain.",
-    "notDo1": "Nous ne diagnostiquons pas de troubles. C'est un travail clinique.",
-    "notDo2": "Nous ne prescrivons pas de traitements ni de médicaments.",
-    "notDo3": "Nous ne remplaçons pas la thérapie ni les séances avec ton psychologue.",
-    "notDo4": "Nous ne donnons pas de phrases motivantes vides ni de recettes magiques.",
-    "notDo5": "Nous ne te disons pas ce que tu dois faire de ta vie.",
-    "notDo6": "Nous n'attendons pas que tu changes vite. Le vrai changement prend du temps.",
     "ctaNote": "La méthode ne prend sens que lorsqu'on la vit.",
     "ctaPrimary": "Essayer maintenant",
     "ctaSecondary": "Découvrir le projet"
@@ -891,16 +858,6 @@
     "mvpSubnote": "Sans carte. Sans engagement. Juste ton inscription.",
     "mvpCta": "Créer un compte gratuit",
     "mvpCtaFootnote": "En t'inscrivant, tu accèdes automatiquement au plan Pro complet. Aucune carte bancaire ne te sera demandée.",
-    "feature1": "Conversations illimitées avec le coach IA",
-    "feature2": "Messages illimités",
-    "feature3": "Mode Impulse complet — 21 jours de transformation",
-    "feature4": "Diagnostics avancés et défis personnalisés",
-    "feature5": "Insights hebdomadaires de comportement",
-    "feature6": "Check-in quotidien avec série",
-    "feature7": "Carte des schémas d'évitement",
-    "feature8": "Historique complet des conversations",
-    "feature9": "Bot Telegram intégré",
-    "feature10": "Portail pour personnes de confiance",
     "whyTitle": "Pourquoi c'est gratuit (et jusqu'à quand)",
     "whyP1": "Trois Milliards de Battements est en phase de produit minimum viable. Ça fonctionne, mais ça apprend encore. Et pour apprendre, il faut de vraies personnes qui l'utilisent pour de vrai — pas des bêtas fermées ni des démos auxquelles personne ne touche.",
     "whyP2": "Pendant ces 6 mois (jusqu'en octobre 2026), tout le plan Pro est ouvert sans frais. En échange, tes interactions nous aident à améliorer le produit. Nous ne vendons pas tes données. Nous ne les partageons pas. Nous les utilisons, anonymisées, pour que l'outil soit meilleur pour toi et pour ceux qui viendront après.",
@@ -2024,9 +1981,6 @@
     },
     "continuity": {
       "title": "Continuité et compte",
-      "descNoSession": "Session en cours de démarrage. La progression et le plan se synchroniseront quand l'identité sera prête.",
-      "descPro": "Continuité complète entre appareils, mémoire persistante et Mode Impulsion déverrouillé.",
-      "descFreeTpl": "Discute sans limite. Plan {plan} : quand tu veux la continuité cross-device et le Mode Impulsion, Pro les déverrouille.",
       "planFree": "Free",
       "anonProgress": "Progression non sauvegardée",
       "savedProgress": "Progression sauvegardée",
@@ -2236,9 +2190,6 @@
     "footer": "Trois Milliards de Battements — Réseau de soutien",
     "footerConfidential": "Ce portail est confidentiel. Ne le partage pas et ne le transfère pas."
   },
-  "journey": {
-    "loading": "Chargement…"
-  },
   "profilePage": {
     "title": "Ton profil",
     "noName": "Sans nom — définis-en un",
@@ -2300,20 +2251,16 @@
     "disclaimer": "Trois Milliards de Battements ne remplace pas une thérapie ni une intervention psychologique professionnelle.",
     "phases": {
       "autoconocimiento": {
-        "label": "Connaissance de soi",
-        "desc": "Identifie qui tu es : tes schémas, tes émotions, tes forces."
+        "label": "Connaissance de soi"
       },
       "gestion_emocional": {
-        "label": "Gestion Émotionnelle",
-        "desc": "Des outils pour réguler sans éviter ni exploiter."
+        "label": "Gestion Émotionnelle"
       },
       "proposito": {
-        "label": "Objectif et Direction",
-        "desc": "Découvre tes valeurs et construis une direction réelle."
+        "label": "Objectif et Direction"
       },
       "accion": {
-        "label": "Action et Suivi",
-        "desc": "Transforme la clarté en exécution et en vrais habits."
+        "label": "Action et Suivi"
       }
     },
     "exerciseTypes": {

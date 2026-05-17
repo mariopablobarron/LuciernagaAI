@@ -1,20 +1,9 @@
 {
   "nav": {
     "chat": "Chat",
-    "journeys": "Percursos",
-    "community": "Comunidade",
-    "how": "Como funciona",
-    "compare": "Comparativo",
-    "faq": "FAQ",
-    "test": "Teste grátis",
     "dashboard": "Painel",
-    "pricing": "Preços",
-    "freeTest": "Teste grátis",
     "login": "Entrar",
     "signup": "Criar conta",
-    "cta": "Começa a bater",
-    "brand": "Três Mil Milhões",
-    "brandFull": "de Batidas",
     "profile": "Perfil",
     "settings": "Definições",
     "logout": "Terminar sessão",
@@ -120,18 +109,6 @@
     "cta": "Começa a bater de outra forma",
     "ctaSignup": "Ou cria uma conta para guardar o teu progresso",
     "disclaimer": "Não substitui terapia nem intervenção psicológica profissional."
-  },
-  "chatMockup": {
-    "msg1User": "Há semanas que não avanço com o projeto",
-    "msg2Ai": "Qual é a coisa mais pequena que poderias fazer nos próximos 10 minutos?",
-    "msg3User": "Imagino que abrir o ficheiro e escrever um parágrafo",
-    "msg4Ai": "É exatamente o que precisas. Fá-lo agora. Depois contas-me.",
-    "placeholder": "Escreve o que se passa…"
-  },
-  "footer": {
-    "rights": "Todos os direitos reservados.",
-    "privacy": "Privacidade",
-    "terms": "Termos"
   },
   "settings": {
     "title": "Definições",
@@ -390,10 +367,6 @@
       "p3": "A resposta a uma pergunta que o Mario se tem feito durante anos: como ajudo alguém a dar o primeiro passo quando está bloqueado, sem lhe dizer o que tem de fazer?"
     },
     "commitmentsTitle": "Compromissos",
-    "commitment1": "Não substituímos ajuda profissional. Se detetarmos risco, ligamos a linhas de emergência.",
-    "commitment2": "As tuas conversas são tuas. Não vendemos dados nem os usamos para fins publicitários.",
-    "commitment3": "Podes exportar ou apagar todos os teus dados em qualquer momento.",
-    "commitment4": "A IA acompanha — não diagnostica, não prescreve, não julga.",
     "ctaNote": "Comprometidos com o bem-estar emocional através da tecnologia.",
     "ctaPrimary": "Começar agora",
     "ctaSecondary": "Conhecer a Startidea",
@@ -649,12 +622,6 @@
     },
     "notDoTitle": "O que não fazemos",
     "notDoSubtitle": "Para que fique claro onde estão os limites do método — e onde começa um profissional humano.",
-    "notDo1": "Não diagnosticamos transtornos. Isso é trabalho clínico.",
-    "notDo2": "Não prescrevemos tratamentos nem medicação.",
-    "notDo3": "Não substituímos terapia nem sessões com o teu psicólogo.",
-    "notDo4": "Não damos frases motivacionais vazias nem receitas mágicas.",
-    "notDo5": "Não te dizemos o que tens de fazer com a tua vida.",
-    "notDo6": "Não pretendemos que mudes depressa. A mudança real leva tempo.",
     "ctaNote": "O método só faz sentido quando o vives.",
     "ctaPrimary": "Experimentar agora",
     "ctaSecondary": "Conhecer o projeto"
@@ -891,16 +858,6 @@
     "mvpSubnote": "Sem cartão. Sem compromisso. Só o teu registo.",
     "mvpCta": "Criar conta gratuita",
     "mvpCtaFootnote": "Ao registares-te acedes automaticamente ao plano Pro completo. Não te será pedido cartão de crédito.",
-    "feature1": "Conversas ilimitadas com o coach IA",
-    "feature2": "Mensagens ilimitadas",
-    "feature3": "Modo Impulso completo — 21 dias de transformação",
-    "feature4": "Diagnósticos avançados e desafios personalizados",
-    "feature5": "Insights semanais de comportamento",
-    "feature6": "Check-in diário com sequência",
-    "feature7": "Mapa de padrões de evitação",
-    "feature8": "Histórico de conversas completo",
-    "feature9": "Bot de Telegram integrado",
-    "feature10": "Portal para pessoas de confiança",
     "whyTitle": "Porque é grátis (e até quando)",
     "whyP1": "Três Mil Milhões de Batidas está em fase de produto mínimo viável. Funciona, mas ainda está a aprender. E para aprender precisa de pessoas reais a usá-lo a sério — não betas fechadas nem demos que ninguém toca.",
     "whyP2": "Durante estes 6 meses (até outubro 2026), todo o plano Pro está aberto sem custo. Em troca, as tuas interações ajudam-nos a melhorar o produto. Não vendemos os teus dados. Não os partilhamos. Usamo-los, de forma anónima, para que a ferramenta seja melhor para ti e para os que vierem depois.",
@@ -2024,9 +1981,6 @@
     },
     "continuity": {
       "title": "Continuidade e conta",
-      "descNoSession": "Sessão a iniciar-se. O progresso e o plano sincronizar-se-ão quando a identidade estiver pronta.",
-      "descPro": "Continuidade completa entre dispositivos, memória persistente e Modo Impulso desbloqueado.",
-      "descFreeTpl": "Conversa sem limite. Plano {plan}: quando quiseres continuidade cross-device e Modo Impulso, Pro desbloqueia-o.",
       "planFree": "Free",
       "anonProgress": "Progresso sem guardar",
       "savedProgress": "Progresso guardado",
@@ -2236,9 +2190,6 @@
     "footer": "Três Mil Milhões de Batidas — Rede de apoio",
     "footerConfidential": "Este portal é confidencial. Não o compartas nem o reencaminhas."
   },
-  "journey": {
-    "loading": "A carregar…"
-  },
   "profilePage": {
     "title": "O teu perfil",
     "noName": "Sem nome — define um",
@@ -2300,20 +2251,16 @@
     "disclaimer": "Três Mil Milhões de Batidas não substitui terapia nem intervenção psicológica profissional.",
     "phases": {
       "autoconocimiento": {
-        "label": "Autoconhecimento",
-        "desc": "Identifica quem és: padrões, emoções, forças."
+        "label": "Autoconhecimento"
       },
       "gestion_emocional": {
-        "label": "Gestão Emocional",
-        "desc": "Ferramentas para regular sem evitar nem explorar."
+        "label": "Gestão Emocional"
       },
       "proposito": {
-        "label": "Propósito e Direção",
-        "desc": "Descobre os teus valores e constrói uma direção real."
+        "label": "Propósito e Direção"
       },
       "accion": {
-        "label": "Ação e Acompanhamento",
-        "desc": "Converte a clareza em execução e hábitos reais."
+        "label": "Ação e Acompanhamento"
       }
     },
     "exerciseTypes": {

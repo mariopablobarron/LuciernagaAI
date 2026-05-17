@@ -1,20 +1,9 @@
 {
   "nav": {
     "chat": "Chat",
-    "journeys": "Itinerarios",
-    "community": "Comunidad",
-    "how": "Cómo funciona",
-    "compare": "Comparativa",
-    "faq": "FAQ",
-    "test": "Test gratuito",
     "dashboard": "Dashboard",
-    "pricing": "Precios",
-    "freeTest": "Test gratuito",
     "login": "Entrar",
     "signup": "Crear cuenta",
-    "cta": "Empieza a latir",
-    "brand": "Tres Mil Millones",
-    "brandFull": "de Latidos",
     "profile": "Perfil",
     "settings": "Ajustes",
     "logout": "Cerrar sesión",
@@ -121,57 +110,141 @@
     "ctaSignup": "O crea una cuenta para guardar tu progreso",
     "disclaimer": "No sustituye terapia ni intervención psicológica profesional."
   },
-  "chatMockup": {
-    "msg1User": "Llevo semanas sin avanzar con el proyecto",
-    "msg2Ai": "¿Qué es lo más pequeño que podrías hacer en los próximos 10 minutos?",
-    "msg3User": "Supongo que abrir el archivo y escribir un párrafo",
-    "msg4Ai": "Eso es exactamente lo que necesitas. Hazlo ahora. Luego me cuentas.",
-    "placeholder": "Escribe lo que te pasa…"
-  },
-  "footer": {
-    "rights": "Todos los derechos reservados.",
-    "privacy": "Privacidad",
-    "terms": "Términos"
-  },
   "settings": {
     "title": "Configuración",
-    "coach": "Coach IA",
-    "coachDesc": "Personaliza cómo te habla tu mentor",
-    "tone": "Tono de conversación",
-    "toneDirect": "Directo",
-    "toneDirectDesc": "Va al grano, sin rodeos",
-    "toneSocratic": "Socrático",
-    "toneSocraticDesc": "Te guía con preguntas",
-    "toneWarm": "Cálido",
-    "toneWarmDesc": "Empático y cercano",
-    "notifications": "Notificaciones",
-    "notificationsDesc": "Controla qué te enviamos y cuándo",
-    "dailyReminders": "Recordatorios diarios",
-    "dailyRemindersDesc": "Check-in y acciones pendientes",
-    "reminderTime": "Hora del recordatorio",
-    "reminderTimeDesc": "Recibirás el recordatorio a esta hora",
-    "weeklyEmail": "Resumen semanal por email",
-    "weeklyEmailDesc": "Tu progreso de la semana cada domingo",
-    "insights": "Nuevos insights",
-    "insightsDesc": "Cuando tengas nuevas recomendaciones",
-    "goals": "Objetivos completados",
-    "goalsDesc": "Celebraciones cuando termines un objetivo",
-    "updates": "Actualizaciones del producto",
-    "updatesDesc": "Nuevas funciones y mejoras",
-    "telegram": "Telegram",
-    "telegramDesc": "Recibe recordatorios y chatea fuera de la app",
-    "region": "Región",
-    "regionDesc": "Afecta a la hora de los recordatorios",
-    "security": "Seguridad",
-    "changePassword": "Cambiar contraseña",
-    "data": "Tus datos",
-    "dataDesc": "Derecho a portabilidad (Art. 20 RGPD)",
-    "exportCsv": "Historial de Chat (CSV)",
-    "exportJson": "Datos completos (JSON)",
-    "dangerZone": "Zona de peligro",
-    "dangerDesc": "Estas acciones no se pueden deshacer.",
-    "deleteAccount": "Eliminar mi cuenta y todos mis datos",
-    "saved": "Guardado"
+    "saved": "Guardado",
+    "saveError": "Error al guardar",
+    "loadErrorProfile": "No se pudo cargar tu perfil",
+    "loadErrorPrefs": "No se pudieron cargar las preferencias",
+    "profile": {
+      "title": "Tu perfil",
+      "subtitle": "Nombre, foto y datos personales",
+      "saved": "Perfil guardado",
+      "saveError": "Error al guardar el perfil",
+      "avatarRemoved": "Avatar eliminado",
+      "avatarTooLarge": "La imagen debe ser menor de 200 KB",
+      "avatarInvalidType": "Solo se permiten imágenes",
+      "avatarAlt": "Avatar",
+      "changePhoto": "Cambiar foto",
+      "removePhoto": "Eliminar foto",
+      "avatarHint": "PNG, JPEG o WebP. Max 200 KB.",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "bioLabel": "Bio",
+      "bioPlaceholder": "Cuéntanos sobre ti...",
+      "bioCounterTpl": "{n}/500",
+      "phoneLabel": "Teléfono",
+      "phonePlaceholder": "+34 612 345 678",
+      "saving": "Guardando...",
+      "save": "Guardar perfil"
+    },
+    "coach": {
+      "title": "Coach IA",
+      "subtitle": "Personaliza cómo te habla tu mentor",
+      "toneTitle": "Tono de conversación",
+      "tones": {
+        "directo": {
+          "label": "Directo",
+          "desc": "Va al grano, sin rodeos"
+        },
+        "socratico": {
+          "label": "Socrático",
+          "desc": "Te guía con preguntas"
+        },
+        "calido": {
+          "label": "Cálido",
+          "desc": "Empático y cercano"
+        }
+      },
+      "genderTitle": "¿Cómo prefieres que te hablemos?",
+      "genderHint": "Define la conjugación gramatical del mentor cuando se dirige a ti. Puedes cambiarlo cuando quieras.",
+      "genders": {
+        "feminine": {
+          "label": "Femenino",
+          "desc": "\"estás cansada\""
+        },
+        "masculine": {
+          "label": "Masculino",
+          "desc": "\"estás cansado\""
+        },
+        "neutral": {
+          "label": "Neutro",
+          "desc": "Sin conjugaciones de género (\"estás en un momento de cansancio\")"
+        }
+      },
+      "clearGender": "Quitar preferencia (volver a sin definir)"
+    },
+    "notifications": {
+      "title": "Notificaciones",
+      "subtitle": "Controla qué te enviamos y cuándo",
+      "dailyReminders": "Recordatorios diarios",
+      "dailyRemindersDesc": "Check-in y acciones pendientes",
+      "reminderTime": "Hora del recordatorio",
+      "reminderTimeDesc": "Recibirás el recordatorio a esta hora",
+      "weeklyEmail": "Resumen semanal por email",
+      "weeklyEmailDesc": "Tu progreso de la semana cada domingo",
+      "sundayLetter": "Carta del domingo",
+      "sundayLetterDesc": "Una carta breve del mentor cada domingo con tus propias palabras de la semana. El contenido siempre está en la app.",
+      "letterEmailNotice": "Aviso por email de la carta",
+      "letterEmailNoticeDesc": "Te avisamos cuando la carta esté lista. El email no contiene la carta — solo un enlace.",
+      "insights": "Nuevos insights",
+      "insightsDesc": "Cuando tengas nuevas recomendaciones",
+      "goals": "Objetivos completados",
+      "goalsDesc": "Celebraciones cuando termines un objetivo",
+      "updates": "Actualizaciones del producto",
+      "updatesDesc": "Nuevas funciones y mejoras"
+    },
+    "telegram": {
+      "title": "Telegram",
+      "subtitle": "Recibe recordatorios y chatea fuera de la app",
+      "linkedTitle": "Cuenta conectada",
+      "linkedDesc": "Ya recibes mensajes y recordatorios en Telegram.",
+      "howToConnect": "Cómo conectar",
+      "step1": "Abre el bot en Telegram",
+      "step2": "Pulsa Iniciar o escribe /start",
+      "step3": "Envía el comando /vincular",
+      "step4": "Haz clic en el enlace que te mande el bot",
+      "openBot": "Abrir bot en Telegram"
+    },
+    "region": {
+      "title": "Región",
+      "subtitle": "Afecta a la hora de los recordatorios",
+      "timezones": {
+        "madrid": "Madrid (GMT+1)",
+        "london": "Londres (GMT+0)",
+        "mexico": "Ciudad de México (GMT-6)",
+        "bogota": "Bogotá (GMT-5)",
+        "lima": "Lima (GMT-5)",
+        "santiago": "Santiago (GMT-4)",
+        "buenosAires": "Buenos Aires (GMT-3)",
+        "newYork": "Nueva York (GMT-5)",
+        "losAngeles": "Los Ángeles (GMT-8)"
+      }
+    },
+    "security": {
+      "title": "Seguridad",
+      "changePassword": "Cambiar contraseña",
+      "changePasswordForm": "Cambiar contraseña",
+      "currentLabel": "Contraseña actual",
+      "newLabel": "Nueva contraseña",
+      "confirmLabel": "Confirmar nueva",
+      "passwordPlaceholder": "••••••••",
+      "newPasswordPlaceholder": "Mínimo 8 caracteres",
+      "saving": "Guardando…",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "errorMismatch": "Las contraseñas nuevas no coinciden.",
+      "errorTooShort": "Mínimo 8 caracteres.",
+      "errorCurrentRequired": "Introduce tu contraseña actual.",
+      "errorInvalidCredentials": "La contraseña actual no es correcta.",
+      "errorGeneric": "Error al cambiar la contraseña.",
+      "successChanged": "Contraseña actualizada correctamente."
+    },
+    "help": {
+      "title": "Ayuda",
+      "repeatTour": "Repetir el tour guiado",
+      "tourReset": "Tour reiniciado — vuelve al chat para verlo"
+    }
   },
   "ethics": {
     "eyebrow": "Ética y límites",
@@ -294,10 +367,6 @@
       "p3": "La respuesta a una pregunta que Mario se ha hecho durante años: ¿cómo ayudo a alguien a dar el primer paso cuando está bloqueado, sin decirle lo que tiene que hacer?"
     },
     "commitmentsTitle": "Compromisos",
-    "commitment1": "No sustituimos ayuda profesional. Si detectamos riesgo, conectamos con líneas de emergencia.",
-    "commitment2": "Tus conversaciones son tuyas. No vendemos datos ni los usamos con fines publicitarios.",
-    "commitment3": "Puedes exportar o eliminar todos tus datos en cualquier momento.",
-    "commitment4": "La IA acompaña — no diagnostica, no prescribe, no juzga.",
     "ctaNote": "Comprometidos con el bienestar emocional a través de la tecnología.",
     "ctaPrimary": "Empezar ahora",
     "ctaSecondary": "Conocer Startidea",
@@ -553,12 +622,6 @@
     },
     "notDoTitle": "Qué no hacemos",
     "notDoSubtitle": "Para que quede claro dónde están los límites del método — y dónde empieza un profesional humano.",
-    "notDo1": "No diagnosticamos trastornos. Eso es trabajo clínico.",
-    "notDo2": "No prescribimos tratamientos ni medicación.",
-    "notDo3": "No sustituimos terapia ni sesiones con tu psicólogo.",
-    "notDo4": "No damos frases motivacionales vacías ni recetas mágicas.",
-    "notDo5": "No te decimos qué tienes que hacer con tu vida.",
-    "notDo6": "No pretendemos que cambies rápido. El cambio real lleva tiempo.",
     "ctaNote": "El método sólo cobra sentido cuando lo vives.",
     "ctaPrimary": "Probarlo ahora",
     "ctaSecondary": "Conocer el proyecto"
@@ -795,16 +858,6 @@
     "mvpSubnote": "Sin tarjeta. Sin compromiso. Solo tu registro.",
     "mvpCta": "Crear cuenta gratuita",
     "mvpCtaFootnote": "Al registrarte accedes automáticamente al plan Pro completo. No se te pedirá tarjeta de crédito.",
-    "feature1": "Conversaciones ilimitadas con el coach IA",
-    "feature2": "Mensajes ilimitados",
-    "feature3": "Modo Impulso completo — 21 días de transformación",
-    "feature4": "Diagnósticos avanzados y retos personalizados",
-    "feature5": "Insights semanales de comportamiento",
-    "feature6": "Check-in diario con racha",
-    "feature7": "Mapa de patrones de evitación",
-    "feature8": "Historial de conversaciones completo",
-    "feature9": "Bot de Telegram integrado",
-    "feature10": "Portal para personas de confianza",
     "whyTitle": "Por qué es gratis (y hasta cuándo)",
     "whyP1": "Tres Mil Millones de Latidos está en fase de producto mínimo viable. Funciona, pero todavía está aprendiendo. Y para aprender necesita personas reales usándolo de verdad — no betas cerradas ni demos que nadie toca.",
     "whyP2": "Durante estos 6 meses (hasta octubre 2026), todo el plan Pro está abierto sin coste. A cambio, tus interacciones nos ayudan a mejorar el producto. No vendemos tus datos. No los compartimos. Los usamos, anonimizados, para que la herramienta sea mejor para ti y para los que vengan después.",
@@ -1928,9 +1981,6 @@
     },
     "continuity": {
       "title": "Continuidad y cuenta",
-      "descNoSession": "Sesión iniciándose. El progreso y el plan se sincronizarán cuando la identidad esté lista.",
-      "descPro": "Continuidad completa entre dispositivos, memoria persistente y Modo Impulso desbloqueado.",
-      "descFreeTpl": "Conversa sin límite. Plan {plan}: cuando quieras continuidad cross-device y Modo Impulso, Pro lo desbloquea.",
       "planFree": "Free",
       "anonProgress": "Progreso sin guardar",
       "savedProgress": "Progreso guardado",
@@ -1981,142 +2031,6 @@
     "account": {
       "anon": "Cuenta anónima",
       "noName": "Sin nombre — añádelo en Ajustes"
-    }
-  },
-  "settings": {
-    "title": "Configuración",
-    "saved": "Guardado",
-    "saveError": "Error al guardar",
-    "loadErrorProfile": "No se pudo cargar tu perfil",
-    "loadErrorPrefs": "No se pudieron cargar las preferencias",
-    "profile": {
-      "title": "Tu perfil",
-      "subtitle": "Nombre, foto y datos personales",
-      "saved": "Perfil guardado",
-      "saveError": "Error al guardar el perfil",
-      "avatarRemoved": "Avatar eliminado",
-      "avatarTooLarge": "La imagen debe ser menor de 200 KB",
-      "avatarInvalidType": "Solo se permiten imágenes",
-      "avatarAlt": "Avatar",
-      "changePhoto": "Cambiar foto",
-      "removePhoto": "Eliminar foto",
-      "avatarHint": "PNG, JPEG o WebP. Max 200 KB.",
-      "nameLabel": "Nombre",
-      "namePlaceholder": "Tu nombre",
-      "bioLabel": "Bio",
-      "bioPlaceholder": "Cuéntanos sobre ti...",
-      "bioCounterTpl": "{n}/500",
-      "phoneLabel": "Teléfono",
-      "phonePlaceholder": "+34 612 345 678",
-      "saving": "Guardando...",
-      "save": "Guardar perfil"
-    },
-    "coach": {
-      "title": "Coach IA",
-      "subtitle": "Personaliza cómo te habla tu mentor",
-      "toneTitle": "Tono de conversación",
-      "tones": {
-        "directo": {
-          "label": "Directo",
-          "desc": "Va al grano, sin rodeos"
-        },
-        "socratico": {
-          "label": "Socrático",
-          "desc": "Te guía con preguntas"
-        },
-        "calido": {
-          "label": "Cálido",
-          "desc": "Empático y cercano"
-        }
-      },
-      "genderTitle": "¿Cómo prefieres que te hablemos?",
-      "genderHint": "Define la conjugación gramatical del mentor cuando se dirige a ti. Puedes cambiarlo cuando quieras.",
-      "genders": {
-        "feminine": {
-          "label": "Femenino",
-          "desc": "\"estás cansada\""
-        },
-        "masculine": {
-          "label": "Masculino",
-          "desc": "\"estás cansado\""
-        },
-        "neutral": {
-          "label": "Neutro",
-          "desc": "Sin conjugaciones de género (\"estás en un momento de cansancio\")"
-        }
-      },
-      "clearGender": "Quitar preferencia (volver a sin definir)"
-    },
-    "notifications": {
-      "title": "Notificaciones",
-      "subtitle": "Controla qué te enviamos y cuándo",
-      "dailyReminders": "Recordatorios diarios",
-      "dailyRemindersDesc": "Check-in y acciones pendientes",
-      "reminderTime": "Hora del recordatorio",
-      "reminderTimeDesc": "Recibirás el recordatorio a esta hora",
-      "weeklyEmail": "Resumen semanal por email",
-      "weeklyEmailDesc": "Tu progreso de la semana cada domingo",
-      "sundayLetter": "Carta del domingo",
-      "sundayLetterDesc": "Una carta breve del mentor cada domingo con tus propias palabras de la semana. El contenido siempre está en la app.",
-      "letterEmailNotice": "Aviso por email de la carta",
-      "letterEmailNoticeDesc": "Te avisamos cuando la carta esté lista. El email no contiene la carta — solo un enlace.",
-      "insights": "Nuevos insights",
-      "insightsDesc": "Cuando tengas nuevas recomendaciones",
-      "goals": "Objetivos completados",
-      "goalsDesc": "Celebraciones cuando termines un objetivo",
-      "updates": "Actualizaciones del producto",
-      "updatesDesc": "Nuevas funciones y mejoras"
-    },
-    "telegram": {
-      "title": "Telegram",
-      "subtitle": "Recibe recordatorios y chatea fuera de la app",
-      "linkedTitle": "Cuenta conectada",
-      "linkedDesc": "Ya recibes mensajes y recordatorios en Telegram.",
-      "howToConnect": "Cómo conectar",
-      "step1": "Abre el bot en Telegram",
-      "step2": "Pulsa Iniciar o escribe /start",
-      "step3": "Envía el comando /vincular",
-      "step4": "Haz clic en el enlace que te mande el bot",
-      "openBot": "Abrir bot en Telegram"
-    },
-    "region": {
-      "title": "Región",
-      "subtitle": "Afecta a la hora de los recordatorios",
-      "timezones": {
-        "madrid": "Madrid (GMT+1)",
-        "london": "Londres (GMT+0)",
-        "mexico": "Ciudad de México (GMT-6)",
-        "bogota": "Bogotá (GMT-5)",
-        "lima": "Lima (GMT-5)",
-        "santiago": "Santiago (GMT-4)",
-        "buenosAires": "Buenos Aires (GMT-3)",
-        "newYork": "Nueva York (GMT-5)",
-        "losAngeles": "Los Ángeles (GMT-8)"
-      }
-    },
-    "security": {
-      "title": "Seguridad",
-      "changePassword": "Cambiar contraseña",
-      "changePasswordForm": "Cambiar contraseña",
-      "currentLabel": "Contraseña actual",
-      "newLabel": "Nueva contraseña",
-      "confirmLabel": "Confirmar nueva",
-      "passwordPlaceholder": "••••••••",
-      "newPasswordPlaceholder": "Mínimo 8 caracteres",
-      "saving": "Guardando…",
-      "save": "Guardar",
-      "cancel": "Cancelar",
-      "errorMismatch": "Las contraseñas nuevas no coinciden.",
-      "errorTooShort": "Mínimo 8 caracteres.",
-      "errorCurrentRequired": "Introduce tu contraseña actual.",
-      "errorInvalidCredentials": "La contraseña actual no es correcta.",
-      "errorGeneric": "Error al cambiar la contraseña.",
-      "successChanged": "Contraseña actualizada correctamente."
-    },
-    "help": {
-      "title": "Ayuda",
-      "repeatTour": "Repetir el tour guiado",
-      "tourReset": "Tour reiniciado — vuelve al chat para verlo"
     }
   },
   "dashboard": {
@@ -2276,9 +2190,6 @@
     "footer": "Tres Mil Millones de Latidos — Red de apoyo",
     "footerConfidential": "Este portal es confidencial. No lo compartas ni lo reenvíes."
   },
-  "journey": {
-    "loading": "Cargando…"
-  },
   "profilePage": {
     "title": "Tu perfil",
     "noName": "Sin nombre — define uno",
@@ -2340,20 +2251,16 @@
     "disclaimer": "Tres Mil Millones de Latidos no sustituye terapia ni intervención psicológica profesional.",
     "phases": {
       "autoconocimiento": {
-        "label": "Autoconocimiento",
-        "desc": "Identifica quién eres: patrones, emociones, fortalezas."
+        "label": "Autoconocimiento"
       },
       "gestion_emocional": {
-        "label": "Gestión Emocional",
-        "desc": "Herramientas para regular sin evitar ni explotar."
+        "label": "Gestión Emocional"
       },
       "proposito": {
-        "label": "Propósito y Dirección",
-        "desc": "Descubre tus valores y construye una dirección real."
+        "label": "Propósito y Dirección"
       },
       "accion": {
-        "label": "Acción y Seguimiento",
-        "desc": "Convierte la claridad en ejecución y hábitos reales."
+        "label": "Acción y Seguimiento"
       }
     },
     "exerciseTypes": {
@@ -2863,14 +2770,38 @@
     "unlockedFeaturesAria": "{count} de {total} funciones desbloqueadas",
     "unlocksAt": "Se desbloquea en: {req}",
     "nav": {
-      "chat": { "label": "Chat", "req": "Siempre" },
-      "checkin": { "label": "Check-in", "req": "Siempre" },
-      "comunidad": { "label": "Comunidad", "req": "Siempre" },
-      "plan": { "label": "Plan", "req": "Día 3" },
-      "diario": { "label": "Diario", "req": "Día 7" },
-      "respirar": { "label": "Respirar", "req": "Racha 3d" },
-      "logros": { "label": "Logros", "req": "Racha 7d" },
-      "impulso": { "label": "Impulso 21d", "req": "Día 21" }
+      "chat": {
+        "label": "Chat",
+        "req": "Siempre"
+      },
+      "checkin": {
+        "label": "Check-in",
+        "req": "Siempre"
+      },
+      "comunidad": {
+        "label": "Comunidad",
+        "req": "Siempre"
+      },
+      "plan": {
+        "label": "Plan",
+        "req": "Día 3"
+      },
+      "diario": {
+        "label": "Diario",
+        "req": "Día 7"
+      },
+      "respirar": {
+        "label": "Respirar",
+        "req": "Racha 3d"
+      },
+      "logros": {
+        "label": "Logros",
+        "req": "Racha 7d"
+      },
+      "impulso": {
+        "label": "Impulso 21d",
+        "req": "Día 21"
+      }
     },
     "settings": "Ajustes",
     "knowMethod": "Conoce el método",

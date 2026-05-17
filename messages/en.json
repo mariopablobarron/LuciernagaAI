@@ -1788,5 +1788,116 @@
     "ctaTitle": "Want to move from stuck to action?",
     "ctaDesc": "Three Billion Heartbeats walks with you using AI. Free during the MVP.",
     "ctaButton": "Start now"
+  },
+  "chat": {
+    "ariaRegion": "Mentorship chat",
+    "ariaMessagesLog": "Chat messages",
+    "ariaThinking": "Mentor is thinking",
+    "ariaScrollToBottom": "Go to latest message",
+    "ariaSendMessage": "Send message",
+    "ariaWriteMessage": "Write your message",
+    "ariaAttachImage": "Attach image",
+    "ariaSuggestions": "Suggestions to continue",
+    "ariaCrisisCall": "Call 024, crisis line",
+    "ariaRemoveMode": "Remove mode",
+    "timeNow": "now",
+    "timeMinutes": "{n}m ago",
+    "voiceNote": "Voice note",
+    "imageAttached": "Image attached",
+    "imageAlt": "Attached image",
+    "imageAdjuntoAlt": "Attachment",
+    "thinking": "Thinking…",
+    "reload": "Reload",
+    "flowActive": "Active flow:",
+    "copy": {
+      "tooltipCopy": "Copy message",
+      "tooltipCopyReply": "Copy reply",
+      "tooltipCopied": "Copied"
+    },
+    "signals": {
+      "searchUsed": "· search used",
+      "fallback": "· fallback response"
+    },
+    "crisis": {
+      "alertLabel": "Safety alert",
+      "callButton": "Call 024",
+      "callMxLabel": "MX: 800 290 0024",
+      "callArLabel": "AR: 011 5275-1135",
+      "callMxFull": "Mexico: 800 290 0024",
+      "callArFull": "Argentina: 011 5275-1135",
+      "exitMode": "I'm feeling better — exit crisis mode",
+      "panelTitle": "Crisis mode activated",
+      "breathingTitle": "4-7-8 Breathing",
+      "breathingBody": "Inhale 4 sec · hold 7 sec · exhale 8 sec. Repeat 3 times.",
+      "groundingTitle": "5-4-3-2-1 Technique",
+      "groundingBody": "5 things you see · 4 you touch · 3 you hear · 2 you smell · 1 you taste.",
+      "withYou": "Tell me what's happening. I'm here with you.",
+      "footerLink": "🚨 Crisis: call 024",
+      "buttonShort": "Crisis"
+    },
+    "actionRequired": {
+      "label": "Action required",
+      "replyLater": "Not now",
+      "replyClose": "Doesn't apply",
+      "replyDoIt": "Yes, I'll do it",
+      "replyLaterFull": "Not now, I'll get back to it later.",
+      "replyCloseFull": "Doesn't apply, closing it.",
+      "replyDoItFull": "Yes, I'll do it today."
+    },
+    "journal": {
+      "active": "Journal mode active.",
+      "noResponse": "AI won't respond. Write freely.",
+      "buttonShort": "Journal"
+    },
+    "actionLock": {
+      "openThread": "Thread open:",
+      "hint": "You can pick it back up, park it for later, or close it. Your call."
+    },
+    "empty": {
+      "title": "What can I help you with today?",
+      "subtitle": "I ask you the questions you're not asking yourself, so you see what you're still missing.",
+      "startPrompt": "Tell me what's going on or pick a starting point.",
+      "modesTitle": "How do you want me to show up for you?",
+      "modesHint": "You can switch modes anytime.",
+      "telegramCta": "💬 Take me on Telegram — same mentor, on your phone",
+      "voiceHint": "You can type or use the mic 🎙️"
+    },
+    "community": {
+      "askTitle": "What if you asked people who've been through it?",
+      "suggestionTitle": "Mentor suggestion",
+      "dismiss": "Not now"
+    },
+    "rating": {
+      "label": "Was this helpful?",
+      "yes": "Helpful",
+      "no": "Not helpful",
+      "thanks": "Thanks for your feedback."
+    },
+    "input": {
+      "placeholder": "Tell me what's going on… (Enter to send)",
+      "shiftHint": "Shift + Enter for a new line",
+      "counterMax": "{count}/1000",
+      "footnote": "AI supervised by psychologists, mentors and coaches · Not a substitute for clinical care ·",
+      "modeLabel": "Mode: {label}"
+    },
+    "audio": {
+      "noteLabel": "Voice note",
+      "seconds": "{n}s recorded"
+    },
+    "image": {
+      "attachedTitle": "Image attached",
+      "attachedHint": "Describe what it shows — the mentor can't see images, but can help you with what you tell them"
+    },
+    "signup": {
+      "doneMessage": "Done. Your progress is saved. You can come back from any device.",
+      "eyebrow": "Save this progress?",
+      "body": "You've started something important. If you want to keep this conversation, your journal, and your next steps, leave your email. You can come back from any device.",
+      "emailPlaceholder": "your@email.com",
+      "saving": "Saving…",
+      "submit": "Save my account",
+      "dismiss": "Not now",
+      "errorFormat": "Check your email format.",
+      "errorGeneric": "Couldn't save. Try again."
+    }
   }
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import {
   AlertTriangle,
   ArrowDown,
@@ -148,94 +149,116 @@ export type ChatProps = {
 
 const STARTERS = CHAT_STARTER_PICKS;
 
+// Map locale → BCP47 para Intl.DateTimeFormat.
+const LOCALE_BCP47: Record<string, string> = {
+  es: "es-ES",
+  en: "en-US",
+  pt: "pt-PT",
+  fr: "fr-FR",
+};
+
 // ─── Simple markdown renderer ─────────────────────────────────────────────────
 // Handles: **bold**, `inline code`, line breaks, and - bullet lists.
 // No external dependencies.
 
-function formatMsgTime(iso: string): string {
-  const d = new Date(iso);
-  const now = new Date();
-  const diffMs = now.getTime() - d.getTime();
-  const diffMin = Math.floor(diffMs / 60000);
-  if (diffMin < 1) return "ahora";
-  if (diffMin < 60) return `hace ${diffMin}m`;
-  const diffH = Math.floor(diffMin / 60);
-  if (diffH < 24 && d.getDate() === now.getDate()) {
-    return d.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
-  }
-  return d.toLocaleDateString("es-ES", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+function useFormatMsgTime() {
+  const t = useTranslations("chat");
+  const locale = useLocale();
+  const bcp = LOCALE_BCP47[locale] ?? "en-US";
+  return useCallback(
+    (iso: string): string => {
+      const d = new Date(iso);
+      const now = new Date();
+      const diffMs = now.getTime() - d.getTime();
+      const diffMin = Math.floor(diffMs / 60000);
+      if (diffMin < 1) return t("timeNow");
+      if (diffMin < 60) return t("timeMinutes", { n: diffMin });
+      const diffH = Math.floor(diffMin / 60);
+      if (diffH < 24 && d.getDate() === now.getDate()) {
+        return d.toLocaleTimeString(bcp, { hour: "2-digit", minute: "2-digit" });
+      }
+      return d.toLocaleDateString(bcp, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+    },
+    [t, bcp],
+  );
 }
 
-function renderMarkdown(text: string): React.ReactNode[] {
-  // Strip raw audio/image base64 tags — render as clean player/image
-  let cleaned = text.replace(
-    /\[audio:(\d+)s:(data:audio\/[^;]+;base64,[^\]]+)\]/g,
-    (_match, dur, dataUri) => `[__AUDIO_PLAYER__:${dur}:${dataUri}]`,
+function useRenderMarkdown() {
+  const t = useTranslations("chat");
+  return useCallback(
+    (text: string): React.ReactNode[] => {
+      // Strip raw audio/image base64 tags — render as clean player/image
+      let cleaned = text.replace(
+        /\[audio:(\d+)s:(data:audio\/[^;]+;base64,[^\]]+)\]/g,
+        (_match, dur, dataUri) => `[__AUDIO_PLAYER__:${dur}:${dataUri}]`,
+      );
+      cleaned = cleaned.replace(
+        /\[image:(data:image\/[^;]+;base64,[^\]]+)\]/g,
+        (_match, dataUri) => `[__IMAGE_EMBED__:${dataUri}]`,
+      );
+
+      const lines = cleaned.split("\n");
+      const nodes: React.ReactNode[] = [];
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+
+        // Audio player placeholder
+        const audioMatch = /\[__AUDIO_PLAYER__:(\d+):(data:audio\/[^:]+;base64,[^\]]+)\]/.exec(line);
+        if (audioMatch) {
+          const dur = parseInt(audioMatch[1], 10);
+          const src = audioMatch[2];
+          nodes.push(
+            <div key={`audio-${i}`} className="flex items-center gap-2 rounded-lg bg-zinc-800/60 px-3 py-2 my-1">
+              <audio controls preload="metadata" className="h-8 max-w-full" src={src} />
+              <span className="text-xs text-zinc-500">{dur > 0 ? `${dur}s` : t("voiceNote")}</span>
+            </div>,
+          );
+          continue;
+        }
+
+        // Image embed placeholder
+        const imageMatch = /\[__IMAGE_EMBED__:(data:image\/[^:]+;base64,[^\]]+)\]/.exec(line);
+        if (imageMatch) {
+          nodes.push(
+            <div key={`img-${i}`} className="my-2">
+              <img
+                src={imageMatch[1]}
+                alt={t("imageAlt")}
+                className="max-w-xs max-h-64 rounded-xl border border-zinc-700 object-contain"
+              />
+            </div>,
+          );
+          continue;
+        }
+
+        // Bullet point
+        const bulletMatch = /^[-*•]\s+(.+)/.exec(line);
+        if (bulletMatch) {
+          nodes.push(
+            <li key={i} className="ml-4 list-disc text-sm leading-relaxed">
+              {inlineMarkdown(bulletMatch[1])}
+            </li>,
+          );
+          continue;
+        }
+
+        // Regular line
+        if (line.trim() === "") {
+          nodes.push(<br key={`br-${i}`} />);
+        } else {
+          nodes.push(
+            <span key={i} className="block text-sm leading-relaxed">
+              {inlineMarkdown(line)}
+            </span>,
+          );
+        }
+      }
+
+      return nodes;
+    },
+    [t],
   );
-  cleaned = cleaned.replace(
-    /\[image:(data:image\/[^;]+;base64,[^\]]+)\]/g,
-    (_match, dataUri) => `[__IMAGE_EMBED__:${dataUri}]`,
-  );
-
-  const lines = cleaned.split("\n");
-  const nodes: React.ReactNode[] = [];
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-
-    // Audio player placeholder
-    const audioMatch = /\[__AUDIO_PLAYER__:(\d+):(data:audio\/[^:]+;base64,[^\]]+)\]/.exec(line);
-    if (audioMatch) {
-      const dur = parseInt(audioMatch[1], 10);
-      const src = audioMatch[2];
-      nodes.push(
-        <div key={`audio-${i}`} className="flex items-center gap-2 rounded-lg bg-zinc-800/60 px-3 py-2 my-1">
-          <audio controls preload="metadata" className="h-8 max-w-full" src={src} />
-          <span className="text-xs text-zinc-500">{dur > 0 ? `${dur}s` : "Nota de voz"}</span>
-        </div>
-      );
-      continue;
-    }
-
-    // Image embed placeholder
-    const imageMatch = /\[__IMAGE_EMBED__:(data:image\/[^:]+;base64,[^\]]+)\]/.exec(line);
-    if (imageMatch) {
-      nodes.push(
-        <div key={`img-${i}`} className="my-2">
-          <img
-            src={imageMatch[1]}
-            alt="Imagen adjunta"
-            className="max-w-xs max-h-64 rounded-xl border border-zinc-700 object-contain"
-          />
-        </div>
-      );
-      continue;
-    }
-
-    // Bullet point
-    const bulletMatch = /^[-*•]\s+(.+)/.exec(line);
-    if (bulletMatch) {
-      nodes.push(
-        <li key={i} className="ml-4 list-disc text-sm leading-relaxed">
-          {inlineMarkdown(bulletMatch[1])}
-        </li>
-      );
-      continue;
-    }
-
-    // Regular line
-    if (line.trim() === "") {
-      nodes.push(<br key={`br-${i}`} />);
-    } else {
-      nodes.push(
-        <span key={i} className="block text-sm leading-relaxed">
-          {inlineMarkdown(line)}
-        </span>
-      );
-    }
-  }
-
-  return nodes;
 }
 
 function inlineMarkdown(text: string): React.ReactNode[] {
@@ -271,6 +294,7 @@ function SignupPromptBubble({
   onSubmit?: (email: string) => Promise<void> | void;
   onDismiss?: (messageId: string) => void;
 }) {
+  const t = useTranslations("chat");
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -280,7 +304,7 @@ function SignupPromptBubble({
     e.preventDefault();
     const trimmed = email.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-      setError("Revisa el formato del email.");
+      setError(t("signup.errorFormat"));
       return;
     }
     setError(null);
@@ -289,11 +313,11 @@ function SignupPromptBubble({
       await onSubmit?.(trimmed);
       setDone(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo guardar. Prueba otra vez.");
+      setError(err instanceof Error ? err.message : t("signup.errorGeneric"));
     } finally {
       setSubmitting(false);
     }
-  }, [email, onSubmit]);
+  }, [email, onSubmit, t]);
 
   if (done) {
     return (
@@ -302,9 +326,7 @@ function SignupPromptBubble({
           <Check className="h-3.5 w-3.5 text-emerald-400" />
         </div>
         <div className="flex-1 rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-3.5">
-          <p className="text-sm leading-relaxed text-emerald-100">
-            Listo. Tu progreso queda guardado. Podrás volver desde cualquier dispositivo.
-          </p>
+          <p className="text-sm leading-relaxed text-emerald-100">{t("signup.doneMessage")}</p>
         </div>
       </div>
     );
@@ -317,18 +339,15 @@ function SignupPromptBubble({
       </div>
       <div className="flex-1 rounded-xl border border-cyan-500/30 bg-cyan-950/15 p-3.5">
         <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-cyan-400">
-          ¿Guardamos este avance?
+          {t("signup.eyebrow")}
         </p>
-        <p className="mb-3 text-sm leading-relaxed text-zinc-200">
-          Has empezado algo importante. Si quieres conservar esta conversación, tu diario y
-          tus próximos pasos, deja tu email. Podrás volver desde cualquier dispositivo.
-        </p>
+        <p className="mb-3 text-sm leading-relaxed text-zinc-200">{t("signup.body")}</p>
         <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row">
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="tu@email.com"
+            placeholder={t("signup.emailPlaceholder")}
             className="flex-1 rounded-lg border border-zinc-700 bg-zinc-900/80 px-3 py-2 text-sm text-zinc-200 placeholder-zinc-600 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
             disabled={submitting}
             autoComplete="email"
@@ -339,7 +358,7 @@ function SignupPromptBubble({
             disabled={submitting || !email.trim()}
             className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-500 disabled:opacity-50"
           >
-            {submitting ? "Guardando..." : "Guardar mi cuenta"}
+            {submitting ? t("signup.saving") : t("signup.submit")}
           </button>
         </form>
         {error && (
@@ -350,7 +369,7 @@ function SignupPromptBubble({
           onClick={() => onDismiss?.(message.id)}
           className="mt-2 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
         >
-          No, ahora no
+          {t("signup.dismiss")}
         </button>
       </div>
     </div>
@@ -368,6 +387,9 @@ function MessageBubble({
   isStreaming: boolean;
   onQuickReply?: (text: string) => void;
 }) {
+  const t = useTranslations("chat");
+  const formatMsgTime = useFormatMsgTime();
+  const renderMarkdown = useRenderMarkdown();
   const [copied, setCopied] = useState(false);
   const isUser = message.role === "user";
 
@@ -386,7 +408,7 @@ function MessageBubble({
         </div>
         <div className="flex-1 rounded-xl border border-red-500/30 bg-red-950/30 p-3.5">
           <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-red-400">
-            Alerta de seguridad
+            {t("crisis.alertLabel")}
           </p>
           <div className="text-sm leading-relaxed text-red-100">
             {renderMarkdown(message.content)}
@@ -397,7 +419,7 @@ function MessageBubble({
             className="mt-3 flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-600/20 transition hover:bg-red-500 active:scale-[0.98]"
           >
             <Phone className="h-4 w-4" />
-            Llamar al 024
+            {t("crisis.callButton")}
           </a>
           <div className="mt-2 flex gap-2">
             <a
@@ -405,14 +427,14 @@ function MessageBubble({
               className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-red-500/30 bg-red-950/50 px-2 py-1.5 text-[11px] font-semibold text-red-200 transition hover:bg-red-900/40"
             >
               <Phone className="h-3 w-3" />
-              MX: 800 290 0024
+              {t("crisis.callMxLabel")}
             </a>
             <a
               href="tel:01152751135"
               className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-red-500/30 bg-red-950/50 px-2 py-1.5 text-[11px] font-semibold text-red-200 transition hover:bg-red-900/40"
             >
               <Phone className="h-3 w-3" />
-              AR: 011 5275-1135
+              {t("crisis.callArLabel")}
             </a>
           </div>
           <button
@@ -423,7 +445,7 @@ function MessageBubble({
             }}
             className="mt-3 w-full rounded-lg border border-zinc-700 bg-zinc-900/80 px-3 py-2 text-xs text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors"
           >
-            Ya me siento mejor — salir del modo crisis
+            {t("crisis.exitMode")}
           </button>
         </div>
       </div>
@@ -439,7 +461,7 @@ function MessageBubble({
         </div>
         <div className="flex-1 rounded-xl border border-amber-500/30 bg-amber-950/20 p-3.5">
           <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-amber-400">
-            Acción requerida
+            {t("actionRequired.label")}
           </p>
           <div className="text-sm leading-relaxed text-amber-100">
             {renderMarkdown(message.content)}
@@ -448,24 +470,24 @@ function MessageBubble({
             <div className="mt-3 flex flex-wrap gap-1.5">
               <button
                 type="button"
-                onClick={() => onQuickReply("Ahora no, lo retomo más tarde.")}
+                onClick={() => onQuickReply(t("actionRequired.replyLaterFull"))}
                 className="rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[11px] text-amber-100 transition hover:bg-amber-500/20"
               >
-                Ahora no
+                {t("actionRequired.replyLater")}
               </button>
               <button
                 type="button"
-                onClick={() => onQuickReply("Ya no aplica, lo cierro.")}
+                onClick={() => onQuickReply(t("actionRequired.replyCloseFull"))}
                 className="rounded-full border border-zinc-700 bg-zinc-900/60 px-3 py-1 text-[11px] text-zinc-300 transition hover:bg-zinc-800"
               >
-                Ya no aplica
+                {t("actionRequired.replyClose")}
               </button>
               <button
                 type="button"
-                onClick={() => onQuickReply("Sí, lo voy a hacer hoy.")}
+                onClick={() => onQuickReply(t("actionRequired.replyDoItFull"))}
                 className="rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-[11px] text-cyan-100 transition hover:bg-cyan-500/20"
               >
-                Sí, lo voy a hacer
+                {t("actionRequired.replyDoIt")}
               </button>
             </div>
           ) : null}
@@ -493,7 +515,7 @@ function MessageBubble({
           )}
           <button
             onClick={() => void handleCopy()}
-            aria-label={copied ? "Copiado" : "Copiar mensaje"}
+            aria-label={copied ? t("copy.tooltipCopied") : t("copy.tooltipCopy")}
             className="absolute -left-10 top-0 p-2 opacity-0 transition-opacity group-hover:opacity-100"
           >
             {copied ? (
@@ -534,10 +556,10 @@ function MessageBubble({
           )}
           {/* Fallback / search signals */}
           {message.meta?.searchUsed && (
-            <p className="mt-1.5 text-[10px] text-zinc-600">· búsqueda usada</p>
+            <p className="mt-1.5 text-[10px] text-zinc-600">{t("signals.searchUsed")}</p>
           )}
           {message.meta?.fallback && (
-            <p className="mt-1.5 text-[10px] text-zinc-600">· respuesta de respaldo</p>
+            <p className="mt-1.5 text-[10px] text-zinc-600">{t("signals.fallback")}</p>
           )}
         </div>
 
@@ -549,7 +571,7 @@ function MessageBubble({
             <div className="absolute -right-10 top-0 flex flex-col gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
               <button
                 onClick={() => void handleCopy()}
-                aria-label={copied ? "Copiado" : "Copiar respuesta"}
+                aria-label={copied ? t("copy.tooltipCopied") : t("copy.tooltipCopyReply")}
                 className="p-2"
               >
                 {copied ? (
@@ -570,12 +592,13 @@ function MessageBubble({
 // ─── Urgent / crisis panel ────────────────────────────────────────────────────
 
 function UrgentPanel({ onClose }: { onClose: () => void }) {
+  const t = useTranslations("chat");
   return (
     <div className="shrink-0 border-b border-red-500/30 bg-red-950/30 px-4 py-4">
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Shield className="h-4 w-4 text-red-400" />
-          <span className="text-sm font-semibold text-red-300">Modo crisis activado</span>
+          <span className="text-sm font-semibold text-red-300">{t("crisis.panelTitle")}</span>
         </div>
         <button type="button" onClick={onClose} className="text-zinc-500 hover:text-zinc-300">
           <X className="h-4 w-4" />
@@ -589,7 +612,7 @@ function UrgentPanel({ onClose }: { onClose: () => void }) {
           className="flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-red-600/20 transition hover:bg-red-500 active:scale-[0.98]"
         >
           <Phone className="h-5 w-5" />
-          Llamar al 024
+          {t("crisis.callButton")}
         </a>
         <div className="grid grid-cols-2 gap-2">
           <a
@@ -597,28 +620,28 @@ function UrgentPanel({ onClose }: { onClose: () => void }) {
             className="flex items-center justify-center gap-1.5 rounded-xl border border-red-500/30 bg-red-950/50 px-3 py-2.5 text-xs font-semibold text-red-200 transition hover:bg-red-900/40 active:scale-[0.98]"
           >
             <Phone className="h-3.5 w-3.5" />
-            Mexico: 800 290 0024
+            {t("crisis.callMxFull")}
           </a>
           <a
             href="tel:01152751135"
             className="flex items-center justify-center gap-1.5 rounded-xl border border-red-500/30 bg-red-950/50 px-3 py-2.5 text-xs font-semibold text-red-200 transition hover:bg-red-900/40 active:scale-[0.98]"
           >
             <Phone className="h-3.5 w-3.5" />
-            Argentina: 011 5275-1135
+            {t("crisis.callArFull")}
           </a>
         </div>
       </div>
 
       <div className="space-y-3 text-xs text-zinc-300">
         <div className="rounded-xl border border-red-500/20 bg-red-900/20 px-3 py-2.5">
-          <p className="mb-1 font-semibold text-red-300">Respiracion 4-7-8</p>
-          <p>Inhala 4 seg · reten 7 seg · exhala 8 seg. Repite 3 veces.</p>
+          <p className="mb-1 font-semibold text-red-300">{t("crisis.breathingTitle")}</p>
+          <p>{t("crisis.breathingBody")}</p>
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 px-3 py-2.5">
-          <p className="mb-1 font-semibold text-zinc-200">Tecnica 5-4-3-2-1</p>
-          <p>5 cosas que ves · 4 que tocas · 3 que oyes · 2 que hueles · 1 que saboreas.</p>
+          <p className="mb-1 font-semibold text-zinc-200">{t("crisis.groundingTitle")}</p>
+          <p>{t("crisis.groundingBody")}</p>
         </div>
-        <p className="text-zinc-500">Cuentame lo que esta pasando. Estoy aqui contigo.</p>
+        <p className="text-zinc-500">{t("crisis.withYou")}</p>
       </div>
     </div>
   );
@@ -654,6 +677,7 @@ export default function Chat({
   onCompletePendingAction,
   teamLetter,
 }: ChatProps) {
+  const t = useTranslations("chat");
   const activeMentorMode = getMentorMode(mentorModeId ?? null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -768,12 +792,12 @@ export default function Chat({
         setAudioDuration(0);
         return;
       }
-      parts.push(userText || "Nota de voz");
+      parts.push(userText || t("voiceNote"));
       parts.push(`\n\n[audio:${audioDuration}s:${attachedAudio}]`);
       setAttachedAudio(null);
       setAudioDuration(0);
     } else if (attachedImage) {
-      parts.push(userText || "Mira esta imagen");
+      parts.push(userText || t("imageAttached"));
       parts.push(`\n\n[image:${attachedImage}]`);
       setAttachedImage(null);
     } else if (userText) {
@@ -800,12 +824,12 @@ export default function Chat({
   const flowActive = responseSignals?.flow?.activeFlow;
 
   return (
-    <div className="flex flex-1 min-h-0 flex-col bg-zinc-950" role="region" aria-label="Chat de mentoría">
+    <div className="flex flex-1 min-h-0 flex-col bg-zinc-950" role="region" aria-label={t("ariaRegion")}>
       {/* ── Flow indicator ──────────────────────────────────────────────── */}
       {flowActive && (
         <div className="shrink-0 border-b border-zinc-800/60 bg-cyan-950/30 px-4 py-2">
           <p className="text-xs text-cyan-400">
-            Flujo activo: <span className="font-semibold">{flowActive}</span>
+            {t("flowActive")} <span className="font-semibold">{flowActive}</span>
             {responseSignals?.flow?.instruction && (
               <span className="ml-2 text-zinc-500">— {responseSignals.flow.instruction}</span>
             )}
@@ -822,8 +846,7 @@ export default function Chat({
           <div className="flex items-center gap-2">
             <BookOpen className="h-3.5 w-3.5 text-indigo-400" />
             <p className="text-xs text-indigo-300">
-              <span className="font-semibold">Modo diario activo.</span> La IA no responderá.
-              Escribe libremente.
+              <span className="font-semibold">{t("journal.active")}</span> {t("journal.noResponse")}
             </p>
           </div>
         </div>
@@ -833,13 +856,11 @@ export default function Chat({
       {actionLock && (
         <div className="shrink-0 border-b border-amber-500/20 bg-amber-950/20 px-4 py-2.5">
           <p className="text-xs text-amber-300">
-            <span className="font-semibold">Hilo abierto:</span>{" "}
+            <span className="font-semibold">{t("actionLock.openThread")}</span>{" "}
             <span className="italic">{actionLock.actionTitle}</span>
           </p>
           <p className="mt-0.5 text-xs text-amber-500/80">{actionLock.message}</p>
-          <p className="mt-1 text-[10px] text-amber-600/60">
-            Puedes retomarlo, aparcarlo para luego o cerrarlo. Tú decides.
-          </p>
+          <p className="mt-1 text-[10px] text-amber-600/60">{t("actionLock.hint")}</p>
         </div>
       )}
 
@@ -856,26 +877,22 @@ export default function Chat({
               onClick={() => window.location.reload()}
               className="shrink-0 rounded px-2 py-0.5 text-[10px] font-semibold text-red-400 hover:bg-red-500/20 transition-colors"
             >
-              Recargar
+              {t("reload")}
             </button>
           </div>
         </div>
       )}
 
       {/* ── Messages area ───────────────────────────────────────────────── */}
-      <div ref={scrollRef} onScroll={handleScroll} className="relative flex-1 overflow-y-auto" role="log" aria-label="Mensajes del chat" aria-live="polite">
+      <div ref={scrollRef} onScroll={handleScroll} className="relative flex-1 overflow-y-auto" role="log" aria-label={t("ariaMessagesLog")} aria-live="polite">
         {isEmpty ? (
           /* Empty state */
           <div className="flex h-full flex-col items-center justify-center px-6 py-12 text-center">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-cyan-500/10 ring-1 ring-cyan-500/20">
               <Sparkles className="h-5 w-5 text-cyan-400" />
             </div>
-            <h3 className="mb-1 text-base font-semibold text-white">
-              ¿En qué te puedo ayudar hoy?
-            </h3>
-            <p className="mb-3 max-w-sm text-xs text-zinc-600 leading-relaxed">
-              Te hago las preguntas que no te estás haciendo, para que veas lo que todavía no estás viendo.
-            </p>
+            <h3 className="mb-1 text-base font-semibold text-white">{t("empty.title")}</h3>
+            <p className="mb-3 max-w-sm text-xs text-zinc-600 leading-relaxed">{t("empty.subtitle")}</p>
             {proactivePrompt ? (
               <button
                 onClick={() => handleStarterClick(proactivePrompt)}
@@ -885,9 +902,7 @@ export default function Chat({
                 {proactivePrompt}
               </button>
             ) : (
-              <p className="mb-6 text-sm text-zinc-500">
-                Escribe lo que te pasa o elige un punto de partida.
-              </p>
+              <p className="mb-6 text-sm text-zinc-500">{t("empty.startPrompt")}</p>
             )}
             <div className="flex w-full max-w-sm flex-col gap-2">
               {STARTERS.map((text) => (
@@ -903,7 +918,7 @@ export default function Chat({
             {onSelectMentorMode ? (
               <div className="mt-6 flex w-full max-w-md flex-col items-center">
                 <p className="mb-2 text-xs font-medium uppercase tracking-wide text-zinc-500">
-                  ¿Cómo quieres que te acompañe?
+                  {t("empty.modesTitle")}
                 </p>
                 <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2">
                   {MENTOR_MODES.map((mode) => {
@@ -931,9 +946,7 @@ export default function Chat({
                     );
                   })}
                 </div>
-                <p className="mt-2 text-[10px] text-zinc-600">
-                  Puedes cambiar el modo en cualquier momento.
-                </p>
+                <p className="mt-2 text-[10px] text-zinc-600">{t("empty.modesHint")}</p>
               </div>
             ) : null}
             <div className="mt-5 flex flex-col items-center gap-2 max-w-sm mx-auto">
@@ -943,11 +956,9 @@ export default function Chat({
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 rounded-xl border border-cyan-500/20 bg-cyan-500/5 px-4 py-2.5 text-xs font-medium text-cyan-400 hover:bg-cyan-500/10 transition-colors"
               >
-                💬 Llevame en Telegram — mismo mentor, desde el movil
+                {t("empty.telegramCta")}
               </a>
-              <p className="text-[10px] text-zinc-600">
-                Puedes escribir o usar el microfono 🎙️
-              </p>
+              <p className="text-[10px] text-zinc-600">{t("empty.voiceHint")}</p>
             </div>
           </div>
         ) : (
@@ -972,7 +983,7 @@ export default function Chat({
 
             {/* Typing / loading indicator (before assistant responds) */}
             {loading && !streamingMessageId && (
-              <div className="flex items-start gap-2.5 px-1 animate-in fade-in duration-300" role="status" aria-label="El mentor esta pensando">
+              <div className="flex items-start gap-2.5 px-1 animate-in fade-in duration-300" role="status" aria-label={t("ariaThinking")}>
                 <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-500/20 ring-1 ring-cyan-500/30">
                   <Sparkles className="h-3 w-3 text-cyan-400 animate-pulse" aria-hidden="true" />
                 </div>
@@ -983,21 +994,19 @@ export default function Chat({
                       <span className="h-2 w-2 animate-bounce rounded-full bg-fuchsia-400 [animation-delay:150ms]" />
                       <span className="h-2 w-2 animate-bounce rounded-full bg-cyan-400 [animation-delay:300ms]" />
                     </div>
-                    <span className="text-xs text-zinc-600 animate-pulse">Pensando...</span>
+                    <span className="text-xs text-zinc-600 animate-pulse">{t("thinking")}</span>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Suggested action chips — only after assistant has finished
-                 responding and we have suggestions. Reduce cognitive load
-                 ("¿qué pregunto ahora?") and reinforce the method. */}
+            {/* Suggested action chips */}
             {!loading && !streamingMessageId && suggestedActions && suggestedActions.length > 0 &&
              messages.length > 0 && messages[messages.length - 1]?.role === "assistant" && (
               <div
                 className="flex flex-wrap gap-2 px-1 pt-1 animate-in fade-in slide-in-from-bottom-1 duration-300"
                 role="group"
-                aria-label="Sugerencias para continuar"
+                aria-label={t("ariaSuggestions")}
               >
                 {suggestedActions.map((chip) => (
                   <button
@@ -1007,9 +1016,6 @@ export default function Chat({
                       if (chip.kind === "complete") {
                         onCompletePendingAction?.();
                       } else {
-                        // Inject prompt into input for the user to send (gives
-                        // them a chance to edit before submitting). If they
-                        // want one-tap send, they just press the send button.
                         const setter = setInput ?? onInputChange;
                         setter?.(chip.prompt);
                       }
@@ -1026,8 +1032,7 @@ export default function Chat({
               </div>
             )}
 
-            {/* Team-letter CTA — tras 3+ turnos del user, ofrece una carta humana
-                 personalizada del equipo. Razón de retención del primer día. */}
+            {/* Team-letter CTA */}
             {!loading && !streamingMessageId && teamLetter && (
               <TeamLetterCta
                 userTurnsCount={messages.filter((m) => m.role === "user").length}
@@ -1040,14 +1045,13 @@ export default function Chat({
               />
             )}
 
-            {/* Community CTA — shown when mentor detects a recurrent pattern
-                 or a question the community could help with. */}
+            {/* Community CTA */}
             {!loading && communityCta && (
               <div className="mx-1 rounded-2xl border border-violet-500/30 bg-gradient-to-br from-violet-500/5 to-fuchsia-500/5 p-4 space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <p className="text-xs text-violet-300 font-semibold uppercase tracking-wide">
                   {communityCta.kind === "ask_community"
-                    ? "¿Y si lo consultas con quienes ya han pasado por ahí?"
-                    : "Sugerencia del mentor"}
+                    ? t("community.askTitle")
+                    : t("community.suggestionTitle")}
                 </p>
                 <p className="text-sm text-zinc-200">{communityCta.reason}</p>
                 <div className="flex items-center gap-2 pt-1">
@@ -1063,18 +1067,18 @@ export default function Chat({
                       onClick={onDismissCommunityCta}
                       className="rounded-xl px-3 py-2 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
                     >
-                      Ahora no
+                      {t("community.dismiss")}
                     </button>
                   )}
                 </div>
               </div>
             )}
 
-            {/* Rating row — shown after last AI message finishes */}
+            {/* Rating row */}
             {!loading && conversationId && messages.some((m) => m.role === "assistant") && (
               <div className="flex items-center gap-2 px-1 pb-1">
                 <Heart className="h-3 w-3 text-zinc-600" />
-                <span className="text-xs text-zinc-600">¿Fue útil?</span>
+                <span className="text-xs text-zinc-600">{t("rating.label")}</span>
                 <button
                   type="button"
                   onClick={() => {
@@ -1086,7 +1090,7 @@ export default function Chat({
                       ? "bg-emerald-500/20 text-emerald-400"
                       : "text-zinc-600 hover:bg-zinc-800 hover:text-emerald-400"
                   }`}
-                  title="Útil"
+                  title={t("rating.yes")}
                 >
                   <ThumbsUp className="h-4 w-4" />
                 </button>
@@ -1101,12 +1105,12 @@ export default function Chat({
                       ? "bg-red-500/20 text-red-400"
                       : "text-zinc-600 hover:bg-zinc-800 hover:text-red-400"
                   }`}
-                  title="No fue útil"
+                  title={t("rating.no")}
                 >
                   <ThumbsDown className="h-4 w-4" />
                 </button>
                 {sessionRating !== null && (
-                  <span className="text-xs text-zinc-500">Gracias por tu feedback.</span>
+                  <span className="text-xs text-zinc-500">{t("rating.thanks")}</span>
                 )}
               </div>
             )}
@@ -1123,7 +1127,7 @@ export default function Chat({
               if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
               setAtBottom(true);
             }}
-            aria-label="Ir al ultimo mensaje"
+            aria-label={t("ariaScrollToBottom")}
             className="absolute bottom-4 right-4 flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-zinc-400 shadow-lg transition hover:bg-zinc-800 hover:text-white"
           >
             <ArrowDown className="h-4 w-4" />
@@ -1138,12 +1142,12 @@ export default function Chat({
           <div className="mb-2 flex items-center justify-between gap-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-1.5">
             <span className="flex items-center gap-2 text-xs text-cyan-100">
               <span>{activeMentorMode.icon}</span>
-              <span className="font-medium">Modo: {activeMentorMode.label}</span>
+              <span className="font-medium">{t("input.modeLabel", { label: activeMentorMode.label })}</span>
             </span>
             <button
               type="button"
               onClick={() => onSelectMentorMode(null)}
-              aria-label="Quitar modo"
+              aria-label={t("ariaRemoveMode")}
               className="text-cyan-300/70 transition hover:text-cyan-100"
             >
               <X className="h-3.5 w-3.5" />
@@ -1153,10 +1157,10 @@ export default function Chat({
         {/* Image preview */}
         {attachedImage && (
           <div className="mb-2 flex items-start gap-2 rounded-xl border border-zinc-800 bg-zinc-900/50 p-2">
-            <img src={attachedImage} alt="Adjunto" className="h-16 w-16 rounded-lg object-cover" />
+            <img src={attachedImage} alt={t("imageAdjuntoAlt")} className="h-16 w-16 rounded-lg object-cover" />
             <div className="flex-1 min-w-0">
-              <p className="text-xs text-zinc-400">Imagen adjunta</p>
-              <p className="text-[10px] text-zinc-600">Describe lo que muestra — el mentor no puede ver imagenes, pero puede ayudarte con lo que le cuentes</p>
+              <p className="text-xs text-zinc-400">{t("image.attachedTitle")}</p>
+              <p className="text-[10px] text-zinc-600">{t("image.attachedHint")}</p>
             </div>
             <button
               type="button"
@@ -1175,8 +1179,8 @@ export default function Chat({
                 <Mic className="h-4 w-4 text-fuchsia-400" />
               </div>
               <div>
-                <p className="text-xs text-zinc-400">Nota de voz</p>
-                <p className="text-xs text-zinc-600">{audioDuration}s grabados</p>
+                <p className="text-xs text-zinc-400">{t("audio.noteLabel")}</p>
+                <p className="text-xs text-zinc-600">{t("audio.seconds", { n: audioDuration })}</p>
               </div>
             </div>
             <button
@@ -1193,10 +1197,10 @@ export default function Chat({
             value={input}
             onChange={(e) => handleInputChange(e.target.value)}
             onKeyDown={onKeyDown}
-            placeholder="Escribe lo que te pasa… (Enter para enviar)"
+            placeholder={t("input.placeholder")}
             disabled={loading}
             rows={1}
-            aria-label="Escribe tu mensaje"
+            aria-label={t("ariaWriteMessage")}
             className="min-h-11 max-h-24 sm:max-h-36 flex-1 resize-none overflow-hidden rounded-xl border-zinc-800 bg-zinc-900 text-base sm:text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-indigo-500/50"
             style={{ fieldSizing: "content" } as React.CSSProperties}
           />
@@ -1204,8 +1208,6 @@ export default function Chat({
             onTranscript={(text) => handleInputChange(input ? `${input} ${text}` : text)}
             disabled={loading}
           />
-          {/* AudioRecorder y adjuntar imagen ocultos en mobile: liberan ~88px
-              de ancho para que el textarea no quede minusculo en iPhone. */}
           <div className="hidden sm:contents">
             <AudioRecorder
               onAudioReady={(base64, dur) => { setAttachedAudio(base64); setAudioDuration(dur); }}
@@ -1224,7 +1226,7 @@ export default function Chat({
               disabled={loading}
               size="icon"
               variant="ghost"
-              aria-label="Adjuntar imagen"
+              aria-label={t("ariaAttachImage")}
               className="h-11 w-11 shrink-0 rounded-xl text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 disabled:opacity-30"
             >
               <ImagePlus className="h-4 w-4" />
@@ -1234,7 +1236,7 @@ export default function Chat({
             onClick={handleSendWithAttachments}
             disabled={loading || (!input.trim() && !attachedImage && !attachedAudio)}
             size="icon"
-            aria-label="Enviar mensaje"
+            aria-label={t("ariaSendMessage")}
             style={{ backgroundColor: "var(--accent-emotion)" }}
             className="h-11 w-11 shrink-0 rounded-xl text-white hover:opacity-90 transition-opacity disabled:opacity-30"
           >
@@ -1243,17 +1245,17 @@ export default function Chat({
         </div>
         <div className="mt-1.5 flex items-center justify-between px-1">
           <div className="flex items-center gap-2">
-            <p className="hidden sm:block text-[10px] text-zinc-700">Shift + Enter para nueva línea</p>
+            <p className="hidden sm:block text-[10px] text-zinc-700">{t("input.shiftHint")}</p>
             <button
               type="button"
               onClick={() => setUrgentMode((v) => !v)}
               className={`flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition ${
                 urgentMode ? "bg-red-500/20 text-red-400" : "text-zinc-600 hover:text-red-400"
               }`}
-              title="Modo crisis"
+              title={t("crisis.buttonShort")}
             >
               <Zap className="h-3.5 w-3.5" />
-              Crisis
+              {t("crisis.buttonShort")}
             </button>
             {onToggleJournal && (
               <button
@@ -1264,27 +1266,27 @@ export default function Chat({
                     ? "bg-indigo-500/20 text-indigo-400"
                     : "text-zinc-600 hover:text-indigo-400"
                 }`}
-                title="Modo diario"
+                title={t("journal.buttonShort")}
               >
                 <BookOpen className="h-3.5 w-3.5" />
-                Diario
+                {t("journal.buttonShort")}
               </button>
             )}
           </div>
           {input.length > 0 && (
             <p className={`text-xs ${input.length > 900 ? "text-amber-500" : "text-zinc-700"}`}>
-              {input.length}/1000
+              {t("input.counterMax", { count: input.length })}
             </p>
           )}
         </div>
         <p className="mt-1.5 text-center text-[10px] text-zinc-700">
-          IA supervisada por psicologos, mentores y coaches · No sustituye atencion clinica ·{" "}
+          {t("input.footnote")}{" "}
           <a
             href="tel:024"
-            aria-label="Llamar al 024, linea de crisis"
+            aria-label={t("ariaCrisisCall")}
             className="inline-flex items-center gap-1 text-red-400 hover:text-red-300 underline decoration-red-400/40 hover:decoration-red-300 underline-offset-2 font-medium"
           >
-            🚨 Crisis: llamar al 024
+            {t("crisis.footerLink")}
           </a>
         </p>
       </div>

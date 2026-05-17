@@ -1788,5 +1788,116 @@
     "ctaTitle": "¿Quieres pasar del bloqueo a la acción?",
     "ctaDesc": "Tres Mil Millones de Latidos te acompaña con IA. Gratis durante el MVP.",
     "ctaButton": "Empezar ahora"
+  },
+  "chat": {
+    "ariaRegion": "Chat de mentoría",
+    "ariaMessagesLog": "Mensajes del chat",
+    "ariaThinking": "El mentor está pensando",
+    "ariaScrollToBottom": "Ir al último mensaje",
+    "ariaSendMessage": "Enviar mensaje",
+    "ariaWriteMessage": "Escribe tu mensaje",
+    "ariaAttachImage": "Adjuntar imagen",
+    "ariaSuggestions": "Sugerencias para continuar",
+    "ariaCrisisCall": "Llamar al 024, línea de crisis",
+    "ariaRemoveMode": "Quitar modo",
+    "timeNow": "ahora",
+    "timeMinutes": "hace {n}m",
+    "voiceNote": "Nota de voz",
+    "imageAttached": "Imagen adjunta",
+    "imageAlt": "Imagen adjunta",
+    "imageAdjuntoAlt": "Adjunto",
+    "thinking": "Pensando…",
+    "reload": "Recargar",
+    "flowActive": "Flujo activo:",
+    "copy": {
+      "tooltipCopy": "Copiar mensaje",
+      "tooltipCopyReply": "Copiar respuesta",
+      "tooltipCopied": "Copiado"
+    },
+    "signals": {
+      "searchUsed": "· búsqueda usada",
+      "fallback": "· respuesta de respaldo"
+    },
+    "crisis": {
+      "alertLabel": "Alerta de seguridad",
+      "callButton": "Llamar al 024",
+      "callMxLabel": "MX: 800 290 0024",
+      "callArLabel": "AR: 011 5275-1135",
+      "callMxFull": "México: 800 290 0024",
+      "callArFull": "Argentina: 011 5275-1135",
+      "exitMode": "Ya me siento mejor — salir del modo crisis",
+      "panelTitle": "Modo crisis activado",
+      "breathingTitle": "Respiración 4-7-8",
+      "breathingBody": "Inhala 4 seg · retén 7 seg · exhala 8 seg. Repite 3 veces.",
+      "groundingTitle": "Técnica 5-4-3-2-1",
+      "groundingBody": "5 cosas que ves · 4 que tocas · 3 que oyes · 2 que hueles · 1 que saboreas.",
+      "withYou": "Cuéntame lo que está pasando. Estoy aquí contigo.",
+      "footerLink": "🚨 Crisis: llamar al 024",
+      "buttonShort": "Crisis"
+    },
+    "actionRequired": {
+      "label": "Acción requerida",
+      "replyLater": "Ahora no",
+      "replyClose": "Ya no aplica",
+      "replyDoIt": "Sí, lo voy a hacer",
+      "replyLaterFull": "Ahora no, lo retomo más tarde.",
+      "replyCloseFull": "Ya no aplica, lo cierro.",
+      "replyDoItFull": "Sí, lo voy a hacer hoy."
+    },
+    "journal": {
+      "active": "Modo diario activo.",
+      "noResponse": "La IA no responderá. Escribe libremente.",
+      "buttonShort": "Diario"
+    },
+    "actionLock": {
+      "openThread": "Hilo abierto:",
+      "hint": "Puedes retomarlo, aparcarlo para luego o cerrarlo. Tú decides."
+    },
+    "empty": {
+      "title": "¿En qué te puedo ayudar hoy?",
+      "subtitle": "Te hago las preguntas que no te estás haciendo, para que veas lo que todavía no estás viendo.",
+      "startPrompt": "Escribe lo que te pasa o elige un punto de partida.",
+      "modesTitle": "¿Cómo quieres que te acompañe?",
+      "modesHint": "Puedes cambiar el modo en cualquier momento.",
+      "telegramCta": "💬 Llévame en Telegram — mismo mentor, desde el móvil",
+      "voiceHint": "Puedes escribir o usar el micrófono 🎙️"
+    },
+    "community": {
+      "askTitle": "¿Y si lo consultas con quienes ya han pasado por ahí?",
+      "suggestionTitle": "Sugerencia del mentor",
+      "dismiss": "Ahora no"
+    },
+    "rating": {
+      "label": "¿Fue útil?",
+      "yes": "Útil",
+      "no": "No fue útil",
+      "thanks": "Gracias por tu feedback."
+    },
+    "input": {
+      "placeholder": "Escribe lo que te pasa… (Enter para enviar)",
+      "shiftHint": "Shift + Enter para nueva línea",
+      "counterMax": "{count}/1000",
+      "footnote": "IA supervisada por psicólogos, mentores y coaches · No sustituye atención clínica ·",
+      "modeLabel": "Modo: {label}"
+    },
+    "audio": {
+      "noteLabel": "Nota de voz",
+      "seconds": "{n}s grabados"
+    },
+    "image": {
+      "attachedTitle": "Imagen adjunta",
+      "attachedHint": "Describe lo que muestra — el mentor no puede ver imágenes, pero puede ayudarte con lo que le cuentes"
+    },
+    "signup": {
+      "doneMessage": "Listo. Tu progreso queda guardado. Podrás volver desde cualquier dispositivo.",
+      "eyebrow": "¿Guardamos este avance?",
+      "body": "Has empezado algo importante. Si quieres conservar esta conversación, tu diario y tus próximos pasos, deja tu email. Podrás volver desde cualquier dispositivo.",
+      "emailPlaceholder": "tu@email.com",
+      "saving": "Guardando…",
+      "submit": "Guardar mi cuenta",
+      "dismiss": "No, ahora no",
+      "errorFormat": "Revisa el formato del email.",
+      "errorGeneric": "No se pudo guardar. Prueba otra vez."
+    }
   }
 }

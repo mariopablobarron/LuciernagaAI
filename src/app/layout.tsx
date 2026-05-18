@@ -10,6 +10,7 @@ import InstallPWA from "@/components/InstallPWA";
 import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
 import UsageTracker from "@/components/UsageTracker";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
+import { FontSizeShortcuts } from "@/components/FontSizeShortcuts";
 import TopProgressBar from "@/components/TopProgressBar";
 import { Toaster } from "@/components/ui/sonner";
 import { SAAS_CONFIG } from "@/lib/saas";
@@ -251,6 +252,9 @@ export default async function RootLayout({
             <div aria-live="polite" aria-atomic="true" className="sr-only" id="a11y-announcer" />
 
             <AccessibilityWidget />
+            {/* Atajos de teclado Ctrl/Cmd +/-/0 para cambiar tamaño de fuente.
+                Toast efímero global montado una sola vez aquí. */}
+            <FontSizeShortcuts />
             <CookieConsent />
             <InstallPWA />
             <Toaster />

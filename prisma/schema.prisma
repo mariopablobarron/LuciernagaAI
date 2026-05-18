@@ -108,6 +108,7 @@ model User {
   lastMessageAt             DateTime?
   conversations             Conversation[]            @relation("UserConversations")
   messages                  Message[]                 @relation("UserMessages")
+  bookmarks                 MessageBookmark[]         @relation("UserBookmarks")
   goals                     Goal[]
   crisisEvents              CrisisEvent[]
   avoidanceEvents           AvoidanceEvent[]
@@ -212,9 +213,31 @@ model Message {
   embeddedAt     DateTime?
   user           User?        @relation("UserMessages", fields: [userId], references: [id], onDelete: Cascade)
   conversation   Conversation @relation("ConversationMessages", fields: [conversationId], references: [id], onDelete: Cascade)
+  bookmarks      MessageBookmark[] @relation("MessageBookmarks")
 
   @@index([conversationId, createdAt])
   @@index([createdAt])
+  @@index([userId, createdAt])
+}
+
+/// Bookmark de un mensaje del mentor para que el usuario pueda volver a
+/// él más tarde. En estado emocional difícil a veces algo te llega pero
+/// no puedes procesarlo entonces — esto permite marcarlo y volver luego.
+///
+/// Único por (userId, messageId): si el usuario ya marcó el mensaje y
+/// vuelve a hacer click, se interpreta como "quitar bookmark".
+model MessageBookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  messageId String
+  /// Nota opcional del usuario sobre POR QUÉ guardó este mensaje.
+  /// Max 500 chars enforced en el endpoint.
+  note      String?
+  createdAt DateTime @default(now())
+  user      User     @relation("UserBookmarks", fields: [userId], references: [id], onDelete: Cascade)
+  message   Message  @relation("MessageBookmarks", fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, messageId])
   @@index([userId, createdAt])
 }
 

@@ -2921,5 +2921,21 @@
   "fontSizeShortcuts": {
     "levelDefault": "Size A (default)",
     "levelPlus": "Size A+{n}"
+  },
+  "bookmarks": {
+    "addAria": "Save this message for later",
+    "addTooltip": "Save for later",
+    "removeAria": "Remove from saved",
+    "removeTooltip": "Remove from saved",
+    "listLabel": "{n, plural, one {Saved (1)} other {Saved (#)}}",
+    "listAria": "Open my saved messages ({n})",
+    "listTooltip": "{n} saved messages",
+    "modalTitle": "My saved messages",
+    "empty": "You haven't saved any messages yet. When something resonates, mark it with the 🔖 icon to come back later.",
+    "emptyContent": "(no content)",
+    "removeOneAria": "Remove this saved item",
+    "removeOneTooltip": "Remove",
+    "close": "Close",
+    "disclosure": "Your saved items are private. Only you see them."
   }
 }

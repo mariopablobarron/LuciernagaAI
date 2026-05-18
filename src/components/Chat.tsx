@@ -52,6 +52,7 @@ import { EscalationBanner } from "@/components/EscalationBanner";
 import { detectEscalation } from "@/lib/escalation-detector";
 import { MentorPrefsButton } from "@/components/MentorPrefsButton";
 import { DataSummaryButton } from "@/components/DataSummaryButton";
+import { useCrisisAutoMotion } from "@/lib/useCrisisAutoMotion";
 import { CHAT_STARTER_PICKS, MENTOR_MODES, getMentorMode } from "@/lib/onboarding";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -733,6 +734,11 @@ export default function Chat({
   // Modal "demasiado mal para escribir" — overlay calmo con respiración + crisis line.
   // Disponible siempre vía botón discreto sobre el input, no escondido en menús.
   const [shelterOpen, setShelterOpen] = useState(false);
+
+  // Reduce motion automático si los últimos mensajes incluyen variant: "crisis".
+  // Aplica html.a11y-reduced-motion-auto durante 30 min. No pisa la preferencia
+  // manual del usuario en el AccessibilityWidget (clases CSS separadas).
+  useCrisisAutoMotion(messages);
   const [sessionRating, setSessionRating] = useState<1 | -1 | null>(null);
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
   const [attachedAudio, setAttachedAudio] = useState<string | null>(null);

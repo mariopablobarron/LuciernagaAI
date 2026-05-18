@@ -45,6 +45,7 @@ import {
   type BrowserSessionUser,
 } from "@/lib/session-client";
 import { getMentorMode } from "@/lib/onboarding";
+import { useMentorPreferences } from "@/lib/useMentorPreferences";
 import { DEFAULT_EMOTIONAL_PROFILE, type EmotionalProfile } from "@/types/emotional-profile";
 import GoalContextBar from "@/components/GoalContextBar";
 import { EmailVerificationBanner } from "@/components/EmailVerificationBanner";
@@ -161,6 +162,9 @@ export default function HomePage() {
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [mentorModeId, setMentorModeId] = useState<string | null>(null);
+  // Preferencias del usuario sobre el mentor (no-interpretes, verbosity).
+  // Persiste en localStorage; se envía en cada body al chat API.
+  const { toApiPayload: getMentorPrefsPayload } = useMentorPreferences();
   const [loading, setLoading] = useState(false);
   const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -1372,6 +1376,9 @@ export default function HomePage() {
           message: trimmed,
           conversationId: resolvedConversation.isDraft ? undefined : currentConversationId,
           mentorModeId: activeMode?.id ?? null,
+          // Preferencias del usuario sobre estilo del mentor. null si están en
+          // defaults (no inyectamos nada al prompt en ese caso).
+          mentorPrefs: getMentorPrefsPayload(),
         }),
       });
 

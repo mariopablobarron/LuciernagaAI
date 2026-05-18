@@ -2848,5 +2848,28 @@
       "active_addiction": "Une addiction active demande un soutien professionnel et un réseau de personnes réelles. On peut parler ici, mais ce n'est pas suffisant.",
       "explicit_request": "Tu as raison. Chercher un thérapeute est ce qui convient. En attendant je suis là."
     }
+  },
+  "mentorPrefs": {
+    "trigger": "Mentor",
+    "panelTitle": "Comment tu veux que je te parle",
+    "close": "Fermer",
+    "reset": "Revenir au standard",
+    "disclosure": "Ces préférences sont enregistrées sur cet appareil et voyagent avec chaque message au mentor. Elles ne sont pas partagées ni liées à ton compte.",
+    "noInterpretation": {
+      "label": "Ne m'interprète pas",
+      "description": "Le mentor n'analyse pas ni ne dit 'ce que j'entends c'est...'. Il écoute juste et pose une question ou suggère une action."
+    },
+    "verbosity": {
+      "label": "Verbosité",
+      "minLabel": "Min",
+      "maxLabel": "Max",
+      "description": {
+        "1": "Minimum : 1-2 phrases par réponse.",
+        "2": "Bas : 2-3 phrases par réponse.",
+        "3": "Standard (4-6 phrases).",
+        "4": "Élevé : réponses plus longues (6-8 phrases).",
+        "5": "Maximum : longues réponses avec plusieurs angles."
+      }
+    }
   }
 }

@@ -93,6 +93,15 @@ export type CoachContext = {
   // etc.). Se inyecta en el system prompt sin aparecer nunca en el chat
   // visible del usuario.
   accompanimentMode?: { label: string; instruction: string } | null;
+  // Preferencias del usuario sobre estilo del mentor. Inyectadas como
+  // guidance al system prompt SOLO si el usuario las ha activado.
+  // - noInterpretation: el mentor NO debe analizar ni decir "lo que oigo es..."
+  // - verbosity: 1 (mínimo, respuestas cortas) a 5 (estándar actual).
+  //   Defaults conservadores: verbosity=3 = comportamiento actual sin cambio.
+  mentorPrefs?: {
+    noInterpretation?: boolean;
+    verbosity?: number;
+  } | null;
   // Forma gramatical preferida para dirigirse al usuario.
   // - "feminine"  → conjuga en femenino ("estás cansada")
   // - "masculine" → conjuga en masculino ("estás cansado")
@@ -488,6 +497,54 @@ function buildEnneagramGuidance(context: CoachContext): string {
   return `Perfil del usuario (Eneagrama, no mencionar la etiqueta al usuario): ${ENNEAGRAM_GUIDANCE[t]}`;
 }
 
+/**
+ * Preferencias explícitas del usuario sobre cómo quiere que le hable
+ * el mentor. Activadas desde la UI (componente MentorPrefsButton).
+ *
+ * - noInterpretation: silencia interpretaciones/análisis del mentor.
+ *   Algunos usuarios solo quieren ser ESCUCHADOS, no diagnosticados.
+ * - verbosity: 1 (mínimo: 1-2 frases máx) ... 5 (estándar 4-6 frases).
+ *   3 = comportamiento actual sin cambios, no inyecta nada.
+ *
+ * Si ninguna pref está activa, devuelve "" (cero ruido en el prompt).
+ */
+function buildMentorPrefsGuidance(context: CoachContext): string {
+  const prefs = context.mentorPrefs;
+  if (!prefs) return "";
+
+  const lines: string[] = [];
+
+  if (prefs.noInterpretation === true) {
+    lines.push(
+      "El usuario ha pedido NO interpretar ni analizar. NUNCA digas frases tipo 'lo que oigo es...', 'parece que...', 'detrás de eso veo...', 'tiene sentido porque...'. NO devuelvas un diagnóstico ni una lectura psicológica de lo que cuenta. Tu papel aquí es escuchar y, cuando proceda, preguntar UNA cosa concreta o sugerir UNA acción mínima. Sin interpretar, sin nombrar patrones. Si esto contradice otras instrucciones del prompt, esta gana — es preferencia explícita del usuario.",
+    );
+  }
+
+  const v = prefs.verbosity;
+  if (typeof v === "number" && v >= 1 && v <= 5 && v !== 3) {
+    if (v === 1) {
+      lines.push(
+        "Verbosidad mínima: 1-2 frases MÁXIMO por respuesta. Sin contexto, sin párrafos múltiples. Una observación corta + una pregunta o acción. NADA más. La pregunta de cierre cuenta como una frase, así que el total real es ~2 frases.",
+      );
+    } else if (v === 2) {
+      lines.push(
+        "Verbosidad baja: 2-3 frases máx por respuesta. Una idea + una pregunta o acción. Sin reflexiones largas. El usuario quiere respuestas concisas.",
+      );
+    } else if (v === 4) {
+      lines.push(
+        "Verbosidad alta: el usuario está cómodo con respuestas más extensas (6-8 frases). Puedes desarrollar más el contexto antes de la pregunta o acción, sin perder concreción.",
+      );
+    } else if (v === 5) {
+      lines.push(
+        "Verbosidad máxima: respuestas largas y desarrolladas (hasta 10-12 frases). Profundiza en el contexto, conecta con observaciones anteriores, ofrece varios ángulos. NO sacrifiques la pregunta única de cierre ni la acción concreta — solo desarrolla más.",
+      );
+    }
+  }
+
+  if (lines.length === 0) return "";
+  return ["Preferencias explícitas del usuario sobre tu estilo:", ...lines].join("\n");
+}
+
 function buildExtendedIntentGuidance(context: CoachContext): string {
   const i = context.extendedIntent;
   if (!i || (!i.grief && !i.mildIdeation && !i.gratitudeClosure)) return "";
@@ -570,6 +627,7 @@ export function buildCoachPrompt(
   const genderGuidance = buildGenderGuidance(context);
   const extendedIntentGuidance = buildExtendedIntentGuidance(context);
   const enneagramGuidance = buildEnneagramGuidance(context);
+  const mentorPrefsGuidance = buildMentorPrefsGuidance(context);
   const audienceGuidance = buildAudienceGuidance(context);
   const conversationSummaryGuidance = context.conversationSummary
     ? `Resumen de la conversación hasta ahora (turnos anteriores a los visibles abajo, úsalo para recordar nombres, decisiones y arcos): ${context.conversationSummary}`
@@ -685,6 +743,9 @@ No se pudo verificar información externa suficiente. No afirmes datos actuales 
     journeyGuidance,
     projectGuidance,
     accompanimentGuidance,
+    // mentorPrefs va DESPUÉS de accompaniment para que pueda overridear si
+    // el usuario pidió "no interpretes" explícitamente.
+    mentorPrefsGuidance,
     contextualInterpretationGuidance,
     domainGuidance,
   ].filter(Boolean);

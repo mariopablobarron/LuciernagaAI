@@ -26,9 +26,14 @@ export function buildErrorResponse(
 
 export async function orchestrateChat(req: NextRequest): Promise<Response> {
   // ── 1. Parse body ───────────────────────────────────────────────────────
-  let body: { message?: string; conversationId?: string; mentorModeId?: string | null };
+  let body: {
+    message?: string;
+    conversationId?: string;
+    mentorModeId?: string | null;
+    mentorPrefs?: { noInterpretation?: boolean; verbosity?: number } | null;
+  };
   try {
-    body = (await req.json()) as { message?: string; conversationId?: string; mentorModeId?: string | null };
+    body = (await req.json()) as typeof body;
   } catch (parseError: unknown) {
     logError("CHAT", parseError, { area: "parse_chat_body" });
     return buildErrorResponse("Body inválido en la solicitud", 400, "neutral", "INVALID_BODY");
@@ -176,6 +181,7 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
     message,
     conversationId: body.conversationId,
     mentorModeId: typeof body.mentorModeId === "string" ? body.mentorModeId : null,
+    mentorPrefs: body.mentorPrefs ?? null,
     session: {
       isAnonymous: accessState.isAnonymous,
       hasPlan: accessState.hasPlan,

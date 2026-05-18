@@ -24,6 +24,7 @@
 | 9 | Tamaño fuente — atajos teclado Ctrl/Cmd+/-/0 + toast | ✅ Producción |
 | 19 | Bookmark mensajes del mentor — botón + modal con lista | ✅ Producción |
 | 1 | Swipe-to-delete en lista de conversaciones (touch) | ✅ Producción |
+| 12 | Post-crisis check-in email 24h después (silencioso, opt-out trivial) | ✅ Producción |
 
 ## Pendientes — ordenadas por área
 
@@ -42,7 +43,6 @@
 
 | # | Feature | Estimación | Notas |
 |---|---|---|---|
-| 12 | Post-crisis check-in 24h | 4-6h | Si user activó panel crisis hoy, cron al día siguiente envía email "¿cómo estás hoy?". Requiere opt-in explícito y unsubscribe trivial. |
 | 13 | Recursos por país en tiempo real | 4-8h | Hoy crisis-hotlines.ts tiene 12 países hardcoded. Integrar con [findahelpline.com](https://findahelpline.com/) API o equivalente para los que faltan. |
 
 ### Continuidad y relación

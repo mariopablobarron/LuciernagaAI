@@ -2897,6 +2897,12 @@
       "conversations": "{n, plural, =0 {Nenhuma conversa} one {1 conversa} other {# conversas}}",
       "messages": "{n, plural, =0 {0 mensagens} one {1 mensagem} other {# mensagens}}",
       "activeGoal": "Tens um objetivo ativo."
+    },
+    "export": {
+      "cta": "Descarregar todos os meus dados (.md)",
+      "downloading": "A descarregar…",
+      "done": "Descarregado",
+      "error": "Falha ao descarregar"
     }
   }
 }

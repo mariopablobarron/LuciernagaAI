@@ -20,6 +20,7 @@
 | 4 | Exportar a Markdown cliente-side desde el modal de "Mis datos" | ✅ Producción |
 | 5 | Auto-borrado opcional tras 30 días de inactividad | ✅ Producción (cron VPS 04:00 UTC) |
 | 8 | Reduce motion automático tras crisis (30 min silenciosos) | ✅ Producción |
+| 11 | Caja respiración 4-7-8 permanente — pill 'Respirar' + modal | ✅ Producción |
 
 ## Pendientes — ordenadas por área
 
@@ -40,7 +41,6 @@
 
 | # | Feature | Estimación | Notas |
 |---|---|---|---|
-| 11 | Caja respiración 4-7-8 permanente | 3-4h | Ya implementada en EmergencyShelter para #14. Extraer a componente reusable + sidebar entry. |
 | 12 | Post-crisis check-in 24h | 4-6h | Si user activó panel crisis hoy, cron al día siguiente envía email "¿cómo estás hoy?". Requiere opt-in explícito y unsubscribe trivial. |
 | 13 | Recursos por país en tiempo real | 4-8h | Hoy crisis-hotlines.ts tiene 12 países hardcoded. Integrar con [findahelpline.com](https://findahelpline.com/) API o equivalente para los que faltan. |
 

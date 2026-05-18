@@ -1,0 +1,24 @@
+src/components/Sidebar.tsx
+  s_d2308f25c4747c::t_402375a3b5c5a9 795-797
+  s_d2308f25c4747c::t_3593f8cf9a9786 436-455
+  s_d2308f25c4747c::t_d66076382a6e3c 775-794,798-957
+  s_d2308f25c4747c::t_8d842be10f9198 8
+src/lib/useSwipeAction.ts
+  s_d2308f25c4747c::t_55067dfdf4cbae 1-89
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "383b062edce555753023026416ff64e5a65238bb",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

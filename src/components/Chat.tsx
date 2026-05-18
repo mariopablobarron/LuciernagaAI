@@ -51,6 +51,7 @@ import { NegativeFeedbackButton } from "@/components/NegativeFeedbackButton";
 import { EscalationBanner } from "@/components/EscalationBanner";
 import { detectEscalation } from "@/lib/escalation-detector";
 import { MentorPrefsButton } from "@/components/MentorPrefsButton";
+import { DataSummaryButton } from "@/components/DataSummaryButton";
 import { CHAT_STARTER_PICKS, MENTOR_MODES, getMentorMode } from "@/lib/onboarding";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -1206,6 +1207,7 @@ export default function Chat({
         <EmergencyShelterTrigger onClick={() => setShelterOpen(true)} />
         <IncognitoToggle />
         <MentorPrefsButton />
+        <DataSummaryButton />
       </div>
 
       {/* ── Input area ──────────────────────────────────────────────────── */}

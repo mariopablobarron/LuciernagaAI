@@ -21,6 +21,7 @@
 | 5 | Auto-borrado opcional tras 30 días de inactividad | ✅ Producción (cron VPS 04:00 UTC) |
 | 8 | Reduce motion automático tras crisis (30 min silenciosos) | ✅ Producción |
 | 11 | Caja respiración 4-7-8 permanente — pill 'Respirar' + modal | ✅ Producción |
+| 9 | Tamaño fuente — atajos teclado Ctrl/Cmd+/-/0 + toast | ✅ Producción |
 
 ## Pendientes — ordenadas por área
 
@@ -35,7 +36,6 @@
 | # | Feature | Estimación | Notas |
 |---|---|---|---|
 | 7 | Modo una sola mano | 8-12h | Toggle que mueve input + botones a un lado (izq/dch). Swipe-para-enviar. Para usuarios en cama, con bebé en brazos. |
-| 9 | Tamaño de fuente persistente | 1-2h | Ya existe `a11y.fontSize` (0-4). Solo falta exposición clara en settings (no escondido en widget). |
 
 ### Crisis y post-crisis
 

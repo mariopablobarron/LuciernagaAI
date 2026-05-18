@@ -2921,5 +2921,21 @@
   "fontSizeShortcuts": {
     "levelDefault": "Taille A (par défaut)",
     "levelPlus": "Taille A+{n}"
+  },
+  "bookmarks": {
+    "addAria": "Garder ce message pour plus tard",
+    "addTooltip": "Garder pour plus tard",
+    "removeAria": "Retirer des sauvegardés",
+    "removeTooltip": "Retirer des sauvegardés",
+    "listLabel": "{n, plural, one {Sauvegardé (1)} other {Sauvegardés (#)}}",
+    "listAria": "Ouvrir mes messages sauvegardés ({n})",
+    "listTooltip": "{n} messages sauvegardés",
+    "modalTitle": "Mes messages sauvegardés",
+    "empty": "Tu n'as encore sauvegardé aucun message. Quand quelque chose te touche, marque-le avec l'icône 🔖 pour y revenir plus tard.",
+    "emptyContent": "(sans contenu)",
+    "removeOneAria": "Retirer ce sauvegardé",
+    "removeOneTooltip": "Retirer",
+    "close": "Fermer",
+    "disclosure": "Tes sauvegardés sont privés. Toi seul les vois."
   }
 }

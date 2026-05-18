@@ -54,6 +54,8 @@ import { MentorPrefsButton } from "@/components/MentorPrefsButton";
 import { DataSummaryButton } from "@/components/DataSummaryButton";
 import { useCrisisAutoMotion } from "@/lib/useCrisisAutoMotion";
 import { BreathingModal, BreathingTrigger } from "@/components/BreathingModal";
+import { BookmarkButton } from "@/components/BookmarkButton";
+import { BookmarksTrigger } from "@/components/BookmarksModal";
 import { CHAT_STARTER_PICKS, MENTOR_MODES, getMentorMode } from "@/lib/onboarding";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -626,7 +628,10 @@ function MessageBubble({
               {/* Feedback negativo específico sobre esta respuesta. Solo si el */}
               {/* mensaje tiene id (los mocks de demo no, los reales sí). */}
               {message.id ? (
-                <NegativeFeedbackButton messageId={message.id} className="p-2" />
+                <>
+                  <BookmarkButton messageId={message.id} className="p-2" />
+                  <NegativeFeedbackButton messageId={message.id} className="p-2" />
+                </>
               ) : null}
             </div>
           </>
@@ -1219,6 +1224,8 @@ export default function Chat({
         <IncognitoToggle />
         <MentorPrefsButton />
         <DataSummaryButton />
+        {/* Pill "Guardados (N)" — solo aparece si el usuario tiene bookmarks. */}
+        <BookmarksTrigger />
       </div>
 
       {/* ── Input area ──────────────────────────────────────────────────── */}

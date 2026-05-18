@@ -3072,5 +3072,21 @@
   "fontSizeShortcuts": {
     "levelDefault": "Tamaño A (predeterminado)",
     "levelPlus": "Tamaño A+{n}"
+  },
+  "bookmarks": {
+    "addAria": "Guardar este mensaje para volver luego",
+    "addTooltip": "Guardar para volver luego",
+    "removeAria": "Quitar de mis guardados",
+    "removeTooltip": "Quitar de guardados",
+    "listLabel": "{n, plural, one {Guardado (1)} other {Guardados (#)}}",
+    "listAria": "Abrir mis mensajes guardados ({n})",
+    "listTooltip": "{n} mensajes guardados",
+    "modalTitle": "Mis mensajes guardados",
+    "empty": "Aún no has guardado ningún mensaje. Cuando algo te llegue, marcalo con el icono 🔖 para volver luego.",
+    "emptyContent": "(sin contenido)",
+    "removeOneAria": "Quitar este guardado",
+    "removeOneTooltip": "Quitar",
+    "close": "Cerrar",
+    "disclosure": "Tus guardados son privados. Solo tú los ves."
   }
 }

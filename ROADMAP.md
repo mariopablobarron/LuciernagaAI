@@ -23,6 +23,7 @@
 | 11 | Caja respiración 4-7-8 permanente — pill 'Respirar' + modal | ✅ Producción |
 | 9 | Tamaño fuente — atajos teclado Ctrl/Cmd+/-/0 + toast | ✅ Producción |
 | 19 | Bookmark mensajes del mentor — botón + modal con lista | ✅ Producción |
+| 1 | Swipe-to-delete en lista de conversaciones (touch) | ✅ Producción |
 
 ## Pendientes — ordenadas por área
 
@@ -30,7 +31,6 @@
 
 | # | Feature | Estimación | Notas |
 |---|---|---|---|
-| 1 | Borrado instantáneo con swipe | 4-6h | Swipe horizontal en bubbles → confirmación + animación + DELETE en BD. Refuerza la promesa de borrar todo. |
 
 ### Accesibilidad
 

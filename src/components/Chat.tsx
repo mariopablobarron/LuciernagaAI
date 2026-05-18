@@ -53,6 +53,7 @@ import { detectEscalation } from "@/lib/escalation-detector";
 import { MentorPrefsButton } from "@/components/MentorPrefsButton";
 import { DataSummaryButton } from "@/components/DataSummaryButton";
 import { useCrisisAutoMotion } from "@/lib/useCrisisAutoMotion";
+import { BreathingModal, BreathingTrigger } from "@/components/BreathingModal";
 import { CHAT_STARTER_PICKS, MENTOR_MODES, getMentorMode } from "@/lib/onboarding";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -734,6 +735,9 @@ export default function Chat({
   // Modal "demasiado mal para escribir" — overlay calmo con respiración + crisis line.
   // Disponible siempre vía botón discreto sobre el input, no escondido en menús.
   const [shelterOpen, setShelterOpen] = useState(false);
+  // Modal de respiración guiada permanente — versión "ligera" del shelter,
+  // sin teléfono de crisis. Para tensión cotidiana, no para emergencia.
+  const [breathingOpen, setBreathingOpen] = useState(false);
 
   // Reduce motion automático si los últimos mensajes incluyen variant: "crisis".
   // Aplica html.a11y-reduced-motion-auto durante 30 min. No pisa la preferencia
@@ -1211,6 +1215,7 @@ export default function Chat({
       {/* Siempre visible justo encima del input. Sin esconder en menús. */}
       <div className="shrink-0 flex flex-wrap items-center justify-center gap-2 bg-zinc-950 pt-2 pb-1">
         <EmergencyShelterTrigger onClick={() => setShelterOpen(true)} />
+        <BreathingTrigger onClick={() => setBreathingOpen(true)} />
         <IncognitoToggle />
         <MentorPrefsButton />
         <DataSummaryButton />
@@ -1375,6 +1380,9 @@ export default function Chat({
       {/* Modal "demasiado mal para escribir" — montado al final del árbol para */}
       {/* que el overlay z-100 cubra todo el chat sin conflicto con sticky bars. */}
       <EmergencyShelter open={shelterOpen} onClose={() => setShelterOpen(false)} />
+
+      {/* Modal de respiración permanente — para tensión cotidiana. Misma capa. */}
+      <BreathingModal open={breathingOpen} onClose={() => setBreathingOpen(false)} />
     </div>
   );
 }

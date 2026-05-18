@@ -3060,5 +3060,13 @@
       "description": "Si pasan 30 días sin abrir el chat, marcamos tu cuenta para borrado. Si vuelves antes, se cancela automáticamente.",
       "error": "No se pudo guardar. Inténtalo de nuevo."
     }
+  },
+  "breathingModal": {
+    "trigger": "Respirar",
+    "ariaLabel": "Espacio de respiración guiada",
+    "title": "Respira conmigo.",
+    "instruction": "Sigue el círculo. Inhala 4 segundos, retén 7, exhala 8. Quédate los ciclos que necesites.",
+    "close": "Cerrar",
+    "done": "Listo, vuelvo al chat"
   }
 }

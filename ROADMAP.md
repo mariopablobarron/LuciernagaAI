@@ -22,6 +22,7 @@
 | 8 | Reduce motion automático tras crisis (30 min silenciosos) | ✅ Producción |
 | 11 | Caja respiración 4-7-8 permanente — pill 'Respirar' + modal | ✅ Producción |
 | 9 | Tamaño fuente — atajos teclado Ctrl/Cmd+/-/0 + toast | ✅ Producción |
+| 19 | Bookmark mensajes del mentor — botón + modal con lista | ✅ Producción |
 
 ## Pendientes — ordenadas por área
 
@@ -51,7 +52,6 @@
 | 15 | Resumen al volver tras 24h+ | 6-8h | Modificar pipeline `processMessage` para inyectar resumen automático si última conversación >24h. Memoria semántica light. |
 | 16 | Citar lo que dijiste antes | 6-8h | Mejorar retrieval del historial en el LLM. Prompt engineering + few-shot examples. |
 | 17 | Detectar y nombrar bucles | 8-12h | Análisis cross-conversación de tópicos. Heurística semantic embedding o keyword. Solo activar si bucle ≥3. |
-| 19 | Marcar mensaje "para volver luego" | 4-6h | Bookmark UI + lista persistida + sección "guardado" en /journey. |
 
 ### Calidad del mentor
 

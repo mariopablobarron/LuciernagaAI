@@ -2999,5 +2999,28 @@
       "active_addiction": "Una adicción activa pide apoyo profesional y red de personas reales. Aquí podemos hablar pero no es suficiente.",
       "explicit_request": "Tienes razón. Buscar un terapeuta es lo que toca. Mientras tanto sigo aquí."
     }
+  },
+  "mentorPrefs": {
+    "trigger": "Mentor",
+    "panelTitle": "Cómo quieres que te hable",
+    "close": "Cerrar",
+    "reset": "Volver al estándar",
+    "disclosure": "Estas preferencias se guardan en este dispositivo y viajan en cada mensaje al mentor. No se comparten ni se asocian a tu cuenta.",
+    "noInterpretation": {
+      "label": "No me interpretes",
+      "description": "El mentor no analiza ni dice 'lo que oigo es...'. Solo escucha y pregunta o sugiere acción."
+    },
+    "verbosity": {
+      "label": "Verbosidad",
+      "minLabel": "Mínimo",
+      "maxLabel": "Máximo",
+      "description": {
+        "1": "Mínimo: 1-2 frases por respuesta.",
+        "2": "Bajo: 2-3 frases por respuesta.",
+        "3": "Estándar (4-6 frases).",
+        "4": "Alto: respuestas más extensas (6-8 frases).",
+        "5": "Máximo: respuestas largas con varios ángulos."
+      }
+    }
   }
 }

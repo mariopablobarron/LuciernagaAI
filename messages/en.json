@@ -2848,5 +2848,28 @@
       "active_addiction": "An active addiction calls for professional support and a network of real people. We can talk here, but it's not enough.",
       "explicit_request": "You're right. Looking for a therapist is what fits here. Meanwhile I'm still here."
     }
+  },
+  "mentorPrefs": {
+    "trigger": "Mentor",
+    "panelTitle": "How you want me to speak",
+    "close": "Close",
+    "reset": "Reset to default",
+    "disclosure": "These preferences are saved on this device and travel with each message to the mentor. They are not shared or linked to your account.",
+    "noInterpretation": {
+      "label": "Don't interpret me",
+      "description": "The mentor won't analyze or say 'what I hear is...'. Just listens and asks or suggests action."
+    },
+    "verbosity": {
+      "label": "Verbosity",
+      "minLabel": "Min",
+      "maxLabel": "Max",
+      "description": {
+        "1": "Minimum: 1-2 sentences per response.",
+        "2": "Low: 2-3 sentences per response.",
+        "3": "Default (4-6 sentences).",
+        "4": "High: longer responses (6-8 sentences).",
+        "5": "Maximum: long responses with multiple angles."
+      }
+    }
   }
 }

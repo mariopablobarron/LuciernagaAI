@@ -18,6 +18,7 @@
 | 21 | Slider de verbosidad 1-5 — flag al prompt | ✅ Producción |
 | 3 | Indicador "¿qué sabemos de ti?" — modal con datos del usuario | ✅ Producción |
 | 4 | Exportar a Markdown cliente-side desde el modal de "Mis datos" | ✅ Producción |
+| 5 | Auto-borrado opcional tras 30 días de inactividad | ✅ Producción (cron VPS 04:00 UTC) |
 
 ## Pendientes — ordenadas por área
 
@@ -26,7 +27,6 @@
 | # | Feature | Estimación | Notas |
 |---|---|---|---|
 | 1 | Borrado instantáneo con swipe | 4-6h | Swipe horizontal en bubbles → confirmación + animación + DELETE en BD. Refuerza la promesa de borrar todo. |
-| 5 | Auto-borrado opcional | 2-3h + cron | Setting "borra mis datos en 30 días si no vuelvo". Cron diario que hace soft-delete de inactivos. |
 
 ### Accesibilidad
 

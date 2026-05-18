@@ -2903,6 +2903,11 @@
       "downloading": "Téléchargement…",
       "done": "Téléchargé",
       "error": "Échec du téléchargement"
+    },
+    "autoDelete": {
+      "label": "Supprime mes données si je ne reviens pas dans 30 jours",
+      "description": "Si 30 jours passent sans ouvrir le chat, on marque ton compte pour suppression. Si tu reviens avant, c'est annulé automatiquement.",
+      "error": "Impossible d'enregistrer. Réessaie."
     }
   }
 }

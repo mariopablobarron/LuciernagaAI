@@ -802,6 +802,11 @@ model UserPreferences {
   capsuleEmailDisabled      Boolean  @default(false) // opt-out for capsule-ready email notification (capsules still appear in-app)
   genderForm                String? // 'feminine' | 'masculine' | 'neutral' | null. NULL = el coach usa lenguaje neutro (sin conjugaciones de género)
   timezone                  String   @default("Europe/Madrid")
+  /// Si true, el usuario eligió que sus datos se borren automáticamente
+  /// tras 30 días sin actividad (lastSeen < now - 30d). Refuerza la
+  /// promesa anonymous-first: "si no vuelvo, olvídame". Por defecto OFF
+  /// para conservar la conducta histórica del producto.
+  autoDeleteAfter30dInactive Boolean @default(false)
   createdAt                 DateTime @default(now())
   updatedAt                 DateTime @updatedAt
   user                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)

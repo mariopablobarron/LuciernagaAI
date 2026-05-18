@@ -2903,6 +2903,11 @@
       "downloading": "A descarregar…",
       "done": "Descarregado",
       "error": "Falha ao descarregar"
+    },
+    "autoDelete": {
+      "label": "Apaga os meus dados se não voltar em 30 dias",
+      "description": "Se passarem 30 dias sem abrires o chat, marcamos a tua conta para apagar. Se voltares antes, é cancelado automaticamente.",
+      "error": "Não foi possível guardar. Tenta de novo."
     }
   }
 }

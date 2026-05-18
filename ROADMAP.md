@@ -17,6 +17,7 @@
 | 20 | Modo "no me interpretes" — toggle + flag al prompt | ✅ Producción |
 | 21 | Slider de verbosidad 1-5 — flag al prompt | ✅ Producción |
 | 3 | Indicador "¿qué sabemos de ti?" — modal con datos del usuario | ✅ Producción |
+| 4 | Exportar a Markdown cliente-side desde el modal de "Mis datos" | ✅ Producción |
 
 ## Pendientes — ordenadas por área
 
@@ -25,7 +26,6 @@
 | # | Feature | Estimación | Notas |
 |---|---|---|---|
 | 1 | Borrado instantáneo con swipe | 4-6h | Swipe horizontal en bubbles → confirmación + animación + DELETE en BD. Refuerza la promesa de borrar todo. |
-| 4 | Exportar a PDF cliente-side | 3-4h | Usar `pdfmake` o similar. Sin pasar por servidor (que no quiere dar email para recibirlo). |
 | 5 | Auto-borrado opcional | 2-3h + cron | Setting "borra mis datos en 30 días si no vuelvo". Cron diario que hace soft-delete de inactivos. |
 
 ### Accesibilidad

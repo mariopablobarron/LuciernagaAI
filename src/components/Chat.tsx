@@ -50,6 +50,7 @@ import { useIncognitoMode } from "@/lib/useIncognitoMode";
 import { NegativeFeedbackButton } from "@/components/NegativeFeedbackButton";
 import { EscalationBanner } from "@/components/EscalationBanner";
 import { detectEscalation } from "@/lib/escalation-detector";
+import { MentorPrefsButton } from "@/components/MentorPrefsButton";
 import { CHAT_STARTER_PICKS, MENTOR_MODES, getMentorMode } from "@/lib/onboarding";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -1204,6 +1205,7 @@ export default function Chat({
       <div className="shrink-0 flex flex-wrap items-center justify-center gap-2 bg-zinc-950 pt-2 pb-1">
         <EmergencyShelterTrigger onClick={() => setShelterOpen(true)} />
         <IncognitoToggle />
+        <MentorPrefsButton />
       </div>
 
       {/* ── Input area ──────────────────────────────────────────────────── */}

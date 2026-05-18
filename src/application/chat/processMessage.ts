@@ -40,6 +40,9 @@ export interface ProcessMessageInput {
   /** Locale activo del usuario (es/en/pt/fr). Determina el idioma de respuesta
    *  del mentor y los recursos de crisis a sugerir. */
   locale?: "es" | "en" | "pt" | "fr";
+  /** Preferencias del usuario sobre estilo del mentor (no-interpretes, verbosity).
+   *  Inyectadas como guidance al system prompt vía buildCoachPrompt. */
+  mentorPrefs?: { noInterpretation?: boolean; verbosity?: number } | null;
 }
 
 export type ProcessMessageResult =
@@ -238,6 +241,9 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     // Locale activo del usuario → coach.ts lo usa para responder en ese
     // idioma + sugerir el recurso de crisis del país correcto.
     ...(locale ? { locale } : {}),
+    // Preferencias explícitas del mentor (no-interpretes, verbosity).
+    // Inyectadas como guidance al final del system prompt vía buildMentorPrefsGuidance.
+    ...(input.mentorPrefs ? { mentorPrefs: input.mentorPrefs } : {}),
   };
 
   // ── 9. Impulse mode (non-streaming JSON) ──────────────────────────────

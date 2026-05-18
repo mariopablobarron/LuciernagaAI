@@ -2848,5 +2848,28 @@
       "active_addiction": "Uma dependência ativa pede apoio profissional e uma rede de pessoas reais. Aqui podemos falar mas não chega.",
       "explicit_request": "Tens razão. Procurar um terapeuta é o que faz sentido. Entretanto continuo aqui."
     }
+  },
+  "mentorPrefs": {
+    "trigger": "Mentor",
+    "panelTitle": "Como queres que te fale",
+    "close": "Fechar",
+    "reset": "Voltar ao padrão",
+    "disclosure": "Estas preferências são guardadas neste dispositivo e viajam com cada mensagem ao mentor. Não são partilhadas nem associadas à tua conta.",
+    "noInterpretation": {
+      "label": "Não me interpretes",
+      "description": "O mentor não analisa nem diz 'o que ouço é...'. Apenas escuta e pergunta ou sugere ação."
+    },
+    "verbosity": {
+      "label": "Verbosidade",
+      "minLabel": "Mínimo",
+      "maxLabel": "Máximo",
+      "description": {
+        "1": "Mínimo: 1-2 frases por resposta.",
+        "2": "Baixo: 2-3 frases por resposta.",
+        "3": "Padrão (4-6 frases).",
+        "4": "Alto: respostas mais extensas (6-8 frases).",
+        "5": "Máximo: respostas longas com vários ângulos."
+      }
+    }
   }
 }

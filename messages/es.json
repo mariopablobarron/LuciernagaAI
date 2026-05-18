@@ -3022,5 +3022,32 @@
         "5": "Máximo: respuestas largas con varios ángulos."
       }
     }
+  },
+  "dataSummary": {
+    "trigger": "Mis datos",
+    "modalTitle": "Qué sabemos de ti",
+    "modalSubtitle": "Solo lo vinculado a esta sesión. Sin terceros, sin trackers cruzados.",
+    "close": "Cerrar",
+    "error": "No pudimos cargar tus datos ahora mismo.",
+    "retry": "Reintentar",
+    "manageDataLink": "Gestionar datos",
+    "disclosure": "Puedes borrar tu cuenta y todos los datos asociados desde Ajustes.",
+    "identity": {
+      "anonymous": "Anónimo (sin email)",
+      "unknown": "—"
+    },
+    "fields": {
+      "identity": "Identidad",
+      "locale": "Idioma",
+      "ageRange": "Edad",
+      "createdAt": "En el producto desde",
+      "activity": "Actividad",
+      "notProvided": "No facilitado"
+    },
+    "activity": {
+      "conversations": "{n, plural, =0 {Ninguna conversación} one {1 conversación} other {# conversaciones}}",
+      "messages": "{n, plural, =0 {0 mensajes} one {1 mensaje} other {# mensajes}}",
+      "activeGoal": "Tienes un objetivo activo."
+    }
   }
 }

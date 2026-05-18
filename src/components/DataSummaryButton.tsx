@@ -1,0 +1,199 @@
+"use client";
+
+/**
+ * Botón ⓘ "¿qué sabemos de ti?" — refuerza anonymous-first con
+ * transparencia total. El usuario abre modal y ve EXACTAMENTE qué
+ * datos guardamos vinculados a su sesión.
+ *
+ * UX:
+ *  - Pill discreta junto al EmergencyShelter, Incognito, MentorPrefs
+ *  - Click → fetch a /api/user/data-summary + modal con la info
+ *  - Si no se ha conectado (sesión recién creada), muestra "todavía nada"
+ *  - Link a /settings para acciones (cambiar email, borrar cuenta) ya
+ *    existentes — no duplicamos esa funcionalidad aquí.
+ */
+
+import { useState, useCallback } from "react";
+import { useTranslations, useLocale } from "next-intl";
+import { Info, X, Loader2 } from "lucide-react";
+
+type Summary = {
+  isAnonymous: boolean;
+  email: string | null;
+  name: string | null;
+  locale: string;
+  ageRange: string | null;
+  createdAt: string;
+  conversationsCount: number;
+  messagesCount: number;
+  hasActiveGoal: boolean;
+};
+
+type State = "idle" | "loading" | "loaded" | "error";
+
+export function DataSummaryButton() {
+  const t = useTranslations("dataSummary");
+  const locale = useLocale();
+  const [open, setOpen] = useState(false);
+  const [state, setState] = useState<State>("idle");
+  const [summary, setSummary] = useState<Summary | null>(null);
+
+  const fetchSummary = useCallback(async () => {
+    setState("loading");
+    try {
+      const res = await fetch("/api/user/data-summary", { credentials: "include" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = (await res.json()) as Summary;
+      setSummary(data);
+      setState("loaded");
+    } catch {
+      setState("error");
+    }
+  }, []);
+
+  const openModal = useCallback(() => {
+    setOpen(true);
+    if (state === "idle" || state === "error") void fetchSummary();
+  }, [state, fetchSummary]);
+
+  const closeModal = useCallback(() => {
+    setOpen(false);
+  }, []);
+
+  // Formatear fecha de creación según locale del usuario.
+  const formatCreatedAt = useCallback((iso: string): string => {
+    try {
+      const date = new Date(iso);
+      return new Intl.DateTimeFormat(locale === "es" ? "es-ES" : locale, {
+        dateStyle: "medium",
+      }).format(date);
+    } catch {
+      return iso.slice(0, 10);
+    }
+  }, [locale]);
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={openModal}
+        aria-label={t("trigger")}
+        title={t("trigger")}
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-zinc-900/50 border border-zinc-700/40 text-zinc-400 hover:text-zinc-200 hover:border-zinc-600/60 transition-colors"
+      >
+        <Info className="w-3.5 h-3.5" aria-hidden="true" />
+        <span>{t("trigger")}</span>
+      </button>
+
+      {open && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={t("modalTitle")}
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/80 backdrop-blur-md px-4"
+          onClick={closeModal}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative max-w-md w-full rounded-2xl border border-zinc-700 bg-zinc-900 p-6 shadow-2xl"
+          >
+            <button
+              type="button"
+              onClick={closeModal}
+              aria-label={t("close")}
+              className="absolute top-3 right-3 p-2 rounded-full text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/60 transition-colors"
+            >
+              <X className="w-4 h-4" aria-hidden="true" />
+            </button>
+
+            <h3 className="text-base font-semibold text-white mb-1">{t("modalTitle")}</h3>
+            <p className="text-xs text-zinc-500 mb-5 leading-relaxed">{t("modalSubtitle")}</p>
+
+            {state === "loading" && (
+              <div className="flex items-center justify-center py-10">
+                <Loader2 className="w-5 h-5 text-zinc-500 animate-spin" aria-hidden="true" />
+              </div>
+            )}
+
+            {state === "error" && (
+              <div className="rounded-xl border border-red-700/30 bg-red-950/20 p-3">
+                <p className="text-xs text-red-300">{t("error")}</p>
+                <button
+                  type="button"
+                  onClick={() => void fetchSummary()}
+                  className="mt-2 text-xs text-red-300 hover:text-red-200 underline underline-offset-4"
+                >
+                  {t("retry")}
+                </button>
+              </div>
+            )}
+
+            {state === "loaded" && summary && (
+              <>
+                {/* Estado de identidad: anónimo vs con email */}
+                <div className="rounded-xl border border-zinc-700/50 bg-zinc-950/40 p-3 mb-3">
+                  <p className="text-[10px] uppercase tracking-widest text-zinc-600 mb-1">
+                    {t("fields.identity")}
+                  </p>
+                  <p className="text-sm font-medium text-zinc-100">
+                    {summary.isAnonymous ? t("identity.anonymous") : (summary.email ?? t("identity.unknown"))}
+                  </p>
+                  {summary.name ? (
+                    <p className="text-xs text-zinc-500 mt-0.5">{summary.name}</p>
+                  ) : null}
+                </div>
+
+                {/* Datos: locale, edad, fecha creación */}
+                <dl className="grid grid-cols-2 gap-2 mb-3">
+                  <div className="rounded-xl border border-zinc-700/50 bg-zinc-950/40 p-3">
+                    <dt className="text-[10px] uppercase tracking-widest text-zinc-600 mb-1">
+                      {t("fields.locale")}
+                    </dt>
+                    <dd className="text-sm font-medium text-zinc-100">{summary.locale.toUpperCase()}</dd>
+                  </div>
+                  <div className="rounded-xl border border-zinc-700/50 bg-zinc-950/40 p-3">
+                    <dt className="text-[10px] uppercase tracking-widest text-zinc-600 mb-1">
+                      {t("fields.ageRange")}
+                    </dt>
+                    <dd className="text-sm font-medium text-zinc-100">
+                      {summary.ageRange ?? t("fields.notProvided")}
+                    </dd>
+                  </div>
+                  <div className="col-span-2 rounded-xl border border-zinc-700/50 bg-zinc-950/40 p-3">
+                    <dt className="text-[10px] uppercase tracking-widest text-zinc-600 mb-1">
+                      {t("fields.createdAt")}
+                    </dt>
+                    <dd className="text-sm font-medium text-zinc-100">{formatCreatedAt(summary.createdAt)}</dd>
+                  </div>
+                </dl>
+
+                {/* Actividad */}
+                <div className="rounded-xl border border-zinc-700/50 bg-zinc-950/40 p-3 mb-3">
+                  <p className="text-[10px] uppercase tracking-widest text-zinc-600 mb-1">
+                    {t("fields.activity")}
+                  </p>
+                  <p className="text-sm text-zinc-100">
+                    {t("activity.conversations", { n: summary.conversationsCount })} · {t("activity.messages", { n: summary.messagesCount })}
+                  </p>
+                  {summary.hasActiveGoal ? (
+                    <p className="text-xs text-zinc-500 mt-1">{t("activity.activeGoal")}</p>
+                  ) : null}
+                </div>
+
+                <p className="text-[10px] text-zinc-600 leading-relaxed">
+                  {t("disclosure")}{" "}
+                  <a
+                    href="/settings"
+                    className="text-zinc-400 hover:text-zinc-200 underline underline-offset-2"
+                  >
+                    {t("manageDataLink")}
+                  </a>
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

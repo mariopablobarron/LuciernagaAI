@@ -19,6 +19,7 @@
 | 3 | Indicador "¿qué sabemos de ti?" — modal con datos del usuario | ✅ Producción |
 | 4 | Exportar a Markdown cliente-side desde el modal de "Mis datos" | ✅ Producción |
 | 5 | Auto-borrado opcional tras 30 días de inactividad | ✅ Producción (cron VPS 04:00 UTC) |
+| 8 | Reduce motion automático tras crisis (30 min silenciosos) | ✅ Producción |
 
 ## Pendientes — ordenadas por área
 
@@ -33,7 +34,6 @@
 | # | Feature | Estimación | Notas |
 |---|---|---|---|
 | 7 | Modo una sola mano | 8-12h | Toggle que mueve input + botones a un lado (izq/dch). Swipe-para-enviar. Para usuarios en cama, con bebé en brazos. |
-| 8 | Reduce motion automático tras crisis | 2-3h | Detectar últimos N mensajes con keywords crisis → activar reducedMotion automáticamente 30min. Reutiliza a11y.reducedMotion. |
 | 9 | Tamaño de fuente persistente | 1-2h | Ya existe `a11y.fontSize` (0-4). Solo falta exposición clara en settings (no escondido en widget). |
 
 ### Crisis y post-crisis

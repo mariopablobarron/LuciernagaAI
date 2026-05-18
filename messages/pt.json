@@ -2917,5 +2917,9 @@
     "instruction": "Segue o círculo. Inspira 4 segundos, segura 7, expira 8. Fica os ciclos que precisares.",
     "close": "Fechar",
     "done": "Pronto, volto ao chat"
+  },
+  "fontSizeShortcuts": {
+    "levelDefault": "Tamanho A (predefinido)",
+    "levelPlus": "Tamanho A+{n}"
   }
 }

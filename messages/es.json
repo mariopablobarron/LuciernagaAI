@@ -3068,5 +3068,9 @@
     "instruction": "Sigue el círculo. Inhala 4 segundos, retén 7, exhala 8. Quédate los ciclos que necesites.",
     "close": "Cerrar",
     "done": "Listo, vuelvo al chat"
+  },
+  "fontSizeShortcuts": {
+    "levelDefault": "Tamaño A (predeterminado)",
+    "levelPlus": "Tamaño A+{n}"
   }
 }

@@ -2917,5 +2917,9 @@
     "instruction": "Follow the circle. Inhale 4 seconds, hold 7, exhale 8. Stay for as many cycles as you need.",
     "close": "Close",
     "done": "Done, back to chat"
+  },
+  "fontSizeShortcuts": {
+    "levelDefault": "Size A (default)",
+    "levelPlus": "Size A+{n}"
   }
 }

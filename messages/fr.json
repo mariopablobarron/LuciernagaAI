@@ -2917,5 +2917,9 @@
     "instruction": "Suis le cercle. Inspire 4 secondes, retiens 7, expire 8. Reste les cycles dont tu as besoin.",
     "close": "Fermer",
     "done": "C'est bon, je retourne au chat"
+  },
+  "fontSizeShortcuts": {
+    "levelDefault": "Taille A (par défaut)",
+    "levelPlus": "Taille A+{n}"
   }
 }

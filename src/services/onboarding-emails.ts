@@ -136,6 +136,50 @@ const TEMPLATES: Record<string, TemplateBuilder> = {
       text: `${greeting}, hace 3 dias hiciste el test. Tu estado puede haber cambiado. Repite el test: ${APP_URL}/test o abre el chat: ${APP_URL}/app`,
     };
   },
+
+  /**
+   * Check-in 24h después de un evento de crisis (level=high|critical).
+   * Tono deliberadamente suave: NO recordamos la crisis, NO pedimos que
+   * cuente nada. Solo "estoy aquí si quieres hablar". El mero hecho de
+   * que el producto se acuerde puede valer.
+   *
+   * Solo se envía si el usuario tiene email real (no synthetic anónimo)
+   * y no ha hecho opt-out de emails (weeklyEmailEnabled !== false).
+   */
+  crisis_followup_24h: (name) => {
+    const greeting = name || "Hola";
+    return {
+      to: "",
+      subject: "Solo quería saber cómo estás",
+      textOnly: `${greeting}, ayer pasaste por un rato difícil. No tienes que responder a esto. Pero quería que supieras que sigo aquí si necesitas hablar — sin agenda, sin tareas, sin tener que explicar nada. ${APP_URL}/app`,
+      html: emailShell(`
+        <p style="margin:0 0 20px;font-size:16px;color:#e4e4e7;line-height:1.6">
+          ${greeting},
+        </p>
+        <p style="margin:0 0 20px;font-size:15px;color:#d4d4d8;line-height:1.7">
+          Solo quería saber cómo estás hoy.
+        </p>
+        <p style="margin:0 0 24px;font-size:14px;color:#a1a1aa;line-height:1.7">
+          No tienes que responder a este email.
+          Pero si quieres hablar, sigo aquí —
+          sin agenda, sin tareas, sin tener que explicar nada.
+        </p>
+        ${ctaButton("Abrir el chat", `${APP_URL}/app`)}
+        <p style="margin:20px 0 0;font-size:13px;color:#71717a;line-height:1.6">
+          Si en algún momento te sientes en peligro,
+          llama al <strong style="color:#fca5a5">024</strong>
+          (España, 24/7 gratis) o al número de emergencias de tu país.
+        </p>
+        <p style="margin:16px 0 0;font-size:12px;color:#52525b;line-height:1.5;font-style:italic">
+          Este email lo recibes solo porque ayer la conversación
+          tocó algo serio. Si prefieres no volver a recibir
+          mensajes así, puedes desactivarlos en
+          <a href="${APP_URL}/settings" style="color:#71717a;text-decoration:underline">Ajustes</a>.
+        </p>
+      `),
+      text: `${greeting}, solo quería saber cómo estás hoy. No tienes que responder. Si quieres hablar, sigo aquí: ${APP_URL}/app. En emergencia, 024 (España).`,
+    };
+  },
 };
 
 /**

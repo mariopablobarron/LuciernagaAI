@@ -274,6 +274,14 @@ export async function registerCrisisEvent(payload: CrisisEventPayload): Promise<
         () => notifyTrustedContactOnCrisis(payload.userId),
         "crisis_trusted_contact",
       );
+
+      // Programar check-in 24h después. El cron /api/cron/scheduled-emails
+      // recoge ScheduledEmails con scheduledAt <= now y respeta opt-out
+      // (weeklyEmailEnabled=false) + email synthetic anónimos.
+      // Fire-and-forget: si falla, no bloqueamos el registro de crisis.
+      schedulePostCrisisCheckin(payload.userId).catch((err) => {
+        logError("RISK", err, { action: "schedule_post_crisis_checkin_failed", userId: payload.userId });
+      });
     }
   } catch (error: unknown) {
     logError("RISK", error, {
@@ -372,4 +380,49 @@ export async function listRecentCrisisEvents(
     });
     return [];
   }
+}
+
+/**
+ * Programa un email check-in 24h después de un evento de crisis.
+ *
+ * Tono deliberadamente suave: NO recuerda la crisis, NO pide explicaciones.
+ * Solo "estoy aquí si quieres hablar". El hecho de que el producto se
+ * acuerde puede valer más que el contenido.
+ *
+ * Idempotente: si ya hay un ScheduledEmail crisis_followup_24h pendiente
+ * de las últimas 26h del mismo userId, NO duplica. Esto evita spam si
+ * un usuario activa el panel varias veces seguidas.
+ */
+async function schedulePostCrisisCheckin(userId: string): Promise<void> {
+  const prisma = getPrismaClient();
+  const now = new Date();
+  const twentySixHoursAgo = new Date(now.getTime() - 26 * 60 * 60 * 1000);
+
+  // Evitar duplicado: ya hay un follow-up reciente programado.
+  const existing = await prisma.scheduledEmail.findFirst({
+    where: {
+      userId,
+      template: "crisis_followup_24h",
+      cancelled: false,
+      sentAt: null,
+      scheduledAt: { gte: twentySixHoursAgo },
+    },
+  });
+  if (existing) {
+    logInfo("RISK", "post_crisis_checkin_skipped_duplicate", { userId, existingId: existing.id });
+    return;
+  }
+
+  const scheduledAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  await prisma.scheduledEmail.create({
+    data: {
+      userId,
+      template: "crisis_followup_24h",
+      scheduledAt,
+    },
+  });
+  logInfo("RISK", "post_crisis_checkin_scheduled", {
+    userId,
+    scheduledAt: scheduledAt.toISOString(),
+  });
 }

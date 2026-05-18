@@ -2909,5 +2909,13 @@
       "description": "Si 30 jours passent sans ouvrir le chat, on marque ton compte pour suppression. Si tu reviens avant, c'est annulé automatiquement.",
       "error": "Impossible d'enregistrer. Réessaie."
     }
+  },
+  "breathingModal": {
+    "trigger": "Respirer",
+    "ariaLabel": "Espace de respiration guidée",
+    "title": "Respire avec moi.",
+    "instruction": "Suis le cercle. Inspire 4 secondes, retiens 7, expire 8. Reste les cycles dont tu as besoin.",
+    "close": "Fermer",
+    "done": "C'est bon, je retourne au chat"
   }
 }

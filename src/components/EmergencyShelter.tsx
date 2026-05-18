@@ -16,10 +16,11 @@
  * usuario (header CF-IPCountry). Default España si no se detecta.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Phone, X } from "lucide-react";
 import { getHotlinesForCountry, type CountryHotlines } from "@/lib/crisis-hotlines";
+import { BreathingBox } from "./BreathingBox";
 
 type Props = {
   open: boolean;
@@ -28,38 +29,10 @@ type Props = {
   countryCode?: string | null;
 };
 
-/**
- * Ciclo de respiración 4-7-8: 4s inhalar, 7s retener, 8s exhalar.
- * Loop infinito mientras el modal esté abierto.
- */
-type BreathPhase = "inhale" | "hold" | "exhale";
-const BREATH_DURATIONS: Record<BreathPhase, number> = {
-  inhale: 4000,
-  hold: 7000,
-  exhale: 8000,
-};
-const BREATH_ORDER: BreathPhase[] = ["inhale", "hold", "exhale"];
-
 export default function EmergencyShelter({ open, onClose, countryCode }: Props) {
   const t = useTranslations("emergencyShelter");
-  const [phaseIdx, setPhaseIdx] = useState(0);
-  const phase = BREATH_ORDER[phaseIdx];
 
   const hotlines: CountryHotlines = getHotlinesForCountry(countryCode);
-
-  // Bucle de respiración mientras el modal esté abierto.
-  useEffect(() => {
-    if (!open) return;
-    const id = setTimeout(() => {
-      setPhaseIdx((idx) => (idx + 1) % BREATH_ORDER.length);
-    }, BREATH_DURATIONS[phase]);
-    return () => clearTimeout(id);
-  }, [open, phase, phaseIdx]);
-
-  // Reset al cerrar.
-  useEffect(() => {
-    if (!open) setPhaseIdx(0);
-  }, [open]);
 
   // Cerrar con Escape.
   useEffect(() => {
@@ -106,21 +79,8 @@ export default function EmergencyShelter({ open, onClose, countryCode }: Props) 
           {t("phrase")}
         </p>
 
-        {/* Caja de respiración 4-7-8. El tamaño cambia con la fase. */}
-        <div className="relative flex flex-col items-center gap-4">
-          <div
-            className="relative flex items-center justify-center rounded-full bg-gradient-to-br from-cyan-500/30 via-violet-500/20 to-fuchsia-500/15 ring-1 ring-cyan-400/40"
-            style={{
-              width: phase === "inhale" ? 200 : phase === "hold" ? 200 : 100,
-              height: phase === "inhale" ? 200 : phase === "hold" ? 200 : 100,
-              transition: `width ${BREATH_DURATIONS[phase]}ms ease-in-out, height ${BREATH_DURATIONS[phase]}ms ease-in-out`,
-            }}
-          >
-            <span className="text-base font-medium text-zinc-200">
-              {t(`breath.${phase}`)}
-            </span>
-          </div>
-        </div>
+        {/* Caja de respiración 4-7-8 — componente reutilizable. */}
+        <BreathingBox size="md" />
 
         {/* Teléfono crisis: grande, una línea, click → llamada. */}
         <a

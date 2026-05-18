@@ -1,0 +1,37 @@
+src/components/BreathingModal.tsx
+  s_d2308f25c4747c::t_1848430fc6275b 1-118
+messages/es.json
+  s_d2308f25c4747c::t_368c4cb9c7c173 3063-3070
+messages/pt.json
+  s_d2308f25c4747c::t_368c4cb9c7c173 2912-2919
+src/components/Chat.tsx
+  s_d2308f25c4747c::t_0ab86bba3c0c42 1383-1385
+  s_d2308f25c4747c::t_5ae5562eaaff66 738-740
+  s_d2308f25c4747c::t_868f974c115ca5 1218
+  s_d2308f25c4747c::t_25f55567e0604a 56
+messages/fr.json
+  s_d2308f25c4747c::t_368c4cb9c7c173 2912-2919
+src/components/BreathingBox.tsx
+  s_d2308f25c4747c::t_1d6a01e6c25790 1-71
+messages/en.json
+  s_d2308f25c4747c::t_368c4cb9c7c173 2912-2919
+src/components/EmergencyShelter.tsx
+  s_d2308f25c4747c::t_4505d3207e9477 19,23
+  s_d2308f25c4747c::t_b5389634a0098b 82-83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "2d20f80d3b09bba0704fcc941710006d83692367",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

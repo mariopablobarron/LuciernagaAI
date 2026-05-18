@@ -1,0 +1,22 @@
+src/services/risk.ts
+  s_d2308f25c4747c::t_5803875dc17a55 384-428
+  s_d2308f25c4747c::t_4edf84cb709542 277-284
+src/services/onboarding-emails.ts
+  s_d2308f25c4747c::t_ecd05db55338d7 139-182
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "165465cccfdfa09fabfdf4b31c4478b70a88673a",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

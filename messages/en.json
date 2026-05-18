@@ -2871,5 +2871,32 @@
         "5": "Maximum: long responses with multiple angles."
       }
     }
+  },
+  "dataSummary": {
+    "trigger": "My data",
+    "modalTitle": "What we know about you",
+    "modalSubtitle": "Only what's linked to this session. No third parties, no cross-trackers.",
+    "close": "Close",
+    "error": "Couldn't load your data right now.",
+    "retry": "Retry",
+    "manageDataLink": "Manage data",
+    "disclosure": "You can delete your account and all associated data from Settings.",
+    "identity": {
+      "anonymous": "Anonymous (no email)",
+      "unknown": "—"
+    },
+    "fields": {
+      "identity": "Identity",
+      "locale": "Language",
+      "ageRange": "Age",
+      "createdAt": "Here since",
+      "activity": "Activity",
+      "notProvided": "Not provided"
+    },
+    "activity": {
+      "conversations": "{n, plural, =0 {No conversations} one {1 conversation} other {# conversations}}",
+      "messages": "{n, plural, =0 {0 messages} one {1 message} other {# messages}}",
+      "activeGoal": "You have an active goal."
+    }
   }
 }

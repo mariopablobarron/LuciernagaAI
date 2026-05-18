@@ -3054,6 +3054,11 @@
       "downloading": "Descargando…",
       "done": "Descargado",
       "error": "Error al descargar"
+    },
+    "autoDelete": {
+      "label": "Borra mis datos si no vuelvo en 30 días",
+      "description": "Si pasan 30 días sin abrir el chat, marcamos tu cuenta para borrado. Si vuelves antes, se cancela automáticamente.",
+      "error": "No se pudo guardar. Inténtalo de nuevo."
     }
   }
 }

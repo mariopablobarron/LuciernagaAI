@@ -32,6 +32,7 @@ type Summary = {
 
 type State = "idle" | "loading" | "loaded" | "error";
 type ExportState = "idle" | "downloading" | "done" | "error";
+type AutoDeleteState = "idle" | "saving" | "error";
 
 export function DataSummaryButton() {
   const t = useTranslations("dataSummary");
@@ -40,19 +41,52 @@ export function DataSummaryButton() {
   const [state, setState] = useState<State>("idle");
   const [summary, setSummary] = useState<Summary | null>(null);
   const [exportState, setExportState] = useState<ExportState>("idle");
+  // Toggle "borrar mis datos si no vuelvo en 30d" — sincronizado con BD.
+  const [autoDeleteEnabled, setAutoDeleteEnabled] = useState<boolean | null>(null);
+  const [autoDeleteState, setAutoDeleteState] = useState<AutoDeleteState>("idle");
 
   const fetchSummary = useCallback(async () => {
     setState("loading");
     try {
-      const res = await fetch("/api/user/data-summary", { credentials: "include" });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = (await res.json()) as Summary;
+      const [resSummary, resAutoDelete] = await Promise.all([
+        fetch("/api/user/data-summary", { credentials: "include" }),
+        fetch("/api/user/auto-delete", { credentials: "include" }),
+      ]);
+      if (!resSummary.ok) throw new Error(`HTTP ${resSummary.status}`);
+      const data = (await resSummary.json()) as Summary;
       setSummary(data);
+      if (resAutoDelete.ok) {
+        const ad = (await resAutoDelete.json()) as { enabled: boolean };
+        setAutoDeleteEnabled(ad.enabled);
+      }
       setState("loaded");
     } catch {
       setState("error");
     }
   }, []);
+
+  // Persiste el toggle de auto-borrado en la BD vía endpoint.
+  // Optimistic UI: el switch responde al instante; si el fetch falla,
+  // revertimos y mostramos error.
+  const toggleAutoDelete = useCallback(async (next: boolean) => {
+    const prev = autoDeleteEnabled;
+    setAutoDeleteEnabled(next);
+    setAutoDeleteState("saving");
+    try {
+      const res = await fetch("/api/user/auto-delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled: next }),
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setAutoDeleteState("idle");
+    } catch {
+      setAutoDeleteEnabled(prev);
+      setAutoDeleteState("error");
+      setTimeout(() => setAutoDeleteState("idle"), 3000);
+    }
+  }, [autoDeleteEnabled]);
 
   const openModal = useCallback(() => {
     setOpen(true);
@@ -202,6 +236,32 @@ export function DataSummaryButton() {
                     <p className="text-xs text-zinc-500 mt-1">{t("activity.activeGoal")}</p>
                   ) : null}
                 </div>
+
+                {/* Auto-borrado opcional: si no vuelvo en 30 días, borradme.
+                    Anonymous-first reforzado para usuarios que prueban y no
+                    quieren dejar rastro si no continúan. */}
+                {autoDeleteEnabled !== null ? (
+                  <label className="flex items-start gap-3 cursor-pointer mb-3 rounded-xl border border-zinc-700/50 bg-zinc-950/40 p-3">
+                    <input
+                      type="checkbox"
+                      checked={autoDeleteEnabled}
+                      onChange={(e) => void toggleAutoDelete(e.target.checked)}
+                      disabled={autoDeleteState === "saving"}
+                      className="mt-0.5 h-4 w-4 rounded border-zinc-600 bg-zinc-800 text-amber-500 focus:ring-1 focus:ring-amber-500"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-zinc-100">
+                        {t("autoDelete.label")}
+                      </p>
+                      <p className="text-xs text-zinc-500 mt-0.5">
+                        {t("autoDelete.description")}
+                      </p>
+                      {autoDeleteState === "error" ? (
+                        <p className="text-[10px] text-red-400 mt-1">{t("autoDelete.error")}</p>
+                      ) : null}
+                    </div>
+                  </label>
+                ) : null}
 
                 {/* Descargar todos los datos en Markdown — derecho a portabilidad. */}
                 <button

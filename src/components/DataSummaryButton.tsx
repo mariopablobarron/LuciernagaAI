@@ -15,7 +15,8 @@
 
 import { useState, useCallback } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Info, X, Loader2 } from "lucide-react";
+import { Info, X, Loader2, Download } from "lucide-react";
+import { exportToMarkdown, downloadAsFile } from "@/lib/exportToMarkdown";
 
 type Summary = {
   isAnonymous: boolean;
@@ -30,6 +31,7 @@ type Summary = {
 };
 
 type State = "idle" | "loading" | "loaded" | "error";
+type ExportState = "idle" | "downloading" | "done" | "error";
 
 export function DataSummaryButton() {
   const t = useTranslations("dataSummary");
@@ -37,6 +39,7 @@ export function DataSummaryButton() {
   const [open, setOpen] = useState(false);
   const [state, setState] = useState<State>("idle");
   const [summary, setSummary] = useState<Summary | null>(null);
+  const [exportState, setExportState] = useState<ExportState>("idle");
 
   const fetchSummary = useCallback(async () => {
     setState("loading");
@@ -59,6 +62,26 @@ export function DataSummaryButton() {
   const closeModal = useCallback(() => {
     setOpen(false);
   }, []);
+
+  // Descargar todos los datos del usuario como Markdown (.md).
+  // Reutiliza el endpoint GDPR existente /api/user/export y convierte
+  // en cliente para no añadir formato server-side.
+  const downloadMarkdown = useCallback(async () => {
+    setExportState("downloading");
+    try {
+      const res = await fetch("/api/user/export?format=json", { credentials: "include" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const md = exportToMarkdown(data, locale);
+      const stamp = new Date().toISOString().slice(0, 10);
+      downloadAsFile(md, `tres-mil-millones-${stamp}.md`);
+      setExportState("done");
+      setTimeout(() => setExportState("idle"), 3000);
+    } catch {
+      setExportState("error");
+      setTimeout(() => setExportState("idle"), 3000);
+    }
+  }, [locale]);
 
   // Formatear fecha de creación según locale del usuario.
   const formatCreatedAt = useCallback((iso: string): string => {
@@ -179,6 +202,29 @@ export function DataSummaryButton() {
                     <p className="text-xs text-zinc-500 mt-1">{t("activity.activeGoal")}</p>
                   ) : null}
                 </div>
+
+                {/* Descargar todos los datos en Markdown — derecho a portabilidad. */}
+                <button
+                  type="button"
+                  onClick={() => void downloadMarkdown()}
+                  disabled={exportState === "downloading"}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-zinc-700 text-sm font-medium text-zinc-300 hover:text-white hover:border-zinc-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-3"
+                >
+                  {exportState === "downloading" ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" aria-hidden="true" />
+                  ) : (
+                    <Download className="w-3.5 h-3.5" aria-hidden="true" />
+                  )}
+                  <span>
+                    {exportState === "downloading"
+                      ? t("export.downloading")
+                      : exportState === "done"
+                        ? t("export.done")
+                        : exportState === "error"
+                          ? t("export.error")
+                          : t("export.cta")}
+                  </span>
+                </button>
 
                 <p className="text-[10px] text-zinc-600 leading-relaxed">
                   {t("disclosure")}{" "}

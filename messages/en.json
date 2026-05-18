@@ -2897,6 +2897,12 @@
       "conversations": "{n, plural, =0 {No conversations} one {1 conversation} other {# conversations}}",
       "messages": "{n, plural, =0 {0 messages} one {1 message} other {# messages}}",
       "activeGoal": "You have an active goal."
+    },
+    "export": {
+      "cta": "Download all my data (.md)",
+      "downloading": "Downloading…",
+      "done": "Downloaded",
+      "error": "Download failed"
     }
   }
 }

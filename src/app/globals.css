@@ -713,9 +713,17 @@ html.a11y-big-cursor * {
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cpath d='M4 4l16 40 6-16 16-6z' fill='%23fff' stroke='%23000' stroke-width='2'/%3E%3C/svg%3E") 4 4, auto !important;
 }
 
-/* ── Reduced motion (manual toggle, complements prefers-reduced-motion) */
+/* ── Reduced motion (manual toggle + auto-tras-crisis) ────────────── */
+/* Dos clases separadas para no pisar la preferencia manual del usuario:
+   .a11y-reduced-motion       = toggle explícito del AccessibilityWidget
+   .a11y-reduced-motion-auto  = activado por useCrisisAutoMotion durante 30 min
+                                tras detectar variant: "crisis" en los últimos
+                                3 mensajes. Misma regla CSS, pero se quita sola.
+*/
 html.a11y-reduced-motion,
-html.a11y-reduced-motion * {
+html.a11y-reduced-motion *,
+html.a11y-reduced-motion-auto,
+html.a11y-reduced-motion-auto * {
   animation-duration: 0.01ms !important;
   animation-iteration-count: 1 !important;
   transition-duration: 0.01ms !important;

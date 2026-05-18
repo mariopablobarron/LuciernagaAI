@@ -2909,5 +2909,13 @@
       "description": "If 30 days pass without opening the chat, we mark your account for deletion. If you come back sooner, it's cancelled automatically.",
       "error": "Couldn't save. Try again."
     }
+  },
+  "breathingModal": {
+    "trigger": "Breathe",
+    "ariaLabel": "Guided breathing space",
+    "title": "Breathe with me.",
+    "instruction": "Follow the circle. Inhale 4 seconds, hold 7, exhale 8. Stay for as many cycles as you need.",
+    "close": "Close",
+    "done": "Done, back to chat"
   }
 }

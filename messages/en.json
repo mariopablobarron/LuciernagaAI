@@ -2903,6 +2903,11 @@
       "downloading": "Downloading…",
       "done": "Downloaded",
       "error": "Download failed"
+    },
+    "autoDelete": {
+      "label": "Delete my data if I don't return in 30 days",
+      "description": "If 30 days pass without opening the chat, we mark your account for deletion. If you come back sooner, it's cancelled automatically.",
+      "error": "Couldn't save. Try again."
     }
   }
 }

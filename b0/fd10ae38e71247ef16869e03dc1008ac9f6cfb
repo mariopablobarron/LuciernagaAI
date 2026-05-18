@@ -1,0 +1,33 @@
+messages/es.json
+  s_d2308f25c4747c::t_a277f3726a93c3 3025-3051
+src/components/DataSummaryButton.tsx
+  s_d2308f25c4747c::t_dcdf9994f0cb4d 1-199
+src/components/Chat.tsx
+  s_d2308f25c4747c::t_0e07616820fd04 54
+  s_d2308f25c4747c::t_8f52879c017379 1210
+messages/pt.json
+  s_d2308f25c4747c::t_a277f3726a93c3 2874-2900
+messages/en.json
+  s_d2308f25c4747c::t_a277f3726a93c3 2874-2900
+messages/fr.json
+  s_d2308f25c4747c::t_a277f3726a93c3 2874-2900
+src/app/api/user/data-summary/route.ts
+  s_d2308f25c4747c::t_3acb4ab826032b 61
+  s_d2308f25c4747c::t_63f35d55a21f46 1-60,62-87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "b0fd10ae38e71247ef16869e03dc1008ac9f6cfb",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

@@ -204,3 +204,39 @@ describe("audience guidance by tier", () => {
     expect(prompt).not.toContain("Audiencia:");
   });
 });
+
+describe("locale reminder — el prompt TERMINA con la instrucción de idioma", () => {
+  it("default (sin locale) termina con recordatorio en español", () => {
+    const prompt = buildCoachPrompt("duda");
+    expect(prompt.trimEnd().endsWith(
+      "respondes en español.",
+    )).toBe(true);
+  });
+
+  it("locale=en termina con recordatorio en inglés", () => {
+    const prompt = buildCoachPrompt("duda", undefined, { locale: "en" });
+    expect(prompt).toContain("FINAL NON-NEGOTIABLE REMINDER");
+    expect(prompt.trimEnd().endsWith("you reply in English.")).toBe(true);
+  });
+
+  it("locale=pt termina con recordatorio en pt-PT", () => {
+    const prompt = buildCoachPrompt("duda", undefined, { locale: "pt" });
+    expect(prompt).toContain("LEMBRETE FINAL");
+    expect(prompt.trimEnd().endsWith("respondes em português.")).toBe(true);
+  });
+
+  it("locale=fr termina con recordatorio en francés", () => {
+    const prompt = buildCoachPrompt("duda", undefined, { locale: "fr" });
+    expect(prompt).toContain("RAPPEL FINAL");
+    expect(prompt.trimEnd().endsWith("tu réponds en français.")).toBe(true);
+  });
+
+  it("el recordatorio de idioma aparece DESPUÉS del bloque de no-repetir", () => {
+    // El reminder debe ser lo último — recency effect. Verificamos que va
+    // después del cierre 'Nunca respondas igual...'.
+    const prompt = buildCoachPrompt("duda", undefined, { locale: "en" });
+    const idxNoRepeat = prompt.indexOf("Nunca respondas igual");
+    const idxReminder = prompt.indexOf("FINAL NON-NEGOTIABLE REMINDER");
+    expect(idxReminder).toBeGreaterThan(idxNoRepeat);
+  });
+});

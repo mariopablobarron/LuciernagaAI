@@ -206,6 +206,30 @@ N'utilise JAMAIS le numéro comme conclusion motivationnelle; donne-le seulement
   return blocks[norm];
 }
 
+/**
+ * Recordatorio corto de idioma para inyectar AL FINAL del system prompt.
+ *
+ * Por qué: buildLocaleGuidance va al PRINCIPIO, pero le siguen ~440 líneas
+ * de prompt redactadas en español (BASE_PROMPT, STATE_GUIDANCE, etc.). Un
+ * LLM — sobre todo modelos pequeños — tiende a responder en el idioma
+ * dominante del prompt. Por recency effect, repetir la instrucción como
+ * ÚLTIMA línea del prompt la hace mucho más robusta: es lo último que el
+ * modelo lee antes de generar.
+ *
+ * Mantener MUY corto e imperativo. Escrito en el idioma destino para que
+ * el modelo "entre" ya en ese idioma.
+ */
+function buildLocaleReminder(locale: CoachContext["locale"] | undefined): string {
+  const norm = locale ?? "es";
+  const reminders: Record<NonNullable<CoachContext["locale"]>, string> = {
+    es: "RECORDATORIO FINAL E INNEGOCIABLE: tu respuesta va escrita ÍNTEGRAMENTE en español de España. No importa en qué idioma escribió el usuario — respondes en español.",
+    en: "FINAL NON-NEGOTIABLE REMINDER: write your entire reply in English. It does not matter what language the user wrote in — you reply in English.",
+    pt: "LEMBRETE FINAL E INEGOCIÁVEL: escreve a tua resposta INTEIRAMENTE em português de Portugal (pt-PT, com \"tu\" e ênclise). Não importa em que idioma o utilizador escreveu — respondes em português.",
+    fr: "RAPPEL FINAL ET NON NÉGOCIABLE: rédige toute ta réponse en français de France (avec le tutoiement). Peu importe la langue dans laquelle l'utilisateur a écrit — tu réponds en français.",
+  };
+  return reminders[norm];
+}
+
 type ResponseFinalizationContext = {
   state: UserState;
   mentor?: MentorMode | null;
@@ -750,6 +774,12 @@ No se pudo verificar información externa suficiente. No afirmes datos actuales 
     domainGuidance,
   ].filter(Boolean);
 
+  // El recordatorio de idioma va LITERALMENTE al final del prompt: por
+  // recency effect es lo último que el LLM lee antes de generar, lo que
+  // hace mucho más robusta la instrucción de locale frente a las ~440
+  // líneas de prompt redactadas en español.
+  const localeReminder = buildLocaleReminder(context.locale);
+
   return `${sections.join("\n\n")}
 ${
   flowGuidance
@@ -766,7 +796,9 @@ ${continuityGuidance}`
 ${goalContext}
 ${webContext}
 
-Nunca respondas igual a dos usuarios distintos si su perfil emocional acumulado es diferente aunque digan algo parecido.`;
+Nunca respondas igual a dos usuarios distintos si su perfil emocional acumulado es diferente aunque digan algo parecido.
+
+${localeReminder}`;
 }
 
 export function buildFallbackResponse(state?: UserState): string {

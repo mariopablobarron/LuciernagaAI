@@ -1,0 +1,26 @@
+src/services/coach.ts
+  s_d2308f25c4747c::t_03663844dc2488 777-782,799-801
+  s_d2308f25c4747c::t_810a9269a8f779 209-232
+src/services/coach.test.ts
+  s_d2308f25c4747c::t_a2f492d53c87f1 207-242
+src/app/app/page.tsx
+  s_d2308f25c4747c::t_a52b8f92d3a0f1 169-172
+  s_d2308f25c4747c::t_75c24b4b6a9ace 47
+  s_d2308f25c4747c::t_1c01efe7be20ab 1387-1389
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "75b41fb9d88cd8ba8a9c23802ead70c388e148a3",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

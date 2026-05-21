@@ -44,6 +44,7 @@ import {
   fetchBrowserSession,
   type BrowserSessionUser,
 } from "@/lib/session-client";
+import { useLocale } from "next-intl";
 import { getMentorMode } from "@/lib/onboarding";
 import { useMentorPreferences } from "@/lib/useMentorPreferences";
 import { DEFAULT_EMOTIONAL_PROFILE, type EmotionalProfile } from "@/types/emotional-profile";
@@ -165,6 +166,10 @@ export default function HomePage() {
   // Preferencias del usuario sobre el mentor (no-interpretes, verbosity).
   // Persiste en localStorage; se envía en cada body al chat API.
   const { toApiPayload: getMentorPrefsPayload } = useMentorPreferences();
+  // Locale activo de la web (es/en/pt/fr). Lo enviamos EXPLÍCITO en cada
+  // body a /api/chat para que el mentor responda en ese idioma. Es la
+  // fuente más fiable — sin depender de cookie NEXT_LOCALE ni del referer.
+  const activeLocale = useLocale();
   const [loading, setLoading] = useState(false);
   const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -1379,6 +1384,9 @@ export default function HomePage() {
           // Preferencias del usuario sobre estilo del mentor. null si están en
           // defaults (no inyectamos nada al prompt en ese caso).
           mentorPrefs: getMentorPrefsPayload(),
+          // Locale activo de la web → el mentor responde en este idioma.
+          // Tiene prioridad sobre cookie/referer en chatOrchestrator.
+          locale: activeLocale,
         }),
       });
 

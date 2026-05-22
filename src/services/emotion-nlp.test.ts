@@ -1,23 +1,31 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from "@jest/globals";
 import { detectEmotionNlp, fuseEmotion } from "./emotion-nlp";
 
-const ORIGINAL_TOKEN = process.env.HUGGINGFACE_API_TOKEN;
+const ORIGINAL_KEY = process.env.OPENROUTER_API_KEY;
 const ORIGINAL_FETCH = global.fetch;
 
 function mockFetchOnce(impl: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>) {
   global.fetch = jest.fn(impl) as unknown as typeof fetch;
 }
 
+/** Construye una respuesta con la forma de OpenRouter chat completions. */
+function openRouterResponse(content: string, status = 200): Response {
+  return new Response(
+    JSON.stringify({ choices: [{ message: { content } }] }),
+    { status },
+  );
+}
+
 beforeEach(() => {
-  process.env.HUGGINGFACE_API_TOKEN = "test-token";
+  process.env.OPENROUTER_API_KEY = "test-key";
 });
 
 afterEach(() => {
   global.fetch = ORIGINAL_FETCH;
-  if (ORIGINAL_TOKEN === undefined) {
-    delete process.env.HUGGINGFACE_API_TOKEN;
+  if (ORIGINAL_KEY === undefined) {
+    delete process.env.OPENROUTER_API_KEY;
   } else {
-    process.env.HUGGINGFACE_API_TOKEN = ORIGINAL_TOKEN;
+    process.env.OPENROUTER_API_KEY = ORIGINAL_KEY;
   }
 });
 
@@ -27,41 +35,27 @@ describe("detectEmotionNlp", () => {
     expect(result).toBeNull();
   });
 
-  it("devuelve null si no hay token configurado", async () => {
-    delete process.env.HUGGINGFACE_API_TOKEN;
+  it("devuelve null si no hay OPENROUTER_API_KEY configurada", async () => {
+    delete process.env.OPENROUTER_API_KEY;
     const result = await detectEmotionNlp("estoy fatal");
     expect(result).toBeNull();
   });
 
-  it("parsea respuesta plana [{label,score}, ...] y mapea a interna", async () => {
+  it("parsea JSON limpio del LLM y mapea sadness → apatía", async () => {
     mockFetchOnce(async () =>
-      new Response(
-        JSON.stringify([
-          { label: "sadness", score: 0.82 },
-          { label: "fear", score: 0.1 },
-          { label: "joy", score: 0.05 },
-        ]),
-        { status: 200 }
-      )
+      openRouterResponse('{"label":"sadness","score":0.82}')
     );
-
     const result = await detectEmotionNlp("siento un peso enorme en el pecho");
     expect(result).not.toBeNull();
     expect(result?.rawLabel).toBe("sadness");
+    expect(result?.rawScore).toBe(0.82);
     expect(result?.mappedEmotion).toBe("apatía");
   });
 
-  it("parsea respuesta anidada [[{label,score}, ...]]", async () => {
+  it("tolera JSON envuelto en markdown ```json … ```", async () => {
     mockFetchOnce(async () =>
-      new Response(
-        JSON.stringify([[
-          { label: "fear", score: 0.7 },
-          { label: "sadness", score: 0.2 },
-        ]]),
-        { status: 200 }
-      )
+      openRouterResponse('```json\n{"label":"fear","score":0.7}\n```')
     );
-
     const result = await detectEmotionNlp("no puedo dejar de pensar que va a pasar algo malo");
     expect(result?.rawLabel).toBe("fear");
     expect(result?.mappedEmotion).toBe("ansiedad");
@@ -69,7 +63,7 @@ describe("detectEmotionNlp", () => {
 
   it("mapea anger → frustración", async () => {
     mockFetchOnce(async () =>
-      new Response(JSON.stringify([{ label: "anger", score: 0.91 }]), { status: 200 })
+      openRouterResponse('{"label":"anger","score":0.91}')
     );
     const result = await detectEmotionNlp("estoy harto, otra vez lo mismo");
     expect(result?.mappedEmotion).toBe("frustración");
@@ -77,22 +71,39 @@ describe("detectEmotionNlp", () => {
 
   it("devuelve mappedEmotion=null para etiquetas sin mapeo (surprise/others)", async () => {
     mockFetchOnce(async () =>
-      new Response(JSON.stringify([{ label: "surprise", score: 0.6 }]), { status: 200 })
+      openRouterResponse('{"label":"surprise","score":0.6}')
     );
     const result = await detectEmotionNlp("no me esperaba esto");
     expect(result?.rawLabel).toBe("surprise");
     expect(result?.mappedEmotion).toBeNull();
   });
 
-  it("devuelve null si HF responde con error HTTP", async () => {
-    mockFetchOnce(async () => new Response("rate limited", { status: 429 }));
+  it("score ausente → confianza media 0.5", async () => {
+    mockFetchOnce(async () =>
+      openRouterResponse('{"label":"joy"}')
+    );
+    const result = await detectEmotionNlp("hoy me siento bien");
+    expect(result?.rawLabel).toBe("joy");
+    expect(result?.rawScore).toBe(0.5);
+  });
+
+  it("devuelve null si OpenRouter responde con error HTTP", async () => {
+    mockFetchOnce(async () => openRouterResponse("rate limited", 429));
     const result = await detectEmotionNlp("texto cualquiera");
     expect(result).toBeNull();
   });
 
-  it("devuelve null si el payload no tiene la forma esperada", async () => {
+  it("devuelve null si el LLM devuelve una etiqueta inválida", async () => {
     mockFetchOnce(async () =>
-      new Response(JSON.stringify({ error: "model loading" }), { status: 200 })
+      openRouterResponse('{"label":"euforia","score":0.9}')
+    );
+    const result = await detectEmotionNlp("texto cualquiera");
+    expect(result).toBeNull();
+  });
+
+  it("devuelve null si el contenido no tiene JSON parseable", async () => {
+    mockFetchOnce(async () =>
+      openRouterResponse("No puedo clasificar este mensaje.")
     );
     const result = await detectEmotionNlp("texto cualquiera");
     expect(result).toBeNull();
@@ -117,7 +128,6 @@ describe("detectEmotionNlp", () => {
           });
         })
     );
-
     const result = await detectEmotionNlp("texto", { timeoutMs: 20 });
     expect(result).toBeNull();
   });

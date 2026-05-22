@@ -1,0 +1,23 @@
+messages/pt.json
+  s_d2308f25c4747c::t_de909c615b96e6 2821-2848,2970-3093
+messages/fr.json
+  s_d2308f25c4747c::t_de909c615b96e6 2821-2848,2970-3093
+messages/en.json
+  s_d2308f25c4747c::t_de909c615b96e6 2821-2848,2970-3093
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "a45dc67cfaf820683eb1c62b49166da9305e4f0a",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

@@ -2818,7 +2818,34 @@
   },
   "accessibility": {
     "quietRead": "Lecture calme",
-    "quietReadDesc": "Réduit les couleurs vives et les animations. Pour les jours difficiles."
+    "quietReadDesc": "Réduit les couleurs vives et les animations. Pour les jours difficiles.",
+    "bigCursor": "Grand curseur",
+    "bigCursorDesc": "Curseur plus grand et visible",
+    "close": "Fermer",
+    "closePanel": "Fermer le panneau d'accessibilité",
+    "dialogLabel": "Options d'accessibilité",
+    "dyslexiaFont": "Police pour dyslexie",
+    "dyslexiaFontDesc": "Police plus lisible pour la dyslexie",
+    "highContrast": "Contraste élevé",
+    "highContrastDesc": "Augmente le contraste des couleurs",
+    "highlightLinks": "Surligner les liens",
+    "highlightLinksDesc": "Souligne tous les liens",
+    "increaseText": "Augmenter la taille du texte",
+    "openPanel": "Ouvrir le panneau d'accessibilité",
+    "reduceMotion": "Réduire les animations",
+    "reduceMotionDesc": "Désactive les animations et les transitions",
+    "reduceText": "Réduire la taille du texte",
+    "resetAll": "Tout réinitialiser",
+    "savedInBrowser": "Les préférences sont enregistrées dans ton navigateur",
+    "sizeNormal": "Taille normale",
+    "sizePlus": "Taille +{level}",
+    "textSize": "Taille du texte",
+    "textSizeLevel": "Niveau de taille du texte",
+    "textSpacing": "Espacement du texte",
+    "textSpacingDesc": "Plus d'espace entre les lettres et les lignes",
+    "title": "Accessibilité",
+    "toToggle": "pour ouvrir/fermer",
+    "triggerTooltip": "Accessibilité : taille du texte, contraste et animations"
   },
   "feedback": {
     "message": {
@@ -2940,5 +2967,129 @@
   },
   "chatToolsMenu": {
     "trigger": "Plus"
+  },
+  "footerLinks": {
+    "commitment": "Engagés pour le bien-être émotionnel grâce à la technologie",
+    "copyright": "© {year} <domain>tresmilmillonesdelatidos.es</domain> — Tous droits réservés.",
+    "disclaimer": "Ne remplace pas une thérapie ni une intervention psychologique professionnelle.",
+    "info": {
+      "about": "À propos",
+      "changelog": "Nouveautés",
+      "contact": "Contact",
+      "ethics": "Éthique et limites",
+      "forPros": "Pour les professionnels",
+      "privacy": "Politique de confidentialité",
+      "terms": "Conditions d'utilisation"
+    },
+    "infoHeading": "Informations",
+    "product": {
+      "access": "Se connecter",
+      "blog": "Blog",
+      "calculator": "Calculateur de battements",
+      "challenge": "Le défi de 30 jours",
+      "compare": "Comparatif",
+      "faq": "Foire aux questions",
+      "guide": "Guide d'utilisation",
+      "join": "Rejoindre le défi",
+      "method": "La méthode",
+      "pricing": "Tarifs",
+      "resources": "Ressources",
+      "test": "Test gratuit",
+      "useCases": "Cas d'usage"
+    },
+    "productHeading": "Produit",
+    "tagline": "Chaque battement est un choix. Trois Milliards de Battements existe pour que les tiens aient une direction réelle."
+  },
+  "sidebar": {
+    "actionsCompleted": "{done}/{total} actions terminées.",
+    "actionsProgress": "{done}/{total} actions",
+    "active": "Actif",
+    "activeGoal": "Objectif actif",
+    "adminAccess": "Accès admin",
+    "adminPanel": "Panneau admin",
+    "adminSession": "Session opérationnelle active.",
+    "availableCount": "{count} disponibles",
+    "completeAssessment": "Terminer l'évaluation",
+    "conversations": "Conversations",
+    "conversationsDesc": "Activité récente et continuité.",
+    "copied": "Copié",
+    "copy": "Copier",
+    "delete": "Supprimer",
+    "deleteConfirm": "Supprimer la conversation ?",
+    "earnInvites": "Gagne des invitations avec ta série",
+    "emptyGoalHint": "Utilise le chat pour définir un objectif et le transformer en suivi ici.",
+    "invitations": "Invitations",
+    "knowMethod": "Découvre la méthode",
+    "logout": "Se déconnecter",
+    "markDone": "Marquer comme faite",
+    "markPendingAgain": "Marquer à nouveau comme à faire",
+    "messageCount": "{count} messages",
+    "moreInvites": "+{count} de plus — ",
+    "nav": {
+      "chat": {
+        "label": "Chat",
+        "req": "Toujours"
+      },
+      "checkin": {
+        "label": "Check-in",
+        "req": "Toujours"
+      },
+      "comunidad": {
+        "label": "Communauté",
+        "req": "Toujours"
+      },
+      "diario": {
+        "label": "Journal",
+        "req": "Jour 7"
+      },
+      "impulso": {
+        "label": "Impulso 21j",
+        "req": "Jour 21"
+      },
+      "logros": {
+        "label": "Réussites",
+        "req": "Série 7j"
+      },
+      "plan": {
+        "label": "Plan",
+        "req": "Jour 3"
+      },
+      "respirar": {
+        "label": "Respirer",
+        "req": "Série 3j"
+      }
+    },
+    "newConversation": "Nouvelle conversation",
+    "newCount": "{count} nouvelles",
+    "no": "Non",
+    "noActiveGoal": "Aucun objectif actif",
+    "noConversations": "Aucune conversation enregistrée pour l'instant.",
+    "noOpenDebt": "Aucune tâche en suspens",
+    "noResults": "Aucun résultat.",
+    "pendingAssessment": "Évaluation en attente",
+    "pendingAssessmentDesc": "Ton professionnel t'a attribué une évaluation. Termine-la pour qu'il puisse suivre ta progression.",
+    "pendingCount": "{count} en attente",
+    "processProgress": "Progression du parcours",
+    "processProgressDesc": "Continuité visible pour que le travail ne repose pas uniquement sur la mémoire.",
+    "projectOf": "un projet de <startidea>Startidea</startidea>",
+    "rename": "Renommer",
+    "searchPlaceholder": "Rechercher une conversation...",
+    "settings": "Paramètres",
+    "share": "Partager",
+    "streak30": "🏆 <strong>30 jours de série</strong> → 1 invitation de plus",
+    "streak7": "🔥 <strong>7 jours de série</strong> → 1 invitation",
+    "streakDays": "🔥 {count} jours de série",
+    "supportMessages": "Messages de soutien",
+    "telegramDesc": "Parle à ton mentor, reçois des rappels et fais ton check-in sans ouvrir le site.",
+    "telegramTitle": "Emporte-moi sur Telegram",
+    "trend": "Tendance : {value}",
+    "unlockedFeaturesAria": "{count} sur {total} fonctionnalités débloquées",
+    "unlocksAt": "Se débloque à : {req}",
+    "viewAllInvitations": "Voir toutes les invitations",
+    "workspace": "Espace de travail",
+    "workspaceDesc": "Conversations, continuité et accès rapide au produit.",
+    "yes": "Oui",
+    "yourPath": "Ton parcours",
+    "yourPathTooltip": "Fonctionnalités débloquées : le parcours s'ouvre au fur et à mesure que tu utilises l'app (série, jours actifs, etc.)"
   }
 }

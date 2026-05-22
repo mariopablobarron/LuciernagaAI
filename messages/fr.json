@@ -2937,5 +2937,8 @@
     "removeOneTooltip": "Retirer",
     "close": "Fermer",
     "disclosure": "Tes sauvegardés sont privés. Toi seul les vois."
+  },
+  "chatToolsMenu": {
+    "trigger": "Plus"
   }
 }

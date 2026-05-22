@@ -2937,5 +2937,8 @@
     "removeOneTooltip": "Remove",
     "close": "Close",
     "disclosure": "Your saved items are private. Only you see them."
+  },
+  "chatToolsMenu": {
+    "trigger": "More"
   }
 }

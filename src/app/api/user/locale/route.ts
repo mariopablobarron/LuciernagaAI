@@ -9,14 +9,27 @@
 // signup. En ese momento, signup/route.ts persiste body.locale en User.locale.
 
 import { NextRequest, NextResponse } from "next/server";
-import { resolveIdentity } from "@/lib/auth";
+import { resolveIdentity, InvalidSessionTokenError } from "@/lib/auth";
 import { getPrismaClient } from "@/db/prisma";
 import { pickEmailLocale } from "@/lib/email-i18n";
 import { logError, logInfo } from "@/lib/logger";
 
 export async function POST(req: NextRequest) {
   try {
-    const identity = await resolveIdentity(req);
+    let identity;
+    try {
+      identity = await resolveIdentity(req);
+    } catch (authErr) {
+      // Token expirado o inválido NO es un error del sistema — es una
+      // cookie vieja. Tratamos igual que a un anónimo: el switcher solo
+      // necesita la cookie NEXT_LOCALE, que ya persistió en el cliente.
+      // Sin logError para no ensuciar SystemLog con ruido benigno.
+      if (authErr instanceof InvalidSessionTokenError) {
+        return NextResponse.json({ ok: true, persisted: false });
+      }
+      throw authErr;
+    }
+
     if (!identity.userId) {
       // Anónimo: nada que persistir, devolvemos OK para no romper el switcher.
       return NextResponse.json({ ok: true, persisted: false });

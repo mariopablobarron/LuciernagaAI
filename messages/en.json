@@ -2818,7 +2818,34 @@
   },
   "accessibility": {
     "quietRead": "Quiet read",
-    "quietReadDesc": "Reduces vibrant colors and animations. For hard days."
+    "quietReadDesc": "Reduces vibrant colors and animations. For hard days.",
+    "bigCursor": "Large cursor",
+    "bigCursorDesc": "Larger, more visible cursor",
+    "close": "Close",
+    "closePanel": "Close accessibility panel",
+    "dialogLabel": "Accessibility options",
+    "dyslexiaFont": "Dyslexia font",
+    "dyslexiaFontDesc": "More legible typeface for dyslexia",
+    "highContrast": "High contrast",
+    "highContrastDesc": "Increases color contrast",
+    "highlightLinks": "Highlight links",
+    "highlightLinksDesc": "Underlines all links",
+    "increaseText": "Increase text size",
+    "openPanel": "Open accessibility panel",
+    "reduceMotion": "Reduce motion",
+    "reduceMotionDesc": "Disables animations and transitions",
+    "reduceText": "Decrease text size",
+    "resetAll": "Reset all",
+    "savedInBrowser": "Preferences are saved in your browser",
+    "sizeNormal": "Normal size",
+    "sizePlus": "Size +{level}",
+    "textSize": "Text size",
+    "textSizeLevel": "Text size level",
+    "textSpacing": "Text spacing",
+    "textSpacingDesc": "More space between letters and lines",
+    "title": "Accessibility",
+    "toToggle": "to toggle",
+    "triggerTooltip": "Accessibility: text size, contrast and motion"
   },
   "feedback": {
     "message": {
@@ -2940,5 +2967,129 @@
   },
   "chatToolsMenu": {
     "trigger": "More"
+  },
+  "footerLinks": {
+    "commitment": "Committed to emotional wellbeing through technology",
+    "copyright": "© {year} <domain>tresmilmillonesdelatidos.es</domain> — All rights reserved.",
+    "disclaimer": "Not a substitute for therapy or professional psychological intervention.",
+    "info": {
+      "about": "About us",
+      "changelog": "What's new",
+      "contact": "Contact",
+      "ethics": "Ethics and limits",
+      "forPros": "For professionals",
+      "privacy": "Privacy policy",
+      "terms": "Terms of service"
+    },
+    "infoHeading": "Information",
+    "product": {
+      "access": "Sign in",
+      "blog": "Blog",
+      "calculator": "Heartbeat calculator",
+      "challenge": "The 30-day challenge",
+      "compare": "Comparison",
+      "faq": "FAQ",
+      "guide": "User guide",
+      "join": "Join the challenge",
+      "method": "The method",
+      "pricing": "Pricing",
+      "resources": "Resources",
+      "test": "Free test",
+      "useCases": "Use cases"
+    },
+    "productHeading": "Product",
+    "tagline": "Every heartbeat is a choice. Three Billion Heartbeats exists so yours have real direction."
+  },
+  "sidebar": {
+    "actionsCompleted": "{done}/{total} actions completed.",
+    "actionsProgress": "{done}/{total} actions",
+    "active": "Active",
+    "activeGoal": "Active goal",
+    "adminAccess": "Admin access",
+    "adminPanel": "Admin panel",
+    "adminSession": "Operational session active.",
+    "availableCount": "{count} available",
+    "completeAssessment": "Complete assessment",
+    "conversations": "Conversations",
+    "conversationsDesc": "Recent activity and continuity.",
+    "copied": "Copied",
+    "copy": "Copy",
+    "delete": "Delete",
+    "deleteConfirm": "Delete conversation?",
+    "earnInvites": "Earn invites with your streak",
+    "emptyGoalHint": "Use the chat to define a focus and turn it into tracking here.",
+    "invitations": "Invitations",
+    "knowMethod": "Discover the method",
+    "logout": "Log out",
+    "markDone": "Mark as done",
+    "markPendingAgain": "Mark as pending again",
+    "messageCount": "{count} messages",
+    "moreInvites": "+{count} more — ",
+    "nav": {
+      "chat": {
+        "label": "Chat",
+        "req": "Always"
+      },
+      "checkin": {
+        "label": "Check-in",
+        "req": "Always"
+      },
+      "comunidad": {
+        "label": "Community",
+        "req": "Always"
+      },
+      "diario": {
+        "label": "Journal",
+        "req": "Day 7"
+      },
+      "impulso": {
+        "label": "Impulso 21d",
+        "req": "Day 21"
+      },
+      "logros": {
+        "label": "Achievements",
+        "req": "7-day streak"
+      },
+      "plan": {
+        "label": "Plan",
+        "req": "Day 3"
+      },
+      "respirar": {
+        "label": "Breathe",
+        "req": "3-day streak"
+      }
+    },
+    "newConversation": "New conversation",
+    "newCount": "{count} new",
+    "no": "No",
+    "noActiveGoal": "No active goal",
+    "noConversations": "No saved conversations yet.",
+    "noOpenDebt": "No open debt",
+    "noResults": "No results.",
+    "pendingAssessment": "Pending assessment",
+    "pendingAssessmentDesc": "Your professional has assigned you an assessment. Complete it so they can follow your progress.",
+    "pendingCount": "{count} pending",
+    "processProgress": "Process progress",
+    "processProgressDesc": "Visible continuity so the work doesn't depend on memory alone.",
+    "projectOf": "a project by <startidea>Startidea</startidea>",
+    "rename": "Rename",
+    "searchPlaceholder": "Search conversation...",
+    "settings": "Settings",
+    "share": "Share",
+    "streak30": "🏆 <strong>30-day streak</strong> → 1 more invite",
+    "streak7": "🔥 <strong>7-day streak</strong> → 1 invite",
+    "streakDays": "🔥 {count}-day streak",
+    "supportMessages": "Support messages",
+    "telegramDesc": "Talk to your mentor, get reminders and check in without opening the web.",
+    "telegramTitle": "Take me on Telegram",
+    "trend": "Trend: {value}",
+    "unlockedFeaturesAria": "{count} of {total} features unlocked",
+    "unlocksAt": "Unlocks at: {req}",
+    "viewAllInvitations": "View all invitations",
+    "workspace": "Workspace",
+    "workspaceDesc": "Conversations, continuity and quick access to the product.",
+    "yes": "Yes",
+    "yourPath": "Your path",
+    "yourPathTooltip": "Unlocked features: the path opens up as you use the app (streak, active days, etc.)"
   }
 }

@@ -352,7 +352,7 @@ export default function BlogEditorPage({ params }: { params: Promise<{ id: strin
               <p className="text-[11px] text-zinc-400 leading-relaxed">
                 Este post está en <strong className="text-zinc-300">{LOCALE_OPTIONS.find((o) => o.code === locale)?.label}</strong>.
                 Si fue auto-traducido, revisa el tono antes de publicar. Tus ediciones aquí
-                NO se pierden cuando se regenera la traducción desde el ES (solo se sobrescribe con "Forzar").
+                NO se pierden cuando se regenera la traducción desde el ES (solo se sobrescribe con &ldquo;Forzar&rdquo;).
               </p>
             </div>
           )}

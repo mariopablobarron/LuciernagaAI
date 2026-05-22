@@ -14,6 +14,7 @@
  */
 
 import { useState, useCallback } from "react";
+import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
 import { Info, X, Loader2, Download } from "lucide-react";
 import { exportToMarkdown, downloadAsFile } from "@/lib/exportToMarkdown";
@@ -288,12 +289,12 @@ export function DataSummaryButton() {
 
                 <p className="text-[10px] text-zinc-600 leading-relaxed">
                   {t("disclosure")}{" "}
-                  <a
+                  <Link
                     href="/settings"
                     className="text-zinc-400 hover:text-zinc-200 underline underline-offset-2"
                   >
                     {t("manageDataLink")}
-                  </a>
+                  </Link>
                 </p>
               </>
             )}

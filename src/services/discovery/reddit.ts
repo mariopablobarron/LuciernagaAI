@@ -18,7 +18,7 @@
  * Docs: https://www.reddit.com/dev/api / https://github.com/reddit-archive/reddit/wiki/OAuth2
  */
 
-import { logError, logWarn } from "@/lib/logger";
+import { logError, logWarn, logInfo } from "@/lib/logger";
 
 const UA =
   "TresMilMillonesDeLatidos-Discovery/1.0 (by /u/luciernaga-ai; contact mario@startidea.es)";
@@ -33,7 +33,9 @@ async function getAccessToken(): Promise<string | null> {
   const clientId = process.env.REDDIT_CLIENT_ID?.trim();
   const clientSecret = process.env.REDDIT_CLIENT_SECRET?.trim();
   if (!clientId || !clientSecret) {
-    logWarn("DISCOVERY", "reddit_no_credentials", { reason: "REDDIT_CLIENT_ID/SECRET not set" });
+    // Reddit discovery es opt-in. Sin credenciales = feature no activada,
+    // estado esperado — no es warn. El caller (discoverRedditMatches) ya
+    // registra un logInfo único. Aquí: return silencioso.
     return null;
   }
 
@@ -296,7 +298,9 @@ async function fetchGlobalSearch(query: string, token: string): Promise<RedditPo
 export async function discoverRedditMatches(): Promise<RedditPost[]> {
   const token = await getAccessToken();
   if (!token) {
-    logWarn("DISCOVERY", "reddit_skipped_no_oauth", {
+    // Feature opt-in no activada. logInfo (no warn) — un único rastro por
+    // ejecución, sin contaminar el panel de warnings/errores.
+    logInfo("DISCOVERY", "reddit_skipped_no_oauth", {
       hint: "Add REDDIT_CLIENT_ID and REDDIT_CLIENT_SECRET to enable Reddit discovery",
     });
     return [];

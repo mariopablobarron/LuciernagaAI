@@ -186,6 +186,7 @@ export default function DistributionPage() {
           </div>
           <div className="flex items-center gap-2">
             {reddit?.hasCredentials && !reddit.connected && (
+              // eslint-disable-next-line @next/next/no-html-link-for-pages -- endpoint API (route handler OAuth), no una página: <Link> rompería el redirect 302
               <a
                 href="/api/admin/distribution/reddit-oauth-start"
                 className="text-xs px-2.5 py-1 rounded-md bg-orange-500/20 text-orange-300 border border-orange-500/40 hover:bg-orange-500/30 flex items-center gap-1.5"
@@ -194,6 +195,7 @@ export default function DistributionPage() {
               </a>
             )}
             {reddit?.connected && (
+              // eslint-disable-next-line @next/next/no-html-link-for-pages -- endpoint API (route handler OAuth), no una página: <Link> rompería el redirect 302
               <a
                 href="/api/admin/distribution/reddit-oauth-start"
                 className="text-[10px] px-2 py-0.5 rounded text-zinc-500 hover:text-orange-300"

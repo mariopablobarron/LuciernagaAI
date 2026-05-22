@@ -51,11 +51,10 @@ import { NegativeFeedbackButton } from "@/components/NegativeFeedbackButton";
 import { EscalationBanner } from "@/components/EscalationBanner";
 import { detectEscalation } from "@/lib/escalation-detector";
 import { MentorPrefsButton } from "@/components/MentorPrefsButton";
-import { DataSummaryButton } from "@/components/DataSummaryButton";
 import { useCrisisAutoMotion } from "@/lib/useCrisisAutoMotion";
 import { BreathingModal, BreathingTrigger } from "@/components/BreathingModal";
 import { BookmarkButton } from "@/components/BookmarkButton";
-import { BookmarksTrigger } from "@/components/BookmarksModal";
+import { ChatToolsMenu } from "@/components/ChatToolsMenu";
 import { CHAT_STARTER_PICKS, MENTOR_MODES, getMentorMode } from "@/lib/onboarding";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -1216,16 +1215,15 @@ export default function Chat({
         )}
       </div>
 
-      {/* ── Barra de controles discretos: shelter de emergencia + incógnito ── */}
-      {/* Siempre visible justo encima del input. Sin esconder en menús. */}
+      {/* ── Barra de controles del chat, encima del input ──────────────────── */}
+      {/* Visibles siempre las 3 de uso frecuente/crítico (emergencia, respirar, */}
+      {/* mentor). El resto (incógnito, mis datos, guardados) en el menú "Más" */}
+      {/* para no saturar la barra en móvil. */}
       <div className="shrink-0 flex flex-wrap items-center justify-center gap-2 bg-zinc-950 pt-2 pb-1">
         <EmergencyShelterTrigger onClick={() => setShelterOpen(true)} />
         <BreathingTrigger onClick={() => setBreathingOpen(true)} />
-        <IncognitoToggle />
         <MentorPrefsButton />
-        <DataSummaryButton />
-        {/* Pill "Guardados (N)" — solo aparece si el usuario tiene bookmarks. */}
-        <BookmarksTrigger />
+        <ChatToolsMenu />
       </div>
 
       {/* ── Input area ──────────────────────────────────────────────────── */}

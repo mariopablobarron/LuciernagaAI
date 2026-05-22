@@ -3088,5 +3088,8 @@
     "removeOneTooltip": "Quitar",
     "close": "Cerrar",
     "disclosure": "Tus guardados son privados. Solo tú los ves."
+  },
+  "chatToolsMenu": {
+    "trigger": "Más"
   }
 }

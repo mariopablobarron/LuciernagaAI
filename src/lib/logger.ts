@@ -14,7 +14,60 @@ type BufferedEntry = {
   message: string;
   context: Record<string, unknown> | null;
   stack?: string;
+  // Columnas dedicadas en SystemLog (Prisma schema) que hasta ahora se
+  // quedaban siempre NULL. Sin esto no se puede medir latencia por route
+  // ni filtrar logs por userId con índice. Auditoría 2026-05-24: route y
+  // durationMs vacíos en 30 días de producción.
+  userId?: string;
+  route?: string;
+  statusCode?: number;
+  durationMs?: number;
 };
+
+/**
+ * Extrae los campos especiales (__route, __userId, etc.) del meta y los
+ * devuelve separados del context restante. Mantiene la API pública de
+ * logInfo/logWarn/logError intacta — solo se popula la columna si el
+ * caller pasa el campo con prefijo `__`.
+ */
+function extractStructured(
+  meta?: Record<string, unknown>,
+): {
+  context: Record<string, unknown> | null;
+  userId?: string;
+  route?: string;
+  statusCode?: number;
+  durationMs?: number;
+} {
+  if (!meta) return { context: null };
+  const out: Record<string, unknown> = {};
+  let userId: string | undefined;
+  let route: string | undefined;
+  let statusCode: number | undefined;
+  let durationMs: number | undefined;
+
+  for (const [k, v] of Object.entries(meta)) {
+    if (k === "__userId" && typeof v === "string" && v.length <= 200) {
+      userId = v;
+    } else if (k === "__route" && typeof v === "string" && v.length <= 200) {
+      route = v;
+    } else if (k === "__statusCode" && typeof v === "number" && Number.isFinite(v)) {
+      statusCode = Math.trunc(v);
+    } else if (k === "__durationMs" && typeof v === "number" && Number.isFinite(v) && v >= 0) {
+      durationMs = Math.trunc(v);
+    } else {
+      out[k] = v;
+    }
+  }
+
+  return {
+    context: Object.keys(out).length === 0 ? null : out,
+    userId,
+    route,
+    statusCode,
+    durationMs,
+  };
+}
 
 const MAX_BUFFER = 50;
 const FLUSH_INTERVAL_MS = 5000;
@@ -49,6 +102,10 @@ async function flushBuffer(): Promise<void> {
           ? undefined
           : JSON.parse(JSON.stringify(b.context))) as object | undefined,
         stack: b.stack?.slice(0, 4000),
+        userId: b.userId,
+        route: b.route?.slice(0, 200),
+        statusCode: b.statusCode,
+        durationMs: b.durationMs,
       })),
     });
   } catch (err) {
@@ -135,15 +192,20 @@ function ts(): string {
 // ── Public API ────────────────────────────────────────────────────────────────
 export function logInfo(tag: string, message: string, meta?: Record<string, unknown>): void {
   const safeMeta = sanitizeMeta(meta);
-  const ctx = { tag, ...safeMeta };
-  if (!IS_PROD) console.info(`[${ts()}] [INFO] [${tag}] ${message}`, safeMeta ?? "");
+  const structured = extractStructured(safeMeta);
+  const ctx = { tag, ...(structured.context ?? {}) };
+  if (!IS_PROD) console.info(`[${ts()}] [INFO] [${tag}] ${message}`, structured.context ?? "");
   void getLogtail()?.info(message, ctx);
   enqueueLog({
     timestamp: new Date(),
     level: "info",
     tag,
     message,
-    context: safeMeta ?? null,
+    context: structured.context,
+    userId: structured.userId,
+    route: structured.route,
+    statusCode: structured.statusCode,
+    durationMs: structured.durationMs,
   });
 }
 
@@ -159,15 +221,20 @@ async function fireAlerts(entry: { level: "warn" | "error"; tag: string; message
 
 export function logWarn(tag: string, message: string, meta?: Record<string, unknown>): void {
   const safeMeta = sanitizeMeta(meta);
-  const ctx = { tag, ...safeMeta };
-  console.warn(`[${ts()}] [WARN] [${tag}] ${message}`, safeMeta ?? "");
+  const structured = extractStructured(safeMeta);
+  const ctx = { tag, ...(structured.context ?? {}) };
+  console.warn(`[${ts()}] [WARN] [${tag}] ${message}`, structured.context ?? "");
   void getLogtail()?.warn(message, ctx);
   enqueueLog({
     timestamp: new Date(),
     level: "warn",
     tag,
     message,
-    context: safeMeta ?? null,
+    context: structured.context,
+    userId: structured.userId,
+    route: structured.route,
+    statusCode: structured.statusCode,
+    durationMs: structured.durationMs,
   });
   void fireAlerts({ level: "warn", tag, message });
 }
@@ -175,18 +242,23 @@ export function logWarn(tag: string, message: string, meta?: Record<string, unkn
 export function logError(tag: string, error: unknown, meta?: Record<string, unknown>): void {
   const base = getErrorMessage(error);
   const safeMeta = sanitizeMeta(meta);
-  const ctx = { tag, error: base, ...safeMeta };
-  console.error(`[${ts()}] [ERROR] [${tag}] ${base}`, safeMeta ?? "");
+  const structured = extractStructured(safeMeta);
+  const ctx = { tag, error: base, ...(structured.context ?? {}) };
+  console.error(`[${ts()}] [ERROR] [${tag}] ${base}`, structured.context ?? "");
   void getLogtail()?.error(base, ctx);
-  void captureToSentry(error, { tag, ...safeMeta });
+  void captureToSentry(error, { tag, ...(structured.context ?? {}) });
   const stack = error instanceof Error ? error.stack : undefined;
   enqueueLog({
     timestamp: new Date(),
     level: "error",
     tag,
     message: base,
-    context: safeMeta ?? null,
+    context: structured.context,
     stack,
+    userId: structured.userId,
+    route: structured.route,
+    statusCode: structured.statusCode,
+    durationMs: structured.durationMs,
   });
   void fireAlerts({ level: "error", tag, message: base, stack });
 }

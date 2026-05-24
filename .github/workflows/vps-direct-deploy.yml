@@ -67,7 +67,15 @@ jobs:
           port: 22
           username: root
           key: ${{ secrets.VPS_SSH_KEY }}
-          command_timeout: 20m
+          # 30m (antes 20m). Build cold sin cache de Docker — provocado por
+          # cambios en archivos que invalidan layers (Dockerfile, package.json,
+          # globals.css, etc.) — puede tomar 15-20 min solo en `docker build`,
+          # dejando poco margen para `compose up -d` + health check. El
+          # 2026-05-24 el deploy de los spells (commit e86fde2) hizo timeout
+          # exacto a 20m con la imagen ya construida pero sin llegar al
+          # switch del compose (3 días sin desplegar). Ver memoria
+          # reference_deploy_validation.md.
+          command_timeout: 30m
           script: /root/deploy-mentor-web.sh
 
       - name: Verificar que la web responde

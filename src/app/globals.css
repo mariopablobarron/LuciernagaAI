@@ -784,3 +784,75 @@ html.a11y-quiet-read [class*="text-violet-"] {
 html.a11y-quiet-read .lucide-sparkles[aria-hidden="true"] {
   opacity: 0.4;
 }
+
+/* ──────────────────────────────────────────────────────────────────
+   Design Spells — detalles que dan personalidad sin romper el tono.
+   Todos respetan prefers-reduced-motion y las clases a11y manuales.
+   ────────────────────────────────────────────────────────────────── */
+
+/* Spell A: Latido lub-dub real del 💓 del logo. Patrón cardíaco
+   verdadero (lub corto fuerte → pausa → dub más suave → pausa larga),
+   no un pulse genérico. 70 BPM ≈ 857ms; usamos 1.5s para dar el
+   "rest" entre latidos sin sentirse acelerado. */
+@keyframes tmm-heartbeat {
+  0%, 70%, 100% { transform: scale(1); }
+  14%           { transform: scale(1.08); }  /* lub */
+  28%           { transform: scale(1); }
+  42%           { transform: scale(1.05); }  /* dub */
+  56%           { transform: scale(1); }
+}
+.tmm-heartbeat {
+  animation: tmm-heartbeat 1.5s ease-in-out infinite;
+  transform-origin: center;
+  will-change: transform;
+  display: inline-block;
+}
+
+/* Off para usuarios que prefieren menos movimiento (manual o sistema)
+   y para el modo "lectura tranquila". Quietud total. */
+@media (prefers-reduced-motion: reduce) {
+  .tmm-heartbeat { animation: none; }
+}
+html.a11y-reduced-motion .tmm-heartbeat,
+html.a11y-reduced-motion-auto .tmm-heartbeat,
+html.a11y-quiet-read .tmm-heartbeat {
+  animation: none;
+}
+
+/* Spell B: Dots respirando del typing indicator del mentor. En vez del
+   bounce genérico de Tailwind, los 3 dots respiran con un ciclo de 2.4s
+   y se desfasan 800ms entre sí — efecto "ola" suave que evoca el ritmo
+   4-7-8 de la BreathingBox sin alargar tanto el ciclo. Marca de autor.
+   Estilo aplicado vía clase .tmm-breathe-dot + animationDelay inline. */
+@keyframes tmm-breathe-dot {
+  0%, 100% { transform: scale(0.55); opacity: 0.4; }
+  50%      { transform: scale(1.15); opacity: 1;   }
+}
+.tmm-breathe-dot {
+  animation: tmm-breathe-dot 2.4s ease-in-out infinite;
+  transform-origin: center;
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Fade simple sin scale, mantiene el indicador funcional pero sin
+     movimiento — el usuario sigue sabiendo que el mentor está pensando. */
+  .tmm-breathe-dot { animation: none; opacity: 0.6; }
+}
+html.a11y-reduced-motion .tmm-breathe-dot,
+html.a11y-reduced-motion-auto .tmm-breathe-dot,
+html.a11y-quiet-read .tmm-breathe-dot {
+  animation: none;
+  opacity: 0.6;
+}
+
+/* Spell C: Cursor halo en el área del chat. El componente CursorHalo
+   ya respeta prefers-reduced-motion del sistema (no instala listeners).
+   Aquí cubrimos los toggles manuales de a11y y el modo quiet-read —
+   ocultar el halo completamente vía CSS para evitar repintos. */
+html.a11y-reduced-motion .tmm-cursor-halo,
+html.a11y-reduced-motion-auto .tmm-cursor-halo,
+html.a11y-quiet-read .tmm-cursor-halo {
+  display: none !important;
+}

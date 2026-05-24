@@ -43,7 +43,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 25 # build puede tardar 6-10 min, dejamos margen
+    timeout-minutes: 35 # margen de 5m sobre el command_timeout del SSH (30m). Build cold con cache invalidado puede tomar 15-20 min.
 
     steps:
       - name: Validar secrets configurados

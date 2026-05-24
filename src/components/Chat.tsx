@@ -55,6 +55,7 @@ import { useCrisisAutoMotion } from "@/lib/useCrisisAutoMotion";
 import { BreathingModal, BreathingTrigger } from "@/components/BreathingModal";
 import { BookmarkButton } from "@/components/BookmarkButton";
 import { ChatToolsMenu } from "@/components/ChatToolsMenu";
+import { CursorHalo } from "@/components/CursorHalo";
 import { CHAT_STARTER_PICKS, MENTOR_MODES, getMentorMode } from "@/lib/onboarding";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -585,9 +586,10 @@ function MessageBubble({
         >
           {isStreaming ? (
             <div className="flex items-center gap-1 py-1">
-              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-indigo-400 [animation-delay:0ms]" />
-              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-indigo-400 [animation-delay:150ms]" />
-              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-indigo-400 [animation-delay:300ms]" />
+              {/* Dots respirando (mismo spell que el typing indicator principal). */}
+              <span className="tmm-breathe-dot h-1.5 w-1.5 rounded-full bg-indigo-400" style={{ animationDelay: "0ms" }} />
+              <span className="tmm-breathe-dot h-1.5 w-1.5 rounded-full bg-indigo-400" style={{ animationDelay: "800ms" }} />
+              <span className="tmm-breathe-dot h-1.5 w-1.5 rounded-full bg-indigo-400" style={{ animationDelay: "1600ms" }} />
             </div>
           ) : (
             <div>{renderMarkdown(message.content)}</div>
@@ -957,6 +959,9 @@ export default function Chat({
 
       {/* ── Messages area ───────────────────────────────────────────────── */}
       <div ref={scrollRef} onScroll={handleScroll} className="relative flex-1 overflow-y-auto" role="log" aria-label={t("ariaMessagesLog")} aria-live="polite">
+        {/* Design Spell: halo radial sutil siguiendo el cursor. Solo mouse,
+            cero overhead en táctil, off con prefers-reduced-motion. */}
+        <CursorHalo containerRef={scrollRef} />
         {isEmpty ? (
           /* Empty state */
           <div className="flex h-full flex-col items-center justify-center px-6 py-12 text-center">
@@ -1069,10 +1074,13 @@ export default function Chat({
                 </div>
                 <div className="rounded-2xl rounded-tl-sm border border-zinc-800 bg-zinc-900 px-3.5 py-2.5">
                   <div className="flex items-center gap-2" aria-hidden="true">
+                    {/* Dots respirando: ola sutil con desfase 800ms entre dots.
+                        Inspirado en el ritmo 4-7-8 de la BreathingBox — marca
+                        de autor del producto. */}
                     <div className="flex items-center gap-1">
-                      <span className="h-2 w-2 animate-bounce rounded-full bg-violet-400 [animation-delay:0ms]" />
-                      <span className="h-2 w-2 animate-bounce rounded-full bg-fuchsia-400 [animation-delay:150ms]" />
-                      <span className="h-2 w-2 animate-bounce rounded-full bg-cyan-400 [animation-delay:300ms]" />
+                      <span className="tmm-breathe-dot h-2 w-2 rounded-full bg-violet-400" style={{ animationDelay: "0ms" }} />
+                      <span className="tmm-breathe-dot h-2 w-2 rounded-full bg-fuchsia-400" style={{ animationDelay: "800ms" }} />
+                      <span className="tmm-breathe-dot h-2 w-2 rounded-full bg-cyan-400" style={{ animationDelay: "1600ms" }} />
                     </div>
                     <span className="text-xs text-zinc-600 animate-pulse">{t("thinking")}</span>
                   </div>

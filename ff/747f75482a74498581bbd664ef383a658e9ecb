@@ -1,0 +1,27 @@
+src/lib/logger.test.ts
+  s_d2308f25c4747c::t_c2d2da8dcccaf6 1-82
+src/lib/logger.ts
+  s_d2308f25c4747c::t_ee811c41b550f2 17-24,27-70
+  s_d2308f25c4747c::t_b0cdbdddf03132 195-197,204-208
+  s_d2308f25c4747c::t_2902072c3a8462 224-226,233-237
+  s_d2308f25c4747c::t_0966800d19ecdd 105-108
+  s_d2308f25c4747c::t_d563ebab6276ac 245-247,249,256,258-261
+src/app/api/chat/route.ts
+  s_d2308f25c4747c::t_8b9ee727b0cccf 2,6-7,9-14,16-28,31-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "ff747f75482a74498581bbd664ef383a658e9ecb",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

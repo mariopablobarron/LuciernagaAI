@@ -38,7 +38,8 @@
     "noSignup": "No signup. No email. Just write.",
     "socialProof": "+200 people",
     "socialProofText": "using it weekly",
-    "langNote": "AI mentoring in English. Not a replacement for therapy."
+    "langNote": "AI mentoring in English. Not a replacement for therapy.",
+    "relationalHonesty": "This doesn't replace the people who love you. The mentor is here to sort your thoughts — not to substitute coffee with your sister or a call to a friend. If you've been talking only with it for a while, maybe what you actually need is to pick up the phone."
   },
   "features": {
     "sectionLabel": "How it works",
@@ -1962,7 +1963,7 @@
       "placeholder": "Tell me what's going on… (Enter to send)",
       "shiftHint": "Shift + Enter for a new line",
       "counterMax": "{count}/1000",
-      "footnote": "AI supervised by psychologists, mentors and coaches · Not a substitute for clinical care ·",
+      "footnote": "AI supervised by psychologists, mentors and coaches · Not a substitute for clinical care nor for the people who love you ·",
       "modeLabel": "Mode: {label}"
     },
     "audio": {

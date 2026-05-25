@@ -45,6 +45,11 @@ export default function ConsentModal({ onAccept }: Props) {
             artificial. <strong className="text-white">No es un servicio de salud mental, no
             sustituye la psicoterapia ni la intervención psicológica profesional.</strong>
           </p>
+          <p className="border-l-2 border-cyan-500/60 pl-3 py-0.5 text-zinc-300">
+            <strong className="text-white">Tampoco reemplaza a las personas que te quieren.</strong> El mentor
+            ordena tu cabeza; no sustituye el café con tu hermana ni la llamada al amigo. Si llevas
+            tiempo hablando solo aquí, igual lo que necesitas es marcar un número.
+          </p>
           <p>
             Al continuar, confirmas que:
           </p>

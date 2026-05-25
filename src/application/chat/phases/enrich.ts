@@ -134,6 +134,9 @@ export type EnrichInput = {
   crisisMode: boolean;
   crisisSource: "detected" | "active_state" | "none";
   crisisActiveUntil: string | null;
+  /** Locale activo del usuario (es/en/pt/fr). Pasado a las funciones que
+   *  generan strings hardcoded para que respondan en el idioma correcto. */
+  locale?: "es" | "en" | "pt" | "fr";
 };
 
 export type EnrichResult = {
@@ -548,6 +551,7 @@ export async function enrichContext(input: EnrichInput): Promise<EnrichResult> {
               avoidanceCount: goalAvoidanceCount,
               unfinishedActionsCount: goalPendingActionsCount,
               mentorMode,
+              locale: input.locale,
             });
             actionLockPayload = {
               success: true,

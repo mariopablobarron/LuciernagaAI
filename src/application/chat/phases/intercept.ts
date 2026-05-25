@@ -102,6 +102,10 @@ export type InterceptInput = {
   // used to route crisis hotlines to local resources (024 ES / 988 US / 188 BR…).
   countryCode?: string | null;
 
+  // Locale activo del usuario — propagado a appendCaptureEmailPrompt para
+  // que el "déjame tu email" salga en el idioma correcto, no siempre en ES.
+  locale?: "es" | "en" | "pt" | "fr";
+
   // Transitional void
   domainState: SystemState;
   domainDecision: DomainDecision;
@@ -123,7 +127,7 @@ export async function interceptActionLock(input: InterceptInput): Promise<Interc
 
   let assistantMessage = input.actionLockAssistantMessage;
   if (input.captureEmailRecommended) {
-    assistantMessage = appendCaptureEmailPrompt(assistantMessage, true);
+    assistantMessage = appendCaptureEmailPrompt(assistantMessage, true, input.locale);
   }
 
   const payload = {

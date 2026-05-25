@@ -94,4 +94,54 @@ Para abordar una de las pendientes:
 
 ---
 
+## Fixes de calidad del chat (sesión 2026-05-24/25)
+
+No son items del ROADMAP de 30 features — son fixes de **calidad y observabilidad** que salieron de auditar conversaciones reales en producción. Documentados aquí para que la próxima sesión no los olvide.
+
+### Auditoría de conversaciones reales
+
+Sacar 5 conversaciones con ≥3 turnos del usuario en últimos 30 días. Hallazgos concretos con ejemplo:
+
+| Patrón | Evidencia |
+|---|---|
+| Bucle "Hay algo de antes que seguimos sin cerrar..." | Convo `cmpc71rz...` — 14 turnos consecutivos. Usuario suplica "Deja de pedirme el email". |
+| Bucle pisa la crisis aguda | Misma convo: T45 "estoy cansada de vivir" → T50 dispara 024 → T52/54/56 vuelve al bucle. |
+| Rechazo activo de cambio de idioma | Convo `cmpff1w...` — usuario PT pide "Em português". Mentor responde ES: "Respondo siempre en español, trabajo mejor así". |
+| Plantilla repetida ante gibberish | Convo `cmon4fb...` — "Hoka" / "Hzhshdhs" → mentor responde MISMA plantilla 3 turnos seguidos. |
+
+### Fixes desplegados
+
+| Commit | Qué |
+|---|---|
+| `8ddbff9` | `anti-loop.ts` — detecta protesta del usuario, cuenta repeticiones recientes, bypass total tras crisis. 14 tests. Aplicado a enrich.ts en los 2 sitios que generaban el bucle. |
+| `8ddbff9` | `buildLocaleGuidance` (×4 idiomas) — el LLM ya NO inventa "Respondo siempre en español, trabajo mejor así". Ahora indica el selector. |
+| `0c31b68` | Observabilidad logger: `route`, `durationMs`, `statusCode`, `userId` ahora se populan en SystemLog (antes 0%). Aplicado a `/api/chat`. |
+| `12a4e43` | `input-quality.ts` + intercept en orchestrator. Detecta gibberish (sin vocales, baja diversidad ≥7 chars) y too_short (<5). 4 variantes por idioma con rotación. 21 tests. Cero llamada al LLM en estos casos. |
+| `4799f50` | Multilingualización completa de strings hardcoded: `buildFallbackResponse`, `buildActionRequiredMessage`, `captureEmailPrompt`, `paywallMessage`, `appendConversionPrompt`. Antes solo ES, ahora 4 idiomas. |
+| `4799f50` | `language-request.ts` — detector con 14 patrones multi-idioma. Override del locale en runtime + persistencia en User.locale fire-and-forget. 9 tests. |
+
+### Infra
+
+| Commit | Qué |
+|---|---|
+| `c69d925` + `0c32894` | `command_timeout: 30m` (antes 20) y `timeout-minutes: 35` (antes 25) en vps-direct-deploy.yml. Razón: build cold sin cache + container health check excedía 20m. |
+| (manual VPS) | `pull_policy: never` añadido al docker-compose. El switch manual a una imagen local ya no intenta pull spurious. |
+| `scripts/reset-superadmin-password.mjs` | Script idempotente para sincronizar AdminUser.passwordHash con `ADMIN_PASSWORD` del .env-vars. Útil cuando se rota el secret. |
+
+### Validado E2E en producción 2026-05-25 ~07:24 UTC
+
+- POST `/api/chat` con `"Háblame em português por favor"` y `locale: es` → log `language_override_from_chat from=es to=pt` ✅, User.locale actualizado a `pt` en BD ✅, respuesta en pt-PT con tu+enclisis ✅.
+- POST con `"Hoka"` → intercept ambiguous_input, respuesta scripted, cero LLM call ✅.
+- 3 variantes distintas en 4 requests separados por 2s — rotación funciona ✅.
+
+### Lecciones operativas nuevas (en memoria de proyecto)
+
+- `reference_deploy_validation.md` — siempre verificar VPS Direct Deploy además de CI. Lección del 24-05.
+- `incident_vps_docker_overload_20260524.md` — NUNCA `systemctl restart docker` en producción sin canal alternativo. Genera load >700.
+- `incident_i18n_orphan_purge_20260517.md` — NO borrar keys sin smoke test de la home.
+
+_Sesión cerrada con 17 features ROADMAP en producción + 6 fixes profundos de calidad + observabilidad nueva + 1 incidente VPS resuelto._
+
+---
+
 _Origen: lista de 30 mejoras pedidas por Mario a Claude el 2026-05-18. Versión inicial sin priorizar disponible en el transcript de la sesión._

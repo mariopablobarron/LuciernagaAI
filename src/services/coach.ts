@@ -170,7 +170,7 @@ function buildLocaleGuidance(locale: CoachContext["locale"] | undefined): string
   const norm = locale ?? "es";
 
   const blocks: Record<NonNullable<CoachContext["locale"]>, string> = {
-    es: `IDIOMA DE RESPUESTA: español de España. Responde SIEMPRE en español, sin importar el idioma del input del usuario.
+    es: `IDIOMA DE RESPUESTA: español de España. Responde SIEMPRE en español, sin importar el idioma del input del usuario. Si el usuario pide explícitamente otro idioma (ej. "in English", "em português", "en français"), responde en español pero indica una sola frase: "Puedes cambiar el idioma desde el selector arriba en la web." NO te niegues a hablar ni digas "trabajo mejor en español" — el idioma viene determinado por el selector del usuario, tú no decides eso.
 
 RECURSOS DE CRISIS (España) — invócalos solo si detectas ideación, autolesión o riesgo agudo (no para malestar genérico):
 - 024 — Línea de Atención a la Conducta Suicida (24/7, gratuita).
@@ -178,7 +178,7 @@ RECURSOS DE CRISIS (España) — invócalos solo si detectas ideación, autolesi
 - 112 — Emergencias.
 NUNCA des el número como remate motivacional; dilo solo cuando la conversación lo necesite.`,
 
-    en: `RESPONSE LANGUAGE: English. ALWAYS reply in English, regardless of the language of the user's input.
+    en: `RESPONSE LANGUAGE: English. ALWAYS reply in English, regardless of the language of the user's input. If the user explicitly asks for another language, reply in English and add one short line: "You can switch the language from the selector at the top of the website." DO NOT refuse or claim you "work better in English" — the language is set by the user's selector, not by you.
 
 CRISIS RESOURCES (US/International) — only invoke if you detect ideation, self-harm or acute risk (not for generic distress):
 - 988 — Suicide & Crisis Lifeline (US, 24/7).
@@ -186,7 +186,7 @@ CRISIS RESOURCES (US/International) — only invoke if you detect ideation, self
 - If the user is in another country, tell them to contact their local emergency number.
 NEVER deliver the number as motivational closure; only when the conversation requires it.`,
 
-    pt: `IDIOMA DE RESPOSTA: português de Portugal (pt-PT). Responde SEMPRE em pt-PT, independentemente do idioma do input do utilizador. Usa "tu", enclise (fá-lo, dizemos-te) e léxico português europeu (telemóvel, ficheiro, ecrã, definições, palavra-passe, anónimo, deteta).
+    pt: `IDIOMA DE RESPOSTA: português de Portugal (pt-PT). Responde SEMPRE em pt-PT, independentemente do idioma do input do utilizador. Usa "tu", enclise (fá-lo, dizemos-te) e léxico português europeu (telemóvel, ficheiro, ecrã, definições, palavra-passe, anónimo, deteta). Se o utilizador pedir explicitamente outro idioma, responde em pt-PT e acrescenta uma frase: "Podes mudar o idioma no seletor no topo do site." NÃO te recuses a falar nem digas "trabalho melhor em português" — o idioma é definido pelo seletor do utilizador, tu não decides isso.
 
 RECURSOS DE CRISE (Portugal) — só invoca se detetares ideação, autolesão ou risco agudo (não para mal-estar genérico):
 - 808 24 24 24 — SNS 24 (24/7, gratuito).
@@ -194,7 +194,7 @@ RECURSOS DE CRISE (Portugal) — só invoca se detetares ideação, autolesão o
 - 112 — Emergências.
 NUNCA dês o número como remate motivacional; di-lo apenas quando a conversa o exigir.`,
 
-    fr: `LANGUE DE RÉPONSE: français de France (fr-FR). Réponds TOUJOURS en français, peu importe la langue d'entrée de l'utilisateur. Utilise le tutoiement (tu), pas le vouvoiement.
+    fr: `LANGUE DE RÉPONSE: français de France (fr-FR). Réponds TOUJOURS en français, peu importe la langue d'entrée de l'utilisateur. Utilise le tutoiement (tu), pas le vouvoiement. Si l'utilisateur demande explicitement une autre langue, réponds en français et ajoute une phrase : "Tu peux changer la langue depuis le sélecteur en haut du site." NE refuse PAS de parler et ne dis PAS "je travaille mieux en français" — la langue est définie par le sélecteur de l'utilisateur, pas par toi.
 
 RESSOURCES DE CRISE (France) — invoque-les uniquement si tu détectes idéation, automutilation ou risque aigu (pas pour mal-être générique):
 - 3114 — Numéro national de prévention du suicide (24/7, gratuit).

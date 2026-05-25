@@ -20,6 +20,7 @@ import type {
 import { buildUserState } from "@/domain/userStateEngine";
 import { trackSafe } from "@/services/events";
 import { buildActionRequiredMessage } from "@/services/coach";
+import { shouldSilenceAdminLoops } from "@/services/anti-loop";
 import {
   countMessagesForConversation,
   ensureUserSession,
@@ -522,7 +523,20 @@ export async function enrichContext(input: EnrichInput): Promise<EnrichResult> {
             });
           }
 
-          if (!shouldBypassActionLock(state) && !lockBypass) {
+          // Anti-bucle: si el usuario protestó por repetición, hay crisis
+          // reciente, o ya hemos pegado el action lock ≥2 veces seguidas,
+          // NO volver a pegarlo. Auditoría 2026-05-25 reveló bucles de
+          // hasta 14 turnos con el mismo mensaje, incluso pisando crisis.
+          const adminLoopGuard = shouldSilenceAdminLoops({
+            currentUserMessage: message,
+            recentMessages: conversationHistory,
+          });
+          if (adminLoopGuard.silenceActionLock) {
+            logInfo("CHAT", "action_lock_silenced", {
+              userId, conversationId, reason: adminLoopGuard.reason,
+            });
+          }
+          if (!shouldBypassActionLock(state) && !lockBypass && !adminLoopGuard.silenceActionLock) {
             await trackSafe({
               userId,
               type: "AVOIDANCE_DETECTED",
@@ -558,12 +572,21 @@ export async function enrichContext(input: EnrichInput): Promise<EnrichResult> {
         }
       }
 
+      // Anti-bucle: mismo guard que arriba — silenciar si el usuario protestó,
+      // hay crisis reciente, o ya repetimos el action lock ≥2 veces. Lo
+      // calculamos otra vez (vs cachear) porque el flujo permite que un
+      // bypass anterior NO hubiera entrado en el otro bloque.
+      const adminLoopGuard2 = shouldSilenceAdminLoops({
+        currentUserMessage: message,
+        recentMessages: conversationHistory,
+      });
       if (
         !actionCompletedThisTurn &&
         !actionLockPayload &&
         pendingAction &&
         !shouldBypassActionLock(state) &&
-        !lockBypass
+        !lockBypass &&
+        !adminLoopGuard2.silenceActionLock
       ) {
         actionLockAssistantMessage = buildActionRequiredMessage({
           actionTitle: pendingAction.description,
@@ -680,6 +703,29 @@ export async function enrichContext(input: EnrichInput): Promise<EnrichResult> {
         conversationMessageCount,
         conversionTrigger,
       });
+      // Anti-bucle: si el usuario protestó por las peticiones de email, ya
+      // dio el email (mensaje contiene "@"), hay crisis reciente, o ya
+      // pegamos el prompt de email ≥2 veces seguidas → NO volver a pedirlo.
+      // Auditoría 2026-05-25 mostró el bucle del email pisando una conversación
+      // sobre suicidio adolescente — inaceptable.
+      const emailGuard = shouldSilenceAdminLoops({
+        currentUserMessage: message,
+        recentMessages: conversationHistory,
+      });
+      if (captureEmailRecommended && emailGuard.silenceEmailPrompt) {
+        captureEmailRecommended = false;
+        logInfo("CHAT", "capture_email_silenced", {
+          userId, conversationId, reason: emailGuard.reason,
+        });
+      }
+      // Además: si el mensaje actual del usuario contiene un email válido,
+      // ya nos lo dio — NO seguir pidiéndolo.
+      if (captureEmailRecommended && /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i.test(message)) {
+        captureEmailRecommended = false;
+        logInfo("CHAT", "capture_email_silenced", {
+          userId, conversationId, reason: "user_already_provided",
+        });
+      }
       captureNameRecommended = shouldAskForName({
         isAnonymous: sessionProfile.isAnonymous,
         hasName,

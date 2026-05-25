@@ -240,3 +240,22 @@ describe("locale reminder — el prompt TERMINA con la instrucción de idioma", 
     expect(idxReminder).toBeGreaterThan(idxNoRepeat);
   });
 });
+
+describe("#16 citar lo que el usuario dijo antes — regla en BASE_PROMPT", () => {
+  it("el prompt incluye la instrucción de citar palabras concretas", () => {
+    const prompt = buildCoachPrompt("duda");
+    expect(prompt).toContain("CITA EXPLÍCITAMENTE lo que el usuario dijo");
+    expect(prompt).toContain("entrecomilladas");
+  });
+
+  it("la regla prohíbe paráfrasis vagas", () => {
+    const prompt = buildCoachPrompt("duda");
+    expect(prompt).toContain("NO parafrasees vagamente");
+    expect(prompt).toContain("lo que comentabas");
+  });
+
+  it("la regla aplica también a resúmenes de conversaciones previas", () => {
+    const prompt = buildCoachPrompt("duda");
+    expect(prompt).toContain("conversaciones previas");
+  });
+});

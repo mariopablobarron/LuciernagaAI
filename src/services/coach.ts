@@ -801,19 +801,47 @@ Nunca respondas igual a dos usuarios distintos si su perfil emocional acumulado 
 ${localeReminder}`;
 }
 
-export function buildFallbackResponse(state?: UserState): string {
-  switch (state) {
-    case "bloqueo":
-      return "Parece que algo se ha trabado. Dime una cosa: ¿qué es lo que llevas posponiendo y por qué?";
-    case "ansiedad":
-      return "Respira. Una cosa a la vez. ¿Qué es lo que más te presiona ahora mismo?";
-    case "duda":
-      return "Entiendo la incertidumbre. Vamos a ordenar: ¿cuáles son las dos opciones que ves?";
-    case "claridad":
-      return "Tienes claridad — aprovechemos. ¿Cuál es el paso más concreto que puedes dar hoy?";
-    default:
-      return "Vamos a hacerlo simple. Dime qué estás evitando ahora mismo y lo convertimos en un paso concreto hoy.";
-  }
+/** Locales soportados — mismos que i18n del producto. */
+export type CoachLocale = "es" | "en" | "pt" | "fr";
+
+function coachLocale(input: unknown): CoachLocale {
+  return (["es", "en", "pt", "fr"].includes(input as string) ? input : "es") as CoachLocale;
+}
+
+export function buildFallbackResponse(state?: UserState, locale?: unknown): string {
+  const loc = coachLocale(locale);
+  const variants: Record<CoachLocale, Record<string, string>> = {
+    es: {
+      bloqueo: "Parece que algo se ha trabado. Dime una cosa: ¿qué es lo que llevas posponiendo y por qué?",
+      ansiedad: "Respira. Una cosa a la vez. ¿Qué es lo que más te presiona ahora mismo?",
+      duda: "Entiendo la incertidumbre. Vamos a ordenar: ¿cuáles son las dos opciones que ves?",
+      claridad: "Tienes claridad — aprovechemos. ¿Cuál es el paso más concreto que puedes dar hoy?",
+      default: "Vamos a hacerlo simple. Dime qué estás evitando ahora mismo y lo convertimos en un paso concreto hoy.",
+    },
+    en: {
+      bloqueo: "Something seems stuck. Tell me one thing: what have you been postponing, and why?",
+      ansiedad: "Breathe. One thing at a time. What's putting the most pressure on you right now?",
+      duda: "I get the uncertainty. Let's sort it out: what are the two options you see?",
+      claridad: "You have clarity — let's use it. What's the most concrete step you can take today?",
+      default: "Let's keep it simple. Tell me what you're avoiding right now and we'll turn it into a concrete step today.",
+    },
+    pt: {
+      bloqueo: "Parece que algo se travou. Diz-me uma coisa: o que andas a adiar e porquê?",
+      ansiedad: "Respira. Uma coisa de cada vez. O que te está a pressionar mais agora?",
+      duda: "Compreendo a incerteza. Vamos pôr ordem: quais são as duas opções que vês?",
+      claridad: "Tens clareza — vamos aproveitá-la. Qual é o passo mais concreto que podes dar hoje?",
+      default: "Vamos simplificar. Diz-me o que estás a evitar agora mesmo e transformamo-lo num passo concreto para hoje.",
+    },
+    fr: {
+      bloqueo: "Quelque chose semble coincé. Dis-moi une chose : qu'est-ce que tu repousses, et pourquoi ?",
+      ansiedad: "Respire. Une chose à la fois. Qu'est-ce qui te met le plus de pression maintenant ?",
+      duda: "Je comprends l'incertitude. Mettons de l'ordre : quelles sont les deux options que tu vois ?",
+      claridad: "Tu as de la clarté — profitons-en. Quel est le pas le plus concret que tu peux faire aujourd'hui ?",
+      default: "Restons simples. Dis-moi ce que tu évites maintenant et transformons-le en un pas concret pour aujourd'hui.",
+    },
+  };
+  const table = variants[loc];
+  return table[state ?? "default"] ?? table.default;
 }
 
 function buildActionLine(context: ResponseFinalizationContext): string {
@@ -979,49 +1007,90 @@ export function buildActionRequiredMessage(params: {
   avoidanceCount?: number;
   unfinishedActionsCount?: number;
   mentorMode?: MentorMode | null;
+  locale?: unknown;
 }): string {
   const avoidanceCount = params.avoidanceCount ?? 0;
   const unfinishedActionsCount = params.unfinishedActionsCount ?? 0;
   const confront = params.mentorMode?.confront ?? false;
   const action = `«${params.actionTitle}»`;
+  const loc = coachLocale(params.locale);
 
-  if (avoidanceCount >= 2 || unfinishedActionsCount > 2) {
-    return `Hay algo de antes que seguimos sin cerrar: ${action}. ¿Qué prefieres — ya lo hiciste, lo retomas ahora, lo aparcas para más tarde, o lo cerramos porque ya no aplica?`;
-  }
+  const escalated: Record<CoachLocale, (a: string) => string> = {
+    es: (a) => `Hay algo de antes que seguimos sin cerrar: ${a}. ¿Qué prefieres — ya lo hiciste, lo retomas ahora, lo aparcas para más tarde, o lo cerramos porque ya no aplica?`,
+    en: (a) => `Something from before is still open: ${a}. What do you want — did you do it, pick it up now, park it for later, or close it because it no longer applies?`,
+    pt: (a) => `Há algo de antes que ainda não fechámos: ${a}. O que preferes — já o fizeste, retomá-lo agora, deixá-lo para depois, ou fechá-lo porque já não se aplica?`,
+    fr: (a) => `Quelque chose d'avant est encore ouvert : ${a}. Qu'est-ce que tu préfères — tu l'as fait, tu le reprends maintenant, tu le mets de côté, ou on le ferme car ce n'est plus d'actualité ?`,
+  };
+  const confrontVariants: Record<CoachLocale, (a: string) => string> = {
+    es: (a) => `Dejamos ${a} a medias. ¿Ya lo hiciste, lo retomas hoy, lo aparcas, o lo cerramos?`,
+    en: (a) => `We left ${a} halfway. Did you do it, pick it up today, park it, or close it?`,
+    pt: (a) => `Deixámos ${a} a meio. Já o fizeste, retomas hoje, deixas para depois, ou fechamos?`,
+    fr: (a) => `On a laissé ${a} à mi-chemin. Tu l'as fait, tu le reprends aujourd'hui, tu le mets de côté, ou on le ferme ?`,
+  };
+  const soft: Record<CoachLocale, (a: string) => string> = {
+    es: (a) => `Quedó abierto ${a}. Dime si ya lo hiciste, si lo retomas, si lo aparcas para luego o si lo cerramos — y seguimos por donde quieras.`,
+    en: (a) => `${a} was left open. Tell me if you did it, pick it up, park it for later, or close it — and we continue wherever you want.`,
+    pt: (a) => `${a} ficou em aberto. Diz-me se já o fizeste, se o retomas, se o deixas para depois ou se o fechamos — e continuamos por onde quiseres.`,
+    fr: (a) => `${a} est resté ouvert. Dis-moi si tu l'as fait, si tu le reprends, si tu le mets de côté ou si on le ferme — et on continue où tu veux.`,
+  };
 
-  if (confront) {
-    return `Dejamos ${action} a medias. ¿Ya lo hiciste, lo retomas hoy, lo aparcas, o lo cerramos?`;
-  }
-
-  return `Quedó abierto ${action}. Dime si ya lo hiciste, si lo retomas, si lo aparcas para luego o si lo cerramos — y seguimos por donde quieras.`;
+  if (avoidanceCount >= 2 || unfinishedActionsCount > 2) return escalated[loc](action);
+  if (confront) return confrontVariants[loc](action);
+  return soft[loc](action);
 }
 
+/** @deprecated Use captureEmailPrompt(locale). Kept for backwards-compat tests. */
 export const CAPTURE_EMAIL_PROMPT =
   "Si quieres retomar esto otro día justo donde lo dejamos, déjame tu email y te lo guardo.";
 
+export function captureEmailPrompt(locale?: unknown): string {
+  const loc = coachLocale(locale);
+  return {
+    es: "Si quieres retomar esto otro día justo donde lo dejamos, déjame tu email y te lo guardo.",
+    en: "If you want to pick this up another day right where we left off, give me your email and I'll save it for you.",
+    pt: "Se quiseres retomar isto outro dia exatamente onde ficámos, deixa-me o teu email e eu guardo-o.",
+    fr: "Si tu veux reprendre cela un autre jour, exactement où on s'est arrêté, donne-moi ton email et je le garde.",
+  }[loc];
+}
+
+/** @deprecated Use paywallMessage(locale). */
 export const PAYWALL_MESSAGE =
   "No es falta de claridad. Es que esto se sostiene cuando vuelves mañana, y al día siguiente. Si quieres que te acompañe con esa continuidad, te cuento cómo seguimos.\n\n¿Quieres sostener este avance con continuidad real?";
 
-export function appendCaptureEmailPrompt(response: string, shouldAsk: boolean): string {
+export function paywallMessage(locale?: unknown): string {
+  const loc = coachLocale(locale);
+  return {
+    es: "No es falta de claridad. Es que esto se sostiene cuando vuelves mañana, y al día siguiente. Si quieres que te acompañe con esa continuidad, te cuento cómo seguimos.\n\n¿Quieres sostener este avance con continuidad real?",
+    en: "It's not a lack of clarity. It's that this only holds when you come back tomorrow, and the next day. If you want me to walk that continuity with you, I'll tell you how we keep going.\n\nDo you want to sustain this progress with real continuity?",
+    pt: "Não é falta de clareza. É que isto sustenta-se quando voltas amanhã, e no dia seguinte. Se quiseres que te acompanhe com essa continuidade, conto-te como seguimos.\n\nQueres sustentar este avanço com continuidade real?",
+    fr: "Ce n'est pas un manque de clarté. C'est que cela ne tient que quand tu reviens demain, et le jour suivant. Si tu veux que je t'accompagne avec cette continuité, je te dis comment on continue.\n\nVeux-tu soutenir ce progrès avec une continuité réelle ?",
+  }[loc];
+}
+
+export function appendCaptureEmailPrompt(response: string, shouldAsk: boolean, locale?: unknown): string {
   if (!shouldAsk) {
     return response;
   }
-
-  return `${response}\n\n${CAPTURE_EMAIL_PROMPT}`;
+  return `${response}\n\n${captureEmailPrompt(locale)}`;
 }
 
-export function appendConversionPrompt(response: string, conversionTrigger: boolean): string {
+export function appendConversionPrompt(response: string, conversionTrigger: boolean, locale?: unknown): string {
   if (!conversionTrigger) {
     return response;
   }
-
-  return `${response}\n\nEsto que acabas de definir es importante. Si quieres, lo guardo para que no se te escape entre el ruido del día. ¿Te lo guardo?`;
+  const loc = coachLocale(locale);
+  const prompts: Record<CoachLocale, string> = {
+    es: "Esto que acabas de definir es importante. Si quieres, lo guardo para que no se te escape entre el ruido del día. ¿Te lo guardo?",
+    en: "What you just defined matters. If you want, I'll save it so it doesn't get lost in the noise of the day. Shall I save it?",
+    pt: "Isto que acabaste de definir é importante. Se quiseres, guardo-o para que não se perca no ruído do dia. Guardo-o?",
+    fr: "Ce que tu viens de définir compte. Si tu veux, je le garde pour qu'il ne se perde pas dans le bruit du jour. Je le garde ?",
+  };
+  return `${response}\n\n${prompts[loc]}`;
 }
 
-export function appendSoftPaywallPrompt(response: string, shouldPrompt: boolean): string {
+export function appendSoftPaywallPrompt(response: string, shouldPrompt: boolean, locale?: unknown): string {
   if (!shouldPrompt) {
     return response;
   }
-
-  return `${response}\n\n${PAYWALL_MESSAGE}`;
+  return `${response}\n\n${paywallMessage(locale)}`;
 }

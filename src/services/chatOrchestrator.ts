@@ -7,6 +7,7 @@ import {
 } from "@/lib/auth";
 import { logError, logInfo } from "@/lib/logger";
 import { assessInputQuality, buildAmbiguousInputResponse } from "@/services/input-quality";
+import { detectLanguageRequest } from "@/services/language-request";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getErrorMessage } from "@/lib/utils";
 import { getUserSessionProfile, isSyntheticEmail } from "@/services/user";
@@ -225,6 +226,38 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
         // Referer ausente o malformado — mantener default "es"
       }
     }
+  }
+
+  // ── 5b. Detector de cambio de idioma en el mensaje del usuario ──────────
+  // Si el usuario dice "en inglés" / "em português" / etc. → override del
+  // locale + persistir en User.locale. El mentor le hace caso desde ESTE
+  // turn. Auditoría 2026-05-25 reveló que antes el mentor rechazaba con
+  // "Respondo siempre en español, trabajo mejor así" — comportamiento
+  // inaceptable.
+  const languageReq = detectLanguageRequest(message, locale);
+  if (languageReq.changed) {
+    locale = languageReq.newLocale;
+    logInfo("CHAT", "language_override_from_chat", {
+      __route: "/api/chat",
+      __userId: identity.userId,
+      from: bodyLocale ?? "?",
+      to: languageReq.newLocale,
+    });
+    // Persistir en BD fire-and-forget — el siguiente turn también vendrá en
+    // el nuevo idioma porque el cliente refrescará cookie en el próximo render.
+    // Si la persistencia falla, no bloqueamos el chat.
+    (async () => {
+      try {
+        const { getPrismaClient } = await import("@/db/prisma");
+        const prisma = getPrismaClient();
+        await prisma.user.update({
+          where: { id: identity.userId },
+          data: { locale: languageReq.newLocale },
+        });
+      } catch (e) {
+        logError("CHAT", e, { __userId: identity.userId, area: "persist_locale_override" });
+      }
+    })();
   }
 
   const result = await processMessage({

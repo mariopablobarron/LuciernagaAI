@@ -161,7 +161,9 @@ describe("interceptActionLock", () => {
         captureEmailMessage: "Deja tu email",
       })
     );
-    expect(appendCaptureEmailPrompt).toHaveBeenCalledWith("Base", true);
+    // 3er arg = locale; el test no lo provee, llega como undefined
+    // (back-compat: appendCaptureEmailPrompt(response, shouldAsk, locale?))
+    expect(appendCaptureEmailPrompt).toHaveBeenCalledWith("Base", true, undefined);
     if (!result.intercepted) throw new Error("unreachable");
     expect(result.data.message).toBe("Base [captura-email]");
     expect(result.data.captureEmail).toBe(true);

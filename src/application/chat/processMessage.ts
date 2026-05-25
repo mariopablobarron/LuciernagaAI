@@ -110,6 +110,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     crisisMode: analysis.crisisMode,
     crisisSource: analysis.crisisSource,
     crisisActiveUntil: analysis.crisisActiveUntil,
+    locale: input.locale,
   });
 
   let persistenceAvailable = enriched.persistenceAvailable;
@@ -164,6 +165,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     domainDecision,
     activeGoal,
     countryCode: countryCode ?? null,
+    locale: input.locale,
   };
 
   const lockResult = await interceptActionLock(interceptInput);

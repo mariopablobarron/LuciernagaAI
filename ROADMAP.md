@@ -25,6 +25,7 @@
 | 19 | Bookmark mensajes del mentor — botón + modal con lista | ✅ Producción |
 | 1 | Swipe-to-delete en lista de conversaciones (touch) | ✅ Producción |
 | 12 | Post-crisis check-in email 24h después (silencioso, opt-out trivial) | ✅ Producción |
+| 16 | Mentor cita explícitamente palabras previas del usuario (regla BASE_PROMPT) | ✅ Producción |
 
 ## Pendientes — ordenadas por área
 
@@ -50,7 +51,6 @@
 | # | Feature | Estimación | Notas |
 |---|---|---|---|
 | 15 | Resumen al volver tras 24h+ | 6-8h | Modificar pipeline `processMessage` para inyectar resumen automático si última conversación >24h. Memoria semántica light. |
-| 16 | Citar lo que dijiste antes | 6-8h | Mejorar retrieval del historial en el LLM. Prompt engineering + few-shot examples. |
 | 17 | Detectar y nombrar bucles | 8-12h | Análisis cross-conversación de tópicos. Heurística semantic embedding o keyword. Solo activar si bucle ≥3. |
 
 ### Calidad del mentor

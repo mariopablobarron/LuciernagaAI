@@ -1,0 +1,25 @@
+src/services/chatOrchestrator.ts
+  s_c72d0ada98a9af::t_c1f503bcb98014 191-198,201-202,205-208,211-212,214-226,229-260
+  s_c72d0ada98a9af::t_4e59bbb3a9aa5b 199-200,203-204,209,213,227-228,261-262
+  s_d2308f25c4747c::t_35e39c1baeb953 73-122
+  s_d2308f25c4747c::t_d5414928bf9c0b 31-36,38
+  s_d2308f25c4747c::t_e70c6de1ff7ced 268
+  s_c72d0ada98a9af::t_915b8620dee7a7 210
+  s_d2308f25c4747c::t_625a6219c1e08d 8-9
+  s_c72d0ada98a9af::t_bfca7dcce5d77b 280
+scripts/reset-superadmin-password.mjs
+  s_d2308f25c4747c::t_b78c9371fea685 1-107
+src/services/input-quality.ts
+  s_d2308f25c4747c::t_c3631abd9f5e64 82-95
+  s_d2308f25c4747c::t_5752b782a104bf 1-40,44-81,96-160
+  s_d2308f25c4747c::t_4d63133b1f5bf5 41-43
+src/services/input-quality.test.ts
+  s_d2308f25c4747c::t_5d870a1ec5eb9e 75-84
+  s_d2308f25c4747c::t_6348be84a097a6 1-74,85-131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "4799f5059bc2a115dcbd0d7ee79ecdab9519d03c",
+  "prompts": {}
+}

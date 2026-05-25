@@ -86,6 +86,7 @@ export async function GET(req: NextRequest) {
   }
 
   const prisma = getPrismaClient();
+  const now = new Date();
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   try {
@@ -115,13 +116,37 @@ export async function GET(req: NextRequest) {
       take: 200,
     });
 
+    // Dedup duro: si el usuario ya recibió un weekly_inactive en los últimos
+    // 7 días, NO volver a mandar — aunque el endpoint sea llamado 100 veces.
+    // Fix incidente 2026-05-25: un caller externo (probable cron-job.org
+    // zombi) llamaba este endpoint cada 15 min → 22 emails × 5 ejecuciones
+    // = 110 emails al mismo grupo de usuarios en 2 horas. Inaceptable.
+    const candidateIds = users.map((u) => u.id);
+    const recentSent = await prisma.scheduledEmail.findMany({
+      where: {
+        userId: { in: candidateIds },
+        template: "weekly_inactive",
+        OR: [
+          { sentAt: { gte: sevenDaysAgo } },
+          { scheduledAt: { gte: sevenDaysAgo }, cancelled: false, sentAt: null },
+        ],
+      },
+      select: { userId: true },
+    });
+    const recentSentSet = new Set(recentSent.map((s) => s.userId));
+
     let sent = 0;
     let skipped = 0;
+    let dedupSkipped = 0;
     let errors = 0;
 
     for (const user of users) {
       if (isSyntheticEmail(user.email)) {
         skipped++;
+        continue;
+      }
+      if (recentSentSet.has(user.id)) {
+        dedupSkipped++;
         continue;
       }
 
@@ -139,8 +164,22 @@ export async function GET(req: NextRequest) {
           userId: user.id,
           template: "weekly_inactive",
         });
-        if (ok) sent++;
-        else errors++;
+        if (ok) {
+          // Registrar el envío para que el dedup funcione en la próxima llamada.
+          // Fire-and-forget: si falla, el siguiente turn lo capturará igual
+          // (el peor caso es 1 email duplicado por usuario, no 5).
+          await prisma.scheduledEmail.create({
+            data: {
+              userId: user.id,
+              template: "weekly_inactive",
+              scheduledAt: now,
+              sentAt: now,
+            },
+          }).catch((e) => {
+            logError("CRON", e, { userId: user.id, action: "weekly_inactive_dedup_record_failed" });
+          });
+          sent++;
+        } else errors++;
         await new Promise((r) => setTimeout(r, 200)); // throttle: 5 emails/sec max
       } catch (err) {
         logError("CRON", err, { userId: user.id, action: "weekly_inactive_reminder" });
@@ -148,8 +187,17 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    logInfo("CRON", "weekly_inactive_reminder_done", { candidates: users.length, sent, skipped, errors });
-    return NextResponse.json({ ok: true, candidates: users.length, sent, skipped, errors });
+    logInfo("CRON", "weekly_inactive_reminder_done", {
+      candidates: users.length, sent, skipped, dedupSkipped, errors,
+    });
+    return NextResponse.json({
+      ok: true,
+      candidates: users.length,
+      sent,
+      skipped,
+      dedupSkipped,
+      errors,
+    });
   } catch (error) {
     logError("CRON", error, { action: "weekly_inactive_reminder_failed" });
     sendAutomatedAlert({ type: "critical", title: "Cron falló: weekly-inactive-reminder", message: error instanceof Error ? error.message : "Error desconocido" }).catch(() => {});

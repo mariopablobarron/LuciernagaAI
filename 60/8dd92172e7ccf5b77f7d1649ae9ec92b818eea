@@ -1,0 +1,39 @@
+src/application/chat/phases/enrich.ts
+  s_d2308f25c4747c::t_20d9bd615ebd37 137-139
+  s_d2308f25c4747c::t_07b1f12b4bc020 554
+src/services/coach.ts
+  s_d2308f25c4747c::t_145d974573965c 1010,1016,1018-1035,1037-1039,1042,1046-1056,1060-1070,1074
+  s_d2308f25c4747c::t_57a8a7d32d9e36 1077,1081-1088,1091,1095
+  s_d2308f25c4747c::t_7afbf3115066fe 804-844
+src/services/language-request.ts
+  s_d2308f25c4747c::t_0a366776ae878f 1-54
+src/application/chat/processMessage.ts
+  s_d2308f25c4747c::t_30610299aba6e3 168
+  s_d2308f25c4747c::t_af396436771bcb 113
+src/application/chat/phases/intercept.test.ts
+  s_d2308f25c4747c::t_00d81f8231e649 164-166
+src/application/chat/phases/intercept.ts
+  s_d2308f25c4747c::t_f6449d1a8ec030 130
+  s_d2308f25c4747c::t_3c15dc3a117c88 105-108
+src/services/language-request.test.ts
+  s_d2308f25c4747c::t_d14e70642716a2 1-54
+src/services/chatOrchestrator.ts
+  s_d2308f25c4747c::t_58f2c7dd82cb5c 231-262
+  s_d2308f25c4747c::t_74e85bb599cb05 10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "608dd92172e7ccf5b77f7d1649ae9ec92b818eea",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

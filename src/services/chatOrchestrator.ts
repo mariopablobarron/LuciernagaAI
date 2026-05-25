@@ -5,7 +5,8 @@ import {
   InvalidSessionTokenError,
   bootstrapSessionIdentity,
 } from "@/lib/auth";
-import { logError } from "@/lib/logger";
+import { logError, logInfo } from "@/lib/logger";
+import { assessInputQuality, buildAmbiguousInputResponse } from "@/services/input-quality";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getErrorMessage } from "@/lib/utils";
 import { getUserSessionProfile, isSyntheticEmail } from "@/services/user";
@@ -66,6 +67,56 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
       "neutral",
       "EMPTY_MESSAGE"
     );
+  }
+
+  // ── 2b. Intercept para input ambiguo (gibberish / muy corto) ─────────────
+  // Auditoría 2026-05-25 reveló convo con "Hoka"/"Hzhshdhs"/"No lo se" → el
+  // mentor respondía la MISMA plantilla 3 veces. Ahora: detectamos antes de
+  // pegar al LLM (cero coste, respuesta instantánea, variantes rotadas).
+  //
+  // Para `ambiguous_short_reply` (sí/no/ok) NO interceptamos — esas son
+  // respuestas válidas cuando hay contexto previo.
+  const inputQuality = assessInputQuality(message);
+  if (inputQuality.kind === "too_short" || inputQuality.kind === "gibberish") {
+    // Locale para la respuesta scripted — mismo orden de prioridad que el
+    // resto del orchestrator (body.locale > cookie > "es").
+    const localeRaw =
+      ((body as Record<string, unknown>).locale as string | undefined) ??
+      req.cookies.get("NEXT_LOCALE")?.value ??
+      "es";
+    const safeLocale = (["es","en","pt","fr"].includes(localeRaw) ? localeRaw : "es") as
+      | "es" | "en" | "pt" | "fr";
+    // Rotación basada en segundo actual → si el usuario manda 2 gibberish
+    // seguidos, la variante NO se repite literal.
+    const turnIdx = Math.floor(Date.now() / 1000);
+    const scripted = buildAmbiguousInputResponse(safeLocale, turnIdx);
+
+    logInfo("CHAT", "input_ambiguous_intercepted", {
+      __route: "/api/chat",
+      __userId: identity.userId,
+      kind: inputQuality.kind,
+      reason: "reason" in inputQuality ? inputQuality.reason : undefined,
+      messageLength: message.length,
+    });
+
+    // SSE stream con UN solo chunk con la respuesta scripted + meta.
+    // El cliente ya sabe parsear SSE estándar del chat.
+    const stream = new ReadableStream({
+      start(controller) {
+        const encoder = new TextEncoder();
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "delta", delta: scripted })}\n\n`));
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "meta", success: true, state: "neutral", intercepted: "ambiguous_input" })}\n\n`));
+        controller.close();
+      },
+    });
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache, no-transform",
+        Connection: "keep-alive",
+        "X-Accel-Buffering": "no",
+      },
+    });
   }
 
   // ── 3. Email verification gate ────────────────────────────────────────────

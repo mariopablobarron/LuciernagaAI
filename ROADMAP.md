@@ -144,4 +144,84 @@ _Sesión cerrada con 17 features ROADMAP en producción + 6 fixes profundos de c
 
 ---
 
+## Honestidad relacional vs §100 Dilexit Nos (sesión 2026-05-25)
+
+Tema **estratégico y de marca**, no del ROADMAP de 30 features. La encíclica
+Dilexit Nos §100 (Francisco, oct 2024) critica explícitamente la "imitación
+artificial de la relación de cuidado" en contextos de pobreza relacional. La
+crítica NO es la del psicólogo ("no eres terapeuta" — eso ya está contestado
+en 18 sitios del producto) sino más fina: **no eres reemplazo de las
+personas que quieren al usuario**.
+
+### Diagnóstico — qué tiene ya el producto en esa dirección
+
+- BASE_PROMPT "Interpelar > instruir" — devuelve al usuario a sí mismo.
+- `ask-community-cta.ts` — deriva preguntas a comunidad real.
+- `crisis-hotlines.ts` — deriva inmediato a teléfono humano (024, ANAR…).
+- Anti-loop — corta el mentor pegajoso.
+- Auto-borrado 30d, modo incógnito, no gamificación, no rachas, "esto no
+  me sirvió" — todo es arquitectura anti-retentiva.
+
+Pero **nada lo declaraba en el copy público**, y no hay mecanismo activo
+para empujar al usuario fuera cuando lleva mucho tiempo dentro.
+
+### Plan en 3 capas
+
+**Capa A — Copy declarativo** ✅ **Hecha 2026-05-25** (commit `0fc06df` en main)
+- Nueva key `hero.relationalHonesty` en los 4 idiomas → bloque destacado
+  con border-l cyan en home, debajo del langNote.
+- `chat.input.footnote` endurecido: añade "ni a las personas que te
+  quieren" en los 4 idiomas.
+- `ConsentModal.tsx` (hardcoded ES) → párrafo destacado tras el primer
+  disclaimer, con la mención explícita "el café con tu hermana ni la
+  llamada al amigo".
+
+**Capa B — Mecanismo activo `relational-nudge.ts`** ⏳ Pendiente (~4-6h)
+- Detector: >X mensajes en últimos 7d + ausencia de mención a otras
+  personas + tópicos de soledad/aislamiento.
+- Una vez por semana max (cooldown duro). En lugar de responder, el
+  mentor dice: *"Antes de seguir conmigo, escribe ahora mismo a una
+  persona — la que sea, aunque sea para decir hola. Vuelve cuando lo
+  hayas hecho."*
+- Si crisis activa o usuario protesta → NO se dispara. Como anti-loop,
+  respeta la urgencia.
+- Riesgo: si se calibra mal, suena paternalista y se carga la marca.
+  No abordar sin cabeza fresca y revisión por psicóloga clínica.
+
+**Capa C — Métrica anti-engagement** ⏳ Pendiente (~2-3h)
+- Panel `/admin/metrics` con 2 KPIs nuevos:
+  - % sesiones que terminan con derivación a humano (crisis, community,
+    nudge clickeado).
+  - Tiempo medio entre sesiones (declarando `>7d` = bueno, no malo).
+- Bloque público en `/sobre-nosotros`: *"Si la gente pasa cada vez menos
+  tiempo aquí porque tiene relaciones más fuertes fuera, hemos ganado.
+  Es la única métrica que importa."*
+- Decisión ideológica: implica declarar que medimos "queremos que nos
+  uses menos". Hay que aguantar las consecuencias en pitchdecks.
+
+### Posicionamiento de marca derivado
+
+Esto separa el producto de ChatGPT (genérico, retentivo), Replika
+(explícitamente sustitutivo), Character.AI (lo mismo en escala).
+Argumento vendible a:
+
+- Familias católicas (mercado Granada, congregaciones, parroquias) — la
+  encíclica da el lenguaje.
+- Profesionales salud mental — "yo soy el puente entre crisis y vuestra
+  consulta, no el sustituto".
+- Padres preocupados por pantallas y adolescentes — producto que intenta
+  usarse menos.
+- Reguladores europeos (AI Act art. 5, prohibición IA que explote
+  vulnerabilidades) — 5 años de adelanto.
+
+### Pendientes de la sesión
+
+- **Observar 24-48h** la respuesta a Capa A antes de abordar B o C.
+- **Mario**: borrar el cron zombi de cron-job.org (ver
+  `incident_email_spam_cronjob_zombi_20260525.md`).
+- **Producto**: auditar los otros 5 endpoints cron para meterles dedup
+  interno con mismo patrón que el de weekly-inactive-reminder.
+
+---
+
 _Origen: lista de 30 mejoras pedidas por Mario a Claude el 2026-05-18. Versión inicial sin priorizar disponible en el transcript de la sesión._

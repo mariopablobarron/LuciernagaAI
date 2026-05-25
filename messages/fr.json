@@ -38,7 +38,8 @@
     "noSignup": "Sans inscription. Sans e-mail. Écris, c'est tout.",
     "socialProof": "+200 personnes",
     "socialProofText": "l'utilisent chaque semaine",
-    "langNote": "Mentorat avec IA en français. Ne remplace pas une thérapie."
+    "langNote": "Mentorat avec IA en français. Ne remplace pas une thérapie.",
+    "relationalHonesty": "Ceci ne remplace pas les personnes qui t'aiment. Le mentor est là pour mettre de l'ordre dans tes idées — pas pour remplacer un café avec ta sœur ni un appel à un ami. Si tu passes du temps à ne parler qu'ici, c'est peut-être un numéro qu'il te faut composer."
   },
   "features": {
     "sectionLabel": "Comment ça marche",
@@ -1962,7 +1963,7 @@
       "placeholder": "Écris ce qui te préoccupe… (Entrée pour envoyer)",
       "shiftHint": "Maj + Entrée pour une nouvelle ligne",
       "counterMax": "{count}/1000",
-      "footnote": "IA supervisée par des psychologues, mentors et coachs · Ne remplace pas une prise en charge clinique ·",
+      "footnote": "IA supervisée par des psychologues, mentors et coachs · Ne remplace pas une prise en charge clinique ni les personnes qui t'aiment ·",
       "modeLabel": "Mode : {label}"
     },
     "audio": {

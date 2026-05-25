@@ -168,6 +168,15 @@ export default async function LandingPageI18n({
                   </div>
                 </div>
                 <p className="text-xs text-zinc-500 mt-3">{t('hero.langNote')}</p>
+
+                {/* #100 — Honestidad relacional: la app NO sustituye personas. */}
+                {/* Bloque visible (no microcopy) — declaración de marca, no */}
+                {/* disclaimer legal. Encíclica Dilexit Nos §100 lo pide. */}
+                <div className="mt-5 border-l-2 border-cyan-500/60 pl-4 py-1">
+                  <p className="text-sm text-zinc-300 leading-relaxed">
+                    {t('hero.relationalHonesty')}
+                  </p>
+                </div>
               </Reveal>
             </div>
 

@@ -38,7 +38,8 @@
     "noSignup": "Sin registro. Sin email. Escribe y ya.",
     "socialProof": "+200 personas",
     "socialProofText": "usándolo cada semana",
-    "langNote": "Mentoría con IA en español. No sustituye terapia."
+    "langNote": "Mentoría con IA en español. No sustituye terapia.",
+    "relationalHonesty": "Esto no reemplaza a las personas que te quieren. El mentor ordena tu cabeza; no sustituye el café con tu hermana ni la llamada al amigo. Si llevas tiempo hablando solo aquí, igual lo que necesitas es marcar un número."
   },
   "features": {
     "sectionLabel": "Cómo funciona",
@@ -1962,7 +1963,7 @@
       "placeholder": "Escribe lo que te pasa… (Enter para enviar)",
       "shiftHint": "Shift + Enter para nueva línea",
       "counterMax": "{count}/1000",
-      "footnote": "IA supervisada por psicólogos, mentores y coaches · No sustituye atención clínica ·",
+      "footnote": "IA supervisada por psicólogos, mentores y coaches · No sustituye atención clínica ni a las personas que te quieren ·",
       "modeLabel": "Modo: {label}"
     },
     "audio": {

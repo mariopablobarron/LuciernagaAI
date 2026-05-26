@@ -1,0 +1,25 @@
+src/app/profile/page.tsx
+  s_d2308f25c4747c::t_fb098a9f03ac87 246-253,255
+src/app/impulso/page.tsx
+  s_d2308f25c4747c::t_595b99f28b389f 644-650
+src/app/impulso/mensajes/page.tsx
+  s_d2308f25c4747c::t_57db9a3840a1f9 133-139
+src/app/impulso/retos/[id]/page.tsx
+  s_d2308f25c4747c::t_2770452d53ddda 70-76,79-85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "837555826c9d08a6772c8554bce6f75b73943392",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

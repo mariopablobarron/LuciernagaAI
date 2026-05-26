@@ -1,0 +1,29 @@
+src/app/api/cron/capsule-deliver/route.ts
+  s_d2308f25c4747c::t_b3082f50211b48 24-30
+  s_d2308f25c4747c::t_78f8700eda51b6 99-104
+  s_d2308f25c4747c::t_1ec13b8537333b 13
+src/app/api/cron/weekly-inactive-reminder/route.ts
+  s_d2308f25c4747c::t_fa29d832c026c6 10
+  s_d2308f25c4747c::t_b1f2c9a7ae180f 80-89
+  s_d2308f25c4747c::t_5a5db13ee7eaab 216-221
+src/app/api/cron/user-weekly-review/route.ts
+  s_d2308f25c4747c::t_92db24621e80f7 9
+  s_d2308f25c4747c::t_fdfb70394f298a 102-108
+  s_d2308f25c4747c::t_3fb31446151f4b 224-229
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "9b2b097bf1d09d52eea40600922bb4f656a8be4b",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

@@ -641,7 +641,13 @@ export default function ImpulsoPage() {
                   );
                 })}
 
-                <button className="w-full py-3 px-4 rounded-xl border border-violet-500/40 text-violet-400 text-sm font-semibold hover:bg-violet-500/10 hover:border-violet-500/60 transition-all">
+                <button
+                  type="button"
+                  disabled
+                  title="Aún no disponible"
+                  aria-disabled="true"
+                  className="w-full py-3 px-4 rounded-xl border border-violet-500/40 text-violet-400 text-sm font-semibold opacity-50 cursor-not-allowed transition-all"
+                >
                   {t("requestNewChallenge")}
                 </button>
               </>

@@ -243,9 +243,16 @@ export default function ProfilePage() {
           <Link href="/dashboard" className={`${COMPONENTS.buttonSecondary} w-full block text-center`}>
             {t('viewProgress')}
           </Link>
-          <button className="w-full py-2 px-4 rounded-lg border border-red-500/50 text-red-400 hover:bg-red-500/10 transition-colors font-semibold">
+          {/* Botón con endpoint inmediato no existe todavía. Damos salida real */}
+          {/* al usuario que quiere irse: mailto a soporte. Auditoría falsos */}
+          {/* clicables 2026-05-26. */}
+          <a
+            href="mailto:hola@tresmilmillonesdelatidos.es?subject=Quiero borrar mi cuenta"
+            className="w-full py-2 px-4 rounded-lg border border-red-500/50 text-red-400 hover:bg-red-500/10 transition-colors font-semibold block text-center"
+            aria-label="Escribir a soporte para borrar la cuenta"
+          >
             {t('deleteAccount')}
-          </button>
+          </a>
         </div>
       </div>
     </div>

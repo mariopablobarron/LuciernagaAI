@@ -119,7 +119,51 @@ Configurados en `crontab -e` como root. Log: `/var/log/mentor-crons.log`.
 - VPS: `tail -100 /var/log/mentor-crons.log`. Cada línea es JSON `{"ok":true,...}` o error.
 
 ### cron-job.org
-**No usado** (migrado a crontab VPS el 2026-05-17). Si la memoria operativa dice lo contrario, está desactualizada.
+**No usado** (migrado a crontab VPS el 2026-05-17). Si la memoria operativa dice lo contrario, está desactualizada. **Patrón confirmado de zombies**: 2 incidentes en 1 semana (2026-05-20 `/api/admin/backup`, 2026-05-25 `/api/cron/weekly-inactive-reminder`). Auditar cron-job.org tras cada migración y eliminar todo lo que apunte al dominio.
+
+### Patrón obligatorio para crons que envían emails
+
+Tras el incidente del **2026-05-25** (cron-job.org zombi llamó
+`weekly-inactive-reminder` cada 15 min → 110 emails a 22 usuarios en 2h),
+todo endpoint cron que envíe emails debe tener **al menos** las 2 primeras
+capas, idealmente las 3:
+
+1. **`withCronDedup(jobName, keyFn)` de `src/lib/cron-log.ts`** — lock
+   distribuido con UNIQUE constraint en `CronRunLog.{jobName, dedupKey}`.
+   Llamadas repetidas dentro de la ventana devuelven `dedup_lock` sin
+   tocar BD ni sistema de email. Ventanas disponibles: `dailyUtcKey()`,
+   `isoWeekKey()`. Es la capa CRÍTICA contra spam por caller mal portado.
+2. **Dedup interno por usuario** — consultar la tabla relevante
+   (`ScheduledEmail`, `WeeklyLetter`, status de capsule, etc.) antes de
+   procesar cada item, registrar tras procesar. Protege contra el caso
+   donde el lock se libere (ej. semanas cruzadas) o varios crons compartan
+   estado.
+3. **Flag en `notification-config.json`** — corte de emergencia legible
+   en tiempo real (cache 30s) sin redeploy:
+   ```bash
+   ssh root@72.61.195.108 'docker exec luciernaga-ai sh -c \
+     "echo \"{\\\"cronXYZ\\\": false}\" > /app/notification-config.json"'
+   ```
+
+**Verificación post-deploy** (2 curls seguidos):
+```bash
+curl -H 'x-cron-secret: ...' https://.../api/cron/<endpoint>
+# 1ª: {ok:true, candidates:N, sent:M, ...}
+curl -H 'x-cron-secret: ...' https://.../api/cron/<endpoint>
+# 2ª: {ok:true, skipped:true, reason:"dedup_lock", dedupKey:"YYYY-Www"}
+```
+
+**Estado actual de los 6 endpoints que mandan emails** (auditoría
+2026-05-26):
+
+| Endpoint | Lock distribuido | Dedup interno |
+|---|---|---|
+| `24h-nudge` | ✅ `dailyUtcKey` | n/a (idempotente por crisis flag) |
+| `7d-nudge` | ✅ `dailyUtcKey` | ✅ `nudge_7d` template + 14d |
+| `weekly-inactive-reminder` | ✅ `isoWeekKey` | ✅ `ScheduledEmail` + 7d |
+| `user-weekly-review` | ✅ `isoWeekKey` | ⚠️ pendiente (volumen bajo) |
+| `weekly-letter` | n/a (dedup query) | ✅ `weeklyLetters.none {weekStart}` |
+| `capsule-deliver` | ✅ `dailyUtcKey` | ✅ status pending→ready |
 
 ---
 

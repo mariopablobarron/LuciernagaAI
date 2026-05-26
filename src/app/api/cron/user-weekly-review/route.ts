@@ -6,6 +6,7 @@ import { logError, logInfo } from "@/lib/logger";
 import { sendAutomatedAlert } from "@/lib/alerts";
 import { getNotificationConfig } from "@/lib/notification-config";
 import { requireCronSecret } from "@/lib/cron-auth";
+import { withCronDedup, isoWeekKey } from "@/lib/cron-log";
 
 export const dynamic = "force-dynamic";
 
@@ -98,8 +99,13 @@ function buildWeeklyReviewEmail(params: {
   return { subject, html, text };
 }
 
-export async function GET(req: NextRequest) {
-  const unauthorized = requireCronSecret(req);
+// Lock por semana ISO: si el endpoint es llamado N veces en la misma
+// semana, solo la primera ejecuta. Las demás devuelven `dedup_lock`. Esto
+// evita el patrón cron-job.org zombi que causó el incidente del 2026-05-25
+// en `weekly-inactive-reminder` — este endpoint era vulnerable al mismo
+// bug porque NO tenía dedup interno y manda email a todos los lastSeen<7d.
+async function handler(req: Request): Promise<Response> {
+  const unauthorized = requireCronSecret(req as NextRequest);
   if (unauthorized) return unauthorized;
 
   const notifConfig = await getNotificationConfig();
@@ -215,3 +221,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }
+
+export const GET = withCronDedup(
+  "user-weekly-review",
+  () => isoWeekKey(),
+  handler,
+);

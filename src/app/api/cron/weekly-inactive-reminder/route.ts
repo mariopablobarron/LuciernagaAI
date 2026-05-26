@@ -7,6 +7,7 @@ import { sendAutomatedAlert } from "@/lib/alerts";
 import { isSyntheticEmail } from "@/services/user";
 import { getNotificationConfig } from "@/lib/notification-config";
 import { requireCronSecret } from "@/lib/cron-auth";
+import { withCronDedup, isoWeekKey } from "@/lib/cron-log";
 
 export const dynamic = "force-dynamic";
 
@@ -76,8 +77,16 @@ export function buildWeeklyInactiveReminderEmail(data: InactiveUserData): {
 }
 
 // GET /api/cron/weekly-inactive-reminder?secret=CRON_SECRET
-export async function GET(req: NextRequest) {
-  const unauthorized = requireCronSecret(req);
+// Doble protección contra spam:
+//   1. withCronDedup(isoWeekKey) → solo 1 ejecución por semana ISO completa.
+//      Llamadas repetidas en la misma semana devuelven `dedup_lock` y NO
+//      tocan la BD ni el sistema de email. Defensa contra cron-job.org
+//      zombies y callers mal configurados.
+//   2. Dedup interno por usuario (ScheduledEmail) — si por lo que sea el
+//      cron acaba ejecutándose 2× (ej. semanas cruzadas o lock liberado),
+//      ningún usuario recibe 2 emails en menos de 7 días.
+async function handler(req: Request): Promise<Response> {
+  const unauthorized = requireCronSecret(req as NextRequest);
   if (unauthorized) return unauthorized;
 
   const notifConfig = await getNotificationConfig();
@@ -204,3 +213,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }
+
+export const GET = withCronDedup(
+  "weekly-inactive-reminder",
+  () => isoWeekKey(),
+  handler,
+);

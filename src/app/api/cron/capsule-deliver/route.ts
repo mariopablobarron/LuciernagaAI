@@ -10,6 +10,7 @@ import {
   markCapsuleReady,
 } from "@/services/capsules";
 import { requireCronSecret } from "@/lib/cron-auth";
+import { withCronDedup, dailyUtcKey } from "@/lib/cron-log";
 
 export const dynamic = "force-dynamic";
 
@@ -20,10 +21,13 @@ export const dynamic = "force-dynamic";
 //   2. Marca pending→ready las que ya alcanzaron deliverAt, y manda email
 //      a quien tenga email real, verificado y opt-in.
 //
-// Idempotente para los emails: solo procesamos cápsulas en pending; tras
-// markCapsuleReady pasan a ready y no vuelven a entrar en el bucle.
-export async function GET(req: NextRequest) {
-  const unauthorized = requireCronSecret(req);
+// Idempotente por status transition: solo procesamos cápsulas en pending;
+// tras markCapsuleReady pasan a ready y no vuelven a entrar en el bucle.
+// Encima, lock por día UTC vía withCronDedup → llamadas repetidas en el
+// mismo día devuelven `dedup_lock` sin tocar BD (defensa preventiva
+// añadida tras incidente cron-job.org zombi 2026-05-25).
+async function handler(req: Request): Promise<Response> {
+  const unauthorized = requireCronSecret(req as NextRequest);
   if (unauthorized) return unauthorized;
 
   try {
@@ -92,3 +96,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "CAPSULE_DELIVER_FAILED" }, { status: 500 });
   }
 }
+
+export const GET = withCronDedup(
+  "capsule-deliver",
+  () => dailyUtcKey(),
+  handler,
+);

@@ -130,7 +130,13 @@ export default function MensajesPage() {
 
               {!mensaje.locked && (
                 <div className="pt-3 border-t border-zinc-800">
-                  <button className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1">
+                  <button
+                    type="button"
+                    disabled
+                    title="Aún no disponible"
+                    aria-disabled="true"
+                    className="text-xs font-semibold text-cyan-400 opacity-50 cursor-not-allowed transition-colors flex items-center gap-1"
+                  >
                     <MessageSquare className="w-3 h-3" />
                     Leer mensaje completo
                   </button>

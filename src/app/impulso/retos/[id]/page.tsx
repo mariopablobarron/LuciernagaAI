@@ -67,10 +67,22 @@ export default async function RetoDetailPage({ params }: { params: Promise<{ id:
 
         {/* Actions */}
         <div className={`${COMPONENTS.card} p-6 space-y-3`}>
-          <button className={`${COMPONENTS.buttonPrimary} w-full`}>
+          <button
+            type="button"
+            disabled
+            title="Aún no disponible"
+            aria-disabled="true"
+            className={`${COMPONENTS.buttonPrimary} w-full opacity-50 cursor-not-allowed`}
+          >
             Marcar como completado hoy
           </button>
-          <button className={`${COMPONENTS.buttonSecondary} w-full`}>
+          <button
+            type="button"
+            disabled
+            title="Aún no disponible"
+            aria-disabled="true"
+            className={`${COMPONENTS.buttonSecondary} w-full opacity-50 cursor-not-allowed`}
+          >
             Ver historial
           </button>
         </div>

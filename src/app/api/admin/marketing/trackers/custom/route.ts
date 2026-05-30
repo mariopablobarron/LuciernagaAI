@@ -5,7 +5,7 @@ import { logError, logInfo } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 
-const PROVIDERS = ["hotjar", "clarity", "plausible", "posthog"] as const;
+const PROVIDERS = ["hotjar", "clarity", "plausible", "posthog", "umami"] as const;
 type Provider = (typeof PROVIDERS)[number];
 
 const NAME_MAX = 80;

@@ -182,7 +182,7 @@ export default function MarketingPage() {
   // Custom trackers (DB-driven, no redeploy)
   type CustomTrackerRow = {
     id: string;
-    provider: "hotjar" | "clarity" | "plausible" | "posthog";
+    provider: "hotjar" | "clarity" | "plausible" | "posthog" | "umami";
     name: string;
     identifier: string;
     apiHost: string | null;
@@ -1982,6 +1982,7 @@ export default function MarketingPage() {
                     <option value="clarity">Microsoft Clarity (projectId)</option>
                     <option value="plausible">Plausible (domain)</option>
                     <option value="posthog">PostHog (projectKey)</option>
+                    <option value="umami">Umami (website-id UUID)</option>
                   </select>
                 </div>
                 <div>
@@ -2005,6 +2006,7 @@ export default function MarketingPage() {
                     {newProvider === "plausible" &&
                       " (tu dominio, ej. tresmilmillonesdelatidos.es)"}
                     {newProvider === "posthog" && " (projectKey, empieza por phc_)"}
+                    {newProvider === "umami" && " (website-id, UUID v4)"}
                   </label>
                   <input
                     type="text"
@@ -2014,12 +2016,13 @@ export default function MarketingPage() {
                     className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white placeholder:text-zinc-600 font-mono"
                   />
                 </div>
-                {(newProvider === "plausible" || newProvider === "posthog") && (
+                {(newProvider === "plausible" || newProvider === "posthog" || newProvider === "umami") && (
                   <div>
                     <label className="block text-[11px] uppercase font-semibold text-zinc-400 mb-1">
-                      API host (opcional)
+                      API host {newProvider === "umami" ? "(recomendado)" : "(opcional)"}
                       {newProvider === "plausible" && " — para Plausible self-hosted"}
                       {newProvider === "posthog" && " — default https://us.i.posthog.com"}
+                      {newProvider === "umami" && " — ej. https://analytics.hubstartidea.es"}
                     </label>
                     <input
                       type="text"

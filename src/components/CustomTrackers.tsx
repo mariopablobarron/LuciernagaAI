@@ -4,7 +4,7 @@ import Script from "next/script";
 import { useEffect, useState } from "react";
 
 type ActiveTracker = {
-  provider: "hotjar" | "clarity" | "plausible" | "posthog";
+  provider: "hotjar" | "clarity" | "plausible" | "posthog" | "umami";
   identifier: string;
   apiHost: string | null;
 };
@@ -48,6 +48,7 @@ export default function CustomTrackers() {
         if (t.provider === "clarity") return <ClarityScript key={key} projectId={t.identifier} />;
         if (t.provider === "plausible") return <PlausibleScript key={key} domain={t.identifier} apiHost={t.apiHost} />;
         if (t.provider === "posthog") return <PostHogScript key={key} projectKey={t.identifier} apiHost={t.apiHost} />;
+        if (t.provider === "umami") return <UmamiScript key={key} websiteId={t.identifier} apiHost={t.apiHost} />;
         return null;
       })}
     </>
@@ -109,6 +110,24 @@ function PlausibleScript({ domain, apiHost }: { domain: string; apiHost: string 
       strategy="afterInteractive"
       defer
       data-domain={domain}
+      src={src}
+    />
+  );
+}
+
+function UmamiScript({ websiteId, apiHost }: { websiteId: string; apiHost: string | null }) {
+  // websiteId es UUID v4: hex con guiones.
+  if (!/^[A-Za-z0-9\-]+$/.test(websiteId)) return null;
+  // apiHost obligatorio para Umami self-hosted. Fallback al cloud público.
+  const src = apiHost && /^https:\/\/[A-Za-z0-9.\-]+/.test(apiHost)
+    ? `${apiHost.replace(/\/+$/, "")}/script.js`
+    : "https://cloud.umami.is/script.js";
+  return (
+    <Script
+      id={`umami-${websiteId}`}
+      strategy="afterInteractive"
+      defer
+      data-website-id={websiteId}
       src={src}
     />
   );

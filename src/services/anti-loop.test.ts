@@ -1,5 +1,6 @@
 import {
   userProtestedRepetition,
+  userRejectedFlow,
   recentActionLockCount,
   recentEmailPromptCount,
   recentCrisisActivity,
@@ -140,5 +141,100 @@ describe("shouldSilenceAdminLoops — decisión final integrada", () => {
     expect(r.silenceActionLock).toBe(false);
     expect(r.silenceEmailPrompt).toBe(false);
     expect(r.reason).toBe(null);
+  });
+});
+
+// ─── Iteración 2026-05-26 — fixes tras observar conv cmpmww8tr ────────────────
+
+describe("userProtestedRepetition — confusión suave (añadida 26-05-2026)", () => {
+  test("ES — 'no te entiendo' (caso real conv cmpmww8tr)", () => {
+    expect(userProtestedRepetition("No te entiendo")).toBe(true);
+    expect(userProtestedRepetition("no entiendo")).toBe(true);
+    expect(userProtestedRepetition("no comprendo")).toBe(true);
+    expect(userProtestedRepetition("no te sigo")).toBe(true);
+    expect(userProtestedRepetition("no sé qué quieres")).toBe(true);
+    expect(userProtestedRepetition("no sé de qué hablas")).toBe(true);
+    expect(userProtestedRepetition("qué dices?")).toBe(true);
+    expect(userProtestedRepetition("qué quieres decir")).toBe(true);
+  });
+
+  test("EN — confusión suave", () => {
+    expect(userProtestedRepetition("I don't understand")).toBe(true);
+    expect(userProtestedRepetition("I don't get it")).toBe(true);
+    expect(userProtestedRepetition("what do you mean")).toBe(true);
+    expect(userProtestedRepetition("what are you talking about")).toBe(true);
+  });
+
+  test("PT — confusão", () => {
+    expect(userProtestedRepetition("não entendo")).toBe(true);
+    expect(userProtestedRepetition("não te percebo")).toBe(true);
+  });
+
+  test("FR — confusion", () => {
+    expect(userProtestedRepetition("je ne comprends pas")).toBe(true);
+    expect(userProtestedRepetition("je ne te suis pas")).toBe(true);
+  });
+
+  test("Sigue sin falso positivo con 'no' aislado (es flow_rejection, no protesta)", () => {
+    expect(userProtestedRepetition("no")).toBe(false);
+    expect(userProtestedRepetition("No.")).toBe(false);
+  });
+});
+
+describe("userRejectedFlow — rechazo corto del flujo (añadida 26-05-2026)", () => {
+  test("ES — 'No' aislado (caso real conv cmpmww8tr)", () => {
+    expect(userRejectedFlow("No")).toBe(true);
+    expect(userRejectedFlow("no")).toBe(true);
+    expect(userRejectedFlow("No.")).toBe(true);
+    expect(userRejectedFlow("no quiero")).toBe(true);
+    expect(userRejectedFlow("déjalo")).toBe(true);
+    expect(userRejectedFlow("olvídalo")).toBe(true);
+  });
+
+  test("Multilingüe", () => {
+    expect(userRejectedFlow("Nope")).toBe(true);
+    expect(userRejectedFlow("Não")).toBe(true);
+    expect(userRejectedFlow("Non")).toBe(true);
+    expect(userRejectedFlow("drop it")).toBe(true);
+    expect(userRejectedFlow("laisse tomber")).toBe(true);
+  });
+
+  test("NO falso positivo con frases con 'no' dentro", () => {
+    expect(userRejectedFlow("no me siento bien")).toBe(false);
+    expect(userRejectedFlow("creo que no es buena idea")).toBe(false);
+    expect(userRejectedFlow("no sé qué hacer")).toBe(false);
+  });
+});
+
+describe("shouldSilenceAdminLoops — umbral nuevo y flow_rejection", () => {
+  test("1 action lock previo SÍ silencia (umbral bajado de 2 a 1)", () => {
+    const recent = [
+      { role: "assistant", content: "Hay algo de antes que seguimos sin cerrar: X" },
+      { role: "user", content: "vale" },
+    ];
+    const r = shouldSilenceAdminLoops({ currentUserMessage: "vale", recentMessages: recent });
+    expect(r.silenceActionLock).toBe(true);
+    expect(r.reason).toBe("repeated_action_lock");
+  });
+
+  test("Confusión suave del usuario silencia action lock (caso real cmpmww8tr T5)", () => {
+    const r = shouldSilenceAdminLoops({
+      currentUserMessage: "No te entiendo",
+      recentMessages: [
+        { role: "assistant", content: "Hay algo de antes que seguimos sin cerrar: X" },
+      ],
+    });
+    expect(r.silenceActionLock).toBe(true);
+    expect(r.reason).toBe("protest");
+  });
+
+  test("'No' aislado dispara flow_rejection (NO action lock)", () => {
+    const r = shouldSilenceAdminLoops({
+      currentUserMessage: "No",
+      recentMessages: [{ role: "assistant", content: "¿qué llevas evitando?" }],
+    });
+    expect(r.silenceActionLock).toBe(true);
+    expect(r.silenceEmailPrompt).toBe(false); // email NO se pausa por flow_rejection
+    expect(r.reason).toBe("flow_rejection");
   });
 });

@@ -42,6 +42,7 @@ export function SpeakButton({
   lang = "es-ES",
   className,
   preferElevenLabs = false,
+  autoPlay = false,
 }: {
   text: string;
   lang?: string;

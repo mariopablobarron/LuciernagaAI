@@ -154,13 +154,22 @@ async function requestOpenRouter(
             messages: [
               {
                 role: "system",
-                content: buildCoachPrompt(userState, emotionalProfile, safeCoachContext),
+                // Pasamos el último mensaje del usuario al context para que
+                // buildCoachPrompt active el modo desahogo (extensión
+                // proporcional) cuando el mensaje sea largo o multi-párrafo.
+                content: buildCoachPrompt(userState, emotionalProfile, { ...safeCoachContext, lastUserMessage: message }),
               },
               ...history,
               { role: "user", content: message },
             ],
             temperature: 0.7,
-            max_tokens: 450,
+            // Modo desahogo (mensaje largo o multi-párrafo) → permite respuesta
+            // proporcional. Sin esto, el max_tokens estrangularía la
+            // proporcionalidad que pedimos al LLM en el prompt.
+            max_tokens:
+              message.length > 200 || message.split(/\n\s*\n/).filter(Boolean).length >= 2
+                ? 900
+                : 450,
           }),
         },
         REQUEST_TIMEOUT_MS

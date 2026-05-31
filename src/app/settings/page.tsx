@@ -93,6 +93,40 @@ function Toggle({ checked, onChange, disabled }: { checked: boolean; onChange: (
   );
 }
 
+// ─── TTS auto-play (preferencia de dispositivo, localStorage) ─────────────────
+
+function TTSAutoplayToggle() {
+  const [checked, setChecked] = useState<boolean>(false);
+  const [mounted, setMounted] = useState<boolean>(false);
+
+  // Lee la preferencia al montar — no SSR para evitar mismatch.
+  useEffect(() => {
+    setMounted(true);
+    if (typeof window === "undefined") return;
+    setChecked(window.localStorage.getItem("tts_autoplay") === "true");
+  }, []);
+
+  const update = useCallback((next: boolean) => {
+    setChecked(next);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("tts_autoplay", next ? "true" : "false");
+    }
+  }, []);
+
+  return (
+    <div className="flex items-center justify-between pt-4 mt-4 border-t border-zinc-800">
+      <div className="flex-1 min-w-0 pr-3">
+        <p className="text-sm font-semibold text-white">Reproducir voz del mentor automáticamente</p>
+        <p className="text-[11px] text-zinc-500 mt-0.5">
+          Cuando el mentor termine de responder, su mensaje se escucha solo
+          (sin pulsar el botón). Útil si prefieres conversación oral.
+        </p>
+      </div>
+      <Toggle checked={checked} onChange={update} disabled={!mounted} />
+    </div>
+  );
+}
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
@@ -504,6 +538,11 @@ export default function SettingsPage() {
               </button>
             )}
           </div>
+
+          {/* Auto-reproducir voz del mentor — gated por localStorage (pref del */}
+          {/* dispositivo, no UserPreferences). Cambiar este toggle no requiere */}
+          {/* redeploy ni roundtrip de servidor. */}
+          <TTSAutoplayToggle />
         </div>
 
         {/* ── Subscription (BillingSection modular: plan + consumo + upgrade/portal) ── */}

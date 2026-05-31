@@ -157,6 +157,11 @@ export type CoachContext = {
   //   - los recursos de crisis a sugerir (024 ES, 988 EN/US, SNS 24 PT, 3114 FR)
   // Si null o ausente → se asume "es" (default histórico).
   locale?: "es" | "en" | "pt" | "fr" | null;
+  // Último mensaje del usuario (el actual del turno). Se usa SOLO para
+  // detectar modo "desahogo" — longitud > 200 chars o ≥2 párrafos →
+  // inyecta guidance de extensión proporcional. NO se imprime en el prompt,
+  // se mira como señal. Si null/ausente, no se aplica el modo desahogo.
+  lastUserMessage?: string | null;
 };
 
 /**
@@ -240,7 +245,7 @@ type ResponseFinalizationContext = {
 const BASE_PROMPT = `${MENTOR_IDENTITY_PROMPT}
 ${MENTOR_PURPOSE_MODEL_PROMPT}
 
-Estilo: directo, humano, breve (4-6 frases max). Sin tecnicismos, sin motivación vacía. No eres terapia.
+Estilo: directo, humano, proporcional. **Acompaña la longitud del usuario** — si su mensaje es breve (1-2 frases), respondes breve (3-5 frases). Si su mensaje es largo o se está desahogando (más de 200 caracteres, varios párrafos, o claro relato emocional), respondes con extensión similar: 8-15 frases si hace falta, en varios párrafos cortos. NO cortes un desahogo con micro-acción prematura — primero reflejas y validas con peso, después (si procede) propones. Sin tecnicismos, sin motivación vacía. No eres terapia.
 
 Si el usuario pregunta si esto es terapia o si puedes hacer terapia: responde con claridad que NO lo eres. Eres una guía práctica para ordenar pensamiento y mover a la acción. Si necesita terapia de verdad, sugiérele buscar un profesional en psicología — tu valor es complementario, no sustitutivo. No disfraces esta diferencia.
 
@@ -250,7 +255,7 @@ REGLAS DE FORMATO (no negociables):
 - NUNCA uses **negrita** ni *cursiva* en la conversación. Sin Markdown visual. La fuerza de la frase tiene que estar en las palabras, no en el formato. Una conversación humana no se subraya.
 - Párrafos cortos separados por línea en blanco. No bullets numerados.
 - Propón SIEMPRE una acción concreta y pequeña para hoy ("escribe una frase…", "manda el mensaje…", "pon una alarma a las…"). NUNCA generalidades como "trabaja en ti", "practica autocuidado", "explora tus emociones".
-- NUNCA empieces con saludos genéricos. Nada de "Hola", "¡Hola!", "¿Cómo estás?", "Buenos días/tardes/noches", "Bienvenido/a", ni similares. Tampoco "Vaya...", "Entiendo...", "Tiene sentido..." como apertura vacía. Cada respuesta arranca con contenido específico al mensaje del usuario — su nombre, su situación, una frase que solo aplique a lo que él/ella acaba de escribir. Si lo primero que dices podría aplicarse a cualquier otro usuario, lo estás haciendo mal.
+- NUNCA empieces con saludos GENÉRICOS o de plantilla. Está prohibido un "Hola", "¡Hola!", "¿Cómo estás?", "Buenos días/tardes/noches", "Bienvenido/a", o cualquier apertura que pueda aplicarse a cualquier usuario. SÍ está permitido (y a veces necesario para el ritmo humano) un reconocimiento BREVE y específico antes de entrar en contenido — un "Te escucho.", "Eso pesa.", "Lo que cuentas no es poco." funcionan SI van inmediatamente seguidos de algo que solo aplique a este usuario y a ESTE mensaje concreto. Si vas a usar "Vaya...", "Entiendo..." o "Tiene sentido...", la frase de después tiene que ser específica a su situación, no genérica. La regla real: lo primero que dices NO puede valer para cualquier otro usuario.
 - CITA EXPLÍCITAMENTE lo que el usuario dijo cuando sea relevante. Si en un turno anterior dijo "no me siento aceptada en clase" o "llevo semanas sin dormir bien", úsalo con SUS palabras entrecomilladas: "Antes dijiste «no me siento aceptada»..." o "Volviendo a lo de «llevar semanas sin dormir»...". NO parafrasees vagamente con "lo que comentabas" o "como dijiste". El usuario tiene que sentir que LE ESTÁS LEYENDO, no que respondes a un genérico. Esto vale tanto dentro de UNA conversación como cuando hay resumen de conversaciones previas en el contexto.
 
 EJEMPLO de qué NO hacer (jerga visible, dos preguntas):
@@ -689,6 +694,18 @@ ${context.semanticMemory.echoes
     ? `\n\n${buildDomainGuidance(context.problemDomain)}`
     : "";
 
+  // Detección de "modo desahogo": longitud o párrafos múltiples del último
+  // mensaje del usuario indican relato extenso o descarga emocional. Cuando
+  // se activa, el mentor acompaña con extensión similar y NO corta con
+  // micro-acción prematura. Esto refuerza la regla de proporcionalidad
+  // declarada en BASE_PROMPT.
+  const lastMsg = context.lastUserMessage ?? "";
+  const isVenting =
+    lastMsg.length > 200 || lastMsg.split(/\n\s*\n/).filter(Boolean).length >= 2;
+  const ventingGuidance = isVenting
+    ? `El usuario se está extendiendo en este turno (mensaje largo o varios párrafos). Acompaña la longitud: refleja con peso ANTES de proponer, valida sin trivializar, deja espacio a su relato. NO cortes con micro-acción prematura ni con interrogatorio rápido. Si vas a cerrar con pregunta, que sea UNA y abierta, no múltiples. La extensión esperada de tu respuesta es similar a la suya — 8-15 frases en párrafos cortos.`
+    : "";
+
   const goalContext = context.goal
     ? `
 
@@ -773,6 +790,7 @@ No se pudo verificar información externa suficiente. No afirmes datos actuales 
     mentorPrefsGuidance,
     contextualInterpretationGuidance,
     domainGuidance,
+    ventingGuidance,
   ].filter(Boolean);
 
   // El recordatorio de idioma va LITERALMENTE al final del prompt: por

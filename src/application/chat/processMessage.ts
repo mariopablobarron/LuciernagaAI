@@ -243,6 +243,9 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     // Locale activo del usuario → coach.ts lo usa para responder en ese
     // idioma + sugerir el recurso de crisis del país correcto.
     ...(locale ? { locale } : {}),
+    // Último mensaje del usuario — coach.ts lo mira para activar el modo
+    // desahogo (extensión proporcional). NO se imprime en el prompt.
+    lastUserMessage: input.message,
     // Preferencias explícitas del mentor (no-interpretes, verbosity).
     // Inyectadas como guidance al final del system prompt vía buildMentorPrefsGuidance.
     ...(input.mentorPrefs ? { mentorPrefs: input.mentorPrefs } : {}),

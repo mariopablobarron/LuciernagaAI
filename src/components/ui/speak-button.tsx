@@ -52,6 +52,14 @@ export function SpeakButton({
    * silenciosamente al synth nativo del navegador.
    */
   preferElevenLabs?: boolean;
+  /**
+   * Si true, dispara la reproducción AUTOMÁTICA una vez al montar el
+   * componente. Lo usa Chat.tsx para el modo "reproducir voz del mentor
+   * automáticamente" gated por localStorage.tts_autoplay.
+   * El prop sigue siendo controlable por el botón visible — el usuario
+   * puede pulsar para parar/reanudar como siempre.
+   */
+  autoPlay?: boolean;
 }) {
   const [synthSupported] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
@@ -155,6 +163,17 @@ export function SpeakButton({
       playNative(cleaned);
     }
   }, [state, text, preferElevenLabs, playHD, playNative]);
+
+  // Auto-play una vez al montar si está habilitado. Useref para no
+  // disparar dos veces en strict mode. Si el texto está vacío o el modo
+  // no es soportado, no pasa nada (handleClick chequea ambos).
+  const autoPlayFired = useRef(false);
+  useEffect(() => {
+    if (autoPlay && !autoPlayFired.current && text && text.trim().length > 0) {
+      autoPlayFired.current = true;
+      handleClick();
+    }
+  }, [autoPlay, text, handleClick]);
 
   // Si el navegador no soporta NADA, no renderizamos. El usuario verá un
   // chat sin botón de escuchar — preferible a un botón roto.

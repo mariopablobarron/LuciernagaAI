@@ -410,10 +410,12 @@ const SPEECH_BCP47: Record<string, string> = {
 function MessageBubble({
   message,
   isStreaming,
+  isLast,
   onQuickReply,
 }: {
   message: ChatMessage;
   isStreaming: boolean;
+  isLast?: boolean;
   onQuickReply?: (text: string) => void;
 }) {
   const t = useTranslations("chat");
@@ -625,6 +627,17 @@ function MessageBubble({
                 lang={speakLang}
                 preferElevenLabs
                 className="p-2"
+                // Auto-play sólo en el último mensaje del mentor, cuando el
+                // streaming acabó y el usuario activó la preferencia (gated
+                // por localStorage para no requerir migración Prisma — es
+                // una pref de audio, vive en el dispositivo).
+                autoPlay={
+                  !isStreaming &&
+                  isLast === true &&
+                  message.role === "assistant" &&
+                  typeof window !== "undefined" &&
+                  window.localStorage.getItem("tts_autoplay") === "true"
+                }
               />
               {/* Feedback negativo específico sobre esta respuesta. Solo si el */}
               {/* mensaje tiene id (los mocks de demo no, los reales sí). */}
@@ -1048,7 +1061,7 @@ export default function Chat({
           </div>
         ) : (
           <div className="space-y-3 px-3 py-4">
-            {messages.map((message) => (
+            {messages.map((message, idx, arr) => (
               message.variant === "signup_prompt" ? (
                 <SignupPromptBubble
                   key={message.id}
@@ -1061,6 +1074,7 @@ export default function Chat({
                   key={message.id}
                   message={message}
                   isStreaming={streamingMessageId === message.id}
+                  isLast={idx === arr.length - 1}
                   onQuickReply={handleStarterClick}
                 />
               )

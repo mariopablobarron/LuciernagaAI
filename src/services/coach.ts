@@ -1027,35 +1027,88 @@ export function buildActionRequiredMessage(params: {
   unfinishedActionsCount?: number;
   mentorMode?: MentorMode | null;
   locale?: unknown;
+  /**
+   * Índice de rotación de la redacción (0..N-1). El caller debe pasar un
+   * valor distinto cuando el action lock se vuelve a disparar para evitar
+   * la repetición textual idéntica que detonó la frustración observada
+   * en conv cmpmww8tr (26-05-2026). Si null/undefined → 0 (primera variante).
+   * Recomendación: pasar `recentActionLockCount(messages)` como rotador.
+   */
+  variant?: number | null;
 }): string {
   const avoidanceCount = params.avoidanceCount ?? 0;
   const unfinishedActionsCount = params.unfinishedActionsCount ?? 0;
   const confront = params.mentorMode?.confront ?? false;
   const action = `«${params.actionTitle}»`;
   const loc = coachLocale(params.locale);
+  const variantIdx = Math.max(0, params.variant ?? 0);
 
-  const escalated: Record<CoachLocale, (a: string) => string> = {
-    es: (a) => `Hay algo de antes que seguimos sin cerrar: ${a}. ¿Qué prefieres — ya lo hiciste, lo retomas ahora, lo aparcas para más tarde, o lo cerramos porque ya no aplica?`,
-    en: (a) => `Something from before is still open: ${a}. What do you want — did you do it, pick it up now, park it for later, or close it because it no longer applies?`,
-    pt: (a) => `Há algo de antes que ainda não fechámos: ${a}. O que preferes — já o fizeste, retomá-lo agora, deixá-lo para depois, ou fechá-lo porque já não se aplica?`,
-    fr: (a) => `Quelque chose d'avant est encore ouvert : ${a}. Qu'est-ce que tu préfères — tu l'as fait, tu le reprends maintenant, tu le mets de côté, ou on le ferme car ce n'est plus d'actualité ?`,
+  // 2 redacciones distintas por modo × locale. Si en algún momento se
+  // necesita escalar más (3+), añadir variantes sin tocar callers — el
+  // module reduce variantIdx % variants.length.
+  const escalated: Record<CoachLocale, Array<(a: string) => string>> = {
+    es: [
+      (a) => `Hay algo de antes que seguimos sin cerrar: ${a}. ¿Qué prefieres — ya lo hiciste, lo retomas ahora, lo aparcas para más tarde, o lo cerramos porque ya no aplica?`,
+      (a) => `Antes de seguir, ${a} sigue en el aire. ¿Lo retomas hoy, lo dejas para más adelante, o lo damos por cerrado?`,
+    ],
+    en: [
+      (a) => `Something from before is still open: ${a}. What do you want — did you do it, pick it up now, park it for later, or close it because it no longer applies?`,
+      (a) => `Before we move on, ${a} is still in the air. Pick it up today, park it for later, or close it?`,
+    ],
+    pt: [
+      (a) => `Há algo de antes que ainda não fechámos: ${a}. O que preferes — já o fizeste, retomá-lo agora, deixá-lo para depois, ou fechá-lo porque já não se aplica?`,
+      (a) => `Antes de seguir, ${a} ainda está em aberto. Retomas hoje, deixas para depois ou damos por encerrado?`,
+    ],
+    fr: [
+      (a) => `Quelque chose d'avant est encore ouvert : ${a}. Qu'est-ce que tu préfères — tu l'as fait, tu le reprends maintenant, tu le mets de côté, ou on le ferme car ce n'est plus d'actualité ?`,
+      (a) => `Avant de continuer, ${a} reste en suspens. Tu le reprends aujourd'hui, tu le mets de côté, ou on le clôt ?`,
+    ],
   };
-  const confrontVariants: Record<CoachLocale, (a: string) => string> = {
-    es: (a) => `Dejamos ${a} a medias. ¿Ya lo hiciste, lo retomas hoy, lo aparcas, o lo cerramos?`,
-    en: (a) => `We left ${a} halfway. Did you do it, pick it up today, park it, or close it?`,
-    pt: (a) => `Deixámos ${a} a meio. Já o fizeste, retomas hoje, deixas para depois, ou fechamos?`,
-    fr: (a) => `On a laissé ${a} à mi-chemin. Tu l'as fait, tu le reprends aujourd'hui, tu le mets de côté, ou on le ferme ?`,
+  const confrontVariants: Record<CoachLocale, Array<(a: string) => string>> = {
+    es: [
+      (a) => `Dejamos ${a} a medias. ¿Ya lo hiciste, lo retomas hoy, lo aparcas, o lo cerramos?`,
+      (a) => `${a} se quedó sin terminar. Hoy decides: hecho, retomado, aparcado o cerrado.`,
+    ],
+    en: [
+      (a) => `We left ${a} halfway. Did you do it, pick it up today, park it, or close it?`,
+      (a) => `${a} stayed unfinished. Today you decide: done, picked up, parked or closed.`,
+    ],
+    pt: [
+      (a) => `Deixámos ${a} a meio. Já o fizeste, retomas hoje, deixas para depois, ou fechamos?`,
+      (a) => `${a} ficou por terminar. Hoje decides: feito, retomado, deixado para depois ou encerrado.`,
+    ],
+    fr: [
+      (a) => `On a laissé ${a} à mi-chemin. Tu l'as fait, tu le reprends aujourd'hui, tu le mets de côté, ou on le ferme ?`,
+      (a) => `${a} est resté inachevé. Aujourd'hui tu choisis : fait, repris, mis de côté ou clôturé.`,
+    ],
   };
-  const soft: Record<CoachLocale, (a: string) => string> = {
-    es: (a) => `Quedó abierto ${a}. Dime si ya lo hiciste, si lo retomas, si lo aparcas para luego o si lo cerramos — y seguimos por donde quieras.`,
-    en: (a) => `${a} was left open. Tell me if you did it, pick it up, park it for later, or close it — and we continue wherever you want.`,
-    pt: (a) => `${a} ficou em aberto. Diz-me se já o fizeste, se o retomas, se o deixas para depois ou se o fechamos — e continuamos por onde quiseres.`,
-    fr: (a) => `${a} est resté ouvert. Dis-moi si tu l'as fait, si tu le reprends, si tu le mets de côté ou si on le ferme — et on continue où tu veux.`,
+  const soft: Record<CoachLocale, Array<(a: string) => string>> = {
+    es: [
+      (a) => `Quedó abierto ${a}. Dime si ya lo hiciste, si lo retomas, si lo aparcas para luego o si lo cerramos — y seguimos por donde quieras.`,
+      (a) => `Sigue abierto ${a}. Cuéntame cómo está — hecho, en pausa, aparcado o cerrado — y avanzamos.`,
+    ],
+    en: [
+      (a) => `${a} was left open. Tell me if you did it, pick it up, park it for later, or close it — and we continue wherever you want.`,
+      (a) => `${a} is still open. Tell me how it stands — done, paused, parked or closed — and we move on.`,
+    ],
+    pt: [
+      (a) => `${a} ficou em aberto. Diz-me se já o fizeste, se o retomas, se o deixas para depois ou se o fechamos — e continuamos por onde quiseres.`,
+      (a) => `${a} continua em aberto. Diz-me em que pé está — feito, em pausa, deixado para depois ou encerrado — e avançamos.`,
+    ],
+    fr: [
+      (a) => `${a} est resté ouvert. Dis-moi si tu l'as fait, si tu le reprends, si tu le mets de côté ou si on le ferme — et on continue où tu veux.`,
+      (a) => `${a} reste ouvert. Dis-moi où ça en est — fait, en pause, mis de côté ou clos — et on avance.`,
+    ],
   };
 
-  if (avoidanceCount >= 2 || unfinishedActionsCount > 2) return escalated[loc](action);
-  if (confront) return confrontVariants[loc](action);
-  return soft[loc](action);
+  function pick(table: Record<CoachLocale, Array<(a: string) => string>>) {
+    const list = table[loc];
+    return list[variantIdx % list.length](action);
+  }
+
+  if (avoidanceCount >= 2 || unfinishedActionsCount > 2) return pick(escalated);
+  if (confront) return pick(confrontVariants);
+  return pick(soft);
 }
 
 /** @deprecated Use captureEmailPrompt(locale). Kept for backwards-compat tests. */

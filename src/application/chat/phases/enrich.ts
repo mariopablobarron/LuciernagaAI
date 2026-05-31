@@ -20,7 +20,7 @@ import type {
 import { buildUserState } from "@/domain/userStateEngine";
 import { trackSafe } from "@/services/events";
 import { buildActionRequiredMessage } from "@/services/coach";
-import { shouldSilenceAdminLoops } from "@/services/anti-loop";
+import { shouldSilenceAdminLoops, recentActionLockCount } from "@/services/anti-loop";
 import {
   countMessagesForConversation,
   ensureUserSession,
@@ -552,6 +552,10 @@ export async function enrichContext(input: EnrichInput): Promise<EnrichResult> {
               unfinishedActionsCount: goalPendingActionsCount,
               mentorMode,
               locale: input.locale,
+              // Rotar redacción según cuántas veces ya hemos pegado el
+              // action lock — evita repetición textual idéntica observada
+              // en conv cmpmww8tr 26-05-2026.
+              variant: recentActionLockCount(conversationHistory),
             });
             actionLockPayload = {
               success: true,
@@ -597,6 +601,8 @@ export async function enrichContext(input: EnrichInput): Promise<EnrichResult> {
           goalTitle: activeGoal?.title ?? null,
           avoidanceCount: goalAvoidanceCount,
           unfinishedActionsCount: goalPendingActionsCount,
+          // Rotar redacción si ya hemos pegado el action lock antes.
+          variant: recentActionLockCount(conversationHistory),
           mentorMode,
         });
         actionLockPayload = {

@@ -1,0 +1,29 @@
+src/application/chat/phases/enrich.ts
+  s_d2308f25c4747c::t_7967019e39c190 604-605
+  s_d2308f25c4747c::t_a810aa69bf01f5 23
+  s_d2308f25c4747c::t_b715f86851515f 555-558
+src/services/coach.ts
+  s_d2308f25c4747c::t_6f085a9793250c 1030-1037,1044-1065,1067-1083,1085-1101,1104-1111
+src/services/anti-loop.ts
+  s_d2308f25c4747c::t_79e0cd851f2344 35-39,44-45,49,53,56-77
+  s_d2308f25c4747c::t_4fa127f941855c 172-180,188-194,204-210,214-218,221
+src/services/anti-loop.test.ts
+  s_d2308f25c4747c::t_0fe257d6eaa7a1 3
+  s_d2308f25c4747c::t_f53891ec290912 146-240
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "667e271a16478238c1677df0674e5ae3c9d5c098",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

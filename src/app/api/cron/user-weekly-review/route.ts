@@ -156,7 +156,12 @@ async function handler(req: Request): Promise<Response> {
           dominantEmotion,
         });
 
-        const ok = await sendUserEmail({ to: user.email, ...email });
+        const ok = await sendUserEmail({
+          to: user.email,
+          ...email,
+          userId: user.id,
+          template: "user_weekly_review",
+        });
         if (ok) sent++;
         else errors++;
         await new Promise((r) => setTimeout(r, 200)); // throttle: 5 emails/sec max

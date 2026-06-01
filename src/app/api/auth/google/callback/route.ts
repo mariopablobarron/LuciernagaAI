@@ -5,6 +5,9 @@ import { getGoogleConfig, exchangeCodeForTokens, getGoogleProfile } from "@/lib/
 import { logError, logInfo } from "@/lib/logger";
 import { normalizeEmail } from "@/services/user";
 import { triggerWelcomeAvatarVideoAsync } from "@/services/welcomeAvatarVideo";
+import { scheduleOnboardingEmails } from "@/services/onboarding-emails";
+import { buildWelcomeEmail, sendUserEmail } from "@/lib/email";
+import { pickEmailLocale } from "@/lib/email-i18n";
 
 /**
  * GET /api/auth/google/callback?code=xxx&state=yyy
@@ -69,6 +72,28 @@ export async function GET(req: NextRequest) {
       user = created;
       logInfo("AUTH", "google_signup", { userId: user.id, email });
       triggerWelcomeAvatarVideoAsync(user.id);
+
+      // Welcome email + onboarding sequence (day 1, 3, 7). Sin esto, los
+      // usuarios que entran por Google nunca recibían el flujo de
+      // bienvenida — solo lo recibían los que pasaban por /api/auth/signup
+      // (email+password). Bug detectado 31-05-2026: 3 google_signups en
+      // 30 días, 0 onboarding scheduled.
+      const welcomeLocale = pickEmailLocale(null);
+      const welcomeEmail = buildWelcomeEmail({
+        name: profile.name ?? null,
+        appUrl: baseUrl,
+        locale: welcomeLocale,
+      });
+      sendUserEmail({
+        to: email,
+        ...welcomeEmail,
+        userId: user.id,
+        template: "welcome",
+        locale: welcomeLocale,
+      }).catch((e) => logError("AUTH", e, { action: "send_welcome_email_google", email }));
+      scheduleOnboardingEmails(user.id).catch(
+        (e) => logError("AUTH", e, { action: "schedule_onboarding_emails_google", email }),
+      );
     }
 
     const token = issueSessionToken(user.id);

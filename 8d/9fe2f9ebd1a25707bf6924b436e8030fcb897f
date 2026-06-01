@@ -1,0 +1,19 @@
+src/app/api/cron/user-weekly-review/route.ts
+  s_d2308f25c4747c::t_9494a71d1d7e62 159-164
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8d9fe2f9ebd1a25707bf6924b436e8030fcb897f",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

@@ -3166,5 +3166,48 @@
       "backToChat": "Volver al chat",
       "repeat": "Repetir el test"
     }
+  },
+  "circleHub": {
+    "loading": "Cargando tu círculo…",
+    "noCircle": {
+      "title": "Aún no tienes círculo asignado",
+      "description": "Los círculos se forman por afinidad de patrón emocional reciente — grupos cerrados de 4 personas, ciclos de 6 semanas. Cuando haya match con tu estado actual, te asignaremos uno.",
+      "note": "No hay listado para unirse manualmente. El emparejamiento es automático y respeta tu anonimato."
+    },
+    "header": {
+      "cycle": "Ciclo",
+      "daysRemaining": "{days}d restantes"
+    },
+    "noPulse": {
+      "title": "No hay pulso abierto esta semana",
+      "description": "El próximo se abrirá automáticamente cuando empiece la semana siguiente."
+    },
+    "pulse": {
+      "eyebrow": "Pulso de la semana",
+      "daysShort": "{days}d",
+      "toClose": "para cerrar",
+      "placeholder": "Responde cuando quieras durante esta semana…",
+      "alreadyResponded": "Ya respondiste — puedes editar",
+      "anonymous": "Anónimo dentro del círculo",
+      "update": "Actualizar",
+      "share": "Compartir con el círculo",
+      "participation": "{count}/{max} han respondido",
+      "unlockHint": "· tu respuesta desbloquea las del resto",
+      "toasts": {
+        "closed": "Este pulso ya cerró",
+        "saveError": "No se pudo guardar tu respuesta",
+        "updated": "Respuesta actualizada",
+        "shared": "Tu respuesta forma parte del pulso"
+      }
+    },
+    "peers": {
+      "title": "Voces del círculo (anónimas)",
+      "empty": "Aún no han respondido. Volverán durante la semana."
+    },
+    "reflections": {
+      "title": "Devolución privada del mentor",
+      "unread": "· no leído"
+    },
+    "archive": "Cartas de cierre archivadas"
   }
 }

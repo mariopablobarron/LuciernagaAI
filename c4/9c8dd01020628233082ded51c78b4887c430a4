@@ -1,0 +1,21 @@
+messages/es.json
+  s_c72d0ada98a9af::t_18205267f1e77d 3120-3162
+src/components/community/CircleHubV2.tsx
+  s_c72d0ada98a9af::t_4f960efa9035be 5,47-53,60-69,114,117,135,142,144,146,171-172,182-183,189,193-194,203,210,218,226,228,238,241,259,276,291
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c49c8dd01020628233082ded51c78b4887c430a4",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

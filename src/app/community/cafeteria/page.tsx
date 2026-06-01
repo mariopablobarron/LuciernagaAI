@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useTranslations, useLocale } from "next-intl";
 import { ArrowLeft, Send, Users, Sparkles, MessageCircleQuestion, Loader2, Flag } from "lucide-react";
 import { toast } from "sonner";
 import AnonymousHint from "@/components/community/AnonymousHint";
@@ -40,21 +41,33 @@ type Payload = {
   myCircle: { id: string; name: string } | null;
 };
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
-function timeAgo(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const min = Math.floor(diff / 60000);
-  if (min < 1) return "ahora";
-  if (min < 60) return `hace ${min}m`;
-  const h = Math.floor(min / 60);
-  if (h < 24) return `hace ${h}h`;
-  return `hace ${Math.floor(h / 24)}d`;
-}
+const LOCALE_BCP47: Record<string, string> = {
+  es: "es-ES",
+  en: "en-US",
+  pt: "pt-PT",
+  fr: "fr-FR",
+};
 
 // ─── Page ───────────────────────────────────────────────────────────────────
 
 export default function CafeteriaPage() {
+  const t = useTranslations("cafeteria");
+  const locale = useLocale();
+  const bcp = LOCALE_BCP47[locale] ?? "es-ES";
+
+  const timeAgo = useCallback(
+    (iso: string): string => {
+      const diff = Date.now() - new Date(iso).getTime();
+      const min = Math.floor(diff / 60000);
+      if (min < 1) return t("timeAgo.now");
+      if (min < 60) return t("timeAgo.minutes", { n: min });
+      const h = Math.floor(min / 60);
+      if (h < 24) return t("timeAgo.hours", { n: h });
+      return t("timeAgo.days", { n: Math.floor(h / 24) });
+    },
+    [t],
+  );
+
   const [data, setData] = useState<Payload | null>(null);
   const [loading, setLoading] = useState(true);
   const [input, setInput] = useState("");
@@ -71,17 +84,17 @@ export default function CafeteriaPage() {
     try {
       const res = await fetch("/api/community/daily-round", { credentials: "include" });
       if (!res.ok) {
-        if (res.status === 401) { toast.error("Sesión expirada"); return; }
+        if (res.status === 401) { toast.error(t("toasts.sessionExpired")); return; }
         throw new Error("load failed");
       }
       const payload = (await res.json()) as Payload;
       setData(payload);
     } catch {
-      toast.error("Error al cargar la ronda");
+      toast.error(t("toasts.loadError"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => { void loadData(); }, [loadData]);
 
@@ -98,14 +111,14 @@ export default function CafeteriaPage() {
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) {
-        toast.error(body.message ?? "No se pudo publicar");
+        toast.error(body.message ?? t("toasts.publishError"));
         return;
       }
       setInput("");
-      toast.success("Tu respuesta está en la ronda");
+      toast.success(t("toasts.published"));
       await loadData();
     } catch {
-      toast.error("Error de red");
+      toast.error(t("toasts.networkError"));
     } finally {
       setSubmitting(false);
     }
@@ -135,7 +148,7 @@ export default function CafeteriaPage() {
       });
       if (!res.ok) {
         await loadData();
-        toast.error("No se pudo registrar");
+        toast.error(t("toasts.reactionError"));
       }
     } catch {
       await loadData();
@@ -157,15 +170,15 @@ export default function CafeteriaPage() {
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) {
-        toast.error(body.error ?? "No se pudo reportar");
+        toast.error(body.error ?? t("toasts.reportError"));
         return;
       }
       setReportFor(null);
       setReportReason("harmful");
-      toast.success("Gracias. Lo revisamos.");
+      toast.success(t("toasts.reported"));
       if (body.autoHidden) await loadData();
     } catch {
-      toast.error("Error de red");
+      toast.error(t("toasts.networkError"));
     } finally {
       setReportPosting(false);
     }
@@ -185,15 +198,15 @@ export default function CafeteriaPage() {
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) {
-        toast.error(body.message ?? "No se pudo enviar");
+        toast.error(body.message ?? t("toasts.mirrorError"));
         return;
       }
       setMirrorText("");
       setMirrorFor(null);
-      toast.success("Pregunta enviada");
+      toast.success(t("toasts.mirrorSent"));
       await loadData();
     } catch {
-      toast.error("Error de red");
+      toast.error(t("toasts.networkError"));
     } finally {
       setMirrorPosting(false);
     }
@@ -215,8 +228,8 @@ export default function CafeteriaPage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
-              <h1 className="text-xl font-bold">☕ La Cafetería</h1>
-              <p className="text-[11px] text-zinc-500">Una ronda al día. Anónima si quieres.</p>
+              <h1 className="text-xl font-bold">{t("header.title")}</h1>
+              <p className="text-[11px] text-zinc-500">{t("header.subtitle")}</p>
             </div>
           </div>
           {data?.myCircle && (
@@ -224,7 +237,7 @@ export default function CafeteriaPage() {
               href="/community?tab=circle"
               className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1.5 text-xs font-semibold text-violet-300 hover:bg-violet-500/20 transition-colors"
             >
-              <Users className="w-3.5 h-3.5" /> {data.myCircle.name}
+              <Users className="w-3.5 h-3.5" /> {t("header.myCircleShort", { name: data.myCircle.name })}
             </Link>
           )}
         </div>
@@ -235,21 +248,21 @@ export default function CafeteriaPage() {
           </div>
         ) : !round ? (
           <EmptyState
-            title="La ronda de hoy aún no está abierta"
-            body="Vuelve en un rato. Se renueva cada madrugada con una pregunta nueva."
+            title={t("noRound.title")}
+            body={t("noRound.body")}
           />
         ) : (
           <>
             {/* Prompt del día */}
             <section className="rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-500/10 via-zinc-900/50 to-fuchsia-500/5 p-6 space-y-2">
               <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-violet-300">
-                <Sparkles className="w-3.5 h-3.5" /> Pregunta del día
+                <Sparkles className="w-3.5 h-3.5" /> {t("prompt.eyebrow")}
               </div>
               <p className="text-lg sm:text-xl font-semibold leading-snug text-white">
                 {round.prompt}
               </p>
               <p className="text-[11px] text-zinc-500">
-                {new Date(round.date).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })}
+                {new Date(round.date).toLocaleDateString(bcp, { weekday: "long", day: "numeric", month: "long" })}
               </p>
             </section>
 
@@ -258,7 +271,7 @@ export default function CafeteriaPage() {
                 href="/community?tab=circle"
                 className="sm:hidden flex items-center justify-center gap-1.5 rounded-xl border border-violet-500/30 bg-violet-500/10 px-3 py-2.5 text-xs font-semibold text-violet-300"
               >
-                <Users className="w-3.5 h-3.5" /> Ir a mi círculo · {data.myCircle.name}
+                <Users className="w-3.5 h-3.5" /> {t("header.myCircleLong", { name: data.myCircle.name })}
               </Link>
             )}
 
@@ -267,7 +280,7 @@ export default function CafeteriaPage() {
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Escribe tu respuesta. En 1-3 frases está bien."
+                  placeholder={t("compose.placeholder")}
                   rows={4}
                   maxLength={500}
                   className="w-full rounded-xl border border-zinc-700 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-zinc-600 resize-none focus:border-violet-500/50 focus:outline-none"
@@ -282,7 +295,7 @@ export default function CafeteriaPage() {
                     <span className={`relative h-4 w-7 rounded-full transition-colors ${anonymous ? "bg-violet-600" : "bg-zinc-700"}`}>
                       <span className={`absolute top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${anonymous ? "left-[14px]" : "left-0.5"}`} />
                     </span>
-                    {anonymous ? "Anónimo" : "Con mi nombre"}
+                    {anonymous ? t("compose.anonymous") : t("compose.named")}
                   </button>
                   <button
                     onClick={() => void handleSubmit()}
@@ -290,37 +303,35 @@ export default function CafeteriaPage() {
                     className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/20 hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                   >
                     {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                    Publicar
+                    {t("compose.publish")}
                   </button>
                 </div>
-                <p className="text-[11px] text-zinc-600">
-                  Cuando publiques verás lo que han compartido los demás. Una respuesta por día.
-                </p>
+                <p className="text-[11px] text-zinc-600">{t("compose.hint")}</p>
               </section>
             ) : (
               <>
                 {myResponse && (
                   <section className="rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-5 space-y-2">
                     <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-cyan-300">
-                      Tu respuesta · {timeAgo(myResponse.createdAt)}
+                      {t("mine.eyebrow", { time: timeAgo(myResponse.createdAt) })}
                     </div>
                     <p className="text-sm leading-relaxed text-zinc-100 whitespace-pre-wrap">{myResponse.content}</p>
                     <p className="text-[11px] text-zinc-500">
-                      {myResponse.anonymous ? "Publicado como anónimo" : "Publicado con tu nombre"}
+                      {myResponse.anonymous ? t("mine.asAnonymous") : t("mine.asNamed")}
                     </p>
                   </section>
                 )}
 
                 <section className="space-y-3">
                   <h2 className="text-sm font-semibold text-zinc-400 flex items-center gap-2">
-                    Otras respuestas de hoy
-                    <span className="text-xs text-zinc-600">({responses.length})</span>
+                    {t("others.title")}
+                    <span className="text-xs text-zinc-600">{t("others.count", { n: responses.length })}</span>
                   </h2>
 
                   {responses.length === 0 ? (
                     <EmptyState
-                      title="Todavía no hay más respuestas"
-                      body="Has sido de los primeros en responder hoy. Vuelve más tarde y verás lo que escribieron los demás."
+                      title={t("othersEmpty.title")}
+                      body={t("othersEmpty.body")}
                     />
                   ) : (
                     responses.map((r) => (
@@ -328,12 +339,12 @@ export default function CafeteriaPage() {
                         <p className="text-sm leading-relaxed text-zinc-200 whitespace-pre-wrap">{r.content}</p>
 
                         <div className="flex items-center justify-between text-[11px] text-zinc-600">
-                          <span>{r.author?.name ?? "Anónimo"} · {timeAgo(r.createdAt)}</span>
+                          <span>{r.author?.name ?? t("others.anonymousName")} · {timeAgo(r.createdAt)}</span>
                           <button
                             onClick={() => setReportFor({ kind: "response", id: r.id })}
                             className="inline-flex items-center gap-1 text-zinc-600 hover:text-rose-400 transition-colors"
-                            aria-label="Reportar esta respuesta"
-                            title="Reportar"
+                            aria-label={t("others.reportAria")}
+                            title={t("others.reportTitle")}
                           >
                             <Flag className="w-3 h-3" />
                           </button>
@@ -362,7 +373,7 @@ export default function CafeteriaPage() {
                                     ? "border-fuchsia-500/40 bg-fuchsia-500/15 text-fuchsia-100"
                                     : "border-zinc-700 bg-zinc-800/40 text-zinc-400 hover:border-zinc-600 hover:text-white"
                                 }`}
-                                aria-label={`Reaccionar con ${emoji}`}
+                                aria-label={t("others.reactAria", { emoji })}
                               >
                                 <span>{emoji}</span>
                                 {count > 0 && <span className="text-[10px] font-semibold">{count}</span>}
@@ -373,23 +384,27 @@ export default function CafeteriaPage() {
                             onClick={() => { setMirrorFor(r.id); setMirrorText(""); }}
                             disabled={r.mirrors.some((m) => m.isOwn) || r.mirrors.length >= 3}
                             className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-xs font-semibold text-violet-300 hover:bg-violet-500/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                            title={r.mirrors.some((m) => m.isOwn) ? "Ya le devolviste una pregunta" : r.mirrors.length >= 3 ? "Esta respuesta ya tiene 3 preguntas" : "Devolver una pregunta"}
+                            title={
+                              r.mirrors.some((m) => m.isOwn)
+                                ? t("others.mirrorDisabledOwn")
+                                : r.mirrors.length >= 3
+                                ? t("others.mirrorDisabledFull")
+                                : t("others.mirrorEnabled")
+                            }
                           >
                             <MessageCircleQuestion className="w-3 h-3" />
-                            Devolver pregunta
+                            {t("others.mirrorBtn")}
                           </button>
                         </div>
 
                         {mirrorFor === r.id && (
                           <div className="rounded-xl border border-violet-500/30 bg-violet-500/5 p-3 space-y-2">
-                            <p className="text-[11px] text-violet-300">
-                              Una sola pregunta corta. Sin opinar. Sin consejo. Solo preguntar.
-                            </p>
+                            <p className="text-[11px] text-violet-300">{t("mirror.hint")}</p>
                             <input
                               value={mirrorText}
                               onChange={(e) => setMirrorText(e.target.value)}
                               maxLength={180}
-                              placeholder="¿Qué estaría pasando si..."
+                              placeholder={t("mirror.placeholder")}
                               className="w-full rounded-lg border border-zinc-700 bg-black/50 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:border-violet-500/50 focus:outline-none"
                               onKeyDown={(e) => { if (e.key === "Enter" && mirrorText.trim()) void handleMirror(); }}
                               autoFocus
@@ -402,13 +417,13 @@ export default function CafeteriaPage() {
                                 className="inline-flex items-center gap-1.5 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-500 disabled:opacity-40"
                               >
                                 {mirrorPosting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
-                                Enviar
+                                {t("mirror.send")}
                               </button>
                               <button
                                 onClick={() => { setMirrorFor(null); setMirrorText(""); }}
                                 className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs text-zinc-400 hover:text-white"
                               >
-                                Cancelar
+                                {t("mirror.cancel")}
                               </button>
                             </div>
                           </div>
@@ -416,21 +431,21 @@ export default function CafeteriaPage() {
 
                         {r.mirrors.length > 0 && (
                           <div className="border-t border-zinc-800 pt-3 space-y-2">
-                            <p className="text-[10px] uppercase tracking-wider text-zinc-600">Preguntas recibidas</p>
+                            <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("mirrorList.title")}</p>
                             {r.mirrors.map((m) => (
                               <div key={m.id} className="space-y-1">
                                 <div className="flex items-start gap-2 text-xs text-zinc-400">
                                   <MessageCircleQuestion className="w-3 h-3 text-violet-400 mt-0.5 shrink-0" />
                                   <p className="leading-relaxed flex-1">
                                     <span className="text-zinc-200">{m.question}</span>
-                                    <span className="text-zinc-600"> · {m.isOwn ? "tú" : "anónimo"} · {timeAgo(m.createdAt)}</span>
+                                    <span className="text-zinc-600"> · {m.isOwn ? t("mirrorList.you") : t("mirrorList.anonymous")} · {timeAgo(m.createdAt)}</span>
                                   </p>
                                   {!m.isOwn && (
                                     <button
                                       onClick={() => setReportFor({ kind: "mirror", id: m.id })}
                                       className="text-zinc-600 hover:text-rose-400 shrink-0"
-                                      aria-label="Reportar esta pregunta"
-                                      title="Reportar"
+                                      aria-label={t("mirrorList.reportAria")}
+                                      title={t("mirrorList.reportTitle")}
                                     >
                                       <Flag className="w-3 h-3" />
                                     </button>
@@ -471,16 +486,17 @@ function ReportForm({
   onSubmit: () => void;
   posting: boolean;
 }) {
-  const REASONS: { value: string; label: string }[] = [
-    { value: "harmful", label: "Dañino o inapropiado" },
-    { value: "self_harm", label: "Autolesión / crisis" },
-    { value: "harassment", label: "Acoso" },
-    { value: "spam", label: "Spam" },
-    { value: "other", label: "Otro" },
+  const t = useTranslations("cafeteria.report");
+  const REASONS: { value: string; labelKey: "harmful" | "self_harm" | "harassment" | "spam" | "other" }[] = [
+    { value: "harmful", labelKey: "harmful" },
+    { value: "self_harm", labelKey: "self_harm" },
+    { value: "harassment", labelKey: "harassment" },
+    { value: "spam", labelKey: "spam" },
+    { value: "other", labelKey: "other" },
   ];
   return (
     <div className="rounded-xl border border-rose-500/30 bg-rose-500/5 p-3 space-y-2">
-      <p className="text-[11px] text-rose-300">¿Por qué quieres reportarlo?</p>
+      <p className="text-[11px] text-rose-300">{t("title")}</p>
       <div className="flex flex-wrap gap-1.5">
         {REASONS.map((r) => (
           <button
@@ -492,7 +508,7 @@ function ReportForm({
                 : "border-zinc-700 bg-zinc-800/40 text-zinc-400 hover:text-white"
             }`}
           >
-            {r.label}
+            {t(`reasons.${r.labelKey}`)}
           </button>
         ))}
       </div>
@@ -503,13 +519,13 @@ function ReportForm({
           className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-500 disabled:opacity-40"
         >
           {posting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Flag className="w-3 h-3" />}
-          Enviar reporte
+          {t("submit")}
         </button>
         <button
           onClick={onCancel}
           className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs text-zinc-400 hover:text-white"
         >
-          Cancelar
+          {t("cancel")}
         </button>
       </div>
     </div>

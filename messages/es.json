@@ -3209,5 +3209,91 @@
       "unread": "· no leído"
     },
     "archive": "Cartas de cierre archivadas"
+  },
+  "cafeteria": {
+    "header": {
+      "title": "☕ La Cafetería",
+      "subtitle": "Una ronda al día. Anónima si quieres.",
+      "myCircleShort": "{name}",
+      "myCircleLong": "Ir a mi círculo · {name}"
+    },
+    "timeAgo": {
+      "now": "ahora",
+      "minutes": "hace {n}m",
+      "hours": "hace {n}h",
+      "days": "hace {n}d"
+    },
+    "toasts": {
+      "sessionExpired": "Sesión expirada",
+      "loadError": "Error al cargar la ronda",
+      "publishError": "No se pudo publicar",
+      "published": "Tu respuesta está en la ronda",
+      "networkError": "Error de red",
+      "reactionError": "No se pudo registrar",
+      "reportError": "No se pudo reportar",
+      "reported": "Gracias. Lo revisamos.",
+      "mirrorError": "No se pudo enviar",
+      "mirrorSent": "Pregunta enviada"
+    },
+    "noRound": {
+      "title": "La ronda de hoy aún no está abierta",
+      "body": "Vuelve en un rato. Se renueva cada madrugada con una pregunta nueva."
+    },
+    "prompt": {
+      "eyebrow": "Pregunta del día"
+    },
+    "compose": {
+      "placeholder": "Escribe tu respuesta. En 1-3 frases está bien.",
+      "anonymous": "Anónimo",
+      "named": "Con mi nombre",
+      "publish": "Publicar",
+      "hint": "Cuando publiques verás lo que han compartido los demás. Una respuesta por día."
+    },
+    "mine": {
+      "eyebrow": "Tu respuesta · {time}",
+      "asAnonymous": "Publicado como anónimo",
+      "asNamed": "Publicado con tu nombre"
+    },
+    "others": {
+      "title": "Otras respuestas de hoy",
+      "count": "({n})",
+      "anonymousName": "Anónimo",
+      "reportAria": "Reportar esta respuesta",
+      "reportTitle": "Reportar",
+      "reactAria": "Reaccionar con {emoji}",
+      "mirrorBtn": "Devolver pregunta",
+      "mirrorDisabledOwn": "Ya le devolviste una pregunta",
+      "mirrorDisabledFull": "Esta respuesta ya tiene 3 preguntas",
+      "mirrorEnabled": "Devolver una pregunta"
+    },
+    "othersEmpty": {
+      "title": "Todavía no hay más respuestas",
+      "body": "Has sido de los primeros en responder hoy. Vuelve más tarde y verás lo que escribieron los demás."
+    },
+    "mirror": {
+      "hint": "Una sola pregunta corta. Sin opinar. Sin consejo. Solo preguntar.",
+      "placeholder": "¿Qué estaría pasando si…",
+      "send": "Enviar",
+      "cancel": "Cancelar"
+    },
+    "mirrorList": {
+      "title": "Preguntas recibidas",
+      "you": "tú",
+      "anonymous": "anónimo",
+      "reportAria": "Reportar esta pregunta",
+      "reportTitle": "Reportar"
+    },
+    "report": {
+      "title": "¿Por qué quieres reportarlo?",
+      "reasons": {
+        "harmful": "Dañino o inapropiado",
+        "self_harm": "Autolesión / crisis",
+        "harassment": "Acoso",
+        "spam": "Spam",
+        "other": "Otro"
+      },
+      "submit": "Enviar reporte",
+      "cancel": "Cancelar"
+    }
   }
 }

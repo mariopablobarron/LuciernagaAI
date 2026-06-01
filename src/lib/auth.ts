@@ -4,6 +4,7 @@ import { getPrismaClient } from "@/db/prisma";
 import { cache } from "@/lib/cache";
 import { logError, logInfo } from "@/lib/logger";
 import { ensureUserAccount, linkIdentityToEmail, touchLastSeen } from "@/services/user";
+import { isBotUserAgent } from "@/lib/bot-detection";
 
 type SessionPayload = {
   uid: string;
@@ -243,7 +244,8 @@ export function invalidateUserDisabledCache(userId: string): void {
 
 async function finalizeIdentity(
   identity: ResolvedIdentity,
-  options: ResolveIdentityOptions
+  options: ResolveIdentityOptions,
+  req?: NextRequest,
 ): Promise<ResolvedIdentity> {
   // Reject existing sessions whose account got deactivated or deleted.
   // Cached 60s to bound DB load; newly-issued tokens from login path are already validated there.
@@ -260,8 +262,23 @@ async function finalizeIdentity(
 
   // On bootstrap (new user), we need the full upsert.
   // On existing sessions, just debounce lastSeen — no DB write per request.
+  //
+  // Excepción 2026-06-01: si la identidad acaba de generarse PARA UN BOT
+  // (Googlebot, scanner SEO, monitor externo, etc.), NO persistimos el User
+  // en BD. Cookie se emite igualmente (el bot la ignora), anonymous-first
+  // intacto, pero evitamos llenar la tabla con usuarios que nunca harán nada.
+  // Auditoría 2026-06-01: 44% de los usr_*@session.* recientes eran sesión
+  // <60s con 0 mensajes — casi todos crawlers.
   if (identity.source === "generated") {
-    await ensureUserAccount(identity.userId);
+    const ua = req?.headers.get("user-agent") ?? null;
+    if (isBotUserAgent(ua)) {
+      logInfo("AUTH", "bootstrap_skip_persist_bot", {
+        userId: identity.userId,
+        ua: ua?.slice(0, 80),
+      });
+    } else {
+      await ensureUserAccount(identity.userId);
+    }
   } else {
     touchLastSeen(identity.userId);
   }
@@ -316,7 +333,8 @@ export async function resolveIdentity(
           sessionToken: requestToken,
           shouldSetCookie: false,
         },
-        options
+        options,
+        req,
       );
     }
 
@@ -332,7 +350,8 @@ export async function resolveIdentity(
           sessionToken: refreshedToken,
           shouldSetCookie: true,
         },
-        options
+        options,
+        req,
       );
     }
 
@@ -359,7 +378,8 @@ export async function resolveIdentity(
         sessionToken,
         shouldSetCookie: true,
       },
-      options
+      options,
+      req,
     );
   }
 

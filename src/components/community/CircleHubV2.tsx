@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslations, useLocale } from "next-intl";
 import { toast } from "sonner";
 import { Activity, Clock, Send, Mail, Users, Inbox, Archive } from "lucide-react";
 
@@ -43,16 +44,29 @@ type Reflection = {
   weekStart: string;
 };
 
+const LOCALE_BCP47: Record<string, string> = {
+  es: "es-ES",
+  en: "en-US",
+  pt: "pt-PT",
+  fr: "fr-FR",
+};
+
 function daysBetween(target: string): number {
   const diff = new Date(target).getTime() - Date.now();
   return Math.max(0, Math.ceil(diff / (24 * 60 * 60 * 1000)));
 }
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("es-ES", { day: "2-digit", month: "short" });
-}
-
 export function CircleHubV2() {
+  const t = useTranslations("circleHub");
+  const locale = useLocale();
+  const bcp = LOCALE_BCP47[locale] ?? "es-ES";
+
+  const formatDate = useCallback(
+    (iso: string): string =>
+      new Date(iso).toLocaleDateString(bcp, { day: "2-digit", month: "short" }),
+    [bcp],
+  );
+
   const [loading, setLoading] = useState(true);
   const [circle, setCircle] = useState<CircleData | null>(null);
   const [pulse, setPulse] = useState<PulseData | null>(null);
@@ -97,10 +111,10 @@ export function CircleHubV2() {
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        toast.error(err.error === "PULSE_CLOSED" ? "Este pulso ya cerró" : "No se pudo guardar tu respuesta");
+        toast.error(err.error === "PULSE_CLOSED" ? t("pulse.toasts.closed") : t("pulse.toasts.saveError"));
         return;
       }
-      toast.success(pulse.myResponse ? "Respuesta actualizada" : "Tu respuesta forma parte del pulso");
+      toast.success(pulse.myResponse ? t("pulse.toasts.updated") : t("pulse.toasts.shared"));
       void load();
     } finally {
       setSubmitting(false);
@@ -118,18 +132,18 @@ export function CircleHubV2() {
   }
 
   if (loading) {
-    return <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 text-sm text-zinc-500">Cargando tu círculo...</div>;
+    return <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 text-sm text-zinc-500">{t("loading")}</div>;
   }
 
   if (!circle) {
     return (
       <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 space-y-3 text-center">
         <Users className="h-6 w-6 text-zinc-500 mx-auto" />
-        <p className="text-sm text-zinc-300 font-semibold">Aún no tienes círculo asignado</p>
+        <p className="text-sm text-zinc-300 font-semibold">{t("noCircle.title")}</p>
         <p className="text-xs text-zinc-500 max-w-md mx-auto leading-relaxed">
-          Los círculos se forman por afinidad de patrón emocional reciente — grupos cerrados de 4 personas, ciclos de 6 semanas. Cuando haya match con tu estado actual, te asignaremos uno.
+          {t("noCircle.description")}
         </p>
-        <p className="text-[11px] text-zinc-600">No hay listado para unirse manualmente. El emparejamiento es automático y respeta tu anonimato.</p>
+        <p className="text-[11px] text-zinc-600">{t("noCircle.note")}</p>
       </div>
     );
   }
@@ -154,8 +168,8 @@ export function CircleHubV2() {
           </div>
           {daysToCycleEnd !== null && (
             <div className="text-right shrink-0">
-              <p className="text-[10px] uppercase font-semibold text-zinc-500">Ciclo</p>
-              <p className="text-xs text-zinc-300">{daysToCycleEnd}d restantes</p>
+              <p className="text-[10px] uppercase font-semibold text-zinc-500">{t("header.cycle")}</p>
+              <p className="text-xs text-zinc-300">{t("header.daysRemaining", { days: daysToCycleEnd })}</p>
             </div>
           )}
         </div>
@@ -165,19 +179,19 @@ export function CircleHubV2() {
       {!pulse ? (
         <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 text-center space-y-2">
           <Clock className="h-5 w-5 text-zinc-500 mx-auto" />
-          <p className="text-sm text-zinc-300 font-semibold">No hay pulso abierto esta semana</p>
-          <p className="text-xs text-zinc-500">El próximo se abrirá automáticamente cuando empiece la semana siguiente.</p>
+          <p className="text-sm text-zinc-300 font-semibold">{t("noPulse.title")}</p>
+          <p className="text-xs text-zinc-500">{t("noPulse.description")}</p>
         </div>
       ) : (
         <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-5 space-y-4">
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] uppercase font-semibold text-cyan-400 tracking-wider">Pulso de la semana</p>
+              <p className="text-[10px] uppercase font-semibold text-cyan-400 tracking-wider">{t("pulse.eyebrow")}</p>
               <p className="text-base text-white mt-1 leading-relaxed">{pulse.prompt}</p>
             </div>
             <div className="text-right shrink-0 text-xs">
-              <p className="text-zinc-300">{daysToPulseEnd}d</p>
-              <p className="text-zinc-600 text-[10px]">para cerrar</p>
+              <p className="text-zinc-300">{t("pulse.daysShort", { days: daysToPulseEnd ?? 0 })}</p>
+              <p className="text-zinc-600 text-[10px]">{t("pulse.toClose")}</p>
             </div>
           </div>
 
@@ -186,14 +200,14 @@ export function CircleHubV2() {
             <textarea
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
-              placeholder="Responde cuando quieras durante esta semana..."
+              placeholder={t("pulse.placeholder")}
               rows={4}
               maxLength={1500}
               className="w-full rounded-lg border border-zinc-700 bg-black/40 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-cyan-500/50 focus:outline-none resize-none"
             />
             <div className="flex items-center justify-between gap-2">
               <p className="text-[10px] text-zinc-500">
-                {hasResponded ? "Ya respondiste — puedes editar" : "Anónimo dentro del círculo"} · {draft.length}/1500
+                {hasResponded ? t("pulse.alreadyResponded") : t("pulse.anonymous")} · {draft.length}/1500
               </p>
               <button
                 onClick={() => void submit()}
@@ -201,7 +215,7 @@ export function CircleHubV2() {
                 className="inline-flex items-center gap-1.5 rounded-lg bg-cyan-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-cyan-500 disabled:opacity-40"
               >
                 <Send className="w-3 h-3" />
-                {hasResponded ? "Actualizar" : "Compartir con el círculo"}
+                {hasResponded ? t("pulse.update") : t("pulse.share")}
               </button>
             </div>
           </div>
@@ -209,9 +223,9 @@ export function CircleHubV2() {
           {/* Participation indicator */}
           <div className="flex items-center gap-2 text-[11px] text-zinc-500 pt-2 border-t border-cyan-500/10">
             <Activity className="h-3 w-3" />
-            <span>{pulse.responseCount}/{circle.maxMembers} han respondido</span>
+            <span>{t("pulse.participation", { count: pulse.responseCount, max: circle.maxMembers })}</span>
             {!hasResponded && (
-              <span className="text-cyan-400">· tu respuesta desbloquea las del resto</span>
+              <span className="text-cyan-400">{t("pulse.unlockHint")}</span>
             )}
           </div>
         </div>
@@ -221,10 +235,10 @@ export function CircleHubV2() {
       {showPeers && pulse && (
         <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 space-y-3">
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
-            <Inbox className="h-3.5 w-3.5" /> Voces del círculo (anónimas)
+            <Inbox className="h-3.5 w-3.5" /> {t("peers.title")}
           </p>
           {pulse.peerResponses.filter((p) => p.content !== null).length === 0 ? (
-            <p className="text-xs text-zinc-500">Aún no han respondido. Volverán durante la semana.</p>
+            <p className="text-xs text-zinc-500">{t("peers.empty")}</p>
           ) : (
             <div className="space-y-2">
               {pulse.peerResponses.filter((p) => p.content !== null).map((p) => (
@@ -242,7 +256,7 @@ export function CircleHubV2() {
       {reflections.length > 0 && (
         <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-5 space-y-3">
           <p className="text-xs font-semibold text-amber-300 uppercase tracking-wider flex items-center gap-2">
-            <Mail className="h-3.5 w-3.5" /> Devolución privada del mentor
+            <Mail className="h-3.5 w-3.5" /> {t("reflections.title")}
           </p>
           <div className="space-y-3">
             {reflections.slice(0, 3).map((r) => (
@@ -259,7 +273,7 @@ export function CircleHubV2() {
                 <p className="text-sm text-zinc-100 whitespace-pre-wrap leading-relaxed">{r.content}</p>
                 <p className="text-[10px] text-zinc-600 mt-2">
                   {r.publishedAt && formatDate(r.publishedAt)}
-                  {!r.readAt && <span className="ml-2 text-amber-400">· no leído</span>}
+                  {!r.readAt && <span className="ml-2 text-amber-400">{t("reflections.unread")}</span>}
                 </p>
               </button>
             ))}
@@ -274,7 +288,7 @@ export function CircleHubV2() {
       >
         <div className="flex items-center gap-2">
           <Archive className="h-4 w-4 text-zinc-500" />
-          <span className="text-sm text-zinc-300">Cartas de cierre archivadas</span>
+          <span className="text-sm text-zinc-300">{t("archive")}</span>
         </div>
         <span className="text-xs text-zinc-500">→</span>
       </Link>

@@ -299,6 +299,10 @@ export async function processScheduledEmails(): Promise<{ sent: number; skipped:
     } else {
       errors++;
     }
+    // Throttle 5 emails/seg — límite de Resend. Sin esto, lotes >5 emails
+    // pegaban 429 rate_limit_exceeded (diagnóstico EmailLog 31-05-2026:
+    // ~31 fallos por 429 en 30 días).
+    await new Promise((r) => setTimeout(r, 200));
   }
 
   return { sent, skipped, errors };

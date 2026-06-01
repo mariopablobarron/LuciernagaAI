@@ -132,6 +132,7 @@ export const GET = withCronLog("weekly-letter", async (req) => {
             to: candidate.email!, // shouldSendNotification guaranteed non-null
             userId: candidate.userId,
             template: "weekly-letter-notification",
+            locale: pickEmailLocale(candidate.locale),
             ...mail,
           });
           if (ok) {

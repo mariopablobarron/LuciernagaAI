@@ -95,6 +95,7 @@ const dedupedHandler = withCronDedup("7d-nudge", () => dailyUtcKey(), async () =
           ...email,
           userId: user.id,
           template: "nudge_7d",
+          locale: pickEmailLocale(user.locale),
         });
 
         if (ok) {

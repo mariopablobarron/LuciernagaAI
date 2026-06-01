@@ -1,0 +1,21 @@
+src/app/community/cafeteria/page.tsx
+  s_c72d0ada98a9af::t_1114b86e6387a3 5,44-49,54-70,87,93,97,114,118,121,151,173,178,181,201,206,209,231-232,240,251-252,259,265,274,283,298,306,309,316,320,327-328,333-334,342,346-347,376,387-393,396,402,407,420,426,434,441,447-448,489-495,499,511,522,528
+messages/es.json
+  s_c72d0ada98a9af::t_a0c6b919c49bb3 3163-3248
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6fd18e6251a64780ca5be2a2a0ad135dce389b29",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

@@ -274,7 +274,83 @@ export type UserEmail = {
   text: string;
   userId?: string;
   template?: string;
+  /** Locale del destinatario — controla el idioma del footer de unsubscribe
+   *  que se inyecta automáticamente en sendUserEmail. Si null/ausente → "es". */
+  locale?: EmailLocale;
 };
+
+// ─── Footer de unsubscribe — visible en todos los emails ──────────────────────
+// El header List-Unsubscribe ya existe (Gmail/Outlook lo muestran arriba).
+// Esto añade además un footer VISIBLE en el cuerpo del email, para clientes
+// que no soportan RFC 8058 o usuarios que prefieren un link clickable claro.
+// Añadido 2026-05-31 a petición explícita: "los correos tienen que tener
+// el mensaje de no seguir recibiendo".
+
+const UNSUBSCRIBE_FOOTER_STRINGS: Record<EmailLocale, {
+  question: string;
+  unsubscribe: string;
+  manage: string;
+  separator: string;
+}> = {
+  es: {
+    question: "¿No quieres recibir más correos como este?",
+    unsubscribe: "Cancelar suscripción",
+    manage: "Gestionar notificaciones",
+    separator: " · ",
+  },
+  en: {
+    question: "Don't want to receive more emails like this?",
+    unsubscribe: "Unsubscribe",
+    manage: "Manage notifications",
+    separator: " · ",
+  },
+  pt: {
+    question: "Não queres receber mais emails como este?",
+    unsubscribe: "Cancelar subscrição",
+    manage: "Gerir notificações",
+    separator: " · ",
+  },
+  fr: {
+    question: "Tu ne veux plus recevoir d'emails comme celui-ci ?",
+    unsubscribe: "Se désinscrire",
+    manage: "Gérer les notifications",
+    separator: " · ",
+  },
+};
+
+function buildUnsubscribeFooterHtml(unsubscribeUrl: string, settingsUrl: string, locale: EmailLocale): string {
+  const s = UNSUBSCRIBE_FOOTER_STRINGS[locale];
+  // Inline styles only — los clientes de email no soportan stylesheets externos.
+  // Color discreto pero legible, separado del body por un border-top sutil.
+  return `
+<table width="100%" cellpadding="0" cellspacing="0" style="margin:0;padding:24px 32px 32px;background:transparent;border-top:1px solid rgba(255,255,255,0.06)">
+  <tr><td align="center" style="font-family:system-ui,-apple-system,sans-serif">
+    <p style="margin:0 0 6px;font-size:11px;line-height:1.5;color:#71717a">${s.question}</p>
+    <p style="margin:0;font-size:11px;line-height:1.5;color:#71717a">
+      <a href="${unsubscribeUrl}" style="color:#a78bfa;text-decoration:underline">${s.unsubscribe}</a>${s.separator}<a href="${settingsUrl}" style="color:#a78bfa;text-decoration:underline">${s.manage}</a>
+    </p>
+  </td></tr>
+</table>`;
+}
+
+function buildUnsubscribeFooterText(unsubscribeUrl: string, settingsUrl: string, locale: EmailLocale): string {
+  const s = UNSUBSCRIBE_FOOTER_STRINGS[locale];
+  return `\n\n---\n${s.question}\n${s.unsubscribe}: ${unsubscribeUrl}\n${s.manage}: ${settingsUrl}\n`;
+}
+
+/**
+ * Inyecta el footer de unsubscribe en el HTML antes del </body>. Si no hay
+ * </body> (HTML mal formado o fragment), lo añade al final. Idempotente —
+ * NO duplica si ya está marcado con el data-attr.
+ */
+function injectUnsubscribeFooterHtml(html: string, footerHtml: string): string {
+  if (html.includes('data-unsubscribe-footer="injected"')) return html;
+  const marked = footerHtml.replace("<table ", '<table data-unsubscribe-footer="injected" ');
+  if (html.includes("</body>")) {
+    return html.replace("</body>", `${marked}\n</body>`);
+  }
+  return `${html}${marked}`;
+}
 
 async function createEmailLog(
   email: UserEmail,
@@ -363,6 +439,22 @@ export async function sendUserEmail(email: UserEmail): Promise<boolean> {
 
   const unsubscribeToken = signUnsubscribeToken(email.to);
   const unsubscribeUrl = `${baseUrl}/api/email/unsubscribe?email=${encodeURIComponent(email.to)}&token=${encodeURIComponent(unsubscribeToken)}`;
+  const settingsUrl = `${baseUrl}/settings`;
+  const locale: EmailLocale = email.locale ?? "es";
+
+  // Inyectar footer visible de unsubscribe en HTML y text. El header
+  // List-Unsubscribe ya activa el botón nativo en Gmail/Outlook; esto añade
+  // el link visible para clientes sin RFC 8058 o usuarios que prefieren
+  // verlo explícito. Idempotente: si el HTML ya lo lleva marcado, no duplica.
+  const footerHtml = buildUnsubscribeFooterHtml(unsubscribeUrl, settingsUrl, locale);
+  const footerText = buildUnsubscribeFooterText(unsubscribeUrl, settingsUrl, locale);
+  const htmlWithFooter = injectUnsubscribeFooterHtml(email.html, footerHtml);
+  const textWithFooter = email.text.includes("Cancelar suscripción") ||
+    email.text.includes("Unsubscribe") ||
+    email.text.includes("Cancelar subscrição") ||
+    email.text.includes("Se désinscrire")
+    ? email.text
+    : email.text + footerText;
 
   try {
     const res = await fetch(RESEND_URL, {
@@ -375,8 +467,8 @@ export async function sendUserEmail(email: UserEmail): Promise<boolean> {
         from,
         to: [email.to],
         subject: email.subject,
-        html: email.html,
-        text: email.text,
+        html: htmlWithFooter,
+        text: textWithFooter,
         headers: {
           "List-Unsubscribe": `<${unsubscribeUrl}>`,
           "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",

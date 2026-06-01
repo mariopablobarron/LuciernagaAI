@@ -1,0 +1,28 @@
+src/lib/auth.ts
+  s_d2308f25c4747c::t_4e4bb8fd8d1efb 247-248
+  s_d2308f25c4747c::t_c55b00808923a2 353-354
+  s_d2308f25c4747c::t_f0adc81a7d0a00 381-382
+  s_d2308f25c4747c::t_395b8a03e71661 7
+  s_d2308f25c4747c::t_12488591e5bb22 336-337
+  s_d2308f25c4747c::t_f46b5a4337faf0 265-271,273-281
+src/lib/bot-detection.ts
+  s_d2308f25c4747c::t_2e8cb5e8f62881 1-99
+src/app/api/cron/purge-anonymous-dormant/route.ts
+  s_d2308f25c4747c::t_a79bbc52b663de 1-107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d6b4ca3e4dd8bc4cb28b18903207fd7500be1818",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { MessageCircle, Plus, Sparkles } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 import { trackMetaEvent } from "@/lib/meta-pixel";
@@ -157,6 +158,7 @@ type CheckinApiResponse = {
 // Pure helpers extracted to ./chat-utils.ts
 
 export default function HomePage() {
+  const t = useTranslations("appPage");
   const sfx = useSfx();
   const pendingWaitlistMessageRef = useRef<string | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -428,13 +430,15 @@ export default function HomePage() {
     const displayName =
       sessionProfile?.name ||
       (sessionProfile && !sessionProfile.isAnonymous ? sessionProfile.email : "") ||
-      "Sesión anónima";
+      t("sidebar.anonymous");
 
     return {
       name: displayName,
-      plan: sessionProfile?.planLabel ? `Plan ${sessionProfile.planLabel}` : "Plan Free",
+      plan: sessionProfile?.planLabel
+        ? t("sidebar.planLabel", { plan: sessionProfile.planLabel })
+        : t("sidebar.planFree"),
     };
-  }, [sessionProfile]);
+  }, [sessionProfile, t]);
 
   const effectiveActionLock = useMemo(() => {
     if (actionLock) {
@@ -466,8 +470,8 @@ export default function HomePage() {
 
   const upgradeCopy = useMemo(() => {
     if (!showUpgradeCta) return null;
-    return "Aquí ya hubo valor real: claridad, objetivo o una acción concreta. Pro lo sostiene entre sesiones y desbloquea Modo Impulso.";
-  }, [showUpgradeCta]);
+    return t("upgrade.valueDetected");
+  }, [showUpgradeCta, t]);
 
   const loadMessages = async (conversationId: string): Promise<void> => {
     const response = await fetch(
@@ -2119,7 +2123,7 @@ export default function HomePage() {
       {workspaceTab !== "chat" && (
         <FloatingButton
           icon={<MessageCircle className="w-6 h-6" />}
-          label="Nueva conversación"
+          label={t("newConversation")}
           position="bottom-right"
           onClick={handleNewConversation}
           color="cyan"
@@ -2129,43 +2133,42 @@ export default function HomePage() {
       <Dialog open={upgradeDialogOpen} onOpenChange={setUpgradeDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Continuidad completa, no presión vacía</DialogTitle>
+            <DialogTitle>{t("upgrade.title")}</DialogTitle>
             <DialogDescription>
-              {upgradeCopy ||
-                "El siguiente salto no es más ruido: es más continuidad, historial y seguimiento real."}
+              {upgradeCopy || t("upgrade.default")}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="rounded-2xl border border-border bg-muted/40 p-4">
-                <p className="text-sm font-semibold text-foreground">Free</p>
+                <p className="text-sm font-semibold text-foreground">{t("upgrade.free.title")}</p>
                 <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                  <li>10 mensajes al día</li>
-                  <li>Continuidad resumida</li>
-                  <li>Buen punto de entrada</li>
+                  <li>{t("upgrade.free.bullets.daily")}</li>
+                  <li>{t("upgrade.free.bullets.continuity")}</li>
+                  <li>{t("upgrade.free.bullets.entry")}</li>
                 </ul>
               </div>
               <div className="rounded-2xl border border-border bg-background p-4">
-                <p className="text-sm font-semibold text-foreground">Pro</p>
+                <p className="text-sm font-semibold text-foreground">{t("upgrade.pro.title")}</p>
                 <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                  <li>Sin límite diario</li>
-                  <li>Seguimiento completo de objetivos y acciones</li>
-                  <li>Más continuidad entre sesiones</li>
+                  <li>{t("upgrade.pro.bullets.unlimited")}</li>
+                  <li>{t("upgrade.pro.bullets.tracking")}</li>
+                  <li>{t("upgrade.pro.bullets.continuity")}</li>
                 </ul>
               </div>
             </div>
 
             <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
               {sessionProfile?.isAnonymous
-                ? "Antes de activar un plan, guarda tu progreso con email para no perder continuidad."
-                : `Tu progreso ya está vinculado a ${sessionProfile?.email}. Cuando Pro esté listo, este flujo ya estará preparado.`}
+                ? t("upgrade.footer.anonymous")
+                : t("upgrade.footer.linked", { email: sessionProfile?.email ?? "" })}
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setUpgradeDialogOpen(false)}>
-              Ahora no
+              {t("upgrade.actions.later")}
             </Button>
             <Button
               onClick={() => {
@@ -2173,7 +2176,7 @@ export default function HomePage() {
                 setUpgradeDialogOpen(false);
               }}
             >
-              Ver continuidad en el plan
+              {t("upgrade.actions.viewPlan")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -2182,34 +2185,36 @@ export default function HomePage() {
       <Dialog open={captureDialogOpen} onOpenChange={setCaptureDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Guarda tu progreso antes de perderlo</DialogTitle>
+            <DialogTitle>{t("capture.title")}</DialogTitle>
             <DialogDescription>
-              {captureEmailPrompt ||
-                "Ya apareció claridad real en la conversación. Vincula un email para no perder objetivos, acciones y continuidad."}
+              {captureEmailPrompt || t("capture.default")}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="warning" className="rounded-full px-3 py-1">
-                Cuenta anónima
+                {t("capture.badges.anonymous")}
               </Badge>
               <Badge variant="secondary" className="rounded-full px-3 py-1">
-                {sessionProfile?.planLabel || "Free"}
+                {sessionProfile?.planLabel || t("capture.badges.free")}
               </Badge>
               <Badge variant="secondary" className="rounded-full px-3 py-1">
-                Progreso {progress.completedActions}/{progress.totalActions}
+                {t("capture.badges.progress", {
+                  done: progress.completedActions,
+                  total: progress.totalActions,
+                })}
               </Badge>
             </div>
 
             <div className="space-y-3">
               <label className="block space-y-2">
-                <span className="text-sm font-medium text-foreground">Email</span>
+                <span className="text-sm font-medium text-foreground">{t("capture.emailLabel")}</span>
                 <Input
                   type="email"
                   value={saveProgressEmail}
                   onChange={(event) => setSaveProgressEmail(event.target.value)}
-                  placeholder="tu@email.com"
+                  placeholder={t("capture.emailPlaceholder")}
                 />
               </label>
 
@@ -2223,14 +2228,14 @@ export default function HomePage() {
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setCaptureDialogOpen(false)}>
-              Seguir anónimo
+              {t("capture.actions.stayAnonymous")}
             </Button>
             <Button
               type="button"
               onClick={() => void handleSaveProgress()}
               disabled={saveProgressLoading || !saveProgressEmail.trim()}
             >
-              {saveProgressLoading ? "Guardando..." : "Guardar progreso"}
+              {saveProgressLoading ? t("capture.actions.saving") : t("capture.actions.save")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -2278,7 +2283,7 @@ export default function HomePage() {
         onSaved={(savedName) => {
           setNameCaptureOpen(false);
           setSessionProfile((prev) => (prev ? { ...prev, name: savedName } : prev));
-          toast.success(`Encantado, ${savedName}.`);
+          toast.success(t("nameSaved", { name: savedName }));
         }}
       />
     </AgeGate>

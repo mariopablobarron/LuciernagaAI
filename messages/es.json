@@ -3295,5 +3295,59 @@
       "submit": "Enviar reporte",
       "cancel": "Cancelar"
     }
+  },
+  "appPage": {
+    "sidebar": {
+      "anonymous": "Sesión anónima",
+      "planLabel": "Plan {plan}",
+      "planFree": "Plan Free"
+    },
+    "newConversation": "Nueva conversación",
+    "nameSaved": "Encantado, {name}.",
+    "upgrade": {
+      "title": "Continuidad completa, no presión vacía",
+      "default": "El siguiente salto no es más ruido: es más continuidad, historial y seguimiento real.",
+      "valueDetected": "Aquí ya hubo valor real: claridad, objetivo o una acción concreta. Pro lo sostiene entre sesiones y desbloquea Modo Impulso.",
+      "free": {
+        "title": "Free",
+        "bullets": {
+          "daily": "10 mensajes al día",
+          "continuity": "Continuidad resumida",
+          "entry": "Buen punto de entrada"
+        }
+      },
+      "pro": {
+        "title": "Pro",
+        "bullets": {
+          "unlimited": "Sin límite diario",
+          "tracking": "Seguimiento completo de objetivos y acciones",
+          "continuity": "Más continuidad entre sesiones"
+        }
+      },
+      "footer": {
+        "anonymous": "Antes de activar un plan, guarda tu progreso con email para no perder continuidad.",
+        "linked": "Tu progreso ya está vinculado a {email}. Cuando Pro esté listo, este flujo ya estará preparado."
+      },
+      "actions": {
+        "later": "Ahora no",
+        "viewPlan": "Ver continuidad en el plan"
+      }
+    },
+    "capture": {
+      "title": "Guarda tu progreso antes de perderlo",
+      "default": "Ya apareció claridad real en la conversación. Vincula un email para no perder objetivos, acciones y continuidad.",
+      "badges": {
+        "anonymous": "Cuenta anónima",
+        "free": "Free",
+        "progress": "Progreso {done}/{total}"
+      },
+      "emailLabel": "Email",
+      "emailPlaceholder": "tu@email.com",
+      "actions": {
+        "stayAnonymous": "Seguir anónimo",
+        "saving": "Guardando…",
+        "save": "Guardar progreso"
+      }
+    }
   }
 }

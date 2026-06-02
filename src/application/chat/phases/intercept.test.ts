@@ -23,8 +23,8 @@ jest.mock("@/lib/alerts", () => ({
 
 jest.mock("@/services/risk", () => ({
   getCrisisResponse: jest.fn().mockReturnValue({
-    response: "Estoy contigo. Llama al 717 003 717.",
-    resources: [{ name: "Teléfono de la Esperanza", url: "tel:717003717" }],
+    response: "Estoy contigo. Llama al 024.",
+    resources: [{ name: "Línea 024", url: "tel:024" }],
     shouldEscalate: true,
     legalFlag: true,
     disclaimer: "No sustituye terapia.",
@@ -268,7 +268,7 @@ describe("interceptCrisis", () => {
     expect(saveConversationMessage).toHaveBeenCalledWith(
       expect.objectContaining({
         role: "assistant",
-        content: "Estoy contigo. Llama al 717 003 717.",
+        content: "Estoy contigo. Llama al 024.",
       })
     );
   });
@@ -288,7 +288,7 @@ describe("interceptCrisis", () => {
   it("includes crisis resources and legal flags in the payload", async () => {
     const result = await interceptCrisis(makeInput({ crisisMode: true, riskLevel: "high" }));
     if (!result.intercepted) throw new Error("unreachable");
-    expect(result.data.alerts).toEqual([{ name: "Teléfono de la Esperanza", url: "tel:717003717" }]);
+    expect(result.data.alerts).toEqual([{ name: "Línea 024", url: "tel:024" }]);
     expect(result.data.legalFlag).toBe(true);
     expect(result.data.legalDisclaimer).toBe("No sustituye terapia.");
   });

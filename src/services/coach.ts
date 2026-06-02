@@ -179,7 +179,6 @@ function buildLocaleGuidance(locale: CoachContext["locale"] | undefined): string
 
 RECURSOS DE CRISIS (España) — invócalos solo si detectas ideación, autolesión o riesgo agudo (no para malestar genérico):
 - 024 — Línea de Atención a la Conducta Suicida (24/7, gratuita).
-- 717 003 717 — Teléfono de la Esperanza (escucha profesional, 24/7).
 - 112 — Emergencias.
 NUNCA des el número como remate motivacional; dilo solo cuando la conversación lo necesite.`,
 

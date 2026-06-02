@@ -59,12 +59,12 @@ describe("getHotlinesForCountry", () => {
 });
 
 describe("formatHotlinesInline", () => {
-  it("formatea España con alternativa", () => {
+  it("formatea España sin alternativas (solo 024)", () => {
     const inline = formatHotlinesInline(getHotlinesForCountry("ES"));
     expect(inline).toContain("112");
     expect(inline).toContain("024");
     expect(inline).toContain("Línea 024");
-    expect(inline).toContain("Teléfono de la Esperanza");
+    expect(inline).not.toContain("Teléfono de la Esperanza");
   });
 
   it("formatea México con alternativa", () => {

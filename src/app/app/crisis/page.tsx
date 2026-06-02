@@ -36,14 +36,6 @@ const URGENT: Resource[] = [
     hours: '24 h · gratuito · confidencial',
     highlight: true,
   },
-  {
-    name: 'Teléfono de la Esperanza',
-    phone: '717 003 717',
-    href: 'https://telefonodelaesperanza.org',
-    hrefLabel: 'telefonodelaesperanza.org',
-    desc: 'Atención emocional y apoyo en crisis por profesionales y voluntariado formado.',
-    hours: '24 h',
-  },
 ];
 
 const SUPPORT: Resource[] = [

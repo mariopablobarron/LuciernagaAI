@@ -1,0 +1,31 @@
+src/lib/crisis-hotlines.test.ts
+  s_c72d0ada98a9af::t_21a736afc8e309 62,67
+e2e/crisis-flow.spec.ts
+  s_c72d0ada98a9af::t_c59d302d017b5a 18,51
+  s_c72d0ada98a9af::t_d64f83f605f66b 36-37
+messages/es.json
+  s_c72d0ada98a9af::t_7508764f26d706 32
+  s_c72d0ada98a9af::t_f66ecd2273d8d4 1547
+src/application/chat/phases/intercept.test.ts
+  s_c72d0ada98a9af::t_14866d8fba1541 26-27
+  s_c72d0ada98a9af::t_8c031859d56345 269
+  s_c72d0ada98a9af::t_8a72b0b3b8d91f 289
+docs/manual-psicologa.md
+  s_c72d0ada98a9af::t_3c7bba5e853140 35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e933c99a1b27aebbe8d1c3b1a1d0458a9d84505a",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

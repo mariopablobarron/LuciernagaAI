@@ -32,7 +32,7 @@
 
 - **No es psicoterapia.** No sustituye a una consulta con terapeuta profesional.
 - **No es una herramienta clínica diagnóstica.** Las "evaluaciones" que aparecen en la plataforma son instrumentos de autoconocimiento, no diagnóstico.
-- **No es un servicio de atención a urgencias psiquiátricas.** Aunque tiene protocolo de crisis, no reemplaza al 112, al teléfono de la esperanza (024), ni a servicios de urgencias.
+- **No es un servicio de atención a urgencias psiquiátricas.** Aunque tiene protocolo de crisis, no reemplaza al 112, al 024 (Línea de Atención a la Conducta Suicida), ni a servicios de urgencias.
 - **No es un espacio de ventilación ilimitada.** El mentor interpela, no solo escucha — está diseñado para ordenar pensamiento y mover a la acción, no para contener crónicamente.
 
 **Lo que sí es:**
@@ -561,7 +561,6 @@ Estos son los que aparecen en los mensajes de crisis del mentor. Verifica que si
 - **024** — Línea de Atención a la Conducta Suicida (Ministerio de Sanidad, 24/7, gratuita, confidencial).
 - **112** — Emergencias generales.
 - **016** — Violencia de género.
-- **Teléfono de la Esperanza**: 717 003 717.
 - **Unidades de Salud Mental de referencia** — verificar por comunidad autónoma del usuario si es posible.
 
 Si detectas que alguno de estos recursos ha cambiado de número o ya no está operativo, repórtalo.

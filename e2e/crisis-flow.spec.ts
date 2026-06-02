@@ -15,7 +15,7 @@ test.describe("Flujo de Crisis — Seguridad", () => {
 
     // 4. Verificar que aparece la respuesta de seguridad
     // Debe contener números de teléfono de emergencia
-    await expect(page.getByText("717 003 717").first()).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText("024").first()).toBeVisible({ timeout: 15000 });
 
     // 5. Verificar que aparece el banner/alerta de crisis
     await expect(page.getByText(/alerta de seguridad|modo crisis/i).first()).toBeVisible({ timeout: 5000 });
@@ -33,8 +33,8 @@ test.describe("Flujo de Crisis — Seguridad", () => {
 
     // Verificar que aparece el panel con técnicas de respiración
     await expect(page.getByText(/respiración 4-7-8/i).first()).toBeVisible({ timeout: 5000 });
-    // Verificar que aparece el teléfono de la esperanza
-    await expect(page.getByText("717 003 717").first()).toBeVisible();
+    // Verificar que aparece la línea oficial 024
+    await expect(page.getByText("024").first()).toBeVisible();
   });
 
   test("Crisis keywords en variaciones con tildes", async ({ page }) => {
@@ -48,6 +48,6 @@ test.describe("Flujo de Crisis — Seguridad", () => {
     await chatInput.press("Enter");
 
     // Debe activar respuesta de seguridad igualmente
-    await expect(page.getByText("717 003 717").first()).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText("024").first()).toBeVisible({ timeout: 15000 });
   });
 });

@@ -29,7 +29,7 @@
     "badge": "Mentor IA en español · Sin email para empezar · Custodia clínica humana",
     "title": "Cuéntale lo que te bloquea.",
     "titleHighlight": "Sal con un paso concreto para hoy.",
-    "subtitle": "Mentor con IA en español, anónimo desde el primer mensaje. Cero entrenamiento de modelos con tus conversaciones, supervisión clínica humana, y derivación inmediata al 024 y al Teléfono de la Esperanza si la cosa pesa demasiado para un chat. La IA es la herramienta. El método y la supervisión los pone un equipo humano.",
+    "subtitle": "Mentor con IA en español, anónimo desde el primer mensaje. Cero entrenamiento de modelos con tus conversaciones, supervisión clínica humana, y derivación inmediata al 024 si la cosa pesa demasiado para un chat. La IA es la herramienta. El método y la supervisión los pone un equipo humano.",
     "bullet1": "Escribes lo que te pasa, sin filtros ni formularios",
     "bullet2": "Detecta tu estado y adapta la conversación",
     "bullet3": "Termina con un siguiente paso accionable hoy",
@@ -1629,7 +1629,7 @@
     "entry": {
       "helpPage": {
         "title": "Página de ayuda urgente",
-        "body": "Incorporamos dentro de la app una página con los recursos oficiales de emergencia en España (112, 024, Teléfono de la Esperanza, ANAR, 016) y una guía corta para esos minutos críticos en los que alguien está esperando a que le atiendan. No sustituye a ningún servicio — hace más fácil llegar a ellos."
+        "body": "Incorporamos dentro de la app una página con los recursos oficiales de emergencia en España (112, 024, ANAR, 016) y una guía corta para esos minutos críticos en los que alguien está esperando a que le atiendan. No sustituye a ningún servicio — hace más fácil llegar a ellos."
       },
       "referrals": {
         "title": "Programa de referidos",

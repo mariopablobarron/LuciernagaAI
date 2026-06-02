@@ -38,9 +38,6 @@ const HOTLINES: Record<string, CountryHotlines> = {
       available: "24/7 gratis",
       url: "https://www.sanidad.gob.es/linea024",
     },
-    alternatives: [
-      { name: "Teléfono de la Esperanza", number: "717 003 717", available: "24/7" },
-    ],
   },
   MX: {
     countryCode: "MX",

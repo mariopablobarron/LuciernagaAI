@@ -238,23 +238,16 @@ export default function HomePage() {
   const [onboardingConsentSaving, setOnboardingConsentSaving] = useState(false);
   const [onboardingConsentError, setOnboardingConsentError] = useState<string | null>(null);
 
-  // Redirect a /app/inicio si el usuario no ha completado las 3 preguntas iniciales.
-  // Silencioso: si /api/onboarding falla, seguimos con el flujo normal.
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/onboarding", { credentials: "include" })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data: { completed?: boolean } | null) => {
-        if (cancelled || !data) return;
-        if (data.completed === false) {
-          window.location.replace("/app/inicio");
-        }
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  // El usuario llega a /app y puede escribir directamente — sin formulario
+  // bloqueante previo. El wizard sigue existiendo en /app/inicio como
+  // configuración opcional (botón discreto en el menú del chat), pero
+  // nunca se fuerza.
+  //
+  // Auditoría 2026-06-02: del 50 signups del mes, 13 (26%) completaban el
+  // wizard de 3 preguntas y 37 (74%) abandonaban antes de poder escribir.
+  // El embudo "escribió ≥1 mensaje" estaba directamente bloqueado por
+  // este redirect. Anonymous-first significa también fricción-cero —
+  // si el usuario quiere escribir, debe poder hacerlo en su primer segundo.
 
   const handleUnauthorizedSession = () => {
     setSessionReady(false);

@@ -123,7 +123,7 @@ export function proxy(request: NextRequest) {
   }
 
   // ── i18n locale routing ─────────────────────────────────────────────
-  // Solo aplicamos i18n routing al landing (/, /en, /es, /pt, /fr).
+  // Solo aplicamos i18n routing al landing (/, /en, /es, /pt, /fr, /de).
   // El resto de páginas viven fuera del segmento [locale] y leen el
   // locale activo de la cookie NEXT_LOCALE en src/i18n/request.ts.
   if (
@@ -131,7 +131,8 @@ export function proxy(request: NextRequest) {
     pathname === "/en" ||
     pathname === "/es" ||
     pathname === "/pt" ||
-    pathname === "/fr"
+    pathname === "/fr" ||
+    pathname === "/de"
   ) {
     return intlMiddleware(request);
   }

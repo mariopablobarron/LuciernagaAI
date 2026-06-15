@@ -1,0 +1,57 @@
+src/application/chat/processMessage.ts
+  s_d2308f25c4747c::t_396ed92f93ff45 42
+src/lib/escalation-detector.ts
+  s_d2308f25c4747c::t_0dfd5a7570e1af 204
+  s_d2308f25c4747c::t_0314dd3c250221 40
+  s_d2308f25c4747c::t_4caa2089fb23f8 167-196
+src/app/layout.tsx
+  s_d2308f25c4747c::t_d5782aac79929a 187,189
+src/services/coach.ts
+  s_d2308f25c4747c::t_7574d6b46e7a82 1083-1086
+  s_d2308f25c4747c::t_e0d560b5dfecc9 1154
+  s_d2308f25c4747c::t_1db767bbae3a33 155,157-158,160
+  s_d2308f25c4747c::t_dcb869ea61c8a8 1105-1108
+  s_d2308f25c4747c::t_754bc8693a9f29 243
+  s_d2308f25c4747c::t_48f48c1b602005 837
+  s_d2308f25c4747c::t_5ec6f3e277acc6 834
+  s_d2308f25c4747c::t_079acfa49bd530 1169
+  s_d2308f25c4747c::t_49072b39e50408 1190
+  s_d2308f25c4747c::t_bafa6bc68176c7 210-217
+  s_d2308f25c4747c::t_30a54eb15e3297 871-877
+  s_d2308f25c4747c::t_e795a10745a122 1127-1130
+src/application/chat/phases/intercept.ts
+  s_d2308f25c4747c::t_eea122c602eece 107
+src/app/[locale]/page.tsx
+  s_d2308f25c4747c::t_038e6b87fc9d5a 85
+src/app/admin/blog/[id]/page.tsx
+  s_d2308f25c4747c::t_79ac8323bf2c25 52
+src/application/chat/phases/enrich.ts
+  s_d2308f25c4747c::t_6f9d50cedc8dcf 139
+src/lib/email-i18n.ts
+  s_d2308f25c4747c::t_a1b30c11de4d85 13-19,26-30,33
+src/services/chatOrchestrator.ts
+  s_d2308f25c4747c::t_1024a142723a84 88-89
+src/i18n/routing.ts
+  s_d2308f25c4747c::t_a752e55a4b2df6 9,12,14
+src/lib/elevenlabs/voices.ts
+  s_d2308f25c4747c::t_60f265f4b548af 14
+  s_d2308f25c4747c::t_dd28b071aed7b3 26
+messages/de.json
+  s_d2308f25c4747c::t_3b0430f7ecd02e 1-3096
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "10c4defb9e36698128ae4798959dfd47ffe79971",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

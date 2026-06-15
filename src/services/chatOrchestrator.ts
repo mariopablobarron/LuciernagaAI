@@ -200,7 +200,7 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
   // Determina el idioma EN EL QUE responde el mentor + qué recursos de crisis
   // sugerir (024 ES, 988 EN, SNS 24 PT, 3114 FR). No depende del país real
   // del usuario sino de la versión del sitio que está usando.
-  const SUPPORTED_LOCALES = ["es", "en", "pt", "fr"] as const;
+  const SUPPORTED_LOCALES = ["es", "en", "pt", "fr", "de"] as const;
   type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
   function isSupported(v: string | null | undefined): v is SupportedLocale {
     return !!v && (SUPPORTED_LOCALES as readonly string[]).includes(v);

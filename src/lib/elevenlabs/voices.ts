@@ -11,7 +11,7 @@
  * deploy. Las voces se enumeran en GET /v1/voices (premade + professional).
  */
 
-export type SupportedLocale = "es" | "en" | "pt" | "fr";
+export type SupportedLocale = "es" | "en" | "pt" | "fr" | "de";
 
 /**
  * Mapping locale → ISO 639-1 para Scribe.
@@ -23,6 +23,7 @@ export const LOCALE_TO_SCRIBE_LANG: Record<SupportedLocale, string> = {
   en: "en",
   pt: "pt",
   fr: "fr",
+  de: "de",
 };
 
 /**

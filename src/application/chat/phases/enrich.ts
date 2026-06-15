@@ -136,7 +136,7 @@ export type EnrichInput = {
   crisisActiveUntil: string | null;
   /** Locale activo del usuario (es/en/pt/fr). Pasado a las funciones que
    *  generan strings hardcoded para que respondan en el idioma correcto. */
-  locale?: "es" | "en" | "pt" | "fr";
+  locale?: "es" | "en" | "pt" | "fr" | "de";
 };
 
 export type EnrichResult = {

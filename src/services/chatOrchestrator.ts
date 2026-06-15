@@ -85,8 +85,8 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
       ((body as Record<string, unknown>).locale as string | undefined) ??
       req.cookies.get("NEXT_LOCALE")?.value ??
       "es";
-    const safeLocale = (["es","en","pt","fr"].includes(localeRaw) ? localeRaw : "es") as
-      | "es" | "en" | "pt" | "fr";
+    const safeLocale = (["es","en","pt","fr","de"].includes(localeRaw) ? localeRaw : "es") as
+      | "es" | "en" | "pt" | "fr" | "de";
     // Rotación basada en segundo actual → si el usuario manda 2 gibberish
     // seguidos, la variante NO se repite literal.
     const turnIdx = Math.floor(Date.now() / 1000);

@@ -1,0 +1,3096 @@
+{
+  "nav": {
+    "chat": "Chat",
+    "dashboard": "Dashboard",
+    "login": "Log in",
+    "signup": "Create account",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Log out",
+    "myAccount": "My account",
+    "user": "User",
+    "menuOpen": "Open menu",
+    "menuClose": "Close menu",
+    "ariaMain": "Main navigation",
+    "ariaMobile": "Mobile navigation",
+    "community": "Community",
+    "how": "How it works",
+    "compare": "Compare",
+    "pricing": "Pricing",
+    "faq": "FAQ",
+    "test": "Free test",
+    "journeys": "Journeys",
+    "freeTest": "Free test",
+    "cta": "Start beating",
+    "brand": "Three Billion",
+    "brandFull": "Heartbeats"
+  },
+  "hero": {
+    "badge": "AI mentor · No email to start · Human clinical oversight",
+    "title": "Tell it what's blocking you.",
+    "titleHighlight": "Walk away with a concrete next step.",
+    "subtitle": "Spanish-and-English AI mentor, anonymous from the first message. Zero training of third-party models with your conversations, human clinical oversight, and immediate referral to crisis resources if things get too heavy for a chat. The AI is the tool. A human team designs the method and supervises the system.",
+    "bullet1": "Write what's going on — no filters, no forms",
+    "bullet2": "Detects your state and adapts the conversation",
+    "bullet3": "Ends with an actionable next step for today",
+    "cta": "Start writing",
+    "ctaSecondary": "Create an account to save progress",
+    "noSignup": "No signup. No email. Just write.",
+    "socialProof": "+200 people",
+    "socialProofText": "using it weekly",
+    "langNote": "AI mentoring in English. Not a replacement for therapy.",
+    "relationalHonesty": "This doesn't replace the people who love you. The mentor is here to sort your thoughts — not to substitute coffee with your sister or a call to a friend. If you've been talking only with it for a while, maybe what you actually need is to pick up the phone."
+  },
+  "features": {
+    "sectionLabel": "How it works",
+    "title": "Every heartbeat, a step forward",
+    "subtitle": "A mentorship that understands where you are and walks with you toward action, heartbeat by heartbeat.",
+    "noJudgment": {
+      "title": "No judgment",
+      "description": "Only questions that move you forward. No unsolicited advice, no evaluations, no pressure."
+    },
+    "realState": {
+      "title": "Real state",
+      "description": "Detects if you're blocked, anxious, or clear and adapts the conversation to where you really are."
+    },
+    "concreteAction": {
+      "title": "Concrete action",
+      "description": "Every conversation ends with a real next step you can execute today in under 10 minutes."
+    }
+  },
+  "howItWorks": {
+    "sectionLabel": "The process",
+    "title": "Your change in 3 heartbeats",
+    "step1": {
+      "title": "Describe how you feel",
+      "description": "No filters, no judgment. Tell Three Billion Heartbeats what's happening, what you're avoiding, what's holding you back."
+    },
+    "step2": {
+      "title": "Get clarity",
+      "description": "Blocked, anxious, doubtful, or clear — the conversation adapts to where you are."
+    },
+    "step3": {
+      "title": "Act in under 5 min",
+      "description": "A concrete, actionable next step that generates real momentum starting today."
+    }
+  },
+  "team": {
+    "sectionLabel": "Who's behind this",
+    "title": "We're not a loose AI",
+    "subtitle": "The AI runs a method we designed, supervise and improve every week. This is not a generic chatbot: it's a system with named people accountable for it.",
+    "aiRole": {
+      "title": "The AI",
+      "description": "Reads what you write, detects your state, returns questions and next steps. Fast, available anytime, no judgment."
+    },
+    "humanRole": {
+      "title": "The human team",
+      "description": "Designs the pedagogical method, reviews anonymized conversations, tunes the system and decides when something needs a real professional."
+    },
+    "founder": {
+      "name": "Mario Pablo Sánchez Barrón",
+      "role": "Founder · CEO Startidea",
+      "bio": "I design the method, supervise the system's behavior and personally answer support email."
+    },
+    "advisor": {
+      "name": "Amaya Prado",
+      "role": "Clinical advisor · Psychologist",
+      "bio": "Psychologist specialized in childhood, adolescence and youth, with 20+ years in psychological intervention, family counseling and educational psychology. Preventive and integrative approach. Regular contributor to national media."
+    },
+    "transparency": "We do not read your conversations in real time. We review anonymized samples to improve the system, and the clinical criteria is reviewed with professional advisory. If anything borders on crisis or therapy, we tell you and refer you. We don't play psychologist."
+  },
+  "notWhat": {
+    "sectionLabel": "What it is NOT",
+    "title": "So there's no confusion",
+    "item1": {
+      "title": "It's not therapy",
+      "description": "It does not replace a psychologist or clinical intervention. If you're in crisis, we refer you."
+    },
+    "item2": {
+      "title": "It's not generic ChatGPT",
+      "description": "It's a system with method, guardrails and human supervision. Not loose advice or book summaries."
+    },
+    "item3": {
+      "title": "It's not motivational coaching",
+      "description": "No pretty quotes or empty affirmations. Concrete questions and a real step for today."
+    }
+  },
+  "finalCta": {
+    "title1": "Some heartbeats have already passed.",
+    "title2": "The ones ahead are still yours.",
+    "subtitle": "Three billion heartbeats in a lifetime. How many passed without you feeling them?",
+    "cta": "Start beating differently",
+    "ctaSignup": "Or create an account to save your progress",
+    "disclaimer": "Does not replace therapy or professional psychological intervention."
+  },
+  "settings": {
+    "title": "Settings",
+    "saved": "Saved",
+    "saveError": "Save error",
+    "loadErrorProfile": "Couldn't load your profile",
+    "loadErrorPrefs": "Couldn't load your preferences",
+    "profile": {
+      "title": "Your profile",
+      "subtitle": "Name, photo, and personal info",
+      "saved": "Profile saved",
+      "saveError": "Error saving profile",
+      "avatarRemoved": "Avatar removed",
+      "avatarTooLarge": "Image must be under 200 KB",
+      "avatarInvalidType": "Images only",
+      "avatarAlt": "Avatar",
+      "changePhoto": "Change photo",
+      "removePhoto": "Remove photo",
+      "avatarHint": "PNG, JPEG, or WebP. Max 200 KB.",
+      "nameLabel": "Name",
+      "namePlaceholder": "Your name",
+      "bioLabel": "Bio",
+      "bioPlaceholder": "Tell us about yourself...",
+      "bioCounterTpl": "{n}/500",
+      "phoneLabel": "Phone",
+      "phonePlaceholder": "+34 612 345 678",
+      "saving": "Saving...",
+      "save": "Save profile"
+    },
+    "coach": {
+      "title": "AI Coach",
+      "subtitle": "Customize how your mentor talks to you",
+      "toneTitle": "Conversation tone",
+      "tones": {
+        "directo": {
+          "label": "Direct",
+          "desc": "Straight to the point, no fluff"
+        },
+        "socratico": {
+          "label": "Socratic",
+          "desc": "Guides you with questions"
+        },
+        "calido": {
+          "label": "Warm",
+          "desc": "Empathetic and close"
+        }
+      },
+      "genderTitle": "How do you prefer we speak to you?",
+      "genderHint": "Sets the grammatical gender your mentor uses when addressing you. You can change it anytime.",
+      "genders": {
+        "feminine": {
+          "label": "Feminine",
+          "desc": "\"you're tired\""
+        },
+        "masculine": {
+          "label": "Masculine",
+          "desc": "\"you're tired\""
+        },
+        "neutral": {
+          "label": "Neutral",
+          "desc": "No gender conjugations (\"you're in a moment of fatigue\")"
+        }
+      },
+      "clearGender": "Remove preference (back to undefined)"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Control what we send and when",
+      "dailyReminders": "Daily reminders",
+      "dailyRemindersDesc": "Check-ins and pending actions",
+      "reminderTime": "Reminder time",
+      "reminderTimeDesc": "You'll get your reminder at this time",
+      "weeklyEmail": "Weekly email summary",
+      "weeklyEmailDesc": "Your week's progress every Sunday",
+      "sundayLetter": "Sunday letter",
+      "sundayLetterDesc": "A brief letter from your mentor every Sunday with your own words from the week. Content always lives in the app.",
+      "letterEmailNotice": "Email notification for the letter",
+      "letterEmailNoticeDesc": "We'll let you know when the letter is ready. The email doesn't contain the letter — just a link.",
+      "insights": "New insights",
+      "insightsDesc": "When you get new recommendations",
+      "goals": "Goals completed",
+      "goalsDesc": "Celebrations when you finish a goal",
+      "updates": "Product updates",
+      "updatesDesc": "New features and improvements"
+    },
+    "telegram": {
+      "title": "Telegram",
+      "subtitle": "Get reminders and chat outside the app",
+      "linkedTitle": "Account connected",
+      "linkedDesc": "You're already getting messages and reminders on Telegram.",
+      "howToConnect": "How to connect",
+      "step1": "Open the bot on Telegram",
+      "step2": "Tap Start or type /start",
+      "step3": "Send the /link command",
+      "step4": "Click the link the bot sends you",
+      "openBot": "Open bot on Telegram"
+    },
+    "region": {
+      "title": "Region",
+      "subtitle": "Affects your reminder times",
+      "timezones": {
+        "madrid": "Madrid (GMT+1)",
+        "london": "London (GMT+0)",
+        "mexico": "Mexico City (GMT-6)",
+        "bogota": "Bogotá (GMT-5)",
+        "lima": "Lima (GMT-5)",
+        "santiago": "Santiago (GMT-4)",
+        "buenosAires": "Buenos Aires (GMT-3)",
+        "newYork": "New York (GMT-5)",
+        "losAngeles": "Los Angeles (GMT-8)"
+      }
+    },
+    "security": {
+      "title": "Security",
+      "changePassword": "Change password",
+      "changePasswordForm": "Change password",
+      "currentLabel": "Current password",
+      "newLabel": "New password",
+      "confirmLabel": "Confirm new",
+      "passwordPlaceholder": "••••••••",
+      "newPasswordPlaceholder": "Minimum 8 characters",
+      "saving": "Saving…",
+      "save": "Save",
+      "cancel": "Cancel",
+      "errorMismatch": "New passwords don't match.",
+      "errorTooShort": "Minimum 8 characters.",
+      "errorCurrentRequired": "Enter your current password.",
+      "errorInvalidCredentials": "Current password is incorrect.",
+      "errorGeneric": "Error changing password.",
+      "successChanged": "Password updated successfully."
+    },
+    "help": {
+      "title": "Help",
+      "repeatTour": "Repeat guided tour",
+      "tourReset": "Tour reset — go back to chat to see it"
+    }
+  },
+  "ethics": {
+    "eyebrow": "Ethics and limits",
+    "title": "What we",
+    "titleHighlight": "will never do",
+    "titleEnd": ", and what we will",
+    "subtitle": "We're building a tool that touches people's emotional lives. This page is our explicit positioning — AI, data, dependency, clinical limits, responsibility. No fine print.",
+    "weDoLabel": "What we do",
+    "weNeverLabel": "What we will never do",
+    "ctaNote": "If anything we do doesn't match what you read here, it's a bug. Tell us.",
+    "ctaReport": "Report an ethical failure",
+    "ctaPrivacy": "Privacy policy",
+    "ia": {
+      "title": "About artificial intelligence",
+      "lead": "AI is a tool, not a therapist. Our mentor uses generative models to accompany you, not to diagnose or decide for you.",
+      "commit1": "The mentor is built on a hardcoded pedagogical framework. It doesn't improvise: it follows a supervised process.",
+      "commit2": "There are automatic validators that block responses violating our principles (empty imperatives, validation without context, quick congratulations).",
+      "commit3": "When the AI gets it wrong, we fix the prompt and document it in the public changelog.",
+      "commit4": "The final decision is always yours. The mentor returns questions, not verdicts.",
+      "never1": "We will never use your conversations to train third-party models.",
+      "never2": "We will never generate clinical diagnoses or medical recommendations.",
+      "never3": "We will never pretend the mentor is human."
+    },
+    "datos": {
+      "title": "About your data",
+      "lead": "What you write to the mentor is intimate. We treat it with the same care we'd expect if it were ours.",
+      "commit1": "Your conversations are stored encrypted and used only to give you continuity: the mentor remembers your context to accompany you better.",
+      "commit2": "We would only access a specific conversation if you open a support ticket and explicitly ask us to.",
+      "commit3": "You can export everything we have about you from settings. You can delete it. Deletion is real, not just a flag.",
+      "commit4": "We comply with GDPR. Servers in the European Union.",
+      "never1": "We will never sell your data.",
+      "never2": "We will never share it with advertisers or ad networks.",
+      "never3": "We will never cross-reference it with commercial profiles to segment you."
+    },
+    "dependencia": {
+      "title": "About emotional dependency",
+      "lead": "The mentor's goal is for you to need us less, not more. We write that in code, not just marketing.",
+      "commit1": "The mentor closes every conversation leaving you with clarity, not with a need to return.",
+      "commit2": "If we detect compulsive use (many long conversations a day, no progress), the system suggests a pause and rest — not more sessions.",
+      "commit3": "We don't use addictive design patterns: no infinite scroll, no notifications to recapture attention, no variable rewards.",
+      "commit4": "Reminders are contextual and useful, not retention hooks.",
+      "never1": "We will never optimize engagement metrics at the cost of your wellbeing.",
+      "never2": "We will never add gamification mechanics designed to make you come back for the sake of coming back.",
+      "never3": "We will never say \"I miss you\" or similar to force reactivation."
+    },
+    "limitesClinicos": {
+      "title": "About clinical limits",
+      "lead": "There's a clear line between accompaniment and professional care. We don't cross it, and we make sure it doesn't cross itself.",
+      "commit1": "There's a licensed clinical psychologist responsible for clinical judgment: she reviews risk detection, interventions, and the mentor's templates.",
+      "commit2": "If we detect risk signals (suicidal ideation, self-harm, acute crisis), the mentor stops coaching and connects you with emergency resources.",
+      "commit3": "We have a documented crisis protocol. The responsible psychologist signs off on every change that could affect clinical judgment.",
+      "commit4": "We are a complement to therapy, not a substitute. If someone is in treatment, the human professional leads the case.",
+      "never1": "We will never make psychopathological diagnoses.",
+      "never2": "We will never prescribe medication or dosages.",
+      "never3": "We will never discourage anyone from seeing a human professional."
+    },
+    "responsabilidad": {
+      "title": "About our responsibility",
+      "lead": "When you build something that touches people's emotional lives, the responsibility is serious. We don't delegate it.",
+      "commit1": "We review conversations in aggregated and anonymized form to improve the pedagogical framework.",
+      "commit2": "We document every relevant change in a public changelog you can read.",
+      "commit3": "If you find something that violates these principles, write to us. We fix it and we publish it.",
+      "commit4": "We don't use minors on our platform without consent from legal guardians and additional protection mechanisms."
+    }
+  },
+  "about": {
+    "eyebrow": "Where this comes from",
+    "title": "Every heartbeat is a",
+    "titleHighlight": "choice",
+    "subtitle": "Three Billion Heartbeats is born from one conviction: technology can accompany without replacing what's human. We're not a productivity app. We're a space where artificial intelligence serves what matters most — that you understand what's happening and act accordingly.",
+    "questionTitle": "The question that started it all",
+    "questionP1": "The human heart beats approximately three billion times in a lifetime. Each of those beats is an opportunity — to move forward, to pause, to choose.",
+    "questionP2": "Most people know something needs to change. They feel it. But between knowing and doing there's an abyss: blockages that go unnamed, patterns that repeat, decisions that get postponed. And in that space, clarity is lost.",
+    "questionP3Pre": "Three Billion Heartbeats",
+    "questionP3": "exists to close that abyss. Not with generic advice or empty motivation, but with a question at the right moment, a mirror showing what you're not seeing, and a next step you can take today.",
+    "philosophyTitle": "How we think",
+    "philosophy": {
+      "interpelar": {
+        "title": "Question before instructing",
+        "desc": "We don't tell you what to do. We ask, so you discover what you already know but don't dare to see."
+      },
+      "porque": {
+        "title": "Always the why",
+        "desc": "Every action has a reason. Without understanding the why, action is obedience, not change."
+      },
+      "gafas": {
+        "title": "New glasses",
+        "desc": "We help you see what you've normalized. What you take for granted is often what holds you back the most."
+      },
+      "localGlobal": {
+        "title": "From local to global",
+        "desc": "We start with the concrete of today — your blockage, your emotion — and from there we discover the bigger pattern."
+      },
+      "inside": {
+        "title": "Change comes from within",
+        "desc": "It isn't imposed. It's questioned into being. The right question creates more change than the best instruction."
+      },
+      "progress": {
+        "title": "Progress, not perfection",
+        "desc": "An imperfect step today is worth more than a perfect plan tomorrow. Moving forward is what counts."
+      }
+    },
+    "behindTitle": "Who's behind this",
+    "startidea": {
+      "name": "Startidea",
+      "tagline": "Social Innovation and Technology Development Agency",
+      "p1Pre": "Three Billion Heartbeats emerges from",
+      "p1": ", an agency with 15 years of experience working with organizations seeking real impact. We've supported companies, educational institutions, NGOs, and public administrations in processes of social innovation and digital transformation.",
+      "p2Pre": "After 15 years watching how people get stuck, postpone, and lose clarity — even when they have resources and motivation — we asked ourselves:",
+      "p2Strong": "what if technology could do what a good mentor does? Be there, at the right moment, with the right question.",
+      "p3": "Three Billion Heartbeats is our answer. A project that combines artificial intelligence, behavioral psychology, and 15 years of real-world accompaniment experience to create something that didn't exist: a mentor that doesn't give answers — it asks the questions you're not asking yourself."
+    },
+    "founderTitle": "Founder",
+    "founder": {
+      "name": "Mario Pablo Sánchez Barrón",
+      "role": "Founder of Startidea · Creator of Three Billion Heartbeats",
+      "p1": "With over 15 years of experience developing digital products with social impact, Mario has combined technology with a deeply human vision: digital tools should help people understand themselves better and act accordingly.",
+      "p2": "After years working with teams, clients, and organizations of all kinds, he identified a recurring pattern: most people don't need more information or more advice. They need a space to think clearly, without judgment, and a concrete push to act today — not tomorrow.",
+      "p3Strong": "Three Billion Heartbeats is that space.",
+      "p3": "The answer to a question Mario has been asking himself for years: how do I help someone take the first step when they're stuck, without telling them what to do?"
+    },
+    "commitmentsTitle": "Commitments",
+    "ctaNote": "Committed to emotional wellbeing through technology.",
+    "ctaPrimary": "Start now",
+    "ctaSecondary": "About Startidea",
+    "profNote": "Psychology, coaching, or accompaniment professional?",
+    "profLink": "See how it complements your practice",
+    "commitment1": "We don't replace professional help. If we detect risk, we connect with emergency lines.",
+    "commitment2": "Your conversations are yours. We don't sell data or use it for advertising.",
+    "commitment3": "You can export or delete all your data at any time.",
+    "commitment4": "AI accompanies — it doesn't diagnose, prescribe, or judge."
+  },
+  "faq": {
+    "eyebrow": "Frequently asked questions",
+    "title": "What people",
+    "titleHighlight": "ask before starting",
+    "subtitle": "This page answers your doubts so you can decide whether Three Billion Heartbeats fits you. Direct answers, no marketing.",
+    "notFoundPre": "If what you're looking for isn't here,",
+    "notFoundLink": "write to us",
+    "ctaTitle": "Ready to try it?",
+    "ctaSubtitle": "You start without giving any data. The email is asked for only when there's something worth saving.",
+    "ctaButton": "Start now — free",
+    "ctaQuestionPre": "Your question isn't here?",
+    "ctaQuestionLink": "Tell us about it",
+    "ctaQuestionSuf": "and we'll add it.",
+    "basico": {
+      "title": "The basics",
+      "what": {
+        "q": "What is Three Billion Heartbeats?",
+        "a": "A digital AI mentor that walks with you so you understand what's going on and take the next step. It isn't a productivity app or a generic chatbot: it asks questions so you find your own answers, instead of handing you empty advice."
+      },
+      "naming": {
+        "q": "Why is it called that?",
+        "a": "A human heart beats around three billion times in a lifetime. Each beat is a choice — most of them unconscious. The project exists so that more of your beats have real direction, not to add more noise."
+      },
+      "vsChatGPT": {
+        "q": "How is it different from ChatGPT or other AIs?",
+        "a": "ChatGPT answers what you ask. We work the other way around: we challenge before we instruct. The mentor is trained on a specific pedagogical framework — validate the emotion, order the thinking, propose a small action — and remembers your context between conversations to truly walk with you."
+      },
+      "noPsy": {
+        "q": "Do I need to know about psychology or mindfulness to use it?",
+        "a": "No. You use it by writing as you would speak to someone you trust. The mentor adapts to whatever you bring on the day."
+      },
+      "wellState": {
+        "q": "Can I use it if I'm fine and just want clarity?",
+        "a": "Yes. You don't need to be unwell to use it. Many people use it to decide, to clear their head before something important, or to sustain a good streak."
+      }
+    },
+    "empezar": {
+      "title": "Start without giving data",
+      "register": {
+        "q": "Do I need to register to start?",
+        "a": "No. You enter the chat and start talking. We don't ask for an email, name, or card to try it. That's our promise: crossing the door costs nothing."
+      },
+      "whyEmail": {
+        "q": "Why does it ask me for the email later?",
+        "a": "Only when there's something worth keeping — a goal, a committed action, a conversation worth coming back to. The email saves your progress so you don't lose it if you close the browser. If you don't want to leave it, you keep using it the same way without saving."
+      },
+      "attachAnon": {
+        "q": "What if I came in anonymously and now want to save what I talked about?",
+        "a": "Yes. At any moment you can attach your session to an email and everything you've discussed gets linked to your account — without losing anything."
+      }
+    },
+    "funciona": {
+      "title": "How it works",
+      "when": {
+        "q": "When does it suit me to use it?",
+        "a": "When you feel something is off but can't name it, when you freeze in front of a decision, when you fall back into a pattern, or when you want to think out loud without feeling you're bothering anyone."
+      },
+      "time": {
+        "q": "How long does it take to help me?",
+        "a": "A single conversation can clear something up in 10 minutes. Deeper changes take longer: we usually see clear patterns from 3-4 weeks of regular use. We don't promise quick magic — we do promise accompaniment that adds up day by day."
+      },
+      "memory": {
+        "q": "Does the mentor remember what I told it?",
+        "a": "Yes. It keeps your context between sessions: your open goals, the patterns it detects, what has worked, and what you've avoided. It doesn't make you repeat your story every time."
+      },
+      "enneagram": {
+        "q": "What is the Enneagram test and what's it for?",
+        "a": "An optional 90-statement questionnaire (10-12 minutes) at /profile/eneagrama. We use it for one thing only: to tune the mentor's tone and questions to how you operate. If your type is perfectionist, it avoids \"shoulds\"; if you tend to avoid conflict, it asks more directly what YOU want. It doesn't label you in the chat or tell anyone. You can repeat it whenever you want."
+      },
+      "weeklyLetter": {
+        "q": "What is the weekly letter?",
+        "a": "Once a week the mentor writes you a short letter about what it has seen in you — quoting your own words — and ends with a single question for the coming week. It arrives by email if you turn it on; otherwise it stays in the app."
+      },
+      "teamLetter": {
+        "q": "What is the \"team letter\"?",
+        "a": "Different from the weekly letter. After a few turns in the chat, an offer appears: if you'd like, someone from the team reads your thread and writes you a personal note to your email in the following days. It's optional, not automatic, and signed by a real person — not the AI. Useful when you want a human eye on something specific you're working on."
+      },
+      "exercises": {
+        "q": "Are there exercises or just conversation?",
+        "a": "Both. Beyond the chat: guided breathing, daily check-ins, a journal, goal work with small actions, a free impulse test, a remaining-heartbeats calculator, and \"capsules\" — letters you write to your future self that get delivered on the date you choose."
+      },
+      "structured": {
+        "q": "Is there a structured plan or is everything free-form?",
+        "a": "Both. You can talk at the pace you want. Or step into the 30-day challenge or 21-day Impulse Mode, which give you a clear sequence: a focus, a check-in, and a concrete action every day."
+      }
+    },
+    "comunidad": {
+      "title": "Community and circles",
+      "individual": {
+        "q": "Is there a community or is it only individual?",
+        "a": "It's individual when you enter — just you and the mentor. When you want, you can join a circle: a closed group of four people who share the same recent emotional pattern. It doesn't replace the mentor, it complements it with a peer mirror."
+      },
+      "join": {
+        "q": "How do I join a circle?",
+        "a": "There's no list to sign up to. We assign you a circle automatically when there's a match with your current state. The pairing is by pattern affinity, not by age or demographics, and it respects your anonymity inside the group."
+      },
+      "inside": {
+        "q": "What happens inside the circle?",
+        "a": "Each week a \"pulse\" opens: one question. Each member responds whenever they want during 7 days — anonymously. When it closes, the mentor leaves you a private debrief that picks up what from the group touches you. Cycles last six weeks and at the end you receive a closing letter archived forever."
+      }
+    },
+    "privacidad": {
+      "title": "Privacy and data",
+      "whoReads": {
+        "q": "Who can read my conversations?",
+        "a": "No one reads them by default. They're stored encrypted so the mentor keeps context. We'd only access a specific conversation if you open a support ticket and ask us to do so."
+      },
+      "circleAnon": {
+        "q": "And inside the circle, do the others know who I am?",
+        "a": "No. Replies in the circle are anonymous to other members — your name, email, and photo aren't shown. Only the content of what you write."
+      },
+      "training": {
+        "q": "Do you use my data to train AI or for advertising?",
+        "a": "No. We don't sell data, we don't share it with advertisers, and we don't use it to train third-party models. The conversations are yours."
+      },
+      "exportDelete": {
+        "q": "Can I export or delete everything?",
+        "a": "Yes. From settings you can download a full export (GDPR Art. 15) or delete your account. Deleting it also wipes the associated conversations and content."
+      }
+    },
+    "precios": {
+      "title": "Pricing and account",
+      "free": {
+        "q": "Is it free? Is there a trial?",
+        "a": "You can come in and try it without registering. The free test and the 30-day challenge don't require payment either. The current plans and details are on the pricing page."
+      },
+      "pro": {
+        "q": "What's included in the Pro plan?",
+        "a": "Unlimited conversations, 21-day Impulse Mode with follow-up, challenges personalised to your pattern, access to circles, and the weekly letter by email. Current price at /precios."
+      },
+      "cancel": {
+        "q": "Can I cancel whenever I want?",
+        "a": "Yes. There's no lock-in. You cancel from your account and keep access until the end of the period already paid for."
+      },
+      "pause": {
+        "q": "What if I want to take a break without losing what I've worked on?",
+        "a": "Your account and conversations are kept even if you don't come in for weeks. You return whenever you want and the mentor picks up where you left off."
+      },
+      "mobile": {
+        "q": "Does it work on mobile?",
+        "a": "Yes. It's an optimised web app: you use it from the mobile or desktop browser, with nothing to install."
+      }
+    },
+    "limites": {
+      "title": "Limits and responsibility",
+      "vsTherapy": {
+        "q": "Does it replace a psychologist or psychiatrist?",
+        "a": "No, and we'll never claim it does. It's complementary accompaniment. If there's a diagnosed disorder, ongoing treatment, or a crisis, the human professional is the one who should run the case — we can support between sessions, not replace them."
+      },
+      "crisis": {
+        "q": "What happens if the mentor detects I'm not well?",
+        "a": "If risk appears (suicidal ideation, self-harm, acute crisis), the mentor stops doing coaching and connects you with emergency resources (988 — Suicide & Crisis Lifeline US — and 112, EU emergency). That's a line we don't cross."
+      },
+      "trustedContact": {
+        "q": "Can I leave a trusted contact for extreme situations?",
+        "a": "Yes. In settings you can register a trusted contact. If you enter a sustained crisis, the system can notify them — only in scenarios you've defined, never by default."
+      },
+      "aiMistakes": {
+        "q": "Does the AI make mistakes?",
+        "a": "Sometimes, yes. That's why the pedagogical framework is designed to give you back questions instead of closed answers: the decision is always yours. If something the mentor says doesn't fit you, say so — adjust the course in the same conversation."
+      }
+    },
+    "proyecto": {
+      "title": "The project",
+      "team": {
+        "q": "Who's behind it?",
+        "a": "Built by Startidea, a small team in Spain committed to emotional wellbeing through technology. More on the \"About us\" page."
+      },
+      "languages": {
+        "q": "Which languages is it available in?",
+        "a": "Spanish natively, plus English, Portuguese (Portugal), and French on the home and main pages. Spanish is where the tone and pedagogical framework were tuned first — the other languages are being rolled out page by page."
+      },
+      "pros": {
+        "q": "Is there a version for professionals or teams?",
+        "a": "Yes. We work with organisations and mental health professionals. More details at /para-profesionales."
+      }
+    }
+  },
+  "howTo": {
+    "eyebrow": "The method",
+    "title": "We don't give advice.",
+    "titleHighlight": "We ask questions",
+    "titleEnd": ".",
+    "subtitle": "Most wellbeing apps try to give you more information. We work the other way around: we hand back the question you aren't asking yourself. This is the framework the mentor uses in every conversation.",
+    "lastReviewed": "Reviewed by the Three Billion Heartbeats clinical team",
+    "pipelineTitle": "How the mentor processes every message",
+    "pipelineSubtitle": "Behind every reply there are five phases. It isn't improvisation: it's a process designed so that what we say to you makes sense here and now.",
+    "phase": {
+      "validar": {
+        "title": "Validate the emotion",
+        "desc": "Before thinking, feeling. We name what's happening inside without judgement and without rushing to fix it."
+      },
+      "ordenar": {
+        "title": "Sort the thinking",
+        "desc": "We separate fact from interpretation. What happened, what you tell yourself about what happened, and what you feel about what you tell yourself."
+      },
+      "interpelar": {
+        "title": "Challenge",
+        "desc": "The uncomfortable question no one is asking you. Not to judge you — so you see what you've been dodging for a while."
+      },
+      "actuar": {
+        "title": "Propose action",
+        "desc": "A small, concrete step, today. Not a perfect plan for next week. Real movement, not intention."
+      },
+      "cerrar": {
+        "title": "Close without dependency",
+        "desc": "We end leaving you with more clarity, not more need of us. The goal is for you to need us less, not more."
+      }
+    },
+    "principlesTitle": "The principles that hold it up",
+    "principle": {
+      "interpelar": {
+        "title": "Challenge before instructing",
+        "desc": "A well-placed question creates more change than the best instruction. Advice is forgotten; the answer you discover yourself is not."
+      },
+      "porque": {
+        "title": "Always the why",
+        "desc": "Acting without understanding why is obedience, not change. If you don't know what's moving you, the change won't last."
+      },
+      "localGlobal": {
+        "title": "From local to global",
+        "desc": "We start with what's concrete today — this block, this emotion — and from there we discover the larger pattern. Not the other way around."
+      },
+      "gafas": {
+        "title": "New glasses",
+        "desc": "What holds you back the most is usually what you've normalised. Part of the work is making you see what you no longer see."
+      },
+      "inside": {
+        "title": "Change comes from within",
+        "desc": "No one changes because they're told to. You change when you connect with your own reason. Our job is to accompany that process, not force it."
+      },
+      "progress": {
+        "title": "Progress, not perfection",
+        "desc": "An imperfect step today is worth more than a perfect plan tomorrow. Real movement beats good intentions."
+      }
+    },
+    "adaptTitle": "Adapting the accompaniment to you",
+    "adaptSubtitle": "The mentor by default already adapts to your emotional state, your dominant pattern, and the phase you're in. If you want to go a step further, there are two options — optional — to tune the experience to how you work.",
+    "enneagram": {
+      "title": "Enneagram test",
+      "desc": "90 statements in 10-12 minutes. The mentor adjusts its tone and questions to your type: with a perfectionist it avoids the «shoulds», with someone who tends to avoid conflict it asks directly what you want. It doesn't label you in the chat. It sits in your profile.",
+      "cta": "Take the test"
+    },
+    "teamLetter": {
+      "title": "Human letter from the team",
+      "desc": "After a few turns in the chat an offer appears: if you want, someone from the team reads your thread and writes you a personal note to your email over the following days. A real person signs it — not the AI. It's optional and you request it from the chat itself."
+    },
+    "notDoTitle": "What we don't do",
+    "notDoSubtitle": "So it's clear where the limits of the method are — and where a human professional begins.",
+    "ctaNote": "The method only makes sense when you live it.",
+    "ctaPrimary": "Try it now",
+    "ctaSecondary": "Learn about the project",
+    "notDo1": "We don't diagnose disorders. That's clinical work.",
+    "notDo2": "We don't prescribe treatments or medication.",
+    "notDo3": "We don't replace therapy or sessions with your psychologist.",
+    "notDo4": "We don't hand out empty motivational lines or magic recipes.",
+    "notDo5": "We don't tell you what to do with your life.",
+    "notDo6": "We don't expect you to change quickly. Real change takes time."
+  },
+  "comparison": {
+    "eyebrow": "Comparison",
+    "title": "Three Billion Heartbeats vs ChatGPT, therapy and wellness apps",
+    "subtitle": "If you're deciding which tool to use to sort out what's going on with you, this honestly compares what each one does and when to pick which. Without inflating ours. Without hiding what we don't do.",
+    "lastUpdated": "Last updated: {date} · Reviewed by the Three Billion Heartbeats clinical team.",
+    "lastUpdatedDate": "April 2026",
+    "tableTitle": "Point-by-point comparison",
+    "colCriterio": "Criterion",
+    "colProducto": "Three Billion Heartbeats",
+    "colChatGPT": "ChatGPT / Claude",
+    "colTerapia": "Traditional therapy",
+    "colMeditacion": "Meditation apps",
+    "row": {
+      "purpose": {
+        "criterio": "Main purpose",
+        "producto": "Supporting blocks, decisions and action",
+        "chatgpt": "Generic conversational assistant",
+        "terapia": "1:1 clinical treatment",
+        "meditacion": "Relaxation, sleep, mindfulness"
+      },
+      "framework": {
+        "criterio": "Proprietary pedagogical framework",
+        "producto": "Yes — it questions, it doesn't instruct",
+        "chatgpt": "No — answers whatever you ask",
+        "terapia": "Depends on the therapist",
+        "meditacion": "Exercises, not dialogue"
+      },
+      "crisisDetection": {
+        "criterio": "Automatic crisis detection",
+        "producto": "Yes — risk language → clinical resources",
+        "chatgpt": "Partial, not structured",
+        "terapia": "Only during the session",
+        "meditacion": "No"
+      },
+      "clinicalSupervision": {
+        "criterio": "Human clinical supervision",
+        "producto": "Yes — psychologist responsible for the system",
+        "chatgpt": "No",
+        "terapia": "Yes — directly human",
+        "meditacion": "No"
+      },
+      "context": {
+        "criterio": "Persistent context across sessions",
+        "producto": "Yes — emotional state + goals + history",
+        "chatgpt": "Partial (depends on the plan)",
+        "terapia": "Yes — therapist's clinical notes",
+        "meditacion": "No"
+      },
+      "actions": {
+        "criterio": "Concrete, measurable actions",
+        "producto": "Yes — 10-15 min micro-actions, goals, follow-up",
+        "chatgpt": "If you ask for them",
+        "terapia": "If the therapist assigns them",
+        "meditacion": "Not applicable"
+      },
+      "community": {
+        "criterio": "Peer community",
+        "producto": "Yes — circles of 4 people, asynchronous, 6-week cycles, matched by emotional pattern",
+        "chatgpt": "No",
+        "terapia": "Optional — group therapy",
+        "meditacion": "Light forums in some apps"
+      },
+      "availability": {
+        "criterio": "Availability",
+        "producto": "24/7 — web and Telegram",
+        "chatgpt": "24/7",
+        "terapia": "Only at appointments",
+        "meditacion": "24/7"
+      },
+      "privacy": {
+        "criterio": "Privacy and GDPR erasure",
+        "producto": "Yes — hard delete, encryption in transit, clear policy",
+        "chatgpt": "Standard OpenAI/Anthropic policy",
+        "terapia": "Professional confidentiality",
+        "meditacion": "Varies by provider"
+      },
+      "price": {
+        "criterio": "Reference monthly price",
+        "producto": "€0 Free · €9 Pro",
+        "chatgpt": "€0-20 (ChatGPT Plus)",
+        "terapia": "€40-80 per session",
+        "meditacion": "€10-15/month"
+      },
+      "replaceTherapy": {
+        "criterio": "Does it replace a professional therapist?",
+        "producto": "NO — it says so explicitly",
+        "chatgpt": "Doesn't take a stand",
+        "terapia": "It is therapy",
+        "meditacion": "NO"
+      }
+    },
+    "section1": {
+      "title": "When to choose Three Billion Heartbeats and when to choose therapy?",
+      "p1Strong": "Choose professional therapy",
+      "p1": "if you have a prior clinical diagnosis, persistent suicidal ideation, severe eating disorders, untreated dependencies, suspected psychosis or complex trauma. In those cases the platform isn't enough and we'll tell you so explicitly from the chat.",
+      "p2Strong": "Choose Three Billion Heartbeats",
+      "p2": "if you're dealing with blocks, doubts, life transitions, procrastination or need a structured space to sort your thinking and move into action. Also if you already have a therapist and need support between sessions.",
+      "p3Strong": "Use both",
+      "p3": "when your therapist finds it useful: many professionals work with us as structured complement between their consultations. See",
+      "p3Link": "/para-profesionales",
+      "p3Suffix": "."
+    },
+    "section2": {
+      "title": "Why not just use ChatGPT or Claude?",
+      "p1": "Because",
+      "p1Strong": "ChatGPT and Claude are generic assistants",
+      "p1Cont": ", not mentors. They answer whatever you ask: if you ask for cheap motivation, they give it; if you ask for clinical advice, they do too (and there's a real risk there). Three Billion Heartbeats has a hardcoded pedagogical framework: hollow imperatives like \"you can do it\" or \"keep it up\" are forbidden, ending in a question is mandatory, and when it detects self-harm or suicidal ideation language,",
+      "p1Strong2": "it stops conversing as a coach",
+      "p1End": "and redirects to emergency resources + alerts the clinical team.",
+      "p2": "On top of that, Three Billion Heartbeats remembers your emotional state across sessions, your active goals and the actions you completed or postponed. ChatGPT, by default, starts from scratch every conversation."
+    },
+    "section3": {
+      "title": "What does Three Billion Heartbeats offer that Calm, Headspace or other meditation apps don't?",
+      "p1": "Calm and Headspace are excellent for",
+      "p1Strong": "guided relaxation, sleep hygiene and mindfulness practice",
+      "p1Cont": ". They're pre-recorded exercises you execute. There's no conversation, no tracking of your context, no action outside the meditation moment.",
+      "p2": "Three Billion Heartbeats does the opposite:",
+      "p2Strong": "structured conversation + concrete actions outside the app",
+      "p2Cont": ". The focus isn't lowering momentary stress, it's moving forward on what you have stuck. They're not mutually exclusive: you can use Calm to sleep better and Three Billion Heartbeats to decide whether to leave your job. They're different tools."
+    },
+    "section4": {
+      "title": "Privacy and clinical supervision — what you should know",
+      "item1Strong": "Your conversations",
+      "item1": "are processed by external AI (Anthropic Claude) under a privacy agreement with the provider.",
+      "item2Strong": "The clinical role",
+      "item2": "on the team can access histories of users with elevated risk (protocol supervised by the responsible psychologist). This is documented in the consent when you register.",
+      "item3Strong": "Data in transit is encrypted",
+      "item3": "(TLS). There's no additional column-level encryption in the database — we recommend not sharing information you wouldn't share with a standard software provider.",
+      "item4Strong": "Complete GDPR erasure",
+      "item4": "(hard delete) available at any time from your account settings."
+    },
+    "faqQ1": "Is Three Billion Heartbeats a substitute for psychological therapy?",
+    "faqA1": "No. Three Billion Heartbeats does not diagnose, does not prescribe, and does not replace a professional therapist. It's a support between sessions or a first point of contact for people who don't yet have access to therapy. It has a psychologist responsible for clinical criteria who supervises risk detection and interventions.",
+    "faqQ2": "Why not just use ChatGPT or Claude?",
+    "faqA2": "ChatGPT and Claude are generic assistants. Three Billion Heartbeats applies a specific pedagogical framework (question before instructing, questions before answers), detects risk language and redirects to clinical resources, remembers your emotional state across sessions, proposes concrete time-bounded actions, and is supervised by a psychology professional. ChatGPT answers anything without context; Three Billion Heartbeats accompanies a process.",
+    "faqQ3": "When is a meditation app like Calm or Headspace better than Three Billion Heartbeats?",
+    "faqA3": "If what you're looking for is guided relaxation, sleep hygiene or mindfulness without a personalized process, a meditation app is more direct. Three Billion Heartbeats is conversational and focuses on blocks, decisions and life transitions — it doesn't replace breathing exercises or guided meditation sessions. They can complement each other.",
+    "faqQ4": "When to go to therapy instead of using Three Billion Heartbeats?",
+    "faqA4": "Whenever there's a prior clinical diagnosis, persistent suicidal ideation, severe eating disorders, severe dependencies, psychosis, or suspected complex trauma. Three Billion Heartbeats can support you between sessions, but it doesn't replace professional 1:1 treatment. If you don't have a therapist and you believe you need one, Three Billion Heartbeats will explicitly suggest it.",
+    "faqQ5": "What happens with my privacy? Who can read my conversations?",
+    "faqA5": "Conversations are processed by external AI (Anthropic Claude via OpenRouter) under a privacy agreement. On the Three Billion Heartbeats server, the clinical role can access conversations of users with high riskLevel or active crisis as part of the clinical supervision protocol. Your data is encrypted in transit (TLS) and you can request complete erasure at any time (GDPR).",
+    "ctaTitle": "Want to see how it works before deciding?",
+    "ctaSubtitle": "Read the method before registering. Without giving your email.",
+    "ctaPrimary": "Read the method",
+    "ctaSecondary": "Try it free"
+  },
+  "useCases": {
+    "eyebrow": "Use cases",
+    "title": "It depends on",
+    "titleHighlight": "what you bring",
+    "subtitle": "The mentor isn't the same thing for everyone. Four real ways people are using it. Look at the one that most resembles your moment.",
+    "signsLabel": "You'll recognize yourself if…",
+    "howLabel": "What you'll find here",
+    "limitStrong": "Where the limit is.",
+    "ctaCaso": "Start with this",
+    "footerNote": "If you don't recognize yourself in any of them — or recognize yourself in several — it's fine. The mentor adapts to what you bring the day you come in. These are just examples, not labels.",
+    "footerCta1": "Read the method",
+    "footerCta2": "Frequently asked questions",
+    "case": {
+      "bloqueos": {
+        "kicker": "Blocks and decisions",
+        "title": "You know something has to change, but you don't get started",
+        "pitch": "You keep going around the same thing without moving forward. You're clear you don't want to keep going as you are, but every time you sit down to decide, another doubt shows up. It's not lack of information — it's something else.",
+        "signal1": "You postpone important decisions \"until you have it clear\"",
+        "signal2": "You consume content about the topic but don't act",
+        "signal3": "You feel that if you get it wrong you won't be able to fix it",
+        "signal4": "The people around you have already given you advice — it doesn't help",
+        "how1": "The mentor separates fact from interpretation so you can see what is fear and what is judgment",
+        "how2": "Sends back uncomfortable questions you yourself are dodging",
+        "how3": "Proposes the smallest possible step today — not the perfect plan",
+        "how4": "Reviews with you the patterns when the decision keeps coming back",
+        "limit": "If the block comes with sustained depressive symptoms or disabling anxiety, complement it with a human professional."
+      },
+      "ansiedad": {
+        "kicker": "Everyday anxiety",
+        "title": "You're racing inside even though on the outside everything works",
+        "pitch": "It's not a diagnosed disorder. It's that knot that comes with you when you wake up, the head that won't stop, the feeling that you're always behind. You want to understand it before it escalates.",
+        "signal1": "You find it hard to switch off even when nothing is urgent",
+        "signal2": "You mentally review what could go wrong before going to sleep",
+        "signal3": "You get angry at small things and then feel guilty",
+        "signal4": "Your body warns you (tension, insomnia, digestion) and you ignore it",
+        "how1": "Daily check-ins that force you to name what you feel before acting",
+        "how2": "Guided breathing exercises to bring down the peak in the moment",
+        "how3": "The mentor identifies patterns between what you think and what happens in your body",
+        "how4": "Guided journal to separate the real threat from the imagined one",
+        "limit": "If you have panic attacks, significant avoidances or the anxiety interferes with your daily life, this does not replace clinical assessment."
+      },
+      "transiciones": {
+        "kicker": "Life transitions",
+        "title": "You're in an \"in-between\". The old no longer, the new not yet",
+        "pitch": "Job change, breakup, move, end of a stage, start of another. It's not a crisis: it's the uncomfortable ground between two versions of you. You need to sort out what you're letting go and choose what you're building.",
+        "signal1": "You find it hard to explain to others how you are without sounding dramatic",
+        "signal2": "Sometimes you're fine and sometimes nostalgia or uncertainty take over",
+        "signal3": "You have big decisions to make and don't know where to make them from",
+        "signal4": "You ask yourself \"who am I now?\" more than usual",
+        "how1": "Goal-oriented work to ground the direction in concrete actions",
+        "how2": "The mentor helps you name what ended before forcing what comes next",
+        "how3": "Tracking emotional patterns to see the curve, not just the day",
+        "how4": "Contextual reminders to come back to yourself when you get lost in the noise",
+        "limit": "If the transition includes grief from recent loss or traumatic breakup, this companionship complements but does not replace specific therapy."
+      },
+      "autoconocimiento": {
+        "kicker": "Self-knowledge",
+        "title": "You're not unwell. You want to see yourself with more honesty",
+        "pitch": "There's no crisis. There's curiosity. You want to understand why you react the way you do, what patterns repeat in your relationships, what values you're living and which ones you set aside. To see the glasses through which you look.",
+        "signal1": "You have time and energy, but feel you could live more awake",
+        "signal2": "You notice repeated patterns but don't know exactly what they are",
+        "signal3": "You want to write/reflect regularly but can't sustain the habit alone",
+        "signal4": "You care about how you work, not just what to do",
+        "how1": "Guided journal with questions you wouldn't ask yourself alone",
+        "how2": "Pattern system that returns to you what you're not seeing",
+        "how3": "Deep conversations about values, decisions, relationships",
+        "how4": "No rush to \"fix\" anything — your own pace",
+        "limit": "This case has no particular contraindications beyond the general limits: the mentor accompanies, doesn't diagnose."
+      }
+    }
+  },
+  "pricing": {
+    "metaTitle": "Pricing — Three Billion Heartbeats",
+    "metaDescription": "Three Billion Heartbeats: full access free during the MVP phase. Sign up and get AI mentoring, check-ins, journal, Impulse Mode and more. No credit card required.",
+    "metaOgDescription": "MVP phase: free Pro access. AI mentoring, check-ins, journal and Impulse Mode. At no cost.",
+    "metaTwitterDescription": "AI mentoring free during the MVP. No credit card.",
+    "eyebrow": "tresmilmillonesdelatidos.es",
+    "title": "Full access. Free. Now.",
+    "subtitle": "We're in MVP phase. Early users get the entire Pro plan at no cost until October 2026. No card. No commitment.",
+    "mvpBadge": "MVP PHASE — OPEN ACCESS",
+    "mvpPlanLabel": "Full Pro plan",
+    "mvpPriceMain": "0 euros",
+    "mvpPriceUnit": "/6 months",
+    "mvpSubnote": "No card. No commitment. Just sign up.",
+    "mvpCta": "Create free account",
+    "mvpCtaFootnote": "When you sign up you get automatic access to the full Pro plan. You will not be asked for a credit card.",
+    "whyTitle": "Why it's free (and for how long)",
+    "whyP1": "Three Billion Heartbeats is in minimum viable product phase. It works, but it's still learning. And to learn it needs real people actually using it — not closed betas or demos no one touches.",
+    "whyP2": "During these 6 months (until October 2026), the entire Pro plan is open at no cost. In exchange, your interactions help us improve the product. We don't sell your data. We don't share it. We use it, anonymized, so the tool gets better for you and for those who come next.",
+    "whyP3": "When the MVP phase ends, the free plan will keep unlimited chat. Pro will be for whoever wants cross-device continuity, persistent memory between sessions and Impulse Mode. No surprises.",
+    "futureTitle": "Pricing after the MVP phase",
+    "futureSubtitle": "These will be the prices once the open-access period ends. MVP users will get special conditions.",
+    "futurePlan": {
+      "free": {
+        "name": "Free",
+        "price": "0 euros/month",
+        "desc": "Unlimited conversations with the AI mentor. No daily cap."
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "9 euros/month",
+        "desc": "Cross-device continuity, persistent memory, Impulse Mode and priority"
+      },
+      "proAnnual": {
+        "name": "Pro annual",
+        "price": "79 euros/year",
+        "desc": "Same as Pro, saving 2 months"
+      }
+    },
+    "whyProTitle": "Why does the Pro plan exist?",
+    "whyProDesc": "Real change doesn't happen in one conversation — it happens when you keep the thread going for weeks. Continuity is what turns an idea into a habit. Pro exists so you don't lose that thread: unlimited conversations, action tracking, and a mentor that remembers your full story.",
+    "faqTitle": "Frequently asked questions",
+    "faq": {
+      "free": {
+        "q": "Is it really free?",
+        "a": "Yes. During the MVP phase (until October 2026) there's no charge. You don't need a credit card. Just sign up with your email."
+      },
+      "data": {
+        "q": "What happens with my data?",
+        "a": "Your conversations and emotional data are processed anonymously to improve the product. They are never sold or shared with third parties. You can delete everything at any time from Settings."
+      },
+      "afterMvp": {
+        "q": "What happens when the MVP ends?",
+        "a": "You'll be able to keep using the free plan with unlimited chat, or choose Pro at its regular price for extras (cross-device continuity, persistent memory, Impulse Mode). MVP users will get special conditions."
+      },
+      "psy": {
+        "q": "Does Three Billion Heartbeats replace a psychologist?",
+        "a": "No. It's a conversational AI mentoring tool. It helps you organize ideas and take action, but it does not replace professional therapy. In case of crisis, contact 988 or your local emergency line."
+      },
+      "mobile": {
+        "q": "Can I use it from my phone?",
+        "a": "Yes. The site is optimized for mobile and you can add it to your home screen. You can also use the Telegram bot to chat directly from there."
+      }
+    },
+    "ctaBottom": "Start now — it's free",
+    "feature1": "Unlimited conversations with the AI coach",
+    "feature2": "Unlimited messages",
+    "feature3": "Full Impulse Mode — 21 days of transformation",
+    "feature4": "Advanced diagnostics and personalized challenges",
+    "feature5": "Weekly behavioral insights",
+    "feature6": "Daily check-in with streak",
+    "feature7": "Avoidance pattern map",
+    "feature8": "Full conversation history",
+    "feature9": "Integrated Telegram bot",
+    "feature10": "Portal for trusted contacts"
+  },
+  "challenge": {
+    "badge": "The 30-day challenge",
+    "title": "30 days.",
+    "titleHighlight": "Real change.",
+    "subtitle": "Not just another app. It's a commitment to yourself with the most direct AI there is. Every day you act, your streak grows. Every streak that grows makes change inevitable.",
+    "participantsLine": "{count} people in the challenge right now",
+    "ctaPrimary": "Accept the challenge",
+    "ctaShare": "Share challenge",
+    "ctaShareCopied": "Copied",
+    "statRachas": "Active streaks",
+    "statObjetivos": "Goals completed",
+    "statDias": "Days of the challenge",
+    "stepsTitle": "How does it work?",
+    "stepsSubtitle": "Three steps. No complications.",
+    "step1": {
+      "title": "Complete the 3 missions",
+      "desc": "Answer the questions no one else asks you. That's already the first real step."
+    },
+    "step2": {
+      "title": "30 days of daily action",
+      "desc": "Every day counts. Your streak updates every time you open Three Billion Heartbeats and take action."
+    },
+    "step3": {
+      "title": "Share your progress",
+      "desc": "On day 7 you unlock an invitation. On day 30, three more. Real change is contagious."
+    },
+    "milestonesTitle": "What you unlock",
+    "milestonesSubtitle": "Progress comes with real rewards.",
+    "dayLabel": "Day {n}",
+    "milestone1": {
+      "title": "Full access",
+      "desc": "From day one you have access to the most direct AI there is."
+    },
+    "milestone7": {
+      "title": "First invitation",
+      "desc": "You earn 1 invitation to bring someone who needs it."
+    },
+    "milestone14": {
+      "title": "Advanced mode",
+      "desc": "The AI adjusts its intensity to your accumulated progress."
+    },
+    "milestone30": {
+      "title": "3 invitations + certificate",
+      "desc": "Completing the challenge makes you an ambassador of change."
+    },
+    "testimonialsTitle": "What people say along the way",
+    "testimonial1": {
+      "day": "12",
+      "text": "For the first time in months I know exactly what I have to do tomorrow.",
+      "name": "Ana M."
+    },
+    "testimonial2": {
+      "day": "21",
+      "text": "The AI asked me something that left me speechless. Speechless in a good way.",
+      "name": "Carlos R."
+    },
+    "testimonial3": {
+      "day": "7",
+      "text": "I thought I'd last two days. It's been a week and I don't want to stop.",
+      "name": "Sara L."
+    },
+    "ctaTitle": "Are you ready for the 30 days?",
+    "ctaSubtitle": "Three questions. One commitment. Thirty days. The change you've been putting off starts today.",
+    "ctaFinal": "Accept the challenge now",
+    "ctaFinalNote": "No card. No spam. Just 30 days."
+  },
+  "professionals": {
+    "eyebrow": "For mental health and wellbeing professionals",
+    "title": "Your client,",
+    "titleHighlight": "between sessions",
+    "subtitle": "Three Billion Heartbeats doesn't replace your work. It complements it. An AI mentor that accompanies your clients between sessions, within a clinically reviewed pedagogical framework and with a professional panel so you have real visibility.",
+    "honestyTitle": "What we want to make clear before starting",
+    "honesty1Strong": "It's not therapy.",
+    "honesty1": "It doesn't diagnose, doesn't prescribe, doesn't replace the clinical relationship. If a case needs intervention, the human professional is the one handling it.",
+    "honesty2Strong": "The mentor has lines it won't cross.",
+    "honesty2": "When risk signals appear, it stops coaching and refers to emergency resources and professional help.",
+    "honesty3Strong": "There's a psychology professional responsible for clinical criteria",
+    "honesty3": "who supervises risk detection, interventions and mentor templates.",
+    "benefitsTitle": "What it brings to your practice",
+    "benefit": {
+      "panel": {
+        "title": "Clinical panel",
+        "desc": "You see progression, emotional state, detected patterns and completed actions of the clients who link you as their reference professional."
+      },
+      "risk": {
+        "title": "Early risk detection",
+        "desc": "The system monitors signals (suicidal ideation, self-harm, acute crisis) and escalates them to your panel before they reach your next session."
+      },
+      "notes": {
+        "title": "Integrated clinical notes",
+        "desc": "You can take notes about the client within the panel, link them to specific moments, and review them before each session."
+      },
+      "diary": {
+        "title": "Client diary and patterns",
+        "desc": "The client works on their diary, check-ins and goals between sessions. You arrive at the session with a map, not a blank page."
+      },
+      "interventions": {
+        "title": "Supervised interventions",
+        "desc": "You can activate specific interventions (messages, pauses, mentor refocuses) for your specific client, always at your discretion."
+      },
+      "privacy": {
+        "title": "Privacy and consent",
+        "desc": "The client decides what they share with you. You see what they authorize — we don't read conversations without their explicit consent."
+      }
+    },
+    "frameworkTitle": "The framework the mentor uses",
+    "frameworkIntro": "Four principles hardcoded into the system prompts and watched by automatic validators:",
+    "principle1Title": "Challenge before instructing",
+    "principle1Desc": "The mentor doesn't say \"you have to do X\". It asks. It makes visible what the client isn't seeing.",
+    "principle2Title": "Questions before answers",
+    "principle2Desc": "Answers close. Questions open.",
+    "principle3Title": "From local to global",
+    "principle3Desc": "We start from the concrete data of the day, not from generic frameworks.",
+    "principle4Title": "Change comes from within",
+    "principle4Desc": "We don't push the client — we accompany them to the place where they can see themselves.",
+    "frameworkProhibitedPre": "The system is",
+    "frameworkProhibitedStrong": "explicitly prohibited",
+    "frameworkProhibitedCont": "from using hollow imperatives, validating without context, congratulating quickly when goals are completed or reinforcing emotional dependence on the platform. Read the full method at",
+    "frameworkLinkText": "/como-funciona",
+    "useCasesTitle": "Where it fits in your practice",
+    "useCase1": {
+      "title": "Between sessions",
+      "desc": "Clients who need orderly containment outside the office, without turning it into 24/7 therapy."
+    },
+    "useCase2": {
+      "title": "Waiting list",
+      "desc": "People who can't yet access in-person sessions have a first structured point of contact."
+    },
+    "useCase3": {
+      "title": "Low-intensity cases",
+      "desc": "People with blocks, doubts or life transitions that don't require formal clinical intervention."
+    },
+    "ctaTitle": "Want to explore it?",
+    "ctaDesc": "If you work in psychology, coaching or professional accompaniment and you're interested in trying the clinical panel with a client, write to us. We review every collaboration case by case — we don't work with just anyone.",
+    "ctaPrimary": "Talk to the team",
+    "ctaSecondary": "Read the full method"
+  },
+  "calculator": {
+    "eyebrow": "Free tool",
+    "title": "Heartbeat Calculator",
+    "introPre": "Your heart beats about {bpm} times per minute. Over a lifetime, that's close to",
+    "introHighlight": "3 billion heartbeats",
+    "introPost": "Find out how many you've already lived and how many are still ahead.",
+    "modeAge": "My age",
+    "modeCustom": "Custom time",
+    "birthDateLabel": "Date of birth",
+    "amountLabel": "Amount of time",
+    "amountPlaceholder": "E.g.: 2",
+    "unitMinutes": "Minutes",
+    "unitHours": "Hours",
+    "unitDays": "Days",
+    "unitYears": "Years",
+    "calculateButton": "Calculate heartbeats",
+    "format": {
+      "billion": "{n} billion",
+      "million": "{n}M",
+      "thousand": "{n}K"
+    },
+    "resultLabelAge": "Heartbeats that brought you here",
+    "resultLabelCustom": "Heartbeats in that time",
+    "resultCaptionAge": "Each one of them held you up to reach this moment.",
+    "reframeTitle": "What your heartbeats represent",
+    "reframeSunrises": "sunrises lived",
+    "reframeSongs": "songs that would fit",
+    "reframeHours": "hours of experience",
+    "reframeHugs": "possible hugs",
+    "reframeFooter": "Your heart beats {bpm} times per minute without you asking. That steadiness is already inside you.",
+    "perspectiveTitleAge": "Your heartbeats in perspective",
+    "perspectiveTitleCustom": "{beats} heartbeats are equivalent to...",
+    "perspectiveRatio": "x{n} times in your life",
+    "preset": {
+      "hug": {
+        "label": "A long hug",
+        "description": "20 seconds of real contact"
+      },
+      "song": {
+        "label": "A favorite song",
+        "description": "3 and a half minutes of pause"
+      },
+      "talk": {
+        "label": "A good conversation",
+        "description": "1 hour that can change your day"
+      },
+      "sleep": {
+        "label": "A night of sleep",
+        "description": "8 hours restoring your body"
+      },
+      "year": {
+        "label": "A year of your life",
+        "description": "About 37M heartbeats invested"
+      },
+      "birth": {
+        "label": "Since you were born",
+        "description": "Every one counts"
+      }
+    },
+    "emailTitle": "Get your heartbeat report by email",
+    "emailDesc": "Your calculation, perspective, and a first personalized action step.",
+    "emailPlaceholder": "you@email.com",
+    "emailSend": "Send",
+    "emailSent": "Sent — check your inbox",
+    "emailConsent": "Your email will only be used to send this report.",
+    "ctaTitle": "Your heart already does its part. Now it's your turn.",
+    "ctaDesc": "With the same steadiness with which your heart beats, you can move forward one step every day. Three Billion Heartbeats helps you turn intention into action.",
+    "ctaPrimary": "Start now",
+    "ctaSecondary": "Take the free test",
+    "seoTitle": "Why count heartbeats",
+    "seo1aPre": "Your heart beats about",
+    "seo1aBpm": "{bpm} times per minute",
+    "seo1aPost": "without you asking. That's {perHour} per hour, {perDay} per day. Each one sustains everything you do, think and feel.",
+    "seo1bPre": "Over a lifetime, the heart beats close to",
+    "seo1bStrong": "3 billion times",
+    "seo1bPost": "It's not a countdown — it's a reminder of what you've already built beat by beat.",
+    "seo2a": "This calculator uses the average resting heart rate of a healthy adult. Your real rate varies with age, exercise and genetics.",
+    "seo2bPre": "The goal isn't clinical precision: it's",
+    "seo2bStrong": "perspective",
+    "seo2bPost": "Realizing you already carry millions of heartbeats of experience can be the push you need to take the next step.",
+    "nowWhatTitle": "So what now?",
+    "nowWhatDesc": "Knowing how many heartbeats are left changes nothing. What changes is deciding what you do with the next one. Three Billion Heartbeats helps you take that step.",
+    "nowWhatCta": "Start now →"
+  },
+  "test": {
+    "introEyebrow": "Free diagnostic",
+    "introTitle": "What's holding",
+    "introTitleHighlight": "you back right now?",
+    "introSubtitle": "5 questions. Instant result. One concrete action for today.",
+    "introPreview": {
+      "bloqueo": "Block",
+      "ansiedad": "Anxiety",
+      "duda": "Fog"
+    },
+    "introCta": "Start diagnostic",
+    "introFootnote": "Anonymous · No signup · 2 minutes",
+    "quizProgress": "Question {current} of {total}",
+    "quizBack": "← Back",
+    "quizContinuing": "Continuing…",
+    "question": {
+      "q1": {
+        "text": "How would you describe your mental energy right now?",
+        "option1": "Stuck — I can't move forward",
+        "option2": "Racing — too many thoughts at once",
+        "option3": "Hazy — I don't know what I want",
+        "option4": "Flowing — I know what to do next"
+      },
+      "q2": {
+        "text": "When you think about your main goal, what happens?",
+        "option1": "I freeze before I start",
+        "option2": "I get anxious about what could go wrong",
+        "option3": "I don't know where to start",
+        "option4": "I'm clear on the next step"
+      },
+      "q3": {
+        "text": "How long have you been circling the same issue without moving forward?",
+        "option1": "Days or weeks — I'm in the same spot",
+        "option2": "Hours, with non-stop pressure",
+        "option3": "Not long, but I can't find the direction",
+        "option4": "I'm moving forward, even if slowly"
+      },
+      "q4": {
+        "text": "What do you feel in your body as you answer this?",
+        "option1": "Tension or heaviness",
+        "option2": "Restlessness or a racing heart",
+        "option3": "Mental fog, confusion",
+        "option4": "Calm or presence"
+      },
+      "q5": {
+        "text": "If you could ask for just one thing right now, what would it be?",
+        "option1": "Someone to unstick me",
+        "option2": "To silence the noise in my head",
+        "option3": "Someone to help me sort out my ideas",
+        "option4": "To keep the momentum I already have"
+      }
+    },
+    "emailTitle": "Want us to send you the diagnostic?",
+    "emailDesc": "Get your full result by email and Three Billion Heartbeats will help you track your state over time.",
+    "emailPlaceholder": "you@email.com",
+    "emailConsent": "Your email and result will only be used to send the diagnostic and follow-up.",
+    "emailSending": "Sending…",
+    "emailSeeResult": "See result →",
+    "emailSkip": "Continue without email",
+    "result": {
+      "bloqueo": {
+        "label": "Mental Block",
+        "tagline": "You know what you need to do — but you can't start.",
+        "pattern": "Your mind acts as if the first step were irreversible. It isn't. The block isn't a lack of willpower: it's a protection mechanism that has become excessive and fires before you do anything.",
+        "signal": "The task you perceive as «huge» defuses itself the moment you shrink it to 10 real minutes. You don't need a full plan.",
+        "action": "Open the document, file, or tool for the project right now. Just open it, nothing else. In the next 2 minutes."
+      },
+      "ansiedad": {
+        "label": "Action Anxiety",
+        "tagline": "You have energy — but it turns into pressure, not progress.",
+        "pattern": "Your head generates failure scenarios before you start. Every time you prepare more instead of acting, anxiety grows. More information doesn't solve this — it amplifies it.",
+        "signal": "Anxiety drops with the first small concrete result, not with the first perfect plan. Acting for 5 minutes is worth more than planning for 2 hours.",
+        "action": "Write on paper (or in a document): «What's the worst concrete thing that could happen?» One sentence. No frills. Name it."
+      },
+      "duda": {
+        "label": "Direction Fog",
+        "tagline": "You want to move — but you don't know where.",
+        "pattern": "Chronic doubt isn't a lack of information: it's too many options without a clear decision criterion. Looking for more data doesn't solve this — it adds more variables to an already saturated system.",
+        "signal": "You need to decide something small, not everything at once. A single concrete decision breaks the fog better than any analysis.",
+        "action": "Answer in 30 seconds: What is the ONE goal that, if it moved forward this week, would feel like real progress? Write it down now."
+      },
+      "claridad": {
+        "label": "Clarity Moment",
+        "tagline": "You know what you want and you have the energy to move.",
+        "pattern": "You're in a state of potential flow. The risk now isn't paralysis — it's scatter. Doing too much and losing focus is what turns clarity into chaos.",
+        "signal": "Clarity is a window, not a permanent position. Use it now, not tomorrow.",
+        "action": "Define in one sentence today's concrete outcome. Not the whole list: just the most important thing that, if you do it, will make the day worth it."
+      },
+      "neutral": {
+        "label": "Neutral State",
+        "tagline": "You're in neutral — neither blocked nor in clear momentum.",
+        "pattern": "The neutral state can be necessary recovery or the silent start of a block. The difference is whether you have a defined next step or not.",
+        "signal": "You don't need motivation — you need a small anchor to come back to. A concrete 20-minute commitment is enough.",
+        "action": "Pick one task under 20 minutes that you've been putting off. Put it on today's calendar with an exact time."
+      }
+    },
+    "evolutionTitle": "Your evolution",
+    "evolutionBefore": "before",
+    "evolutionNow": "now",
+    "evolutionImproved": "That doesn't happen on its own. You've worked on this.",
+    "evolutionHarder": "This week is harder than last. That's information, not failure.",
+    "patternHeader": "What's happening",
+    "signalHeader": "The key signal",
+    "actionHeader": "Your action for now",
+    "shareHeader": "Share your result",
+    "shareText": "{emoji} I just discovered I'm in a state of \"{state}\". What about you?",
+    "shareTagline": "Free mental diagnostic test",
+    "shareCopyTitle": "Copy link",
+    "followupDivider": "For ongoing follow-up",
+    "followupTitle": "Three Billion Heartbeats detects your state in every session",
+    "followupBullet1": "Conversations focused on action, not chatter",
+    "followupBullet2": "Tracks goals and blocks across sessions",
+    "followupBullet3": "Risk signals before they escalate",
+    "followupCta": "Start free",
+    "retake": "Retake the test"
+  },
+  "resources": {
+    "eyebrow": "Resources",
+    "title": "Everything in",
+    "titleHighlight": "one place",
+    "subtitle": "Guides, tools and reads organized by intent, not by date. Start wherever you are.",
+    "section": {
+      "empezar": {
+        "title": "To get started",
+        "subtitle": "If you just arrived, start here."
+      },
+      "herramientas": {
+        "title": "Free tools",
+        "subtitle": "No account, no card. Try them now."
+      },
+      "leer": {
+        "title": "Read in depth",
+        "subtitle": "Articles and reflections from the team."
+      },
+      "profesionales": {
+        "title": "If you're a professional",
+        "subtitle": "For psychologists, coaches and wellbeing professionals."
+      }
+    },
+    "item": {
+      "metodo": {
+        "title": "The method",
+        "desc": "How the mentor thinks and responds: challenge before instructing, the five phases, the six principles, and what it explicitly does not do."
+      },
+      "casos": {
+        "title": "Use cases",
+        "desc": "Four real ways to use it — blocks, everyday anxiety, life transitions, self-knowledge — so you can see where you fit in."
+      },
+      "guia": {
+        "title": "User guide",
+        "desc": "How to get the most out of it day by day: check-ins, journal, goals, conversations with the mentor."
+      },
+      "faq": {
+        "title": "Frequently asked questions",
+        "desc": "Direct answers about how it works, privacy, pricing and limits."
+      },
+      "calculadora": {
+        "title": "Heartbeat calculator",
+        "desc": "How many heartbeats you have left, statistically. A raw way to ask yourself what you're doing with yours."
+      },
+      "test": {
+        "title": "Free test",
+        "desc": "A short self-diagnosis to understand where you are before starting."
+      },
+      "reto": {
+        "title": "The 30-day challenge",
+        "desc": "How the challenge works, what to expect and who gets the most out of it."
+      },
+      "blog": {
+        "title": "Blog",
+        "desc": "Reflections on emotional wellbeing, human technology, support and personal change."
+      },
+      "sobre": {
+        "title": "About us",
+        "desc": "Where this project comes from, why and who's behind it. Startidea, Mario, 15 years of support work."
+      },
+      "panel": {
+        "title": "For psychologists and professionals",
+        "desc": "How the mentor fits between sessions, what the clinical panel sees, how clinical judgment is supervised and where the limits are."
+      },
+      "contacto": {
+        "title": "Talk to the team",
+        "desc": "If you want to explore a collaboration or try it with a client, drop us a line."
+      }
+    },
+    "footerLine": "The best resource is the one you use today.",
+    "footerCta": "Start now"
+  },
+  "guide": {
+    "title": "User",
+    "titleHighlight": "guide",
+    "subtitle": "Everything you need to know to get the most out of Three Billion Heartbeats. From start to finish, step by step.",
+    "cta": "Start now",
+    "faqTitle": "Frequently asked questions",
+    "section": {
+      "start": {
+        "shortLabel": "Your first heartbeat",
+        "title": "1. Your first heartbeat",
+        "subtitle": "Get started in under 60 seconds",
+        "step1": "Open the chat from the app.",
+        "step1LinkText": "Go to chat",
+        "step2": "Write what's going on, no filters. There's no right answer.",
+        "step3": "The mentor detects your emotional state and adapts the conversation.",
+        "step4": "When you're done, you get a concrete next step you can take today."
+      },
+      "chat": {
+        "shortLabel": "The Chat — your mentor",
+        "title": "2. The Chat — your mentor",
+        "subtitle": "Not a generic chatbot. A system that knows you.",
+        "feature1": {
+          "label": "Emotional detection",
+          "desc": "It identifies whether you're blocked, anxious, in doubt or clear-headed, and adapts its response."
+        },
+        "feature2": {
+          "label": "Goals and actions",
+          "desc": "When you express an intention, the system creates a goal with concrete 10-minute actions."
+        },
+        "feature3": {
+          "label": "Microactions",
+          "desc": "Every conversation ends with something you can do TODAY. Steps so small you can't say no."
+        },
+        "feature4": {
+          "label": "Full history",
+          "desc": "Every conversation is saved. The mentor remembers your story to give continuity."
+        }
+      },
+      "checkin": {
+        "shortLabel": "Daily check-in",
+        "title": "3. Daily check-in",
+        "subtitle": "Log how you feel in 30 seconds",
+        "step1": "Open the Check-in tab from the workspace or use the Telegram bot.",
+        "step2": "Log your emotional state for the day.",
+        "step3": "Build streaks: how many days in a row you've checked in.",
+        "step4": "Over time, you'll see patterns: which days are harder, which situations affect you."
+      },
+      "diario": {
+        "shortLabel": "Personal journal",
+        "title": "4. Personal journal",
+        "subtitle": "A private space to write without anyone replying",
+        "feature1": {
+          "label": "Free writing",
+          "desc": "Reflections, venting, ideas, gratitude. No required structure."
+        },
+        "feature2": {
+          "label": "Mood",
+          "desc": "Tag each entry: great, good, neutral, bad or terrible."
+        },
+        "feature3": {
+          "label": "Tags",
+          "desc": "Organize your entries with emotional tags."
+        }
+      },
+      "metas": {
+        "shortLabel": "Goals and progress",
+        "title": "5. Goals and progress",
+        "subtitle": "Turn intentions into executable actions",
+        "feature1": {
+          "label": "Concrete goal",
+          "desc": "Not \"improve my life\", but \"have an honest conversation with my boss\"."
+        },
+        "feature2": {
+          "label": "Linked actions",
+          "desc": "Each goal has 5-15 minute steps you can complete and check off."
+        },
+        "feature3": {
+          "label": "Streak and progress",
+          "desc": "Consecutive days of activity. Progress bar in the sidebar."
+        },
+        "feature4": {
+          "label": "Avoidance patterns",
+          "desc": "The system detects what you postpone or reject and shows it to you."
+        }
+      },
+      "respirar": {
+        "shortLabel": "Breathing",
+        "title": "6. Breathing exercises",
+        "subtitle": "Calm anxiety in 2 minutes",
+        "feature1": {
+          "label": "4-7-8 breathing",
+          "desc": "Inhale 4s, hold 7s, exhale 8s. Ideal for calming anxiety."
+        },
+        "feature2": {
+          "label": "Box breathing",
+          "desc": "Inhale 4s, hold 4s, exhale 4s, hold 4s. To center yourself."
+        }
+      },
+      "comunidad": {
+        "shortLabel": "Community",
+        "title": "7. Community",
+        "subtitle": "You're not alone in the process",
+        "feature1": {
+          "label": "Anonymous posts",
+          "desc": "Share reflections and progress without anyone knowing who you are."
+        },
+        "feature2": {
+          "label": "Mutual support",
+          "desc": "Like the posts that resonate with you."
+        },
+        "feature3": {
+          "label": "By phase",
+          "desc": "Posts are organized by the phase of the process you're in."
+        }
+      },
+      "journeys": {
+        "shortLabel": "Guided journeys",
+        "title": "8. Guided journeys",
+        "subtitle": "Structured step-by-step programs",
+        "step1": "Pick a journey based on your phase: self-knowledge, emotional management, purpose or action.",
+        "step2": "Each module has practical exercises with mentor guidance.",
+        "step3": "Your progress is tracked and you can pick up where you left off.",
+        "step4": "As you complete modules, you advance through your transformation phase."
+      },
+      "settings": {
+        "shortLabel": "Settings",
+        "title": "9. Settings",
+        "subtitle": "Customize your experience",
+        "feature1": {
+          "label": "Mentor tone",
+          "desc": "Choose between Direct, Socratic or Warm."
+        },
+        "feature2": {
+          "label": "Reminders",
+          "desc": "Daily check-ins, pending actions and weekly summary."
+        },
+        "feature3": {
+          "label": "Export data",
+          "desc": "Download your history as CSV or all your data as JSON (GDPR)."
+        },
+        "feature4": {
+          "label": "Privacy",
+          "desc": "Change password, manage consent and delete your account."
+        }
+      }
+    },
+    "faq": {
+      "psicologo": {
+        "q": "Does the AI replace a psychologist?",
+        "a": "No. Three Billion Heartbeats is a coaching and self-knowledge tool. It does not diagnose, prescribe or replace professional therapy. In case of crisis, it connects you with emergency lines (988 in the US, 112 in the EU)."
+      },
+      "datos": {
+        "q": "Is my data private?",
+        "a": "Yes. Your conversations are yours. The system complies with the European GDPR. You can export or delete all your data from Settings at any time."
+      },
+      "planes": {
+        "q": "What's the difference between Free and Pro?",
+        "a": "Free: 10 conversations/month, 20 messages per conversation. Pro (€9/month): unlimited conversations and messages, Boost Mode, Telegram bot, family portal and advanced insights. Right now everything is free during the MVP."
+      },
+      "telegram": {
+        "q": "Can I use Telegram?",
+        "a": "Yes. Go to Settings > Telegram. You can chat with your mentor and receive reminders directly on Telegram."
+      },
+      "impulso": {
+        "q": "What is Boost Mode?",
+        "a": "A 21-day intensive program with diagnosis, daily personalized challenges, check-ins and behavior analysis. Available on Pro plan (free during the MVP)."
+      },
+      "precio": {
+        "q": "How much does it cost?",
+        "a": "Right now everything is free. We're in MVP phase until October 2026. After that there will be a Free plan (10 conversations/month) and a Pro (€9/month). Early users will get special conditions."
+      }
+    }
+  },
+  "landing": {
+    "eyebrow": "⚡ Real Transformation",
+    "title": "Change your life",
+    "titleHighlight": "one habit at a time",
+    "subtitle": "An AI-powered mentor supervised by a responsible psychologist. It helps you move from paralysis to action, with the option to request a human letter from the team whenever you want a personal message.",
+    "ctaPrimary": "Create free account",
+    "ctaSecondary": "Try without an account",
+    "chatMock": {
+      "m1": "I'm stuck with my project",
+      "m2": "What's the smallest thing you could do in 10 minutes?",
+      "m3": "Open the file and write one paragraph",
+      "m4": "That's it. Do it now. Then we'll come back."
+    },
+    "howEyebrow": "How it works",
+    "howTitle": "Your transformation in 3 steps",
+    "step": {
+      "describe": {
+        "title": "You describe how you feel",
+        "desc": "Pick your current emotional state. There's no right answer."
+      },
+      "detect": {
+        "title": "The AI detects your pattern",
+        "desc": "Stuck / Anxious / Doubtful / Clear — we adapt the conversation."
+      },
+      "next": {
+        "title": "You get a next step",
+        "desc": "Specific, actionable, something you can do today in 10 minutes."
+      }
+    },
+    "plansEyebrow": "Plans",
+    "plansTitle": "Choose your path",
+    "plan": {
+      "free": {
+        "title": "Free",
+        "description": "Perfect to get started",
+        "price": "Free",
+        "feature1": "Unlimited chat",
+        "feature2": "State detection",
+        "feature3": "First challenge free",
+        "feature4": "Exploration access",
+        "cta": "Create free account"
+      },
+      "impulso": {
+        "title": "Impulso",
+        "description": "21-day intensive program",
+        "price": "Coming soon",
+        "feature1": "Everything in Free",
+        "feature2": "21-day Impulso program",
+        "feature3": "Daily check-ins",
+        "feature4": "Personalized challenges",
+        "feature5": "Future messages",
+        "feature6": "Priority support",
+        "cta": "Join the waitlist"
+      }
+    },
+    "finalTitle": "Ready for your first step?",
+    "finalSubtitle": "Create your account in under 60 seconds. Free.",
+    "finalCta": "Create free account",
+    "finalDisclaimer": "Three Billion Heartbeats does not replace therapy or professional psychological intervention."
+  },
+  "contact": {
+    "metaTitle": "Contact — Three Billion Heartbeats",
+    "metaDescription": "Got questions or want to know more? Write to us and we'll reply in under 24 hours.",
+    "title": "Contact us",
+    "subtitle": "We reply in under 24 hours.",
+    "starter": {
+      "header": "Reason",
+      "note": "We've prepared a starter message below. Edit it before sending.",
+      "profesional": {
+        "label": "Psychologist, coach or wellbeing professional",
+        "message": "Hi, I'm a [profession + license number if applicable] and I'd like to explore how Three Billion Heartbeats could fit into my practice. I'm particularly interested in:\n\n- "
+      },
+      "etica": {
+        "label": "Report an ethical issue",
+        "message": "Hi, I've spotted something on the platform that I think goes against what you promise in /etica. Context:\n\n- What happened:\n- Where (URL or section):\n- When:\n"
+      },
+      "sugerencia": {
+        "label": "Product suggestion or feedback",
+        "message": "Hi, I'm missing / I'd love to see…\n\n"
+      }
+    },
+    "nameLabel": "Name",
+    "namePlaceholder": "Your full name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@email.com",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Tell us what's on your mind...",
+    "statusSuccess": "Message sent! We'll get back to you soon.",
+    "statusError": "Please fill out all fields correctly.",
+    "privacyContext": "Your data will only be used to reply to your message.",
+    "submit": "Send message",
+    "submitSending": "Sending..."
+  },
+  "changelog": {
+    "eyebrow": "What's new",
+    "title": "What",
+    "titleHighlight": "is changing",
+    "subtitle": "Every change explained without marketing. What's new, what we've improved, what we've hardened on security, and what we've adjusted out of care for our users.",
+    "kind": {
+      "nuevo": "New",
+      "mejora": "Improvement",
+      "seguridad": "Security",
+      "cuidado": "Care"
+    },
+    "entry": {
+      "helpPage": {
+        "title": "Urgent help page",
+        "body": "We added a page inside the app with official emergency resources (988 in the US, 112 in the EU, Crisis Text Line, Samaritans) and a short guide for those critical minutes while someone waits to be attended to. It doesn't replace any service — it just makes it easier to reach them."
+      },
+      "referrals": {
+        "title": "Referrals program",
+        "body": "You can now invite someone you think this would help, and share the accompaniment with them. The metrics stay visible in your profile. It's not a paid affiliate scheme: it's a way for what works for you to reach the people you choose."
+      },
+      "rateLimit": {
+        "title": "Rate limiting on password recovery",
+        "body": "We added attempt limits to the password recovery and verification resend endpoints. It protects users against brute-force attacks and makes more noise when someone tries to impersonate."
+      },
+      "clinicalNotes": {
+        "title": "Clinical panel: notes and follow-ups",
+        "body": "The responsible psychologist can now take clinical notes inside the panel, mark pending follow-ups and see when a note resolves automatically as the case evolves. Better traceability for the deeper work."
+      }
+    },
+    "suggestionTitle": "Is something missing?",
+    "suggestionDesc": "If there's something that would make your life easier, tell us. We don't promise to build everything, but we read every suggestion.",
+    "suggestionCta": "Send suggestion"
+  },
+  "join": {
+    "betaAccess": "Beta access",
+    "progressLabel": "Mission {current} of {total}",
+    "invited": "You've been invited. Access guaranteed.",
+    "introTitle1": "Three questions.",
+    "introTitle2": "One heartbeat of honesty.",
+    "introSubtitle": "There's no signup form. There are three questions no one else dares to ask you. Answer them and access is yours.",
+    "emailPlaceholder": "you@email.com",
+    "privacyContext": "Your answers and email will be used to personalize your experience.",
+    "startMissions": "Start the missions",
+    "introFooter": "No card. No spam. Just heartbeats that count.",
+    "mission": {
+      "m1": {
+        "label": "Mission 1 of 3",
+        "question": "What's the change you most need to make in your life right now?",
+        "hint": "Be specific. Not what you 'should' change — what you really need to.",
+        "placeholder": "E.g.: Stop procrastinating on my project, improve my relationships, get my energy back..."
+      },
+      "m2": {
+        "label": "Mission 2 of 3",
+        "question": "What have you tried before to make it happen, and it didn't work?",
+        "hint": "Tell us what you already know doesn't work. That helps us not repeat it.",
+        "placeholder": "E.g.: Productivity apps, promises to myself, courses I never finished..."
+      },
+      "m3": {
+        "label": "Mission 3 of 3",
+        "question": "What would happen if 30 days from now nothing had changed?",
+        "hint": "Feel the real weight of not acting. This question is the engine.",
+        "placeholder": "E.g.: I'd still be just as paralyzed, I'd lose the opportunity, I'd feel..."
+      }
+    },
+    "errorTooShort": "Write at least one full sentence.",
+    "errorGeneric": "Something went wrong. Try again.",
+    "sending": "Sending...",
+    "nextMission": "Next mission",
+    "unlockAccess": "Unlock access",
+    "doneTitle": "First heartbeat. Done.",
+    "doneSubtitle": "You've completed the three missions. Your rhythm has begun.",
+    "doneRecap": "What you just did",
+    "createAccount": "Create my account",
+    "createAccountHint": "Just your name and a password left. Your answers set the rhythm for your first session.",
+    "inviteUnlock": "7 days beating and you'll earn an invitation to bring someone who also needs it."
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: April 10, 2026",
+    "section": {
+      "responsable": {
+        "title": "Data controller",
+        "item1": "<strong>Holder:</strong> Mario Pablo Sánchez Barrón",
+        "item2": "<strong>Trade name:</strong> Startidea",
+        "item3": "<strong>Product:</strong> Three Billion Heartbeats",
+        "item4": "<strong>Privacy email:</strong> <mailto>privacidad@tresmilmillonesdelatidos.es</mailto>",
+        "item5": "<strong>Website:</strong> tresmilmillonesdelatidos.es"
+      },
+      "datos": {
+        "title": "Data we collect",
+        "item1": "Email address (to identify your account)",
+        "item2": "Name (if you provide it voluntarily)",
+        "item3": "Password (stored hashed, never in plain text)",
+        "item4": "Messages and conversations within the platform",
+        "item5": "Emotional check-ins and journal entries",
+        "item6": "Goals, actions and progress",
+        "item7": "Anonymized usage patterns (access frequency, not content)",
+        "item8": "Telegram ID (if you link your account)",
+        "item9": "Subscription data managed by Stripe (we don't store payment data)",
+        "outro1": "We don't collect location data, biometric data or sensitive information beyond what you choose to share in conversations."
+      },
+      "baseJuridica": {
+        "title": "Legal basis for processing",
+        "item1": "<strong>Performance of contract</strong> (art. 6.1.b GDPR): We need your data to provide the service you've requested.",
+        "item2": "<strong>Consent</strong> (art. 6.1.a GDPR): For marketing communications and optional features like the family portal.",
+        "item3": "<strong>Legitimate interest</strong> (art. 6.1.f GDPR): To improve the service through anonymized analytics and to detect crisis situations."
+      },
+      "finalidad": {
+        "title": "How we use your data",
+        "item1": "To provide the AI conversational mentoring service",
+        "item2": "To personalize your experience and track your progress",
+        "item3": "To detect situations of emotional risk and activate crisis protocols",
+        "item4": "To send you account-related communications (reminders, weekly summaries)",
+        "item5": "To generate anonymized statistics that improve the service",
+        "outro1": "We don't sell, transfer or share your information with third parties for commercial or advertising purposes."
+      },
+      "terceros": {
+        "title": "Providers and third parties",
+        "intro": "To operate the service we use the following providers:",
+        "item1": "<strong>Hosting:</strong> European servers with encryption in transit and at rest.",
+        "item2": "<strong>Conversational AI:</strong> Conversations are processed by language models. They are not used to train third-party models.",
+        "item3": "<strong>Stripe:</strong> Payment processing. Stripe is PCI-DSS compliant. We don't store card data.",
+        "item4": "<strong>Telegram:</strong> If you link your account. Telegram processes the messages you send it.",
+        "item5": "<strong>Transactional email:</strong> For verification, reminders and summaries.",
+        "outro1": "All providers are contractually bound to protect your data in accordance with the GDPR."
+      },
+      "transferencias": {
+        "title": "International transfers",
+        "outro1": "Some of our providers may process data outside the European Economic Area (EEA). In all cases, appropriate safeguards are in place: European Commission adequacy decisions, standard contractual clauses or equivalent privacy frameworks (EU-US Data Privacy Framework)."
+      },
+      "retencion": {
+        "title": "Data retention",
+        "item1": "<strong>Active account:</strong> As long as you keep your account, we retain your data to provide the service.",
+        "item2": "<strong>After deletion:</strong> When you delete your account, we erase your personal data within a maximum period of 30 days.",
+        "item3": "<strong>Anonymized data:</strong> Aggregated and anonymized statistics may be kept indefinitely.",
+        "item4": "<strong>Legal obligations:</strong> If the law requires us to retain certain data, we will do so for the required period."
+      },
+      "cookies": {
+        "title": "Cookies",
+        "intro": "We use cookies strictly necessary for the operation of the service:",
+        "item1": "<strong>mw_session:</strong> User session cookie. Required to keep your session logged in. Expires when you log out.",
+        "item2": "<strong>mw_admin_session:</strong> Admin session cookie. Only for the internal team. Expires in 24 hours.",
+        "item3": "<strong>Accessibility preferences:</strong> Stored in localStorage to remember your visual settings.",
+        "outro1": "We don't use third-party cookies, tracking cookies or advertising cookies. As these are strictly necessary cookies, they don't require prior consent under the ePrivacy Directive."
+      },
+      "derechos": {
+        "title": "Your rights",
+        "intro": "Under the GDPR, you have the following rights:",
+        "item1": "<strong>Access:</strong> Request a copy of all your personal data.",
+        "item2": "<strong>Rectification:</strong> Correct inaccurate or incomplete data.",
+        "item3": "<strong>Erasure:</strong> Request the deletion of your data ('right to be forgotten').",
+        "item4": "<strong>Portability:</strong> Receive your data in a structured and readable format (JSON or CSV).",
+        "item5": "<strong>Objection:</strong> Object to processing based on legitimate interest.",
+        "item6": "<strong>Restriction:</strong> Request the restriction of processing in certain cases.",
+        "outro1": "To exercise these rights: from the platform, go to Settings and use the option to export or delete data. From Telegram, type <code>/borrar_datos</code>. Or contact us at <mailto>privacidad@tresmilmillonesdelatidos.es</mailto>. We respond within a maximum of 30 days.",
+        "outro2": "You have the right to file a complaint with the <link>Spanish Data Protection Agency (AEPD)</link>."
+      },
+      "menores": {
+        "title": "Minors",
+        "outro1": "The service is intended for users aged 16 and over. We don't knowingly collect data from minors. If you are under 16 and have created an account, contact us to delete it."
+      },
+      "cambios": {
+        "title": "Changes to this policy",
+        "outro1": "We may update this policy periodically. If the changes are significant, we will notify you by email or via a notice on the platform at least 30 days in advance."
+      }
+    }
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "lastUpdated": "Last updated: April 10, 2026",
+    "section": {
+      "aceptacion": {
+        "title": "Acceptance of terms",
+        "intro": "By accessing and using Three Billion Heartbeats you accept these terms of service. If you do not agree with any of them, please do not use the platform."
+      },
+      "descripcion": {
+        "title": "Description of the service",
+        "intro": "Three Billion Heartbeats is a personal companionship platform based on artificial intelligence. The service includes conversations with an AI mentor, emotional check-ins, personal journaling, goals with actions, guided exercises and transformation programs."
+      },
+      "aviso": {
+        "title": "Legal notice — Not therapy",
+        "intro": "<strongAmber>Three Billion Heartbeats is NOT a substitute for psychological therapy, medical diagnosis or professional mental health intervention.</strongAmber>",
+        "outro1": "The AI accompanies, asks questions and proposes actions, but it does not diagnose, does not prescribe and cannot provide clinical care. In situations of crisis or emergency, contact immediately:",
+        "item1": "<strong>988</strong> — Suicide & Crisis Lifeline (US, 24/7)",
+        "item2": "<strong>112</strong> — Emergency services (EU)",
+        "item3": "<strong>911</strong> — Emergency services (US, 24/7)"
+      },
+      "limitacion": {
+        "title": "Limitation of liability",
+        "intro": "The service is provided 'as is'. We don't guarantee that the AI's responses are always accurate, complete or appropriate to your particular situation. You should apply your own judgment before acting on any suggestion.",
+        "outro1": "To the maximum extent permitted by law, Startidea will not be liable for indirect, incidental, special or consequential damages arising from the use or the inability to use the service."
+      },
+      "disponibilidad": {
+        "title": "Service availability",
+        "intro": "We strive to keep the service available 24/7, but we don't guarantee uninterrupted availability. There may be maintenance periods, updates or technical incidents that temporarily affect access."
+      },
+      "uso": {
+        "title": "Acceptable use",
+        "intro": "You agree to use the platform only for lawful purposes and for the benefit of your personal development. The following is prohibited:",
+        "item1": "Harassing, threatening, defaming or harming third parties",
+        "item2": "Attempting to access other users' accounts",
+        "item3": "Using the service to generate illegal or harmful content",
+        "item4": "Manipulating or attempting to bypass security systems"
+      },
+      "propiedad": {
+        "title": "Intellectual property",
+        "intro": "<strong>Your content is yours.</strong> The conversations, journal entries, goals and reflections you generate are your property. You can export or delete them at any time.",
+        "outro1": "By using the service, you grant us a limited, non-exclusive and revocable license to process your content for the sole purpose of providing the service (generating AI responses, detecting emotional states, generating insights). We don't use your content to train third-party AI models or for advertising purposes.",
+        "outro2": "The brand, design, code and original content of Three Billion Heartbeats are owned by Startidea. Reproduction without authorization is not permitted."
+      },
+      "pagos": {
+        "title": "Plans, payments and cancellation",
+        "intro": "<strong>MVP period (until October 2026):</strong> All features are available for free. No credit card required.",
+        "outro1": "<strong>Paid plans (post-MVP):</strong> Payments are managed through Stripe. Subscriptions renew automatically unless you cancel before the renewal date.",
+        "outro2": "<strong>Cancellation:</strong> You can cancel your subscription at any time from Settings or from Stripe's billing portal. You'll keep access to the Pro plan until the end of the already-paid period. No partial refunds are issued for unused periods.",
+        "outro3": "<strong>Account deletion:</strong> You can delete your account and all your data at any time from Settings or by typing <code>/borrar_datos</code> on Telegram."
+      },
+      "privacidad": {
+        "title": "Privacy and data",
+        "intro": "Your privacy is our priority. See our <link>Privacy Policy</link> to understand in detail how we collect, use and protect your data."
+      },
+      "modificaciones": {
+        "title": "Modifications",
+        "intro": "We reserve the right to update these terms. Any relevant change will be communicated at least 30 days in advance by email or notice on the platform. Continued use of the service after that period implies acceptance of the current terms."
+      },
+      "legislacion": {
+        "title": "Governing law",
+        "intro": "These terms are governed by Spanish law. For any dispute, the parties submit to the courts of Granada (Spain), unless consumer regulations establish a different jurisdiction."
+      },
+      "lssi": {
+        "title": "Legal notice (LSSI)",
+        "intro": "In compliance with Spanish Law 34/2002 of July 11, on Information Society Services and Electronic Commerce (LSSI-CE):",
+        "item1": "<strong>Holder:</strong> Mario Pablo Sánchez Barrón",
+        "item2": "<strong>Trade name:</strong> Startidea",
+        "item3": "<strong>Address:</strong> Granada, Spain",
+        "item4": "<strong>Email:</strong> <mailto>hola@tresmilmillonesdelatidos.es</mailto>",
+        "item5": "<strong>Website:</strong> <link>tresmilmillonesdelatidos.es</link>"
+      },
+      "contacto": {
+        "title": "Contact",
+        "intro": "For inquiries about these terms write to us at <mailto>hola@tresmilmillonesdelatidos.es</mailto>."
+      }
+    }
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Articles, reflections and recommendations on emotional wellbeing, personal growth and artificial intelligence.",
+    "empty": "We'll be publishing articles here soon.",
+    "emptyBack": "Back to home",
+    "prev": "Previous",
+    "next": "Next",
+    "notFoundTitle": "Article not found",
+    "backToBlog": "Back to blog",
+    "backShort": "Blog",
+    "backArrow": "← Back to blog",
+    "ctaTitle": "Want to move from stuck to action?",
+    "ctaDesc": "Three Billion Heartbeats walks with you using AI. Free during the MVP.",
+    "ctaButton": "Start now"
+  },
+  "chat": {
+    "ariaRegion": "Mentorship chat",
+    "ariaMessagesLog": "Chat messages",
+    "ariaThinking": "Mentor is thinking",
+    "ariaScrollToBottom": "Go to latest message",
+    "ariaSendMessage": "Send message",
+    "ariaWriteMessage": "Write your message",
+    "ariaAttachImage": "Attach image",
+    "ariaSuggestions": "Suggestions to continue",
+    "ariaCrisisCall": "Call 024, crisis line",
+    "ariaRemoveMode": "Remove mode",
+    "timeNow": "now",
+    "timeMinutes": "{n}m ago",
+    "voiceNote": "Voice note",
+    "imageAttached": "Image attached",
+    "imageAlt": "Attached image",
+    "imageAdjuntoAlt": "Attachment",
+    "thinking": "Thinking…",
+    "reload": "Reload",
+    "flowActive": "Active flow:",
+    "copy": {
+      "tooltipCopy": "Copy message",
+      "tooltipCopyReply": "Copy reply",
+      "tooltipCopied": "Copied"
+    },
+    "signals": {
+      "searchUsed": "· search used",
+      "fallback": "· fallback response"
+    },
+    "crisis": {
+      "alertLabel": "Safety alert",
+      "callButton": "Call 024",
+      "callMxLabel": "MX: 800 290 0024",
+      "callArLabel": "AR: 011 5275-1135",
+      "callMxFull": "Mexico: 800 290 0024",
+      "callArFull": "Argentina: 011 5275-1135",
+      "exitMode": "I'm feeling better — exit crisis mode",
+      "panelTitle": "Crisis mode activated",
+      "breathingTitle": "4-7-8 Breathing",
+      "breathingBody": "Inhale 4 sec · hold 7 sec · exhale 8 sec. Repeat 3 times.",
+      "groundingTitle": "5-4-3-2-1 Technique",
+      "groundingBody": "5 things you see · 4 you touch · 3 you hear · 2 you smell · 1 you taste.",
+      "withYou": "Tell me what's happening. I'm here with you.",
+      "footerLink": "🚨 Crisis: call 024",
+      "buttonShort": "Crisis"
+    },
+    "actionRequired": {
+      "label": "Action required",
+      "replyLater": "Not now",
+      "replyClose": "Doesn't apply",
+      "replyDoIt": "Yes, I'll do it",
+      "replyLaterFull": "Not now, I'll get back to it later.",
+      "replyCloseFull": "Doesn't apply, closing it.",
+      "replyDoItFull": "Yes, I'll do it today."
+    },
+    "journal": {
+      "active": "Journal mode active.",
+      "noResponse": "AI won't respond. Write freely.",
+      "buttonShort": "Journal"
+    },
+    "actionLock": {
+      "openThread": "Thread open:",
+      "hint": "You can pick it back up, park it for later, or close it. Your call."
+    },
+    "empty": {
+      "title": "What can I help you with today?",
+      "subtitle": "I ask you the questions you're not asking yourself, so you see what you're still missing.",
+      "startPrompt": "Tell me what's going on or pick a starting point.",
+      "modesTitle": "How do you want me to show up for you?",
+      "modesHint": "You can switch modes anytime.",
+      "telegramCta": "💬 Take me on Telegram — same mentor, on your phone",
+      "voiceHint": "You can type or use the mic 🎙️",
+      "conversationNumber": "Your conversation #{n}"
+    },
+    "community": {
+      "askTitle": "What if you asked people who've been through it?",
+      "suggestionTitle": "Mentor suggestion",
+      "dismiss": "Not now"
+    },
+    "rating": {
+      "label": "Was this helpful?",
+      "yes": "Helpful",
+      "no": "Not helpful",
+      "thanks": "Thanks for your feedback."
+    },
+    "input": {
+      "placeholder": "Tell me what's going on… (Enter to send)",
+      "shiftHint": "Shift + Enter for a new line",
+      "counterMax": "{count}/1000",
+      "footnote": "AI supervised by psychologists, mentors and coaches · Not a substitute for clinical care nor for the people who love you ·",
+      "modeLabel": "Mode: {label}"
+    },
+    "audio": {
+      "noteLabel": "Voice note",
+      "seconds": "{n}s recorded"
+    },
+    "image": {
+      "attachedTitle": "Image attached",
+      "attachedHint": "Describe what it shows — the mentor can't see images, but can help you with what you tell them"
+    },
+    "signup": {
+      "doneMessage": "Done. Your progress is saved. You can come back from any device.",
+      "eyebrow": "Save this progress?",
+      "body": "You've started something important. If you want to keep this conversation, your journal, and your next steps, leave your email. You can come back from any device.",
+      "emailPlaceholder": "your@email.com",
+      "saving": "Saving…",
+      "submit": "Save my account",
+      "dismiss": "Not now",
+      "errorFormat": "Check your email format.",
+      "errorGeneric": "Couldn't save. Try again."
+    }
+  },
+  "workspace": {
+    "tabs": {
+      "chat": "Chat",
+      "plan": "Plan",
+      "checkin": "Check-in",
+      "espejo": "Mirror",
+      "espejoTooltip": "Map of patterns you're putting off"
+    },
+    "plan": {
+      "title": "Execution Plan",
+      "subtitle": "Turn clarity into visible tracking. Your goal and real action debt live here.",
+      "badgeActive": "Active tracking",
+      "badgeClear": "No open debt",
+      "noGoal": "No active goal yet. Use chat to define it, then come back here to turn it into a system.",
+      "actionsCounter": "{done}/{total} actions",
+      "progressLine": "Current progress: {n}% complete",
+      "checklistTitle": "Action Checklist",
+      "checklistSubtitle": "Mark progress without leaving your central workspace.",
+      "noActionsYet": "No actions defined for this goal yet.",
+      "actionDone": "Done",
+      "actionPending": "Pending",
+      "markPending": "Mark pending",
+      "markDone": "Mark done",
+      "remindTomorrow": "Remind me tomorrow at 9:00 AM",
+      "remindTomorrowToast": "We'll remind you tomorrow at 9:00 AM"
+    },
+    "continuity": {
+      "title": "Continuity and Accountability",
+      "planFree": "Free",
+      "anonProgress": "Unsaved progress",
+      "savedProgress": "Progress saved",
+      "proUpsell": "Pro: continuity across devices, persistent memory between sessions, and Impulse Mode.",
+      "saveProgressEyebrow": "Save progress",
+      "saveProgressDefaultPrompt": "Link an email to keep conversations, goals, and continuity across devices.",
+      "emailPlaceholder": "your@email.com",
+      "saving": "Saving…",
+      "save": "Save progress",
+      "completeUpgradeTitle": "Full continuity",
+      "openUpgrade": "View Pro plan",
+      "descNoSession": "Session starting up. Progress and plan will sync once your identity is ready.",
+      "descPro": "Full continuity across devices, persistent memory, and Impulse Mode unlocked.",
+      "descFreeTpl": "Chat without limits. Plan {plan}: when you want cross-device continuity and Impulse Mode, Pro unlocks it."
+    },
+    "responsibility": {
+      "title": "Active Accountability",
+      "subtitle": "What doesn't get done today becomes friction tomorrow.",
+      "priorityLabel": "Priority pending action",
+      "nextLabel": "Suggested next action",
+      "empty": "No active open debt. Use chat to define your next step.",
+      "backToChat": "Back to chat",
+      "goalsHistory": "Goals history"
+    },
+    "checkin": {
+      "title": "Daily Ritual",
+      "subtitle": "Use it to log how you're showing up today, even if you don't need a long conversation. Why every day? Because change doesn't come from one good day — it comes from not losing the thread. 30 seconds is enough. Small consistency always beats perfect effort.",
+      "placeholder": "Example: Today I'm stuck and struggling to get started.",
+      "lastSavedTpl": "Last saved: {time} · status {state}",
+      "noneThisSession": "No check-in recorded this session.",
+      "saving": "Saving…",
+      "save": "Save check-in",
+      "pulseTitle": "Current pulse",
+      "pulseSubtitle": "A quick read on where you are today and how it fits with your continuity.",
+      "currentStateTpl": "Current state: {state}",
+      "dominantTpl": "Dominant: {state}",
+      "checkinsTodayTpl": "{n} check-ins today",
+      "hintTitle": "Check in when you need to log your state without opening a full session.",
+      "hintBody": "The goal isn't to explain everything. It's to leave a brief signal that keeps the thread going.",
+      "shortcutsTitle": "Continuity shortcuts",
+      "shortcutsSubtitle": "Jump to the mode you need without losing the local state of this view.",
+      "goToChat": "Go to chat",
+      "viewPlan": "View active plan",
+      "checkinsHistory": "Check-ins history"
+    },
+    "espejo": {
+      "title": "Avoidance map",
+      "subtitle": "This is what you've been putting off and why. Looking it straight on is the first step.",
+      "fullAnalysis": "View full pattern analysis"
+    },
+    "account": {
+      "anon": "Anonymous account",
+      "noName": "No name — add it in Settings"
+    }
+  },
+  "dashboard": {
+    "title": "Your accompaniment",
+    "goToChat": "Go to chat",
+    "state": {
+      "header": "State",
+      "hint": "Your state shifts with what you write. The mentor adapts their tone and questions to where you are.",
+      "claridad": {
+        "label": "Clarity",
+        "desc": "Heartbeat in direction. Use this momentum now."
+      },
+      "bloqueo": {
+        "label": "Block",
+        "desc": "Heartbeat paused. Naming it unblocks the rhythm."
+      },
+      "ansiedad": {
+        "label": "Anxiety",
+        "desc": "Too many heartbeats at once. Pick one."
+      },
+      "duda": {
+        "label": "Doubt",
+        "desc": "The heartbeat searches for rhythm. Chat can point it."
+      },
+      "neutral": {
+        "label": "Neutral",
+        "desc": "Heartbeat at rest. Good time to choose direction."
+      }
+    },
+    "constancia": {
+      "header": "Consistency",
+      "none": "You haven't been back this month.",
+      "one": "You've been back one day.",
+      "manyTpl": "You've been back {n} days.",
+      "hint": "No streak to keep. Come back when you need it."
+    },
+    "trend": {
+      "header": "Trend",
+      "labels": {
+        "subiendo": "rising",
+        "bajando": "falling",
+        "igual": "flat"
+      }
+    },
+    "lens": {
+      "surfaceLabel": "What you see",
+      "revealedLabel": "What's underneath",
+      "bloqueo": "It's not lack of ability. It's fear it won't be enough.",
+      "ansiedad": "The urgency you feel isn't real. It's noise dressed up as action.",
+      "duda": "You don't lack information. You lack permission to choose wrong.",
+      "claridad": "You see it clearly now. The question is: will you act before it clouds over?",
+      "neutral": "Calm isn't always peace. Sometimes it's silent avoidance.",
+      "metaTpl": "Trend: {trend} · Streak: {n} days"
+    },
+    "actions": {
+      "title": "Pending actions",
+      "newInChat": "New in chat",
+      "emptyTitle": "No pending actions.",
+      "emptyHint": "Talk with Three Billion Heartbeats to define your next move."
+    },
+    "wins": {
+      "title": "What you've wanted to keep",
+      "emptyTitle": "You haven't saved anything here yet.",
+      "emptyHint": "When something deserves to stay, tell the chat about it."
+    },
+    "card": {
+      "emotionalLabel": "Emotional state"
+    },
+    "quick": {
+      "openChat": "Open chat",
+      "impulse": "Impulse Program",
+      "explore": "Explore now"
+    }
+  },
+  "minors": {
+    "metaTitle": "We're waiting for you — Three Billion Heartbeats",
+    "metaDescription": "This platform requires you to be at least 14 years old. In the meantime, here are resources made for you.",
+    "heading": "We're waiting for you.",
+    "p1": "This platform is designed for people 14 and older. Not because we don't care about you — it's because to support you the way you deserve, we need a trusted adult nearby.",
+    "p2": "If what you're feeling weighs on you, there are people listening. Calling is free and confidential.",
+    "resourceTitle": "ANAR Foundation — Help for Children and Adolescents",
+    "resourcePhone": "900 20 20 10",
+    "resourceHint": "24 hours, free and confidential. Trained people will listen to you without judgment.",
+    "emergency": "If there's immediate risk to your life or someone near you, call 112.",
+    "comeBack": "When you turn 14, come back and let's talk.",
+    "backHome": "← Back to home"
+  },
+  "invite": {
+    "verifying": "Verifying invitation...",
+    "badge": "Personal invitation",
+    "headlineTpl": "{name} invited you to Three Billion Heartbeats",
+    "intro": "This invitation is yours. It's not an ad — it's someone who believes you can change and wants you to have access.",
+    "fallbackInviter": "someone from Three Billion Heartbeats",
+    "whatIsTitle": "What is Three Billion Heartbeats?",
+    "feature1": "An AI that asks you the questions no one else dares to ask",
+    "feature2": "A system that catches when you're avoiding what matters and tells you straight",
+    "feature3": "30 days to make the change you've been putting off too long",
+    "accept": "Accept the invitation",
+    "learnMore": "Learn more about Three Billion Heartbeats first",
+    "exclusiveAccess": "Exclusive access. No credit card.",
+    "invalidTitle": "Invalid invitation",
+    "invalidBody": "This invitation link has expired or already been used.",
+    "fallbackPath": "You can still request access by completing the 3 missions on the waitlist.",
+    "goWaitlist": "Go to waitlist"
+  },
+  "family": {
+    "metaTitle": "Support Portal | Three Billion Heartbeats",
+    "metaDescription": "Private portal for trusted contacts.",
+    "heading": "Support Portal",
+    "subtitleTpl": "Trust network for {name}",
+    "protocolTitle": "Confidentiality protocol",
+    "protocolBody": "What you see here is confidential. Don't mention what you know about their progress, streak, or status. If the system needs you to act, it will tell you. Your role is to be there — not to watch.",
+    "relationTips": {
+      "madre": "Your presence matters more than your advice. Don't try to fix it — just be there.",
+      "padre": "Your presence matters more than your advice. Don't try to fix it — just be there.",
+      "pareja": "Support without controlling. Don't use what you see here in arguments.",
+      "amigo": "Be natural. A plan together is worth more than advice. Don't change how you treat them.",
+      "terapeuta": "Use this information as context between sessions, not as an agenda.",
+      "default": "Your presence matters more than your advice."
+    },
+    "whatToDo": "What to do now",
+    "actions": {
+      "crisisTitle": "Call them now",
+      "crisisSub": "Don't text — call. An 'I'm here' is enough. Don't try to solve anything on the phone.",
+      "weekTitle": "Send a natural message",
+      "weekSub": "Without mentioning the app. A 'want to hang out?' or 'how are you?' with no hidden agenda. Normalcy is support.",
+      "fewDaysTitle": "A short message is enough",
+      "fewDaysSub": "Don't ask about the app. A 'I thought of you' or a meme is worth more than 'have you logged in?'",
+      "winsTitle": "Celebrate with them",
+      "winsSub": "They shared a win with you. This step cost them more than it looks. Tell them.",
+      "calmTitle": "Do nothing",
+      "calmSub": "Everything's going well. The absence of pressure is the best support right now."
+    },
+    "metrics": {
+      "streakTitle": "Consistency",
+      "streakUnit": "days",
+      "streakNone": "No active streak. Don't ask why — just send something kind.",
+      "streakLongHint": "They're on a good streak. Consistency is costing them — acknowledge it if it comes up naturally.",
+      "streakBestTpl": "Best streak: {n} days.",
+      "lastActivityTitle": "Last activity",
+      "lastActivityToday": "Today",
+      "lastActivityYesterday": "Yesterday",
+      "lastActivityDaysTpl": "{n} days ago",
+      "lastActivityWeekHint": "Could be fine, could not be. A natural message without mentioning the app works best.",
+      "lastActivityFewDaysHint": "Haven't checked in for a few days. It's okay — sometimes you need a break.",
+      "lastActivityRecentHint": "Recent activity. Everything looks good.",
+      "goalTitle": "Active goal",
+      "goalProgress": "Progress",
+      "goalAllDone": "They've completed all actions. If it comes up, celebrate with them.",
+      "goalNotStarted": "Haven't started yet. Don't push — the moment will come.",
+      "goalInProgress": "Moving at their own pace. That's already a lot."
+    },
+    "wins": {
+      "title": "Shared wins",
+      "intro": "They wanted to share these wins with you. Each one cost them more than it looks."
+    },
+    "footer": "Three Billion Heartbeats — Support Network",
+    "footerConfidential": "This portal is confidential. Don't share it or forward it."
+  },
+  "profilePage": {
+    "title": "Your profile",
+    "noName": "No name — set one",
+    "planFallback": "Free plan",
+    "edit": "Edit",
+    "photoNudgeStrong": "Upload a photo · ",
+    "photoNudgeRest": "Your mentor gets you better when they see you as a person, not just a session.",
+    "emailLabel": "Email",
+    "planLabel": "Plan",
+    "streakLabel": "Current streak (days)",
+    "currentStateLabel": "Current state",
+    "stateLabels": {
+      "claridad": "Clarity",
+      "bloqueo": "Blocked",
+      "ansiedad": "Anxiety",
+      "duda": "Doubt",
+      "neutral": "Neutral"
+    },
+    "adaptTitle": "Tailor your mentoring",
+    "adaptDesc": "Tests and preferences so your mentor understands how you work.",
+    "enneagram": "Enneagram Test",
+    "enneagramDesc": "90 statements · 10-12 min · tunes your mentor's tone and questions to your type",
+    "accountActions": "Account actions",
+    "configAndSecurity": "Settings and security",
+    "viewProgress": "View my progress",
+    "deleteAccount": "Delete account",
+    "avatarFallback": "Avatar"
+  },
+  "journeyPage": {
+    "title": "Your journey",
+    "subtitle": "Four phases to understand yourself, regulate, find direction, and act.",
+    "goToChat": "Go to chat",
+    "activeLabel": "Active journey",
+    "completed": "Completed",
+    "exercisesCountTpl": "{done}/{total} exercises",
+    "continue": "Continue",
+    "viewFullMap": "View full map →",
+    "emptyTitle": "Pick your first journey",
+    "emptyDesc": "Journeys are guided programs with practical exercises. Pick one to start working on what you need most.",
+    "steps": {
+      "step1Title": "Pick a journey",
+      "step1Desc": "The one that resonates with you right now.",
+      "step2Title": "Do the exercises",
+      "step2Desc": "Guided, step by step, at your pace.",
+      "step3Title": "Reflect",
+      "step3Desc": "Each exercise closes with reflection.",
+      "step4Title": "Talk to Three Billion Heartbeats",
+      "step4Desc": "The AI adapts its responses to your progress."
+    },
+    "availableHeader": "Available journeys",
+    "active": "Active",
+    "modulesTpl": "{n} modules",
+    "exercisesTpl": "{n} exercises",
+    "weeksTpl": "{n} weeks",
+    "progress": "Progress",
+    "viewMap": "View map",
+    "starting": "Starting...",
+    "start": "Start your journey",
+    "disclaimer": "Three Billion Heartbeats is not a substitute for therapy or professional psychological intervention.",
+    "phases": {
+      "autoconocimiento": {
+        "label": "Self-Awareness"
+      },
+      "gestion_emocional": {
+        "label": "Emotional Regulation"
+      },
+      "proposito": {
+        "label": "Purpose and Direction"
+      },
+      "accion": {
+        "label": "Action and Follow-Through"
+      }
+    },
+    "exerciseTypes": {
+      "reflection": "Reflection",
+      "writing": "Writing",
+      "action": "Action",
+      "assessment": "Assessment",
+      "breathing": "Breathing",
+      "visualization": "Visualization"
+    }
+  },
+  "auth": {
+    "shared": {
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@email.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "••••••••",
+      "passwordMinPlaceholder": "Minimum 8 characters",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "continueWithGoogle": "Continue with Google",
+      "signupWithGoogle": "Sign up with Google",
+      "orWithEmail": "or with email",
+      "passwordsMismatch": "Passwords don't match.",
+      "errors": {
+        "EMAIL_INVALID": "Email isn't valid.",
+        "INVALID_CREDENTIALS": "Email or password is wrong.",
+        "LOGIN_FAILED": "Login failed. Try again.",
+        "EMAIL_TAKEN": "An account with that email already exists.",
+        "PASSWORD_TOO_SHORT": "Password needs at least 8 characters.",
+        "CONSENT_REQUIRED": "You need to accept the Terms and Privacy to create your account.",
+        "CONSENT_VERSION_MISMATCH": "Terms have been updated. Reload the page and accept again.",
+        "SIGNUP_FAILED": "Account creation failed. Try again.",
+        "TOKEN_REQUIRED": "Link isn't valid.",
+        "INVALID_TOKEN": "Link isn't valid or already used.",
+        "EXPIRED_TOKEN": "Link expired. Request a new one.",
+        "RESET_FAILED": "Reset failed. Try again.",
+        "oauth_invalid_state": "Google session expired. Try again.",
+        "oauth_failed": "Couldn't connect with Google. Try again.",
+        "google_not_configured": "Google sign-in isn't available right now. Use email and password.",
+        "generic": "Authentication error."
+      }
+    },
+    "login": {
+      "title": "Your heart already knew the way.",
+      "subtitle": "Beat again.",
+      "justVerified": "Email verified. You can log in now.",
+      "forgotLink": "Forgot your password?",
+      "submitting": "Logging in…",
+      "submit": "Log in",
+      "noAccount": "No account yet?",
+      "signupLink": "Sign up here",
+      "termsLine": "By logging in, you accept our",
+      "termsLink": "Terms",
+      "and": "and",
+      "privacyLink": "Privacy"
+    },
+    "signup": {
+      "title": "First heartbeat.",
+      "subtitle": "The first of many that will count.",
+      "nameLabel": "Name",
+      "namePlaceholder": "Your name",
+      "phoneLabel": "Phone / Telegram",
+      "phoneHint": "(optional — for reminders)",
+      "phonePlaceholder": "+34 612 345 678",
+      "confirmPasswordLabel": "Confirm your password",
+      "mvpDisclaimer": "We're in MVP phase — every conversation you have helps us improve the mentor for you and everyone after. Your data is handled confidentially and you can delete it anytime.",
+      "consentTpl": "I accept the <terms>Terms</terms> and <privacy>Privacy</privacy> (version {version}) and understand this is a beta product that doesn't replace a mental health professional.",
+      "submitting": "Creating account…",
+      "submit": "Create account",
+      "alreadyAccount": "Already have an account?",
+      "loginLink": "Sign in",
+      "createdTitle": "Account created",
+      "createdBodyTpl": "We've sent a verification link to {email}.",
+      "telegramCta": "Take me with you on Telegram",
+      "telegramCtaDesc": "Click to connect your account. I'll be there with you — no web needed.",
+      "spamHint": "Can't find the email? Check your spam folder.",
+      "continueToApp": "Continue to app"
+    },
+    "forgot": {
+      "back": "Back to sign in",
+      "title": "Forgot your password?",
+      "subtitle": "Enter your email and we'll send you a link to reset it.",
+      "doneTitle": "Check your email",
+      "doneBody": "If an account exists with that email, you'll receive a password reset link in the next few minutes.",
+      "submitting": "Sending…",
+      "submit": "Send recovery link",
+      "errorSend": "Error sending email. Try again."
+    },
+    "reset": {
+      "title": "New password",
+      "subtitle": "Choose a strong password for your account.",
+      "loading": "Loading…",
+      "invalidLinkTitle": "Invalid link. Request a new one.",
+      "requestNewLink": "Reset password",
+      "doneTitle": "Password updated!",
+      "doneSubtitle": "Redirecting to app…",
+      "newPasswordLabel": "New password",
+      "confirmLabel": "Confirm password",
+      "submitting": "Saving…",
+      "submit": "Set new password",
+      "requestNewSuffix": "Request a new one"
+    }
+  },
+  "impulso": {
+    "page": {
+      "welcomeTitle": "Impulse Mode",
+      "welcomeSubtitle": "21 days to break the patterns holding you back. Not motivation — structure, action, and proof.",
+      "why21Title": "Why 21 days?",
+      "why21P1": "Behavioral psychology research shows a habit doesn't form in a day and doesn't break with a decision. It takes <strong>sustained repetition</strong> in an environment with structure and feedback.",
+      "why21P2": "21 days is the point where what started as conscious effort becomes <strong>positive momentum</strong>. It's not magic — it's neuroplasticity: your brain builds new connections when you repeat an action with intention.",
+      "cycle1Title": "First cycle",
+      "cycle1Desc": "You break the inertia",
+      "cycle2Title": "Second cycle",
+      "cycle2Desc": "You see your patterns",
+      "cycle3Title": "Transformation",
+      "cycle3Desc": "The change is yours",
+      "why21Note": "It's not about being perfect for 21 days. It's about not quitting when you slip on day 4. The system is there so you come back on day 5.",
+      "pillar": {
+        "diagnostic": {
+          "title": "Diagnostic",
+          "desc": "12 questions to identify your profile: high potential, blocked, anxious, or unmotivated."
+        },
+        "challenges": {
+          "title": "Personalized challenges",
+          "desc": "3 to 7-day challenges tailored to your profile. Each one breaks a specific pattern."
+        },
+        "checkin": {
+          "title": "Daily check-in",
+          "desc": "Log your progress every day. Consistency is what drives change, not intensity."
+        },
+        "insights": {
+          "title": "Behavior insights",
+          "desc": "Analysis of your patterns in 14-day windows. See what you're missing."
+        }
+      },
+      "howTitle": "How it works",
+      "howStep1": "You take the diagnostic (5 min) — we identify where you're starting.",
+      "howStep2": "You get your first personalized challenge — built for what's blocking you.",
+      "howStep3": "Every day you check in — you log if you moved forward and how you feel.",
+      "howStep4": "At 14 days, the system shows you your real patterns.",
+      "howStep5": "At 21 days, what started as effort becomes habit.",
+      "startDiagnosticCta": "Start diagnostic",
+      "startDiagnosticHint": "5 minutes · 12 questions · free",
+      "programLabel": "Program",
+      "programTitle": "Impulse",
+      "programSubtitle": "21 days of consistent action",
+      "checkinToday": "Today's check-in",
+      "daysInARow": "days in a row",
+      "bestStreak": "Best: {days}",
+      "programProgress": "Program progress",
+      "daysCompleted": "Days completed",
+      "completed": "Completed",
+      "onTrack": "On track ✓",
+      "tabs": {
+        "diagnostico": "Diagnostics",
+        "retos": "Challenges",
+        "insights": "Insights",
+        "mensajes": "Messages"
+      },
+      "noProfileTitle": "You don't have an active profile yet",
+      "noProfileDesc": "Take the 12-question diagnostic to discover your blocking pattern and get a personalized 21-day program.",
+      "doDiagnosticNow": "Take diagnostic now",
+      "doDiagnosticHint": "5 minutes · Instant results · No sign-up",
+      "flowStep": {
+        "diagnostic": {
+          "title": "Diagnostic",
+          "desc": "12 questions about clarity, energy, and discipline."
+        },
+        "profile": {
+          "title": "Your profile",
+          "desc": "BLOCKED, ANXIOUS, UNMOTIVATED, LOST, or HIGH_POTENTIAL."
+        },
+        "challenges": {
+          "title": "21-Day Challenges",
+          "desc": "Daily check-in with personalized progression."
+        }
+      },
+      "preferChatTitle": "Prefer to start with chat?",
+      "preferChatDesc": "The coach can help you without a prior diagnosis.",
+      "goToChat": "Go to chat →",
+      "operationalFocus": "Operational focus",
+      "scoreLabels": {
+        "claridad": "Clarity",
+        "autoestima": "Self-esteem",
+        "energia": "Energy",
+        "disciplina": "Discipline",
+        "social": "Social"
+      },
+      "last7Days": "Last 7 days",
+      "noActiveChallenges": "You don't have active challenges yet.",
+      "noActiveChallengesHint": "Complete the diagnosis to get personalized challenges.",
+      "daysOf": "{done}/{total} days",
+      "statusCompleted": "Completed",
+      "statusInProgress": "In progress",
+      "totalDays": "{total} days total",
+      "requestNewChallenge": "+ Request new challenge",
+      "noInsights": "Not enough data yet to generate insights.",
+      "noInsightsHint": "Daily check-in for several days to see patterns.",
+      "unlocksOnDay": "Unlocks on day {day}",
+      "milestoneMessages": {
+        "day7": {
+          "title": "Your first week",
+          "preview": "You did what most don't: show up. Seven days straight already says something about you."
+        },
+        "day14": {
+          "title": "Breaking point",
+          "preview": "This is where most quit. You didn't. That's what separates those who change from those who just try."
+        },
+        "day21": {
+          "title": "Your new habit",
+          "preview": "Twenty-one days. It's not effort anymore, it's part of you. What you built here doesn't disappear."
+        }
+      }
+    },
+    "dashboard": {
+      "modeLabel": "Impulso Mode",
+      "profileBadge": "{title} Profile",
+      "streakBadge": "{days}-day streak",
+      "headlineTitle": "Train clarity, not just conversation",
+      "headlineDesc": "Initial diagnosis, operational profile, short challenges, daily check-in, and behavior signals to turn thinking into execution.",
+      "account": "Account",
+      "anonymousSession": "Anonymous session",
+      "pending": "Pending",
+      "currentPlan": "Current plan",
+      "planFree": "Free",
+      "operationalProfile": "Operational profile",
+      "noDiagnosticYet": "No diagnosis yet",
+      "noDiagnosticDesc": "Complete the initial test and the system will assign you a work profile.",
+      "activeStreak": "Active streak",
+      "bestStreakLine": "Best streak: {best}. Last check-in: {date}",
+      "automaticInsights": "Automatic insights",
+      "insightsEmpty": "Real patterns will appear here once the system has enough activity.",
+      "notRegistered": "Not registered",
+      "scale": {
+        "nothing": "Nothing",
+        "little": "Little",
+        "some": "Some",
+        "quite": "Quite a bit",
+        "much": "Much"
+      },
+      "momentum": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      },
+      "tabs": {
+        "diagnostic": "Diagnostic",
+        "challenges": "Challenges",
+        "checkin": "Check-in",
+        "future": "Time Capsule"
+      },
+      "diagnostic": {
+        "title": "Initial impulse test",
+        "desc": "12 questions, 1-5 scale. This defines how Three Billion Heartbeats should push you.",
+        "loading": "Loading diagnostic...",
+        "recalculate": "Recalculate profile",
+        "save": "Save diagnostic",
+        "totalScore": "Total {score}/100",
+        "detected": "Profile detected"
+      },
+      "scoreLabels": {
+        "claridad": "Clarity",
+        "autoestima": "Self-esteem",
+        "energia": "Energy",
+        "disciplina": "Discipline",
+        "social": "Social"
+      },
+      "challenges": {
+        "title": "Active challenges",
+        "desc": "Short, progressive challenges aligned to your operating profile.",
+        "assigning": "Assigning...",
+        "assignRefresh": "Assign / refresh challenges",
+        "noneAssigned": "No active challenges yet. Assign your first ones and start today.",
+        "needsDiagnostic": "Complete the diagnostic first to unlock personalized challenges.",
+        "difficulty": "Difficulty {level}",
+        "daysDuration": "{days} days",
+        "daysProgress": "{done}/{total} days",
+        "minPerDay": "{minutes} min/day"
+      },
+      "checkin": {
+        "title": "Daily check-in",
+        "desc": "The point isn't just to say how you feel. It's to train continuity.",
+        "placeholder": "What you did today, what you avoided, and your next move.",
+        "challengeStateLabel": "Challenge status",
+        "statusFulfilled": "Fulfilled",
+        "statusPartial": "Partial",
+        "statusBlocked": "Blocked",
+        "energyLabel": "Today's energy",
+        "saving": "Saving...",
+        "save": "Save check-in"
+      },
+      "logs": {
+        "title": "Recent logs",
+        "desc": "Recent emotional pattern and real continuity.",
+        "empty": "No logs yet. Your first check-in will activate this view.",
+        "neutral": "neutral",
+        "noNote": "No note"
+      },
+      "future": {
+        "title": "Time capsule",
+        "desc": "Leave yourself a message that the system will open when the date arrives.",
+        "titlePlaceholder": "Message title",
+        "contentPlaceholder": "What you need to remember when that moment comes.",
+        "saving": "Saving...",
+        "save": "Save capsule",
+        "unlockedTitle": "Unlocked messages",
+        "availableSummary": "Available now: {available}. Locked: {locked}.",
+        "empty": "No messages available yet. Create one for later.",
+        "available": "Available"
+      },
+      "footer": {
+        "diagnostic": {
+          "title": "Quick diagnostic",
+          "desc": "12 questions to figure out how to push you."
+        },
+        "challenge": {
+          "title": "Active challenge",
+          "desc": "Progress is measured in days completed, not pretty conversation."
+        },
+        "containment": {
+          "title": "Containment and continuity",
+          "desc": "The system keeps track without replacing professional help."
+        }
+      },
+      "errors": {
+        "loadDashboard": "Couldn't load Impulse Mode.",
+        "saveDiagnostic": "Couldn't save the diagnostic.",
+        "assignChallenges": "Couldn't assign challenges.",
+        "checkinEmpty": "Write your check-in before saving.",
+        "saveCheckin": "Couldn't save the check-in.",
+        "futureIncomplete": "Complete title, message, and unlock date.",
+        "saveFuture": "Couldn't save the future message."
+      },
+      "status": {
+        "profileAssigned": "Profile assigned: {title}. Now let's activate your challenges.",
+        "activeChallengesUpdated": "Active challenges updated.",
+        "checkinSaved": "Check-in saved. The system updated your streak and active challenges.",
+        "futureSaved": "Time capsule saved."
+      }
+    }
+  },
+  "community": {
+    "header": {
+      "title": "Community",
+      "subtitle": "Transformation circles"
+    },
+    "gate": {
+      "title": "Community is for those who already have an account",
+      "description": "Here you share wins, doubts, and real commitments. To protect those who write, you can only read and reply with a created account — you can try the mentor chat without signing up.",
+      "bullets": {
+        "victories": "Weekly wins",
+        "mutualHelp": "Mutual support between members",
+        "circles": "Circles of 5-8 people in your same phase",
+        "sessions": "Live sessions with professionals"
+      },
+      "createAccount": "Create free account",
+      "haveAccount": "I already have an account",
+      "notTriedQuestion": "Haven't tried it yet?",
+      "tryChatNoAccount": "Enter chat without an account"
+    },
+    "stats": {
+      "members": "Members",
+      "victoriesWeek": "Wins 7d",
+      "helpsWeek": "Helps 7d",
+      "activeCircles": "Active circles"
+    },
+    "confidentiality": "Safe space. What's shared here is confidential. Post anonymously if you prefer.",
+    "tabs": {
+      "today": {
+        "label": "Today",
+        "hint": "Daily round + your wins"
+      },
+      "circle": {
+        "label": "My Circle",
+        "hint": "Group of 5-8 in your same phase"
+      },
+      "questions": {
+        "label": "Mutual support",
+        "hint": "Ask for help or answer someone who needs it"
+      },
+      "coaches": {
+        "label": "Sessions",
+        "hint": "Meetings with professionals"
+      },
+      "spaces": {
+        "label": "Spaces",
+        "hint": "Themed rooms"
+      }
+    },
+    "cafeteria": {
+      "title": "The Cafeteria — today's round",
+      "description": "One question. Your answer first, then see how others live it.",
+      "enter": "Enter →"
+    },
+    "victories": {
+      "shareTitle": "Share a victory",
+      "placeholder": "Today I achieved...",
+      "loading": "Loading victories...",
+      "empty": "No victories yet. Be the first.",
+      "shared": "Victory shared"
+    },
+    "spaces": {
+      "emptyTitle": "No spaces open yet",
+      "emptyDescription": "Spaces are themed rooms (habits, decisions, relationships, work…) where everyone shares their step of the day. We'll open them as the community grows.",
+      "notifyMe": "Let me know when they open",
+      "postCount": "{count} posts",
+      "back": "← Back to spaces",
+      "shareReflection": "Share your reflection",
+      "feelingPlaceholder": "Today I feel...",
+      "blockerPlaceholder": "What holds me back is...",
+      "stepPlaceholder": "My step today is..."
+    },
+    "circle": {
+      "commitmentRegistered": "Commitment registered"
+    },
+    "questions": {
+      "filters": {
+        "community": "Asking for help",
+        "personal": "They wrote to you",
+        "mine": "I asked"
+      },
+      "chainContinues": {
+        "label": "The chain continues",
+        "message": "Someone else needs what you needed just now.",
+        "helpNow": "Help now",
+        "notNow": "Not now"
+      },
+      "askTitle": "Ask for help. Someone's been through something like this.",
+      "askDescription": "Your request is anonymous — nobody knows who's asking. Whoever answers can use their name or stay anonymous too. If you help someone down the line, the chain keeps going.",
+      "askPlaceholder": "Tell us what you're stuck on or what's on your mind right now…",
+      "charsAnonymous": "{count}/500 · Anonymous",
+      "askSuccess": "Request posted. Someone who's been through something similar will see it.",
+      "loading": "Loading…",
+      "empty": {
+        "mine": "You haven't asked the community for help yet.",
+        "personal": "Nobody's written to you directly yet.",
+        "community": "Nobody's asking for help right now. Check back soon to help someone."
+      },
+      "noAnswers": "No one's answered yet",
+      "oneHelped": "1 person helped",
+      "manyHelped": "{count} people helped",
+      "writtenToYou": "Written to you",
+      "answersFull": "Already got plenty of help",
+      "referredProfessional": "Referred to professional care",
+      "someoneWaiting": "Someone's waiting for help",
+      "crisisNotice": "This question shows signs of crisis. Community responses disabled. If you're in crisis, call <strong>988</strong>.",
+      "mostHelpful": "Most helpful",
+      "anonymous": "Anonymous",
+      "cantVoteOwn": "You can't vote on your own answer",
+      "helpedMeTitle": "Helped me",
+      "helpedMe": "helped me",
+      "answerPlaceholder": "What question would you ask?",
+      "answerPublished": "Answer published"
+    },
+    "guardian": {
+      "pedagogicalSuggestion": "Pedagogical suggestion",
+      "directAdviceHint": "Sounds like direct advice. What if you framed it as a question instead?",
+      "publishReformulated": "Publish reformulated",
+      "publishOriginal": "Publish original",
+      "prescriptiveNoAlt": "Your message sounds directive. We couldn't generate an alternative, but you can publish it if you think it's appropriate.",
+      "reviewing": "Reviewing...",
+      "reviewAndAnswer": "Review and answer",
+      "blockedFlagged": "Your message was flagged by our safety filter. If you think it's a false positive, you can publish it anyway or adjust the text.",
+      "blockedRateLimit": "You've done a lot of checks in a short time. You can publish anyway or wait a few minutes.",
+      "blockedReview": "We couldn't review your answer right now. You can publish anyway.",
+      "blockedNetwork": "There was an error reviewing your answer. You can publish anyway."
+    },
+    "coaches": {
+      "intro": "Group sessions with professionals. Open to the whole community or specific to your circle.",
+      "loading": "Loading sessions...",
+      "empty": "No sessions scheduled",
+      "emptyHint": "Sessions are announced via email and Telegram",
+      "roleCoach": "Coach",
+      "rolePsychologist": "Psychologist",
+      "live": "Live",
+      "minutes": "{min} min",
+      "openToAll": "Open to all",
+      "circleLabel": "Circle: {name}",
+      "joinNow": "Join now"
+    },
+    "posts": {
+      "published": "Published"
+    },
+    "actions": {
+      "share": "Share",
+      "publish": "Publish",
+      "publishAnyway": "Publish anyway",
+      "cancel": "Cancel",
+      "help": "Help",
+      "askHelp": "Ask for help"
+    },
+    "errors": {
+      "loadFailed": "Failed to load community",
+      "postFailed": "Failed to publish",
+      "network": "Network error",
+      "answerFailed": "Couldn't publish your answer",
+      "selfVoteForbidden": "You can't vote on your own answer."
+    }
+  },
+  "emergencyShelter": {
+    "trigger": "Too overwhelmed to type",
+    "ariaLabel": "Emergency calm space",
+    "phrase": "You're here. That's already something. Breathe.",
+    "callNow": "Call now",
+    "back": "Back to chat",
+    "close": "Close",
+    "breath": {
+      "inhale": "Inhale (4s)",
+      "hold": "Hold (7s)",
+      "exhale": "Exhale (8s)"
+    }
+  },
+  "incognito": {
+    "activeLabel": "Incognito mode",
+    "inactiveLabel": "Incognito mode",
+    "tooltipOn": "Incognito on — turn off (drafts will be remembered on this device again)",
+    "tooltipOff": "Turn on incognito — we won't remember anything on this device",
+    "bannerText": "Incognito mode · we're not saving drafts on this device"
+  },
+  "accessibility": {
+    "quietRead": "Quiet read",
+    "quietReadDesc": "Reduces vibrant colors and animations. For hard days.",
+    "bigCursor": "Large cursor",
+    "bigCursorDesc": "Larger, more visible cursor",
+    "close": "Close",
+    "closePanel": "Close accessibility panel",
+    "dialogLabel": "Accessibility options",
+    "dyslexiaFont": "Dyslexia font",
+    "dyslexiaFontDesc": "More legible typeface for dyslexia",
+    "highContrast": "High contrast",
+    "highContrastDesc": "Increases color contrast",
+    "highlightLinks": "Highlight links",
+    "highlightLinksDesc": "Underlines all links",
+    "increaseText": "Increase text size",
+    "openPanel": "Open accessibility panel",
+    "reduceMotion": "Reduce motion",
+    "reduceMotionDesc": "Disables animations and transitions",
+    "reduceText": "Decrease text size",
+    "resetAll": "Reset all",
+    "savedInBrowser": "Preferences are saved in your browser",
+    "sizeNormal": "Normal size",
+    "sizePlus": "Size +{level}",
+    "textSize": "Text size",
+    "textSizeLevel": "Text size level",
+    "textSpacing": "Text spacing",
+    "textSpacingDesc": "More space between letters and lines",
+    "title": "Accessibility",
+    "toToggle": "to toggle",
+    "triggerTooltip": "Accessibility: text size, contrast and motion"
+  },
+  "feedback": {
+    "message": {
+      "trigger": "This didn't help",
+      "modalTitle": "Why didn't it help?",
+      "modalSubtitle": "Optional. Helps us improve future responses.",
+      "placeholder": "For example: didn't understand what I said, felt impersonal, made me feel judged...",
+      "send": "Send",
+      "sending": "Sending…",
+      "cancel": "Cancel",
+      "close": "Close",
+      "alreadySent": "Feedback sent",
+      "errorRetry": "Failed to send. Try again.",
+      "disclosure": "We only store what you write here and a message ID. No name, no email."
+    }
+  },
+  "escalation": {
+    "ariaLabel": "Professional support suggestion",
+    "title": "This may need more than what I can offer here",
+    "ctaFindProfessional": "Find a therapist",
+    "dismiss": "Dismiss this notice",
+    "disclaimer": "We're not leaving you. You can keep talking here — we just want you to know there are people who hold this better than an AI.",
+    "reason": {
+      "trauma": "What you've shared sounds like deep trauma. That needs sustained human accompaniment, not a chat.",
+      "eating_disorder": "What you describe fits an eating disorder. That requires specialized professional intervention.",
+      "psychotic_symptoms": "What you describe (hearing voices, feeling watched) calls for psychiatric evaluation. Not something to resolve in chat.",
+      "active_addiction": "An active addiction calls for professional support and a network of real people. We can talk here, but it's not enough.",
+      "explicit_request": "You're right. Looking for a therapist is what fits here. Meanwhile I'm still here."
+    }
+  },
+  "mentorPrefs": {
+    "trigger": "Mentor",
+    "panelTitle": "How you want me to speak",
+    "close": "Close",
+    "reset": "Reset to default",
+    "disclosure": "These preferences are saved on this device and travel with each message to the mentor. They are not shared or linked to your account.",
+    "noInterpretation": {
+      "label": "Don't interpret me",
+      "description": "The mentor won't analyze or say 'what I hear is...'. Just listens and asks or suggests action."
+    },
+    "verbosity": {
+      "label": "Verbosity",
+      "minLabel": "Min",
+      "maxLabel": "Max",
+      "description": {
+        "1": "Minimum: 1-2 sentences per response.",
+        "2": "Low: 2-3 sentences per response.",
+        "3": "Default (4-6 sentences).",
+        "4": "High: longer responses (6-8 sentences).",
+        "5": "Maximum: long responses with multiple angles."
+      }
+    }
+  },
+  "dataSummary": {
+    "trigger": "My data",
+    "modalTitle": "What we know about you",
+    "modalSubtitle": "Only what's linked to this session. No third parties, no cross-trackers.",
+    "close": "Close",
+    "error": "Couldn't load your data right now.",
+    "retry": "Retry",
+    "manageDataLink": "Manage data",
+    "disclosure": "You can delete your account and all associated data from Settings.",
+    "identity": {
+      "anonymous": "Anonymous (no email)",
+      "unknown": "—"
+    },
+    "fields": {
+      "identity": "Identity",
+      "locale": "Language",
+      "ageRange": "Age",
+      "createdAt": "Here since",
+      "activity": "Activity",
+      "notProvided": "Not provided"
+    },
+    "activity": {
+      "conversations": "{n, plural, =0 {No conversations} one {1 conversation} other {# conversations}}",
+      "messages": "{n, plural, =0 {0 messages} one {1 message} other {# messages}}",
+      "activeGoal": "You have an active goal."
+    },
+    "export": {
+      "cta": "Download all my data (.md)",
+      "downloading": "Downloading…",
+      "done": "Downloaded",
+      "error": "Download failed"
+    },
+    "autoDelete": {
+      "label": "Delete my data if I don't return in 30 days",
+      "description": "If 30 days pass without opening the chat, we mark your account for deletion. If you come back sooner, it's cancelled automatically.",
+      "error": "Couldn't save. Try again."
+    }
+  },
+  "breathingModal": {
+    "trigger": "Breathe",
+    "ariaLabel": "Guided breathing space",
+    "title": "Breathe with me.",
+    "instruction": "Follow the circle. Inhale 4 seconds, hold 7, exhale 8. Stay for as many cycles as you need.",
+    "close": "Close",
+    "done": "Done, back to chat"
+  },
+  "fontSizeShortcuts": {
+    "levelDefault": "Size A (default)",
+    "levelPlus": "Size A+{n}"
+  },
+  "bookmarks": {
+    "addAria": "Save this message for later",
+    "addTooltip": "Save for later",
+    "removeAria": "Remove from saved",
+    "removeTooltip": "Remove from saved",
+    "listLabel": "{n, plural, one {Saved (1)} other {Saved (#)}}",
+    "listAria": "Open my saved messages ({n})",
+    "listTooltip": "{n} saved messages",
+    "modalTitle": "My saved messages",
+    "empty": "You haven't saved any messages yet. When something resonates, mark it with the 🔖 icon to come back later.",
+    "emptyContent": "(no content)",
+    "removeOneAria": "Remove this saved item",
+    "removeOneTooltip": "Remove",
+    "close": "Close",
+    "disclosure": "Your saved items are private. Only you see them."
+  },
+  "chatToolsMenu": {
+    "trigger": "More"
+  },
+  "footerLinks": {
+    "commitment": "Committed to emotional wellbeing through technology",
+    "copyright": "© {year} <domain>tresmilmillonesdelatidos.es</domain> — All rights reserved.",
+    "disclaimer": "Not a substitute for therapy or professional psychological intervention.",
+    "info": {
+      "about": "About us",
+      "changelog": "What's new",
+      "contact": "Contact",
+      "ethics": "Ethics and limits",
+      "forPros": "For professionals",
+      "privacy": "Privacy policy",
+      "terms": "Terms of service"
+    },
+    "infoHeading": "Information",
+    "product": {
+      "access": "Sign in",
+      "blog": "Blog",
+      "calculator": "Heartbeat calculator",
+      "challenge": "The 30-day challenge",
+      "compare": "Comparison",
+      "faq": "FAQ",
+      "guide": "User guide",
+      "join": "Join the challenge",
+      "method": "The method",
+      "pricing": "Pricing",
+      "resources": "Resources",
+      "test": "Free test",
+      "useCases": "Use cases"
+    },
+    "productHeading": "Product",
+    "tagline": "Every heartbeat is a choice. Three Billion Heartbeats exists so yours have real direction."
+  },
+  "sidebar": {
+    "actionsCompleted": "{done}/{total} actions completed.",
+    "actionsProgress": "{done}/{total} actions",
+    "active": "Active",
+    "activeGoal": "Active goal",
+    "adminAccess": "Admin access",
+    "adminPanel": "Admin panel",
+    "adminSession": "Operational session active.",
+    "availableCount": "{count} available",
+    "completeAssessment": "Complete assessment",
+    "conversations": "Conversations",
+    "conversationsDesc": "Recent activity and continuity.",
+    "copied": "Copied",
+    "copy": "Copy",
+    "delete": "Delete",
+    "deleteConfirm": "Delete conversation?",
+    "earnInvites": "Earn invites with your streak",
+    "emptyGoalHint": "Use the chat to define a focus and turn it into tracking here.",
+    "invitations": "Invitations",
+    "knowMethod": "Discover the method",
+    "logout": "Log out",
+    "markDone": "Mark as done",
+    "markPendingAgain": "Mark as pending again",
+    "messageCount": "{count} messages",
+    "moreInvites": "+{count} more — ",
+    "nav": {
+      "chat": {
+        "label": "Chat",
+        "req": "Always"
+      },
+      "checkin": {
+        "label": "Check-in",
+        "req": "Always"
+      },
+      "comunidad": {
+        "label": "Community",
+        "req": "Always"
+      },
+      "diario": {
+        "label": "Journal",
+        "req": "Day 7"
+      },
+      "impulso": {
+        "label": "Impulso 21d",
+        "req": "Day 21"
+      },
+      "logros": {
+        "label": "Achievements",
+        "req": "7-day streak"
+      },
+      "plan": {
+        "label": "Plan",
+        "req": "Day 3"
+      },
+      "respirar": {
+        "label": "Breathe",
+        "req": "3-day streak"
+      }
+    },
+    "newConversation": "New conversation",
+    "newCount": "{count} new",
+    "no": "No",
+    "noActiveGoal": "No active goal",
+    "noConversations": "No saved conversations yet.",
+    "noOpenDebt": "No open debt",
+    "noResults": "No results.",
+    "pendingAssessment": "Pending assessment",
+    "pendingAssessmentDesc": "Your professional has assigned you an assessment. Complete it so they can follow your progress.",
+    "pendingCount": "{count} pending",
+    "processProgress": "Process progress",
+    "processProgressDesc": "Visible continuity so the work doesn't depend on memory alone.",
+    "projectOf": "a project by <startidea>Startidea</startidea>",
+    "rename": "Rename",
+    "searchPlaceholder": "Search conversation...",
+    "settings": "Settings",
+    "share": "Share",
+    "streak30": "🏆 <strong>30-day streak</strong> → 1 more invite",
+    "streak7": "🔥 <strong>7-day streak</strong> → 1 invite",
+    "streakDays": "🔥 {count}-day streak",
+    "supportMessages": "Support messages",
+    "telegramDesc": "Talk to your mentor, get reminders and check in without opening the web.",
+    "telegramTitle": "Take me on Telegram",
+    "trend": "Trend: {value}",
+    "unlockedFeaturesAria": "{count} of {total} features unlocked",
+    "unlocksAt": "Unlocks at: {req}",
+    "viewAllInvitations": "View all invitations",
+    "workspace": "Workspace",
+    "workspaceDesc": "Conversations, continuity and quick access to the product.",
+    "yes": "Yes",
+    "yourPath": "Your path",
+    "yourPathTooltip": "Unlocked features: the path opens up as you use the app (streak, active days, etc.)"
+  }
+}

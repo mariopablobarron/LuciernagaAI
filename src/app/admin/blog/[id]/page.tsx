@@ -49,7 +49,7 @@ export default function BlogEditorPage({ params }: { params: Promise<{ id: strin
 
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
-  const [locale, setLocale] = useState<"es" | "en" | "pt" | "fr">("es");
+  const [locale, setLocale] = useState<"es" | "en" | "pt" | "fr" | "de">("es");
   const [excerpt, setExcerpt] = useState("");
   const [coverImage, setCoverImage] = useState("");
   const [tagsInput, setTagsInput] = useState("");

@@ -138,7 +138,7 @@ export function proxy(request: NextRequest) {
 
   // Redirigir /<locale>/anything → /anything (strip prefix). Las páginas
   // detrás de (public) consumen la cookie NEXT_LOCALE para traducir.
-  const localeMatch = pathname.match(/^\/(es|en|pt|fr)(\/.*)/);
+  const localeMatch = pathname.match(/^\/(es|en|pt|fr|de)(\/.*)/);
   if (localeMatch) {
     const url = request.nextUrl.clone();
     url.pathname = localeMatch[2];

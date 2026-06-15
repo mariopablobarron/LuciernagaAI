@@ -39,6 +39,12 @@ export async function generateMetadata({
       ogLocale: "fr_FR",
       url: "https://tresmilmillonesdelatidos.es/fr",
     },
+    de: {
+      name: "Drei Milliarden Herzschläge",
+      seoSuffix: "KI-Mentor auf Deutsch, anonym",
+      ogLocale: "de_DE",
+      url: "https://tresmilmillonesdelatidos.es/de",
+    },
   } as const;
 
   const norm = (locale === "" ? "es" : locale) as keyof typeof SITE_CONFIG;
@@ -61,6 +67,7 @@ export async function generateMetadata({
         en: SITE_CONFIG.en.url,
         pt: SITE_CONFIG.pt.url,
         fr: SITE_CONFIG.fr.url,
+        de: SITE_CONFIG.de.url,
       },
     },
     openGraph: {

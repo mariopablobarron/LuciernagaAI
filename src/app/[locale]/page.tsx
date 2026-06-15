@@ -82,7 +82,7 @@ export async function generateMetadata({
 }
 
 export function generateStaticParams() {
-  return [{ locale: "es" }, { locale: "en" }, { locale: "pt" }, { locale: "fr" }];
+  return [{ locale: "es" }, { locale: "en" }, { locale: "pt" }, { locale: "fr" }, { locale: "de" }];
 }
 
 export default async function LocaleLandingPage({

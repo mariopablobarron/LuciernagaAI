@@ -10,15 +10,27 @@
 //   pt: "Três Mil Milhões de Batidas" (PT-PT)
 //   fr: "Trois Milliards de Battements" (FR-FR)
 
+/**
+ * Idiomas con templates de email completamente traducidos. NO incluye "de"
+ * porque los 22 Records de templates abajo (welcome, nudge, weekly-letter,
+ * etc.) están sólo en 4 idiomas. La web sí soporta "de" — los emails para
+ * usuarios alemanes se sirven temporalmente en inglés hasta que se traduzcan
+ * las plantillas una por una. Ver pickEmailLocale().
+ */
 export type EmailLocale = "es" | "en" | "pt" | "fr";
 
 const SUPPORTED: readonly EmailLocale[] = ["es", "en", "pt", "fr"];
 
 /**
  * Normaliza una entrada (cookie/header/param) a un EmailLocale válido.
- * Si no es válido devuelve "es" (default histórico).
+ * - Si es uno de los 4 idiomas soportados, lo retorna.
+ * - "de" se mapea temporalmente a "en" hasta que existan plantillas en alemán.
+ *   Esto permite que la web acepte de como locale (messages/de.json) sin
+ *   romper el envío de emails a usuarios alemanes.
+ * - Cualquier otro valor → "es" (default histórico).
  */
 export function pickEmailLocale(value: string | null | undefined): EmailLocale {
+  if (value === "de") return "en"; // Fallback temporal para alemán
   if (value && (SUPPORTED as readonly string[]).includes(value)) {
     return value as EmailLocale;
   }

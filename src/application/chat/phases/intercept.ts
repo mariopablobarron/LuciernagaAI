@@ -104,7 +104,7 @@ export type InterceptInput = {
 
   // Locale activo del usuario — propagado a appendCaptureEmailPrompt para
   // que el "déjame tu email" salga en el idioma correcto, no siempre en ES.
-  locale?: "es" | "en" | "pt" | "fr";
+  locale?: "es" | "en" | "pt" | "fr" | "de";
 
   // Transitional void
   domainState: SystemState;

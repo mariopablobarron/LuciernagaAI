@@ -39,7 +39,7 @@ export interface ProcessMessageInput {
   countryCode?: string | null;
   /** Locale activo del usuario (es/en/pt/fr). Determina el idioma de respuesta
    *  del mentor y los recursos de crisis a sugerir. */
-  locale?: "es" | "en" | "pt" | "fr";
+  locale?: "es" | "en" | "pt" | "fr" | "de";
   /** Preferencias del usuario sobre estilo del mentor (no-interpretes, verbosity).
    *  Inyectadas como guidance al system prompt vía buildCoachPrompt. */
   mentorPrefs?: { noInterpretation?: boolean; verbosity?: number } | null;

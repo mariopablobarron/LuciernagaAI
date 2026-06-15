@@ -6,10 +6,11 @@ export const routing = defineRouting({
   //   - en: inglés (US/UK genérico)
   //   - pt: portugués de Portugal (PT-PT) — léxico, ortografía y crisis Portugal
   //   - fr: francés de Francia (FR-FR)
+  //   - de: alemán (Alemania) — Du-Form (informal), crisis Telefonseelsorge
   // Para añadir variantes regionales adicionales (pt-BR, fr-CA, etc.) habría que
   // refactorizar el matching plano y duplicar los archivos de mensajes.
-  locales: ["es", "en", "pt", "fr"],
+  locales: ["es", "en", "pt", "fr", "de"],
   defaultLocale: "es",
-  localePrefix: "as-needed", // / = Spanish. /en, /pt, /fr para los demás.
+  localePrefix: "as-needed", // / = Spanish. /en, /pt, /fr, /de para los demás.
   localeDetection: false, // Sin auto-redirect por idioma del navegador
 });

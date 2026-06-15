@@ -37,7 +37,7 @@ export type EscalationResult = {
   matches: string[];
 };
 
-type LocaleKey = "es" | "en" | "pt" | "fr";
+type LocaleKey = "es" | "en" | "pt" | "fr" | "de";
 
 // Patrones por idioma. Cada uno es una regex case-insensitive.
 // IMPORTANTE: solo añadir patrones MUY explícitos. La IA debe seguir
@@ -164,6 +164,36 @@ const PATTERNS: Record<LocaleKey, Record<Exclude<EscalationCategory, null>, RegE
       /\bje\s+veux\s+(aller\s+en\s+)?thérapie\b/i,
     ],
   },
+  de: {
+    trauma: [
+      /\b(ich\s+wurde\s+(vergewaltigt|missbraucht|geschlagen|misshandelt))\b/i,
+      /\b(sexuell|körperlich|seit\s+der\s+kindheit)er?\s+(missbrauch|misshandlung)\b/i,
+      /\b(gefoltert|entführt)\b/i,
+      /\b(trauma|ptbs|posttraumatisch)e?[snr]?\s+(schwer|tief|kindheits|komplex)/i,
+    ],
+    eating_disorder: [
+      /\b(anorexie|magersucht|bulimie|essstörung|binge[\s-]?eating)\b/i,
+      /\b(ich\s+esse\s+nicht|seit\s+\d+\s+(tagen|wochen)\s+nichts\s+gegessen)\b/i,
+      /\b(ich\s+übergebe\s+mich\s+nach\s+dem\s+essen)\b/i,
+      /\b(ich\s+hasse\s+meinen\s+körper|sehe\s+mich\s+dick\s+obwohl)\b/i,
+    ],
+    psychotic_symptoms: [
+      /\b(ich\s+höre\s+stimmen|die\s+stimmen\s+sagen\s+mir)\b/i,
+      /\b(man\s+(verfolgt|beobachtet|bespitzelt)\s+mich)\b/i,
+      /\b(sie\s+(kontrollieren|lesen)\s+meine\s+gedanken)\b/i,
+      /\b(halluzination|psychose|paranoia)\b/i,
+    ],
+    active_addiction: [
+      /\b(ich\s+kann\s+nicht\s+aufhören\s+zu\s+(trinken|konsumieren))\b/i,
+      /\b(ich\s+bin\s+(alkoholiker|drogenabhängig|süchtig))\b/i,
+      /\b(ich\s+trinke\s+(jeden\s+tag|täglich|ohne\s+pause))\b/i,
+    ],
+    explicit_request: [
+      /\b(ich\s+brauche\s+(einen\s+)?(psychologen|psychiater|therapeuten|therapie))\b/i,
+      /\b(du\s+reichst\s+nicht|das\s+übersteigt\s+mich)\b/i,
+      /\b(ich\s+will\s+(in\s+)?therapie)\b/i,
+    ],
+  },
 };
 
 /**
@@ -171,7 +201,7 @@ const PATTERNS: Record<LocaleKey, Record<Exclude<EscalationCategory, null>, RegE
  * o null. Para que dispare, requiere al menos 1 match de un patrón.
  */
 export function detectEscalation(text: string, locale: string): EscalationResult {
-  const loc = (["es", "en", "pt", "fr"].includes(locale) ? locale : "es") as LocaleKey;
+  const loc = (["es", "en", "pt", "fr", "de"].includes(locale) ? locale : "es") as LocaleKey;
   const trimmed = text.trim();
   if (!trimmed || trimmed.length < 10) {
     return { category: null, confidence: 0, matches: [] };

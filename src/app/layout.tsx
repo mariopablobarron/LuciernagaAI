@@ -184,9 +184,9 @@ const jsonLd = {
       ],
       provider: { "@id": "https://tresmilmillonesdelatidos.es/#organization" },
       author: { "@id": "https://tresmilmillonesdelatidos.es/#founder" },
-      inLanguage: ["es", "en", "pt", "fr"],
+      inLanguage: ["es", "en", "pt", "fr", "de"],
       description:
-        "Tres Mil Millones de Latidos es una plataforma de mentoría con inteligencia artificial. Detecta tu estado emocional y te guía a la acción concreta con microacciones de 10 minutos. Disponible en español, inglés, portugués y francés.",
+        "Tres Mil Millones de Latidos es una plataforma de mentoría con inteligencia artificial. Detecta tu estado emocional y te guía a la acción concreta con microacciones de 10 minutos. Disponible en español, inglés, portugués, francés y alemán.",
     },
     {
       "@type": "WebSite",

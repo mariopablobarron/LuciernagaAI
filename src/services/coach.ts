@@ -152,11 +152,12 @@ export type CoachContext = {
   audience?: {
     tier: "minor" | "adult" | "elder";
   } | null;
-  // Locale activo del usuario en la sesión (es/en/pt/fr). Determina:
+  // Locale activo del usuario en la sesión (es/en/pt/fr/de). Determina:
   //   - el idioma EN EL QUE responde el mentor (no se traduce desde español)
-  //   - los recursos de crisis a sugerir (024 ES, 988 EN/US, SNS 24 PT, 3114 FR)
+  //   - los recursos de crisis a sugerir (024 ES, 988 EN/US, SNS 24 PT,
+  //     3114 FR, 0800 111 0 111 DE)
   // Si null o ausente → se asume "es" (default histórico).
-  locale?: "es" | "en" | "pt" | "fr" | null;
+  locale?: "es" | "en" | "pt" | "fr" | "de" | null;
   // Último mensaje del usuario (el actual del turno). Se usa SOLO para
   // detectar modo "desahogo" — longitud > 200 chars o ≥2 párrafos →
   // inyecta guidance de extensión proporcional. NO se imprime en el prompt,
@@ -206,6 +207,14 @@ RESSOURCES DE CRISE (France) — invoque-les uniquement si tu détectes idéatio
 - 09 72 39 40 50 — SOS Amitié.
 - 15 / 112 — Urgences.
 N'utilise JAMAIS le numéro comme conclusion motivationnelle; donne-le seulement quand la conversation l'exige.`,
+
+    de: `ANTWORT-SPRACHE: Deutsch (Deutschland). Antworte IMMER auf Deutsch, unabhängig von der Eingabesprache des Nutzers. Du duzt den Nutzer (Du-Form), kein Sie. Wenn der Nutzer ausdrücklich eine andere Sprache verlangt, antwortest du auf Deutsch und fügst einen Satz hinzu: "Du kannst die Sprache im Auswahlmenü oben auf der Website ändern." Weigere dich NICHT zu sprechen und sage NICHT "ich arbeite besser auf Deutsch" — die Sprache wird vom Nutzer im Selector festgelegt, nicht von dir.
+
+KRISEN-RESSOURCEN (Deutschland) — rufe sie nur auf, wenn du Suizidgedanken, Selbstverletzung oder akute Gefährdung erkennst (nicht bei allgemeinem Unwohlsein):
+- 0800 111 0 111 oder 0800 111 0 222 — Telefonseelsorge (24/7, kostenfrei, anonym).
+- 112 — Notruf.
+- Nummer gegen Kummer für Jugendliche: 116 111 (Mo-Sa 14-20 Uhr).
+Verwende die Nummer NIEMALS als motivierenden Abschluss; nenne sie nur, wenn das Gespräch es wirklich erfordert.`,
   };
 
   return blocks[norm];
@@ -231,6 +240,7 @@ function buildLocaleReminder(locale: CoachContext["locale"] | undefined): string
     en: "FINAL NON-NEGOTIABLE REMINDER: write your entire reply in English. It does not matter what language the user wrote in — you reply in English.",
     pt: "LEMBRETE FINAL E INEGOCIÁVEL: escreve a tua resposta INTEIRAMENTE em português de Portugal (pt-PT, com \"tu\" e ênclise). Não importa em que idioma o utilizador escreveu — respondes em português.",
     fr: "RAPPEL FINAL ET NON NÉGOCIABLE: rédige toute ta réponse en français de France (avec le tutoiement). Peu importe la langue dans laquelle l'utilisateur a écrit — tu réponds en français.",
+    de: "FINALE NICHT VERHANDELBARE ERINNERUNG: schreibe deine gesamte Antwort auf Deutsch (Du-Form). Egal in welcher Sprache der Nutzer geschrieben hat — du antwortest auf Deutsch.",
   };
   return reminders[norm];
 }
@@ -821,10 +831,10 @@ ${localeReminder}`;
 }
 
 /** Locales soportados — mismos que i18n del producto. */
-export type CoachLocale = "es" | "en" | "pt" | "fr";
+export type CoachLocale = "es" | "en" | "pt" | "fr" | "de";
 
 function coachLocale(input: unknown): CoachLocale {
-  return (["es", "en", "pt", "fr"].includes(input as string) ? input : "es") as CoachLocale;
+  return (["es", "en", "pt", "fr", "de"].includes(input as string) ? input : "es") as CoachLocale;
 }
 
 export function buildFallbackResponse(state?: UserState, locale?: unknown): string {
@@ -857,6 +867,13 @@ export function buildFallbackResponse(state?: UserState, locale?: unknown): stri
       duda: "Je comprends l'incertitude. Mettons de l'ordre : quelles sont les deux options que tu vois ?",
       claridad: "Tu as de la clarté — profitons-en. Quel est le pas le plus concret que tu peux faire aujourd'hui ?",
       default: "Restons simples. Dis-moi ce que tu évites maintenant et transformons-le en un pas concret pour aujourd'hui.",
+    },
+    de: {
+      bloqueo: "Da hängt etwas fest. Sag mir eines: was schiebst du gerade vor dir her, und warum?",
+      ansiedad: "Atme. Eins nach dem anderen. Was setzt dich gerade am meisten unter Druck?",
+      duda: "Ich verstehe die Unsicherheit. Bringen wir Ordnung rein: welche zwei Optionen siehst du?",
+      claridad: "Du hast Klarheit — nutzen wir das. Was ist der konkreteste Schritt, den du heute machen kannst?",
+      default: "Halten wir es einfach. Sag mir, was du gerade vermeidest, und wir machen daraus einen konkreten Schritt für heute.",
     },
   };
   const table = variants[loc];
@@ -1063,6 +1080,10 @@ export function buildActionRequiredMessage(params: {
       (a) => `Quelque chose d'avant est encore ouvert : ${a}. Qu'est-ce que tu préfères — tu l'as fait, tu le reprends maintenant, tu le mets de côté, ou on le ferme car ce n'est plus d'actualité ?`,
       (a) => `Avant de continuer, ${a} reste en suspens. Tu le reprends aujourd'hui, tu le mets de côté, ou on le clôt ?`,
     ],
+    de: [
+      (a) => `Da ist noch etwas offen von vorher: ${a}. Was passt dir — hast du es schon erledigt, nimmst du es jetzt wieder auf, schiebst du es nach hinten oder schließen wir es, weil es nicht mehr passt?`,
+      (a) => `Bevor wir weitermachen, ${a} steht noch im Raum. Nimmst du es heute wieder auf, lässt du es liegen, oder schließen wir es ab?`,
+    ],
   };
   const confrontVariants: Record<CoachLocale, Array<(a: string) => string>> = {
     es: [
@@ -1081,6 +1102,10 @@ export function buildActionRequiredMessage(params: {
       (a) => `On a laissé ${a} à mi-chemin. Tu l'as fait, tu le reprends aujourd'hui, tu le mets de côté, ou on le ferme ?`,
       (a) => `${a} est resté inachevé. Aujourd'hui tu choisis : fait, repris, mis de côté ou clôturé.`,
     ],
+    de: [
+      (a) => `${a} ist auf halber Strecke liegengeblieben. Hast du es schon gemacht, nimmst du es heute wieder auf, schiebst du es nach hinten oder schließen wir es?`,
+      (a) => `${a} blieb unerledigt. Heute entscheidest du: erledigt, wieder aufgenommen, zurückgestellt oder abgeschlossen.`,
+    ],
   };
   const soft: Record<CoachLocale, Array<(a: string) => string>> = {
     es: [
@@ -1098,6 +1123,10 @@ export function buildActionRequiredMessage(params: {
     fr: [
       (a) => `${a} est resté ouvert. Dis-moi si tu l'as fait, si tu le reprends, si tu le mets de côté ou si on le ferme — et on continue où tu veux.`,
       (a) => `${a} reste ouvert. Dis-moi où ça en est — fait, en pause, mis de côté ou clos — et on avance.`,
+    ],
+    de: [
+      (a) => `${a} ist noch offen. Sag mir, ob du es schon gemacht hast, ob du es wieder aufnimmst, ob du es liegen lässt oder ob wir es schließen — und wir gehen weiter, wohin du willst.`,
+      (a) => `${a} ist weiterhin offen. Sag mir, wie es steht — erledigt, pausiert, zurückgestellt oder abgeschlossen — und wir machen weiter.`,
     ],
   };
 
@@ -1122,6 +1151,7 @@ export function captureEmailPrompt(locale?: unknown): string {
     en: "If you want to pick this up another day right where we left off, give me your email and I'll save it for you.",
     pt: "Se quiseres retomar isto outro dia exatamente onde ficámos, deixa-me o teu email e eu guardo-o.",
     fr: "Si tu veux reprendre cela un autre jour, exactement où on s'est arrêté, donne-moi ton email et je le garde.",
+    de: "Wenn du das an einem anderen Tag genau dort wieder aufnehmen willst, wo wir aufgehört haben, gib mir deine E-Mail und ich speichere es für dich.",
   }[loc];
 }
 
@@ -1136,6 +1166,7 @@ export function paywallMessage(locale?: unknown): string {
     en: "It's not a lack of clarity. It's that this only holds when you come back tomorrow, and the next day. If you want me to walk that continuity with you, I'll tell you how we keep going.\n\nDo you want to sustain this progress with real continuity?",
     pt: "Não é falta de clareza. É que isto sustenta-se quando voltas amanhã, e no dia seguinte. Se quiseres que te acompanhe com essa continuidade, conto-te como seguimos.\n\nQueres sustentar este avanço com continuidade real?",
     fr: "Ce n'est pas un manque de clarté. C'est que cela ne tient que quand tu reviens demain, et le jour suivant. Si tu veux que je t'accompagne avec cette continuité, je te dis comment on continue.\n\nVeux-tu soutenir ce progrès avec une continuité réelle ?",
+    de: "Es ist kein Mangel an Klarheit. Es trägt sich nur, wenn du morgen wiederkommst, und übermorgen. Wenn ich dich mit dieser Stetigkeit begleiten soll, sage ich dir, wie wir weitermachen.\n\nWillst du diesen Fortschritt mit echter Stetigkeit halten?",
   }[loc];
 }
 
@@ -1156,6 +1187,7 @@ export function appendConversionPrompt(response: string, conversionTrigger: bool
     en: "What you just defined matters. If you want, I'll save it so it doesn't get lost in the noise of the day. Shall I save it?",
     pt: "Isto que acabaste de definir é importante. Se quiseres, guardo-o para que não se perca no ruído do dia. Guardo-o?",
     fr: "Ce que tu viens de définir compte. Si tu veux, je le garde pour qu'il ne se perde pas dans le bruit du jour. Je le garde ?",
+    de: "Was du gerade festgehalten hast, ist wichtig. Wenn du willst, speichere ich es, damit es nicht im Tageslärm untergeht. Soll ich es speichern?",
   };
   return `${response}\n\n${prompts[loc]}`;
 }

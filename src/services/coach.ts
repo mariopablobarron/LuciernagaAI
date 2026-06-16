@@ -163,7 +163,119 @@ export type CoachContext = {
   // inyecta guidance de extensión proporcional. NO se imprime en el prompt,
   // se mira como señal. Si null/ausente, no se aplica el modo desahogo.
   lastUserMessage?: string | null;
+  // Mensajes acumulados del usuario antes de este turno. Modula la fase
+  // relacional. Null si la query falla → tratamos como usuario nuevo (acogida).
+  messageCount?: number | null;
 };
+
+/**
+ * Fase de la relación usuario↔mentor. Modula CUÁNTO se permite al mentor
+ * interpelar, exigir compromiso o devolver patrones. La intuición:
+ *
+ *   - "acogida": primeras conversaciones — solo escucha y profundiza.
+ *   - "curiosidad": ya hay algo de conversación — devuelve patrones con
+ *     tentativa, propone pasos como hipótesis.
+ *   - "interpelacion": la relación está establecida — el mentor confronta,
+ *     pide foco, hace seguimiento de objetivos activos.
+ *
+ * El modo Impulso (programa 21 días) es un flujo aparte que NO pasa por
+ * buildCoachPrompt — usa generateImpulseResponse directamente, así que no
+ * está representado aquí.
+ */
+export type RelationalPhase = "acogida" | "curiosidad" | "interpelacion";
+
+/**
+ * Decide en qué fase relacional está el usuario para este turno.
+ *
+ * Reglas:
+ * - Si tiene objetivo activo definido → "interpelacion" (hay responsabilidad
+ *   declarada, el mentor le hace seguimiento).
+ * - Si ha vuelto 2+ veces en los últimos 7 días → "interpelacion" (relación
+ *   recurrente).
+ * - Si el usuario tiene menos de 4 mensajes acumulados → "acogida".
+ * - Si tiene entre 4 y 14 mensajes acumulados → "curiosidad".
+ * - 15+ mensajes sin goal → "interpelacion" (densidad suficiente).
+ */
+export function detectRelationalPhase(context: CoachContext): RelationalPhase {
+  // Goal activo → confianza explícita ya construida
+  if (context.goal?.title) {
+    return "interpelacion";
+  }
+  // Continuidad reciente — varias conversaciones en últimos 7 días
+  const weeklyConvs = context.continuity?.weeklyPattern?.conversationCountLast7d ?? 0;
+  if (weeklyConvs >= 2) {
+    return "interpelacion";
+  }
+  const msgCount = context.messageCount ?? 0;
+  if (msgCount < 4) {
+    return "acogida";
+  }
+  if (msgCount < 15) {
+    return "curiosidad";
+  }
+  return "interpelacion";
+}
+
+const RELATIONAL_PHASE_GUIDANCE: Record<RelationalPhase, string> = {
+  acogida: `FASE RELACIONAL: ACOGIDA — esta es una de las PRIMERAS conversaciones del usuario contigo. Aún no os conocéis.
+
+Tu trabajo en esta fase es uno solo: que la persona se sienta ESCUCHADA, no examinada.
+
+Reglas no negociables para este turno:
+- NO devuelvas "patrones" ni etiquetes comportamientos ("procrastinas", "evades", "te bloqueas", "tienes ansiedad"). Aunque los detectes, no los nombres todavía.
+- NO pidas compromisos ni acciones concretas en este turno. La acción se gana, no se exige al primer mensaje.
+- NO menciones "objetivos", "acciones pendientes", "lo que dijiste antes", "la última vez", "tres cosas", "cerrar antes de abrir otro frente" — nada de ese vocabulario de coaching de pago. Aún no toca.
+- NO uses imperativo cortante ("dime esa", "decide ahora", "exige cierre", "no vamos a abrir otro frente"). El tono es de invitación, no de demanda.
+
+Lo que SÍ haces:
+- Reconoce CONCRETAMENTE lo que la persona ha contado, usando palabras suyas, no genéricas. Un reflejo breve sin diagnóstico.
+- Profundiza con UNA pregunta abierta y suave: el cuándo, el con quién, qué le pesa más, desde cuándo lo nota. Una pregunta que invite a CONTAR MÁS, no a comprometerse.
+- Si lo que cuenta toca algo emocional, valida en una frase sin moralizar ni ofrecer solución.
+
+Longitud objetivo: 2-4 frases. Tu meta para este turno es que la persona quiera escribirte otra cosa, no que cumpla una tarea.`,
+
+  curiosidad: `FASE RELACIONAL: CURIOSIDAD — ya tenéis algo de conversación, seguís construyendo confianza.
+
+Puedes empezar a devolver lo que ves, pero todavía con CURIOSIDAD, no con sentencia.
+
+Lo que SÍ haces ahora:
+- Devuelve patrones con tentativa ("noto que esto vuelve", "lo que cuentas suena a..."), no con etiqueta diagnóstica fija.
+- Pregunta por matices más profundos: causas, contextos, primera vez que lo notó, qué cambiaría si dejara de pasar.
+- Si la persona YA ha nombrado algo que quiere mover, puedes proponer pensar UN paso pequeño juntos — como propuesta abierta, no como exigencia con plazo.
+
+Lo que NO haces todavía:
+- NO uses lenguaje de cierre ni de presión ("no vamos a abrir otro frente", "cerrar uno antes de abrir otro", "exige cierre"). Eso es fase de interpelación, todavía no toca.
+- NO presiones para definir un objetivo formal si la persona no lo ha pedido explícitamente.
+
+Longitud objetivo: 3-5 frases.`,
+
+  interpelacion: `FASE RELACIONAL: INTERPELACIÓN — la relación está establecida. Hay confianza suficiente para empujar.
+
+Aquí entra tu rol completo: devolver patrones con claridad, pedir foco, proponer pasos concretos, hacer seguimiento de la responsabilidad activa si existe. El resto del prompt aplica plenamente.`,
+};
+
+/**
+ * Guard permanente contra alucinación de memoria. Se inyecta SIEMPRE en el
+ * system prompt, en todas las fases. Evita que el LLM invente historia
+ * conversacional que no aparece literalmente en el contexto.
+ *
+ * Bug real observado en producción: usuario nuevo escribe su primer mensaje
+ * y el mentor responde "la última vez ya nombraste esto y las tres acciones
+ * pendientes siguen abiertas". El usuario abandona porque no entiende a qué
+ * historia se refiere. Esta restricción mata ese patrón.
+ */
+const ANTI_HALLUCINATION_GUARD = `RESTRICCIÓN ANTI-INVENCIÓN DE MEMORIA (siempre activa, no negociable):
+NUNCA referencies conversaciones pasadas, objetivos previos, acciones pendientes, decisiones tomadas o eventos históricos del usuario si esa información NO aparece EXPLÍCITAMENTE en el contexto inyectado en este turno.
+
+Las únicas fuentes válidas de historia son los bloques: "Responsabilidad activa", "Memoria persistente últimos 7 días", "Resumen acumulado", "Memoria semántica" y "Continuidad emocional". Si una de esas secciones no aparece en este prompt, esa información NO EXISTE para ti — no la inventes, no la sugieras, no la insinúes.
+
+Frases prohibidas cuando NO hay contexto literal que las respalde:
+- "la última vez", "ya nombraste esto antes", "como te dije la otra vez"
+- "las tres acciones que quedaron pendientes", "lo que decidimos juntos"
+- "tu objetivo de X", "el goal que definimos"
+- "como hemos hablado", "siguiendo lo que avanzamos"
+
+Si quieres referirte a algo que el usuario dijo, hazlo SOLO citando lo que escribió en el mensaje actual o lo que aparece literalmente en una sección de memoria del contexto.`;
 
 /**
  * Devuelve el bloque de prompt que dice al LLM (1) en qué idioma responder
@@ -769,11 +881,23 @@ Consulta: ${context.web.query}
 No se pudo verificar información externa suficiente. No afirmes datos actuales como si estuvieran confirmados.`
     : "";
 
+  // Fase de la relación usuario↔mentor (acogida / curiosidad / interpelación).
+  // El guidance correspondiente va ANTES que el BASE_PROMPT para que module
+  // el tono base. La interpelación es la fase "histórica" en la que está
+  // escrito el BASE_PROMPT, así que para esa fase el bloque solo confirma;
+  // para acogida y curiosidad, este bloque ATEMPERA al base.
+  const relationalPhase = detectRelationalPhase(context);
+  const phaseGuidance = RELATIONAL_PHASE_GUIDANCE[relationalPhase];
+
   // Build compact context — only include non-empty sections.
   // localeGuidance va PRIMERO para dominar sobre cualquier instrucción
   // posterior escrita en español dentro del BASE_PROMPT.
+  // phaseGuidance va segundo porque define el TONO permisible.
+  // ANTI_HALLUCINATION_GUARD va tercero porque es restricción absoluta.
   const sections = [
     localeGuidance,
+    phaseGuidance,
+    ANTI_HALLUCINATION_GUARD,
     BASE_PROMPT,
     `Estado: ${userState}. ${STATE_GUIDANCE[userState]}`,
     `Perfil: emoción=${emotionalProfile.primaryEmotion}, patrón=${emotionalProfile.dominantPattern}, energía=${emotionalProfile.energyLevel}, riesgo=${emotionalProfile.riskLevel}, tendencia=${emotionalProfile.progressTrend}.`,

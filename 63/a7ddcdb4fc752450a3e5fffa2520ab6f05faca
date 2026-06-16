@@ -1,0 +1,26 @@
+src/application/chat/phases/context.ts
+  s_c72d0ada98a9af::t_072bb9af4962ef 246
+  s_c72d0ada98a9af::t_84fb6c5cbabcd4 139,144,157-161
+src/services/coach.ts
+  s_c72d0ada98a9af::t_e5934a7c507c88 773-780,784-785,788-789
+  s_c72d0ada98a9af::t_7dafc4fe5e34a8 151-153,156-263
+src/services/coach.test.ts
+  s_c72d0ada98a9af::t_ecf56a933e5fbd 99-187
+  s_c72d0ada98a9af::t_e9125b782c29ec 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "63a7ddcdb4fc752450a3e5fffa2520ab6f05faca",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

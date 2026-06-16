@@ -2,6 +2,7 @@ import {
   buildActionRequiredMessage,
   buildCoachPrompt,
   buildFallbackResponse,
+  detectRelationalPhase,
   finalizeResponse,
 } from "@/services/coach";
 
@@ -92,6 +93,95 @@ describe("coach prompt identity", () => {
     expect(buildFallbackResponse("ansiedad")).toContain("presiona");
     expect(buildFallbackResponse("duda")).toContain("opciones");
     expect(buildFallbackResponse("claridad")).toContain("paso más concreto");
+  });
+});
+
+describe("detectRelationalPhase", () => {
+  it("usuario nuevo (0-3 mensajes, sin goal) → acogida", () => {
+    expect(detectRelationalPhase({ messageCount: 0 })).toBe("acogida");
+    expect(detectRelationalPhase({ messageCount: 1 })).toBe("acogida");
+    expect(detectRelationalPhase({ messageCount: 3 })).toBe("acogida");
+  });
+
+  it("usuario sin messageCount conocido → acogida (preferir blando)", () => {
+    expect(detectRelationalPhase({})).toBe("acogida");
+    expect(detectRelationalPhase({ messageCount: null })).toBe("acogida");
+  });
+
+  it("usuario 4-14 mensajes sin goal → curiosidad", () => {
+    expect(detectRelationalPhase({ messageCount: 4 })).toBe("curiosidad");
+    expect(detectRelationalPhase({ messageCount: 10 })).toBe("curiosidad");
+    expect(detectRelationalPhase({ messageCount: 14 })).toBe("curiosidad");
+  });
+
+  it("usuario 15+ mensajes sin goal → interpelacion", () => {
+    expect(detectRelationalPhase({ messageCount: 15 })).toBe("interpelacion");
+    expect(detectRelationalPhase({ messageCount: 50 })).toBe("interpelacion");
+  });
+
+  it("usuario con goal activo → interpelacion (aunque sea primer turno)", () => {
+    expect(
+      detectRelationalPhase({
+        messageCount: 1,
+        goal: {
+          title: "Cerrar contrato pendiente",
+          progress: 0,
+          pendingActions: [],
+          activeAction: null,
+          avoidanceDetected: false,
+          avoidanceCount: 0,
+          unfinishedActionsCount: 0,
+          confrontationMode: false,
+        },
+      }),
+    ).toBe("interpelacion");
+  });
+
+  it("usuario con varias conversaciones recientes → interpelacion", () => {
+    expect(
+      detectRelationalPhase({
+        messageCount: 2,
+        continuity: {
+          lastGoal: null,
+          pendingActions: [],
+          emotionalState: "neutral",
+          summary: "",
+          weeklyPattern: {
+            daysSinceLastSession: 2,
+            dominantStateLast7d: "bloqueo",
+            avoidanceCountLast7d: 0,
+            crisisEventsLast7d: 0,
+            conversationCountLast7d: 3,
+          },
+        },
+      }),
+    ).toBe("interpelacion");
+  });
+});
+
+describe("buildCoachPrompt — fase relacional + anti-alucinación", () => {
+  it("acogida: bloquea vocabulario de coaching duro", () => {
+    const prompt = buildCoachPrompt("bloqueo", undefined, { messageCount: 1 });
+    expect(prompt).toContain("FASE RELACIONAL: ACOGIDA");
+    expect(prompt).toContain("se sienta ESCUCHADA, no examinada");
+    expect(prompt).toContain("NO pidas compromisos");
+    expect(prompt).toContain("NO menciones");
+    expect(prompt).toContain("RESTRICCIÓN ANTI-INVENCIÓN DE MEMORIA");
+  });
+
+  it("interpelacion: activa rol completo del mentor", () => {
+    const prompt = buildCoachPrompt("bloqueo", undefined, { messageCount: 30 });
+    expect(prompt).toContain("FASE RELACIONAL: INTERPELACIÓN");
+    expect(prompt).toContain("confianza suficiente para empujar");
+  });
+
+  it("guard anti-alucinación se inyecta en TODAS las fases", () => {
+    for (const msgCount of [0, 5, 100]) {
+      const prompt = buildCoachPrompt("neutral", undefined, { messageCount: msgCount });
+      expect(prompt).toContain("RESTRICCIÓN ANTI-INVENCIÓN DE MEMORIA");
+      expect(prompt).toContain('NUNCA referencies conversaciones pasadas');
+      expect(prompt).toContain('"la última vez"');
+    }
   });
 });
 

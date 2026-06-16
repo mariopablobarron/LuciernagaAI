@@ -136,12 +136,12 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
         return null;
       }
     })(),
-    (async (): Promise<{ ageRange: string | null } | null> => {
+    (async (): Promise<{ ageRange: string | null; messageCount: number } | null> => {
       try {
         const client = getPrismaClient();
         return await client.user.findUnique({
           where: { id: userId },
-          select: { ageRange: true },
+          select: { ageRange: true, messageCount: true },
         });
       } catch {
         return null;
@@ -153,6 +153,12 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
   const audienceTier = userAge?.ageRange && isAgeRange(userAge.ageRange)
     ? rangeToTier(userAge.ageRange)
     : null;
+
+  // Mensajes acumulados del usuario antes de este turno. Modula la fase
+  // relacional (acogida → curiosidad → interpelación) en coach.ts.
+  // Si la query falla, dejamos null y coach.ts lo trata como usuario nuevo
+  // (fase acogida) — preferimos pecar de blando que de exigente.
+  const userMessageCount = userAge?.messageCount ?? null;
 
   // Forma gramatical preferida (feminine | masculine | neutral | null).
   // null/desconocido se trata como "neutral" en el coach prompt.
@@ -237,6 +243,7 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
         }
       : null,
     audience: audienceTier ? { tier: audienceTier } : null,
+    messageCount: userMessageCount,
   };
 
   logInfo("AI", "openrouter_call_requested", {

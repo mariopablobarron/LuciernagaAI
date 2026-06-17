@@ -1,0 +1,21 @@
+src/services/input-quality.ts
+  s_d2308f25c4747c::t_39fe952b21b7d3 122,147-151
+  s_d2308f25c4747c::t_23ef59d936eb0c 83-84,86-97,99
+  s_d2308f25c4747c::t_182e538f673453 162,165,169-170
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "0731af0adf3f96571d5381659ad66e81d2ae17cb",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

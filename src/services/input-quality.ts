@@ -80,16 +80,23 @@ export function assessInputQuality(raw: string): InputQuality {
   }
 
   // 2. Baja diversidad de caracteres (gibberish basado en repetición).
-  //    En vez de "max repeated char / total" (falla con 'mañana' que
-  //    legítimamente tiene 'a' 3/6 = 50%), usamos diversidad: cuántos
-  //    chars UNIQUE hay vs el total. Texto humano tiene diversidad
-  //    naturalmente alta (~0.6+); gibberish la tiene baja.
+  //    Heurística: chars UNIQUE / total. Texto humano corto tiene
+  //    diversidad alta; gibberish la tiene baja.
   //
-  //    Solo aplicamos en strings ≥7 chars — palabras cortas legítimas
-  //    como "papa" o "abeja" pueden tener baja diversidad sin ser
-  //    gibberish.
+  //    CRÍTICO: el alfabeto es FINITO (~26 letras + acentos). Para
+  //    mensajes largos legítimos, la diversidad ABSOLUTA cae naturalmente
+  //    porque las letras se repiten. Un texto de 100 chars con 28 únicos
+  //    da 0.28 — debajo de cualquier threshold fijo.
+  //
+  //    Fix incidente 2026-06-19 (auditoría externa reveló que mensajes
+  //    emocionales reales de 100-300 chars se marcaban como gibberish y
+  //    nunca llegaban al LLM, recibían fallback scripted):
+  //    - SOLO aplicamos esta heurística a strings ENTRE 7 y 40 chars.
+  //    - Para >40 chars confiamos en que es texto real. Si fuera
+  //      gibberish largo (raro), las otras heurísticas (vocales,
+  //      WORD_RE) lo cazarían antes.
   const nospace = trimmed.replace(/\s/g, "").toLowerCase();
-  if (nospace.length >= 7) {
+  if (nospace.length >= 7 && nospace.length <= 40) {
     const unique = new Set(nospace).size;
     const diversity = unique / nospace.length;
     if (diversity < 0.3) {
@@ -112,7 +119,7 @@ export function assessInputQuality(raw: string): InputQuality {
  * Rotación pseudo-aleatoria basada en un seed estable (idx del turno)
  * para que el usuario nunca vea la misma respuesta 2 veces seguidas.
  */
-const AMBIGUOUS_INPUT_PROMPTS: Record<"es" | "en" | "pt" | "fr", string[]> = {
+const AMBIGUOUS_INPUT_PROMPTS: Record<"es" | "en" | "pt" | "fr" | "de", string[]> = {
   es: [
     "No me has dado mucho con lo que trabajar. Cuéntame algo concreto: ¿qué hay en tu cabeza ahora?",
     "Necesito algo más para ayudarte. ¿Qué te ha hecho abrir el chat hoy?",
@@ -137,6 +144,12 @@ const AMBIGUOUS_INPUT_PROMPTS: Record<"es" | "en" | "pt" | "fr", string[]> = {
     "Commence par une phrase entière, même maladroite. Qu'est-ce qui te pèse le plus en ce moment ?",
     "Donne-moi un peu plus. Un mot ne suffit pas. Qu'est-ce que tu veux regarder aujourd'hui ?",
   ],
+  de: [
+    "Damit kann ich noch nicht viel anfangen. Erzähl mir etwas Konkretes: was geht dir gerade durch den Kopf?",
+    "Ich brauche etwas mehr, um dir helfen zu können. Was hat dich heute hier hergebracht?",
+    "Fang mit einem ganzen Satz an, auch wenn er holprig ist. Was wiegt gerade am schwersten?",
+    "Gib mir noch etwas mehr. Ein Wort reicht nicht. Was möchtest du heute anschauen?",
+  ],
 };
 
 /**
@@ -146,14 +159,15 @@ const AMBIGUOUS_INPUT_PROMPTS: Record<"es" | "en" | "pt" | "fr", string[]> = {
  * garantizar rotación entre turnos.
  */
 export function buildAmbiguousInputResponse(
-  locale: "es" | "en" | "pt" | "fr" | string,
+  locale: "es" | "en" | "pt" | "fr" | "de" | string,
   turnIndex: number,
 ): string {
-  const safeLocale = (["es", "en", "pt", "fr"].includes(locale) ? locale : "es") as
+  const safeLocale = (["es", "en", "pt", "fr", "de"].includes(locale) ? locale : "es") as
     | "es"
     | "en"
     | "pt"
-    | "fr";
+    | "fr"
+    | "de";
   const variants = AMBIGUOUS_INPUT_PROMPTS[safeLocale];
   const idx = ((turnIndex % variants.length) + variants.length) % variants.length;
   return variants[idx];

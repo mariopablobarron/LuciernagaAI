@@ -1,0 +1,19 @@
+src/components/home/ChatDemo.tsx
+  s_d2308f25c4747c::t_a643397b1f4d77 3,8-34,36-37,39-53,55-61,63-69,71,73-75,78-79,93,97-102,104-108,111-112,116,118-123,125-134,136
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "53fcff747dbd8920789be3e90ad2439244bca28c",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

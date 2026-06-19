@@ -29,15 +29,19 @@ COPY public ./public
 COPY messages ./messages
 
 # Build Next.js app
-# NODE_OPTIONS: cap heap del proceso de build en 4GB. Sin este límite,
-# Next.js puede inflar memoria descontroladamente durante el bundling
-# y disparar OOM del kernel — el mismo incidente que tumbó merch-db el
-# 2026-05-16 (build sin cap → OOM → WAL Postgres corrupto).
-# Mentor-web requiere MÁS heap que merch (2GB es insuficiente: OOM
-# probado el 2026-05-17 commit 94ab03d). 4GB cubre el bundling actual
-# con margen para crecimiento. VPS tiene 15GB total.
+# NODE_OPTIONS: cap heap del proceso de build. Sin este límite, Next.js
+# puede inflar memoria descontroladamente durante el bundling y disparar
+# OOM del kernel — el mismo incidente que tumbó merch-db el 2026-05-16
+# (build sin cap → OOM → WAL Postgres corrupto).
+# Mentor-web requiere MÁS heap que merch:
+#   - 2026-05-17 commit 94ab03d: 2GB insuficiente, OOM.
+#   - 4GB funcionó hasta junio 2026.
+#   - 2026-06-19: build OOM exit 137 con 4GB (Killed). El proyecto
+#     creció (más rutas, más chunks, turbopack). Subido a 6GB con margen.
+# VPS tiene 32GB total; 6GB sigue siendo seguro frente al runtime de otros
+# containers (telar, raizyaccion, hub, etc.).
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_OPTIONS="--max-old-space-size=4096"
+ENV NODE_OPTIONS="--max-old-space-size=6144"
 RUN npm run build
 
 # ============================================

@@ -161,6 +161,17 @@ export default function HomePage() {
   const t = useTranslations("appPage");
   const sfx = useSfx();
   const pendingWaitlistMessageRef = useRef<string | null>(null);
+
+  // ── Goal Completion → CTA Pro coherente ───────────────────────────────
+  // Cuando el usuario CIERRA un goal (transición a status=completed), le
+  // ofrecemos Pro con respeto. NO se ofrece tras N mensajes ni por presión,
+  // SOLO en el momento exacto donde el usuario YA recibió valor real
+  // (cerró un objetivo). Coherente con Capa A Dilexit Nos §100: el
+  // upgrade se ofrece DESPUÉS del valor, no antes para extraer.
+  // El usuario tiene 7 días gratis (configurado en stripe.ts).
+  const previousGoalStatusRef = useRef<string | null>(null);
+  const goalCompletionToastShownRef = useRef<Set<string>>(new Set());
+
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [input, setInput] = useState("");
@@ -237,6 +248,40 @@ export default function HomePage() {
   const [onboardingConsentGiven, setOnboardingConsentGiven] = useState(false);
   const [onboardingConsentSaving, setOnboardingConsentSaving] = useState(false);
   const [onboardingConsentError, setOnboardingConsentError] = useState<string | null>(null);
+
+  // Goal Completion → CTA Pro toast.
+  // Solo se dispara en la transición real `!completed → completed`, una vez
+  // por goal (Set evita duplicados si el efecto re-evalúa), y NUNCA si el
+  // usuario ya es pro. No reemplaza ningún copy del chat; solo añade un
+  // toast no intrusivo que el usuario puede ignorar.
+  useEffect(() => {
+    const currentStatus = activeGoal?.status ?? null;
+    const prevStatus = previousGoalStatusRef.current;
+    const goalId = activeGoal?.id;
+    const isAlreadyPro = sessionProfile?.plan === "pro";
+    if (
+      goalId &&
+      currentStatus === "completed" &&
+      prevStatus !== "completed" &&
+      prevStatus !== null &&
+      !goalCompletionToastShownRef.current.has(goalId) &&
+      !isAlreadyPro
+    ) {
+      goalCompletionToastShownRef.current.add(goalId);
+      toast.success(`Has cerrado "${activeGoal.title}"`, {
+        description:
+          "Si quieres que recuerde tus avances entre conversaciones, Pro te da memoria continua. 7 días gratis.",
+        duration: 15000,
+        action: {
+          label: "Ver Pro",
+          onClick: () => {
+            window.location.href = "/precios";
+          },
+        },
+      });
+    }
+    previousGoalStatusRef.current = currentStatus;
+  }, [activeGoal?.id, activeGoal?.status, activeGoal?.title, sessionProfile?.plan]);
 
   // El usuario llega a /app y puede escribir directamente — sin formulario
   // bloqueante previo. El wizard sigue existiendo en /app/inicio como

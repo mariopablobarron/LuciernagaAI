@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
 import { MessageCircle, Plus, Sparkles } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 import { trackMetaEvent } from "@/lib/meta-pixel";
@@ -158,9 +157,18 @@ type CheckinApiResponse = {
 // Pure helpers extracted to ./chat-utils.ts
 
 export default function HomePage() {
-  const t = useTranslations("appPage");
   const sfx = useSfx();
   const pendingWaitlistMessageRef = useRef<string | null>(null);
+
+  // ── Goal Completion → CTA Pro coherente ───────────────────────────────
+  // Cuando el usuario CIERRA un goal (transición a status=completed), le
+  // ofrecemos Pro con respeto. NO se ofrece tras N mensajes ni por presión,
+  // SOLO en el momento exacto donde el usuario YA recibió valor real
+  // (cerró un objetivo). Coherente con Capa A Dilexit Nos §100: el
+  // upgrade se ofrece DESPUÉS del valor, no antes para extraer.
+  // El usuario tiene 7 días gratis (configurado en stripe.ts).
+  const previousGoalStatusRef = useRef<string | null>(null);
+  const goalCompletionToastShownRef = useRef<Set<string>>(new Set());
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [input, setInput] = useState("");
@@ -237,6 +245,38 @@ export default function HomePage() {
   const [onboardingConsentGiven, setOnboardingConsentGiven] = useState(false);
   const [onboardingConsentSaving, setOnboardingConsentSaving] = useState(false);
   const [onboardingConsentError, setOnboardingConsentError] = useState<string | null>(null);
+
+  // Detecta transición de goal a "completed" → CTA Pro respetuoso.
+  // Trigger 1 vez por goal (ref tracked) y solo si el usuario aún NO es Pro.
+  useEffect(() => {
+    const currentStatus = activeGoal?.status ?? null;
+    const prevStatus = previousGoalStatusRef.current;
+    const goalId = activeGoal?.id;
+    const isAlreadyPro = sessionProfile?.plan === "pro";
+
+    if (
+      goalId &&
+      currentStatus === "completed" &&
+      prevStatus !== "completed" &&
+      prevStatus !== null &&
+      !goalCompletionToastShownRef.current.has(goalId) &&
+      !isAlreadyPro
+    ) {
+      goalCompletionToastShownRef.current.add(goalId);
+      toast.success(`Has cerrado "${activeGoal.title}"`, {
+        description:
+          "Si quieres que recuerde tus avances entre conversaciones, Pro te da memoria continua. 7 días gratis.",
+        duration: 15000,
+        action: {
+          label: "Ver Pro",
+          onClick: () => {
+            window.location.href = "/precios";
+          },
+        },
+      });
+    }
+    previousGoalStatusRef.current = currentStatus;
+  }, [activeGoal?.id, activeGoal?.status, activeGoal?.title, sessionProfile?.plan]);
 
   // El usuario llega a /app y puede escribir directamente — sin formulario
   // bloqueante previo. El wizard sigue existiendo en /app/inicio como
@@ -423,15 +463,13 @@ export default function HomePage() {
     const displayName =
       sessionProfile?.name ||
       (sessionProfile && !sessionProfile.isAnonymous ? sessionProfile.email : "") ||
-      t("sidebar.anonymous");
+      "Sesión anónima";
 
     return {
       name: displayName,
-      plan: sessionProfile?.planLabel
-        ? t("sidebar.planLabel", { plan: sessionProfile.planLabel })
-        : t("sidebar.planFree"),
+      plan: sessionProfile?.planLabel ? `Plan ${sessionProfile.planLabel}` : "Plan Free",
     };
-  }, [sessionProfile, t]);
+  }, [sessionProfile]);
 
   const effectiveActionLock = useMemo(() => {
     if (actionLock) {
@@ -463,8 +501,8 @@ export default function HomePage() {
 
   const upgradeCopy = useMemo(() => {
     if (!showUpgradeCta) return null;
-    return t("upgrade.valueDetected");
-  }, [showUpgradeCta, t]);
+    return "Aquí ya hubo valor real: claridad, objetivo o una acción concreta. Pro lo sostiene entre sesiones y desbloquea Modo Impulso.";
+  }, [showUpgradeCta]);
 
   const loadMessages = async (conversationId: string): Promise<void> => {
     const response = await fetch(
@@ -2116,7 +2154,7 @@ export default function HomePage() {
       {workspaceTab !== "chat" && (
         <FloatingButton
           icon={<MessageCircle className="w-6 h-6" />}
-          label={t("newConversation")}
+          label="Nueva conversación"
           position="bottom-right"
           onClick={handleNewConversation}
           color="cyan"
@@ -2126,42 +2164,43 @@ export default function HomePage() {
       <Dialog open={upgradeDialogOpen} onOpenChange={setUpgradeDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("upgrade.title")}</DialogTitle>
+            <DialogTitle>Continuidad completa, no presión vacía</DialogTitle>
             <DialogDescription>
-              {upgradeCopy || t("upgrade.default")}
+              {upgradeCopy ||
+                "El siguiente salto no es más ruido: es más continuidad, historial y seguimiento real."}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="rounded-2xl border border-border bg-muted/40 p-4">
-                <p className="text-sm font-semibold text-foreground">{t("upgrade.free.title")}</p>
+                <p className="text-sm font-semibold text-foreground">Free</p>
                 <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                  <li>{t("upgrade.free.bullets.daily")}</li>
-                  <li>{t("upgrade.free.bullets.continuity")}</li>
-                  <li>{t("upgrade.free.bullets.entry")}</li>
+                  <li>10 mensajes al día</li>
+                  <li>Continuidad resumida</li>
+                  <li>Buen punto de entrada</li>
                 </ul>
               </div>
               <div className="rounded-2xl border border-border bg-background p-4">
-                <p className="text-sm font-semibold text-foreground">{t("upgrade.pro.title")}</p>
+                <p className="text-sm font-semibold text-foreground">Pro</p>
                 <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                  <li>{t("upgrade.pro.bullets.unlimited")}</li>
-                  <li>{t("upgrade.pro.bullets.tracking")}</li>
-                  <li>{t("upgrade.pro.bullets.continuity")}</li>
+                  <li>Sin límite diario</li>
+                  <li>Seguimiento completo de objetivos y acciones</li>
+                  <li>Más continuidad entre sesiones</li>
                 </ul>
               </div>
             </div>
 
             <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
               {sessionProfile?.isAnonymous
-                ? t("upgrade.footer.anonymous")
-                : t("upgrade.footer.linked", { email: sessionProfile?.email ?? "" })}
+                ? "Antes de activar un plan, guarda tu progreso con email para no perder continuidad."
+                : `Tu progreso ya está vinculado a ${sessionProfile?.email}. Cuando Pro esté listo, este flujo ya estará preparado.`}
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setUpgradeDialogOpen(false)}>
-              {t("upgrade.actions.later")}
+              Ahora no
             </Button>
             <Button
               onClick={() => {
@@ -2169,7 +2208,7 @@ export default function HomePage() {
                 setUpgradeDialogOpen(false);
               }}
             >
-              {t("upgrade.actions.viewPlan")}
+              Ver continuidad en el plan
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -2178,36 +2217,34 @@ export default function HomePage() {
       <Dialog open={captureDialogOpen} onOpenChange={setCaptureDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("capture.title")}</DialogTitle>
+            <DialogTitle>Guarda tu progreso antes de perderlo</DialogTitle>
             <DialogDescription>
-              {captureEmailPrompt || t("capture.default")}
+              {captureEmailPrompt ||
+                "Ya apareció claridad real en la conversación. Vincula un email para no perder objetivos, acciones y continuidad."}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="warning" className="rounded-full px-3 py-1">
-                {t("capture.badges.anonymous")}
+                Cuenta anónima
               </Badge>
               <Badge variant="secondary" className="rounded-full px-3 py-1">
-                {sessionProfile?.planLabel || t("capture.badges.free")}
+                {sessionProfile?.planLabel || "Free"}
               </Badge>
               <Badge variant="secondary" className="rounded-full px-3 py-1">
-                {t("capture.badges.progress", {
-                  done: progress.completedActions,
-                  total: progress.totalActions,
-                })}
+                Progreso {progress.completedActions}/{progress.totalActions}
               </Badge>
             </div>
 
             <div className="space-y-3">
               <label className="block space-y-2">
-                <span className="text-sm font-medium text-foreground">{t("capture.emailLabel")}</span>
+                <span className="text-sm font-medium text-foreground">Email</span>
                 <Input
                   type="email"
                   value={saveProgressEmail}
                   onChange={(event) => setSaveProgressEmail(event.target.value)}
-                  placeholder={t("capture.emailPlaceholder")}
+                  placeholder="tu@email.com"
                 />
               </label>
 
@@ -2221,14 +2258,14 @@ export default function HomePage() {
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setCaptureDialogOpen(false)}>
-              {t("capture.actions.stayAnonymous")}
+              Seguir anónimo
             </Button>
             <Button
               type="button"
               onClick={() => void handleSaveProgress()}
               disabled={saveProgressLoading || !saveProgressEmail.trim()}
             >
-              {saveProgressLoading ? t("capture.actions.saving") : t("capture.actions.save")}
+              {saveProgressLoading ? "Guardando..." : "Guardar progreso"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -2276,7 +2313,7 @@ export default function HomePage() {
         onSaved={(savedName) => {
           setNameCaptureOpen(false);
           setSessionProfile((prev) => (prev ? { ...prev, name: savedName } : prev));
-          toast.success(t("nameSaved", { name: savedName }));
+          toast.success(`Encantado, ${savedName}.`);
         }}
       />
     </AgeGate>

@@ -300,7 +300,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
 
   // ── 10. JSON path ──────────────────────────────────────────────────────
   if (jsonMode) {
-    const aiResult = await generateAIResponse(message, state, emotionalProfile, coachContext, conversationHistory, { userId, source: "chat" });
+    const aiResult = await generateAIResponse(message, state, emotionalProfile, coachContext, conversationHistory, { userId, source: "chat", locale });
     let assistantResponse = completionMicroFeedback
       ? `${completionMicroFeedback}\n\n${aiResult.response}`
       : aiResult.response;
@@ -418,7 +418,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
       let streamFallback = false;
 
       try {
-        for await (const token of streamOpenRouterTokens(message, systemPrompt, conversationHistory)) {
+        for await (const token of streamOpenRouterTokens(message, systemPrompt, conversationHistory, { locale })) {
           rawText += token;
           send({ type: "delta", delta: token });
         }
@@ -434,7 +434,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
           emotionalProfile,
           coachContext,
           conversationHistory,
-          { userId, source: "chat" },
+          { userId, source: "chat", locale },
         );
         rawText = fallbackResult.response;
         streamFallback = fallbackResult.fallback;

@@ -2,6 +2,7 @@ import { logError, logInfo } from "@/lib/logger";
 import { logLlmCall } from "@/lib/llm-logger";
 import { getErrorMessage, fetchWithTimeout } from "@/lib/utils";
 import { buildCoachPrompt, buildFallbackResponse, type CoachContext } from "@/services/coach";
+import { recordFallback } from "@/services/llm-health";
 import type { UserState } from "@/domain/types";
 import { DEFAULT_EMOTIONAL_PROFILE, type EmotionalProfile } from "@/types/emotional-profile";
 
@@ -287,6 +288,15 @@ export async function generateAIResponse(
       route: "ai_service",
       errorType,
     });
+    // Mapeamos a reason normalizado para health monitoring. classifyAIError
+    // devuelve missing_config|provider_failure|unknown — pero para distinguir
+    // 402 de 5xx miramos errorMessage que incluye el HTTP code en provider_failure.
+    let reason: "no_api_key" | "openrouter_402" | "openrouter_http_error" | "unknown" =
+      errorType === "missing_config" ? "no_api_key" :
+      errorType === "provider_failure"
+        ? (errorMessage.includes("402") ? "openrouter_402" : "openrouter_http_error")
+        : "unknown";
+    recordFallback(reason, { errorType, errorMessage: errorMessage.slice(0, 200) });
     return {
       response: buildFallbackResponse(typedState, opts.locale),
       fallback: true,
@@ -413,6 +423,7 @@ export async function* streamOpenRouterTokens(
 ): AsyncGenerator<string, void, unknown> {
   const apiKey = process.env.OPENROUTER_API_KEY?.trim();
   if (!apiKey) {
+    recordFallback("no_api_key");
     yield buildFallbackResponse(undefined, opts.locale);
     return;
   }
@@ -445,6 +456,7 @@ export async function* streamOpenRouterTokens(
     );
   } catch (error: unknown) {
     logError("AI", error, { area: "streamOpenRouterTokens_fetch" });
+    recordFallback("fetch_error", { area: "streamOpenRouterTokens_fetch" });
     yield buildFallbackResponse(undefined, opts.locale);
     return;
   }
@@ -453,12 +465,16 @@ export async function* streamOpenRouterTokens(
     logError("AI", new Error(`OpenRouter stream HTTP ${res.status}`), {
       area: "streamOpenRouterTokens",
     });
+    recordFallback(res.status === 402 ? "openrouter_402" : "openrouter_http_error", {
+      status: res.status,
+    });
     yield buildFallbackResponse(undefined, opts.locale);
     return;
   }
 
   const reader = res.body?.getReader();
   if (!reader) {
+    recordFallback("empty_response");
     yield buildFallbackResponse(undefined, opts.locale);
     return;
   }

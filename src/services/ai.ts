@@ -245,7 +245,10 @@ export async function generateAIResponse(
   emotionalProfile: EmotionalProfile = DEFAULT_EMOTIONAL_PROFILE,
   coachContext: CoachContext = {},
   history: ConversationTurn[] = [],
-  opts: { userId?: string; source?: string } = {}
+  // opts.locale: idioma para el fallback cuando OpenRouter falla. Sin esto,
+  // un 402/timeout devuelve siempre el fallback en español aunque el
+  // usuario esté en /en. Bug reportado 2026-06-22.
+  opts: { userId?: string; source?: string; locale?: unknown } = {}
 ): Promise<{
   response: string;
   fallback: boolean;
@@ -285,7 +288,7 @@ export async function generateAIResponse(
       errorType,
     });
     return {
-      response: buildFallbackResponse(),
+      response: buildFallbackResponse(typedState, opts.locale),
       fallback: true,
       errorType,
       errorMessage,
@@ -403,11 +406,14 @@ export async function generateImpulseResponse(input: ImpulseResponseInput): Prom
 export async function* streamOpenRouterTokens(
   message: string,
   systemPrompt: string,
-  history: ConversationTurn[] = []
+  history: ConversationTurn[] = [],
+  // opts.locale: fallback en el idioma del usuario cuando OpenRouter no
+  // responde. Sin esto, un 402/timeout devuelve el genérico español.
+  opts: { locale?: unknown } = {},
 ): AsyncGenerator<string, void, unknown> {
   const apiKey = process.env.OPENROUTER_API_KEY?.trim();
   if (!apiKey) {
-    yield buildFallbackResponse();
+    yield buildFallbackResponse(undefined, opts.locale);
     return;
   }
 
@@ -439,7 +445,7 @@ export async function* streamOpenRouterTokens(
     );
   } catch (error: unknown) {
     logError("AI", error, { area: "streamOpenRouterTokens_fetch" });
-    yield buildFallbackResponse();
+    yield buildFallbackResponse(undefined, opts.locale);
     return;
   }
 
@@ -447,13 +453,13 @@ export async function* streamOpenRouterTokens(
     logError("AI", new Error(`OpenRouter stream HTTP ${res.status}`), {
       area: "streamOpenRouterTokens",
     });
-    yield buildFallbackResponse();
+    yield buildFallbackResponse(undefined, opts.locale);
     return;
   }
 
   const reader = res.body?.getReader();
   if (!reader) {
-    yield buildFallbackResponse();
+    yield buildFallbackResponse(undefined, opts.locale);
     return;
   }
 

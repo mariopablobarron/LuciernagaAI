@@ -7,7 +7,7 @@ import {
 } from "@/lib/auth";
 import { logError, logInfo } from "@/lib/logger";
 import { assessInputQuality, buildAmbiguousInputResponse } from "@/services/input-quality";
-import { detectLanguageRequest } from "@/services/language-request";
+import { detectLanguageRequest, detectMessageLanguage } from "@/services/language-request";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getErrorMessage } from "@/lib/utils";
 import { getUserSessionProfile, isSyntheticEmail } from "@/services/user";
@@ -258,6 +258,23 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
         logError("CHAT", e, { __userId: identity.userId, area: "persist_locale_override" });
       }
     })();
+  } else {
+    // ── 5c. Auto-detección por idioma del propio mensaje ────────────────
+    // Si el usuario no pidió cambio explícito pero escribió en un idioma
+    // distinto al UI (caso "Hi, how are you?" desde /es), respondemos en
+    // SU idioma SOLO para esta request. NO persistimos: UI sigue en /es,
+    // cookie intacta, próximo mensaje se evalúa de nuevo. Si vuelve al
+    // español, el coach también vuelve. Conversación multilingüe natural.
+    const messageLang = detectMessageLanguage(message, locale);
+    if (messageLang.detected) {
+      logInfo("CHAT", "language_override_autodetect", {
+        __route: "/api/chat",
+        __userId: identity.userId,
+        from: locale,
+        to: messageLang.locale,
+      });
+      locale = messageLang.locale;
+    }
   }
 
   const result = await processMessage({

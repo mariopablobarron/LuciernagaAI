@@ -312,6 +312,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
         avoidanceDetected: avoidanceDetectedThisTurn,
       }),
       onboarding: onboardingContext,
+      locale,
     });
     // Los prompts comerciales (conversión / paywall / captura de email) se
     // devuelven como flags del payload y los renderiza el cliente en UI
@@ -451,6 +452,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
           avoidanceDetected: avoidanceDetectedThisTurn,
         }),
         onboarding: onboardingContext,
+        locale,
       });
       // Los prompts comerciales se devuelven en los flags del evento `meta`
       // (conversionTrigger, captureEmail, captureEmailMessage) para que el

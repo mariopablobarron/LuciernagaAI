@@ -361,6 +361,14 @@ type ResponseFinalizationContext = {
   mentor?: MentorMode | null;
   goal?: CoachGoalContext | null;
   onboarding?: ConversationalOnboardingContext | null;
+  /**
+   * Idioma de la respuesta. Si se omite, default "es" — compat con tests
+   * legacy. En producción processMessage debe pasarlo SIEMPRE para que
+   * buildActionLine + buildQuestion respeten el idioma del coach. Sin
+   * este campo, el LLM responde en X pero pegamos frases hardcoded en
+   * español → respuesta mezclada + repetitiva (bug reportado 2026-06-22).
+   */
+  locale?: CoachLocale;
 };
 
 const BASE_PROMPT = `${MENTOR_IDENTITY_PROMPT}
@@ -1003,73 +1011,443 @@ export function buildFallbackResponse(state?: UserState, locale?: unknown): stri
   return table[state ?? "default"] ?? table.default;
 }
 
+// ── buildActionLine + buildQuestion: localizados a 5 idiomas + rotación ──
+// Antes: SOLO español hardcoded. Si el LLM respondía en inglés, esta línea
+// pegada al final salía en español → respuesta mezclada. Además, el texto
+// era idéntico para el mismo state, lo que producía respuestas idénticas
+// turn tras turn cuando el usuario seguía atascado. Bug reportado por
+// Mario 2026-06-22: "siempre las mismas respuestas".
+//
+// Fix: tablas por idioma con 3 variantes por slot. Selección determinista
+// (hash de activeAction+state) — mismo input genera misma frase pero
+// distintos contextos generan variantes distintas.
+
+type ActionLineKey =
+  | "bloqueo"
+  | "duda"
+  | "ansiedad"
+  | "claridad"
+  | "onboarding"
+  | "default";
+
+const ACTION_LINES: Record<CoachLocale, Record<ActionLineKey, string[]>> = {
+  es: {
+    bloqueo: [
+      "Haz una versión mínima de esto en menos de 10 minutos.",
+      "Reduce la barrera: 10 minutos hoy, no más.",
+      "Empieza con la versión más pequeña que sí puedes terminar hoy.",
+    ],
+    duda: [
+      "Reduce esto a dos opciones y elige una hoy.",
+      "Quédate con dos caminos y compromete uno antes de acostarte.",
+      "No esperes a tener todos los datos: elige con lo que ya sabes.",
+    ],
+    ansiedad: [
+      "Elige una sola tarea controlable y ciérrala hoy.",
+      "Una cosa, una hora, una decisión.",
+      "Baja el foco a algo pequeño que dependa solo de ti.",
+    ],
+    claridad: [
+      "Convierte esta claridad en una evidencia visible hoy.",
+      "Hazlo tangible: que mañana se note que hoy decidiste.",
+      "Lo que tienes claro pierde fuerza si no lo encarnas hoy.",
+    ],
+    onboarding: [
+      "No busques entenderlo todo ahora: elige un paso pequeño que puedas hacer hoy.",
+      "Antes de entender, mueve algo pequeño. Hoy.",
+      "No te exijas claridad total: actúa con el primer hilo que tengas.",
+    ],
+    default: [
+      "Convierte esto en un paso concreto antes de cerrar el día.",
+      "Cierra el día con un paso, no con una idea.",
+      "Que esto no se quede en pensamiento: dale forma hoy.",
+    ],
+  },
+  en: {
+    bloqueo: [
+      "Make a minimal version of this in less than 10 minutes.",
+      "Lower the bar: 10 minutes today, no more.",
+      "Start with the smallest version you can actually finish today.",
+    ],
+    duda: [
+      "Narrow this down to two options and pick one today.",
+      "Keep two paths and commit to one before you go to bed.",
+      "Don't wait for full data: decide with what you already know.",
+    ],
+    ansiedad: [
+      "Pick one controllable task and close it today.",
+      "One thing, one hour, one decision.",
+      "Shrink your focus to something small that depends only on you.",
+    ],
+    claridad: [
+      "Turn this clarity into something visible today.",
+      "Make it tangible: tomorrow should show what you decided today.",
+      "What you see clearly loses power if you don't embody it today.",
+    ],
+    onboarding: [
+      "Don't try to understand everything now: pick one small step you can do today.",
+      "Before understanding, move something small. Today.",
+      "Don't demand total clarity: act on the first thread you have.",
+    ],
+    default: [
+      "Turn this into a concrete step before the day ends.",
+      "Close the day with a step, not with an idea.",
+      "Don't let this stay as thought: shape it today.",
+    ],
+  },
+  pt: {
+    bloqueo: [
+      "Faz uma versão mínima disto em menos de 10 minutos.",
+      "Baixa a barreira: 10 minutos hoje, não mais.",
+      "Começa pela versão mais pequena que consegues mesmo terminar hoje.",
+    ],
+    duda: [
+      "Reduz isto a duas opções e escolhe uma hoje.",
+      "Fica com dois caminhos e compromete-te com um antes de te deitares.",
+      "Não esperes ter todos os dados: decide com o que já sabes.",
+    ],
+    ansiedad: [
+      "Escolhe uma só tarefa controlável e fecha-a hoje.",
+      "Uma coisa, uma hora, uma decisão.",
+      "Reduz o foco a algo pequeno que dependa só de ti.",
+    ],
+    claridad: [
+      "Transforma esta clareza em algo visível hoje.",
+      "Faz com que amanhã se note que hoje decidiste.",
+      "O que vês claro perde força se não o encarnares hoje.",
+    ],
+    onboarding: [
+      "Não tentes perceber tudo agora: escolhe um passo pequeno que possas dar hoje.",
+      "Antes de perceber, move algo pequeno. Hoje.",
+      "Não exijas clareza total: age com o primeiro fio que tens.",
+    ],
+    default: [
+      "Transforma isto num passo concreto antes do dia acabar.",
+      "Fecha o dia com um passo, não com uma ideia.",
+      "Não deixes isto ficar só pensamento: dá-lhe forma hoje.",
+    ],
+  },
+  fr: {
+    bloqueo: [
+      "Fais une version minimale de ça en moins de 10 minutes.",
+      "Baisse la barre : 10 minutes aujourd'hui, pas plus.",
+      "Commence par la plus petite version que tu peux vraiment terminer aujourd'hui.",
+    ],
+    duda: [
+      "Réduis ça à deux options et choisis-en une aujourd'hui.",
+      "Garde deux chemins et engage-toi sur un avant d'aller te coucher.",
+      "N'attends pas toutes les données : décide avec ce que tu sais déjà.",
+    ],
+    ansiedad: [
+      "Choisis une seule tâche que tu contrôles et termine-la aujourd'hui.",
+      "Une chose, une heure, une décision.",
+      "Réduis ton focus à quelque chose de petit qui ne dépend que de toi.",
+    ],
+    claridad: [
+      "Transforme cette clarté en quelque chose de visible aujourd'hui.",
+      "Rends-la tangible : que demain on voie ce que tu as décidé aujourd'hui.",
+      "Ce qui est clair perd de la force si tu ne l'incarnes pas aujourd'hui.",
+    ],
+    onboarding: [
+      "Ne cherche pas à tout comprendre maintenant : choisis un petit pas que tu peux faire aujourd'hui.",
+      "Avant de comprendre, bouge quelque chose de petit. Aujourd'hui.",
+      "N'exige pas une clarté totale : agis avec le premier fil que tu as.",
+    ],
+    default: [
+      "Transforme ça en pas concret avant la fin de la journée.",
+      "Termine la journée avec un pas, pas avec une idée.",
+      "Ne laisse pas ça rester pensée : donne-lui forme aujourd'hui.",
+    ],
+  },
+  de: {
+    bloqueo: [
+      "Mach eine minimale Version davon in weniger als 10 Minuten.",
+      "Senk die Hürde: 10 Minuten heute, nicht mehr.",
+      "Fang mit der kleinsten Version an, die du heute wirklich beenden kannst.",
+    ],
+    duda: [
+      "Reduzier das auf zwei Optionen und wähl heute eine.",
+      "Behalt zwei Wege und entscheide dich für einen, bevor du ins Bett gehst.",
+      "Warte nicht auf alle Daten: entscheide mit dem, was du schon weißt.",
+    ],
+    ansiedad: [
+      "Wähl eine kontrollierbare Aufgabe und schließ sie heute ab.",
+      "Eine Sache, eine Stunde, eine Entscheidung.",
+      "Verkleinere den Fokus auf etwas Kleines, das nur von dir abhängt.",
+    ],
+    claridad: [
+      "Verwandle diese Klarheit heute in etwas Sichtbares.",
+      "Mach es greifbar: morgen sollte man sehen, was du heute entschieden hast.",
+      "Was du klar siehst, verliert Kraft, wenn du es heute nicht verkörperst.",
+    ],
+    onboarding: [
+      "Versuch jetzt nicht, alles zu verstehen: wähl einen kleinen Schritt für heute.",
+      "Bevor du verstehst, bewege etwas Kleines. Heute.",
+      "Verlang keine totale Klarheit: handle mit dem ersten Faden, den du hast.",
+    ],
+    default: [
+      "Mach daraus heute einen konkreten Schritt, bevor der Tag endet.",
+      "Schließ den Tag mit einem Schritt ab, nicht mit einer Idee.",
+      "Lass das nicht nur Gedanke bleiben: gib ihm heute Form.",
+    ],
+  },
+};
+
+const QUESTION_LINES: Record<CoachLocale, Record<ActionLineKey, string[]>> = {
+  es: {
+    bloqueo: [
+      "¿Cuál es el paso más pequeño que sí puedes hacer hoy?",
+      "¿Qué parte minúscula de esto sí puedes mover hoy?",
+      "¿Por dónde lo abres aunque sea solo 10 minutos?",
+    ],
+    duda: [
+      "¿Qué opción eliges hoy?",
+      "¿Cuál de las dos decides probar primero?",
+      "Si solo pudieras llevarte una, ¿cuál sería?",
+    ],
+    ansiedad: [
+      "¿Qué puedes controlar en la próxima hora?",
+      "¿Qué parte de esto depende solo de ti?",
+      "¿Qué pequeña parte de esto sí está en tu mano?",
+    ],
+    claridad: [
+      "¿Qué vas a cerrar hoy para que esto deje de ser solo una idea?",
+      "¿Qué evidencia vas a dejar hoy de esta claridad?",
+      "¿Cuál es la primera marca visible que vas a poner hoy?",
+    ],
+    onboarding: [
+      "¿Qué estás evitando ahora mismo?",
+      "¿Qué te pesa más al pensar en hoy?",
+      "¿Qué te gustaría que dejara de estar ahí?",
+    ],
+    default: [
+      "¿Qué pequeño paso puedes dar hoy?",
+      "¿Qué quieres haber movido antes de cerrar el día?",
+      "Si solo hicieras una cosa hoy, ¿cuál sería?",
+    ],
+  },
+  en: {
+    bloqueo: [
+      "What's the smallest step you can actually take today?",
+      "What tiny piece of this can you move today?",
+      "Where can you crack it open, even for just 10 minutes?",
+    ],
+    duda: [
+      "Which option will you choose today?",
+      "Which of the two will you try first?",
+      "If you could only take one, which would it be?",
+    ],
+    ansiedad: [
+      "What can you control in the next hour?",
+      "What part of this depends only on you?",
+      "What small piece of this is in your hands?",
+    ],
+    claridad: [
+      "What will you close today so this stops being just an idea?",
+      "What evidence will you leave today of this clarity?",
+      "What's the first visible mark you'll put down today?",
+    ],
+    onboarding: [
+      "What are you avoiding right now?",
+      "What weighs on you most when you think about today?",
+      "What would you want to stop carrying?",
+    ],
+    default: [
+      "What small step can you take today?",
+      "What do you want to have moved before the day ends?",
+      "If you could only do one thing today, what would it be?",
+    ],
+  },
+  pt: {
+    bloqueo: [
+      "Qual é o passo mais pequeno que consegues mesmo dar hoje?",
+      "Que parte mínima disto consegues mover hoje?",
+      "Por onde abres isto, nem que seja só 10 minutos?",
+    ],
+    duda: [
+      "Que opção escolhes hoje?",
+      "Qual das duas decides experimentar primeiro?",
+      "Se só pudesses levar uma, qual seria?",
+    ],
+    ansiedad: [
+      "O que podes controlar na próxima hora?",
+      "Que parte disto depende só de ti?",
+      "Que pequena parte disto está nas tuas mãos?",
+    ],
+    claridad: [
+      "O que vais fechar hoje para isto deixar de ser só uma ideia?",
+      "Que evidência vais deixar hoje desta clareza?",
+      "Qual é a primeira marca visível que vais pôr hoje?",
+    ],
+    onboarding: [
+      "O que estás a evitar agora?",
+      "O que te pesa mais quando pensas em hoje?",
+      "O que gostavas que deixasse de estar aí?",
+    ],
+    default: [
+      "Que pequeno passo podes dar hoje?",
+      "O que queres ter movido antes do dia acabar?",
+      "Se só fizesses uma coisa hoje, qual seria?",
+    ],
+  },
+  fr: {
+    bloqueo: [
+      "Quel est le plus petit pas que tu peux vraiment faire aujourd'hui ?",
+      "Quelle minuscule partie de ça peux-tu bouger aujourd'hui ?",
+      "Par où tu l'ouvres, ne serait-ce que 10 minutes ?",
+    ],
+    duda: [
+      "Quelle option choisis-tu aujourd'hui ?",
+      "Laquelle des deux décides-tu d'essayer en premier ?",
+      "Si tu ne pouvais en garder qu'une, ce serait laquelle ?",
+    ],
+    ansiedad: [
+      "Que peux-tu contrôler dans l'heure qui vient ?",
+      "Quelle partie de ça ne dépend que de toi ?",
+      "Quelle petite partie de ça est entre tes mains ?",
+    ],
+    claridad: [
+      "Que vas-tu fermer aujourd'hui pour que ça cesse d'être juste une idée ?",
+      "Quelle trace vas-tu laisser aujourd'hui de cette clarté ?",
+      "Quelle est la première marque visible que tu vas poser aujourd'hui ?",
+    ],
+    onboarding: [
+      "Qu'est-ce que tu évites en ce moment ?",
+      "Qu'est-ce qui te pèse le plus quand tu penses à aujourd'hui ?",
+      "Qu'est-ce que tu aimerais ne plus avoir à porter ?",
+    ],
+    default: [
+      "Quel petit pas peux-tu faire aujourd'hui ?",
+      "Qu'est-ce que tu veux avoir bougé avant la fin du jour ?",
+      "Si tu ne devais faire qu'une chose aujourd'hui, ce serait quoi ?",
+    ],
+  },
+  de: {
+    bloqueo: [
+      "Was ist der kleinste Schritt, den du heute wirklich machen kannst?",
+      "Welchen winzigen Teil davon kannst du heute bewegen?",
+      "Wo machst du es auf, und sei es nur für 10 Minuten?",
+    ],
+    duda: [
+      "Welche Option wählst du heute?",
+      "Welche der beiden willst du zuerst ausprobieren?",
+      "Wenn du nur eine mitnehmen könntest, welche wäre das?",
+    ],
+    ansiedad: [
+      "Was kannst du in der nächsten Stunde kontrollieren?",
+      "Welcher Teil davon hängt nur von dir ab?",
+      "Welcher kleine Teil davon liegt in deiner Hand?",
+    ],
+    claridad: [
+      "Was schließt du heute ab, damit das aufhört nur eine Idee zu sein?",
+      "Welche Spur lässt du heute von dieser Klarheit zurück?",
+      "Was ist die erste sichtbare Marke, die du heute setzt?",
+    ],
+    onboarding: [
+      "Was vermeidest du gerade?",
+      "Was wiegt am meisten, wenn du an heute denkst?",
+      "Was würdest du gerne nicht mehr mit dir herumtragen?",
+    ],
+    default: [
+      "Welchen kleinen Schritt kannst du heute machen?",
+      "Was willst du heute bewegt haben, bevor der Tag endet?",
+      "Wenn du heute nur eine Sache machen könntest, welche wäre das?",
+    ],
+  },
+};
+
+/** Selección determinista de variante por hash del seed. Mismo input
+ *  produce misma variante (no random ruidoso); seeds distintos producen
+ *  variantes distintas (rotación natural). */
+function pickVariant<T>(variants: T[], seed: string): T {
+  if (variants.length === 0) throw new Error("pickVariant: empty array");
+  if (variants.length === 1) return variants[0];
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0;
+  return variants[Math.abs(hash) % variants.length];
+}
+
+function resolveActionKey(context: ResponseFinalizationContext): ActionLineKey {
+  return context.state === "bloqueo" ? "bloqueo" :
+    context.state === "duda" ? "duda" :
+    context.state === "ansiedad" ? "ansiedad" :
+    context.state === "claridad" ? "claridad" :
+    context.onboarding?.active ? "onboarding" :
+    "default";
+}
+
 function buildActionLine(context: ResponseFinalizationContext): string {
+  const loc = context.locale ?? "es";
   const activeAction = context.goal?.activeAction;
   const unfinishedActionsCount = context.goal?.unfinishedActionsCount ?? 0;
   const confront = context.mentor?.confront ?? false;
 
+  // Caso especial: hay activeAction concreto → frase con interpolación.
   if (activeAction && (confront || unfinishedActionsCount > 0)) {
-    return confront
-      ? `No necesitas seguir dándole vueltas. Tu foco ahora es este: ${activeAction}.`
-      : `Tu siguiente paso concreto es este: ${activeAction}.`;
+    const templates: Record<CoachLocale, { confront: string; soft: string }> = {
+      es: {
+        confront: `No necesitas seguir dándole vueltas. Tu foco ahora es este: ${activeAction}.`,
+        soft: `Tu siguiente paso concreto es este: ${activeAction}.`,
+      },
+      en: {
+        confront: `You don't need to keep going in circles. Your focus right now is this: ${activeAction}.`,
+        soft: `Your next concrete step is this: ${activeAction}.`,
+      },
+      pt: {
+        confront: `Não precisas de continuar a dar voltas. O teu foco agora é este: ${activeAction}.`,
+        soft: `O teu próximo passo concreto é este: ${activeAction}.`,
+      },
+      fr: {
+        confront: `Tu n'as pas besoin de continuer à tourner en rond. Ton focus maintenant, c'est ça : ${activeAction}.`,
+        soft: `Ton prochain pas concret, c'est ça : ${activeAction}.`,
+      },
+      de: {
+        confront: `Du musst nicht weiter im Kreis denken. Dein Fokus jetzt ist das: ${activeAction}.`,
+        soft: `Dein nächster konkreter Schritt ist das: ${activeAction}.`,
+      },
+    };
+    return confront ? templates[loc].confront : templates[loc].soft;
   }
 
-  if (context.state === "bloqueo") {
-    return "Haz una versión mínima de esto en menos de 10 minutos.";
-  }
-
-  if (context.state === "duda") {
-    return "Reduce esto a dos opciones y elige una hoy.";
-  }
-
-  if (context.state === "ansiedad") {
-    return "Elige una sola tarea controlable y ciérrala hoy.";
-  }
-
-  if (context.state === "claridad") {
-    return "Convierte esta claridad en una evidencia visible hoy.";
-  }
-
-  if (context.onboarding?.active) {
-    return "No busques entenderlo todo ahora: elige un paso pequeño que puedas hacer hoy.";
-  }
-
-  return "Convierte esto en un paso concreto antes de cerrar el día.";
+  const key = resolveActionKey(context);
+  const seed = `${key}:${activeAction ?? ""}:${unfinishedActionsCount}`;
+  return pickVariant(ACTION_LINES[loc][key], seed);
 }
 
 function buildQuestion(context: ResponseFinalizationContext): string {
+  const loc = context.locale ?? "es";
   const activeAction = context.goal?.activeAction;
   const confront = context.mentor?.confront ?? false;
 
-  if (activeAction && confront) {
-    return `¿Lo haces hoy o sigues evitando lo importante?`;
-  }
-
   if (activeAction) {
-    return "¿Lo vas a hacer hoy?";
+    const templates: Record<CoachLocale, { confront: string; soft: string }> = {
+      es: {
+        confront: `¿Lo haces hoy o sigues evitando lo importante?`,
+        soft: `¿Lo vas a hacer hoy?`,
+      },
+      en: {
+        confront: `Are you doing it today, or are you still avoiding what matters?`,
+        soft: `Are you going to do it today?`,
+      },
+      pt: {
+        confront: `Fazes isso hoje ou continuas a evitar o que importa?`,
+        soft: `Vais fazê-lo hoje?`,
+      },
+      fr: {
+        confront: `Tu le fais aujourd'hui ou tu continues à éviter l'essentiel ?`,
+        soft: `Tu le fais aujourd'hui ?`,
+      },
+      de: {
+        confront: `Machst du es heute oder weichst du weiter dem aus, was zählt?`,
+        soft: `Machst du es heute?`,
+      },
+    };
+    return confront ? templates[loc].confront : templates[loc].soft;
   }
 
-  if (context.state === "bloqueo") {
-    return "¿Cuál es el paso más pequeño que sí puedes hacer hoy?";
-  }
-
-  if (context.state === "duda") {
-    return "¿Qué opción eliges hoy?";
-  }
-
-  if (context.state === "ansiedad") {
-    return "¿Qué puedes controlar en la próxima hora?";
-  }
-
-  if (context.state === "claridad") {
-    return "¿Qué vas a cerrar hoy para que esto deje de ser solo una idea?";
-  }
-
-  if (context.onboarding?.active) {
-    return "¿Qué estás evitando ahora mismo?";
-  }
-
-  return "¿Qué pequeño paso puedes dar hoy?";
+  const key = resolveActionKey(context);
+  const seed = `q:${key}:${activeAction ?? ""}`;
+  return pickVariant(QUESTION_LINES[loc][key], seed);
 }
 
 /**

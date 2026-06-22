@@ -52,3 +52,127 @@ export function detectLanguageRequest(
   }
   return { changed: false };
 }
+
+// ── Auto-detección por idioma del PROPIO mensaje ──────────────────────────
+// Caso de uso: usuario en /es (UI español) escribe en inglés ("Hi, how are
+// you today?") sin pedir cambio explícito. Antes el coach respondía siempre
+// en español (recordatorio final del system prompt). Ahora detectamos el
+// idioma del mensaje por stopwords + chars característicos y devolvemos un
+// override LOCAL del locale — solo para esa request, sin tocar BD, cookie
+// ni UI. Si el siguiente mensaje vuelve al idioma original, el coach se
+// adapta también. Comportamiento estilo conversación natural multilingüe.
+//
+// Por qué stopwords y no franc/cld: 1) cero deps nuevas, 2) los 5 idiomas
+// soportados son lo suficientemente distintos entre sí para que conteo de
+// palabras función dé alta precisión, 3) franc-min añade ~50KB al bundle.
+
+type SupportedLocale = "es" | "en" | "pt" | "fr" | "de";
+
+const STOPWORDS: Record<SupportedLocale, ReadonlyArray<string>> = {
+  // Lista corta de stopwords muy frecuentes + altamente distintivas. NO
+  // incluir palabras que aparecen en varios idiomas a la vez (ej. "no" o "a"
+  // existen en es/pt/en/it). Sí incluir contracciones inequívocas.
+  es: [
+    "el", "la", "los", "las", "un", "una", "de", "del", "que", "es", "está",
+    "estoy", "soy", "tengo", "muy", "pero", "porque", "para", "cuando",
+    "también", "sí", "qué", "cómo", "dónde", "cuándo", "esto", "eso", "esa",
+    "este", "mi", "mis", "tu", "tus", "su", "sus", "hola", "gracias", "ahora",
+  ],
+  en: [
+    "the", "and", "of", "to", "in", "is", "it", "that", "this", "with", "for",
+    "you", "your", "i'm", "i've", "i'd", "i'll", "don't", "doesn't", "can't",
+    "won't", "isn't", "aren't", "wasn't", "haven't", "what's", "how's",
+    "hello", "thanks", "today", "tomorrow", "yesterday", "because", "about",
+  ],
+  pt: [
+    "o", "a", "os", "as", "um", "uma", "de", "do", "da", "que", "é", "está",
+    "estou", "sou", "tenho", "mas", "porque", "para", "quando", "também",
+    "sim", "não", "olá", "obrigado", "obrigada", "você", "muito", "isto",
+    "isso", "essa", "este", "meu", "minha", "seu", "sua", "agora",
+  ],
+  fr: [
+    "le", "la", "les", "un", "une", "des", "de", "du", "que", "est", "suis",
+    "j'ai", "c'est", "n'est", "qu'est", "qu'il", "mais", "parce", "pour",
+    "quand", "aussi", "oui", "bonjour", "merci", "très", "ceci", "cela",
+    "mon", "ma", "mes", "tes", "ses", "votre", "aujourd'hui",
+  ],
+  de: [
+    "der", "die", "das", "den", "ein", "eine", "ich", "du", "sie", "wir",
+    "ist", "sind", "habe", "haben", "nicht", "aber", "weil", "auch", "ja",
+    "hallo", "danke", "sehr", "dies", "diese", "mein", "meine", "dein",
+    "heute", "morgen", "gestern", "wenn", "als", "über", "ändern", "können",
+  ],
+};
+
+// Marcadores diacríticos como tie-breaker cuando dos idiomas empatan en
+// stopwords. NO usar solos — "está" puede ser es o pt; "été" puede ser fr.
+const DIACRITIC_HINTS: Record<SupportedLocale, RegExp> = {
+  es: /[¿¡ñÑ]/,
+  en: /(?!)/, // sin hint específico (inglés sin diacríticos relevantes)
+  pt: /[ãõÃÕ]|[çÇ](?=[aeiouAEIOU])/, // ã/õ son inequívocos pt
+  fr: /[œŒ]|[àâèêëîïôûüù]/, // diacríticos amplios (algunos solapan con pt)
+  de: /[äöüÄÖÜß]/,
+};
+
+export type MessageLanguageDetection =
+  | { detected: true; locale: SupportedLocale }
+  | { detected: false };
+
+/**
+ * Detecta el idioma del mensaje del usuario por scoring de stopwords +
+ * diacríticos. Devuelve `{ detected: true, locale }` SOLO si:
+ *   - El mensaje tiene >= 5 palabras (mensajes cortos son ambiguos)
+ *   - El idioma ganador tiene >= 2 matches de stopwords
+ *   - El ganador tiene al menos 2x más matches que el segundo
+ *   - El idioma detectado difiere de `currentLocale`
+ *
+ * Si NO se cumple, devuelve `{ detected: false }` y el caller mantiene
+ * `currentLocale`. Diseñado para fail-safe: ante duda, NO cambia.
+ */
+export function detectMessageLanguage(
+  message: string,
+  currentLocale: string,
+  allowedLocales: ReadonlyArray<SupportedLocale> = ["es", "en", "pt", "fr", "de"],
+): MessageLanguageDetection {
+  if (!message || message.trim().length < 8) return { detected: false };
+
+  // Tokenize en palabras, normalizado a minúsculas pero PRESERVANDO
+  // diacríticos (los necesita el matcher). Punctuación fuera salvo ' que
+  // forma parte de contracciones inglesas y francesas.
+  const tokens = message
+    .toLowerCase()
+    .split(/[\s.,;:!?()[\]{}«»"–—…]+/)
+    .filter((t) => t.length > 0);
+
+  if (tokens.length < 5) return { detected: false };
+
+  const scores: Partial<Record<SupportedLocale, number>> = {};
+  for (const locale of allowedLocales) {
+    let count = 0;
+    const stopSet = new Set(STOPWORDS[locale]);
+    for (const token of tokens) {
+      if (stopSet.has(token)) count++;
+    }
+    // Bonus de 2 si hay diacríticos inequívocos. Multiplicador suave.
+    if (DIACRITIC_HINTS[locale].test(message)) count += 2;
+    scores[locale] = count;
+  }
+
+  // Ranking
+  const ranked = Object.entries(scores)
+    .map(([loc, score]) => ({ loc: loc as SupportedLocale, score: score ?? 0 }))
+    .sort((a, b) => b.score - a.score);
+
+  const winner = ranked[0];
+  const runnerUp = ranked[1];
+
+  if (!winner || winner.score < 2) return { detected: false };
+  if (runnerUp && winner.score < runnerUp.score * 2) {
+    // Empate o margen insuficiente: no cambiar.
+    return { detected: false };
+  }
+
+  if (winner.loc === currentLocale) return { detected: false };
+
+  return { detected: true, locale: winner.loc };
+}

@@ -499,6 +499,64 @@ const CHECKS: Check[] = [
       return { status: "ok", detail: "Sin fallos", meta: { count } };
     },
   },
+  {
+    // Tasa de fallback LLM en la última hora. Añadido tras incidente 2026-06-22
+    // (OpenRouter sin saldo durante 3 días → 91.3% respuestas con fallback
+    // hardcoded sin que nadie se enterara). Acompaña la alerta Telegram en
+    // services/llm-health.ts; aquí el operador puede mirar el estado en vivo.
+    id: "product.llm_fallback_rate",
+    name: "LLM fallback rate (1h)",
+    category: "product",
+    run: async () => {
+      const prisma = getPrismaClient();
+      const since = new Date(Date.now() - 60 * 60 * 1000);
+      const [fallbacks, requests] = await withTimeout(
+        Promise.all([
+          prisma.systemLog.count({
+            where: { tag: "AI_FALLBACK", timestamp: { gte: since } },
+          }),
+          // Aproximación de requests al chat: contamos los logs de respuesta
+          // del endpoint /api/chat (tag=CHAT, message ∈ {request_done,
+          // request_streaming}). No es 100% preciso pero suficiente para
+          // ratio operativo.
+          prisma.systemLog.count({
+            where: {
+              tag: "CHAT",
+              message: { in: ["request_done", "request_streaming"] },
+              timestamp: { gte: since },
+            },
+          }),
+        ]),
+      );
+      const pct = requests > 0 ? (fallbacks / requests) * 100 : 0;
+      const pctRounded = Number(pct.toFixed(1));
+      // Umbrales: >50% = fail (chat efectivamente caído); 10-50% = warn;
+      // <10% = ok. Si no hay tráfico, ok con detail neutro.
+      const meta = { fallbacks, requests, pct: pctRounded };
+      if (requests === 0) {
+        return { status: "ok" as const, detail: "Sin tráfico en la última hora", meta };
+      }
+      if (pct >= 50) {
+        return {
+          status: "fail" as const,
+          detail: `🚨 ${pctRounded}% fallback (${fallbacks}/${requests}). Revisa saldo OpenRouter.`,
+          meta,
+        };
+      }
+      if (pct >= 10) {
+        return {
+          status: "warn" as const,
+          detail: `⚠️ ${pctRounded}% fallback (${fallbacks}/${requests})`,
+          meta,
+        };
+      }
+      return {
+        status: "ok" as const,
+        detail: `${pctRounded}% fallback (${fallbacks}/${requests})`,
+        meta,
+      };
+    },
+  },
 ];
 
 // ─── Runner ──────────────────────────────────────────────────────────────────

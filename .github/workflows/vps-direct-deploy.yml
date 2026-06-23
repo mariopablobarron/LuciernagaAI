@@ -42,41 +42,32 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-    timeout-minutes: 35 # margen de 5m sobre el command_timeout del SSH (30m). Build cold con cache invalidado puede tomar 15-20 min.
+    # Self-hosted runner en el propio VPS — elimina la dependencia de SSH
+    # entrante desde GitHub Actions y por tanto los problemas con fail2ban
+    # baneando IPs de runners de GitHub (incidente recurrente 2026-06-23
+    # con 4-5 deploys fallidos en una sesión).
+    # Setup: 2026-06-23. Servicio systemd:
+    #   actions.runner.mariopablobarron-tresmilmillonesdelatidos.mentor-web-vps-runner
+    # Directorio: /opt/gh-runner-mentor-web
+    # Replica el patrón ya operativo del repo hub (hub-vps-runner online
+    # desde 2026-06-09).
+    #
+    # Si el runner se cae: ssh root@72.61.195.108 'systemctl restart
+    # actions.runner.mariopablobarron-tresmilmillonesdelatidos.mentor-web-vps-runner'
+    runs-on: [self-hosted, vps, mentor-web]
+    timeout-minutes: 35 # Build cold con cache invalidado puede tomar 15-20 min.
 
     steps:
-      - name: Validar secrets configurados
-        run: |
-          if [ -z "${{ secrets.VPS_SSH_KEY }}" ]; then
-            echo "::error::VPS_SSH_KEY secret no configurado. Ver docs/setup-auto-deploy.md"
-            exit 1
-          fi
-          echo "OK"
-
       # El script vive en /root/deploy-mentor-web.sh en el VPS (ver
-      # docs/setup-auto-deploy.md). Mantenerlo en el host permite
-      # restringir la SSH key con command="/root/deploy-mentor-web.sh"
-      # en authorized_keys, evitando acceso root pleno para GH Actions.
-      # Modificaciones al deploy se hacen editando ese script en el VPS,
-      # no este YAML.
-      - name: Deploy via SSH al VPS
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: 72.61.195.108
-          port: 22
-          username: root
-          key: ${{ secrets.VPS_SSH_KEY }}
-          # 30m (antes 20m). Build cold sin cache de Docker — provocado por
-          # cambios en archivos que invalidan layers (Dockerfile, package.json,
-          # globals.css, etc.) — puede tomar 15-20 min solo en `docker build`,
-          # dejando poco margen para `compose up -d` + health check. El
-          # 2026-05-24 el deploy de los spells (commit e86fde2) hizo timeout
-          # exacto a 20m con la imagen ya construida pero sin llegar al
-          # switch del compose (3 días sin desplegar). Ver memoria
-          # reference_deploy_validation.md.
-          command_timeout: 30m
-          script: /root/deploy-mentor-web.sh
+      # docs/setup-auto-deploy.md). Lo ejecutamos DIRECTAMENTE porque el
+      # runner corre como root en el propio VPS — sin SSH intermedio.
+      # Esto elimina:
+      #   - SSH timeout por fail2ban baneando runners de GitHub
+      #   - Necesidad del secret VPS_SSH_KEY (queda como código muerto
+      #     pero no se elimina por si alguien lo usa de fallback)
+      #   - Dependencia de appleboy/ssh-action externa
+      - name: Deploy (script en el VPS)
+        run: /root/deploy-mentor-web.sh
 
       - name: Verificar que la web responde
         run: |

@@ -114,6 +114,43 @@ const DIACRITIC_HINTS: Record<SupportedLocale, RegExp> = {
   de: /[äöüÄÖÜß]/,
 };
 
+// Saludos cortos inequívocos. Edge case observado 23-jun-2026: usuaria
+// inglesa empieza con "hello", recibe "¿Qué llevas semanas evitando hacer?"
+// en español (cookie locale=es por default). Resto de la conversación va en
+// inglés porque la stopword detection ya tiene material, pero el primer
+// turno queda raro. Estos saludos son tan distintivos que los detectamos
+// instant sin esperar a tener >=5 palabras.
+//
+// Criterio: incluir solo lo INEQUÍVOCO en el idioma destino. "hi" se
+// considera inglés porque en es/pt/fr/de los hablantes prácticamente no
+// lo usan como saludo. "hallo" es alemán (también holandés pero no
+// soportamos holandés). "bonjour" es francés inequívoco. "olá" portugués
+// inequívoco. "hola" español inequívoco.
+const GREETING_HINTS: Record<SupportedLocale, ReadonlyArray<string>> = {
+  en: ["hi", "hello", "hey", "yo", "sup"],
+  es: ["hola", "holi", "buenas", "qué tal", "que tal"],
+  pt: ["olá", "ola", "oi"],
+  fr: ["salut", "bonjour", "coucou", "bonsoir"],
+  de: ["hallo", "servus", "moin", "tschüss"],
+};
+
+function detectGreeting(message: string): SupportedLocale | null {
+  // Normalizamos: minúsculas, quitamos puntuación final, colapsamos espacios.
+  const normalized = message
+    .toLowerCase()
+    .replace(/[!?.,;:¡¿]+$/g, "")
+    .trim();
+  // Solo activamos cuando el mensaje ENTERO es el saludo (no como prefijo
+  // de una frase larga — esa la cubre stopword detection).
+  if (normalized.length === 0 || normalized.length > 20) return null;
+  for (const [loc, greetings] of Object.entries(GREETING_HINTS)) {
+    if (greetings.includes(normalized)) {
+      return loc as SupportedLocale;
+    }
+  }
+  return null;
+}
+
 export type MessageLanguageDetection =
   | { detected: true; locale: SupportedLocale }
   | { detected: false };
@@ -134,7 +171,16 @@ export function detectMessageLanguage(
   currentLocale: string,
   allowedLocales: ReadonlyArray<SupportedLocale> = ["es", "en", "pt", "fr", "de"],
 ): MessageLanguageDetection {
-  if (!message || message.trim().length < 8) return { detected: false };
+  if (!message) return { detected: false };
+
+  // Fast-path: saludo inequívoco (1-3 palabras) → detección instant sin
+  // pasar por scoring de stopwords. Cubre "hello"/"hola"/"bonjour"/etc.
+  const greetingLocale = detectGreeting(message);
+  if (greetingLocale && allowedLocales.includes(greetingLocale) && greetingLocale !== currentLocale) {
+    return { detected: true, locale: greetingLocale };
+  }
+
+  if (message.trim().length < 8) return { detected: false };
 
   // Tokenize en palabras, normalizado a minúsculas pero PRESERVANDO
   // diacríticos (los necesita el matcher). Punctuación fuera salvo ' que

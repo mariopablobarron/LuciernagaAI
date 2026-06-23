@@ -118,4 +118,44 @@ describe("detectMessageLanguage — auto-detección del idioma del mensaje", () 
     const r = detectMessageLanguage("ok no problem hola buenas", "es");
     expect(r).toEqual({ detected: false });
   });
+
+  // ── Fast-path saludos cortos ──────────────────────────────────────────
+  // Edge case observado 23-jun-2026: usuaria inglesa empieza con "hello",
+  // recibe respuesta en español por defecto del UI. Fast-path GREETING_HINTS.
+
+  test("'hello' solo (locale=es) → detecta en", () => {
+    expect(detectMessageLanguage("hello", "es")).toEqual({ detected: true, locale: "en" });
+  });
+
+  test("'hi!' (locale=es) → detecta en", () => {
+    expect(detectMessageLanguage("hi!", "es")).toEqual({ detected: true, locale: "en" });
+  });
+
+  test("'hola' (locale=en) → detecta es", () => {
+    expect(detectMessageLanguage("hola", "en")).toEqual({ detected: true, locale: "es" });
+  });
+
+  test("'bonjour' (locale=es) → detecta fr", () => {
+    expect(detectMessageLanguage("bonjour", "es")).toEqual({ detected: true, locale: "fr" });
+  });
+
+  test("'hallo' (locale=es) → detecta de", () => {
+    expect(detectMessageLanguage("hallo", "es")).toEqual({ detected: true, locale: "de" });
+  });
+
+  test("'olá' (locale=es) → detecta pt", () => {
+    expect(detectMessageLanguage("olá", "es")).toEqual({ detected: true, locale: "pt" });
+  });
+
+  test("Saludo en el mismo locale → NO cambia", () => {
+    expect(detectMessageLanguage("hola", "es")).toEqual({ detected: false });
+    expect(detectMessageLanguage("hello", "en")).toEqual({ detected: false });
+  });
+
+  test("Texto largo que empieza con saludo NO usa fast-path (cae a stopwords)", () => {
+    // "hello, how are you doing today my friend" — más de 20 chars trimmed,
+    // así que fast-path no aplica; pero stopword detection sí debería pillar EN.
+    const r = detectMessageLanguage("hello, how are you doing today my friend", "es");
+    expect(r).toEqual({ detected: true, locale: "en" });
+  });
 });

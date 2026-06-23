@@ -22,6 +22,7 @@ const PAGES: Entry[] = [
   { path: "/como-funciona", priority: 0.8, changeFrequency: "monthly" },
   { path: "/casos-de-uso", priority: 0.8, changeFrequency: "monthly" },
   { path: "/recursos", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/comparativa", priority: 0.8, changeFrequency: "monthly" },
   { path: "/faq", priority: 0.8, changeFrequency: "monthly" },
   { path: "/blog", priority: 0.8, changeFrequency: "daily" },
   { path: "/reto", priority: 0.7, changeFrequency: "monthly" },

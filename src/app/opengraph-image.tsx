@@ -64,9 +64,14 @@ export default function OGImage() {
           </span>
         </div>
 
-        {/* Headline */}
+        {/* Headline — Satori (ImageResponse) requiere display:flex en cualquier
+            div con multiple children, incluso si son texto + span inline. */}
         <div
           style={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            alignItems: "baseline",
             fontSize: "64px",
             fontWeight: "800",
             color: "#ffffff",
@@ -77,8 +82,9 @@ export default function OGImage() {
             maxWidth: "900px",
           }}
         >
-          ¿Qué te está{" "}
-          <span style={{ color: "#c084fc" }}>frenando</span>?
+          <span>¿Qué te está&nbsp;</span>
+          <span style={{ color: "#c084fc" }}>frenando</span>
+          <span>?</span>
         </div>
 
         {/* Subtext */}

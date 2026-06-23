@@ -866,7 +866,7 @@
     }
   },
   "pricing": {
-    "metaTitle": "Tarifs — Trois Milliards de Battements",
+    "metaTitle": "Tarifs",
     "metaDescription": "Trois Milliards de Battements : accès complet gratuit pendant la phase MVP. Inscris-toi et accède au mentorat avec IA, check-ins, journal, Mode Impulse et plus. Sans carte bancaire.",
     "metaOgDescription": "Phase MVP : accès Pro gratuit. Mentorat avec IA, check-ins, journal et Mode Impulse. Sans frais.",
     "metaTwitterDescription": "Mentorat avec IA gratuit pendant le MVP. Sans carte bancaire.",
@@ -1583,7 +1583,7 @@
     "finalDisclaimer": "Trois Milliards de Battements ne remplace pas une thérapie ni une intervention psychologique professionnelle."
   },
   "contact": {
-    "metaTitle": "Contact — Trois Milliards de Battements",
+    "metaTitle": "Contact",
     "metaDescription": "Tu as des questions ou tu veux en savoir plus ? Écris-nous et nous te répondons en moins de 24 heures.",
     "title": "Contacte-nous",
     "subtitle": "Nous répondons en moins de 24 heures.",
@@ -2142,7 +2142,7 @@
     }
   },
   "minors": {
-    "metaTitle": "On t'attend — Trois Milliards de Battements",
+    "metaTitle": "On t'attend",
     "metaDescription": "Cette plateforme demande que tu aies au moins 14 ans. En attendant, on te laisse des ressources pensées pour toi.",
     "heading": "On t'attend.",
     "p1": "Cette plateforme est pensée pour les personnes à partir de 14 ans. Ce n'est pas parce qu'on ne tient pas à toi — c'est parce que pour t'accompagner comme tu le mérites, on a besoin qu'un adulte de confiance soit près de toi.",
@@ -2173,7 +2173,7 @@
     "goWaitlist": "Aller à la liste d'attente"
   },
   "family": {
-    "metaTitle": "Portail de Soutien | Trois Milliards de Battements",
+    "metaTitle": "Portail de Soutien",
     "metaDescription": "Portail privé pour les contacts de confiance.",
     "heading": "Portail de Soutien",
     "subtitleTpl": "Réseau de confiance de {name}",

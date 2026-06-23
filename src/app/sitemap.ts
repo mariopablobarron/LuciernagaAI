@@ -51,6 +51,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
               en: `${BASE}/en${page.path === "/" ? "" : page.path}`,
               pt: `${BASE}/pt${page.path === "/" ? "" : page.path}`,
               fr: `${BASE}/fr${page.path === "/" ? "" : page.path}`,
+              de: `${BASE}/de${page.path === "/" ? "" : page.path}`,
+              // x-default: indica a Google la versión "fallback" cuando no
+              // matchea ningún idioma del browser del usuario. Apunta a ES.
+              "x-default": `${BASE}${page.path}`,
             },
           },
         }

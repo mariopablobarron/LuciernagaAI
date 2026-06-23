@@ -866,7 +866,7 @@
     }
   },
   "pricing": {
-    "metaTitle": "Precios — Tres Mil Millones de Latidos",
+    "metaTitle": "Precios",
     "metaDescription": "Tres Mil Millones de Latidos: acceso completo gratuito durante la fase MVP. Regístrate y accede a mentoría con IA, check-ins, diario, Modo Impulso y más. Sin tarjeta de crédito.",
     "metaOgDescription": "Fase MVP: acceso Pro gratuito. Mentoría con IA, check-ins, diario y Modo Impulso. Sin coste.",
     "metaTwitterDescription": "Mentoría con IA gratis durante el MVP. Sin tarjeta de crédito.",
@@ -1583,7 +1583,7 @@
     "finalDisclaimer": "Tres Mil Millones de Latidos no sustituye terapia ni intervención psicológica profesional."
   },
   "contact": {
-    "metaTitle": "Contacto — Tres Mil Millones de Latidos",
+    "metaTitle": "Contacto",
     "metaDescription": "¿Tienes dudas o quieres saber más? Escríbenos y te respondemos en menos de 24 horas.",
     "title": "Contáctanos",
     "subtitle": "Respondemos en menos de 24 horas.",
@@ -2142,7 +2142,7 @@
     }
   },
   "minors": {
-    "metaTitle": "Estamos esperándote — Tres Mil Millones de Latidos",
+    "metaTitle": "Estamos esperándote",
     "metaDescription": "Esta plataforma necesita que tengas al menos 14 años. Mientras tanto te dejamos recursos pensados para ti.",
     "heading": "Estamos esperándote.",
     "p1": "Esta plataforma está pensada para personas a partir de 14 años. No es porque no nos importes — es porque para acompañarte como mereces necesitamos que un adulto de confianza esté cerca.",
@@ -2173,7 +2173,7 @@
     "goWaitlist": "Ir a la lista de espera"
   },
   "family": {
-    "metaTitle": "Portal de Apoyo | Tres Mil Millones de Latidos",
+    "metaTitle": "Portal de Apoyo",
     "metaDescription": "Portal privado para contactos de confianza.",
     "heading": "Portal de Apoyo",
     "subtitleTpl": "Red de confianza de {name}",

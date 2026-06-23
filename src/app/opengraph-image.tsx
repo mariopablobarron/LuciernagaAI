@@ -1,6 +1,14 @@
 import { ImageResponse } from "next/og";
 
-export const runtime = "edge";
+// runtime=nodejs en lugar de edge: el contenedor Docker self-hosted en
+// VPS Hostinger NO tiene runtime edge configurado — Next.js intenta arrancar
+// el handler en edge runtime y devuelve 502. Bug reportado por SEO audit
+// 2026-06-23: el opengraph-image responde 502 → cada link compartido en
+// WhatsApp/LinkedIn muestra preview rota. Cambio a nodejs runtime hace que
+// el handler corra en el Node.js runtime estándar que sí tenemos en el
+// container. Trade-off: ~50ms más de cold start, pero la imagen es la
+// MISMA y se cachea agresivamente downstream.
+export const runtime = "nodejs";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

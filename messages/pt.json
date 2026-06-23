@@ -866,7 +866,7 @@
     }
   },
   "pricing": {
-    "metaTitle": "Preços — Três Mil Milhões de Batidas",
+    "metaTitle": "Preços",
     "metaDescription": "Três Mil Milhões de Batidas: acesso completo gratuito durante a fase MVP. Regista-te e acede a mentoria com IA, check-ins, diário, Modo Impulso e mais. Sem cartão de crédito.",
     "metaOgDescription": "Fase MVP: acesso Pro gratuito. Mentoria com IA, check-ins, diário e Modo Impulso. Sem custo.",
     "metaTwitterDescription": "Mentoria com IA grátis durante o MVP. Sem cartão de crédito.",
@@ -1583,7 +1583,7 @@
     "finalDisclaimer": "Três Mil Milhões de Batidas não substitui terapia nem intervenção psicológica profissional."
   },
   "contact": {
-    "metaTitle": "Contacto — Três Mil Milhões de Batidas",
+    "metaTitle": "Contacto",
     "metaDescription": "Tens dúvidas ou queres saber mais? Escreve-nos e respondemos em menos de 24 horas.",
     "title": "Contacta-nos",
     "subtitle": "Respondemos em menos de 24 horas.",
@@ -2142,7 +2142,7 @@
     }
   },
   "minors": {
-    "metaTitle": "Estamos à tua espera — Três Mil Milhões de Batidas",
+    "metaTitle": "Estamos à tua espera",
     "metaDescription": "Esta plataforma requer que tenhas pelo menos 14 anos. Enquanto isso, deixamos-te recursos pensados para ti.",
     "heading": "Estamos à tua espera.",
     "p1": "Esta plataforma é pensada para pessoas a partir dos 14 anos. Não é porque não nos importes — é porque para te acompanharmos como mereces precisamos que um adulto de confiança esteja perto.",
@@ -2173,7 +2173,7 @@
     "goWaitlist": "Ir para a lista de espera"
   },
   "family": {
-    "metaTitle": "Portal de Apoio | Três Mil Milhões de Batidas",
+    "metaTitle": "Portal de Apoio",
     "metaDescription": "Portal privado para contactos de confiança.",
     "heading": "Portal de Apoio",
     "subtitleTpl": "Rede de confiança de {name}",

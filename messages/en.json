@@ -866,7 +866,7 @@
     }
   },
   "pricing": {
-    "metaTitle": "Pricing — Three Billion Heartbeats",
+    "metaTitle": "Pricing",
     "metaDescription": "Three Billion Heartbeats: full access free during the MVP phase. Sign up and get AI mentoring, check-ins, journal, Impulse Mode and more. No credit card required.",
     "metaOgDescription": "MVP phase: free Pro access. AI mentoring, check-ins, journal and Impulse Mode. At no cost.",
     "metaTwitterDescription": "AI mentoring free during the MVP. No credit card.",
@@ -1583,7 +1583,7 @@
     "finalDisclaimer": "Three Billion Heartbeats does not replace therapy or professional psychological intervention."
   },
   "contact": {
-    "metaTitle": "Contact — Three Billion Heartbeats",
+    "metaTitle": "Contact",
     "metaDescription": "Got questions or want to know more? Write to us and we'll reply in under 24 hours.",
     "title": "Contact us",
     "subtitle": "We reply in under 24 hours.",
@@ -2142,7 +2142,7 @@
     }
   },
   "minors": {
-    "metaTitle": "We're waiting for you — Three Billion Heartbeats",
+    "metaTitle": "We're waiting for you",
     "metaDescription": "This platform requires you to be at least 14 years old. In the meantime, here are resources made for you.",
     "heading": "We're waiting for you.",
     "p1": "This platform is designed for people 14 and older. Not because we don't care about you — it's because to support you the way you deserve, we need a trusted adult nearby.",
@@ -2173,7 +2173,7 @@
     "goWaitlist": "Go to waitlist"
   },
   "family": {
-    "metaTitle": "Support Portal | Three Billion Heartbeats",
+    "metaTitle": "Support Portal",
     "metaDescription": "Private portal for trusted contacts.",
     "heading": "Support Portal",
     "subtitleTpl": "Trust network for {name}",

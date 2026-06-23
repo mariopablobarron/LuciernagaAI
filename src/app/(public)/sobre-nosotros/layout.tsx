@@ -1,53 +1,29 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
-  title: "Sobre nosotros — Mario Pablo Sanchez Barron",
+  title: "Sobre nosotros",
   description:
-    "Tres Mil Millones de Latidos nace de Startidea, creada por Mario Pablo Sanchez Barron. 15 años de experiencia en innovación social. Combinamos IA, psicología del comportamiento y acompañamiento real.",
+    "Quiénes somos, por qué construimos un mentor IA con supervisión clínica humana, y por qué insistimos en que NO sustituye a las personas que te quieren.",
   alternates: {
     canonical: "https://tresmilmillonesdelatidos.es/sobre-nosotros",
   },
   openGraph: {
-    title: "Sobre nosotros — Tres Mil Millones de Latidos",
+    title: "Sobre nosotros · Tres Mil Millones de Latidos",
     description:
-      "Conoce a Mario Pablo Sanchez Barron y Startidea, la agencia detrás de Tres Mil Millones de Latidos. 15 años de innovación social.",
-    type: "article",
-    locale: "es_ES",
-    siteName: "Tres Mil Millones de Latidos",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Sobre nosotros — Tres Mil Millones de Latidos" }],
+      "El equipo detrás del mentor IA. Supervisión clínica humana, posicionamiento anti-engagement, transparencia sobre lo que la IA no puede sustituir.",
+    type: "website",
+    url: "https://tresmilmillonesdelatidos.es/sobre-nosotros",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Sobre Tres Mil Millones de Latidos" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sobre nosotros — Tres Mil Millones de Latidos",
-    description:
-      "Mario Pablo Sanchez Barron y Startidea: 15 años de innovación social. Tres Mil Millones de Latidos: un mentor con IA.",
+    title: "Sobre nosotros · Tres Mil Millones de Latidos",
+    description: "Quiénes somos y por qué insistimos en que la IA no sustituye a las personas que te quieren.",
     images: ["/opengraph-image"],
   },
-  robots: { index: true, follow: true },
 };
 
-// AboutPage JSON-LD — helps AI engines identify this as the canonical
-// "about" page for the organization + the founder, boosting entity
-// recognition when users ask "¿quién está detrás de Tres Mil Millones de Latidos?".
-const aboutPageJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "AboutPage",
-  "@id": "https://tresmilmillonesdelatidos.es/sobre-nosotros",
-  name: "Sobre nosotros — Tres Mil Millones de Latidos",
-  url: "https://tresmilmillonesdelatidos.es/sobre-nosotros",
-  inLanguage: "es",
-  mainEntity: { "@id": "https://tresmilmillonesdelatidos.es/#organization" },
-  about: { "@id": "https://tresmilmillonesdelatidos.es/#founder" },
-};
-
-export default function SobreNosotrosLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutPageJsonLd) }}
-      />
-      {children}
-    </>
-  );
+export default function SobreNosotrosLayout({ children }: { children: ReactNode }) {
+  return <>{children}</>;
 }

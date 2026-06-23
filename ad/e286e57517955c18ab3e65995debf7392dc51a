@@ -1,0 +1,25 @@
+src/components/CustomTrackers.tsx
+  s_d2308f25c4747c::t_f4385e40e4deb3 122-124
+  s_d2308f25c4747c::t_9049d423a884fa 45-57
+src/components/ThirdPartyScripts.tsx
+  s_d2308f25c4747c::t_185130ece4b5e2 7
+  s_d2308f25c4747c::t_a9380d133d315a 24-28
+src/components/UmamiPublic.tsx
+  s_d2308f25c4747c::t_c7136b01bca57f 1-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.10",
+  "base_commit_sha": "ade286e57517955c18ab3e65995debf7392dc51a",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Claude (umami no-consent) <noreply@anthropic.com>"
+    }
+  }
+}

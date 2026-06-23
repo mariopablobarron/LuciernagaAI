@@ -42,15 +42,19 @@ export default function CustomTrackers() {
 
   return (
     <>
-      {trackers.map((t) => {
-        const key = `${t.provider}-${t.identifier}`;
-        if (t.provider === "hotjar") return <HotjarScript key={key} siteId={t.identifier} />;
-        if (t.provider === "clarity") return <ClarityScript key={key} projectId={t.identifier} />;
-        if (t.provider === "plausible") return <PlausibleScript key={key} domain={t.identifier} apiHost={t.apiHost} />;
-        if (t.provider === "posthog") return <PostHogScript key={key} projectKey={t.identifier} apiHost={t.apiHost} />;
-        if (t.provider === "umami") return <UmamiScript key={key} websiteId={t.identifier} apiHost={t.apiHost} />;
-        return null;
-      })}
+      {trackers
+        // Umami se carga sin consent vía UmamiPublic.tsx (no usa cookies →
+        // exento del consent GDPR). Filtramos aquí para evitar doble carga
+        // si alguien lo configura desde /admin/marketing → Trackers.
+        .filter((t) => t.provider !== "umami")
+        .map((t) => {
+          const key = `${t.provider}-${t.identifier}`;
+          if (t.provider === "hotjar") return <HotjarScript key={key} siteId={t.identifier} />;
+          if (t.provider === "clarity") return <ClarityScript key={key} projectId={t.identifier} />;
+          if (t.provider === "plausible") return <PlausibleScript key={key} domain={t.identifier} apiHost={t.apiHost} />;
+          if (t.provider === "posthog") return <PostHogScript key={key} projectKey={t.identifier} apiHost={t.apiHost} />;
+          return null;
+        })}
     </>
   );
 }
@@ -115,23 +119,9 @@ function PlausibleScript({ domain, apiHost }: { domain: string; apiHost: string 
   );
 }
 
-function UmamiScript({ websiteId, apiHost }: { websiteId: string; apiHost: string | null }) {
-  // websiteId es UUID v4: hex con guiones.
-  if (!/^[A-Za-z0-9\-]+$/.test(websiteId)) return null;
-  // apiHost obligatorio para Umami self-hosted. Fallback al cloud público.
-  const src = apiHost && /^https:\/\/[A-Za-z0-9.\-]+/.test(apiHost)
-    ? `${apiHost.replace(/\/+$/, "")}/script.js`
-    : "https://cloud.umami.is/script.js";
-  return (
-    <Script
-      id={`umami-${websiteId}`}
-      strategy="afterInteractive"
-      defer
-      data-website-id={websiteId}
-      src={src}
-    />
-  );
-}
+// Nota: UmamiScript se movió a UmamiPublic.tsx (sin consent, monta global).
+// Si en /admin/marketing se configura un Umami custom, se ignora aquí
+// (ver filter en el map de arriba).
 
 function PostHogScript({ projectKey, apiHost }: { projectKey: string; apiHost: string | null }) {
   if (!/^[A-Za-z0-9_\-]+$/.test(projectKey)) return null;

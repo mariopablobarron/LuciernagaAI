@@ -4,6 +4,7 @@ import Analytics from "@/components/Analytics";
 import MetaPixel from "@/components/MetaPixel";
 import Inspectlet from "@/components/Inspectlet";
 import CustomTrackers from "@/components/CustomTrackers";
+import UmamiPublic from "@/components/UmamiPublic";
 
 /**
  * Punto único de entrada para todos los scripts/píxeles de terceros.
@@ -20,6 +21,11 @@ import CustomTrackers from "@/components/CustomTrackers";
 export default function ThirdPartyScripts() {
   return (
     <>
+      {/* Umami: sin cookies → no requiere consent (GDPR/LSSI compliant).
+          Capturas 100% del tráfico. Ver UmamiPublic.tsx para justificación. */}
+      <UmamiPublic />
+
+      {/* Resto: requieren cookies, gated por cookie_consent en cada uno. */}
       <Analytics />
       <MetaPixel />
       <Inspectlet />

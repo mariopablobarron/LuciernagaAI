@@ -5,6 +5,10 @@ import type { ReactNode } from "react";
 // y no puede exportar generateMetadata). SEO audit 2026-06-23: la página no
 // tenía title/description/OG propios. Esta landing es la principal puerta B2B.
 
+// ISR: revalidate cada 24h. Estas páginas cambian poco — el HTML cacheado
+// reduce TTFB y carga del VPS. SEO audit 2026-06-23 #8.
+export const revalidate = 86400;
+
 export const metadata: Metadata = {
   title: "Mentor IA para profesionales de salud mental",
   description:

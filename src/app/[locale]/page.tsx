@@ -4,6 +4,11 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import LandingPageI18n from "@/components/home/LandingPageI18n";
 import { resolveMedia } from "@/i18n/media";
 
+// ISR: revalidate cada 1h. La home cambia más que las páginas internas
+// (testimonios, contadores). 1h equilibra freshness vs hits al VPS.
+// SEO audit 2026-06-23 #8.
+export const revalidate = 3600;
+
 export async function generateMetadata({
   params,
 }: {

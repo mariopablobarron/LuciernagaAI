@@ -1,31 +1,29 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
-  title: "El método — Tres Mil Millones de Latidos",
+  title: "Cómo funciona el mentor IA",
   description:
-    "Cómo trabaja el mentor: interpelar antes de instruir, validar la emoción, ordenar el pensamiento, proponer acción. Un marco pedagógico basado en 15 años de acompañamiento real.",
+    "Cuéntale lo que te bloquea, sal con un paso concreto. Sin registro para empezar, sin entrenamiento de modelos con tus datos. Supervisión clínica humana.",
   alternates: {
     canonical: "https://tresmilmillonesdelatidos.es/como-funciona",
   },
   openGraph: {
-    title: "El método — Tres Mil Millones de Latidos",
+    title: "Cómo funciona el mentor IA",
     description:
-      "No damos consejos. Hacemos preguntas. El marco pedagógico detrás del mentor.",
-    type: "article",
-    locale: "es_ES",
-    siteName: "Tres Mil Millones de Latidos",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "El método" }],
+      "El método: te escucha, detecta tu estado, propone un paso concreto que sí puedes hacer hoy. Anónimo desde el primer mensaje.",
+    type: "website",
+    url: "https://tresmilmillonesdelatidos.es/como-funciona",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Cómo funciona Tres Mil Millones de Latidos" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "El método — Tres Mil Millones de Latidos",
-    description:
-      "Interpelar antes de instruir. El marco pedagógico detrás del mentor.",
+    title: "Cómo funciona el mentor IA",
+    description: "Te escucha, detecta tu estado, propone un paso concreto. Anónimo.",
     images: ["/opengraph-image"],
   },
-  robots: { index: true, follow: true },
 };
 
-export default function ComoFuncionaLayout({ children }: { children: React.ReactNode }) {
-  return children;
+export default function ComoFuncionaLayout({ children }: { children: ReactNode }) {
+  return <>{children}</>;
 }

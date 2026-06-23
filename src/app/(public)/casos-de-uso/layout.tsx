@@ -1,35 +1,29 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
-  title: "Casos de uso — Tres Mil Millones de Latidos",
+  title: "Casos de uso",
   description:
-    "¿Te bloqueas ante decisiones? ¿Vives con ansiedad cotidiana? ¿Atraviesas una transición vital? Descubre cómo el mentor te acompaña según lo que traigas.",
+    "Bloqueo creativo, ansiedad antes de una decisión, niebla mental, claridad que no sabes cómo bajar a tierra. Cuatro estados habituales y cómo el mentor te acompaña.",
   alternates: {
     canonical: "https://tresmilmillonesdelatidos.es/casos-de-uso",
   },
   openGraph: {
-    title: "Casos de uso — Tres Mil Millones de Latidos",
+    title: "Casos de uso · Tres Mil Millones de Latidos",
     description:
-      "Bloqueos, ansiedad cotidiana, transiciones vitales, autoconocimiento. Cómo el mentor encaja según tu momento.",
-    type: "article",
-    locale: "es_ES",
-    siteName: "Tres Mil Millones de Latidos",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Casos de uso" }],
+      "Bloqueo, ansiedad, niebla, claridad. Los cuatro estados donde el mentor IA aporta valor real entre sesiones (o sin terapia detrás).",
+    type: "website",
+    url: "https://tresmilmillonesdelatidos.es/casos-de-uso",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Casos de uso Tres Mil Millones de Latidos" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Casos de uso — Tres Mil Millones de Latidos",
-    description:
-      "Cómo el mentor encaja según lo que estés atravesando.",
+    title: "Casos de uso · Tres Mil Millones de Latidos",
+    description: "Bloqueo, ansiedad, niebla, claridad. Cómo el mentor te acompaña en cada estado.",
     images: ["/opengraph-image"],
   },
-  robots: { index: true, follow: true },
 };
 
-export default function CasosDeUsoLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return children;
+export default function CasosDeUsoLayout({ children }: { children: ReactNode }) {
+  return <>{children}</>;
 }

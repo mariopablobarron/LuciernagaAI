@@ -1,35 +1,33 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
+
+// Metadata server-side para /para-profesionales (page.tsx es client component
+// y no puede exportar generateMetadata). SEO audit 2026-06-23: la página no
+// tenía title/description/OG propios. Esta landing es la principal puerta B2B.
 
 export const metadata: Metadata = {
-  title: "Para profesionales — Tres Mil Millones de Latidos",
+  title: "Mentor IA para profesionales de salud mental",
   description:
-    "Un acompañamiento complementario para tus clientes entre sesiones. Panel clínico, detección de riesgo, notas y un marco pedagógico revisado por profesional de la psicología. No sustituye terapia — la refuerza.",
+    "Panel clínico, detección temprana de riesgo y notas integradas. La IA acompaña a tu cliente entre sesiones sin sustituir tu trabajo. Piloto 3 meses gratis.",
   alternates: {
     canonical: "https://tresmilmillonesdelatidos.es/para-profesionales",
   },
   openGraph: {
-    title: "Para profesionales — Tres Mil Millones de Latidos",
+    title: "Mentor IA para profesionales de salud mental",
     description:
-      "Un acompañamiento entre sesiones con panel clínico, detección de riesgo y protocolo supervisado clínicamente.",
-    type: "article",
-    locale: "es_ES",
-    siteName: "Tres Mil Millones de Latidos",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Para profesionales" }],
+      "Panel clínico con seguimiento entre sesiones, detección temprana de riesgo, notas integradas. Diseñado como complemento — no sustituto — del trabajo clínico.",
+    type: "website",
+    url: "https://tresmilmillonesdelatidos.es/para-profesionales",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Tres Mil Millones de Latidos para profesionales" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Para profesionales — Tres Mil Millones de Latidos",
-    description:
-      "Un acompañamiento complementario con panel clínico para tu consulta.",
+    title: "Mentor IA para profesionales de salud mental",
+    description: "Acompañamiento entre sesiones, detección de riesgo, notas clínicas. Piloto gratuito 3 meses.",
     images: ["/opengraph-image"],
   },
-  robots: { index: true, follow: true },
 };
 
-export default function ParaProfesionalesLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return children;
+export default function ParaProfesionalesLayout({ children }: { children: ReactNode }) {
+  return <>{children}</>;
 }

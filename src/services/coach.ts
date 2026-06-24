@@ -288,14 +288,14 @@ function buildLocaleGuidance(locale: CoachContext["locale"] | undefined): string
   const norm = locale ?? "es";
 
   const blocks: Record<NonNullable<CoachContext["locale"]>, string> = {
-    es: `IDIOMA DE RESPUESTA: español de España. Responde SIEMPRE en español, sin importar el idioma del input del usuario. Si el usuario pide explícitamente otro idioma (ej. "in English", "em português", "en français"), responde en español pero indica una sola frase: "Puedes cambiar el idioma desde el selector arriba en la web." NO te niegues a hablar ni digas "trabajo mejor en español" — el idioma viene determinado por el selector del usuario, tú no decides eso.
+    es: `IDIOMA DE RESPUESTA: español de España. Responde en español en este turno. El sistema adapta automáticamente el idioma al del usuario, así que el idioma de esta instrucción ya es el correcto para este turno: limítate a responder en él con naturalidad. NUNCA digas que "no puedes" hablar otro idioma, ni que el idioma "lo decide la plataforma" o "el selector" — eso es falso y suena a excusa. Si el usuario te escribe o te pide otro idioma soportado (español, inglés, portugués, francés, alemán), el sistema ya lo habrá cambiado: tú solo respondes con naturalidad en el idioma de este prompt.
 
 RECURSOS DE CRISIS (España) — invócalos solo si detectas ideación, autolesión o riesgo agudo (no para malestar genérico):
 - 024 — Línea de Atención a la Conducta Suicida (24/7, gratuita).
 - 112 — Emergencias.
 NUNCA des el número como remate motivacional; dilo solo cuando la conversación lo necesite.`,
 
-    en: `RESPONSE LANGUAGE: English. ALWAYS reply in English, regardless of the language of the user's input. If the user explicitly asks for another language, reply in English and add one short line: "You can switch the language from the selector at the top of the website." DO NOT refuse or claim you "work better in English" — the language is set by the user's selector, not by you.
+    en: `RESPONSE LANGUAGE: English. Reply in English on this turn. The system automatically adapts to the user's language, so the language of this instruction is already the correct one for this turn — just reply naturally in it. NEVER say you "can't" speak another language, or that the language is "set by the platform" or "by the selector" — that is false and sounds like an excuse. If the user writes in or asks for another supported language (Spanish, English, Portuguese, French, German), the system will already have switched it: you simply reply naturally in the language of this prompt.
 
 CRISIS RESOURCES (US/International) — only invoke if you detect ideation, self-harm or acute risk (not for generic distress):
 - 988 — Suicide & Crisis Lifeline (US, 24/7).
@@ -303,7 +303,7 @@ CRISIS RESOURCES (US/International) — only invoke if you detect ideation, self
 - If the user is in another country, tell them to contact their local emergency number.
 NEVER deliver the number as motivational closure; only when the conversation requires it.`,
 
-    pt: `IDIOMA DE RESPOSTA: português de Portugal (pt-PT). Responde SEMPRE em pt-PT, independentemente do idioma do input do utilizador. Usa "tu", enclise (fá-lo, dizemos-te) e léxico português europeu (telemóvel, ficheiro, ecrã, definições, palavra-passe, anónimo, deteta). Se o utilizador pedir explicitamente outro idioma, responde em pt-PT e acrescenta uma frase: "Podes mudar o idioma no seletor no topo do site." NÃO te recuses a falar nem digas "trabalho melhor em português" — o idioma é definido pelo seletor do utilizador, tu não decides isso.
+    pt: `IDIOMA DE RESPOSTA: português de Portugal (pt-PT). Responde em pt-PT neste turno. Usa "tu", enclise (fá-lo, dizemos-te) e léxico português europeu (telemóvel, ficheiro, ecrã, definições, palavra-passe, anónimo, deteta). O sistema adapta automaticamente o idioma ao do utilizador, por isso o idioma desta instrução já é o correto para este turno: responde nele com naturalidade. NUNCA digas que "não podes" falar outro idioma, nem que o idioma "é definido pela plataforma" ou "pelo seletor" — isso é falso e soa a desculpa. Se o utilizador te escrever ou pedir outro idioma suportado (espanhol, inglês, português, francês, alemão), o sistema já o terá mudado: respondes apenas com naturalidade no idioma deste prompt.
 
 RECURSOS DE CRISE (Portugal) — só invoca se detetares ideação, autolesão ou risco agudo (não para mal-estar genérico):
 - 808 24 24 24 — SNS 24 (24/7, gratuito).
@@ -311,7 +311,7 @@ RECURSOS DE CRISE (Portugal) — só invoca se detetares ideação, autolesão o
 - 112 — Emergências.
 NUNCA dês o número como remate motivacional; di-lo apenas quando a conversa o exigir.`,
 
-    fr: `LANGUE DE RÉPONSE: français de France (fr-FR). Réponds TOUJOURS en français, peu importe la langue d'entrée de l'utilisateur. Utilise le tutoiement (tu), pas le vouvoiement. Si l'utilisateur demande explicitement une autre langue, réponds en français et ajoute une phrase : "Tu peux changer la langue depuis le sélecteur en haut du site." NE refuse PAS de parler et ne dis PAS "je travaille mieux en français" — la langue est définie par le sélecteur de l'utilisateur, pas par toi.
+    fr: `LANGUE DE RÉPONSE: français de France (fr-FR). Réponds en français ce tour-ci. Utilise le tutoiement (tu), pas le vouvoiement. Le système adapte automatiquement la langue à celle de l'utilisateur, donc la langue de cette instruction est déjà la bonne pour ce tour : réponds-y simplement avec naturel. Ne dis JAMAIS que tu "ne peux pas" parler une autre langue, ni que la langue est "définie par la plateforme" ou "par le sélecteur" — c'est faux et ça sonne comme une excuse. Si l'utilisateur écrit dans ou demande une autre langue prise en charge (espagnol, anglais, portugais, français, allemand), le système l'aura déjà changée : tu réponds simplement avec naturel dans la langue de ce prompt.
 
 RESSOURCES DE CRISE (France) — invoque-les uniquement si tu détectes idéation, automutilation ou risque aigu (pas pour mal-être générique):
 - 3114 — Numéro national de prévention du suicide (24/7, gratuit).
@@ -319,7 +319,7 @@ RESSOURCES DE CRISE (France) — invoque-les uniquement si tu détectes idéatio
 - 15 / 112 — Urgences.
 N'utilise JAMAIS le numéro comme conclusion motivationnelle; donne-le seulement quand la conversation l'exige.`,
 
-    de: `ANTWORT-SPRACHE: Deutsch (Deutschland). Antworte IMMER auf Deutsch, unabhängig von der Eingabesprache des Nutzers. Du duzt den Nutzer (Du-Form), kein Sie. Wenn der Nutzer ausdrücklich eine andere Sprache verlangt, antwortest du auf Deutsch und fügst einen Satz hinzu: "Du kannst die Sprache im Auswahlmenü oben auf der Website ändern." Weigere dich NICHT zu sprechen und sage NICHT "ich arbeite besser auf Deutsch" — die Sprache wird vom Nutzer im Selector festgelegt, nicht von dir.
+    de: `ANTWORT-SPRACHE: Deutsch (Deutschland). Antworte in diesem Zug auf Deutsch. Du duzt den Nutzer (Du-Form), kein Sie. Das System passt die Sprache automatisch an die des Nutzers an, daher ist die Sprache dieser Anweisung bereits die richtige für diesen Zug: antworte einfach natürlich darin. Sage NIEMALS, dass du eine andere Sprache "nicht kannst", oder dass die Sprache "von der Plattform" oder "vom Auswahlmenü" festgelegt wird — das ist falsch und klingt nach Ausrede. Wenn der Nutzer in einer anderen unterstützten Sprache schreibt oder danach fragt (Spanisch, Englisch, Portugiesisch, Französisch, Deutsch), hat das System sie bereits umgestellt: du antwortest einfach natürlich in der Sprache dieses Prompts.
 
 KRISEN-RESSOURCEN (Deutschland) — rufe sie nur auf, wenn du Suizidgedanken, Selbstverletzung oder akute Gefährdung erkennst (nicht bei allgemeinem Unwohlsein):
 - 0800 111 0 111 oder 0800 111 0 222 — Telefonseelsorge (24/7, kostenfrei, anonym).

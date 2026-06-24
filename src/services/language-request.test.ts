@@ -51,6 +51,49 @@ describe("detectLanguageRequest — peticiones explícitas de cambio de idioma",
     expect(detectLanguageRequest("", "es")).toEqual({ changed: false });
     expect(detectLanguageRequest("en", "es")).toEqual({ changed: false });
   });
+
+  // ── Alemán — caso REAL 2026-06-24 ─────────────────────────────────────
+  // Usuario escribió "ab jetzt antworte immer auf deutsch" y el coach
+  // respondía en inglés inventándose que no podía hablar alemán.
+
+  test("Caso REAL: 'ab jetzt antworte immer auf deutsch' (desde en) → de", () => {
+    expect(detectLanguageRequest("ab jetzt antworte immer auf deutsch", "en")).toEqual({
+      changed: true,
+      newLocale: "de",
+    });
+  });
+
+  test("'sprich deutsch' (desde es) → de", () => {
+    expect(detectLanguageRequest("kannst du sprich deutsch bitte", "es")).toEqual({
+      changed: true,
+      newLocale: "de",
+    });
+  });
+
+  test("'in German please' (desde es) → de", () => {
+    expect(detectLanguageRequest("answer in German please", "es")).toEqual({
+      changed: true,
+      newLocale: "de",
+    });
+  });
+
+  test("'háblame en alemán' (desde es) → de", () => {
+    expect(detectLanguageRequest("por favor háblame en alemán", "es")).toEqual({
+      changed: true,
+      newLocale: "de",
+    });
+  });
+
+  test("'auf englisch' desde de → en (alemán pidiendo inglés)", () => {
+    expect(detectLanguageRequest("antworte auf englisch", "de")).toEqual({
+      changed: true,
+      newLocale: "en",
+    });
+  });
+
+  test("Petición de alemán estando ya en de → NO cambia", () => {
+    expect(detectLanguageRequest("antworte auf deutsch", "de")).toEqual({ changed: false });
+  });
 });
 
 describe("detectMessageLanguage — auto-detección del idioma del mensaje", () => {
@@ -102,10 +145,19 @@ describe("detectMessageLanguage — auto-detección del idioma del mensaje", () 
     expect(r).toEqual({ detected: false });
   });
 
-  test("Mensajes muy cortos no disparan", () => {
-    expect(detectMessageLanguage("Hi", "es")).toEqual({ detected: false });
+  test("Mensajes cortos ambiguos (no saludo) no disparan", () => {
+    // "ok" es ambiguo entre idiomas y NO es saludo → no dispara.
+    expect(detectMessageLanguage("ok", "es")).toEqual({ detected: false });
+    // "Hello world" no es saludo exacto (greeting requiere mensaje entero) y
+    // "hello" solo da 1 match de stopword (<2 umbral) → no dispara.
     expect(detectMessageLanguage("Hello world", "es")).toEqual({ detected: false });
     expect(detectMessageLanguage("", "es")).toEqual({ detected: false });
+  });
+
+  test("'Hi' solo (saludo inglés inequívoco) SÍ dispara → en", () => {
+    // Edge case que arreglamos: "hi"/"hello" como mensaje único debe
+    // cambiar idioma instant aunque sea 1 palabra (fast-path saludos).
+    expect(detectMessageLanguage("Hi", "es")).toEqual({ detected: true, locale: "en" });
   });
 
   test("Mensaje sin stopwords claras (números/símbolos) no dispara", () => {

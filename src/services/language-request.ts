@@ -10,28 +10,41 @@
  * persiste en User.locale para que sobreviva la sesión.
  */
 
-const PATTERNS: Array<{ regex: RegExp; locale: "es" | "en" | "pt" | "fr" }> = [
+const PATTERNS: Array<{ regex: RegExp; locale: "es" | "en" | "pt" | "fr" | "de" }> = [
   // Pedir español
   { regex: /\b(en\s+espa(ñ|n)ol|háblame\s+en\s+espa(ñ|n)ol|responde\s+en\s+espa(ñ|n)ol)\b/i, locale: "es" },
   { regex: /\b(in\s+spanish|speak\s+spanish|reply\s+in\s+spanish)\b/i, locale: "es" },
+  { regex: /\b(auf\s+spanisch|sprich\s+spanisch|antworte\s+(immer\s+)?auf\s+spanisch)\b/i, locale: "es" },
   // Pedir inglés
   { regex: /\b(in\s+english|speak\s+english|reply\s+in\s+english)\b/i, locale: "en" },
   { regex: /\b(en\s+ingl(é|e)s|háblame\s+en\s+ingl(é|e)s|responde\s+en\s+ingl(é|e)s)\b/i, locale: "en" },
   { regex: /\b(em\s+ingl(ê|e)s|fala\s+em\s+ingl(ê|e)s)\b/i, locale: "en" },
   { regex: /\b(en\s+anglais|parle\s+en\s+anglais|r(é|e)ponds\s+en\s+anglais)\b/i, locale: "en" },
+  { regex: /\b(auf\s+englisch|sprich\s+englisch|antworte\s+(immer\s+)?auf\s+englisch)\b/i, locale: "en" },
   // Pedir portugués
   { regex: /\b(em\s+portugu(ê|e)s|fala\s+(em\s+)?portugu(ê|e)s|responde\s+em\s+portugu(ê|e)s)\b/i, locale: "pt" },
   { regex: /\b(en\s+portugu(é|e)s|háblame\s+en\s+portugu(é|e)s)\b/i, locale: "pt" },
   { regex: /\b(in\s+portuguese|speak\s+portuguese)\b/i, locale: "pt" },
+  { regex: /\b(auf\s+portugiesisch|sprich\s+portugiesisch)\b/i, locale: "pt" },
   // Pedir francés
   { regex: /\b(en\s+fran(ç|c)ais|parle\s+en\s+fran(ç|c)ais|r(é|e)ponds\s+en\s+fran(ç|c)ais)\b/i, locale: "fr" },
   { regex: /\b(en\s+franc(é|e)s|háblame\s+en\s+franc(é|e)s)\b/i, locale: "fr" },
   { regex: /\b(in\s+french|speak\s+french)\b/i, locale: "fr" },
   { regex: /\b(em\s+franc(ê|e)s|fala\s+em\s+franc(ê|e)s)\b/i, locale: "fr" },
+  { regex: /\b(auf\s+franz(ö|oe)sisch|sprich\s+franz(ö|oe)sisch)\b/i, locale: "fr" },
+  // Pedir alemán — caso REAL observado 2026-06-24: usuario escribe "ab jetzt
+  // antworte immer auf deutsch" → el coach respondía en inglés y SE INVENTABA
+  // que no podía hablar alemán ("liegt nicht an mir, sondern an der
+  // Plattform"). Patterns en alemán + es/en/pt/fr para pedir alemán.
+  { regex: /\b(auf\s+deutsch|sprich\s+deutsch|antworte\s+(immer\s+)?auf\s+deutsch|rede\s+deutsch|kannst\s+du\s+deutsch)\b/i, locale: "de" },
+  { regex: /\b(en\s+alem(á|a)n|háblame\s+en\s+alem(á|a)n|responde\s+en\s+alem(á|a)n)\b/i, locale: "de" },
+  { regex: /\b(in\s+german|speak\s+german|reply\s+in\s+german)\b/i, locale: "de" },
+  { regex: /\b(em\s+alem(ã|a)o|fala\s+em\s+alem(ã|a)o)\b/i, locale: "de" },
+  { regex: /\b(en\s+allemand|parle\s+en\s+allemand)\b/i, locale: "de" },
 ];
 
 export type LanguageRequest =
-  | { changed: true; newLocale: "es" | "en" | "pt" | "fr" }
+  | { changed: true; newLocale: "es" | "en" | "pt" | "fr" | "de" }
   | { changed: false };
 
 /**

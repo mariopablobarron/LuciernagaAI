@@ -44,7 +44,7 @@ import path from "node:path";
 const ROOT = process.cwd();
 const MESSAGES_DIR = path.join(ROOT, "messages");
 const SOURCE_LOCALE = "es";
-const TARGET_LOCALES_ALL = ["en", "pt", "fr"];
+const TARGET_LOCALES_ALL = ["en", "pt", "fr", "de"];
 const MODEL = process.env.OPENROUTER_MODEL?.trim() || "anthropic/claude-haiku-4-5";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const REQUEST_TIMEOUT_MS = 60_000;

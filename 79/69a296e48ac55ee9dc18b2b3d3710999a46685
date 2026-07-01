@@ -1,0 +1,19 @@
+src/app/sitemap.ts
+  s_d2308f25c4747c::t_6ee669ad194384 25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.10",
+  "base_commit_sha": "7969a296e48ac55ee9dc18b2b3d3710999a46685",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Claude (schema+sitemap) <noreply@anthropic.com>"
+    }
+  }
+}

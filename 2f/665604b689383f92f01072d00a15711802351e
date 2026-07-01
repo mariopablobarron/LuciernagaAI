@@ -1,0 +1,23 @@
+src/services/coach.ts
+  s_d2308f25c4747c::t_705914e0a7009e 1014-1378,1380,1385,1387-1409,1412-1414,1418,1423-1445,1448-1450
+  s_d2308f25c4747c::t_e521cea48cce68 364-371
+src/application/chat/processMessage.ts
+  s_d2308f25c4747c::t_f4206d4fe68ba7 455
+  s_d2308f25c4747c::t_6fdfedd6618fbf 315
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "2f665604b689383f92f01072d00a15711802351e",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Claude (lang autodetect) <noreply@anthropic.com>"
+    }
+  }
+}

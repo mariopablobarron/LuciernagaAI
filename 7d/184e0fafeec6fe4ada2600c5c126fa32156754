@@ -1,0 +1,26 @@
+src/services/ai.ts
+  s_d2308f25c4747c::t_726cc8b380b950 448,456,462
+  s_d2308f25c4747c::t_5475535348fa67 409-412,416
+  s_d2308f25c4747c::t_6d88ed4a9df834 291
+  s_d2308f25c4747c::t_8f923d9f1bf4c7 248-251
+src/application/chat/processMessage.ts
+  s_d2308f25c4747c::t_29baf3549e0621 421
+  s_d2308f25c4747c::t_01fe869c846c74 303
+  s_d2308f25c4747c::t_b1cfdea61df5eb 437
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "7d184e0fafeec6fe4ada2600c5c126fa32156754",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Claude (lang autodetect) <noreply@anthropic.com>"
+    }
+  }
+}

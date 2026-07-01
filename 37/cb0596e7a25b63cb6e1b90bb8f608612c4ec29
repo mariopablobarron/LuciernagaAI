@@ -1,0 +1,19 @@
+src/services/ai.test.ts
+  s_d2308f25c4747c::t_393b70e4b2d8fa 20-23,63-66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.8",
+  "base_commit_sha": "37cb0596e7a25b63cb6e1b90bb8f608612c4ec29",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

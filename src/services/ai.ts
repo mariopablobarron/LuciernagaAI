@@ -291,7 +291,7 @@ export async function generateAIResponse(
     // Mapeamos a reason normalizado para health monitoring. classifyAIError
     // devuelve missing_config|provider_failure|unknown — pero para distinguir
     // 402 de 5xx miramos errorMessage que incluye el HTTP code en provider_failure.
-    let reason: "no_api_key" | "openrouter_402" | "openrouter_http_error" | "unknown" =
+    const reason: "no_api_key" | "openrouter_402" | "openrouter_http_error" | "unknown" =
       errorType === "missing_config" ? "no_api_key" :
       errorType === "provider_failure"
         ? (errorMessage.includes("402") ? "openrouter_402" : "openrouter_http_error")

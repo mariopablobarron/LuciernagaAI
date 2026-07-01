@@ -26,6 +26,100 @@ export function buildErrorResponse(
   );
 }
 
+const CHAT_LOCALES = ["es", "en", "pt", "fr", "de"] as const;
+type ChatLocale = (typeof CHAT_LOCALES)[number];
+function isChatLocale(v: string | null | undefined): v is ChatLocale {
+  return !!v && (CHAT_LOCALES as readonly string[]).includes(v);
+}
+
+/**
+ * Locale de la petición para mensajes de error/gate: body.locale > cookie
+ * NEXT_LOCALE > referer path > "es". Mismo orden que la resolución principal
+ * del mentor (más abajo). Se usa en los returns tempranos, que ocurren antes
+ * de esa resolución, para no dejar errores del chat en español fijo.
+ */
+function resolveRequestLocale(req: NextRequest, body?: unknown): ChatLocale {
+  const bodyLocale =
+    body && typeof body === "object" ? (body as Record<string, unknown>).locale : undefined;
+  if (typeof bodyLocale === "string" && isChatLocale(bodyLocale)) return bodyLocale;
+  const cookieLocale = req.cookies.get("NEXT_LOCALE")?.value;
+  if (isChatLocale(cookieLocale)) return cookieLocale;
+  try {
+    const seg = new URL(req.headers.get("referer") ?? "").pathname.split("/")[1];
+    if (isChatLocale(seg)) return seg;
+  } catch {
+    // referer ausente/malformado → default
+  }
+  return "es";
+}
+
+type ChatErrorCode =
+  | "INVALID_BODY"
+  | "INVALID_SESSION_TOKEN"
+  | "INTERNAL_ERROR"
+  | "EMPTY_MESSAGE"
+  | "EMAIL_NOT_VERIFIED"
+  | "RATE_LIMIT_HOURLY"
+  | "RATE_LIMIT_BURST";
+
+// Mensajes de error/gate localizados. ES fuente, EN revisado; PT/FR/DE
+// pendientes de revisión nativa (no técnicos → traducción directa segura).
+const CHAT_ERROR_MESSAGES: Record<ChatErrorCode, Record<ChatLocale, string>> = {
+  INVALID_BODY: {
+    es: "Body inválido en la solicitud",
+    en: "Invalid request body",
+    pt: "Corpo do pedido inválido",
+    fr: "Corps de la requête invalide",
+    de: "Ungültiger Anfragetext",
+  },
+  INVALID_SESSION_TOKEN: {
+    es: "Token inválido o expirado",
+    en: "Invalid or expired token",
+    pt: "Token inválido ou expirado",
+    fr: "Jeton invalide ou expiré",
+    de: "Ungültiger oder abgelaufener Token",
+  },
+  INTERNAL_ERROR: {
+    es: "Error interno del servidor",
+    en: "Internal server error",
+    pt: "Erro interno do servidor",
+    fr: "Erreur interne du serveur",
+    de: "Interner Serverfehler",
+  },
+  EMPTY_MESSAGE: {
+    es: "Necesito un mensaje para ayudarte.",
+    en: "I need a message to help you.",
+    pt: "Preciso de uma mensagem para te ajudar.",
+    fr: "J'ai besoin d'un message pour t'aider.",
+    de: "Ich brauche eine Nachricht, um dir zu helfen.",
+  },
+  EMAIL_NOT_VERIFIED: {
+    es: "Verifica tu email para poder chatear.",
+    en: "Verify your email to start chatting.",
+    pt: "Verifica o teu email para poderes conversar.",
+    fr: "Vérifie ton e-mail pour pouvoir discuter.",
+    de: "Bestätige deine E-Mail, um chatten zu können.",
+  },
+  RATE_LIMIT_HOURLY: {
+    es: "Has alcanzado el límite por hora. Vuelve en unos minutos.",
+    en: "You've hit the hourly limit. Come back in a few minutes.",
+    pt: "Atingiste o limite por hora. Volta daqui a uns minutos.",
+    fr: "Tu as atteint la limite horaire. Reviens dans quelques minutes.",
+    de: "Du hast das Stundenlimit erreicht. Komm in ein paar Minuten wieder.",
+  },
+  RATE_LIMIT_BURST: {
+    es: "Demasiadas solicitudes. Intenta de nuevo en unos segundos.",
+    en: "Too many requests. Try again in a few seconds.",
+    pt: "Demasiados pedidos. Tenta de novo daqui a uns segundos.",
+    fr: "Trop de requêtes. Réessaie dans quelques secondes.",
+    de: "Zu viele Anfragen. Versuch es in ein paar Sekunden erneut.",
+  },
+};
+
+function chatErr(code: ChatErrorCode, locale: ChatLocale): string {
+  return CHAT_ERROR_MESSAGES[code][locale] ?? CHAT_ERROR_MESSAGES[code].es;
+}
+
 export async function orchestrateChat(req: NextRequest): Promise<Response> {
   // ── 1. Parse body ───────────────────────────────────────────────────────
   let body: {
@@ -38,7 +132,12 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
     body = (await req.json()) as typeof body;
   } catch (parseError: unknown) {
     logError("CHAT", parseError, { area: "parse_chat_body" });
-    return buildErrorResponse("Body inválido en la solicitud", 400, "neutral", "INVALID_BODY");
+    return buildErrorResponse(
+      chatErr("INVALID_BODY", resolveRequestLocale(req)),
+      400,
+      "neutral",
+      "INVALID_BODY"
+    );
   }
 
   // ── 2. Auth (allows anonymous bootstrap for new users) ──────────────────
@@ -48,7 +147,7 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
   } catch (e: unknown) {
     if (e instanceof InvalidSessionTokenError) {
       const res = buildErrorResponse(
-        "Token inválido o expirado",
+        chatErr("INVALID_SESSION_TOKEN", resolveRequestLocale(req, body)),
         401,
         "neutral",
         "INVALID_SESSION_TOKEN"
@@ -57,13 +156,18 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
       return res;
     }
     logError("CHAT", e, { area: "resolve_identity" });
-    return buildErrorResponse("Error interno del servidor", 500, "neutral", "INTERNAL_ERROR");
+    return buildErrorResponse(
+      chatErr("INTERNAL_ERROR", resolveRequestLocale(req, body)),
+      500,
+      "neutral",
+      "INTERNAL_ERROR"
+    );
   }
 
   const message = body.message?.trim() ?? "";
   if (!message) {
     return buildErrorResponse(
-      "Necesito un mensaje para ayudarte.",
+      chatErr("EMPTY_MESSAGE", resolveRequestLocale(req, body)),
       400,
       "neutral",
       "EMPTY_MESSAGE"
@@ -124,7 +228,7 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
   const accessState = await getUserSessionProfile(identity.userId);
   if (!accessState.emailVerified && !isSyntheticEmail(accessState.email)) {
     const res = buildErrorResponse(
-      "Verifica tu email para poder chatear.",
+      chatErr("EMAIL_NOT_VERIFIED", resolveRequestLocale(req, body)),
       403,
       "neutral",
       "EMAIL_NOT_VERIFIED"
@@ -148,15 +252,15 @@ export async function orchestrateChat(req: NextRequest): Promise<Response> {
   const blocked = rateLimits.find((r) => !r.allowed);
   if (blocked) {
     const isHourly = blocked.retryAfterSeconds > 60;
+    const rlMsg = chatErr(
+      isHourly ? "RATE_LIMIT_HOURLY" : "RATE_LIMIT_BURST",
+      resolveRequestLocale(req, body)
+    );
     const res = NextResponse.json(
       {
         success: false,
-        error: isHourly
-          ? "Has alcanzado el límite por hora. Vuelve en unos minutos."
-          : "Demasiadas solicitudes. Intenta de nuevo en unos segundos.",
-        response: isHourly
-          ? "Has alcanzado el límite por hora. Vuelve en unos minutos."
-          : "Demasiadas solicitudes. Intenta de nuevo en unos segundos.",
+        error: rlMsg,
+        response: rlMsg,
         state: "neutral",
         retryAfterSeconds: blocked.retryAfterSeconds,
       },

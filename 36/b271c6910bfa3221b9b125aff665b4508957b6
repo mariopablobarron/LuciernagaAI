@@ -1,0 +1,22 @@
+src/application/chat/processMessage.ts
+  s_d2308f25c4747c::t_a88546359e1b5e 296,375
+  s_d2308f25c4747c::t_5c63b23e7371e3 405
+src/services/suggestedActions.ts
+  s_d2308f25c4747c::t_4e1447dad96ac9 14-17,22-26,36-55,59-72,77-90,97-110,115-128,135-148,153-166,173-186,191-204,211-224,229-242,248,250-263,267,270-283,288-301,309-310,312-313,316,324,326,330
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.8",
+  "base_commit_sha": "36b271c6910bfa3221b9b125aff665b4508957b6",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

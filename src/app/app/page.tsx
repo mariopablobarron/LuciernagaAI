@@ -286,7 +286,22 @@ export default function HomePage() {
   };
 
   const bootstrapSession = async (): Promise<void> => {
-    await bootstrapBrowserSession();
+    // POST /api/auth/bootstrap está rate-limited por IP (10/60s). Re-ejecutarlo en
+    // cada remount — p.ej. al volver al chat desde una subruta como /app/goals — agota
+    // el presupuesto y devuelve 429, que aflora como el banner de error que solo se
+    // limpia recargando la página. GET /api/auth/token NO está rate-limited: reutiliza
+    // la sesión existente cuando la cookie sigue siendo válida (incluidas las anónimas)
+    // y solo bootstrapea una identidad nueva cuando no hay ninguna.
+    let hasValidSession = false;
+    try {
+      const existing = await fetchBrowserSession();
+      hasValidSession = existing.authenticated;
+    } catch {
+      hasValidSession = false;
+    }
+    if (!hasValidSession) {
+      await bootstrapBrowserSession();
+    }
     await refreshSessionProfile();
 
     setSessionReady(true);

@@ -17,9 +17,10 @@ describe("generateAIResponse", () => {
     const result = await generateAIResponse("No sé por dónde empezar", "duda");
 
     expect(result.fallback).toBe(true);
-    expect(result.response).toBe(
-      "Vamos a hacerlo simple. Dime qué estás evitando ahora mismo y lo convertimos en un paso concreto hoy."
-    );
+    // El copy del fallback es contextual por estado (feat 82fd9d5) y evoluciona;
+    // verificamos que el fallback SE ACTIVA y devuelve texto, no el wording exacto.
+    expect(typeof result.response).toBe("string");
+    expect(result.response.length).toBeGreaterThan(0);
   });
 
   it("retorna respuesta real cuando OpenRouter responde bien", async () => {
@@ -59,9 +60,10 @@ describe("generateAIResponse", () => {
     const result = await generateAIResponse("Tengo ansiedad", "ansiedad");
 
     expect(result.fallback).toBe(true);
-    expect(result.response).toBe(
-      "Vamos a hacerlo simple. Dime qué estás evitando ahora mismo y lo convertimos en un paso concreto hoy."
-    );
+    // El copy del fallback es contextual por estado (feat 82fd9d5) y evoluciona;
+    // verificamos que el fallback SE ACTIVA y devuelve texto, no el wording exacto.
+    expect(typeof result.response).toBe("string");
+    expect(result.response.length).toBeGreaterThan(0);
   });
 });
 

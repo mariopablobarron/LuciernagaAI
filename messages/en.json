@@ -2797,6 +2797,161 @@
       "selfVoteForbidden": "You can't vote on your own answer."
     }
   },
+  "sidebar": {
+    "workspace": "Workspace",
+    "workspaceDesc": "Conversations, continuity and quick access to the product.",
+    "newConversation": "New conversation",
+    "yourPath": "Your path",
+    "yourPathTooltip": "Unlocked features: the path opens up as you use the app (streak, active days, etc.)",
+    "unlockedFeaturesAria": "{count} of {total} features unlocked",
+    "unlocksAt": "Unlocks at: {req}",
+    "nav": {
+      "chat": {
+        "label": "Chat",
+        "req": "Always"
+      },
+      "checkin": {
+        "label": "Check-in",
+        "req": "Always"
+      },
+      "comunidad": {
+        "label": "Community",
+        "req": "Always"
+      },
+      "plan": {
+        "label": "Plan",
+        "req": "Day 3"
+      },
+      "diario": {
+        "label": "Journal",
+        "req": "Day 7"
+      },
+      "respirar": {
+        "label": "Breathe",
+        "req": "3-day streak"
+      },
+      "logros": {
+        "label": "Achievements",
+        "req": "7-day streak"
+      },
+      "impulso": {
+        "label": "Impulso 21d",
+        "req": "Day 21"
+      }
+    },
+    "settings": "Settings",
+    "knowMethod": "Discover the method",
+    "telegramTitle": "Take me on Telegram",
+    "telegramDesc": "Talk to your mentor, get reminders and check in without opening the web.",
+    "pendingAssessment": "Pending assessment",
+    "pendingAssessmentDesc": "Your professional has assigned you an assessment. Complete it so they can follow your progress.",
+    "completeAssessment": "Complete assessment",
+    "conversations": "Conversations",
+    "conversationsDesc": "Recent activity and continuity.",
+    "searchPlaceholder": "Search conversation...",
+    "noResults": "No results.",
+    "noConversations": "No saved conversations yet.",
+    "deleteConfirm": "Delete conversation?",
+    "yes": "Yes",
+    "no": "No",
+    "messageCount": "{count} messages",
+    "rename": "Rename",
+    "delete": "Delete",
+    "actionsProgress": "{done}/{total} actions",
+    "processProgress": "Process progress",
+    "processProgressDesc": "Visible continuity so the work doesn't depend on memory alone.",
+    "trend": "Trend: {value}",
+    "streakDays": "🔥 {count}-day streak",
+    "share": "Share",
+    "activeGoal": "Active goal",
+    "noActiveGoal": "No active goal",
+    "actionsCompleted": "{done}/{total} actions completed.",
+    "pendingCount": "{count} pending",
+    "noOpenDebt": "No open debt",
+    "markPendingAgain": "Mark as pending again",
+    "markDone": "Mark as done",
+    "emptyGoalHint": "Use the chat to define a focus and turn it into tracking here.",
+    "supportMessages": "Support messages",
+    "newCount": "{count} new",
+    "invitations": "Invitations",
+    "availableCount": "{count} available",
+    "earnInvites": "Earn invites with your streak",
+    "copy": "Copy",
+    "copied": "Copied",
+    "moreInvites": "+{count} more — ",
+    "viewAllInvitations": "View all invitations",
+    "streak7": "🔥 <strong>7-day streak</strong> → 1 invite",
+    "streak30": "🏆 <strong>30-day streak</strong> → 1 more invite",
+    "adminAccess": "Admin access",
+    "adminSession": "Operational session active.",
+    "active": "Active",
+    "adminPanel": "Admin panel",
+    "logout": "Log out",
+    "projectOf": "a project by <startidea>Startidea</startidea>"
+  },
+  "accessibility": {
+    "openPanel": "Open accessibility panel",
+    "closePanel": "Close accessibility panel",
+    "triggerTooltip": "Accessibility: text size, contrast and motion",
+    "dialogLabel": "Accessibility options",
+    "title": "Accessibility",
+    "close": "Close",
+    "textSize": "Text size",
+    "reduceText": "Decrease text size",
+    "increaseText": "Increase text size",
+    "textSizeLevel": "Text size level",
+    "sizeNormal": "Normal size",
+    "sizePlus": "Size +{level}",
+    "highContrast": "High contrast",
+    "highContrastDesc": "Increases color contrast",
+    "reduceMotion": "Reduce motion",
+    "reduceMotionDesc": "Disables animations and transitions",
+    "dyslexiaFont": "Dyslexia font",
+    "dyslexiaFontDesc": "More legible typeface for dyslexia",
+    "highlightLinks": "Highlight links",
+    "highlightLinksDesc": "Underlines all links",
+    "bigCursor": "Large cursor",
+    "bigCursorDesc": "Larger, more visible cursor",
+    "textSpacing": "Text spacing",
+    "textSpacingDesc": "More space between letters and lines",
+    "resetAll": "Reset all",
+    "savedInBrowser": "Preferences are saved in your browser",
+    "toToggle": "to toggle",
+    "quietRead": "Quiet read",
+    "quietReadDesc": "Reduces vibrant colors and animations. For hard days."
+  },
+  "footerLinks": {
+    "tagline": "Every heartbeat is a choice. Three Billion Heartbeats exists so yours have real direction.",
+    "commitment": "Committed to emotional wellbeing through technology",
+    "productHeading": "Product",
+    "product": {
+      "blog": "Blog",
+      "pricing": "Pricing",
+      "join": "Join the challenge",
+      "challenge": "The 30-day challenge",
+      "test": "Free test",
+      "calculator": "Heartbeat calculator",
+      "guide": "User guide",
+      "method": "The method",
+      "compare": "Comparison",
+      "useCases": "Use cases",
+      "resources": "Resources",
+      "faq": "FAQ",
+      "access": "Sign in"
+    },
+    "infoHeading": "Information",
+    "info": {
+      "about": "About us",
+      "forPros": "For professionals",
+      "ethics": "Ethics and limits",
+      "changelog": "What's new",
+      "privacy": "Privacy policy",
+      "terms": "Terms of service",
+      "contact": "Contact"
+    },
+    "copyright": "© {year} <domain>tresmilmillonesdelatidos.es</domain> — All rights reserved.",
+    "disclaimer": "Not a substitute for therapy or professional psychological intervention."
+  },
   "emergencyShelter": {
     "trigger": "Too overwhelmed to type",
     "ariaLabel": "Emergency calm space",
@@ -2816,37 +2971,6 @@
     "tooltipOn": "Incognito on — turn off (drafts will be remembered on this device again)",
     "tooltipOff": "Turn on incognito — we won't remember anything on this device",
     "bannerText": "Incognito mode · we're not saving drafts on this device"
-  },
-  "accessibility": {
-    "quietRead": "Quiet read",
-    "quietReadDesc": "Reduces vibrant colors and animations. For hard days.",
-    "bigCursor": "Large cursor",
-    "bigCursorDesc": "Larger, more visible cursor",
-    "close": "Close",
-    "closePanel": "Close accessibility panel",
-    "dialogLabel": "Accessibility options",
-    "dyslexiaFont": "Dyslexia font",
-    "dyslexiaFontDesc": "More legible typeface for dyslexia",
-    "highContrast": "High contrast",
-    "highContrastDesc": "Increases color contrast",
-    "highlightLinks": "Highlight links",
-    "highlightLinksDesc": "Underlines all links",
-    "increaseText": "Increase text size",
-    "openPanel": "Open accessibility panel",
-    "reduceMotion": "Reduce motion",
-    "reduceMotionDesc": "Disables animations and transitions",
-    "reduceText": "Decrease text size",
-    "resetAll": "Reset all",
-    "savedInBrowser": "Preferences are saved in your browser",
-    "sizeNormal": "Normal size",
-    "sizePlus": "Size +{level}",
-    "textSize": "Text size",
-    "textSizeLevel": "Text size level",
-    "textSpacing": "Text spacing",
-    "textSpacingDesc": "More space between letters and lines",
-    "title": "Accessibility",
-    "toToggle": "to toggle",
-    "triggerTooltip": "Accessibility: text size, contrast and motion"
   },
   "feedback": {
     "message": {
@@ -2969,128 +3093,261 @@
   "chatToolsMenu": {
     "trigger": "More"
   },
-  "footerLinks": {
-    "commitment": "Committed to emotional wellbeing through technology",
-    "copyright": "© {year} <domain>tresmilmillonesdelatidos.es</domain> — All rights reserved.",
-    "disclaimer": "Not a substitute for therapy or professional psychological intervention.",
-    "info": {
-      "about": "About us",
-      "changelog": "What's new",
-      "contact": "Contact",
-      "ethics": "Ethics and limits",
-      "forPros": "For professionals",
-      "privacy": "Privacy policy",
-      "terms": "Terms of service"
+  "enneagram": {
+    "loading": "Loading…",
+    "backToProfile": "Back to my profile",
+    "likert": {
+      "1": "Strongly disagree",
+      "2": "Somewhat",
+      "3": "Neutral",
+      "4": "Quite a bit",
+      "5": "Completely"
     },
-    "infoHeading": "Information",
-    "product": {
-      "access": "Sign in",
-      "blog": "Blog",
-      "calculator": "Heartbeat calculator",
-      "challenge": "The 30-day challenge",
-      "compare": "Comparison",
-      "faq": "FAQ",
-      "guide": "User guide",
-      "join": "Join the challenge",
-      "method": "The method",
-      "pricing": "Pricing",
-      "resources": "Resources",
-      "test": "Free test",
-      "useCases": "Use cases"
-    },
-    "productHeading": "Product",
-    "tagline": "Every heartbeat is a choice. Three Billion Heartbeats exists so yours have real direction."
-  },
-  "sidebar": {
-    "actionsCompleted": "{done}/{total} actions completed.",
-    "actionsProgress": "{done}/{total} actions",
-    "active": "Active",
-    "activeGoal": "Active goal",
-    "adminAccess": "Admin access",
-    "adminPanel": "Admin panel",
-    "adminSession": "Operational session active.",
-    "availableCount": "{count} available",
-    "completeAssessment": "Complete assessment",
-    "conversations": "Conversations",
-    "conversationsDesc": "Recent activity and continuity.",
-    "copied": "Copied",
-    "copy": "Copy",
-    "delete": "Delete",
-    "deleteConfirm": "Delete conversation?",
-    "earnInvites": "Earn invites with your streak",
-    "emptyGoalHint": "Use the chat to define a focus and turn it into tracking here.",
-    "invitations": "Invitations",
-    "knowMethod": "Discover the method",
-    "logout": "Log out",
-    "markDone": "Mark as done",
-    "markPendingAgain": "Mark as pending again",
-    "messageCount": "{count} messages",
-    "moreInvites": "+{count} more — ",
-    "nav": {
-      "chat": {
-        "label": "Chat",
-        "req": "Always"
+    "intro": {
+      "eyebrow": "Enneagram Test",
+      "title": "How does your mentor understand you better?",
+      "description": "90 statements. You mark how much you identify with each one. At the end you'll get your dominant type, and more importantly, your mentor will adapt their tone and questions to how you actually work.",
+      "bullets": {
+        "duration": "Takes about 10–12 minutes.",
+        "pause": "You can pause and come back: your answers stay saved in this browser.",
+        "storage": "We save your result and answers so your mentor can adjust their tone, and so you can review your test whenever you want. You can delete it right here."
       },
-      "checkin": {
-        "label": "Check-in",
-        "req": "Always"
+      "existing": {
+        "title": "You've already taken this test",
+        "dominantLabel": "Dominant type:",
+        "typeFormat": "{name} (type {n})",
+        "wingSuffix": " · wing {n}",
+        "completedAt": "Completed on {date}",
+        "deleting": "Deleting…",
+        "delete": "Delete my test (including individual answers)",
+        "deleteConfirm": "Delete your enneagram test? Your individual answers will be removed too. You can't undo this."
       },
-      "comunidad": {
-        "label": "Community",
-        "req": "Always"
+      "actions": {
+        "continue": "Continue ({answered}/{total})",
+        "start": "Start the test",
+        "restart": "Start over"
       },
-      "diario": {
-        "label": "Journal",
-        "req": "Day 7"
-      },
-      "impulso": {
-        "label": "Impulso 21d",
-        "req": "Day 21"
-      },
-      "logros": {
-        "label": "Achievements",
-        "req": "7-day streak"
-      },
-      "plan": {
-        "label": "Plan",
-        "req": "Day 3"
-      },
-      "respirar": {
-        "label": "Breathe",
-        "req": "3-day streak"
+      "declare": {
+        "prompt": "Do you already know your type (from another test, a book, or therapy)?",
+        "open": "Declare my type without taking the test",
+        "helper": "Select your dominant type. If you know your wing, add it.",
+        "typeLabel": "Dominant type",
+        "typePlaceholder": "Choose…",
+        "typeOption": "{n} — {name}",
+        "wingLabel": "Wing (optional)",
+        "wingNone": "No wing",
+        "wingOption": "{n} — {name}",
+        "submitting": "Saving…",
+        "submit": "Confirm",
+        "cancel": "Cancel",
+        "saveError": "We couldn't save your type. Try again in a bit.",
+        "offlineError": "No connection. Try again in a bit."
       }
     },
+    "running": {
+      "blockProgress": "Block {page} of {total}",
+      "answeredCount": "{answered}/{total} answered",
+      "autosave": "Your progress saves automatically on this device. Close and come back whenever you want.",
+      "submitError": "We couldn't save your result. Try again in a bit.",
+      "offlineError": "No connection. Your answers are still saved locally.",
+      "prev": "Previous",
+      "next": "Next",
+      "submitting": "Calculating…",
+      "submit": "See my result"
+    },
+    "result": {
+      "eyebrow": "Your dominant type",
+      "typeSuffix": "— type {n}",
+      "wingSuffix": "with wing {n}",
+      "mentorTitle": "How your mentor will use this",
+      "mentorBody": "From now on, they'll adjust their tone and the kind of questions they ask based on how you work. If it doesn't feel right at any point, you can retake the test whenever you want.",
+      "topTitle": "Top 3 — your highest-scoring types",
+      "rankingItem": "Type {n} — {name}",
+      "backToChat": "Back to chat",
+      "repeat": "Retake the test"
+    }
+  },
+  "circleHub": {
+    "loading": "Loading your circle…",
+    "noCircle": {
+      "title": "You don't have a circle assigned yet",
+      "description": "Circles form based on emotional pattern affinity — closed groups of 4 people, 6-week cycles. When we find a match with your current state, we'll assign you one.",
+      "note": "There's no list to manually join. Matching is automatic and respects your anonymity."
+    },
+    "header": {
+      "cycle": "Cycle",
+      "daysRemaining": "{days}d remaining"
+    },
+    "noPulse": {
+      "title": "No pulse open this week",
+      "description": "The next one will open automatically when the next week starts."
+    },
+    "pulse": {
+      "eyebrow": "This week's pulse",
+      "daysShort": "{days}d",
+      "toClose": "to close",
+      "placeholder": "Respond anytime during this week…",
+      "alreadyResponded": "You already responded — you can edit",
+      "anonymous": "Anonymous within the circle",
+      "update": "Update",
+      "share": "Share with the circle",
+      "participation": "{count}/{max} have responded",
+      "unlockHint": "· your response unlocks everyone else's",
+      "toasts": {
+        "closed": "This pulse already closed",
+        "saveError": "Couldn't save your answer",
+        "updated": "Answer updated",
+        "shared": "Your answer is part of the pulse"
+      }
+    },
+    "peers": {
+      "title": "Circle voices (anonymous)",
+      "empty": "No responses yet. They'll come back during the week."
+    },
+    "reflections": {
+      "title": "Private mentor feedback",
+      "unread": "· unread"
+    },
+    "archive": "Archived closing letters"
+  },
+  "cafeteria": {
+    "header": {
+      "title": "☕ The Cafeteria",
+      "subtitle": "One round a day. Anonymous if you want.",
+      "myCircleShort": "{name}",
+      "myCircleLong": "Go to my circle · {name}"
+    },
+    "timeAgo": {
+      "now": "now",
+      "minutes": "{n}m ago",
+      "hours": "{n}h ago",
+      "days": "{n}d ago"
+    },
+    "toasts": {
+      "sessionExpired": "Session expired",
+      "loadError": "Error loading the round",
+      "publishError": "Couldn't publish",
+      "published": "Your answer is in the round",
+      "networkError": "Network error",
+      "reactionError": "Couldn't register",
+      "reportError": "Couldn't report",
+      "reported": "Thanks. We'll review it.",
+      "mirrorError": "Couldn't send",
+      "mirrorSent": "Question sent"
+    },
+    "noRound": {
+      "title": "Today's round isn't open yet",
+      "body": "Check back in a bit. It refreshes every early morning with a new question."
+    },
+    "prompt": {
+      "eyebrow": "Today's question"
+    },
+    "compose": {
+      "placeholder": "Write your answer. 1-3 sentences is plenty.",
+      "anonymous": "Anonymous",
+      "named": "With my name",
+      "publish": "Publish",
+      "hint": "When you publish, you'll see what others shared. One answer per day."
+    },
+    "mine": {
+      "eyebrow": "Your answer · {time}",
+      "asAnonymous": "Published anonymously",
+      "asNamed": "Published with your name"
+    },
+    "others": {
+      "title": "Other answers today",
+      "count": "({n})",
+      "anonymousName": "Anonymous",
+      "reportAria": "Report this answer",
+      "reportTitle": "Report",
+      "reactAria": "React with {emoji}",
+      "mirrorBtn": "Send back a question",
+      "mirrorDisabledOwn": "You already sent them a question",
+      "mirrorDisabledFull": "This answer already has 3 questions",
+      "mirrorEnabled": "Send back a question"
+    },
+    "othersEmpty": {
+      "title": "No other answers yet",
+      "body": "You're among the first to answer today. Come back later and see what others wrote."
+    },
+    "mirror": {
+      "hint": "One short question only. No opinions. No advice. Just ask.",
+      "placeholder": "What if…",
+      "send": "Send",
+      "cancel": "Cancel"
+    },
+    "mirrorList": {
+      "title": "Questions received",
+      "you": "you",
+      "anonymous": "anonymous",
+      "reportAria": "Report this question",
+      "reportTitle": "Report"
+    },
+    "report": {
+      "title": "Why do you want to report it?",
+      "reasons": {
+        "harmful": "Harmful or inappropriate",
+        "self_harm": "Self-harm / crisis",
+        "harassment": "Harassment",
+        "spam": "Spam",
+        "other": "Other"
+      },
+      "submit": "Submit report",
+      "cancel": "Cancel"
+    }
+  },
+  "appPage": {
+    "sidebar": {
+      "anonymous": "Anonymous session",
+      "planLabel": "Plan {plan}",
+      "planFree": "Free Plan"
+    },
     "newConversation": "New conversation",
-    "newCount": "{count} new",
-    "no": "No",
-    "noActiveGoal": "No active goal",
-    "noConversations": "No saved conversations yet.",
-    "noOpenDebt": "No open debt",
-    "noResults": "No results.",
-    "pendingAssessment": "Pending assessment",
-    "pendingAssessmentDesc": "Your professional has assigned you an assessment. Complete it so they can follow your progress.",
-    "pendingCount": "{count} pending",
-    "processProgress": "Process progress",
-    "processProgressDesc": "Visible continuity so the work doesn't depend on memory alone.",
-    "projectOf": "a project by <startidea>Startidea</startidea>",
-    "rename": "Rename",
-    "searchPlaceholder": "Search conversation...",
-    "settings": "Settings",
-    "share": "Share",
-    "streak30": "🏆 <strong>30-day streak</strong> → 1 more invite",
-    "streak7": "🔥 <strong>7-day streak</strong> → 1 invite",
-    "streakDays": "🔥 {count}-day streak",
-    "supportMessages": "Support messages",
-    "telegramDesc": "Talk to your mentor, get reminders and check in without opening the web.",
-    "telegramTitle": "Take me on Telegram",
-    "trend": "Trend: {value}",
-    "unlockedFeaturesAria": "{count} of {total} features unlocked",
-    "unlocksAt": "Unlocks at: {req}",
-    "viewAllInvitations": "View all invitations",
-    "workspace": "Workspace",
-    "workspaceDesc": "Conversations, continuity and quick access to the product.",
-    "yes": "Yes",
-    "yourPath": "Your path",
-    "yourPathTooltip": "Unlocked features: the path opens up as you use the app (streak, active days, etc.)"
+    "nameSaved": "Pleased to meet you, {name}.",
+    "upgrade": {
+      "title": "Full continuity, no empty pressure",
+      "default": "The next leap isn't more noise: it's more continuity, history, and real tracking.",
+      "valueDetected": "Real value was already here: clarity, direction, or concrete action. Pro keeps it between sessions and unlocks Momentum Mode.",
+      "free": {
+        "title": "Free",
+        "bullets": {
+          "daily": "10 messages per day",
+          "continuity": "Basic continuity across sessions",
+          "entry": "Solid starting point"
+        }
+      },
+      "pro": {
+        "title": "Pro",
+        "bullets": {
+          "unlimited": "Unlimited daily messages",
+          "tracking": "Full goal and action tracking",
+          "continuity": "Stronger continuity between sessions"
+        }
+      },
+      "footer": {
+        "anonymous": "Before activating a plan, save your progress with email so you don't lose continuity.",
+        "linked": "Your progress is already linked to {email}. When Pro launches, you're all set."
+      },
+      "actions": {
+        "later": "Not now",
+        "viewPlan": "See continuity in the plan"
+      }
+    },
+    "capture": {
+      "title": "Save your progress before it's gone",
+      "default": "Real clarity is already showing up in this conversation. Link an email so you don't lose your goals, actions, and continuity.",
+      "badges": {
+        "anonymous": "Anonymous account",
+        "free": "Free",
+        "progress": "Progress {done}/{total}"
+      },
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@email.com",
+      "actions": {
+        "stayAnonymous": "Stay anonymous",
+        "saving": "Saving…",
+        "save": "Save progress"
+      }
+    }
   }
 }

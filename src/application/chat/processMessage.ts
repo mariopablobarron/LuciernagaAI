@@ -293,6 +293,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
         suggestedActions: generateSuggestedActions({
           dominantPattern: emotionalProfile?.dominantPattern,
           hasPendingActions: (activeGoal?.actions.some((a) => !a.completed)) ?? false,
+          locale,
         }),
       },
     };
@@ -371,6 +372,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
         suggestedActions: generateSuggestedActions({
           dominantPattern: emotionalProfile?.dominantPattern,
           hasPendingActions: (activeGoal?.actions.some((a) => !a.completed)) ?? false,
+          locale,
         }),
       },
     };
@@ -400,6 +402,7 @@ export async function processMessage(input: ProcessMessageInput): Promise<Proces
     suggestedActions: generateSuggestedActions({
       dominantPattern: emotionalProfile?.dominantPattern,
       hasPendingActions: (activeGoal?.actions.some((a) => !a.completed)) ?? false,
+      locale,
     }),
   };
 

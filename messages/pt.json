@@ -2797,6 +2797,161 @@
       "selfVoteForbidden": "Não podes votar na tua própria resposta."
     }
   },
+  "sidebar": {
+    "workspace": "Workspace",
+    "workspaceDesc": "Conversas, continuidade e acesso rápido ao produto.",
+    "newConversation": "Nova conversa",
+    "yourPath": "O teu caminho",
+    "yourPathTooltip": "Funções desbloqueadas: o caminho vai-se abrindo à medida que usas a app (sequência, dias ativos, etc.)",
+    "unlockedFeaturesAria": "{count} de {total} funções desbloqueadas",
+    "unlocksAt": "Desbloqueia em: {req}",
+    "nav": {
+      "chat": {
+        "label": "Chat",
+        "req": "Sempre"
+      },
+      "checkin": {
+        "label": "Check-in",
+        "req": "Sempre"
+      },
+      "comunidad": {
+        "label": "Comunidade",
+        "req": "Sempre"
+      },
+      "plan": {
+        "label": "Plano",
+        "req": "Dia 3"
+      },
+      "diario": {
+        "label": "Diário",
+        "req": "Dia 7"
+      },
+      "respirar": {
+        "label": "Respirar",
+        "req": "Sequência 3d"
+      },
+      "logros": {
+        "label": "Conquistas",
+        "req": "Sequência 7d"
+      },
+      "impulso": {
+        "label": "Impulso 21d",
+        "req": "Dia 21"
+      }
+    },
+    "settings": "Definições",
+    "knowMethod": "Conhece o método",
+    "telegramTitle": "Leva-me no Telegram",
+    "telegramDesc": "Fala com o teu mentor, recebe lembretes e faz check-in sem abrir a web.",
+    "pendingAssessment": "Avaliação pendente",
+    "pendingAssessmentDesc": "O teu profissional atribuiu-te uma avaliação. Conclui-a para que possa acompanhar o teu progresso.",
+    "completeAssessment": "Concluir avaliação",
+    "conversations": "Conversas",
+    "conversationsDesc": "Atividade recente e continuidade.",
+    "searchPlaceholder": "Procurar conversa...",
+    "noResults": "Sem resultados.",
+    "noConversations": "Ainda não há conversas guardadas.",
+    "deleteConfirm": "Eliminar conversa?",
+    "yes": "Sim",
+    "no": "Não",
+    "messageCount": "{count} mensagens",
+    "rename": "Mudar o nome",
+    "delete": "Eliminar",
+    "actionsProgress": "{done}/{total} ações",
+    "processProgress": "Progresso do processo",
+    "processProgressDesc": "Continuidade visível para que o trabalho não dependa apenas da memória.",
+    "trend": "Tendência: {value}",
+    "streakDays": "🔥 {count} dias de sequência",
+    "share": "Partilhar",
+    "activeGoal": "Objetivo ativo",
+    "noActiveGoal": "Sem objetivo ativo",
+    "actionsCompleted": "{done}/{total} ações concluídas.",
+    "pendingCount": "{count} pendentes",
+    "noOpenDebt": "Sem dívida aberta",
+    "markPendingAgain": "Marcar como pendente outra vez",
+    "markDone": "Marcar como feita",
+    "emptyGoalHint": "Usa o chat para definir um foco e convertê-lo aqui em acompanhamento.",
+    "supportMessages": "Mensagens de apoio",
+    "newCount": "{count} novas",
+    "invitations": "Convites",
+    "availableCount": "{count} disponíveis",
+    "earnInvites": "Ganha convites com a tua sequência",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "moreInvites": "+{count} mais — ",
+    "viewAllInvitations": "Ver todos os convites",
+    "streak7": "🔥 <strong>7 dias de sequência</strong> → 1 convite",
+    "streak30": "🏆 <strong>30 dias de sequência</strong> → mais 1 convite",
+    "adminAccess": "Acesso de administração",
+    "adminSession": "Sessão operacional ativa.",
+    "active": "Ativo",
+    "adminPanel": "Painel de administração",
+    "logout": "Terminar sessão",
+    "projectOf": "um projeto da <startidea>Startidea</startidea>"
+  },
+  "accessibility": {
+    "openPanel": "Abrir painel de acessibilidade",
+    "closePanel": "Fechar painel de acessibilidade",
+    "triggerTooltip": "Acessibilidade: tamanho do texto, contraste e movimento",
+    "dialogLabel": "Opções de acessibilidade",
+    "title": "Acessibilidade",
+    "close": "Fechar",
+    "textSize": "Tamanho do texto",
+    "reduceText": "Reduzir tamanho do texto",
+    "increaseText": "Aumentar tamanho do texto",
+    "textSizeLevel": "Nível de tamanho do texto",
+    "sizeNormal": "Tamanho normal",
+    "sizePlus": "Tamanho +{level}",
+    "highContrast": "Alto contraste",
+    "highContrastDesc": "Aumenta o contraste de cores",
+    "reduceMotion": "Reduzir movimento",
+    "reduceMotionDesc": "Desativa animações e transições",
+    "dyslexiaFont": "Tipo de letra para dislexia",
+    "dyslexiaFontDesc": "Tipografia mais legível para dislexia",
+    "highlightLinks": "Realçar ligações",
+    "highlightLinksDesc": "Sublinha todas as ligações",
+    "bigCursor": "Cursor grande",
+    "bigCursorDesc": "Cursor maior e mais visível",
+    "textSpacing": "Espaçamento do texto",
+    "textSpacingDesc": "Mais espaço entre letras e linhas",
+    "resetAll": "Repor tudo",
+    "savedInBrowser": "As preferências são guardadas no teu navegador",
+    "toToggle": "para abrir/fechar",
+    "quietRead": "Leitura tranquila",
+    "quietReadDesc": "Reduz cores vibrantes e animações. Para dias difíceis."
+  },
+  "footerLinks": {
+    "tagline": "Cada batida é uma escolha. Três Mil Milhões de Batidas existe para que as tuas tenham uma direção real.",
+    "commitment": "Comprometidos com o bem-estar emocional através da tecnologia",
+    "productHeading": "Produto",
+    "product": {
+      "blog": "Blog",
+      "pricing": "Preços",
+      "join": "Juntar-te ao desafio",
+      "challenge": "O desafio de 30 dias",
+      "test": "Teste gratuito",
+      "calculator": "Calculadora de batidas",
+      "guide": "Guia de utilização",
+      "method": "O método",
+      "compare": "Comparação",
+      "useCases": "Casos de uso",
+      "resources": "Recursos",
+      "faq": "Perguntas frequentes",
+      "access": "Aceder"
+    },
+    "infoHeading": "Informação",
+    "info": {
+      "about": "Sobre nós",
+      "forPros": "Para profissionais",
+      "ethics": "Ética e limites",
+      "changelog": "Novidades",
+      "privacy": "Política de privacidade",
+      "terms": "Termos de serviço",
+      "contact": "Contacto"
+    },
+    "copyright": "© {year} <domain>tresmilmillonesdelatidos.es</domain> — Todos os direitos reservados.",
+    "disclaimer": "Não substitui terapia nem intervenção psicológica profissional."
+  },
   "emergencyShelter": {
     "trigger": "Demasiado sobrecarregado para escrever",
     "ariaLabel": "Espaço de calma de emergência",
@@ -2816,37 +2971,6 @@
     "tooltipOn": "Modo incógnito ativo — desativar (voltaremos a guardar rascunhos neste dispositivo)",
     "tooltipOff": "Ativar modo incógnito — não guardaremos nada neste dispositivo",
     "bannerText": "Modo incógnito · não estamos a guardar rascunhos neste dispositivo"
-  },
-  "accessibility": {
-    "quietRead": "Leitura tranquila",
-    "quietReadDesc": "Reduz cores vibrantes e animações. Para dias difíceis.",
-    "bigCursor": "Cursor grande",
-    "bigCursorDesc": "Cursor maior e mais visível",
-    "close": "Fechar",
-    "closePanel": "Fechar painel de acessibilidade",
-    "dialogLabel": "Opções de acessibilidade",
-    "dyslexiaFont": "Tipo de letra para dislexia",
-    "dyslexiaFontDesc": "Tipografia mais legível para dislexia",
-    "highContrast": "Alto contraste",
-    "highContrastDesc": "Aumenta o contraste de cores",
-    "highlightLinks": "Realçar ligações",
-    "highlightLinksDesc": "Sublinha todas as ligações",
-    "increaseText": "Aumentar tamanho do texto",
-    "openPanel": "Abrir painel de acessibilidade",
-    "reduceMotion": "Reduzir movimento",
-    "reduceMotionDesc": "Desativa animações e transições",
-    "reduceText": "Reduzir tamanho do texto",
-    "resetAll": "Repor tudo",
-    "savedInBrowser": "As preferências são guardadas no teu navegador",
-    "sizeNormal": "Tamanho normal",
-    "sizePlus": "Tamanho +{level}",
-    "textSize": "Tamanho do texto",
-    "textSizeLevel": "Nível de tamanho do texto",
-    "textSpacing": "Espaçamento do texto",
-    "textSpacingDesc": "Mais espaço entre letras e linhas",
-    "title": "Acessibilidade",
-    "toToggle": "para abrir/fechar",
-    "triggerTooltip": "Acessibilidade: tamanho do texto, contraste e movimento"
   },
   "feedback": {
     "message": {
@@ -2969,128 +3093,261 @@
   "chatToolsMenu": {
     "trigger": "Mais"
   },
-  "footerLinks": {
-    "commitment": "Comprometidos com o bem-estar emocional através da tecnologia",
-    "copyright": "© {year} <domain>tresmilmillonesdelatidos.es</domain> — Todos os direitos reservados.",
-    "disclaimer": "Não substitui terapia nem intervenção psicológica profissional.",
-    "info": {
-      "about": "Sobre nós",
-      "changelog": "Novidades",
-      "contact": "Contacto",
-      "ethics": "Ética e limites",
-      "forPros": "Para profissionais",
-      "privacy": "Política de privacidade",
-      "terms": "Termos de serviço"
+  "enneagram": {
+    "loading": "A carregar…",
+    "backToProfile": "Voltar ao meu perfil",
+    "likert": {
+      "1": "Discordo totalmente",
+      "2": "Um pouco",
+      "3": "Razoável",
+      "4": "Bastante",
+      "5": "Totalmente"
     },
-    "infoHeading": "Informação",
-    "product": {
-      "access": "Aceder",
-      "blog": "Blog",
-      "calculator": "Calculadora de batidas",
-      "challenge": "O desafio de 30 dias",
-      "compare": "Comparação",
-      "faq": "Perguntas frequentes",
-      "guide": "Guia de utilização",
-      "join": "Juntar-te ao desafio",
-      "method": "O método",
-      "pricing": "Preços",
-      "resources": "Recursos",
-      "test": "Teste gratuito",
-      "useCases": "Casos de uso"
-    },
-    "productHeading": "Produto",
-    "tagline": "Cada batida é uma escolha. Três Mil Milhões de Batidas existe para que as tuas tenham uma direção real."
-  },
-  "sidebar": {
-    "actionsCompleted": "{done}/{total} ações concluídas.",
-    "actionsProgress": "{done}/{total} ações",
-    "active": "Ativo",
-    "activeGoal": "Objetivo ativo",
-    "adminAccess": "Acesso de administração",
-    "adminPanel": "Painel de administração",
-    "adminSession": "Sessão operacional ativa.",
-    "availableCount": "{count} disponíveis",
-    "completeAssessment": "Concluir avaliação",
-    "conversations": "Conversas",
-    "conversationsDesc": "Atividade recente e continuidade.",
-    "copied": "Copiado",
-    "copy": "Copiar",
-    "delete": "Eliminar",
-    "deleteConfirm": "Eliminar conversa?",
-    "earnInvites": "Ganha convites com a tua sequência",
-    "emptyGoalHint": "Usa o chat para definir um foco e convertê-lo aqui em acompanhamento.",
-    "invitations": "Convites",
-    "knowMethod": "Conhece o método",
-    "logout": "Terminar sessão",
-    "markDone": "Marcar como feita",
-    "markPendingAgain": "Marcar como pendente outra vez",
-    "messageCount": "{count} mensagens",
-    "moreInvites": "+{count} mais — ",
-    "nav": {
-      "chat": {
-        "label": "Chat",
-        "req": "Sempre"
+    "intro": {
+      "eyebrow": "Teste do Eneagrama",
+      "title": "Como é que o mentor te compreende melhor?",
+      "description": "90 frases. Marcas em quanto te identificas. No final terás o teu tipo dominante e, o mais importante, o mentor adaptará o seu tom e as suas perguntas a como funcionas tu.",
+      "bullets": {
+        "duration": "Demora cerca de 10-12 minutos.",
+        "pause": "Podes pausar e voltar: as tuas respostas ficam guardadas neste navegador.",
+        "storage": "Guardamos o teu resultado e as tuas respostas para que o teu mentor possa ajustar o tom e para que tu possas rever o teu teste quando quiseres. Podes apagá-lo daqui mesmo."
       },
-      "checkin": {
-        "label": "Check-in",
-        "req": "Sempre"
+      "existing": {
+        "title": "Já fizeste o teste antes",
+        "dominantLabel": "Tipo dominante:",
+        "typeFormat": "{name} (tipo {n})",
+        "wingSuffix": " · asa {n}",
+        "completedAt": "Feito em {date}",
+        "deleting": "A apagar…",
+        "delete": "Apagar o meu teste (inclui as respostas individuais)",
+        "deleteConfirm": "Apagar o teu teste do eneagrama? As respostas individuais também serão eliminadas. Não é possível desfazer."
       },
-      "comunidad": {
-        "label": "Comunidade",
-        "req": "Sempre"
+      "actions": {
+        "continue": "Continuar ({answered}/{total})",
+        "start": "Começar o teste",
+        "restart": "Começar do zero"
       },
-      "diario": {
-        "label": "Diário",
-        "req": "Dia 7"
-      },
-      "impulso": {
-        "label": "Impulso 21d",
-        "req": "Dia 21"
-      },
-      "logros": {
-        "label": "Conquistas",
-        "req": "Sequência 7d"
-      },
-      "plan": {
-        "label": "Plano",
-        "req": "Dia 3"
-      },
-      "respirar": {
-        "label": "Respirar",
-        "req": "Sequência 3d"
+      "declare": {
+        "prompt": "Já conheces o teu tipo (fizeste noutro teste, livro ou terapia)?",
+        "open": "Declarar o meu tipo sem fazer o teste",
+        "helper": "Seleciona o teu tipo dominante. Se conheces a tua ala, adiciona-a.",
+        "typeLabel": "Tipo dominante",
+        "typePlaceholder": "Escolhe…",
+        "typeOption": "{n} — {name}",
+        "wingLabel": "Ala (opcional)",
+        "wingNone": "Sem ala",
+        "wingOption": "{n} — {name}",
+        "submitting": "A guardar…",
+        "submit": "Confirmar",
+        "cancel": "Cancelar",
+        "saveError": "Não conseguimos guardar o teu tipo. Tenta mais tarde.",
+        "offlineError": "Sem ligação. Tenta mais tarde."
       }
     },
+    "running": {
+      "blockProgress": "Bloco {page} de {total}",
+      "answeredCount": "{answered}/{total} respondidas",
+      "autosave": "O teu progresso guarda-se automaticamente neste dispositivo. Podes fechar e voltar quando quiseres.",
+      "submitError": "Não conseguimos guardar o resultado. Tenta novamente mais tarde.",
+      "offlineError": "Sem ligação. As tuas respostas continuam guardadas localmente.",
+      "prev": "Anterior",
+      "next": "Seguinte",
+      "submitting": "A calcular…",
+      "submit": "Ver o meu resultado"
+    },
+    "result": {
+      "eyebrow": "O teu tipo dominante",
+      "typeSuffix": "— tipo {n}",
+      "wingSuffix": "com ala {n}",
+      "mentorTitle": "Como o mentor vai usar isto",
+      "mentorBody": "A partir de agora ajustará o tom e o tipo de perguntas ao modo como funcionas tu. Se em algum momento não te encaixa, podes repetir o teste quando quiseres.",
+      "topTitle": "Top 3 — os 3 com maior pontuação",
+      "rankingItem": "Tipo {n} — {name}",
+      "backToChat": "Voltar ao chat",
+      "repeat": "Repetir o teste"
+    }
+  },
+  "circleHub": {
+    "loading": "A carregar o teu círculo…",
+    "noCircle": {
+      "title": "Ainda não tens círculo atribuído",
+      "description": "Os círculos formam-se por afinidade de padrão emocional recente — grupos fechados de 4 pessoas, ciclos de 6 semanas. Quando houver correspondência com o teu estado atual, atribuir-te-emos um.",
+      "note": "Não há listagem para te unires manualmente. O emparelhamento é automático e respeita o teu anonimato."
+    },
+    "header": {
+      "cycle": "Ciclo",
+      "daysRemaining": "{days}d restantes"
+    },
+    "noPulse": {
+      "title": "Não há batida aberta esta semana",
+      "description": "A próxima abrir-se-á automaticamente quando começar a semana seguinte."
+    },
+    "pulse": {
+      "eyebrow": "Batida da semana",
+      "daysShort": "{days}d",
+      "toClose": "para fechar",
+      "placeholder": "Responde quando quiseres durante esta semana…",
+      "alreadyResponded": "Já respondeste — podes editar",
+      "anonymous": "Anónimo dentro do círculo",
+      "update": "Atualizar",
+      "share": "Partilhar com o círculo",
+      "participation": "{count}/{max} responderam",
+      "unlockHint": "· a tua resposta desbloqueia as do resto",
+      "toasts": {
+        "closed": "Esta batida já fechou",
+        "saveError": "Não foi possível guardar a tua resposta",
+        "updated": "Resposta atualizada",
+        "shared": "A tua resposta faz parte do pulso"
+      }
+    },
+    "peers": {
+      "title": "Vozes do círculo (anónimas)",
+      "empty": "Ainda não responderam. Voltarão durante a semana."
+    },
+    "reflections": {
+      "title": "Devolução privada do mentor",
+      "unread": "· não lido"
+    },
+    "archive": "Cartas de encerramento arquivadas"
+  },
+  "cafeteria": {
+    "header": {
+      "title": "☕ A Cafetaria",
+      "subtitle": "Uma ronda por dia. Anónima se quiseres.",
+      "myCircleShort": "{name}",
+      "myCircleLong": "Ir para o meu círculo · {name}"
+    },
+    "timeAgo": {
+      "now": "agora",
+      "minutes": "há {n}m",
+      "hours": "há {n}h",
+      "days": "há {n}d"
+    },
+    "toasts": {
+      "sessionExpired": "Sessão expirada",
+      "loadError": "Erro ao carregar a ronda",
+      "publishError": "Não foi possível publicar",
+      "published": "A tua resposta está na ronda",
+      "networkError": "Erro de rede",
+      "reactionError": "Não foi possível registar",
+      "reportError": "Não foi possível reportar",
+      "reported": "Obrigado. Analisamos.",
+      "mirrorError": "Não foi possível enviar",
+      "mirrorSent": "Pergunta enviada"
+    },
+    "noRound": {
+      "title": "A ronda de hoje ainda não está aberta",
+      "body": "Volta mais tarde. Renova-se todas as madrugadas com uma pergunta nova."
+    },
+    "prompt": {
+      "eyebrow": "Pergunta do dia"
+    },
+    "compose": {
+      "placeholder": "Escreve a tua resposta. Em 1-3 frases está bem.",
+      "anonymous": "Anónimo",
+      "named": "Com o meu nome",
+      "publish": "Publicar",
+      "hint": "Quando publicares verás o que partilharam os outros. Uma resposta por dia."
+    },
+    "mine": {
+      "eyebrow": "A tua resposta · {time}",
+      "asAnonymous": "Publicado como anónimo",
+      "asNamed": "Publicado com o teu nome"
+    },
+    "others": {
+      "title": "Outras respostas de hoje",
+      "count": "({n})",
+      "anonymousName": "Anónimo",
+      "reportAria": "Reportar esta resposta",
+      "reportTitle": "Reportar",
+      "reactAria": "Reagir com {emoji}",
+      "mirrorBtn": "Devolver pergunta",
+      "mirrorDisabledOwn": "Já lhe devolveste uma pergunta",
+      "mirrorDisabledFull": "Esta resposta já tem 3 perguntas",
+      "mirrorEnabled": "Devolver uma pergunta"
+    },
+    "othersEmpty": {
+      "title": "Ainda não há mais respostas",
+      "body": "Foste um dos primeiros a responder hoje. Volta mais tarde e verás o que escreveram os outros."
+    },
+    "mirror": {
+      "hint": "Uma única pergunta curta. Sem opinar. Sem conselho. Só perguntar.",
+      "placeholder": "E se…",
+      "send": "Enviar",
+      "cancel": "Cancelar"
+    },
+    "mirrorList": {
+      "title": "Perguntas recebidas",
+      "you": "tu",
+      "anonymous": "anónimo",
+      "reportAria": "Reportar esta pergunta",
+      "reportTitle": "Reportar"
+    },
+    "report": {
+      "title": "Por que queres reportá-la?",
+      "reasons": {
+        "harmful": "Prejudicial ou inadequado",
+        "self_harm": "Automutilação / crise",
+        "harassment": "Assédio",
+        "spam": "Spam",
+        "other": "Outro"
+      },
+      "submit": "Enviar relatório",
+      "cancel": "Cancelar"
+    }
+  },
+  "appPage": {
+    "sidebar": {
+      "anonymous": "Sessão anónima",
+      "planLabel": "Plano {plan}",
+      "planFree": "Plano Free"
+    },
     "newConversation": "Nova conversa",
-    "newCount": "{count} novas",
-    "no": "Não",
-    "noActiveGoal": "Sem objetivo ativo",
-    "noConversations": "Ainda não há conversas guardadas.",
-    "noOpenDebt": "Sem dívida aberta",
-    "noResults": "Sem resultados.",
-    "pendingAssessment": "Avaliação pendente",
-    "pendingAssessmentDesc": "O teu profissional atribuiu-te uma avaliação. Conclui-a para que possa acompanhar o teu progresso.",
-    "pendingCount": "{count} pendentes",
-    "processProgress": "Progresso do processo",
-    "processProgressDesc": "Continuidade visível para que o trabalho não dependa apenas da memória.",
-    "projectOf": "um projeto da <startidea>Startidea</startidea>",
-    "rename": "Mudar o nome",
-    "searchPlaceholder": "Procurar conversa...",
-    "settings": "Definições",
-    "share": "Partilhar",
-    "streak30": "🏆 <strong>30 dias de sequência</strong> → mais 1 convite",
-    "streak7": "🔥 <strong>7 dias de sequência</strong> → 1 convite",
-    "streakDays": "🔥 {count} dias de sequência",
-    "supportMessages": "Mensagens de apoio",
-    "telegramDesc": "Fala com o teu mentor, recebe lembretes e faz check-in sem abrir a web.",
-    "telegramTitle": "Leva-me no Telegram",
-    "trend": "Tendência: {value}",
-    "unlockedFeaturesAria": "{count} de {total} funções desbloqueadas",
-    "unlocksAt": "Desbloqueia em: {req}",
-    "viewAllInvitations": "Ver todos os convites",
-    "workspace": "Workspace",
-    "workspaceDesc": "Conversas, continuidade e acesso rápido ao produto.",
-    "yes": "Sim",
-    "yourPath": "O teu caminho",
-    "yourPathTooltip": "Funções desbloqueadas: o caminho vai-se abrindo à medida que usas a app (sequência, dias ativos, etc.)"
+    "nameSaved": "Prazer, {name}.",
+    "upgrade": {
+      "title": "Continuidade completa, sem pressão vazia",
+      "default": "O próximo salto não é mais ruído: é mais continuidade, histórico e acompanhamento real.",
+      "valueDetected": "Aqui já houve valor real: clareza, objetivo ou uma ação concreta. Pro sustém-no entre sessões e desbloqueia Modo Impulso.",
+      "free": {
+        "title": "Free",
+        "bullets": {
+          "daily": "10 mensagens por dia",
+          "continuity": "Continuidade resumida",
+          "entry": "Bom ponto de entrada"
+        }
+      },
+      "pro": {
+        "title": "Pro",
+        "bullets": {
+          "unlimited": "Sem limite diário",
+          "tracking": "Rastreamento completo de objetivos e ações",
+          "continuity": "Mais continuidade entre sessões"
+        }
+      },
+      "footer": {
+        "anonymous": "Antes de ativares um plano, guarda o teu progresso com email para não perderes continuidade.",
+        "linked": "O teu progresso já está vinculado a {email}. Quando Pro estiver pronto, este fluxo já estará preparado."
+      },
+      "actions": {
+        "later": "Agora não",
+        "viewPlan": "Ver continuidade no plano"
+      }
+    },
+    "capture": {
+      "title": "Guarda o teu progresso antes de o perderes",
+      "default": "Já apareceu claridade real na conversa. Vincula um email para não perderes objetivos, ações e continuidade.",
+      "badges": {
+        "anonymous": "Conta anónima",
+        "free": "Free",
+        "progress": "Progresso {done}/{total}"
+      },
+      "emailLabel": "Email",
+      "emailPlaceholder": "tu@email.com",
+      "actions": {
+        "stayAnonymous": "Manter-se anónimo",
+        "saving": "A guardar…",
+        "save": "Guardar progresso"
+      }
+    }
   }
 }

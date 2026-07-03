@@ -139,7 +139,7 @@ export default async function LandingPageI18n({
                     {t('hero.ctaSecondary')}
                   </Link>
                 </div>
-                <p className="text-xs text-zinc-500 mt-3">{t('hero.noSignup')}</p>
+                <p className="text-xs text-zinc-400 mt-3">{t('hero.noSignup')}</p>
               </Reveal>
 
               <Reveal delay={1700} y={10}>
@@ -167,7 +167,7 @@ export default async function LandingPageI18n({
                     </div>
                   </div>
                 </div>
-                <p className="text-xs text-zinc-500 mt-3">{t('hero.langNote')}</p>
+                <p className="text-xs text-zinc-400 mt-3">{t('hero.langNote')}</p>
 
                 {/* #100 — Honestidad relacional: la app NO sustituye personas. */}
                 {/* Bloque visible (no microcopy) — declaración de marca, no */}
@@ -557,7 +557,9 @@ export default async function LandingPageI18n({
             </div>
           </Reveal>
           <Reveal delay={1400}>
-            <p className="text-xs text-zinc-500 uppercase tracking-[0.25em]">{t('finalCta.disclaimer')}</p>
+            {/* Texto legal: mínimo 14px y zinc-400 (7.5:1) — a 12px/zinc-500
+                quedaba en ~4.2:1, por debajo del 4.5:1 de WCAG 1.4.3. */}
+            <p className="text-sm text-zinc-400 uppercase tracking-[0.25em]">{t('finalCta.disclaimer')}</p>
           </Reveal>
         </div>
       </section>

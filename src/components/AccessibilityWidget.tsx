@@ -8,10 +8,12 @@ import {
   Plus, Minus, Coffee,
 } from "lucide-react";
 import { useAccessibility } from "@/lib/accessibility";
+import { useHideOnScroll } from "@/lib/use-hide-on-scroll";
 
 export default function AccessibilityWidget() {
   const t = useTranslations("accessibility");
   const [open, setOpen] = useState(false);
+  const scrollingDown = useHideOnScroll();
   const panelRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { prefs, update, reset } = useAccessibility();
@@ -80,7 +82,9 @@ export default function AccessibilityWidget() {
         title={open ? t("closePanel") : t("triggerTooltip")}
         aria-expanded={open}
         aria-controls="a11y-panel"
-        className="fixed bottom-36 sm:bottom-20 left-4 z-[9998] flex items-center justify-center w-11 h-11 rounded-full bg-violet-600/90 hover:bg-violet-500 text-white shadow-lg shadow-violet-500/25 backdrop-blur-sm transition-all focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
+        className={`fixed bottom-36 sm:bottom-20 left-4 z-[9998] flex items-center justify-center w-11 h-11 rounded-full bg-violet-600/90 hover:bg-violet-500 text-white shadow-lg shadow-violet-500/25 backdrop-blur-sm transition-all focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 ${
+          scrollingDown && !open ? "opacity-0 -translate-x-16 pointer-events-none" : ""
+        }`}
       >
         <Accessibility className="w-5 h-5" />
         {activeCount > 0 && (

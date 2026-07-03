@@ -230,6 +230,11 @@ export default async function RootLayout({
             __html: `(function(){try{var p=JSON.parse(localStorage.getItem("a11y-preferences")||"{}");var c=document.documentElement.classList;if(p.fontSize>0)c.add("a11y-font-"+p.fontSize);if(p.highContrast)c.add("a11y-high-contrast");if(p.reducedMotion)c.add("a11y-reduced-motion");if(p.dyslexiaFont)c.add("a11y-dyslexia-font");if(p.linkHighlight)c.add("a11y-link-highlight");if(p.bigCursor)c.add("a11y-big-cursor");if(p.textSpacing)c.add("a11y-text-spacing");}catch(e){}})();`,
           }}
         />
+        {/* Sin JS, los bloques [data-reveal] (scroll-reveal) quedarían
+            atrapados en opacity:0 y la página se vería en negro. */}
+        <noscript>
+          <style>{`[data-reveal]{opacity:1!important;transform:none!important;filter:none!important}`}</style>
+        </noscript>
       </head>
       <body className="min-h-full flex flex-col">
         {/* Skip-to-content for keyboard/screen-reader users */}

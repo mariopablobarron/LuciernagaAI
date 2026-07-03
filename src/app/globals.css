@@ -374,6 +374,9 @@ body {
   .input-field:focus {
     outline: none;
     border-color: #6366f1;
+    /* WCAG 2.4.7: el cambio de color de un borde de 1px no basta como
+       indicador de foco — el anillo lo hace visible sin mover el layout. */
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.45);
   }
 
   /* Text utilities */
@@ -551,6 +554,12 @@ body {
   }
   .vignette-breathe { animation: vignette-breathe 4.4s ease-in-out infinite; }
   .ticker-scroll { animation: ticker-scroll 40s linear infinite; }
+  /* WCAG 2.2.2 (Pause, Stop, Hide): el contenido en movimiento debe poder
+     pausarse. Hover cubre puntero; focus-within cubre teclado. */
+  .ticker-scroll:hover,
+  .ticker-scroll:focus-within {
+    animation-play-state: paused;
+  }
   .glow-pulse { animation: glow-pulse 3.6s ease-in-out infinite; }
   .text-shimmer-amber {
     background: linear-gradient(90deg, #D4A574 0%, #F5EEE4 25%, #E04E3A 50%, #F5EEE4 75%, #D4A574 100%);
@@ -567,6 +576,19 @@ body {
     .glow-pulse,
     .text-shimmer-amber {
       animation: none;
+    }
+  }
+
+  /* Fallback del scroll-reveal: [data-reveal] arranca en opacity:0 vía estilo
+     inline y solo se revela cuando el IntersectionObserver dispara. Al
+     imprimir, el observer nunca corre para lo que está bajo el pliegue y la
+     página saldría en negro. (El caso JS-desactivado se cubre con el
+     <noscript> del root layout.) */
+  @media print {
+    [data-reveal] {
+      opacity: 1 !important;
+      transform: none !important;
+      filter: none !important;
     }
   }
 }

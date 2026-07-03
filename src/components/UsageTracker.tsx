@@ -22,7 +22,7 @@ function inferSurface(pathname: string | null): "chat" | "app" {
 async function sendHeartbeat(
   surface: "chat" | "app",
   sessionId: string | null,
-): Promise<string | null> {
+): Promise<{ sessionId: string | null; unauthenticated: boolean }> {
   try {
     const res = await fetch("/api/usage/heartbeat", {
       method: "POST",
@@ -32,11 +32,12 @@ async function sendHeartbeat(
       body: JSON.stringify({ surface, sessionId }),
       keepalive: true,
     });
-    if (!res.ok) return sessionId;
+    if (res.status === 401) return { sessionId, unauthenticated: true };
+    if (!res.ok) return { sessionId, unauthenticated: false };
     const data = (await res.json().catch(() => null)) as { sessionId?: string } | null;
-    return data?.sessionId ?? sessionId;
+    return { sessionId: data?.sessionId ?? sessionId, unauthenticated: false };
   } catch {
-    return sessionId;
+    return { sessionId, unauthenticated: false };
   }
 }
 
@@ -53,6 +54,14 @@ export default function UsageTracker() {
     // Excluimos admin — no queremos sesiones de admin distorsionando métricas
     if (pathname?.startsWith("/admin")) return;
 
+    // Solo trackeamos superficies de producto (/app, /chat): son las únicas
+    // con identidad. En marketing (landing, precios, blog…) el visitante es
+    // anónimo y el endpoint devolvía 401 cada 30 s — consola llena de errores
+    // y peticiones inútiles (auditoría UX 2026-07-04).
+    const isProductSurface =
+      pathname === "/app" || pathname?.startsWith("/app/") || pathname?.startsWith("/chat");
+    if (!isProductSurface) return;
+
     if (typeof window === "undefined") return;
 
     try {
@@ -68,8 +77,16 @@ export default function UsageTracker() {
       if (cancelled) return;
       if (document.visibilityState !== "visible") return;
       const surface = inferSurface(pathnameRef.current);
-      const next = await sendHeartbeat(surface, sessionIdRef.current);
+      const result = await sendHeartbeat(surface, sessionIdRef.current);
       if (cancelled) return;
+      // Sin identidad (401) no hay nada que medir: paramos el polling en este
+      // mount. Al navegar (cambio de pathname) el efecto se rearma y reintenta.
+      if (result.unauthenticated) {
+        if (timer) clearInterval(timer);
+        timer = null;
+        return;
+      }
+      const next = result.sessionId;
       if (next && next !== sessionIdRef.current) {
         sessionIdRef.current = next;
         try {

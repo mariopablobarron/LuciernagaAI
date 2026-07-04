@@ -1,0 +1,41 @@
+src/components/home/ChatDemo.tsx
+  s_2ae7d08359d877::t_1424d1199442c8 328-345
+  s_2ae7d08359d877::t_842e1aecb8d313 160-163
+  s_2ae7d08359d877::t_b59788232e7b4c 39
+  s_2ae7d08359d877::t_be7ca3323fec85 235-239
+  s_65877aa637ec34::t_3284af8d6167f4 50-54,65-69,80-84,95-99,110-114
+messages/de.json
+  s_2ae7d08359d877::t_f78962426d7ac5 121
+messages/en.json
+  s_2ae7d08359d877::t_769ae1e438f6b5 121
+messages/es.json
+  s_2ae7d08359d877::t_1b7937c3389f4c 121
+messages/fr.json
+  s_2ae7d08359d877::t_23d61464b126ef 121
+messages/pt.json
+  s_2ae7d08359d877::t_77c327042655fb 121
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "48a5d823c0be40be3bbf64c3fdb185bbb2a38456",
+  "prompts": {},
+  "sessions": {
+    "s_2ae7d08359d877": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "31f1ba56-9d02-40a9-bf9e-fe68214cb727",
+        "model": "claude-fable-5"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    },
+    "s_65877aa637ec34": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "09be501c-fea4-4e5e-ba37-545d057a463d",
+        "model": "claude-fable-5"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

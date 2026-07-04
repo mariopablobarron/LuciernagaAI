@@ -1,0 +1,25 @@
+src/components/home/LandingPageI18n.tsx
+  s_d2308f25c4747c::t_cc1299b46788ea 125-126,137
+  s_d2308f25c4747c::t_53ff3282ade8eb 98
+  s_d2308f25c4747c::t_01e21d11306c6f 184
+  s_d2308f25c4747c::t_6298f2557abaee 105
+  s_d2308f25c4747c::t_6cc8d92bcbf566 112
+  s_d2308f25c4747c::t_7408e6770ae302 145
+  s_d2308f25c4747c::t_308a5842557553 91-92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "1cc7ff65d0e80633cb19b667c069004626fd25a5",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

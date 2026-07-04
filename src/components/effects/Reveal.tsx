@@ -66,8 +66,10 @@ export default function Reveal({
     willChange: "opacity, transform, filter",
   };
 
+  // data-reveal permite el fallback sin JS (noscript/print en globals.css):
+  // el contenido nunca puede quedar atrapado en opacity:0 si el observer no corre.
   // @ts-expect-error dynamic JSX tag
-  return <Tag ref={ref} className={className} style={style}>{children}</Tag>;
+  return <Tag ref={ref} data-reveal="" className={className} style={style}>{children}</Tag>;
 }
 
 /**
@@ -103,7 +105,12 @@ export function RevealWords({
           duration={700}
           className={`inline-block ${wordClassName}`}
         >
-          <span style={{ marginInlineEnd: i < last ? "0.28em" : 0 }}>{word}</span>
+          {/* El espacio final es real (no solo margin) para que textContent
+              conserve los separadores: lectores de pantalla y buscadores leían
+              el titular como una sola palabra concatenada. El trailing space
+              dentro del inline-block colapsa visualmente, así que el layout
+              no cambia. */}
+          <span style={{ marginInlineEnd: i < last ? "0.28em" : 0 }}>{i < last ? `${word} ` : word}</span>
         </Reveal>
       ))}
     </span>

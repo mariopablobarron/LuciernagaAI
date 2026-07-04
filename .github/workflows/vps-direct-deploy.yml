@@ -10,19 +10,26 @@ name: VPS Direct Deploy (luciernaga-ai)
 #   2. docker build con tag = commit hash corto.
 #   3. sed para apuntar el compose al tag nuevo.
 #   4. docker compose up -d.
-#   5. logs runtime para verificar.
+#   5. smoke test /api/health.
 #
-# Setup necesario (1 vez):
-#   - Generar SSH keypair en local: ssh-keygen -t ed25519 -f ~/.ssh/vps_deploy
-#   - Pegar PUBLICA en /root/.ssh/authorized_keys del VPS (vía Web Console
-#     Hostinger UNA SOLA VEZ).
-#   - Pegar PRIVADA en GitHub → Settings → Secrets → New repository secret:
-#       Name:  VPS_SSH_KEY
-#       Value: contenido de ~/.ssh/vps_deploy (incluye BEGIN/END lines)
-#   - (Opcional) Si quieres notificación Telegram al terminar: setear
-#     TELEGRAM_BOT_TOKEN y ADMIN_TELEGRAM_ID en secrets también.
+# HISTORIA DEL RUNNER (leer antes de cambiar esto):
+#   - Hasta 2026-06-23: GH-hosted + SSH (este mismo diseño). Se cambió a
+#     runner self-hosted porque fail2ban baneaba IPs de runners de GitHub.
+#   - 2026-06-24: incidente de CPU (runners de CI compilando en prod) →
+#     se instaló /usr/local/bin/cpu-throttle-guard.sh en el VPS, que MATA
+#     cualquier runner de GH Actions cada 5 min. El runner self-hosted
+#     quedó roto por diseño: deploys en cola infinita o muertos a mitad
+#     (visto 2026-07-04, run 28687363780).
+#   - 2026-07-04: vuelta a GH-hosted + SSH (decisión de Mario, opción A).
+#     La key de deploy está RESTRINGIDA en authorized_keys con
+#     command="/root/deploy-mentor-web.sh" — esta sesión SSH solo puede
+#     ejecutar el script de deploy, haga lo que haga el YAML.
 #
-# Doc completa: docs/setup-auto-deploy.md
+# El script vive en /root/deploy-mentor-web.sh en el VPS (toda la lógica
+# de deploy está allí, no aquí — ver docs/setup-auto-deploy.md).
+#
+# Secrets: VPS_SSH_KEY (obligatorio), TELEGRAM_BOT_TOKEN + ADMIN_TELEGRAM_ID
+# (opcionales, para la notificación).
 
 on:
   push:
@@ -42,32 +49,27 @@ concurrency:
 
 jobs:
   deploy:
-    # Self-hosted runner en el propio VPS — elimina la dependencia de SSH
-    # entrante desde GitHub Actions y por tanto los problemas con fail2ban
-    # baneando IPs de runners de GitHub (incidente recurrente 2026-06-23
-    # con 4-5 deploys fallidos en una sesión).
-    # Setup: 2026-06-23. Servicio systemd:
-    #   actions.runner.mariopablobarron-tresmilmillonesdelatidos.mentor-web-vps-runner
-    # Directorio: /opt/gh-runner-mentor-web
-    # Replica el patrón ya operativo del repo hub (hub-vps-runner online
-    # desde 2026-06-09).
-    #
-    # Si el runner se cae: ssh root@72.61.195.108 'systemctl restart
-    # actions.runner.mariopablobarron-tresmilmillonesdelatidos.mentor-web-vps-runner'
-    runs-on: [self-hosted, vps, mentor-web]
+    runs-on: ubuntu-latest
     timeout-minutes: 35 # Build cold con cache invalidado puede tomar 15-20 min.
 
     steps:
-      # El script vive en /root/deploy-mentor-web.sh en el VPS (ver
-      # docs/setup-auto-deploy.md). Lo ejecutamos DIRECTAMENTE porque el
-      # runner corre como root en el propio VPS — sin SSH intermedio.
-      # Esto elimina:
-      #   - SSH timeout por fail2ban baneando runners de GitHub
-      #   - Necesidad del secret VPS_SSH_KEY (queda como código muerto
-      #     pero no se elimina por si alguien lo usa de fallback)
-      #   - Dependencia de appleboy/ssh-action externa
-      - name: Deploy (script en el VPS)
-        run: /root/deploy-mentor-web.sh
+      - name: Deploy (SSH al VPS, script restringido)
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/vps_deploy
+          chmod 600 ~/.ssh/vps_deploy
+          # La key está restringida con command="/root/deploy-mentor-web.sh"
+          # en el VPS: el comando pasado aquí se ignora y siempre corre el
+          # script. ServerAliveInterval mantiene viva la sesión durante el
+          # docker build (15-20 min en frío).
+          ssh -i ~/.ssh/vps_deploy \
+            -o StrictHostKeyChecking=accept-new \
+            -o ConnectTimeout=20 \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=60 \
+            root@72.61.195.108 "/root/deploy-mentor-web.sh"
 
       - name: Verificar que la web responde
         run: |

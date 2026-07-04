@@ -51,7 +51,9 @@ Mecanismo real (confirmado 5+ runs verdes consecutivos):
 
 **Modificar la lógica de deploy**: editar `/root/deploy-mentor-web.sh` en el VPS (no el YAML). El YAML sólo invoca al script.
 
-**Restringir SSH key de GH Actions (recomendado, ver `docs/setup-auto-deploy.md`)**: añadir `restrict,...,command="/root/deploy-mentor-web.sh"` antes de la pública en `/root/.ssh/authorized_keys`. Sin esto la key tiene root pleno.
+**Restringir SSH key de GH Actions (APLICADO)**: la pública de `VPS_SSH_KEY` está en `/root/.ssh/authorized_keys` con `restrict,...,command="/root/deploy-mentor-web.sh"` — la sesión solo puede ejecutar el script de deploy.
+
+**Historia del runner (no repetir el bucle)**: 2026-06-23 se cambió a runner self-hosted en el VPS (`/opt/gh-runner-mentor-web`) porque fail2ban baneaba IPs de GitHub. 2026-06-24, tras el incidente de CPU, se instaló `cpu-throttle-guard.sh` que **mata cualquier runner de GH Actions** en el VPS → el self-hosted quedó roto por diseño (deploys en cola infinita; visto 2026-07-04). 2026-07-04 se volvió a GH-hosted + SSH. Si vuelven los baneos de IPs de GitHub, la solución es allowlist en CrowdSec/fail2ban, **no** resucitar el runner (el guard lo matará).
 
 ### Deploy manual de emergencia
 Si GH Actions cae, replicar a mano:

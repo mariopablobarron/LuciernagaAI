@@ -239,12 +239,45 @@ export async function interceptTransitionalVoid(input: InterceptInput): Promise<
     return { intercepted: false };
   }
 
-  const tvResponse =
-    `No estás perdido.\n\nEstás en una transición.\n\n` +
-    `El problema no es que no sepas qué hacer.\n` +
-    `Es que estás intentando decidir demasiado pronto.\n\n` +
-    `Vamos a hacer algo simple.\n\n` +
-    `Escribe:\n→ qué parte de tu vida ya no encaja contigo`;
+  // Respuesta canned del estado TRANSITIONAL_VOID, por locale (usa input.locale).
+  // ES fuente, EN revisado. PT/FR/DE traducción propia PENDIENTE de revisión
+  // nativa — copy terapéutico de salud mental (ver flag i18n / decisión Mario).
+  const TV_RESPONSES: Record<"es" | "en" | "pt" | "fr" | "de", string> = {
+    es:
+      `No estás perdido.\n\nEstás en una transición.\n\n` +
+      `El problema no es que no sepas qué hacer.\n` +
+      `Es que estás intentando decidir demasiado pronto.\n\n` +
+      `Vamos a hacer algo simple.\n\n` +
+      `Escribe:\n→ qué parte de tu vida ya no encaja contigo`,
+    en:
+      `You're not lost.\n\nYou're in a transition.\n\n` +
+      `The problem isn't that you don't know what to do.\n` +
+      `It's that you're trying to decide too soon.\n\n` +
+      `Let's do something simple.\n\n` +
+      `Write:\n→ what part of your life no longer fits you`,
+    pt:
+      `Não estás perdido.\n\nEstás numa transição.\n\n` +
+      `O problema não é não saberes o que fazer.\n` +
+      `É que estás a tentar decidir cedo demais.\n\n` +
+      `Vamos fazer uma coisa simples.\n\n` +
+      `Escreve:\n→ que parte da tua vida já não encaixa contigo`,
+    fr:
+      `Tu n'es pas perdu.\n\nTu es dans une transition.\n\n` +
+      `Le problème n'est pas que tu ne saches pas quoi faire.\n` +
+      `C'est que tu essaies de décider trop tôt.\n\n` +
+      `Faisons quelque chose de simple.\n\n` +
+      `Écris :\n→ quelle partie de ta vie ne te correspond plus`,
+    de:
+      `Du bist nicht verloren.\n\nDu bist in einem Übergang.\n\n` +
+      `Das Problem ist nicht, dass du nicht weißt, was zu tun ist.\n` +
+      `Es ist, dass du versuchst, zu früh zu entscheiden.\n\n` +
+      `Lass uns etwas Einfaches machen.\n\n` +
+      `Schreib:\n→ welcher Teil deines Lebens nicht mehr zu dir passt`,
+  };
+  const tvLocale = (["es", "en", "pt", "fr", "de"].includes(input.locale ?? "")
+    ? input.locale
+    : "es") as "es" | "en" | "pt" | "fr" | "de";
+  const tvResponse = TV_RESPONSES[tvLocale];
 
   void trackSafe({
     userId: input.userId,

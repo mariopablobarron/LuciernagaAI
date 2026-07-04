@@ -1,0 +1,21 @@
+.github/workflows/vps-direct-deploy.yml
+  s_2ae7d08359d877::t_7d91b4782c6f2a 13,15-26,28-32,52,56-72
+OPERATIONS.md
+  s_2ae7d08359d877::t_a1f64e3bea009e 54-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "3c6510d10cbe78a55060132cf0c852ecad326f20",
+  "prompts": {},
+  "sessions": {
+    "s_2ae7d08359d877": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "31f1ba56-9d02-40a9-bf9e-fe68214cb727",
+        "model": "claude-fable-5"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

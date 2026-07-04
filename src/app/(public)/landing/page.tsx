@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { ArrowRight } from "lucide-react";
-import TestimonialsSection from "@/components/home/TestimonialsSection";
 
 // IDs estables para steps, planes y mensajes del chat-mock. Copy externalizado a messages.landing.*
 const STEPS = ['describe', 'detect', 'next'] as const;
@@ -110,8 +109,12 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* TESTIMONIALS + STATS */}
-      <TestimonialsSection />
+      {/* TESTIMONIALS retirados 2026-07-04: eran citas inventadas con nombre,
+          edad y 5 estrellas — publicidad engañosa (reseñas falsas, reforma de
+          consumo 2022) e incoherente con el posicionamiento de honestidad del
+          producto. Cuando haya testimonios reales con consentimiento del
+          usuario, montar la sección desde ese contenido (ver auditoría UX
+          2026-07-04). */}
 
       {/* PRICING */}
       <section className="py-20 px-4 bg-zinc-900/30 border-y border-zinc-800">

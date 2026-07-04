@@ -64,12 +64,33 @@ jobs:
           # en el VPS: el comando pasado aquí se ignora y siempre corre el
           # script. ServerAliveInterval mantiene viva la sesión durante el
           # docker build (15-20 min en frío).
-          ssh -i ~/.ssh/vps_deploy \
-            -o StrictHostKeyChecking=accept-new \
-            -o ConnectTimeout=20 \
-            -o ServerAliveInterval=30 \
-            -o ServerAliveCountMax=60 \
-            root@72.61.195.108 "/root/deploy-mentor-web.sh"
+          #
+          # Reintentos: la conexión desde runners de GitHub falla a veces con
+          # "Connection timed out" transitorio (visto run 28697705935 el
+          # 2026-07-04 — no era ban de CrowdSec ni firewall). exit 255 = fallo
+          # de conexión SSH → reintentar; cualquier otro código viene del
+          # script de deploy y NO se reintenta (un build fallido no mejora
+          # repitiéndolo y el script no es abortable a medias sin riesgo).
+          for attempt in 1 2 3 4; do
+            set +e
+            ssh -i ~/.ssh/vps_deploy \
+              -o StrictHostKeyChecking=accept-new \
+              -o ConnectTimeout=25 \
+              -o ServerAliveInterval=30 \
+              -o ServerAliveCountMax=60 \
+              root@72.61.195.108 "/root/deploy-mentor-web.sh"
+            CODE=$?
+            set -e
+            [ "$CODE" -eq 0 ] && exit 0
+            if [ "$CODE" -ne 255 ]; then
+              echo "::error::deploy-mentor-web.sh terminó con código $CODE (no es fallo de conexión — sin reintento)"
+              exit "$CODE"
+            fi
+            echo "Conexión SSH fallida (intento $attempt/4) — espera 30s..."
+            sleep 30
+          done
+          echo "::error::SSH no conectó tras 4 intentos"
+          exit 255
 
       - name: Verificar que la web responde
         run: |

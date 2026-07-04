@@ -36,6 +36,7 @@ const STRINGS: Record<Locale, {
   sendAria: string;
   openFull: string;
   errorGeneric: string;
+  examples: string[];
 }> = {
   es: {
     badge: "chat real · sin registro",
@@ -46,6 +47,11 @@ const STRINGS: Record<Locale, {
     sendAria: "Enviar",
     openFull: "Abrir en pantalla completa →",
     errorGeneric: "Algo no salió bien. Intenta de nuevo.",
+    examples: [
+      "Me agobia decidir qué hacer con mi vida",
+      "Llevo semanas posponiendo algo importante",
+      "Quiero cambiar de trabajo pero me da miedo",
+    ],
   },
   en: {
     badge: "real chat · no signup",
@@ -56,6 +62,11 @@ const STRINGS: Record<Locale, {
     sendAria: "Send",
     openFull: "Open in full screen →",
     errorGeneric: "Something went wrong. Try again.",
+    examples: [
+      "Deciding what to do with my life overwhelms me",
+      "I've been putting off something important for weeks",
+      "I want to change jobs but I'm scared",
+    ],
   },
   pt: {
     badge: "chat real · sem registo",
@@ -66,6 +77,11 @@ const STRINGS: Record<Locale, {
     sendAria: "Enviar",
     openFull: "Abrir em ecrã inteiro →",
     errorGeneric: "Algo correu mal. Tenta de novo.",
+    examples: [
+      "Decidir o que fazer com a minha vida assusta-me",
+      "Há semanas que adio algo importante",
+      "Quero mudar de trabalho mas tenho medo",
+    ],
   },
   fr: {
     badge: "chat réel · sans inscription",
@@ -76,6 +92,11 @@ const STRINGS: Record<Locale, {
     sendAria: "Envoyer",
     openFull: "Ouvrir en plein écran →",
     errorGeneric: "Quelque chose a mal tourné. Réessaie.",
+    examples: [
+      "Décider quoi faire de ma vie m'angoisse",
+      "Je repousse quelque chose d'important depuis des semaines",
+      "Je veux changer de travail mais j'ai peur",
+    ],
   },
   de: {
     badge: "echter Chat · ohne Anmeldung",
@@ -86,6 +107,11 @@ const STRINGS: Record<Locale, {
     sendAria: "Senden",
     openFull: "Im Vollbild öffnen →",
     errorGeneric: "Etwas ist schiefgelaufen. Versuche es noch einmal.",
+    examples: [
+      "Zu entscheiden, was ich mit meinem Leben anfange, überfordert mich",
+      "Ich schiebe seit Wochen etwas Wichtiges auf",
+      "Ich will den Job wechseln, aber ich habe Angst",
+    ],
   },
 };
 
@@ -131,9 +157,10 @@ export default function ChatDemo() {
     }
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const text = input.trim();
+  // Reutilizable por el submit del input y por los chips de ejemplo
+  // (Wayfinder: reduce la ansiedad de folio en blanco — auditoría UX 2026-07-04).
+  async function sendMessage(raw: string) {
+    const text = raw.trim();
     if (!text || sending) return;
 
     setInput("");
@@ -203,6 +230,11 @@ export default function ChatDemo() {
     } finally {
       setSending(false);
     }
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    void sendMessage(input);
   }
 
   // Tras 3+ turnos del usuario, sugerir migrar a pantalla completa con
@@ -290,6 +322,24 @@ export default function ChatDemo() {
         {error && (
           <div className="mx-4 sm:mx-5 mb-2 text-[11px] text-rose-300/80">
             {error}
+          </div>
+        )}
+
+        {/* Chips de ejemplo — solo antes del primer mensaje del usuario.
+            Cada chip envía ese texto al chat real de inmediato. */}
+        {userTurns === 0 && (
+          <div className="px-4 sm:px-5 pb-3 flex flex-wrap gap-2">
+            {s.examples.map((ex) => (
+              <button
+                key={ex}
+                type="button"
+                disabled={sending}
+                onClick={() => void sendMessage(ex)}
+                className="text-xs px-3 py-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-200 hover:bg-violet-500/20 hover:border-violet-500/50 transition-colors disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:outline-none"
+              >
+                {ex}
+              </button>
+            ))}
           </div>
         )}
 

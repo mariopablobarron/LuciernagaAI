@@ -1,0 +1,21 @@
+src/components/home/Footer.tsx
+  s_2ae7d08359d877::t_6733070fc2e9ca 114-117,131-134
+  s_2ae7d08359d877::t_0809f7e5cc7b8e 103
+  s_2ae7d08359d877::t_fd2904da416662 120,137
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "b98aa8a9860918ccd79fc094dc75ce181b014ce0",
+  "prompts": {},
+  "sessions": {
+    "s_2ae7d08359d877": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "31f1ba56-9d02-40a9-bf9e-fe68214cb727",
+        "model": "claude-fable-5"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

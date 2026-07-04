@@ -100,7 +100,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="flex items-center justify-center w-9 h-9 rounded-lg border border-zinc-800 bg-zinc-900/50 text-zinc-500 hover:text-white hover:border-violet-500/40 hover:bg-violet-500/10 transition-all"
+                  className="flex items-center justify-center w-11 h-11 rounded-lg border border-zinc-800 bg-zinc-900/50 text-zinc-500 hover:text-white hover:border-violet-500/40 hover:bg-violet-500/10 transition-all"
                 >
                   {social.icon}
                 </a>
@@ -111,10 +111,13 @@ export default function Footer() {
           {/* Product */}
           <div className="space-y-4">
             <h4 className="font-semibold text-foreground">{t("productHeading")}</h4>
-            <ul className="space-y-2.5">
+            {/* py-1 en cada enlace + space-y-1: mismo ritmo visual (~32px de
+                paso) pero área táctil de 28px — antes los enlaces medían ~20px
+                (auditoría UX 2026-07-04, WCAG 2.5.8 target size). */}
+            <ul className="space-y-1">
               {PRODUCT_LINKS.map((link) => (
                 <li key={link.key}>
-                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link href={link.href} className="inline-block py-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {t(`product.${link.key}`)}
                   </Link>
                 </li>
@@ -125,10 +128,13 @@ export default function Footer() {
           {/* Legal & Contact */}
           <div className="space-y-4">
             <h4 className="font-semibold text-foreground">{t("infoHeading")}</h4>
-            <ul className="space-y-2.5">
+            {/* py-1 en cada enlace + space-y-1: mismo ritmo visual (~32px de
+                paso) pero área táctil de 28px — antes los enlaces medían ~20px
+                (auditoría UX 2026-07-04, WCAG 2.5.8 target size). */}
+            <ul className="space-y-1">
               {INFO_LINKS.map((link) => (
                 <li key={link.key}>
-                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link href={link.href} className="inline-block py-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {t(`info.${link.key}`)}
                   </Link>
                 </li>

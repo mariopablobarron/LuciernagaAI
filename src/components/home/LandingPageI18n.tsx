@@ -88,28 +88,28 @@ export default async function LandingPageI18n({
                 >
                   <RevealWords
                     text={t('hero.title')}
-                    baseDelay={150}
-                    step={70}
+                    baseDelay={100}
+                    step={50}
                     className="block text-white"
                   />
                   <span className="block mt-1">
                     <RevealWords
                       text={t('hero.titleHighlight')}
-                      baseDelay={650}
+                      baseDelay={350}
                       step={70}
                       wordClassName="italic bg-linear-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent"
                     />
                   </span>
                 </h1>
 
-                <Reveal delay={1100} y={12}>
+                <Reveal delay={500} y={12}>
                   <p className="text-base sm:text-lg text-zinc-300 leading-relaxed max-w-xl">
                     {t('hero.subtitle')}
                   </p>
                 </Reveal>
               </div>
 
-              <Reveal delay={1300} y={10}>
+              <Reveal delay={600} y={10}>
                 <ul className="space-y-2.5 max-w-xl">
                   {(['bullet1', 'bullet2', 'bullet3'] as const).map((key, i) => (
                     <li key={key} className="flex items-start gap-3 text-zinc-200">
@@ -122,8 +122,8 @@ export default async function LandingPageI18n({
                 </ul>
               </Reveal>
 
-              <Reveal delay={1500} y={10}>
-                <div className="flex flex-col sm:flex-row gap-3">
+              <Reveal delay={700} y={10}>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-x-6 gap-y-3">
                   <Link
                     href="/app"
                     className="group relative inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-white bg-linear-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 transition-all shadow-lg shadow-fuchsia-500/30 hover:shadow-fuchsia-500/50 hover:scale-[1.02] overflow-hidden"
@@ -134,7 +134,7 @@ export default async function LandingPageI18n({
                   </Link>
                   <Link
                     href="/signup"
-                    className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-medium text-zinc-300 border border-zinc-700 hover:border-violet-500/50 hover:text-white hover:bg-violet-500/5 transition-all"
+                    className="inline-flex items-center text-sm text-zinc-400 hover:text-zinc-200 underline underline-offset-4 transition-colors"
                   >
                     {t('hero.ctaSecondary')}
                   </Link>
@@ -142,7 +142,7 @@ export default async function LandingPageI18n({
                 <p className="text-xs text-zinc-400 mt-3">{t('hero.noSignup')}</p>
               </Reveal>
 
-              <Reveal delay={1700} y={10}>
+              <Reveal delay={800} y={10}>
                 <div className="flex items-center gap-4 pt-2">
                   <div className="flex -space-x-2.5">
                     {['V', 'M', 'P', 'A', 'L'].map((initial, i) => (
@@ -181,7 +181,7 @@ export default async function LandingPageI18n({
             </div>
 
             <div className="mt-2 lg:mt-0">
-              <Reveal delay={500} y={28} blur={6} duration={1000}>
+              <Reveal delay={250} y={28} blur={6} duration={1000}>
                 <ChatDemo />
               </Reveal>
             </div>

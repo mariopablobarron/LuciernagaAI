@@ -39,13 +39,14 @@ Otros proyectos comparten VPS: `startidea-web`, `hub-app`, `merch-app`, `chatwoo
 
 ## 3. Deploy
 
-### Auto-deploy activo
-Mecanismo real (confirmado 5+ runs verdes consecutivos):
+### Auto-deploy activo (por PULL desde el VPS, 2026-07-06)
 
 1. Push a `main` en https://github.com/mariopablobarron/tresmilmillonesdelatidos
-2. GH Actions workflow [`vps-direct-deploy.yml`](.github/workflows/vps-direct-deploy.yml) hace SSH al VPS con `secrets.VPS_SSH_KEY` y ejecuta `/root/deploy-mentor-web.sh` (toda la lógica vive en el VPS, no en el YAML — permite restringir la SSH key con `command="..."`).
+2. Cron del VPS (cada minuto): `/usr/local/bin/mentor-deploy-watcher.sh` compara el HEAD de `origin/main` (`git ls-remote`) con el commit desplegado (tag de la imagen del contenedor `luciernaga-ai`). Si difieren, con `flock`, ejecuta `/root/deploy-mentor-web.sh`. Log en `/var/log/mentor-deploy-watcher.log`.
 3. El script ejecuta: `git pull`, `docker build` (con `NODE_OPTIONS --max-old-space-size=2048` para evitar OOM tipo merch-2026-05-16), `sed` para tag nuevo en compose, `docker compose up -d`, smoke test `/api/health` (6 reintentos, ~60s), notif Telegram.
-4. Tiempo total: ~4-5 minutos.
+4. Tiempo total: ~5-6 minutos desde el push.
+
+**Fallback manual**: el workflow [`vps-direct-deploy.yml`](.github/workflows/vps-direct-deploy.yml) (solo `workflow_dispatch`) hace lo mismo por SSH con `secrets.VPS_SSH_KEY`. OJO: falla de forma intermitente porque la blocklist comunitaria de CrowdSec banea rangos de Azure que engloban a los runners de GitHub — por eso el mecanismo primario es el pull. Existe una allowlist `github-actions` en CrowdSec (refresco mensual, `/usr/local/bin/refresh-gh-actions-allowlist.sh`) pero no anula bans de rangos más amplios que los de la lista.
 
 `paths-ignore` evita redeploy en `docs/**`, `*.md`, workflows de dev-journal/hardening-board/user-manual-pdf.
 

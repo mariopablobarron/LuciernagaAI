@@ -276,7 +276,7 @@
       "commit2": "Es gibt automatische Validatoren, die Antworten blockieren, die unsere Prinzipien verletzen (hohle Imperative, Validierung ohne Kontext, schnelle Glückwünsche).",
       "commit3": "Wenn die KI einen Fehler macht, korrigieren wir den Prompt und dokumentieren ihn im öffentlichen Changelog.",
       "commit4": "Die endgültige Entscheidung triffst immer du. Der Mentor stellt Fragen, fällt keine Urteile.",
-      "never1": "Wir werden deine Gespräche niemals zum Trainieren von Modellen Dritter nutzen.",
+      "never1": "Wir werden deine Gespräche niemals zum Trainieren von KI-Modellen nutzen — weder eigener noch von Dritten.",
       "never2": "Wir werden niemals klinische Diagnosen oder medizinische Empfehlungen generieren.",
       "never3": "Wir werden niemals so tun, als wäre der Mentor ein Mensch."
     },
@@ -502,7 +502,7 @@
       },
       "training": {
         "q": "Nutzt ihr meine Daten zum KI-Training oder für Werbung?",
-        "a": "Nein. Wir verkaufen keine Daten, teilen sie nicht mit Werbetreibenden und nutzen sie nicht zum Training von Modellen Dritter. Die Gespräche gehören dir."
+        "a": "Nein. Wir verkaufen keine Daten, teilen sie nicht mit Werbetreibenden und nutzen sie nicht zum Training von KI-Modellen, weder eigener noch von Dritten. Die Gespräche gehören dir."
       },
       "exportDelete": {
         "q": "Kann ich alles exportieren oder löschen?",
@@ -1735,7 +1735,7 @@
         "title": "Anbieter und Dritte",
         "intro": "Um den Service zu betreiben, nutzen wir folgende Anbieter:",
         "item1": "<strong>Hosting:</strong> Europäische Server mit Verschlüsselung in Transit und im Ruhezustand.",
-        "item2": "<strong>Conversational AI:</strong> Gespräche werden über Sprachmodelle verarbeitet. Sie werden nicht zum Training von Modellen Dritter verwendet.",
+        "item2": "<strong>Conversational AI:</strong> Gespräche werden über Sprachmodelle verarbeitet. Sie werden nicht zum Training irgendeines KI-Modells verwendet, weder eigener noch von Dritten.",
         "item3": "<strong>Stripe:</strong> Zahlungsabwicklung. Stripe erfüllt PCI-DSS. Wir speichern keine Kartendaten.",
         "item4": "<strong>Telegram:</strong> Falls du dein Konto verknüpfst. Telegram verarbeitet die Nachrichten, die du ihm sendest.",
         "item5": "<strong>Transaktions-E-Mail:</strong> Zum Versand von Verifizierung, Erinnerungen und Zusammenfassungen.",
@@ -1822,7 +1822,7 @@
       "propiedad": {
         "title": "Geistiges Eigentum",
         "intro": "<strong>Dein Inhalt gehört dir.</strong> Die Gespräche, Tagebucheinträge, Ziele und Reflexionen, die du erstellst, sind dein Eigentum. Du kannst sie jederzeit exportieren oder löschen.",
-        "outro1": "Durch die Nutzung des Dienstes gewährst du uns eine begrenzte, nicht ausschließliche und widerrufbare Lizenz, um deine Inhalte nur zum Zweck der Erbringung des Dienstes zu verarbeiten (KI-Antworten generieren, emotionale Zustände erkennen, Erkenntnisse generieren). Wir verwenden deine Inhalte nicht zum Trainieren von KI-Modellen Dritter oder für Werbezwecke.",
+        "outro1": "Durch die Nutzung des Dienstes gewährst du uns eine begrenzte, nicht ausschließliche und widerrufbare Lizenz, um deine Inhalte nur zum Zweck der Erbringung des Dienstes zu verarbeiten (KI-Antworten generieren, emotionale Zustände erkennen, Erkenntnisse generieren). Wir verwenden deine Inhalte nicht zum Trainieren von KI-Modellen — weder eigener noch von Dritten — oder für Werbezwecke.",
         "outro2": "Die Marke, das Design, der Code und die ursprünglichen Inhalte von Tres Mil Millones de Latidos sind Eigentum von Startidea. Eine Vervielfältigung ohne Genehmigung ist nicht gestattet."
       },
       "pagos": {

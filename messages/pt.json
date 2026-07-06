@@ -276,7 +276,7 @@
       "commit2": "Há validadores automáticos que bloqueiam respostas que violam os nossos princípios (imperativos ocos, validação sem contexto, felicitações rápidas).",
       "commit3": "Quando a IA se engana, corrigimos o prompt e documentamos no changelog público.",
       "commit4": "A decisão final é sempre tua. O mentor devolve perguntas, não veredictos.",
-      "never1": "Nunca usaremos as tuas conversas para treinar modelos de terceiros.",
+      "never1": "Nunca usaremos as tuas conversas para treinar modelos de IA — nem próprios nem de terceiros.",
       "never2": "Nunca geraremos diagnósticos clínicos nem recomendações médicas.",
       "never3": "Nunca fingiremos que o mentor é humano."
     },
@@ -502,7 +502,7 @@
       },
       "training": {
         "q": "Usam os meus dados para treinar IA ou para publicidade?",
-        "a": "Não. Não vendemos dados, não os partilhamos com anunciantes e não os usamos para treinar modelos de terceiros. As conversas são tuas."
+        "a": "Não. Não vendemos dados, não os partilhamos com anunciantes e não os usamos para treinar modelos de IA, nem próprios nem de terceiros. As conversas são tuas."
       },
       "exportDelete": {
         "q": "Posso exportar ou apagar tudo?",
@@ -1735,7 +1735,7 @@
         "title": "Fornecedores e terceiros",
         "intro": "Para operar o serviço utilizamos os seguintes fornecedores:",
         "item1": "<strong>Alojamento:</strong> Servidores europeus com cifragem em trânsito e em repouso.",
-        "item2": "<strong>IA conversacional:</strong> As conversas são processadas através de modelos de linguagem. Não são usadas para treinar modelos de terceiros.",
+        "item2": "<strong>IA conversacional:</strong> As conversas são processadas através de modelos de linguagem. Não são usadas para treinar nenhum modelo de IA, nem próprio nem de terceiros.",
         "item3": "<strong>Stripe:</strong> Gestão de pagamentos. A Stripe cumpre PCI-DSS. Não armazenamos dados do cartão.",
         "item4": "<strong>Telegram:</strong> Se vinculares a tua conta. O Telegram processa as mensagens que lhe envias.",
         "item5": "<strong>Email transacional:</strong> Para envio de verificação, lembretes e resumos.",
@@ -1822,7 +1822,7 @@
       "propiedad": {
         "title": "Propriedade intelectual",
         "intro": "<strong>O teu conteúdo é teu.</strong> As conversas, entradas de diário, objetivos e reflexões que geras são tua propriedade. Podes exportá-los ou eliminá-los a qualquer momento.",
-        "outro1": "Ao usares o serviço, concedes-nos uma licença limitada, não exclusiva e revogável para processar o teu conteúdo com o único fim de te prestar o serviço (gerar respostas da IA, detetar estados emocionais, gerar insights). Não usamos o teu conteúdo para treinar modelos de IA de terceiros nem para fins publicitários.",
+        "outro1": "Ao usares o serviço, concedes-nos uma licença limitada, não exclusiva e revogável para processar o teu conteúdo com o único fim de te prestar o serviço (gerar respostas da IA, detetar estados emocionais, gerar insights). Não usamos o teu conteúdo para treinar modelos de IA — nem próprios nem de terceiros — nem para fins publicitários.",
         "outro2": "A marca, o design, o código e os conteúdos originais de Três Mil Milhões de Batidas são propriedade da Startidea. Não é permitida a sua reprodução sem autorização."
       },
       "pagos": {

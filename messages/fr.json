@@ -276,7 +276,7 @@
       "commit2": "Il y a des validateurs automatiques qui bloquent les réponses violant nos principes (impératifs creux, validation sans contexte, félicitations rapides).",
       "commit3": "Quand l'IA se trompe, nous corrigeons le prompt et le documentons dans le changelog public.",
       "commit4": "La décision finale t'appartient toujours. Le mentor renvoie des questions, pas des verdicts.",
-      "never1": "Nous n'utiliserons jamais tes conversations pour entraîner des modèles tiers.",
+      "never1": "Nous n'utiliserons jamais tes conversations pour entraîner des modèles d'IA — ni les nôtres ni ceux de tiers.",
       "never2": "Nous ne générerons jamais de diagnostics cliniques ni de recommandations médicales.",
       "never3": "Nous ne prétendrons jamais que le mentor est humain."
     },
@@ -502,7 +502,7 @@
       },
       "training": {
         "q": "Utilisez-vous mes données pour entraîner l'IA ou pour de la publicité ?",
-        "a": "Non. Nous ne vendons pas de données, nous ne les partageons pas avec des annonceurs et nous ne les utilisons pas pour entraîner des modèles tiers. Les conversations sont à toi."
+        "a": "Non. Nous ne vendons pas de données, nous ne les partageons pas avec des annonceurs et nous ne les utilisons pas pour entraîner des modèles d'IA, ni les nôtres ni ceux de tiers. Les conversations sont à toi."
       },
       "exportDelete": {
         "q": "Puis-je exporter ou tout supprimer ?",
@@ -1735,7 +1735,7 @@
         "title": "Prestataires et tiers",
         "intro": "Pour faire fonctionner le service nous utilisons les prestataires suivants :",
         "item1": "<strong>Hébergement :</strong> Serveurs européens avec chiffrement en transit et au repos.",
-        "item2": "<strong>IA conversationnelle :</strong> Les conversations sont traitées par des modèles de langage. Elles ne sont pas utilisées pour entraîner des modèles tiers.",
+        "item2": "<strong>IA conversationnelle :</strong> Les conversations sont traitées par des modèles de langage. Elles ne sont utilisées pour entraîner aucun modèle d'IA, ni les nôtres ni ceux de tiers.",
         "item3": "<strong>Stripe :</strong> Gestion des paiements. Stripe est conforme PCI-DSS. Nous ne stockons aucune donnée de carte.",
         "item4": "<strong>Telegram :</strong> Si tu lies ton compte. Telegram traite les messages que tu lui envoies.",
         "item5": "<strong>Email transactionnel :</strong> Pour l'envoi de vérifications, rappels et résumés.",
@@ -1822,7 +1822,7 @@
       "propiedad": {
         "title": "Propriété intellectuelle",
         "intro": "<strong>Ton contenu t'appartient.</strong> Les conversations, entrées de journal, objectifs et réflexions que tu génères sont ta propriété. Tu peux les exporter ou les supprimer à tout moment.",
-        "outro1": "En utilisant le service, tu nous accordes une licence limitée, non exclusive et révocable pour traiter ton contenu dans le seul but de te fournir le service (générer les réponses de l'IA, détecter les états émotionnels, générer des insights). Nous n'utilisons pas ton contenu pour entraîner des modèles d'IA tiers ni à des fins publicitaires.",
+        "outro1": "En utilisant le service, tu nous accordes une licence limitée, non exclusive et révocable pour traiter ton contenu dans le seul but de te fournir le service (générer les réponses de l'IA, détecter les états émotionnels, générer des insights). Nous n'utilisons pas ton contenu pour entraîner des modèles d'IA — ni les nôtres ni ceux de tiers — ni à des fins publicitaires.",
         "outro2": "La marque, le design, le code et les contenus originaux de Trois Milliards de Battements sont la propriété de Startidea. Leur reproduction sans autorisation n'est pas permise."
       },
       "pagos": {

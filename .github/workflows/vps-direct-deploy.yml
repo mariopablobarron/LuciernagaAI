@@ -31,16 +31,15 @@ name: VPS Direct Deploy (luciernaga-ai)
 # Secrets: VPS_SSH_KEY (obligatorio), TELEGRAM_BOT_TOKEN + ADMIN_TELEGRAM_ID
 # (opcionales, para la notificación).
 
+# 2026-07-06: el trigger de push se retira — el deploy automático lo hace
+# ahora el VPS por PULL (cron /usr/local/bin/mentor-deploy-watcher.sh, cada
+# minuto: compara HEAD de origin/main con el tag de la imagen desplegada y
+# lanza /root/deploy-mentor-web.sh). Motivo: el SSH entrante desde runners
+# de GitHub fallaba de forma intermitente — la blocklist comunitaria de
+# CrowdSec banea rangos de Azure que engloban las IPs de los runners, y la
+# allowlist no anula bans de rangos más amplios. Mismo patrón que el HUB.
+# Este workflow queda como fallback MANUAL (workflow_dispatch).
 on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - "docs/**"
-      - "*.md"
-      - ".github/workflows/dev-journal.yml"
-      - ".github/workflows/hardening-board-auto-update.yml"
-      - ".github/workflows/user-manual-pdf-auto-update.yml"
   workflow_dispatch:
 
 concurrency:

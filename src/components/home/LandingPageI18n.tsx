@@ -160,11 +160,6 @@ export default async function LandingPageI18n({
                     <p className="text-sm text-zinc-300 font-medium">
                       <span className="text-white font-bold">{t('hero.socialProof')}</span> {t('hero.socialProofText')}
                     </p>
-                    <div className="flex gap-0.5 mt-0.5" aria-label="5 estrellas">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <span key={i} className="text-amber-400 text-xs" aria-hidden>★</span>
-                      ))}
-                    </div>
                   </div>
                 </div>
                 <p className="text-xs text-zinc-400 mt-3">{t('hero.langNote')}</p>

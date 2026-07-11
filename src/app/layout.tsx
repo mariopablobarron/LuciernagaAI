@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     google: "X1wK9qLyt2L99gHGjvFlj4qlOR8jc_abOlDZc9JGFb0",
   },
   title: {
-    default: "Tres Mil Millones de Latidos — Mentoria con IA en español",
+    default: "Tres Mil Millones de Latidos — Mentoría con IA en español",
     template: "%s | Tres Mil Millones de Latidos",
   },
   description:
@@ -91,6 +91,7 @@ export const metadata: Metadata = {
       "en": "https://tresmilmillonesdelatidos.es/en",
       "pt": "https://tresmilmillonesdelatidos.es/pt",
       "fr": "https://tresmilmillonesdelatidos.es/fr",
+      "de": "https://tresmilmillonesdelatidos.es/de",
     },
   },
   manifest: "/manifest.json",
@@ -105,19 +106,19 @@ export const metadata: Metadata = {
     title: "Latidos",
   },
   openGraph: {
-    title: "Tres Mil Millones de Latidos — Mentoria con IA en español",
+    title: "Tres Mil Millones de Latidos — Mentoría con IA en español",
     description:
-      "Plataforma de mentoría con inteligencia artificial. Claridad emocional, accion real y seguimiento continuo. Gratis durante el MVP.",
+      "Plataforma de mentoría con inteligencia artificial. Claridad emocional, acción real y seguimiento continuo. Gratis durante el MVP.",
     url: "https://tresmilmillonesdelatidos.es",
     siteName: "Tres Mil Millones de Latidos",
     locale: "es_ES",
     type: "website",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Tres Mil Millones de Latidos — Mentoria con IA" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Tres Mil Millones de Latidos — Mentoría con IA" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tres Mil Millones de Latidos — Mentoria con IA en español",
-    description: "Mentor con IA que detecta tu estado emocional y te guia a la accion concreta. Gratis.",
+    title: "Tres Mil Millones de Latidos — Mentoría con IA en español",
+    description: "Mentor con IA que detecta tu estado emocional y te guía a la acción concreta. Gratis.",
     images: ["/opengraph-image"],
   },
   robots: {

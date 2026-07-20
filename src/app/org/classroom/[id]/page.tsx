@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import {
-  Users, Flame, Target, TrendingUp, TrendingDown, Minus,
+  Users, Flame, Target, TrendingUp,
   AlertTriangle, ChevronDown, ChevronUp, Copy, Check,
   LogOut, BookOpen, Plus, BarChart3,
 } from "lucide-react";
@@ -53,12 +53,6 @@ const RISK_STYLES: Record<string, { bg: string; border: string; dot: string }> =
   high: { bg: "bg-red-500/10", border: "border-red-500/30", dot: "bg-red-400" },
 };
 
-function TrendIcon({ trend }: { trend: string }) {
-  if (trend === "subiendo") return <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />;
-  if (trend === "bajando") return <TrendingDown className="w-3.5 h-3.5 text-red-400" />;
-  return <Minus className="w-3.5 h-3.5 text-zinc-500" />;
-}
-
 function daysAgo(iso: string) {
   const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
   return d === 0 ? "hoy" : `hace ${d}d`;
@@ -80,7 +74,12 @@ function StudentCard({ student }: { student: Student }) {
           <div className={`w-2.5 h-2.5 rounded-full ${risk.dot} shrink-0`} />
           <div className="min-w-0">
             <p className="text-sm font-semibold text-white truncate">{student.name || student.email}</p>
-            <p className="text-xs text-zinc-500 capitalize">{student.state} · {student.primaryEmotion}</p>
+            {/* AI Act art. 5.1(f): prohibida la inferencia emocional individual en
+                contexto educativo. El riesgo/crisis se mantiene (excepción de
+                seguridad); la emoción y el estado por alumno no se muestran. */}
+            <p className="text-xs text-zinc-500">
+              {daysAgo(student.lastSeen)} · {student.messageCount} mensajes
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-3 shrink-0">
@@ -90,7 +89,8 @@ function StudentCard({ student }: { student: Student }) {
               <Flame className="w-3 h-3" />{student.streakDays}d
             </span>
           )}
-          <TrendIcon trend={student.progressTrend} />
+          {/* TrendIcon retirado: progressTrend deriva del modelo emocional →
+              misma restricción art. 5.1(f) que la emoción por alumno. */}
           {open ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
         </div>
       </button>

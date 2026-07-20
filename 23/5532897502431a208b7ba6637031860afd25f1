@@ -1,0 +1,34 @@
+src/components/InsightsPanel.tsx
+  s_d2308f25c4747c::t_c6ebccd114283a 89-92
+src/components/Chat.tsx
+  s_d2308f25c4747c::t_9ec47607b9379b 994-996
+  s_d2308f25c4747c::t_f8b21c204d2acc 1398-1400
+src/components/DataSummaryButton.tsx
+  s_d2308f25c4747c::t_f14b37cb5d62d0 290-291
+messages/de.json
+  s_d2308f25c4747c::t_87453568ba0d1f 1949-1950,3064-3065
+messages/en.json
+  s_d2308f25c4747c::t_61716661df47b4 1949-1950,3064-3065
+messages/es.json
+  s_d2308f25c4747c::t_8c6779360a035f 1949-1950,3064-3065
+messages/fr.json
+  s_d2308f25c4747c::t_b6796cf6bfeb0a 1949-1950,3064-3065
+messages/pt.json
+  s_d2308f25c4747c::t_7d48b29ada58c9 1949-1950,3064-3065
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "235532897502431a208b7ba6637031860afd25f1",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-fable-5"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

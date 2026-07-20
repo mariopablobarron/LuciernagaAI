@@ -86,6 +86,10 @@ export default function InsightsPanel({
     <Card className="border-border/80 bg-card/95 shadow-sm">
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-semibold">Pulso emocional</CardTitle>
+        {/* AI Act art. 50.3: el usuario debe saber que esto es inferencia de la IA. */}
+        <p className="text-[11px] text-muted-foreground">
+          Estimación automática a partir de tus mensajes · puede equivocarse
+        </p>
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">

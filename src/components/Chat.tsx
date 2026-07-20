@@ -991,6 +991,9 @@ export default function Chat({
             ) : null}
             <h3 className="mb-1 text-base font-semibold text-white">{t("empty.title")}</h3>
             <p className="mb-3 max-w-sm text-xs text-zinc-600 leading-relaxed">{t("empty.subtitle")}</p>
+            {/* AI Act art. 50.1+50.5: identidad IA declarada de forma clara y
+                distinguible en la primera interacción, antes del primer mensaje. */}
+            <p className="mb-4 max-w-sm text-xs text-zinc-500">{t("empty.aiDisclosure")}</p>
             {proactivePrompt ? (
               <button
                 onClick={() => handleStarterClick(proactivePrompt)}
@@ -1392,7 +1395,9 @@ export default function Chat({
             </p>
           )}
         </div>
-        <p className="mt-1.5 text-center text-[10px] text-zinc-700">
+        {/* AI Act art. 50.5: la declaración de IA debe ser legible ("clara y
+            distinguible"), no un susurro — zinc-500 en vez de zinc-700. */}
+        <p className="mt-1.5 text-center text-[11px] text-zinc-500">
           {t("input.footnote")}{" "}
           <a
             href="tel:024"

@@ -59,7 +59,9 @@ export async function GET(req: NextRequest, ctx: unknown) {
           messageCount: true, createdAt: true,
           userState: {
             select: {
-              state: true, primaryEmotion: true, progressTrend: true,
+              // AI Act art. 5.1(f): en contexto educativo no se expone la
+              // inferencia emocional individual (state/primaryEmotion/
+              // progressTrend). Riesgo y crisis sí: excepción de seguridad.
               riskLevel: true, crisisActive: true, transformationPhase: true,
             },
           },
@@ -98,9 +100,6 @@ export async function GET(req: NextRequest, ctx: unknown) {
           email: s.email,
           lastSeen: s.lastSeen.toISOString(),
           messageCount: s.messageCount,
-          state: s.userState?.state ?? "neutral",
-          primaryEmotion: s.userState?.primaryEmotion ?? "calma",
-          progressTrend: s.userState?.progressTrend ?? "igual",
           riskLevel: s.userState?.riskLevel ?? "low",
           crisisActive: s.userState?.crisisActive ?? false,
           transformationPhase: s.userState?.transformationPhase ?? "bloqueo",

@@ -1946,7 +1946,8 @@
       "modesHint": "You can switch modes anytime.",
       "telegramCta": "💬 Take me on Telegram — same mentor, on your phone",
       "voiceHint": "You can type or use the mic 🎙️",
-      "conversationNumber": "Your conversation #{n}"
+      "conversationNumber": "Your conversation #{n}",
+      "aiDisclosure": "You are talking to an artificial intelligence supervised by a human team."
     },
     "community": {
       "askTitle": "What if you asked people who've been through it?",
@@ -3060,7 +3061,8 @@
       "label": "Delete my data if I don't return in 30 days",
       "description": "If 30 days pass without opening the chat, we mark your account for deletion. If you come back sooner, it's cancelled automatically.",
       "error": "Couldn't save. Try again."
-    }
+    },
+    "aiInference": "The AI estimates your emotional state from what you write, only to adapt how it accompanies you. You can view and delete it whenever you want."
   },
   "breathingModal": {
     "trigger": "Breathe",

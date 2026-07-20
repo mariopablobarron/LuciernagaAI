@@ -1946,7 +1946,8 @@
       "modesHint": "Du kannst den Modus jederzeit wechseln.",
       "telegramCta": "💬 Nimm mich mit auf Telegram — derselbe Mentor, vom Handy aus",
       "voiceHint": "Du kannst schreiben oder das Mikrofon nutzen 🎙️",
-      "conversationNumber": "Dein Gespräch Nr. {n}"
+      "conversationNumber": "Dein Gespräch Nr. {n}",
+      "aiDisclosure": "Du sprichst mit einer künstlichen Intelligenz unter menschlicher Aufsicht."
     },
     "community": {
       "askTitle": "Was ist, wenn du dich mit denen austauschst, die das schon durchgemacht haben?",
@@ -3060,7 +3061,8 @@
       "label": "Lösche meine Daten, wenn ich 30 Tage nicht zurückkomme",
       "description": "Wenn 30 Tage vergehen, ohne den Chat zu öffnen, markieren wir dein Konto zum Löschen. Wenn du vorher zurückkommst, wird es automatisch storniert.",
       "error": "Konnte nicht gespeichert werden. Versuche es erneut."
-    }
+    },
+    "aiInference": "Die KI schätzt deinen emotionalen Zustand anhand deiner Nachrichten ein – nur, um die Begleitung anzupassen. Du kannst das jederzeit einsehen und löschen."
   },
   "breathingModal": {
     "trigger": "Atmen",

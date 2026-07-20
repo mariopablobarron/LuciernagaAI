@@ -1,0 +1,35 @@
+src/lib/legal.ts
+  s_d2308f25c4747c::t_0266e7ca9c2b9f 14
+src/app/(public)/privacy/page.tsx
+  s_d2308f25c4747c::t_6f6504e8a744e5 24-28
+messages/de.json
+  s_d2308f25c4747c::t_d5a6624524a7cb 1697,1718-1719,1725-1726,1735-1746
+messages/en.json
+  s_d2308f25c4747c::t_ea67f948d624b8 1697,1718-1719,1725-1726,1735-1746
+messages/es.json
+  s_d2308f25c4747c::t_2b48b90d2eb2bb 1697,1718-1719,1725-1726,1735-1746
+messages/fr.json
+  s_d2308f25c4747c::t_6e8a2257ed1faa 1697,1718-1719,1725-1726,1735-1746
+messages/pt.json
+  s_d2308f25c4747c::t_f71f1dccdf55c1 1697,1718-1719,1725-1726,1735-1746
+src/app/api/auth/signup/route.test.ts
+  s_d2308f25c4747c::t_08835aefe0a4b1 72,104,132,143,155,162
+src/app/api/user/consent/route.test.ts
+  s_d2308f25c4747c::t_5d55abd79ca888 23,72,80
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "fdf219c899f451ed60a3bd6ac40851d2c6ccb4c0",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

@@ -1946,7 +1946,8 @@
       "modesHint": "Tu peux changer de mode à tout moment.",
       "telegramCta": "💬 Emporte-moi sur Telegram — même mentor, depuis ton téléphone",
       "voiceHint": "Tu peux écrire ou utiliser le micro 🎙️",
-      "conversationNumber": "Ta conversation nº {n}"
+      "conversationNumber": "Ta conversation nº {n}",
+      "aiDisclosure": "Tu parles avec une intelligence artificielle supervisée par une équipe humaine."
     },
     "community": {
       "askTitle": "Et si tu le demandais à ceux qui ont déjà traversé ça ?",
@@ -3060,7 +3061,8 @@
       "label": "Supprime mes données si je ne reviens pas dans 30 jours",
       "description": "Si 30 jours passent sans ouvrir le chat, on marque ton compte pour suppression. Si tu reviens avant, c'est annulé automatiquement.",
       "error": "Impossible d'enregistrer. Réessaie."
-    }
+    },
+    "aiInference": "L’IA estime ton état émotionnel à partir de ce que tu écris, uniquement pour adapter l’accompagnement. Tu peux le consulter et le supprimer quand tu veux."
   },
   "breathingModal": {
     "trigger": "Respirer",

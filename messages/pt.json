@@ -1946,7 +1946,8 @@
       "modesHint": "Podes mudar o modo em qualquer momento.",
       "telegramCta": "💬 Leva-me no Telegram — mesmo mentor, desde o telemóvel",
       "voiceHint": "Podes escrever ou usar o microfone 🎙️",
-      "conversationNumber": "A tua conversa nº {n}"
+      "conversationNumber": "A tua conversa nº {n}",
+      "aiDisclosure": "Estás a falar com uma inteligência artificial supervisionada por uma equipa humana."
     },
     "community": {
       "askTitle": "E se o consultares com quem já passou por aí?",
@@ -3060,7 +3061,8 @@
       "label": "Apaga os meus dados se não voltar em 30 dias",
       "description": "Se passarem 30 dias sem abrires o chat, marcamos a tua conta para apagar. Se voltares antes, é cancelado automaticamente.",
       "error": "Não foi possível guardar. Tenta de novo."
-    }
+    },
+    "aiInference": "A IA estima o teu estado emocional a partir do que escreves, apenas para adaptar o acompanhamento. Podes vê-lo e apagá-lo quando quiseres."
   },
   "breathingModal": {
     "trigger": "Respirar",

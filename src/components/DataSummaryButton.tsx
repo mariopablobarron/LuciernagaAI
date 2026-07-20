@@ -287,6 +287,8 @@ export function DataSummaryButton() {
                   </span>
                 </button>
 
+                {/* AI Act art. 50.3: transparencia sobre la inferencia emocional. */}
+                <p className="text-[10px] text-zinc-600 leading-relaxed">{t("aiInference")}</p>
                 <p className="text-[10px] text-zinc-600 leading-relaxed">
                   {t("disclosure")}{" "}
                   <Link

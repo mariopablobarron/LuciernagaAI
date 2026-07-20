@@ -1715,8 +1715,9 @@
         "item7": "Anonymisierte Nutzungsmuster (Zugriffshäufigkeit, kein Inhalt)",
         "item8": "Telegram-ID (falls du dein Konto verknüpfst)",
         "item9": "Abonnementdaten verwaltet von Stripe (wir speichern keine Zahlungsdaten)",
-        "outro1": "Wir erheben keine Standortdaten und keine biometrischen Daten. Wir erzeugen jedoch durch die automatische Analyse deiner Nachrichten eine Einschätzung deines emotionalen Zustands: Wir behandeln sie als <strong>Daten besonderer Kategorien (Gesundheit)</strong> mit den dafür erforderlichen verstärkten Garantien.",
-        "item10": "Emotionales Profil, das die KI automatisch aus deinen Nachrichten ableitet (geschätzter emotionaler Zustand, dominantes Muster, Energieniveau, Tendenz und Risikostufe)"
+        "outro1": "Wir erheben keine Standortdaten. Wir verwenden auch weder deine Stimme noch dein Bild, um dich zu identifizieren oder abzuleiten, wie du dich fühlst: Wenn du eine Sprachnachricht sendest, wird sie als Nachrichteninhalt gespeichert, mehr nicht. Wir erzeugen jedoch durch die automatische Analyse des <strong>Textes</strong> deiner Nachrichten eine Einschätzung deines emotionalen Zustands: Wir behandeln sie als <strong>Daten besonderer Kategorien (Gesundheit)</strong> mit den dafür erforderlichen verstärkten Garantien.",
+        "item10": "Emotionales Profil, das die KI automatisch aus deinen Nachrichten ableitet (geschätzter emotionaler Zustand, dominantes Muster, Energieniveau, Tendenz und Risikostufe)",
+        "item11": "Sprachnachrichten, die du im Chat sendest (werden als Teil der Nachricht gespeichert). Das Diktat über das Mikrofon ist etwas anderes: Dein Browser transkribiert es und dieses Audio verlässt dein Gerät nie"
       },
       "baseJuridica": {
         "title": "Rechtsgrundlage der Verarbeitung",
@@ -1739,7 +1740,7 @@
         "title": "Künstliche Intelligenz und automatisierte Entscheidungen",
         "intro": "In Erfüllung der europäischen KI-Verordnung (Verordnung EU 2024/1689) informieren wir dich über Folgendes:",
         "item1": "<strong>Du sprichst mit einer künstlichen Intelligenz</strong>, die von einem menschlichen Team aus Psychologen, Mentoren und Coaches beaufsichtigt wird. Wir werden dich nie glauben lassen, dass eine Person in Echtzeit schreibt.",
-        "item2": "<strong>Die KI schätzt deinen emotionalen Zustand</strong> anhand des Textes ein, den du schreibst — niemals anhand deiner Stimme, deines Gesichts oder biometrischer Daten — und ausschließlich, um die Begleitung anzupassen.",
+        "item2": "<strong>Die KI schätzt deinen emotionalen Zustand anhand des Textes</strong> deiner Nachrichten ein. Niemals anhand des Klangs deiner Stimme, deines Gesichts oder biometrischer Daten — und ausschließlich, um die Begleitung anzupassen.",
         "item3": "<strong>Diese Einschätzung kann falsch sein.</strong> Sie ist eine Arbeitshypothese, keine Diagnose. Du kannst sie unter „Was wir über dich wissen“ einsehen und zusammen mit deinem Konto löschen.",
         "item4": "<strong>Wir treffen keine automatisierten Entscheidungen</strong>, die dir gegenüber rechtliche Wirkung entfalten oder dich in ähnlicher Weise erheblich beeinträchtigen (Art. 22 DSGVO). Die einzige Automatisierung mit Folgen ist die Erkennung von Krisenrisiken, die Hilfsprotokolle und eine menschliche Überprüfung auslöst.",
         "item5": "<strong>In Bildungs- und Arbeitskontexten zeigen wir deinen individuellen emotionalen Zustand nicht</strong> an Lehrkräfte oder Arbeitgeber. Wir teilen nur Sicherheitsindikatoren (Krisenrisiko) und Aktivitätsdaten.",

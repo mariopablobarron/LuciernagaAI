@@ -21,7 +21,7 @@ type SectionDef = {
 
 const SECTIONS: SectionDef[] = [
   { id: 'responsable', itemsCount: 5, mailtoHref: 'mailto:privacidad@tresmilmillonesdelatidos.es' },
-  { id: 'datos', itemsCount: 10, outroCount: 1 },
+  { id: 'datos', itemsCount: 11, outroCount: 1 },
   { id: 'baseJuridica', itemsCount: 4 },
   { id: 'finalidad', itemsCount: 6, outroCount: 1 },
   // AI Act (Reglamento UE 2024/1689) art. 50 + RGPD arts. 9 y 22.

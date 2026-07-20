@@ -69,6 +69,7 @@ jest.mock("@/db/prisma", () => ({
 
 import { NextRequest } from "next/server";
 import { POST } from "./route";
+import { CURRENT_CONSENT_VERSION } from "@/lib/legal";
 
 function makeRequest(body: Record<string, unknown>) {
   return new NextRequest("http://localhost/api/auth/signup", {
@@ -100,7 +101,7 @@ describe("POST /api/auth/signup — consent validation", () => {
         email: "alice@example.com",
         password: "password1234",
         consentAccepted: false,
-        consentVersion: "1.1",
+        consentVersion: CURRENT_CONSENT_VERSION,
       })
     );
     expect(res.status).toBe(400);
@@ -128,7 +129,7 @@ describe("POST /api/auth/signup — consent validation", () => {
         password: "password1234",
         name: "Alice",
         consentAccepted: true,
-        consentVersion: "1.1",
+        consentVersion: CURRENT_CONSENT_VERSION,
       })
     );
     const body = await res.json();
@@ -139,7 +140,7 @@ describe("POST /api/auth/signup — consent validation", () => {
     const createArg = userCreateMock.mock.calls[0][0];
     expect(createArg.data.email).toBe("alice@example.com");
     expect(createArg.data.consentGiven).toBe(true);
-    expect(createArg.data.consentVersion).toBe("1.1");
+    expect(createArg.data.consentVersion).toBe(CURRENT_CONSENT_VERSION);
     expect(createArg.data.consentAt).toBeInstanceOf(Date);
   });
 
@@ -151,13 +152,13 @@ describe("POST /api/auth/signup — consent validation", () => {
         email: "anon@example.com",
         password: "password1234",
         consentAccepted: true,
-        consentVersion: "1.1",
+        consentVersion: CURRENT_CONSENT_VERSION,
       })
     );
     expect(res.status).toBe(200);
     expect(userUpdateMock).toHaveBeenCalledTimes(1);
     const updateArg = userUpdateMock.mock.calls[0][0];
     expect(updateArg.data.consentGiven).toBe(true);
-    expect(updateArg.data.consentVersion).toBe("1.1");
+    expect(updateArg.data.consentVersion).toBe(CURRENT_CONSENT_VERSION);
   });
 });

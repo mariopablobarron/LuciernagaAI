@@ -278,7 +278,8 @@
       "commit4": "La décision finale t'appartient toujours. Le mentor renvoie des questions, pas des verdicts.",
       "never1": "Nous n'utiliserons jamais tes conversations pour entraîner des modèles d'IA — ni les nôtres ni ceux de tiers.",
       "never2": "Nous ne générerons jamais de diagnostics cliniques ni de recommandations médicales.",
-      "never3": "Nous ne prétendrons jamais que le mentor est humain."
+      "never3": "Nous ne prétendrons jamais que le mentor est humain.",
+      "commit5": "Le mentor estime ton état émotionnel (émotion, énergie, tendance) à partir de ce que tu écris, uniquement pour adapter l’accompagnement. Tu peux la voir dans ton panneau, la corriger en en parlant, et elle disparaît si tu supprimes ton compte."
     },
     "datos": {
       "title": "À propos de tes données",

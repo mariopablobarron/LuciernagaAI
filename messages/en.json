@@ -278,7 +278,8 @@
       "commit4": "The final decision is always yours. The mentor returns questions, not verdicts.",
       "never1": "We will never use your conversations to train AI models — neither our own nor third-party ones.",
       "never2": "We will never generate clinical diagnoses or medical recommendations.",
-      "never3": "We will never pretend the mentor is human."
+      "never3": "We will never pretend the mentor is human.",
+      "commit5": "The mentor estimates your emotional state (emotion, energy, trend) from what you write, only to adapt how it accompanies you. You can see it in your panel, correct it by talking, and it disappears if you delete your account."
     },
     "datos": {
       "title": "About your data",

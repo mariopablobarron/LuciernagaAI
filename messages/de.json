@@ -278,7 +278,8 @@
       "commit4": "Die endgültige Entscheidung triffst immer du. Der Mentor stellt Fragen, fällt keine Urteile.",
       "never1": "Wir werden deine Gespräche niemals zum Trainieren von KI-Modellen nutzen — weder eigener noch von Dritten.",
       "never2": "Wir werden niemals klinische Diagnosen oder medizinische Empfehlungen generieren.",
-      "never3": "Wir werden niemals so tun, als wäre der Mentor ein Mensch."
+      "never3": "Wir werden niemals so tun, als wäre der Mentor ein Mensch.",
+      "commit5": "Der Mentor schätzt deinen emotionalen Zustand (Emotion, Energie, Tendenz) anhand deiner Nachrichten ein – nur, um die Begleitung anzupassen. Du siehst diese Einschätzung in deinem Panel, kannst sie im Gespräch korrigieren, und sie verschwindet, wenn du dein Konto löschst."
     },
     "datos": {
       "title": "Über deine Daten",

@@ -22,7 +22,8 @@ const SECTIONS = [
     accent: 'text-violet-400',
     bg: 'bg-violet-500/10',
     border: 'border-violet-500/20',
-    commitsCount: 4,
+    // commit5 = transparencia de inferencia emocional (AI Act art. 50.3).
+    commitsCount: 5,
     neverCount: 3,
   },
   {

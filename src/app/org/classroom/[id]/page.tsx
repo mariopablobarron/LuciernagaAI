@@ -17,9 +17,6 @@ type Student = {
   email: string;
   lastSeen: string;
   messageCount: number;
-  state: string;
-  primaryEmotion: string;
-  progressTrend: string;
   riskLevel: string;
   crisisActive: boolean;
   streakDays: number;

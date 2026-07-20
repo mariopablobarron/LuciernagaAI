@@ -1,0 +1,29 @@
+src/app/(public)/privacy/page.tsx
+  s_d2308f25c4747c::t_ffd168d8cc609f 24
+messages/de.json
+  s_d2308f25c4747c::t_15f39535843589 1718-1720,1743
+messages/en.json
+  s_d2308f25c4747c::t_5d2382b7373de4 1718-1720,1743
+messages/es.json
+  s_d2308f25c4747c::t_b9dc06d296991f 1718-1720,1743
+messages/fr.json
+  s_d2308f25c4747c::t_87c5f82248e96e 1718-1720,1743
+messages/pt.json
+  s_d2308f25c4747c::t_f97deab3a2c5d9 1718-1720,1743
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "9df69772412197cb4bf0fc899e3541760fa2156d",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+src/app/org/classroom/[id]/page.tsx
+  s_d2308f25c4747c::t_63be8a3877fb6f 92-93
+  s_d2308f25c4747c::t_bff04d95195c8c 77-82
+  s_d2308f25c4747c::t_6cae1dfac0b64a 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "e9f3b74fcd5825caac857f4735310a34bec70090",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-fable-5"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

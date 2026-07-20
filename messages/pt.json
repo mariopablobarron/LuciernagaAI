@@ -1715,8 +1715,9 @@
         "item7": "Padrões de utilização anonimizados (frequência de acesso, não o conteúdo)",
         "item8": "ID de Telegram (se vinculares a tua conta)",
         "item9": "Dados de subscrição geridos pela Stripe (não armazenamos dados de pagamento)",
-        "outro1": "Não recolhemos dados de localização nem dados biométricos. Geramos, através de análise automática das tuas mensagens, uma estimativa do teu estado emocional: tratamo-la como <strong>dado de categoria especial (saúde)</strong>, com as garantias reforçadas que isso exige.",
-        "item10": "Perfil emocional inferido automaticamente pela IA a partir das tuas mensagens (estado emocional estimado, padrão dominante, nível de energia, tendência e nível de risco)"
+        "outro1": "Não recolhemos dados de localização. Também não usamos a tua voz nem a tua imagem para te identificar ou para deduzir como te sentes: se enviares uma nota de voz, fica guardada como conteúdo da mensagem, nada mais. Geramos, através de análise automática do <strong>texto</strong> das tuas mensagens, uma estimativa do teu estado emocional: tratamo-la como <strong>dado de categoria especial (saúde)</strong>, com as garantias reforçadas que isso exige.",
+        "item10": "Perfil emocional inferido automaticamente pela IA a partir das tuas mensagens (estado emocional estimado, padrão dominante, nível de energia, tendência e nível de risco)",
+        "item11": "Notas de voz que envias no chat (guardadas como parte da mensagem). O ditado por microfone é diferente: é transcrito pelo teu navegador e esse áudio nunca sai do teu dispositivo"
       },
       "baseJuridica": {
         "title": "Base jurídica do tratamento",
@@ -1739,7 +1740,7 @@
         "title": "Inteligência artificial e decisões automatizadas",
         "intro": "Em cumprimento do Regulamento europeu de IA (Regulamento UE 2024/1689) informamos-te do seguinte:",
         "item1": "<strong>Estás a falar com uma inteligência artificial</strong>, supervisionada por uma equipa humana de psicólogos, mentores e coaches. Nunca te faremos crer que há uma pessoa a escrever em tempo real.",
-        "item2": "<strong>A IA estima o teu estado emocional</strong> a partir do texto que escreves — nunca da tua voz, do teu rosto ou de qualquer dado biométrico — e apenas para adaptar como te acompanha.",
+        "item2": "<strong>A IA estima o teu estado emocional a partir do texto</strong> das tuas mensagens. Nunca a partir do som da tua voz, do teu rosto ou de qualquer dado biométrico — e apenas para adaptar como te acompanha.",
         "item3": "<strong>Essa estimativa pode estar errada.</strong> É uma hipótese de trabalho, não um diagnóstico. Podes consultá-la em «O que sabemos de ti» e apagá-la junto com a tua conta.",
         "item4": "<strong>Não tomamos decisões automatizadas</strong> que produzam efeitos jurídicos sobre ti nem que te afetem significativamente de modo similar (art. 22 RGPD). A única automatização com consequências é a deteção de risco de crise, que ativa protocolos de ajuda e revisão humana.",
         "item5": "<strong>Em contextos educativos e laborais não mostramos o teu estado emocional individual</strong> a professores nem a empresas. Apenas partilhamos indicadores de segurança (risco de crise) e dados de atividade.",

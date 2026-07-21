@@ -1,0 +1,42 @@
+src/services/workable-topics.ts
+  s_d2308f25c4747c::t_329d2bd8fdee57 1-66,68-110
+  s_d2308f25c4747c::t_65f08aeb537448 67
+src/services/coach.ts
+  s_d2308f25c4747c::t_cafaa6ba64a2cb 25
+  s_d2308f25c4747c::t_33899d543bde5c 126-130
+  s_d2308f25c4747c::t_0ca1b72d4a7b0f 950
+  s_d2308f25c4747c::t_223d025a6daba6 818
+  s_d2308f25c4747c::t_78524cb50f813b 741-763
+  s_a61e4107e09ce7::t_db384a3cd4e16c 740
+src/services/coach.test.ts
+  s_d2308f25c4747c::t_2ac47c52d6bd16 351-365
+src/application/chat/phases/context.ts
+  s_d2308f25c4747c::t_1f6b6d3f605b99 19
+  s_d2308f25c4747c::t_216b360d88ccee 235
+src/services/workable-topics.test.ts
+  s_d2308f25c4747c::t_c64bf6c1b8ae49 1-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "dfc795babedd96223229139d238d1c23522a2102",
+  "prompts": {},
+  "sessions": {
+    "s_a61e4107e09ce7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019f7ed2-1efc-7810-bdac-6168f5b1e4a5",
+        "model": "unknown"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    },
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

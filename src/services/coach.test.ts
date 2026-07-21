@@ -348,4 +348,19 @@ describe("#16 citar lo que el usuario dijo antes — regla en BASE_PROMPT", () =
     const prompt = buildCoachPrompt("duda");
     expect(prompt).toContain("conversaciones previas");
   });
+
+  describe("tema trabajable: síndrome del impostor", () => {
+    it("inyecta la guía + el ejercicio cuando se detecta el tema", () => {
+      const prompt = buildCoachPrompt("duda", undefined, { workableTopics: ["impostor"] });
+      expect(prompt).toContain("síndrome del impostor");
+      expect(prompt).toContain("El registro de evidencia");
+      // Barandilla: es hipótesis, no diagnóstico.
+      expect(prompt).toContain("NO etiquetes");
+    });
+
+    it("NO inyecta nada si no hay tema detectado", () => {
+      const prompt = buildCoachPrompt("duda", undefined, { workableTopics: [] });
+      expect(prompt).not.toContain("El registro de evidencia");
+    });
+  });
 });

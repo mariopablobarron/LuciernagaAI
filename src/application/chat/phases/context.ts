@@ -16,6 +16,7 @@ import { listRecentImpulseLogs } from "@/services/impulse-challenges";
 import { buildJourneyPromptBlock } from "@/services/journey-coach-bridge";
 import { buildProjectPromptBlock } from "@/services/project-coach-bridge";
 import { detectExtendedIntents } from "@/services/extendedIntents";
+import { detectWorkableTopics } from "@/services/workable-topics";
 import { findSimilarMessages } from "@/services/semanticMemory";
 import { getPrismaClient } from "@/db/prisma";
 import { isAgeRange, rangeToTier } from "@/lib/age-range";
@@ -231,6 +232,7 @@ export async function buildContext(input: ContextInput): Promise<ContextResult> 
         ? (enneagramLatest.dominantType as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)
         : null,
     extendedIntent: detectExtendedIntents(message),
+    workableTopics: detectWorkableTopics(message),
     conversationSummary: input.conversationSummary ?? null,
     semanticMemory: semanticEchoes.length > 0
       ? {

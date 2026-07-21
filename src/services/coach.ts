@@ -22,6 +22,7 @@ import {
   type PrimaryEmotion,
 } from "@/types/emotional-profile";
 import { buildDomainGuidance } from "@/services/domain";
+import { WORKABLE_TOPICS } from "@/services/workable-topics";
 
 export type CoachGoalContext = {
   title: string;
@@ -122,6 +123,11 @@ export type CoachContext = {
     mildIdeation: boolean;
     gratitudeClosure: boolean;
   } | null;
+  // Temas trabajables detectados en el mensaje (semilla del "glosario":
+  // p.ej. síndrome del impostor). Añaden guía psicoeducativa + un ejercicio
+  // curado que el mentor PUEDE ofrecer. Es psicoeducación, no diagnóstico:
+  // el catálogo vive en services/workable-topics.ts. NO etiqueta al usuario.
+  workableTopics?: import("./workable-topics").WorkableTopicId[] | null;
   // Resumen acumulado de mensajes antiguos que se salen de la ventana literal
   // (LangChain SummaryBufferMemory). Permite al mentor recordar nombres,
   // decisiones y arcos de turnos muy anteriores al actual.
@@ -732,6 +738,30 @@ function buildExtendedIntentGuidance(context: CoachContext): string {
 }
 
 /**
+ * Guía por tema trabajable detectado (síndrome del impostor, etc.). Añade
+ * psicoeducación + un ejercicio curado que el mentor PUEDE ofrecer. Es
+ * hipótesis, no diagnóstico: el mentor no etiqueta a la persona. Catálogo en
+ * services/workable-topics.ts (futuro glosario editable desde /admin).
+ */
+function buildWorkableTopicGuidance(context: CoachContext): string {
+  const ids = context.workableTopics;
+  if (!ids || ids.length === 0) return "";
+
+  return ids
+    .map((id) => {
+      const topic = WORKABLE_TOPICS[id];
+      if (!topic) return "";
+      const steps = topic.exercise.steps.map((s, i) => `  ${i + 1}. ${s}`).join("\n");
+      return `${topic.mentorGuidance}
+Ejercicio disponible para ofrecer — «${topic.exercise.title}» (${topic.exercise.goal}):
+${steps}
+Condúcelo conversando, un paso cada vez; no lo sueltes entero de golpe. Solo si la persona acepta.`;
+    })
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+/**
  * Audience tier guidance. Adapta el tono según el rango etario auto-declarado.
  * Aplica una capa LIGERA encima del prompt base — no reemplaza la identidad
  * del mentor, solo modula vocabulario, ritmo y referencias.
@@ -785,6 +815,7 @@ export function buildCoachPrompt(
   const onboardingGuidance = buildOnboardingGuidance(context);
   const genderGuidance = buildGenderGuidance(context);
   const extendedIntentGuidance = buildExtendedIntentGuidance(context);
+  const workableTopicGuidance = buildWorkableTopicGuidance(context);
   const enneagramGuidance = buildEnneagramGuidance(context);
   const mentorPrefsGuidance = buildMentorPrefsGuidance(context);
   const audienceGuidance = buildAudienceGuidance(context);
@@ -916,6 +947,7 @@ No se pudo verificar información externa suficiente. No afirmes datos actuales 
     genderGuidance,
     enneagramGuidance,
     extendedIntentGuidance,
+    workableTopicGuidance,
     conversationSummaryGuidance,
     semanticMemoryGuidance,
     transformationGuidance,

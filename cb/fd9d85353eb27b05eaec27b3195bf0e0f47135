@@ -1,0 +1,57 @@
+src/services/glossary.test.ts
+  s_d2308f25c4747c::t_52c1d326560140 1-79
+src/services/coach.ts
+  s_d2308f25c4747c::t_71489f43b6ec42 740-759
+  s_d2308f25c4747c::t_2976304f98ee80 946
+  s_d2308f25c4747c::t_cb07fad8ac2cb6 125-129
+  s_d2308f25c4747c::t_870dabda7c59f2 814
+  s_f562496b3cc62d::t_ac000883913c73 739
+src/app/api/admin/glossary/route.ts
+  s_d2308f25c4747c::t_aeec541b01a5d1 1-85
+src/application/chat/phases/context.ts
+  s_d2308f25c4747c::t_4feca090889711 189-192
+  s_d2308f25c4747c::t_242716295dc33b 19
+  s_d2308f25c4747c::t_1fbf38b1a6c8ad 239
+src/features/admin/components/AdminShell.tsx
+  s_d2308f25c4747c::t_f7f901d48f6b32 7
+  s_d2308f25c4747c::t_c6bfd941712577 29
+src/services/glossary.ts
+  s_d2308f25c4747c::t_08d8f0e191c713 1-116
+src/app/api/admin/glossary/[id]/route.ts
+  s_d2308f25c4747c::t_b6e414f61a087a 1-58
+src/lib/permissions.ts
+  s_d2308f25c4747c::t_b3c895297e62e3 64
+  s_d2308f25c4747c::t_4b2d456f5f09eb 105
+prisma/seeds/glossary.ts
+  s_d2308f25c4747c::t_0d8edec734d432 1-95
+src/app/admin/glosario/page.tsx
+  s_d2308f25c4747c::t_ec7a44163b9c62 1-370
+prisma/migrations/20260721180000_add_glossary_topic/migration.sql
+  s_d2308f25c4747c::t_35f4bab02b2476 1-25
+prisma/schema.prisma
+  s_d2308f25c4747c::t_19afcc4aa11cb4 2374-2406
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "cbfd9d85353eb27b05eaec27b3195bf0e0f47135",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    },
+    "s_f562496b3cc62d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "af43c4bf-bcc4-44a5-b9f9-201df66cabb6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

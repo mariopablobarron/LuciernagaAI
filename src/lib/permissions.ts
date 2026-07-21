@@ -61,6 +61,7 @@ export const PERMISSIONS: Record<SystemRole, string[]> = {
     "clinical-notes",
     "interventions",
     "assessments",
+    "glossary",
     "telegram:crisis",
     "telegram:estado",
   ],
@@ -101,6 +102,7 @@ export const PERMISSIONS: Record<SystemRole, string[]> = {
     "exercises",
     "challenges",
     "resources",
+    "glossary",
     "docs",
   ],
 

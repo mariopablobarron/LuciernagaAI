@@ -1,0 +1,27 @@
+src/app/api/journeys/active/route.ts
+  s_d2308f25c4747c::t_408be2ea5e3f23 2,8,10-12
+src/app/api/journeys/exercise/[exerciseId]/route.ts
+  s_d2308f25c4747c::t_c97c6b73748cca 2,16,24-26,35,43-48,52,59,63
+src/app/api/journeys/[journeyId]/route.ts
+  s_d2308f25c4747c::t_beeddd720516d0 2,10,18-20
+src/app/api/journeys/route.test.ts
+  s_d2308f25c4747c::t_90d8befb0ba26e 1-59
+src/app/api/journeys/route.ts
+  s_d2308f25c4747c::t_dfd2b93f0493e8 2,8-11,13-15,24,32-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "bc87cb64b57638b2f00c50ac2b15d146a0c04b83",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

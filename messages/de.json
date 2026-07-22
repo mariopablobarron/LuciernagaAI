@@ -2308,6 +2308,37 @@
       "assessment": "Bewertung",
       "breathing": "Atemübung",
       "visualization": "Visualisierung"
+    },
+    "map": {
+      "notFound": "Route nicht gefunden",
+      "backToJourneys": "Zurück zu den Routen",
+      "breadcrumb": "Routen",
+      "progressTotal": "Gesamtfortschritt",
+      "completePrevious": "Schließe die vorherige ab",
+      "review": "Ansehen",
+      "open": "Öffnen",
+      "minutesTpl": "{n} Min."
+    },
+    "exercise": {
+      "notFound": "Übung nicht gefunden",
+      "breadcrumb": "Routen",
+      "completedTitle": "Übung abgeschlossen",
+      "debriefLabel": "Reflexion von Tres Mil Millones de Latidos",
+      "viewJourney": "Route ansehen",
+      "talkToMentor": "Mit Tres Mil Millones de Latidos sprechen",
+      "stepProgressTpl": "Schritt {current} von {total}",
+      "textPlaceholder": "Schreib hier...",
+      "pauseHint": "Nimm dir einen Moment, bevor du fortfährst.",
+      "reflectionTitle": "Abschlussreflexion",
+      "reflectionPrompt": "Was hast du entdeckt? Was hat dich überrascht? Das ist optional, gibt Tres Mil Millones de Latidos aber Kontext, um dich besser zu begleiten.",
+      "reflectionPlaceholder": "Schreib deine Reflexion...",
+      "previous": "Zurück",
+      "back": "Zurück",
+      "next": "Weiter",
+      "reflect": "Reflektieren",
+      "saving": "Speichern...",
+      "complete": "Übung abschließen",
+      "minutesTpl": "{n} Min."
     }
   },
   "auth": {

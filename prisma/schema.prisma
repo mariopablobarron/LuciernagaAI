@@ -2371,3 +2371,36 @@ model SeoOpportunity {
   @@index([kind, status])
   @@index([detectedAt])
 }
+
+/// Glosario de temas trabajables (editable desde /admin/glosario).
+///
+/// Cuando el usuario expresa en el chat uno de los `triggers` (frases en
+/// lenguaje natural), el mentor recibe la `mentorGuidance` (psicoeducación,
+/// NO diagnóstico) y puede ofrecer el ejercicio curado asociado. Es la
+/// versión de producción del prototipo en código: el equipo humano (rol
+/// `content` / `clinical`) cura el contenido sin redeploy.
+///
+/// Barandilla (AI Act / honestidad relacional): el material es curado y
+/// revisable por humanos; el mentor ofrece hipótesis, no diagnóstico.
+model GlossaryTopic {
+  id             String   @id @default(cuid())
+  /// Clave natural estable (p.ej. "impostor"). Se usa en seeds/upserts.
+  slug           String   @unique
+  /// Etiqueta legible ("Síndrome del impostor"). NO es etiqueta clínica.
+  label          String
+  /// Si false, el tema no se detecta ni se ofrece (borrador / desactivado).
+  enabled        Boolean  @default(true)
+  /// Frases disparadoras en lenguaje natural. Se comparan (normalizadas, por
+  /// límite de palabra) contra el mensaje del usuario. Texto plano, no regex.
+  triggers       String[] @default([])
+  /// Guía de cómo trabajar el tema, inyectada en el system prompt del mentor.
+  mentorGuidance String   @db.Text
+  /// Ejercicio curado que el mentor PUEDE ofrecer.
+  exerciseTitle  String
+  exerciseGoal   String   @db.Text
+  exerciseSteps  String[] @default([])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([enabled])
+}

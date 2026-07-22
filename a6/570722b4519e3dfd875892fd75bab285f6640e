@@ -1,0 +1,59 @@
+src/app/journey/[journeyId]/page.tsx
+  s_d2308f25c4747c::t_bfce215ed260fb 169,171,175
+  s_d2308f25c4747c::t_9490a3f8c60cdc 90
+  s_d2308f25c4747c::t_ab9fa2266f8804 6
+  s_d2308f25c4747c::t_8c8454615203d1 22
+  s_d2308f25c4747c::t_dc3f3f85225289 190
+  s_d2308f25c4747c::t_f04fda89dd41bb 52-53
+  s_d2308f25c4747c::t_aa1effc6a69a8a 132,135
+  s_d2308f25c4747c::t_e602c8fdddceb2 144
+  s_d2308f25c4747c::t_57dfd1249136aa 73
+src/app/journey/exercise/[exerciseId]/page.tsx
+  s_d2308f25c4747c::t_d4941d2f6b048a 137-138
+  s_d2308f25c4747c::t_15f6fd394c3e76 170
+  s_d2308f25c4747c::t_175abd8aa449c0 192
+  s_d2308f25c4747c::t_83b8f464d82494 199
+  s_d2308f25c4747c::t_dcd0793b308715 226
+  s_d2308f25c4747c::t_a34a6066bbbc28 412,417
+  s_d2308f25c4747c::t_51a71ecdd92267 398
+  s_d2308f25c4747c::t_d724f46cefd402 40
+  s_d2308f25c4747c::t_0dbe30b6c46534 25-32
+  s_d2308f25c4747c::t_9580136ce41c7c 366,375
+  s_d2308f25c4747c::t_6e3e59f8adca50 387
+  s_d2308f25c4747c::t_cf9900d2724e03 6
+  s_d2308f25c4747c::t_20edde317ae440 270
+  s_d2308f25c4747c::t_6092886ad5914d 205
+  s_d2308f25c4747c::t_528037d8e435d7 241,243
+  s_d2308f25c4747c::t_e67ea56f645e52 331
+  s_d2308f25c4747c::t_d111284ff13db3 426
+  s_d2308f25c4747c::t_053404401667b5 163
+  s_d2308f25c4747c::t_828398177358bc 178
+  s_d2308f25c4747c::t_fe67fb82cdfec1 284
+  s_d2308f25c4747c::t_291b545c334fc6 343,346,351
+messages/de.json
+  s_d2308f25c4747c::t_61fd06be75b899 2311-2341
+messages/en.json
+  s_d2308f25c4747c::t_b30f19022e6336 2311-2341
+messages/es.json
+  s_d2308f25c4747c::t_8336c4d7a4b5ce 2311-2341
+messages/fr.json
+  s_d2308f25c4747c::t_533f696f001339 2311-2341
+messages/pt.json
+  s_d2308f25c4747c::t_3c72de996740fb 2311-2341
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "a6570722b4519e3dfd875892fd75bab285f6640e",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

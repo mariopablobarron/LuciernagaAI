@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ArrowLeft, CheckCircle2, Circle, Clock, Lock, Sparkles } from "lucide-react";
 import type { JourneyMap } from "@/domain/journeys/types";
 
@@ -18,6 +19,7 @@ function Skeleton({ className }: { className?: string }) {
 }
 
 export default function JourneyMapPage() {
+  const t = useTranslations("journeyPage");
   const { journeyId } = useParams<{ journeyId: string }>();
   const [journey, setJourney] = useState<JourneyMap | null>(null);
   const [loading, setLoading] = useState(true);
@@ -47,8 +49,8 @@ export default function JourneyMapPage() {
   if (!journey) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3 bg-zinc-950">
-        <p className="text-zinc-400">Itinerario no encontrado</p>
-        <Link href="/journey" className="text-sm text-violet-400 hover:text-violet-300">← Volver a itinerarios</Link>
+        <p className="text-zinc-400">{t("map.notFound")}</p>
+        <Link href="/journey" className="text-sm text-violet-400 hover:text-violet-300">← {t("map.backToJourneys")}</Link>
       </div>
     );
   }
@@ -68,7 +70,7 @@ export default function JourneyMapPage() {
           className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-400 transition-colors"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Itinerarios
+          {t("map.breadcrumb")}
         </Link>
 
         {/* Header */}
@@ -85,7 +87,7 @@ export default function JourneyMapPage() {
         {/* Progress */}
         <div className="card-surface rounded-xl border border-zinc-800 p-4">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Progreso total</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{t("map.progressTotal")}</p>
             <p className="text-lg font-bold bg-linear-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
               {journey.progress}%
             </p>
@@ -127,10 +129,10 @@ export default function JourneyMapPage() {
                       <div>
                         <h3 className="font-bold text-white">{mod.title}</h3>
                         <p className="text-xs text-zinc-500">
-                          {mod.completedCount}/{mod.totalCount} ejercicios
+                          {t("exercisesCountTpl", { done: mod.completedCount, total: mod.totalCount })}
                           {!mod.unlocked && (
                             <span className="ml-2 inline-flex items-center gap-1 text-zinc-600">
-                              <Lock className="h-3 w-3" /> Completa el anterior
+                              <Lock className="h-3 w-3" /> {t("map.completePrevious")}
                             </span>
                           )}
                         </p>
@@ -139,7 +141,7 @@ export default function JourneyMapPage() {
                     {isComplete && (
                       <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-1 text-[10px] font-semibold text-emerald-400 border border-emerald-500/30">
                         <CheckCircle2 className="h-3 w-3" />
-                        Completado
+                        {t("completed")}
                       </span>
                     )}
                   </div>
@@ -164,13 +166,13 @@ export default function JourneyMapPage() {
                               </p>
                               <div className="flex items-center gap-2 text-xs text-zinc-600 mt-0.5">
                                 <Clock className="h-3 w-3" />
-                                <span>{ex.estimatedMinutes} min</span>
+                                <span>{t("map.minutesTpl", { n: ex.estimatedMinutes })}</span>
                                 <span>·</span>
-                                <span className="capitalize">{ex.type}</span>
+                                <span>{t(`exerciseTypes.${ex.type}`)}</span>
                               </div>
                             </div>
                             <span className="text-xs text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100">
-                              {ex.status === "completed" ? "Revisar" : "Abrir"} →
+                              {ex.status === "completed" ? t("map.review") : t("map.open")} →
                             </span>
                           </Link>
                         );
@@ -185,7 +187,7 @@ export default function JourneyMapPage() {
 
         {/* Disclaimer */}
         <p className="text-center text-xs text-zinc-700">
-          Tres Mil Millones de Latidos no sustituye terapia ni intervención psicológica profesional.
+          {t("disclaimer")}
         </p>
       </div>
     </div>

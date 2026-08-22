@@ -5,6 +5,7 @@ import { invalidateUserCache } from "@/services/user";
 import { logError } from "@/lib/logger";
 import { buildAdminAlert, notifyAdmin } from "@/services/telegram";
 import { getRequestContext, formatDevice, maskIp } from "@/lib/request-info";
+import { validateAvatarDataUri } from "@/lib/avatar-image";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30; // allow time for large avatar uploads
@@ -12,9 +13,7 @@ export const maxDuration = 30; // allow time for large avatar uploads
 const MAX_NAME = 100;
 const MAX_BIO = 500;
 const MAX_PHONE = 20;
-const MAX_AVATAR_LENGTH = 270_000; // ~200KB base64
 const PHONE_REGEX = /^\+?[\d\s()-]{6,20}$/;
-const AVATAR_PREFIX_REGEX = /^data:image\/(png|jpe?g|webp|gif|svg\+xml|bmp|tiff?|avif|heic|heif);base64,/;
 
 export async function GET(req: NextRequest) {
   try {
@@ -95,11 +94,12 @@ export async function PATCH(req: NextRequest) {
     if (body.avatarData === null) {
       data.avatarData = null;
     } else if (typeof body.avatarData === "string") {
-      if (!AVATAR_PREFIX_REGEX.test(body.avatarData)) {
-        return NextResponse.json({ error: "AVATAR_FORMAT_INVALID", message: "Formato no soportado. Usa PNG, JPG, WebP, GIF, SVG, BMP, TIFF, AVIF o HEIC." }, { status: 400 });
-      }
-      if (body.avatarData.length > MAX_AVATAR_LENGTH) {
+      const avatar = validateAvatarDataUri(body.avatarData);
+      if (!avatar.ok && avatar.reason === "too_large") {
         return NextResponse.json({ error: "AVATAR_TOO_LARGE", message: "La imagen debe ser menor de 200 KB." }, { status: 400 });
+      }
+      if (!avatar.ok) {
+        return NextResponse.json({ error: "AVATAR_FORMAT_INVALID", message: "Formato no soportado. Usa PNG, JPG, WebP, GIF, BMP, TIFF, AVIF, HEIC o HEIF." }, { status: 400 });
       }
       data.avatarData = body.avatarData;
     }

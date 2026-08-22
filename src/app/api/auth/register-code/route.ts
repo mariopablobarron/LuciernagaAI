@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPrismaClient } from "@/db/prisma";
-import { hashPassword } from "@/lib/password";
-import { issueSessionToken, attachSessionCookie } from "@/lib/auth";
+import { hashPassword, verifyPassword } from "@/lib/password";
+import {
+  attachSessionCookie,
+  InvalidSessionTokenError,
+  issueSessionToken,
+  resolveIdentity,
+} from "@/lib/auth";
 import { normalizeEmail } from "@/services/user";
 import { triggerWelcomeAvatarVideoAsync } from "@/services/welcomeAvatarVideo";
 import { logError, logInfo } from "@/lib/logger";
@@ -95,10 +100,29 @@ export async function POST(req: NextRequest) {
     if (existingUser) {
       // If user exists but not in an org, assign them
       if (!existingUser.organizationId) {
+        let sessionOwnsAccount = false;
+        try {
+          sessionOwnsAccount = (await resolveIdentity(req)).userId === existingUser.id;
+        } catch (error) {
+          if (!(error instanceof InvalidSessionTokenError)) throw error;
+        }
+
+        const passwordMatches = existingUser.passwordHash
+          ? await verifyPassword(password, existingUser.passwordHash)
+          : false;
+        if (!sessionOwnsAccount && !passwordMatches) {
+          return NextResponse.json(
+            { error: "INVALID_CREDENTIALS", message: "No se pudo verificar la cuenta existente." },
+            { status: 401 },
+          );
+        }
+
+        const passwordHash = existingUser.passwordHash ?? await hashPassword(password);
         await prisma.$transaction([
           prisma.user.update({
             where: { id: existingUser.id },
             data: {
+              passwordHash,
               organizationId: classroom.organizationId,
               classroomId: classroom.id,
             },
@@ -122,7 +146,7 @@ export async function POST(req: NextRequest) {
       }
 
       return NextResponse.json(
-        { error: "EMAIL_EXISTS", message: "Este email ya esta registrado en otra organizacion." },
+        { error: "EMAIL_EXISTS", message: "Este email ya esta registrado." },
         { status: 409 },
       );
     }

@@ -1,0 +1,33 @@
+src/app/api/auth/capture-email/route.test.ts
+  s_d5531a43474017::t_2617eb5beac072 36-39,42-43,85-111
+src/app/api/auth/login/route.test.ts
+  s_d5531a43474017::t_1b09f798e45846 45-48,51-52,90-110
+src/app/api/auth/register-code/route.test.ts
+  s_d5531a43474017::t_a6d1116f0a7703 1-199
+src/app/api/auth/register-code/route.ts
+  s_d5531a43474017::t_d59cdea7ec4c66 3-9,103-120,125,149
+src/app/api/auth/signup/route.test.ts
+  s_d5531a43474017::t_7c58899768146e 13-14,17-22,24,79,94-95,160,176-210
+src/app/api/auth/signup/route.ts
+  s_d5531a43474017::t_797c78942d3e45 3-8,102-111,149
+src/services/user.identity-link.test.ts
+  s_d5531a43474017::t_d38de17625a9c9 1-122
+src/services/user.ts
+  s_d5531a43474017::t_26a2844b04678c 495-499,502
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "79f230a550d9a3cbd1976d6b226d42901939d5c5",
+  "prompts": {},
+  "sessions": {
+    "s_d5531a43474017": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01a026e9-cdb5-7833-a5ac-183a923ec421",
+        "model": "unknown"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

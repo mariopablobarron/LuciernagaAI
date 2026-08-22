@@ -302,7 +302,18 @@ export default function SettingsPage() {
       toast.error(t('profile.avatarTooLarge'));
       return;
     }
-    if (!file.type.startsWith('image/')) {
+    const allowedAvatarTypes = new Set([
+      'image/png',
+      'image/jpeg',
+      'image/webp',
+      'image/gif',
+      'image/bmp',
+      'image/tiff',
+      'image/avif',
+      'image/heic',
+      'image/heif',
+    ]);
+    if (!allowedAvatarTypes.has(file.type)) {
       toast.error(t('profile.avatarInvalidType'));
       return;
     }
@@ -399,7 +410,7 @@ export default function SettingsPage() {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*"
+                accept="image/png,image/jpeg,image/webp,image/gif,image/bmp,image/tiff,image/avif,image/heic,image/heif"
                 className="hidden"
                 onChange={handleAvatarChange}
               />

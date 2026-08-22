@@ -42,7 +42,13 @@ jest.mock("@/services/user", () => ({
 }));
 
 import { NextRequest } from "next/server";
+import {
+  IdentityLinkConflictError,
+  linkIdentityToEmail,
+} from "@/services/user";
 import { POST } from "./route";
+
+const linkIdentityToEmailMock = jest.mocked(linkIdentityToEmail);
 
 describe("POST /api/auth/login", () => {
   it("crea o vincula una cuenta real por email y emite cookie", async () => {
@@ -80,5 +86,26 @@ describe("POST /api/auth/login", () => {
     expect(response.status).toBe(400);
     expect(body.success).toBe(false);
     expect(body.error).toBe("EMAIL_INVALID");
+  });
+
+  it("no convierte un email existente en login sin contraseña", async () => {
+    linkIdentityToEmailMock.mockRejectedValueOnce(new IdentityLinkConflictError());
+    const req = new NextRequest("http://localhost/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email: "victim@example.com" }),
+      headers: { "content-type": "application/json" },
+    });
+
+    const response = await POST(req);
+    const body = await response.json();
+
+    expect(response.status).toBe(409);
+    expect(body).toEqual(expect.objectContaining({
+      success: false,
+      authenticated: false,
+      error: "IDENTITY_ALREADY_LINKED",
+    }));
+    expect(body.token).toBeUndefined();
+    expect(response.headers.get("set-cookie")).toBeNull();
   });
 });

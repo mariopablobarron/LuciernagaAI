@@ -492,31 +492,14 @@ export async function linkIdentityToEmail(params: {
       return { userId: updatedCurrent.id };
     }
 
-    await tx.user.update({
-      where: { id: existingUser.id },
-      data: {
-        name: existingUser.name ?? nextName,
-        lastSeen:
-          currentUser.lastSeen > existingUser.lastSeen
-            ? currentUser.lastSeen
-            : existingUser.lastSeen,
-      },
-    });
-
-    await moveUserOwnedRecords({
-      tx,
-      sourceUserId: currentUser.id,
-      targetUserId: existingUser.id,
-    });
-
-    await tx.user.delete({
-      where: { id: currentUser.id },
-    });
-
-    return { userId: existingUser.id };
+    // Knowing an email address is not proof that the current browser controls
+    // the account that already owns it. Account merges must only happen in a
+    // flow that has authenticated that target account (password, OAuth, or a
+    // one-time link sent to the mailbox).
+    throw new IdentityLinkConflictError();
   });
 
-  // Invalidate both the old and new user cache entries after merge
+  // Invalidate the identity whose email/profile was updated.
   invalidateUserCache(params.currentUserId);
   invalidateUserCache(result.userId);
 

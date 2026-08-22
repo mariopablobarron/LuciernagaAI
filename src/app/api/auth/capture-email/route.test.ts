@@ -33,7 +33,13 @@ jest.mock("@/services/user", () => ({
 }));
 
 import { NextRequest } from "next/server";
+import {
+  IdentityLinkConflictError,
+  linkIdentityToEmail,
+} from "@/services/user";
 import { POST } from "./route";
+
+const linkIdentityToEmailMock = jest.mocked(linkIdentityToEmail);
 
 describe("POST /api/auth/capture-email", () => {
   it("captura email y vincula la sesión actual sin password", async () => {
@@ -75,5 +81,32 @@ describe("POST /api/auth/capture-email", () => {
 
     expect(response.status).toBe(400);
     expect(body.error).toBe("EMAIL_INVALID");
+  });
+
+  it("no emite sesión cuando el email ya pertenece a otra identidad", async () => {
+    linkIdentityToEmailMock.mockRejectedValueOnce(new IdentityLinkConflictError());
+    const req = new NextRequest("http://localhost/api/auth/capture-email", {
+      method: "POST",
+      body: JSON.stringify({
+        email: "victim@example.com",
+        sessionId: "usr_capture_anon",
+      }),
+      headers: {
+        "content-type": "application/json",
+        cookie: "mw_session=dummy",
+      },
+    });
+
+    const response = await POST(req);
+    const body = await response.json();
+
+    expect(response.status).toBe(409);
+    expect(body).toEqual(expect.objectContaining({
+      success: false,
+      authenticated: false,
+      error: "IDENTITY_ALREADY_LINKED",
+    }));
+    expect(body.token).toBeUndefined();
+    expect(response.headers.get("set-cookie")).toBeNull();
   });
 });

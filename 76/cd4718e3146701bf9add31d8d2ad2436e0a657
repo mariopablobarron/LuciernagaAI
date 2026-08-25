@@ -1,0 +1,29 @@
+src/app/api/org/classrooms/[classroomId]/codes/route.test.ts
+  s_d5531a43474017::t_ad126f2061470d 1-137
+src/app/api/org/classrooms/[classroomId]/codes/route.ts
+  s_d5531a43474017::t_163460037e4291 6-7,44,81-89
+src/app/api/org/classrooms/[classroomId]/route.test.ts
+  s_d5531a43474017::t_231f6ef13d7428 1-137
+src/app/api/org/classrooms/[classroomId]/route.ts
+  s_d5531a43474017::t_fcfd62e8b69a92 6-7,40-42,122-130
+src/lib/org-classroom-access.test.ts
+  s_d5531a43474017::t_d9e668674a2ac0 1-25
+src/lib/org-classroom-access.ts
+  s_d5531a43474017::t_1e2c10598ebc47 1-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "76cd4718e3146701bf9add31d8d2ad2436e0a657",
+  "prompts": {},
+  "sessions": {
+    "s_d5531a43474017": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01a026e9-cdb5-7833-a5ac-183a923ec421",
+        "model": "unknown"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

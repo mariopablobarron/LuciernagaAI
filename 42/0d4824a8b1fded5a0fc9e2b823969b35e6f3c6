@@ -1,0 +1,37 @@
+src/lib/avatar-image.ts
+  s_5cc4671b80d79c::t_2353d7e39b765c 1-120
+  s_5cc4671b80d79c::t_d4af455988e57e 121
+src/app/settings/page.tsx
+  s_5cc4671b80d79c::t_2353d7e39b765c 305-316,413
+src/app/api/user/avatar/[id]/route.ts
+  s_5cc4671b80d79c::t_2353d7e39b765c 3,23-26,32-36
+  s_5cc4671b80d79c::t_f1f177e01eac34 30
+src/app/api/user/profile/route.test.ts
+  s_5cc4671b80d79c::t_2353d7e39b765c 1-89
+  s_5cc4671b80d79c::t_0c357bc98cba9f 90-103
+src/lib/avatar-image.test.ts
+  s_5cc4671b80d79c::t_e3f7f79cee144c 1-67
+  s_5cc4671b80d79c::t_9f46724f12801e 68-69
+src/app/api/user/avatar/[id]/route.test.ts
+  s_5cc4671b80d79c::t_2353d7e39b765c 1-62
+  s_5cc4671b80d79c::t_354c82c1898f60 63-66
+src/app/api/user/profile/route.ts
+  s_5cc4671b80d79c::t_2353d7e39b765c 8,97-98,101-102
+  s_5cc4671b80d79c::t_b2c60545498dc2 103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "420d4824a8b1fded5a0fc9e2b823969b35e6f3c6",
+  "prompts": {},
+  "sessions": {
+    "s_5cc4671b80d79c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a026e9-cdb5-7833-a5ac-183a923ec421",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,109 @@
+messages/de.json
+  s_d2308f25c4747c::t_791d748f5c8a89 2325-2355
+messages/en.json
+  s_d2308f25c4747c::t_3bd7fcf64f037f 2325-2355
+messages/es.json
+  s_d2308f25c4747c::t_82a7d272221507 2325-2355
+messages/fr.json
+  s_d2308f25c4747c::t_295b74716f1403 2325-2355
+messages/pt.json
+  s_d2308f25c4747c::t_ea7fdff75b3d93 2325-2355
+prisma/migrations/20260721180000_add_glossary_topic/migration.sql
+  s_d2308f25c4747c::t_90cf2e5f1b4604 1-25
+prisma/schema.prisma
+  s_d2308f25c4747c::t_47f886a34458e2 2374-2406
+prisma/seeds/glossary.ts
+  s_d2308f25c4747c::t_77feaf42fc8c88 1-95
+security.md
+  s_d2308f25c4747c::t_dfbd79291657b3 11
+src/app/admin/glosario/page.tsx
+  s_d2308f25c4747c::t_6e56bf39d78855 1-370
+src/app/api/admin/glossary/[id]/route.ts
+  s_d2308f25c4747c::t_dec193b38ed365 1-58
+src/app/api/admin/glossary/route.ts
+  s_d2308f25c4747c::t_a4836a52061e10 1-85
+src/app/api/auth/capture-email/route.test.ts
+  s_d2308f25c4747c::t_ff0704fea8863c 36-39,42-43,85-111
+src/app/api/auth/login/route.test.ts
+  s_d2308f25c4747c::t_683bc63743d895 45-48,51-52,90-110
+src/app/api/auth/register-code/route.test.ts
+  s_d2308f25c4747c::t_f534b1f7e0a5c2 1-199
+src/app/api/auth/register-code/route.ts
+  s_d2308f25c4747c::t_f7d4f3836392c2 3-9,103-120,125,149
+src/app/api/auth/signup/route.test.ts
+  s_d2308f25c4747c::t_dac354e642be67 13-14,17-22,24,79,95-96,161,177-211
+src/app/api/auth/signup/route.ts
+  s_d2308f25c4747c::t_5c635e8b820a93 3-8,102-111,149
+src/app/api/journeys/[journeyId]/route.ts
+  s_d2308f25c4747c::t_51189dd1a5e53e 2,10,18-20
+src/app/api/journeys/active/route.ts
+  s_d2308f25c4747c::t_e3a4c58187a6cd 2,8,10-12
+src/app/api/journeys/exercise/[exerciseId]/route.ts
+  s_d2308f25c4747c::t_9534ce0e151466 2,16,24-26,35,43-48,52,59,63
+src/app/api/journeys/route.test.ts
+  s_d2308f25c4747c::t_9e7450a3b5fbee 1-59
+src/app/api/journeys/route.ts
+  s_d2308f25c4747c::t_9fd2c302be5aaf 2,8-11,13-15,24,32-34
+src/app/api/org/classrooms/[classroomId]/codes/route.test.ts
+  s_d2308f25c4747c::t_9c1e32236cddc0 1-137
+src/app/api/org/classrooms/[classroomId]/codes/route.ts
+  s_d2308f25c4747c::t_b0b1a360ff1b87 6-7,44,81-89
+src/app/api/org/classrooms/[classroomId]/route.test.ts
+  s_d2308f25c4747c::t_11dc77fcd5fe91 1-137
+src/app/api/org/classrooms/[classroomId]/route.ts
+  s_d2308f25c4747c::t_8f2f0348d1716f 6-7,40-42,122-130
+src/app/api/user/avatar/[id]/route.test.ts
+  s_d2308f25c4747c::t_0cf64d12ed1a44 1-66
+src/app/api/user/avatar/[id]/route.ts
+  s_d2308f25c4747c::t_073f5c31196b12 3,23-26,30,32-36
+src/app/api/user/profile/route.test.ts
+  s_d2308f25c4747c::t_5b705eba5408e8 1-103
+src/app/api/user/profile/route.ts
+  s_d2308f25c4747c::t_3cfb767f9df079 8,97-98,101-103
+src/app/journey/[journeyId]/page.tsx
+  s_d2308f25c4747c::t_a42c103c8068f5 6,22,52-53,73,90,132,135,144,169,171,175,190
+src/app/journey/exercise/[exerciseId]/page.tsx
+  s_d2308f25c4747c::t_9e14d99a203924 6,25-32,40,137-138,163,170,178,192,199,205,226,241,243,270,284,331,343,346,351,366,375,387,398,412,417,426
+src/app/settings/page.tsx
+  s_d2308f25c4747c::t_fbfeab22e3560b 305-316,413
+src/application/chat/phases/context.ts
+  s_d2308f25c4747c::t_adbeda28112f70 19,189-192,239
+src/features/admin/components/AdminShell.tsx
+  s_d2308f25c4747c::t_f390607dd80cc3 7,29
+src/lib/avatar-image.test.ts
+  s_d2308f25c4747c::t_9dd6c10e9155f3 1-69
+src/lib/avatar-image.ts
+  s_d2308f25c4747c::t_ff2015b8d2ad47 1-121
+src/lib/org-classroom-access.test.ts
+  s_d2308f25c4747c::t_d8a3409cd9e632 1-25
+src/lib/org-classroom-access.ts
+  s_d2308f25c4747c::t_f03b748e6c39d6 1-18
+src/lib/permissions.ts
+  s_d2308f25c4747c::t_f777cde6fb9620 64,105
+src/services/coach.ts
+  s_d2308f25c4747c::t_81bcb1283b8c44 125-129,739-759,814,946
+src/services/glossary.test.ts
+  s_d2308f25c4747c::t_05227b97a173a8 1-79
+src/services/glossary.ts
+  s_d2308f25c4747c::t_dc7363458091c5 1-116
+src/services/user.identity-link.test.ts
+  s_d2308f25c4747c::t_4cee14efac2191 1-122
+src/services/user.ts
+  s_d2308f25c4747c::t_125d961e4bd95f 495-499,502
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "2aaa4b0e5b1f3c464b7277a8c1ed31d4e2b0d029",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

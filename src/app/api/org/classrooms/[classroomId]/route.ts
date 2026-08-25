@@ -3,6 +3,8 @@ import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
 import { verifyOrgToken } from "@/lib/org-auth";
 import { cache } from "@/lib/cache";
+import { canReadClassroomClinicalData } from "@/lib/org-classroom-access";
+import { audit } from "@/lib/audit";
 
 export const dynamic = "force-dynamic";
 
@@ -35,8 +37,9 @@ export async function GET(req: NextRequest, ctx: unknown) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Teachers can only see their own classroom
-    if (admin.role === "teacher" && admin.classroomId !== classroomId) {
+    // Fail closed: this endpoint exposes individual student data and is only
+    // available to the teacher assigned to this classroom.
+    if (!canReadClassroomClinicalData(admin, classroomId)) {
       return NextResponse.json({ error: "No tienes acceso a esta clase" }, { status: 403 });
     }
 
@@ -114,6 +117,15 @@ export async function GET(req: NextRequest, ctx: unknown) {
         codes,
         stats: { totalStudents, activeLastWeek, inCrisis, avgStreak },
       };
+    });
+
+    audit({
+      actorId: admin.id,
+      actorType: "orgAdmin",
+      action: "read",
+      resource: "ClassroomClinicalData",
+      resourceId: classroomId,
+      metadata: { organizationId: orgId, role: admin.role },
     });
 
     return NextResponse.json({ classroom, ...data });

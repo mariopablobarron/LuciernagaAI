@@ -8,7 +8,7 @@ _Generada: 2026-05-12 | Actualizada: 2026-05-12 | Estado: ✅ código limpio_
 ### C-1 · OAuth2 Client Secret hardcodeado en scripts Python
 **Archivos:** `~/Documents/grant_ga4_access.py`, `grant_gsc_access.py`, `grant_gsc_v2.py`
 **Líneas:** 14-22 en cada archivo
-**Problema:** `CLIENT_SECRET = "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"` en texto plano.
+**Problema:** `CLIENT_SECRET = "[REDACTED_REVOKED_GOOGLE_OAUTH_CLIENT_SECRET]"` en texto plano.
 Permite a cualquiera iniciar un flujo OAuth2 haciéndose pasar por la app.
 **Estado:** ⚠️ Scripts fuera del repo (no comprometidos en Git). Considerar revocar si los archivos fueron compartidos.
 **Fix:** Mover a `~/.env.scripts` y leerlos con `python-dotenv`. Añadir `grant_*.py` a `.gitignore` global.

@@ -2322,6 +2322,37 @@
       "assessment": "Avaliação",
       "breathing": "Respiração",
       "visualization": "Visualização"
+    },
+    "map": {
+      "notFound": "Itinerário não encontrado",
+      "backToJourneys": "Voltar aos itinerários",
+      "breadcrumb": "Itinerários",
+      "progressTotal": "Progresso total",
+      "completePrevious": "Completa o anterior",
+      "review": "Rever",
+      "open": "Abrir",
+      "minutesTpl": "{n} min"
+    },
+    "exercise": {
+      "notFound": "Exercício não encontrado",
+      "breadcrumb": "Itinerários",
+      "completedTitle": "Exercício concluído",
+      "debriefLabel": "Reflexão de Tres Mil Millones de Latidos",
+      "viewJourney": "Ver itinerário",
+      "talkToMentor": "Falar com Tres Mil Millones de Latidos",
+      "stepProgressTpl": "Passo {current} de {total}",
+      "textPlaceholder": "Escreve aqui...",
+      "pauseHint": "Tira um momento antes de continuar.",
+      "reflectionTitle": "Reflexão final",
+      "reflectionPrompt": "O que descobriste? O que te surpreendeu? Isto é opcional, mas dá contexto a Tres Mil Millones de Latidos para te acompanhar melhor.",
+      "reflectionPlaceholder": "Escreve a tua reflexão...",
+      "previous": "Anterior",
+      "back": "Voltar",
+      "next": "Seguinte",
+      "reflect": "Refletir",
+      "saving": "A guardar...",
+      "complete": "Concluir exercício",
+      "minutesTpl": "{n} min"
     }
   },
   "auth": {

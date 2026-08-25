@@ -122,6 +122,11 @@ export type CoachContext = {
     mildIdeation: boolean;
     gratitudeClosure: boolean;
   } | null;
+  // Temas del glosario detectados en el mensaje (síndrome del impostor, etc.).
+  // Traen la guía psicoeducativa + un ejercicio curado que el mentor PUEDE
+  // ofrecer. Contenido curado por humanos desde /admin/glosario, detectado en
+  // services/glossary.ts. Es psicoeducación, NO diagnóstico: no etiquetar.
+  glossaryTopics?: import("./glossary").GlossaryTopicData[] | null;
   // Resumen acumulado de mensajes antiguos que se salen de la ventana literal
   // (LangChain SummaryBufferMemory). Permite al mentor recordar nombres,
   // decisiones y arcos de turnos muy anteriores al actual.
@@ -732,6 +737,27 @@ function buildExtendedIntentGuidance(context: CoachContext): string {
 }
 
 /**
+ * Guía por tema del glosario detectado (síndrome del impostor, etc.). Añade
+ * psicoeducación + un ejercicio curado que el mentor PUEDE ofrecer. Es
+ * hipótesis, no diagnóstico: el mentor no etiqueta a la persona. El contenido
+ * viene de la tabla GlossaryTopic (editable en /admin/glosario).
+ */
+function buildGlossaryGuidance(context: CoachContext): string {
+  const topics = context.glossaryTopics;
+  if (!topics || topics.length === 0) return "";
+
+  return topics
+    .map((t) => {
+      const steps = t.exerciseSteps.map((s, i) => `  ${i + 1}. ${s}`).join("\n");
+      const exercise = t.exerciseTitle
+        ? `\nEjercicio disponible para ofrecer — «${t.exerciseTitle}»${t.exerciseGoal ? ` (${t.exerciseGoal})` : ""}:\n${steps}\nCondúcelo conversando, un paso cada vez; no lo sueltes entero de golpe. Solo si la persona acepta.`
+        : "";
+      return `TEMA DETECTADO — «${t.label}» (concepto de trabajo, NO diagnóstico; ofrécelo como hipótesis, no etiquetes a la persona).\n${t.mentorGuidance}${exercise}`;
+    })
+    .join("\n\n");
+}
+
+/**
  * Audience tier guidance. Adapta el tono según el rango etario auto-declarado.
  * Aplica una capa LIGERA encima del prompt base — no reemplaza la identidad
  * del mentor, solo modula vocabulario, ritmo y referencias.
@@ -785,6 +811,7 @@ export function buildCoachPrompt(
   const onboardingGuidance = buildOnboardingGuidance(context);
   const genderGuidance = buildGenderGuidance(context);
   const extendedIntentGuidance = buildExtendedIntentGuidance(context);
+  const glossaryGuidance = buildGlossaryGuidance(context);
   const enneagramGuidance = buildEnneagramGuidance(context);
   const mentorPrefsGuidance = buildMentorPrefsGuidance(context);
   const audienceGuidance = buildAudienceGuidance(context);
@@ -916,6 +943,7 @@ No se pudo verificar información externa suficiente. No afirmes datos actuales 
     genderGuidance,
     enneagramGuidance,
     extendedIntentGuidance,
+    glossaryGuidance,
     conversationSummaryGuidance,
     semanticMemoryGuidance,
     transformationGuidance,

@@ -1,6 +1,11 @@
 import { randomBytes } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { attachSessionCookie, issueSessionToken } from "@/lib/auth";
+import {
+  attachSessionCookie,
+  InvalidSessionTokenError,
+  issueSessionToken,
+  resolveIdentity,
+} from "@/lib/auth";
 import { getPrismaClient } from "@/db/prisma";
 import { hashPassword } from "@/lib/password";
 import { logError, logInfo } from "@/lib/logger";
@@ -94,6 +99,16 @@ export async function POST(req: NextRequest) {
 
     const prisma = getPrismaClient();
 
+    // An existing passwordless account may only be upgraded by the browser
+    // session that already owns it. Knowing the email address alone is not an
+    // authentication factor.
+    let currentSessionUserId: string | null = null;
+    try {
+      currentSessionUserId = (await resolveIdentity(req)).userId;
+    } catch (error) {
+      if (!(error instanceof InvalidSessionTokenError)) throw error;
+    }
+
     // Hash password before the transaction to minimise time spent holding the lock
     const hash = await hashPassword(password);
 
@@ -131,7 +146,7 @@ export async function POST(req: NextRequest) {
       const existing = await tx.user.findUnique({ where: { email }, select: { id: true, passwordHash: true } });
 
       if (existing) {
-        if (existing.passwordHash) {
+        if (existing.passwordHash || existing.id !== currentSessionUserId) {
           return { status: "EMAIL_TAKEN" as const };
         }
         // Anonymous user upgrading to full account

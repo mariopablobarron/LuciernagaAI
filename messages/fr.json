@@ -2322,6 +2322,37 @@
       "assessment": "Évaluation",
       "breathing": "Respiration",
       "visualization": "Visualisation"
+    },
+    "map": {
+      "notFound": "Itinéraire introuvable",
+      "backToJourneys": "Retour aux itinéraires",
+      "breadcrumb": "Itinéraires",
+      "progressTotal": "Progression totale",
+      "completePrevious": "Termine le précédent",
+      "review": "Revoir",
+      "open": "Ouvrir",
+      "minutesTpl": "{n} min"
+    },
+    "exercise": {
+      "notFound": "Exercice introuvable",
+      "breadcrumb": "Itinéraires",
+      "completedTitle": "Exercice terminé",
+      "debriefLabel": "Réflexion de Tres Mil Millones de Latidos",
+      "viewJourney": "Voir l’itinéraire",
+      "talkToMentor": "Parler avec Tres Mil Millones de Latidos",
+      "stepProgressTpl": "Étape {current} sur {total}",
+      "textPlaceholder": "Écris ici...",
+      "pauseHint": "Prends un moment avant de continuer.",
+      "reflectionTitle": "Réflexion finale",
+      "reflectionPrompt": "Qu’as-tu découvert ? Qu’est-ce qui t’a surpris ? C’est facultatif, mais cela donne du contexte à Tres Mil Millones de Latidos pour mieux t’accompagner.",
+      "reflectionPlaceholder": "Écris ta réflexion...",
+      "previous": "Précédent",
+      "back": "Retour",
+      "next": "Suivant",
+      "reflect": "Réfléchir",
+      "saving": "Enregistrement...",
+      "complete": "Terminer l’exercice",
+      "minutesTpl": "{n} min"
     }
   },
   "auth": {

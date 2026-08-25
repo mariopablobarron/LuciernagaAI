@@ -4,7 +4,7 @@ import { type ReactNode, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  BarChart3, BellRing, Bot, BookOpen, Building2, CircleDot, Coffee, FlaskConical, LayoutDashboard, LogOut,
+  BarChart3, BellRing, Bot, BookOpen, BookMarked, Building2, CircleDot, Coffee, FlaskConical, LayoutDashboard, LogOut,
   Mail, Megaphone, Menu, Settings, Shield, ShieldCheck, Sparkles, Stethoscope,
   StickyNote, Users, Webhook, Wrench, X, Database, Activity, FileText, Bell,
 } from "lucide-react";
@@ -26,6 +26,7 @@ const NAV_LINKS = [
   { href: "/admin/research", label: "Investigación", icon: FlaskConical, matchPrefix: true },
   { href: "/admin/marketing", label: "Marketing", icon: Megaphone, matchPrefix: true },
   { href: "/admin/blog", label: "Blog", icon: BookOpen, matchPrefix: true },
+  { href: "/admin/glosario", label: "Glosario", icon: BookMarked, matchPrefix: true },
   { href: "/admin/crm", label: "CRM", icon: Database },
   { href: "/admin/organizations", label: "Organizaciones", icon: Building2 },
   { href: "/admin-clinical", label: "Panel clínico", icon: Stethoscope, matchPrefix: true },

@@ -3,6 +3,8 @@ import { getPrismaClient } from "@/db/prisma";
 import { logError } from "@/lib/logger";
 import { verifyOrgToken } from "@/lib/org-auth";
 import { cache } from "@/lib/cache";
+import { canManageClassroomCodes } from "@/lib/org-classroom-access";
+import { audit } from "@/lib/audit";
 
 export const dynamic = "force-dynamic";
 
@@ -39,7 +41,7 @@ export async function POST(req: NextRequest, ctx: unknown) {
     if (!admin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    if (admin.role === "teacher" && admin.classroomId !== classroomId) {
+    if (!canManageClassroomCodes(admin, classroomId)) {
       return NextResponse.json({ error: "No tienes acceso a esta clase" }, { status: 403 });
     }
 
@@ -75,6 +77,15 @@ export async function POST(req: NextRequest, ctx: unknown) {
 
     // Invalidate classroom cache so codes appear immediately
     cache.invalidate(`classroom:${classroomId}`);
+
+    audit({
+      actorId: admin.id,
+      actorType: "orgAdmin",
+      action: "create",
+      resource: "ClassroomCode",
+      resourceId: created.id,
+      metadata: { organizationId: orgId, classroomId, role: admin.role },
+    });
 
     return NextResponse.json(created, { status: 201 });
   } catch (err) {

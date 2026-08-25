@@ -2322,6 +2322,37 @@
       "assessment": "Assessment",
       "breathing": "Breathing",
       "visualization": "Visualization"
+    },
+    "map": {
+      "notFound": "Journey not found",
+      "backToJourneys": "Back to journeys",
+      "breadcrumb": "Journeys",
+      "progressTotal": "Total progress",
+      "completePrevious": "Complete the previous one",
+      "review": "Review",
+      "open": "Open",
+      "minutesTpl": "{n} min"
+    },
+    "exercise": {
+      "notFound": "Exercise not found",
+      "breadcrumb": "Journeys",
+      "completedTitle": "Exercise completed",
+      "debriefLabel": "Reflection from Tres Mil Millones de Latidos",
+      "viewJourney": "View journey",
+      "talkToMentor": "Talk to Tres Mil Millones de Latidos",
+      "stepProgressTpl": "Step {current} of {total}",
+      "textPlaceholder": "Write here...",
+      "pauseHint": "Take a moment before continuing.",
+      "reflectionTitle": "Final reflection",
+      "reflectionPrompt": "What did you discover? What surprised you? This is optional, but it gives Tres Mil Millones de Latidos context to support you better.",
+      "reflectionPlaceholder": "Write your reflection...",
+      "previous": "Previous",
+      "back": "Back",
+      "next": "Next",
+      "reflect": "Reflect",
+      "saving": "Saving...",
+      "complete": "Complete exercise",
+      "minutesTpl": "{n} min"
     }
   },
   "auth": {

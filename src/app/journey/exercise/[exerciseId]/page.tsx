@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Sparkles } from "lucide-react";
 import type { ExerciseStep, ExerciseResponse, ExerciseType } from "@/domain/journeys/types";
 
@@ -21,13 +22,14 @@ type ExerciseDetail = {
   aiDebrief: string | null;
 };
 
-const TYPE_CONFIG: Record<string, { icon: string; label: string; color: string }> = {
-  reflection: { icon: "🪞", label: "Reflexión", color: "text-violet-400" },
-  writing: { icon: "✍️", label: "Escritura", color: "text-cyan-400" },
-  action: { icon: "⚡", label: "Acción", color: "text-emerald-400" },
-  assessment: { icon: "📊", label: "Evaluación", color: "text-amber-400" },
-  breathing: { icon: "🌬️", label: "Respiración", color: "text-cyan-400" },
-  visualization: { icon: "🎯", label: "Visualización", color: "text-fuchsia-400" },
+// Iconos y color por tipo. La etiqueta legible vive en i18n (journeyPage.exerciseTypes).
+const TYPE_CONFIG: Record<string, { icon: string; color: string }> = {
+  reflection: { icon: "🪞", color: "text-violet-400" },
+  writing: { icon: "✍️", color: "text-cyan-400" },
+  action: { icon: "⚡", color: "text-emerald-400" },
+  assessment: { icon: "📊", color: "text-amber-400" },
+  breathing: { icon: "🌬️", color: "text-cyan-400" },
+  visualization: { icon: "🎯", color: "text-fuchsia-400" },
 };
 
 function Skeleton({ className }: { className?: string }) {
@@ -35,6 +37,7 @@ function Skeleton({ className }: { className?: string }) {
 }
 
 export default function ExercisePage() {
+  const t = useTranslations("journeyPage");
   const { exerciseId } = useParams<{ exerciseId: string }>();
   const [exercise, setExercise] = useState<ExerciseDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -131,8 +134,8 @@ export default function ExercisePage() {
   if (!exercise) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3 bg-zinc-950">
-        <p className="text-zinc-400">Ejercicio no encontrado</p>
-        <Link href="/journey" className="text-sm text-violet-400">← Itinerarios</Link>
+        <p className="text-zinc-400">{t("exercise.notFound")}</p>
+        <Link href="/journey" className="text-sm text-violet-400">← {t("exercise.breadcrumb")}</Link>
       </div>
     );
   }
@@ -157,14 +160,14 @@ export default function ExercisePage() {
             className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-400"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Itinerarios
+            {t("exercise.breadcrumb")}
           </Link>
 
           <div className="mt-6 card-surface rounded-xl border border-emerald-500/20 p-8 text-center">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/10">
               <CheckCircle2 className="h-8 w-8 text-emerald-400" />
             </div>
-            <h2 className="mt-4 text-xl font-bold text-white">Ejercicio completado</h2>
+            <h2 className="mt-4 text-xl font-bold text-white">{t("exercise.completedTitle")}</h2>
             <p className="mt-1 text-sm text-zinc-400">{exercise.title}</p>
 
             {exercise.aiDebrief && (
@@ -172,7 +175,7 @@ export default function ExercisePage() {
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-4 w-4 text-violet-400" />
                   <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                    Reflexión de Tres Mil Millones de Latidos
+                    {t("exercise.debriefLabel")}
                   </p>
                 </div>
                 <p className="mt-3 text-sm leading-relaxed text-zinc-300">
@@ -186,20 +189,20 @@ export default function ExercisePage() {
                 href="/journey"
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-700 bg-zinc-800/50 px-5 py-2.5 text-sm font-semibold text-zinc-300 hover:bg-zinc-800 transition-colors"
               >
-                Ver itinerario
+                {t("exercise.viewJourney")}
               </Link>
               <Link
                 href="/app"
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-violet-500 to-fuchsia-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-fuchsia-500/20 hover:from-violet-400 hover:to-fuchsia-400 transition-all"
               >
                 <Sparkles className="h-4 w-4" />
-                Hablar con Tres Mil Millones de Latidos
+                {t("exercise.talkToMentor")}
               </Link>
             </div>
           </div>
 
           <p className="mt-6 text-center text-xs text-zinc-700">
-            Tres Mil Millones de Latidos no sustituye terapia ni intervención psicológica profesional.
+            {t("disclaimer")}
           </p>
         </div>
       </div>
@@ -220,7 +223,7 @@ export default function ExercisePage() {
           className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-400 transition-colors"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Itinerarios
+          {t("exercise.breadcrumb")}
         </Link>
 
         {/* Header */}
@@ -235,9 +238,9 @@ export default function ExercisePage() {
             <h1 className="text-xl font-bold text-white">{exercise.title}</h1>
             <div className="mt-1 flex items-center gap-2 text-xs text-zinc-500">
               <Clock className="h-3 w-3" />
-              <span>{exercise.estimatedMinutes} min</span>
+              <span>{t("exercise.minutesTpl", { n: exercise.estimatedMinutes })}</span>
               <span>·</span>
-              <span className={typeCfg.color}>{typeCfg.label}</span>
+              <span className={typeCfg.color}>{t(`exerciseTypes.${exercise.type}`)}</span>
             </div>
           </div>
         </div>
@@ -264,7 +267,7 @@ export default function ExercisePage() {
           />
         </div>
         <p className="mt-2 text-xs text-zinc-600">
-          Paso {currentStep + 1} de {steps.length}
+          {t("exercise.stepProgressTpl", { current: currentStep + 1, total: steps.length })}
         </p>
 
         {/* Current step card */}
@@ -278,7 +281,7 @@ export default function ExercisePage() {
               <textarea
                 className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 px-4 py-3 text-sm text-zinc-200 placeholder-zinc-600 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500/50 transition-colors"
                 rows={4}
-                placeholder="Escribe aquí..."
+                placeholder={t("exercise.textPlaceholder")}
                 value={(responses.get(step.step) as string) ?? ""}
                 onChange={(e) => updateResponse(step.step, e.target.value)}
               />
@@ -325,7 +328,7 @@ export default function ExercisePage() {
             {step.inputType === "none" && (
               <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4 text-center">
                 <p className="text-xs italic text-zinc-500">
-                  Tómate un momento antes de continuar.
+                  {t("exercise.pauseHint")}
                 </p>
               </div>
             )}
@@ -337,16 +340,15 @@ export default function ExercisePage() {
           <div className="mt-6 card-surface rounded-xl border border-fuchsia-500/20 p-6 space-y-4">
             <div className="flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-fuchsia-400" />
-              <h3 className="font-bold text-white">Reflexión final</h3>
+              <h3 className="font-bold text-white">{t("exercise.reflectionTitle")}</h3>
             </div>
             <p className="text-sm text-zinc-400">
-              ¿Qué has descubierto? ¿Qué te ha sorprendido? Esto es opcional,
-              pero le da contexto a Tres Mil Millones de Latidos para acompañarte mejor.
+              {t("exercise.reflectionPrompt")}
             </p>
             <textarea
               className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 px-4 py-3 text-sm text-zinc-200 placeholder-zinc-600 focus:border-fuchsia-500 focus:outline-none focus:ring-1 focus:ring-fuchsia-500/50 transition-colors"
               rows={4}
-              placeholder="Escribe tu reflexión..."
+              placeholder={t("exercise.reflectionPlaceholder")}
               value={reflection}
               onChange={(e) => setReflection(e.target.value)}
             />
@@ -361,7 +363,7 @@ export default function ExercisePage() {
               className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-700 bg-zinc-800/50 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
-              Anterior
+              {t("exercise.previous")}
             </button>
           )}
           {showReflection && (
@@ -370,7 +372,7 @@ export default function ExercisePage() {
               className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-700 bg-zinc-800/50 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
-              Volver
+              {t("exercise.back")}
             </button>
           )}
 
@@ -382,7 +384,7 @@ export default function ExercisePage() {
               disabled={!canAdvance}
               className="inline-flex items-center gap-1.5 rounded-xl bg-linear-to-r from-violet-500 to-fuchsia-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/10 transition-all hover:from-violet-400 hover:to-fuchsia-400 disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              Siguiente
+              {t("exercise.next")}
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           )}
@@ -393,7 +395,7 @@ export default function ExercisePage() {
               disabled={!canAdvance}
               className="inline-flex items-center gap-1.5 rounded-xl bg-linear-to-r from-violet-500 to-fuchsia-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/10 transition-all hover:from-violet-400 hover:to-fuchsia-400 disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              Reflexionar
+              {t("exercise.reflect")}
               <Sparkles className="h-3.5 w-3.5" />
             </button>
           )}
@@ -407,12 +409,12 @@ export default function ExercisePage() {
               {submitting ? (
                 <>
                   <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  Guardando...
+                  {t("exercise.saving")}
                 </>
               ) : (
                 <>
                   <CheckCircle2 className="h-3.5 w-3.5" />
-                  Completar ejercicio
+                  {t("exercise.complete")}
                 </>
               )}
             </button>
@@ -421,7 +423,7 @@ export default function ExercisePage() {
 
         {/* Disclaimer */}
         <p className="mt-8 text-center text-xs text-zinc-700">
-          Tres Mil Millones de Latidos no sustituye terapia ni intervención psicológica profesional.
+          {t("disclaimer")}
         </p>
       </div>
     </div>

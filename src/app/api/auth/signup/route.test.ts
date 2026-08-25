@@ -10,9 +10,18 @@ jest.mock("@/lib/password", () => ({
   hashPassword: jest.fn().mockResolvedValue(undefined).mockResolvedValue("hashed-pw"),
 }));
 
+const resolveIdentityMock = jest.fn();
+
 jest.mock("@/lib/auth", () => ({
   attachSessionCookie: jest.fn().mockResolvedValue(undefined),
+  InvalidSessionTokenError: class InvalidSessionTokenError extends Error {
+    constructor() {
+      super("INVALID_SESSION_TOKEN");
+      this.name = "InvalidSessionTokenError";
+    }
+  },
   issueSessionToken: jest.fn().mockResolvedValue(undefined).mockReturnValue("session-token"),
+  resolveIdentity: (...args: unknown[]) => resolveIdentityMock(...args),
 }));
 
 jest.mock("@/lib/email", () => ({
@@ -67,6 +76,7 @@ jest.mock("@/db/prisma", () => ({
   }),
 }));
 
+import { InvalidSessionTokenError } from "@/lib/auth";
 import { NextRequest } from "next/server";
 import { POST } from "./route";
 import { CURRENT_CONSENT_VERSION } from "@/lib/legal";
@@ -82,6 +92,8 @@ function makeRequest(body: Record<string, unknown>) {
 describe("POST /api/auth/signup — consent validation", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    resolveIdentityMock.mockReset();
+    resolveIdentityMock.mockRejectedValue(new InvalidSessionTokenError());
     userFindUniqueMock.mockResolvedValue(null); // email no existe
     userCreateMock.mockResolvedValue({ id: "usr_new" });
   });
@@ -146,6 +158,7 @@ describe("POST /api/auth/signup — consent validation", () => {
 
   it("al hacer upgrade desde anonymous también persiste consent", async () => {
     userFindUniqueMock.mockResolvedValue({ id: "usr_anon", passwordHash: null });
+    resolveIdentityMock.mockResolvedValueOnce({ userId: "usr_anon" });
 
     const res = await POST(
       makeRequest({
@@ -160,5 +173,40 @@ describe("POST /api/auth/signup — consent validation", () => {
     const updateArg = userUpdateMock.mock.calls[0][0];
     expect(updateArg.data.consentGiven).toBe(true);
     expect(updateArg.data.consentVersion).toBe(CURRENT_CONSENT_VERSION);
+  });
+
+  it("no permite reclamar una cuenta passwordless con solo conocer su email", async () => {
+    userFindUniqueMock.mockResolvedValue({ id: "usr_victim", passwordHash: null });
+    resolveIdentityMock.mockResolvedValueOnce({ userId: "usr_attacker" });
+
+    const res = await POST(
+      makeRequest({
+        email: "victim@example.com",
+        password: "attacker-password",
+        consentAccepted: true,
+        consentVersion: CURRENT_CONSENT_VERSION,
+      })
+    );
+
+    expect(res.status).toBe(409);
+    expect(await res.json()).toEqual({ success: false, error: "EMAIL_TAKEN" });
+    expect(userUpdateMock).not.toHaveBeenCalled();
+  });
+
+  it("no permite reclamar una cuenta passwordless sin una sesión propietaria", async () => {
+    userFindUniqueMock.mockResolvedValue({ id: "usr_victim", passwordHash: null });
+
+    const res = await POST(
+      makeRequest({
+        email: "victim@example.com",
+        password: "attacker-password",
+        consentAccepted: true,
+        consentVersion: CURRENT_CONSENT_VERSION,
+      })
+    );
+
+    expect(res.status).toBe(409);
+    expect(await res.json()).toEqual({ success: false, error: "EMAIL_TAKEN" });
+    expect(userUpdateMock).not.toHaveBeenCalled();
   });
 });

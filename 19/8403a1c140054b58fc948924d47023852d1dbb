@@ -1,0 +1,20 @@
+src/lib/statusChecks.ts
+  s_d2308f25c4747c::t_afb70cdfe16e0b 535,537,541,543,548,550,554,556
+  s_d2308f25c4747c::t_07025a97be40a8 502-534,536,538-540,542,544-547,549,551-553,555,557-559
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "198403a1c140054b58fc948924d47023852d1dbb",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Claude (llm-health) <noreply@anthropic.com>"
+    }
+  }
+}

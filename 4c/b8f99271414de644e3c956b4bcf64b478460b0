@@ -1,0 +1,28 @@
+src/services/language-request.test.ts
+  s_d2308f25c4747c::t_df90ccbd6cbfd6 148-152,157-160
+  s_d2308f25c4747c::t_da9b1efe8eab21 54-96,161
+src/services/language-request.ts
+  s_d2308f25c4747c::t_0320a7ad2a1665 13,17,23,28,34-43,47
+src/services/coach.ts
+  s_d2308f25c4747c::t_7a7094d70975b6 298
+  s_d2308f25c4747c::t_9a07b7122b6fc6 314
+  s_d2308f25c4747c::t_ad58bd7d09ced9 306
+  s_d2308f25c4747c::t_5afad759dd3596 291
+  s_d2308f25c4747c::t_44c3a7956d2866 322
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "4cb8f99271414de644e3c956b4bcf64b478460b0",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Claude (de lang patterns) <noreply@anthropic.com>"
+    }
+  }
+}

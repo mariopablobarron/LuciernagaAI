@@ -1,0 +1,20 @@
+src/services/discovery/reddit.ts
+  s_c72d0ada98a9af::t_24729e90f96d11 62-66,72-74,76-79
+  s_c72d0ada98a9af::t_af877ecc1f816f 161-229,231,236-241,243-244,246-261
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "3ad2b48de40c4d3a5fe3886e23922b5ef6920d61",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

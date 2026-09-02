@@ -1,0 +1,31 @@
+src/services/anti-loop.test.ts
+  s_d2308f25c4747c::t_7cfd8699a01c4a 1-144
+src/services/coach.ts
+  s_d2308f25c4747c::t_2d75fd4977f900 189
+  s_d2308f25c4747c::t_3fddf4aa86f2ec 197
+  s_d2308f25c4747c::t_3de3105ec283f7 181
+  s_d2308f25c4747c::t_73b00aa4b5b881 173
+src/services/anti-loop.ts
+  s_d2308f25c4747c::t_00d14bae2d710b 1-165
+src/application/chat/phases/enrich.ts
+  s_d2308f25c4747c::t_ca04639371bca3 526-539
+  s_d2308f25c4747c::t_db5dfd7958593c 706-728
+  s_d2308f25c4747c::t_00a4f74ec3dbd9 575-582,588-589
+  s_d2308f25c4747c::t_9169058dde6be0 23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "0fd4cf36fb301f24432caecd5bd71161bcc735e5",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+src/app/app/page.tsx
+  s_d2308f25c4747c::t_6b55596ccd92be 252-285
+  s_d2308f25c4747c::t_a510359cfc89c4 164-174
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "1316962a23a370e270e802fe77e0789f9efb02f3",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Claude (CTA pro clean) <noreply@anthropic.com>"
+    }
+  }
+}

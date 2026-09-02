@@ -1,0 +1,24 @@
+src/lib/useCrisisAutoMotion.ts
+  s_d2308f25c4747c::t_fa7ff5eea5cdea 1-71
+src/components/Chat.tsx
+  s_d2308f25c4747c::t_615d250b77211f 737-741
+  s_d2308f25c4747c::t_67acb7bfc97409 55
+src/app/globals.css
+  s_d2308f25c4747c::t_6d68d8f9bdbe04 716-722,724-726
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "9a2ac8f702e5aecbe55cd74cd5a98a380b8c0100",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

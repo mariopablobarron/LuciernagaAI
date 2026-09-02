@@ -1,0 +1,23 @@
+src/i18n/routing.ts
+  s_c72d0ada98a9af::t_48154b372added 7-10
+messages/pt.json
+  s_c72d0ada98a9af::t_32b371f54f7edf 4,9-10,14-19,21-23,25,30-31,38,42,47,49-50,53-54,57-58,62,64,67,70-71,76,81,83,90,93-94,103-106,110-114,122,124,127,129,133,136-137,139,141,143,145,147,149,151-154,157-159
+src/app/[locale]/page.tsx
+  s_c72d0ada98a9af::t_9b4552676a2ff3 31-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "40bedbd185018d14ad2dc3c2fe48f16b0fa2e7ac",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

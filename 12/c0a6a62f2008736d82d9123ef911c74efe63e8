@@ -1,0 +1,23 @@
+src/app/api/user/locale/route.ts
+  s_d2308f25c4747c::t_2c2882492cc08a 12,19-32
+src/services/discovery/reddit.ts
+  s_d2308f25c4747c::t_6b42a4dc330a3a 36-38
+  s_d2308f25c4747c::t_332844d6d70045 21
+  s_d2308f25c4747c::t_d80fe5e422cedb 301-303
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "12c0a6a62f2008736d82d9123ef911c74efe63e8",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,31 @@
+.github/workflows/ci.yml
+  s_d2308f25c4747c::t_85a5b4f5b6468c 69,101,119
+  s_d2308f25c4747c::t_b6ca8084b247db 19,67,99,117
+.github/workflows/dev-journal.yml
+  s_d2308f25c4747c::t_119be480b53dde 31
+.github/workflows/user-manual-pdf-auto-update.yml
+  s_d2308f25c4747c::t_116744b0c5d757 25
+.github/workflows/hardening-board-auto-update.yml
+  s_d2308f25c4747c::t_54506ba67f3d25 17
+  s_d2308f25c4747c::t_364fd60522dbae 20
+  s_d2308f25c4747c::t_188ed433ee7ff7 34,74
+.github/workflows/staging-pr-check.yml
+  s_d2308f25c4747c::t_3f6b54e407f584 44
+  s_d2308f25c4747c::t_26b9cf7f484e71 41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "eb476805a71d839d9f3c21f840f5ab0a77cdff9e",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,34 @@
+messages/en.json
+  s_c72d0ada98a9af::t_eaba5d8492686f 2241-2326
+messages/es.json
+  s_c72d0ada98a9af::t_4f336257faa547 2281-2366
+messages/fr.json
+  s_c72d0ada98a9af::t_eaba5d8492686f 2241-2326
+messages/pt.json
+  s_c72d0ada98a9af::t_eaba5d8492686f 2241-2326
+src/app/journey/page.tsx
+  s_c72d0ada98a9af::t_2499a2f9800ecc 182-183,190,200,207,212,218-219,252-254,259,268,277-278,285-286,288,290-291,301,310-312,317,325,330,332,338,350,352,354,361,374,376,386,396
+  s_c72d0ada98a9af::t_ecac68bf8af627 52-53,93-94
+  s_c72d0ada98a9af::t_4dfb0bb17745d2 109
+  s_c72d0ada98a9af::t_2d95484b0b534e 5
+src/app/profile/page.tsx
+  s_c72d0ada98a9af::t_4d14f30b574c56 5
+  s_c72d0ada98a9af::t_cd0627c1a92ad0 34-39,42
+  s_c72d0ada98a9af::t_87945cc326d773 100,111,136,139,150,161-162,171,182,193,204,211,214,223-224,231-232,239,241,244,247
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "917b494fdb780fbf60a5406ac9f0b9ad7b2c1524",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

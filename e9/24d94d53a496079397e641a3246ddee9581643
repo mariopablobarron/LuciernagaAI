@@ -1,0 +1,25 @@
+src/services/ai.ts
+  s_d2308f25c4747c::t_874ce094425906 5
+  s_d2308f25c4747c::t_ba61df1ad64213 299
+  s_d2308f25c4747c::t_1e6398e3d14f6d 426
+  s_d2308f25c4747c::t_8d3e30091dc5b4 291-298
+  s_d2308f25c4747c::t_f32386ecd55275 459,468-470,477
+src/services/llm-health.ts
+  s_d2308f25c4747c::t_96e8807ec614a3 1-152
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "e924d94d53a496079397e641a3246ddee9581643",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Claude (llm-health) <noreply@anthropic.com>"
+    }
+  }
+}

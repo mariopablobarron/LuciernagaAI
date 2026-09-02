@@ -1,0 +1,34 @@
+src/lib/escalation-detector.ts
+  s_d2308f25c4747c::t_3af33b922cfbd1 1-196
+messages/fr.json
+  s_d2308f25c4747c::t_6ca257ec811b89 2836-2849
+src/components/EscalationBanner.tsx
+  s_d2308f25c4747c::t_6a2f12281f660f 1-80
+src/components/Chat.tsx
+  s_d2308f25c4747c::t_df3db07ec65f63 520-522,524-537,539-550,552-555
+  s_d2308f25c4747c::t_6c8b1e4c5b156c 51-52
+messages/pt.json
+  s_d2308f25c4747c::t_6ca257ec811b89 2836-2849
+src/lib/escalation-detector.test.ts
+  s_d2308f25c4747c::t_539fee7a8e5d7a 1-70
+messages/es.json
+  s_d2308f25c4747c::t_6ca257ec811b89 2987-3000
+messages/en.json
+  s_d2308f25c4747c::t_6ca257ec811b89 2836-2849
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "032007e77fa96e1420bdc912a62bb256891af881",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

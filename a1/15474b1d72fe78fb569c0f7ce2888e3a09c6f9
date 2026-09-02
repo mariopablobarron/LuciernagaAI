@@ -1,0 +1,21 @@
+src/app/api/voice/tts/route.ts
+  s_d2308f25c4747c::t_9417a7793bd1fe 58
+  s_d2308f25c4747c::t_0419fd57541994 89
+  s_d2308f25c4747c::t_aae92e51023200 28,44-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "a115474b1d72fe78fb569c0f7ce2888e3a09c6f9",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

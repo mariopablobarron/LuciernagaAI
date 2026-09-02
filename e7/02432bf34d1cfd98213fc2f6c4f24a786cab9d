@@ -1,0 +1,27 @@
+messages/es.json
+  s_c72d0ada98a9af::t_e3219f068ad254 550-695
+messages/fr.json
+  s_c72d0ada98a9af::t_1d31336d20347a 550-695
+src/app/(public)/comparativa/page.tsx
+  s_c72d0ada98a9af::t_8f1e3ac912ed8c 1-2,4,15-30,32-34,37-60,78,81,84,87,97,100,102-104,106-119,130-134,138-139,144,146-152,161,163,167,170,173,176,181,183,187,191,194-198,200,203,205,207-209,212-214,218,220,222-227,234-235,241,247,255-306
+messages/en.json
+  s_c72d0ada98a9af::t_81e3159fa95cd3 550-695
+messages/pt.json
+  s_c72d0ada98a9af::t_f7464024098e31 550-695
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "e702432bf34d1cfd98213fc2f6c4f24a786cab9d",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

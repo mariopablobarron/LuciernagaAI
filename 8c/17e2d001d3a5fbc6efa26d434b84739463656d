@@ -1,0 +1,40 @@
+src/app/api/admin/distribution/[id]/route.ts
+  s_c72d0ada98a9af::t_0f73e9fa7c26b4 63-88
+  s_c72d0ada98a9af::t_051357a7a91269 5
+docs/discovery-setup.md
+  s_c72d0ada98a9af::t_1391ea3d050572 175-226,231
+src/services/discovery/reddit-oauth.ts
+  s_c72d0ada98a9af::t_ce86c221a929a0 1-295
+prisma/schema.prisma
+  s_c72d0ada98a9af::t_33e6d1362157e8 1475-1490
+src/app/api/admin/distribution/reddit-oauth-start/route.ts
+  s_c72d0ada98a9af::t_524bc836e13f35 1-36
+prisma/migrations/20260512220000_add_integration_token/migration.sql
+  s_c72d0ada98a9af::t_1c95a320b2fcad 1-18
+src/app/api/admin/distribution/reddit-oauth-callback/route.ts
+  s_c72d0ada98a9af::t_76b7ac394f5f27 1-54
+src/app/api/admin/distribution/reddit-status/route.ts
+  s_c72d0ada98a9af::t_6b1b8abcabec23 1-24
+src/app/admin/distribution/page.tsx
+  s_c72d0ada98a9af::t_9161c06fe06940 57-63,66,74-98
+  s_c72d0ada98a9af::t_911389a8acaa7c 163-212
+  s_c72d0ada98a9af::t_0d8bf5b96c6a40 361,370-384
+  s_c72d0ada98a9af::t_fa46a181548bc4 398-435
+  s_c72d0ada98a9af::t_f6e1a6cb215a7e 4,6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "8c17e2d001d3a5fbc6efa26d434b84739463656d",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

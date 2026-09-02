@@ -1,0 +1,25 @@
+OPERATIONS.md
+  s_d2308f25c4747c::t_a9c0a191e784bd 46-48,52-54
+.github/workflows/vps-direct-deploy.yml
+  s_d2308f25c4747c::t_dd38c5f853dd1b 57-62,71
+docs/setup-auto-deploy.md
+  s_d2308f25c4747c::t_7f687e7761300a 37-40,46
+Dockerfile
+  s_d2308f25c4747c::t_7d3b39d5327338 32-36,38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "618069ba2f3c0ece077e9839a3e2a7bed5d349c5",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

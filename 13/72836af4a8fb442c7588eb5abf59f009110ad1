@@ -1,0 +1,47 @@
+src/components/Chat.tsx
+  s_d2308f25c4747c::t_7d5b4700917b70 53
+  s_d2308f25c4747c::t_f4218e829feb12 1208
+messages/en.json
+  s_d2308f25c4747c::t_e5359e496ae1bd 2851-2873
+src/services/coach.ts
+  s_d2308f25c4747c::t_8eb87860f2d2fc 630
+  s_d2308f25c4747c::t_0f5b3941264e09 500-547
+  s_d2308f25c4747c::t_83224307b1a799 96-104
+  s_d2308f25c4747c::t_70def4ee955d64 746-748
+src/app/app/page.tsx
+  s_d2308f25c4747c::t_d4c78656866940 165-167
+  s_d2308f25c4747c::t_2f35a17180a62b 1379-1381
+  s_d2308f25c4747c::t_93201cece0ce2f 48
+messages/es.json
+  s_d2308f25c4747c::t_e5359e496ae1bd 3002-3024
+messages/fr.json
+  s_d2308f25c4747c::t_e5359e496ae1bd 2851-2873
+messages/pt.json
+  s_d2308f25c4747c::t_e5359e496ae1bd 2851-2873
+src/application/chat/processMessage.ts
+  s_d2308f25c4747c::t_89c89f78c0ac2c 244-246
+  s_d2308f25c4747c::t_e1f1b740b1527d 43-45
+src/components/MentorPrefsButton.tsx
+  s_d2308f25c4747c::t_0baa46a5ca3fe1 1-145
+src/services/chatOrchestrator.ts
+  s_d2308f25c4747c::t_e70c6de1ff7ced 184
+  s_d2308f25c4747c::t_d5414928bf9c0b 29-34,36
+src/lib/useMentorPreferences.ts
+  s_d2308f25c4747c::t_8117e35b201d85 1-100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "1372836af4a8fb442c7588eb5abf59f009110ad1",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

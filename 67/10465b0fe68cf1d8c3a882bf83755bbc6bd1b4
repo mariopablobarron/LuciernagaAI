@@ -1,0 +1,19 @@
+src/app/(public)/landing/page.tsx
+  s_2ae7d08359d877::t_39cc96afd6ff87 112-117
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "6710465b0fe68cf1d8c3a882bf83755bbc6bd1b4",
+  "prompts": {},
+  "sessions": {
+    "s_2ae7d08359d877": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "31f1ba56-9d02-40a9-bf9e-fe68214cb727",
+        "model": "claude-fable-5"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

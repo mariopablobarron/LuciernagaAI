@@ -1,0 +1,41 @@
+src/lib/elevenlabs/client.ts
+  s_d2308f25c4747c::t_cdb13e071706c3 1-127
+src/lib/elevenlabs/voices.ts
+  s_d2308f25c4747c::t_78eb18ff086a88 1-29,49,51-104
+  s_d2308f25c4747c::t_2a0036ac675cde 30-48,50
+src/lib/elevenlabs/tts.ts
+  s_d2308f25c4747c::t_3cee37cf7e143d 1-27,31-59,62-113,115-132
+  s_d2308f25c4747c::t_4264dd15afc7f2 114
+  s_d2308f25c4747c::t_fe40ea6cb3923d 60-61
+  s_d2308f25c4747c::t_ef3e6f40d457bd 28-30
+src/components/Chat.tsx
+  s_d2308f25c4747c::t_9ae7d8a3d261f5 596-601
+  s_d2308f25c4747c::t_644aeea420d573 381-391,404-405
+src/app/api/voice/tts/route.ts
+  s_d2308f25c4747c::t_b0f208cd88bf0f 1-85,87-113
+  s_d2308f25c4747c::t_eb3c0a5e7371ef 86
+src/components/ui/speak-button.tsx
+  s_d2308f25c4747c::t_c5f59cd8c46048 4,7,9-15,17-19,38-39,44,49-54,56,60,62-63,65,71-75,79-82,85,91-92,94,96-161,163-165,171-172,175-178
+src/lib/elevenlabs/tts.test.ts
+  s_d2308f25c4747c::t_a1e5a8cf3c706a 1-148
+src/components/ui/voice-recorder.tsx
+  s_d2308f25c4747c::t_fce2b445e286ac 125
+  s_d2308f25c4747c::t_211543271eabe5 4,7-14
+  s_d2308f25c4747c::t_03e3cf830f81f3 60-64,74,81-82,85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "14da10ce5d728ffc8e2de139930c309d9b925635",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

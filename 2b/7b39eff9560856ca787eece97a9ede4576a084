@@ -1,0 +1,44 @@
+prisma/migrations/20260518032000_add_message_bookmark/migration.sql
+  s_d2308f25c4747c::t_7963f1395ecab4 1-23
+messages/fr.json
+  s_d2308f25c4747c::t_363b6e70947f05 2924-2939
+src/components/BookmarkButton.tsx
+  s_d2308f25c4747c::t_2ddc14881c82b9 1-80
+src/lib/useBookmarks.ts
+  s_d2308f25c4747c::t_65c398d1c22dc3 1-193
+messages/en.json
+  s_d2308f25c4747c::t_363b6e70947f05 2924-2939
+src/components/BookmarksModal.tsx
+  s_d2308f25c4747c::t_887a3492e4e3cc 1-146
+messages/pt.json
+  s_d2308f25c4747c::t_363b6e70947f05 2924-2939
+src/components/Chat.tsx
+  s_d2308f25c4747c::t_6517c32347f391 57-58
+  s_d2308f25c4747c::t_9e1e70443a7fbf 1227-1228
+  s_d2308f25c4747c::t_b5e183ce19bd87 631-634
+src/app/api/bookmarks/route.ts
+  s_d2308f25c4747c::t_41a80c4f80f9fb 1-170
+messages/es.json
+  s_d2308f25c4747c::t_363b6e70947f05 3075-3090
+prisma/schema.prisma
+  s_d2308f25c4747c::t_524fb4e6f7f04c 111
+  s_d2308f25c4747c::t_afc9b3f5a1b4e6 216,223-240
+src/app/api/bookmarks/[id]/route.ts
+  s_d2308f25c4747c::t_0160f6925c21d2 1-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "2b7b39eff9560856ca787eece97a9ede4576a084",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

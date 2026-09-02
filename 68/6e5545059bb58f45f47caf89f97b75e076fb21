@@ -1,0 +1,21 @@
+src/app/opengraph-image.tsx
+  s_d2308f25c4747c::t_c79f3df8bd26dd 3-11
+src/app/sitemap.ts
+  s_d2308f25c4747c::t_29188541d18d6e 54-57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.10",
+  "base_commit_sha": "686e5545059bb58f45f47caf89f97b75e076fb21",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Claude (seo qwins) <noreply@anthropic.com>"
+    }
+  }
+}

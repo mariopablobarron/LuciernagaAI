@@ -1,0 +1,29 @@
+messages/pt.json
+  s_c72d0ada98a9af::t_5f8e06abfe732b 1776-1790
+src/app/(public)/blog/page.tsx
+  s_c72d0ada98a9af::t_2c705608a8ebf0 5,21-26,29-30,36-41,65,67,78,80,147,157
+messages/en.json
+  s_c72d0ada98a9af::t_58105c684d2e5e 1776-1790
+messages/fr.json
+  s_c72d0ada98a9af::t_34570fe9295a94 1776-1790
+src/app/(public)/blog/[slug]/page.tsx
+  s_c72d0ada98a9af::t_27c9ab9385b93f 6,28-33,36-37,43-48,73,75,87,123,140-141,146,153
+messages/es.json
+  s_c72d0ada98a9af::t_682b7ed39cec37 1776-1790
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "67452abbd9be4c256834a5adfaa13d5cbcbf1bbc",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

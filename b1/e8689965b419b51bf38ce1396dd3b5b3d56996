@@ -1,0 +1,19 @@
+src/services/coach.test.ts
+  s_c72d0ada98a9af::t_ecf56a933e5fbd 99-187,297-351
+  s_c72d0ada98a9af::t_e9125b782c29ec 5
+src/services/coach.ts
+  s_c72d0ada98a9af::t_910e79947b61c3 155-160,165,280-320,329-331,357,1000-1003,1187-1254,1307-1314
+  s_c72d0ada98a9af::t_e5934a7c507c88 884-891,895-896,899-900
+  s_c72d0ada98a9af::t_d008864bb416b1 767-769
+  s_c72d0ada98a9af::t_8d0d7953729a38 892-894,898
+  s_c72d0ada98a9af::t_7dafc4fe5e34a8 166-168,171-278,321-328,332-356,649-696,816-827,929-934,957-963,1183-1186,1269-1279,1285-1296
+src/application/chat/phases/context.ts
+  s_c72d0ada98a9af::t_072bb9af4962ef 246
+  s_c72d0ada98a9af::t_84fb6c5cbabcd4 139,144,157-161
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "b1e8689965b419b51bf38ce1396dd3b5b3d56996",
+  "prompts": {}
+}

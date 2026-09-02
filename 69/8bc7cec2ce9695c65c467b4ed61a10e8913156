@@ -1,0 +1,27 @@
+messages/de.json
+  s_2ae7d08359d877::t_bc572f1b6ce8fc 279,505,1738,1825
+messages/en.json
+  s_2ae7d08359d877::t_42277c801be986 32,279,505,1738,1825
+messages/es.json
+  s_2ae7d08359d877::t_dc7192bbbcac2a 279,505,1738,1825
+messages/fr.json
+  s_2ae7d08359d877::t_14f8a9af7520c9 279,505,1738,1825
+messages/pt.json
+  s_2ae7d08359d877::t_f38fb7c191cdb1 279,505,1738,1825
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "698bc7cec2ce9695c65c467b4ed61a10e8913156",
+  "prompts": {},
+  "sessions": {
+    "s_2ae7d08359d877": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "31f1ba56-9d02-40a9-bf9e-fe68214cb727",
+        "model": "claude-fable-5"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

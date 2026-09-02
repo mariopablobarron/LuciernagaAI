@@ -1,0 +1,27 @@
+messages/fr.json
+  s_c72d0ada98a9af::t_8158ec683a6df0 767-841
+messages/es.json
+  s_c72d0ada98a9af::t_ad5609bbfe8fce 767-841
+messages/en.json
+  s_c72d0ada98a9af::t_65338145eceb76 767-841
+messages/pt.json
+  s_c72d0ada98a9af::t_7988dd0a66dc75 767-841
+src/app/(public)/precios/page.tsx
+  s_c72d0ada98a9af::t_83983d5bdf42d0 3-4,7-15,17-59,61-63,66-67,72-73,75-76,83,90,93-94,96,100-101,103,113,115,124-127,134,136,139-146,151-152,158-162,173
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "468028a10a8d1323326e1322157913c872be2ebc",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

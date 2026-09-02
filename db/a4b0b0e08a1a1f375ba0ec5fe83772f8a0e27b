@@ -1,0 +1,30 @@
+src/components/ChatToolsMenu.tsx
+  s_d2308f25c4747c::t_2900cf5633edd2 1-98
+messages/pt.json
+  s_d2308f25c4747c::t_64bbbe2378b8df 2940-2942
+src/components/Chat.tsx
+  s_d2308f25c4747c::t_2ff3dbe8692392 57
+  s_d2308f25c4747c::t_91ccc57a07f8e1 1218-1221,1226
+messages/es.json
+  s_d2308f25c4747c::t_64bbbe2378b8df 3091-3093
+messages/fr.json
+  s_d2308f25c4747c::t_64bbbe2378b8df 2940-2942
+messages/en.json
+  s_d2308f25c4747c::t_64bbbe2378b8df 2940-2942
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "dba4b0b0e08a1a1f375ba0ec5fe83772f8a0e27b",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

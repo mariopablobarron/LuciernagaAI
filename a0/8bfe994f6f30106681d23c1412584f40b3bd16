@@ -1,0 +1,45 @@
+prisma/schema.prisma
+  s_c72d0ada98a9af::t_96f87ed522eb3e 1469-1470,1475-1492
+src/services/syndication/medium.ts
+  s_c72d0ada98a9af::t_d957508644d5f3 1-89
+src/services/syndication/devto.ts
+  s_c72d0ada98a9af::t_772042d6f4d906 1-90
+prisma/migrations/20260512170000_add_blog_syndication/migration.sql
+  s_c72d0ada98a9af::t_0608682bd15b8c 1-27
+src/app/api/admin/blog/[id]/syndicate/route.ts
+  s_c72d0ada98a9af::t_804959fbf134b8 1-68
+src/app/admin/blog/[id]/page.tsx
+  s_c72d0ada98a9af::t_0fa9bff557c740 10
+  s_c72d0ada98a9af::t_07abc5768b1b1f 277-279
+src/services/syndication/index.ts
+  s_c72d0ada98a9af::t_9c84d1dc7b9dab 1-202
+docs/syndication-setup.md
+  s_c72d0ada98a9af::t_b0ce0b5f795e14 1-125
+src/features/admin/components/blog/SyndicationPanel.tsx
+  s_c72d0ada98a9af::t_592a249f614cc9 1-206
+src/services/syndication/blocks-to-markdown.test.ts
+  s_c72d0ada98a9af::t_ad91025620c425 1-117
+src/app/api/admin/blog/[id]/route.ts
+  s_c72d0ada98a9af::t_0b777c0ca3a3c0 5
+  s_c72d0ada98a9af::t_999d973848c540 68-81
+src/services/syndication/blocks-to-markdown.ts
+  s_c72d0ada98a9af::t_bda74bdd0e8de1 1-117
+src/services/syndication/hashnode.ts
+  s_c72d0ada98a9af::t_e6ca842d36b6bf 1-128
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "a08bfe994f6f30106681d23c1412584f40b3bd16",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

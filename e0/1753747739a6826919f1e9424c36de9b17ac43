@@ -1,0 +1,28 @@
+src/app/admin/marketing/seo/page.tsx
+  s_c72d0ada98a9af::t_8ed239e810f4b4 205,207
+  s_c72d0ada98a9af::t_b771734854d554 611
+src/components/ui/speak-button.tsx
+  s_c72d0ada98a9af::t_f66c1589ba5555 42-45
+src/app/admin/analytics/seo/page.tsx
+  s_c72d0ada98a9af::t_3e86c1192c8714 101
+  s_c72d0ada98a9af::t_78d893d7126f35 211
+src/components/effects/Reveal.tsx
+  s_c72d0ada98a9af::t_7599871de6f6e9 39,43
+  s_c72d0ada98a9af::t_d64743d9ab546c 31-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "e01753747739a6826919f1e9424c36de9b17ac43",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

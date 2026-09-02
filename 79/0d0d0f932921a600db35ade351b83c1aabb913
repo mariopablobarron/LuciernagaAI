@@ -1,0 +1,32 @@
+src/lib/useFontSizeShortcuts.ts
+  s_d2308f25c4747c::t_9e3fb8a2f155e3 1-102
+messages/en.json
+  s_d2308f25c4747c::t_1f84d780504926 2920-2923
+messages/es.json
+  s_d2308f25c4747c::t_1f84d780504926 3071-3074
+src/app/layout.tsx
+  s_d2308f25c4747c::t_9ec0159c312b21 255-257
+  s_d2308f25c4747c::t_88367923d12968 13
+src/components/FontSizeShortcuts.tsx
+  s_d2308f25c4747c::t_dac232b8e794b4 1-35
+messages/pt.json
+  s_d2308f25c4747c::t_1f84d780504926 2920-2923
+messages/fr.json
+  s_d2308f25c4747c::t_1f84d780504926 2920-2923
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "790d0d0f932921a600db35ade351b83c1aabb913",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

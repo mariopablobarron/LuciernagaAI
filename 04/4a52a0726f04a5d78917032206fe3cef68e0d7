@@ -1,0 +1,25 @@
+src/services/language-request.ts
+  s_d2308f25c4747c::t_35f516f8fbc21a 55-178
+src/services/chatOrchestrator.ts
+  s_d2308f25c4747c::t_6433c0eb72e3dd 261-277
+  s_d2308f25c4747c::t_0e97ffd0f44902 10
+src/services/language-request.test.ts
+  s_d2308f25c4747c::t_53d9e59e6407f8 55-121
+  s_d2308f25c4747c::t_775dd98a7cd404 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "044a52a0726f04a5d78917032206fe3cef68e0d7",
+  "prompts": {},
+  "sessions": {
+    "s_d2308f25c4747c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5b6949a-c861-4cba-b028-19d9bca0a653",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Claude (lang autodetect) <noreply@anthropic.com>"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+src/components/UsageTracker.tsx
+  s_2ae7d08359d877::t_8b03536e295146 57-64
+  s_2ae7d08359d877::t_521391112fb635 80,82-89
+  s_2ae7d08359d877::t_c4ffb35453e643 25,35-36,38,40
+src/components/effects/Reveal.tsx
+  s_2ae7d08359d877::t_cc396993b3f560 69-70,72
+  s_2ae7d08359d877::t_5bc92d5cdb9e85 108-113
+src/lib/use-hide-on-scroll.ts
+  s_2ae7d08359d877::t_79356b963e3bba 1-37
+src/components/CookieConsent.tsx
+  s_2ae7d08359d877::t_3635ea05981552 181-183,185
+  s_2ae7d08359d877::t_6652532894c0e7 6,15
+src/components/AccessibilityWidget.tsx
+  s_2ae7d08359d877::t_f9a1ead10c3802 85-87
+  s_2ae7d08359d877::t_68e906b0fd295b 11,16
+src/app/layout.tsx
+  s_2ae7d08359d877::t_ebb9a4f8531dc3 233-237
+src/app/globals.css
+  s_2ae7d08359d877::t_0e545aba3a8592 377-379
+  s_2ae7d08359d877::t_c5f4c4607845e3 581-593
+  s_2ae7d08359d877::t_22cd3f5649bdc7 557-562
+src/components/home/LandingPageI18n.tsx
+  s_2ae7d08359d877::t_4e8ee808285373 142
+  s_2ae7d08359d877::t_25d05e3c4ee29a 170
+  s_2ae7d08359d877::t_b8fb0b106ef2f6 560-562
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "826250c26ebc118d8fa905103a88f70cab55c491",
+  "prompts": {},
+  "sessions": {
+    "s_2ae7d08359d877": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "31f1ba56-9d02-40a9-bf9e-fe68214cb727",
+        "model": "claude-fable-5"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

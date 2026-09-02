@@ -1,0 +1,50 @@
+src/app/api/blog/[slug]/route.ts
+  s_c72d0ada98a9af::t_08da6472e4c3fb 3,7-11,13,17,20-37,40-47,52-57
+src/app/api/admin/blog/[id]/route.ts
+  s_c72d0ada98a9af::t_274bb736fdb917 44-47,52-59,62-71,73-85,102-123
+  s_c72d0ada98a9af::t_d12dc8737e2d9d 7
+src/app/api/blog/route.ts
+  s_c72d0ada98a9af::t_a87e4a5e2c6d4d 3,7-12,18,22-29,31-55,60-63
+src/app/admin/blog/page.tsx
+  s_c72d0ada98a9af::t_76923b5a5c9d85 71
+  s_c72d0ada98a9af::t_d8dac7033e4cfa 15,25-29
+  s_c72d0ada98a9af::t_5a510b0296ea9e 193
+  s_c72d0ada98a9af::t_70e012c7735a3a 51,59
+  s_c72d0ada98a9af::t_0b8b45db549f45 111-112,131-145
+prisma/migrations/20260516200000_add_blogpost_locale/migration.sql
+  s_c72d0ada98a9af::t_d7a47b2e144bf0 1-18
+src/app/api/admin/blog/route.ts
+  s_c72d0ada98a9af::t_8c208fe5aa9c94 18,22-25
+  s_c72d0ada98a9af::t_9f28060c6435f2 5
+  s_c72d0ada98a9af::t_8028e6317f6cdb 69-70,74-79,81-84,90
+src/app/admin/blog/[id]/page.tsx
+  s_c72d0ada98a9af::t_335cc76df12012 52
+  s_c72d0ada98a9af::t_f9d5a0712ebfdc 84-88
+  s_c72d0ada98a9af::t_bbcff2c61d9977 119
+  s_c72d0ada98a9af::t_c839cdbc41de85 234-252,265
+  s_c72d0ada98a9af::t_6423cb2c3f89f6 22,34-40
+prisma/schema.prisma
+  c72d0ada98a9afb7 1480-1481,1488-1561,2259-2345
+  s_c72d0ada98a9af::t_b0c3898f341272 98-103
+  s_c72d0ada98a9af::t_bbded1294be41a 1462-1467,1482-1485
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "df4f0318e0a674ef30dd7fea1f061a2338e3ebae",
+  "prompts": {
+    "c72d0ada98a9afb7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron",
+      "messages_url": "https://usegitai.com/cas/ec20cc280ccc4d404a1fa2b12a8b74be9f319da96f567f45cf9760fa63166571",
+      "total_additions": 687,
+      "total_deletions": 0,
+      "accepted_lines": 163,
+      "overriden_lines": 0
+    }
+  }
+}

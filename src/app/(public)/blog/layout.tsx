@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
+import { buildAlternates } from "@/lib/seo-alternates";
 
 export const metadata: Metadata = {
   title: "Blog — Tres Mil Millones de Latidos",
   description:
     "Articulos, recomendaciones y reflexiones sobre bienestar emocional, desarrollo personal e inteligencia artificial. Por el equipo de Tres Mil Millones de Latidos.",
-  alternates: {
-    canonical: "https://tresmilmillonesdelatidos.es/blog",
-  },
+  alternates: buildAlternates("/blog"),
   openGraph: {
     title: "Blog — Tres Mil Millones de Latidos",
     description: "Articulos sobre bienestar emocional, desarrollo personal e IA.",

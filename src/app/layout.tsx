@@ -84,14 +84,21 @@ export const metadata: Metadata = {
   authors: [{ name: "Mario Pablo Sanchez Barron", url: "https://startidea.es" }],
   creator: "Startidea",
   publisher: "Tres Mil Millones de Latidos",
+  // OJO: NO declarar `canonical` en el root layout. Next.js hace override, no
+  // merge, de `alternates`, así que si aquí ponemos un canonical fijo al home,
+  // TODA subpágina que no lo sobrescriba en su propio layout hereda ese
+  // canonical y Google fusiona /precios, /reto, /faq… con la home. Bug real
+  // observado en producción (SEP-2026): /reto devolvía canonical al home.
+  // Cada layout hijo declara su propio canonical; el root sólo aporta el mapa
+  // de `languages` para hreflang. Ver docs/seo-metadata.md.
   alternates: {
-    canonical: "https://tresmilmillonesdelatidos.es",
     languages: {
       "es": "https://tresmilmillonesdelatidos.es",
       "en": "https://tresmilmillonesdelatidos.es/en",
       "pt": "https://tresmilmillonesdelatidos.es/pt",
       "fr": "https://tresmilmillonesdelatidos.es/fr",
       "de": "https://tresmilmillonesdelatidos.es/de",
+      "x-default": "https://tresmilmillonesdelatidos.es",
     },
   },
   manifest: "/manifest.json",
@@ -138,15 +145,29 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
     {
+      // La Organization principal de este dominio ES el producto — no la
+      // agencia matriz. Antes declaraba name="Startidea" y url="startidea.es"
+      // y Google asociaba el sitio con OTRA entidad de otro dominio, matando
+      // brand identity de TMMdL. Startidea vive ahora como `parentOrganization`
+      // + `sameAs`, no como la Organization principal.
       "@type": "Organization",
       "@id": "https://tresmilmillonesdelatidos.es/#organization",
-      name: "Startidea",
-      alternateName: "Tres Mil Millones de Latidos",
-      url: "https://startidea.es",
+      name: "Tres Mil Millones de Latidos",
+      alternateName: ["3000 millones de latidos", "TMMdL"],
+      url: "https://tresmilmillonesdelatidos.es",
       description:
-        "Agencia de innovación social y desarrollo tecnológico con más de 15 años de experiencia.",
-      foundingDate: "2011",
+        "Mentor con IA en español, anónimo desde el primer mensaje, con custodia clínica humana. Sin registro para empezar. Detecta lo que te bloquea y te ayuda a mover un paso concreto hoy.",
+      foundingDate: "2024",
       founder: { "@id": "https://tresmilmillonesdelatidos.es/#founder" },
+      parentOrganization: {
+        "@type": "Organization",
+        name: "Startidea",
+        url: "https://startidea.es",
+        description:
+          "Agencia matriz — innovación social y desarrollo tecnológico con más de 15 años de experiencia.",
+        foundingDate: "2011",
+      },
+      sameAs: ["https://startidea.es"],
     },
     {
       "@type": "Person",

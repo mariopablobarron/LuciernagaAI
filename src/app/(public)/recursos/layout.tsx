@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
+import { buildAlternates } from "@/lib/seo-alternates";
 
 export const metadata: Metadata = {
   title: "Recursos — Tres Mil Millones de Latidos",
   description:
     "Índice curado de guías, artículos y herramientas para entender qué te pasa y qué hacer. Reflexión, autoconocimiento, decisiones, bienestar emocional.",
-  alternates: {
-    canonical: "https://tresmilmillonesdelatidos.es/recursos",
-  },
+  alternates: buildAlternates("/recursos"),
   openGraph: {
     title: "Recursos — Tres Mil Millones de Latidos",
     description:

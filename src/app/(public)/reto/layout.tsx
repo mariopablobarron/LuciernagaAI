@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { buildAlternates } from "@/lib/seo-alternates";
 
 export const metadata: Metadata = {
   title: "Reto de transformación — Tres Mil Millones de Latidos",
   description:
     "Acepta el reto de 21 días. Check-ins diarios, objetivos personalizados y seguimiento con IA para generar cambios reales.",
+  alternates: buildAlternates("/reto"),
   openGraph: {
     title: "Reto de transformación — Tres Mil Millones de Latidos",
     description:

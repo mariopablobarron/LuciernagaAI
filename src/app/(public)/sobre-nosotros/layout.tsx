@@ -4,14 +4,13 @@ import type { ReactNode } from "react";
 // ISR: revalidate cada 24h. Estas páginas cambian poco — el HTML cacheado
 // reduce TTFB y carga del VPS. SEO audit 2026-06-23 #8.
 export const revalidate = 86400;
+import { buildAlternates } from "@/lib/seo-alternates";
 
 export const metadata: Metadata = {
   title: "Sobre nosotros",
   description:
     "Quiénes somos, por qué construimos un mentor IA con supervisión clínica humana, y por qué insistimos en que NO sustituye a las personas que te quieren.",
-  alternates: {
-    canonical: "https://tresmilmillonesdelatidos.es/sobre-nosotros",
-  },
+  alternates: buildAlternates("/sobre-nosotros"),
   openGraph: {
     title: "Sobre nosotros · Tres Mil Millones de Latidos",
     description:

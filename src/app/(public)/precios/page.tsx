@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { useTranslations } from 'next-intl';
 import { Check, Gift, ArrowRight } from 'lucide-react';
+import { buildAlternates } from '@/lib/seo-alternates';
 
 // generateMetadata dinámica: lee del locale activo (cookie NEXT_LOCALE) y
 // devuelve title/description traducidos. Sin esto, los SEO de /precios
@@ -17,9 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description,
-    alternates: {
-      canonical: 'https://tresmilmillonesdelatidos.es/precios',
-    },
+    alternates: buildAlternates('/precios'),
     openGraph: {
       title,
       description: ogDescription,

@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
+import { buildAlternates } from "@/lib/seo-alternates";
 
 export const metadata: Metadata = {
   title: "Ética y límites — Tres Mil Millones de Latidos",
   description:
     "Nuestro posicionamiento sobre IA, datos, dependencia emocional y límites clínicos. Lo que sí hacemos, lo que nunca haremos, y por qué.",
-  alternates: {
-    canonical: "https://tresmilmillonesdelatidos.es/etica",
-  },
+  alternates: buildAlternates("/etica"),
   openGraph: {
     title: "Ética y límites — Tres Mil Millones de Latidos",
     description:

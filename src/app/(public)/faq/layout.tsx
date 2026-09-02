@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { buildAlternates } from "@/lib/seo-alternates";
 
 // ISR: revalidate cada 24h. Estas páginas cambian poco — el HTML cacheado
 // reduce TTFB y carga del VPS. SEO audit 2026-06-23 #8.
@@ -9,9 +10,7 @@ export const metadata: Metadata = {
   title: "Preguntas frecuentes",
   description:
     "Qué es Tres Mil Millones de Latidos, cómo protegemos tu privacidad, por qué NO es terapia, cuándo derivamos al 024. Respuestas claras a las dudas habituales.",
-  alternates: {
-    canonical: "https://tresmilmillonesdelatidos.es/faq",
-  },
+  alternates: buildAlternates("/faq"),
   openGraph: {
     title: "Preguntas frecuentes · Tres Mil Millones de Latidos",
     description:

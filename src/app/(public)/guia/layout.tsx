@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
+import { buildAlternates } from "@/lib/seo-alternates";
 
 export const metadata: Metadata = {
   title: "Guia de usuario — Tres Mil Millones de Latidos",
   description:
     "Guia completa de Tres Mil Millones de Latidos: chat con mentor IA, check-ins diarios, diario emocional, metas, respiracion, comunidad, Modo Impulso 21 dias y Telegram. Paso a paso.",
-  alternates: {
-    canonical: "https://tresmilmillonesdelatidos.es/guia",
-  },
+  alternates: buildAlternates("/guia"),
   openGraph: {
     title: "Guia de usuario — Tres Mil Millones de Latidos",
     description:

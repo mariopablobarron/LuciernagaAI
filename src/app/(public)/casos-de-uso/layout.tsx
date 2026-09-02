@@ -4,14 +4,13 @@ import type { ReactNode } from "react";
 // ISR: revalidate cada 24h. Estas páginas cambian poco — el HTML cacheado
 // reduce TTFB y carga del VPS. SEO audit 2026-06-23 #8.
 export const revalidate = 86400;
+import { buildAlternates } from "@/lib/seo-alternates";
 
 export const metadata: Metadata = {
   title: "Casos de uso",
   description:
     "Bloqueo creativo, ansiedad antes de una decisión, niebla mental, claridad que no sabes cómo bajar a tierra. Cuatro estados habituales y cómo el mentor te acompaña.",
-  alternates: {
-    canonical: "https://tresmilmillonesdelatidos.es/casos-de-uso",
-  },
+  alternates: buildAlternates("/casos-de-uso"),
   openGraph: {
     title: "Casos de uso · Tres Mil Millones de Latidos",
     description:

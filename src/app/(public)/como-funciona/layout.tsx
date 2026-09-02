@@ -4,14 +4,13 @@ import type { ReactNode } from "react";
 // ISR: revalidate cada 24h. Estas páginas cambian poco — el HTML cacheado
 // reduce TTFB y carga del VPS. SEO audit 2026-06-23 #8.
 export const revalidate = 86400;
+import { buildAlternates } from "@/lib/seo-alternates";
 
 export const metadata: Metadata = {
   title: "Cómo funciona el mentor IA",
   description:
     "Cuéntale lo que te bloquea, sal con un paso concreto. Sin registro para empezar, sin entrenamiento de modelos con tus datos. Supervisión clínica humana.",
-  alternates: {
-    canonical: "https://tresmilmillonesdelatidos.es/como-funciona",
-  },
+  alternates: buildAlternates("/como-funciona"),
   openGraph: {
     title: "Cómo funciona el mentor IA",
     description:

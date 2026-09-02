@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
+import { buildAlternates } from "@/lib/seo-alternates";
 
 export const metadata: Metadata = {
   title: "Tres Mil Millones de Latidos vs ChatGPT, terapia y apps de bienestar — Comparativa honesta",
   description:
     "Comparativa objetiva: Tres Mil Millones de Latidos frente a ChatGPT, terapia tradicional, y apps de meditación como Calm o Headspace. Qué hace cada una, cuándo elegir cuál, precios, privacidad, supervisión clínica.",
-  alternates: {
-    canonical: "https://tresmilmillonesdelatidos.es/comparativa",
-  },
+  alternates: buildAlternates("/comparativa"),
   openGraph: {
     title: "Tres Mil Millones de Latidos vs ChatGPT, terapia y apps de bienestar",
     description:

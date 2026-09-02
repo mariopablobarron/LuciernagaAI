@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
+import { buildAlternates } from "@/lib/seo-alternates";
 
 export const metadata: Metadata = {
   title: "Tres Mil Millones de Latidos — Mentoria con IA para transformar tu vida",
   description:
     "Tres Mil Millones de Latidos es una plataforma de mentoria con IA en espanol. Detecta tu estado emocional, te ayuda a ordenar ideas y te propone microacciones concretas para hoy. Gratis.",
-  alternates: {
-    canonical: "https://tresmilmillonesdelatidos.es/landing",
-  },
+  alternates: buildAlternates("/landing"),
   openGraph: {
     title: "Tres Mil Millones de Latidos — Mentoria con IA para transformar tu vida",
     description:

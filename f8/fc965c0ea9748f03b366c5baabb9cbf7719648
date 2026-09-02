@@ -1,0 +1,53 @@
+src/app/layout.tsx
+  s_c72d0ada98a9af::t_55eb0c7ddee311 147-151,154-156,158-159,161-169
+  s_c72d0ada98a9af::t_d1800c4cd004af 86-92,99-100
+src/app/(public)/blog/layout.tsx
+  s_c72d0ada98a9af::t_ffab84d39c4670 2,8
+src/app/(public)/reto/layout.tsx
+  s_c72d0ada98a9af::t_5bf4b454b335f4 2,8
+src/lib/seo-alternates.ts
+  s_c72d0ada98a9af::t_799faa73209e5d 1-69
+src/app/(public)/landing/layout.tsx
+  s_c72d0ada98a9af::t_d199b6de64f249 2,8
+src/app/(public)/recursos/layout.tsx
+  s_c72d0ada98a9af::t_d199b6de64f249 2,8
+src/app/(public)/precios/page.tsx
+  s_c72d0ada98a9af::t_fee747f6aad5e6 6
+  s_c72d0ada98a9af::t_57f35a5730d677 21
+src/app/(public)/calculadora-latidos/layout.tsx
+  s_c72d0ada98a9af::t_76b95f8acfdae5 3,9
+src/app/(public)/casos-de-uso/layout.tsx
+  s_c72d0ada98a9af::t_7d01e2f7e2079b 2,8
+src/app/(public)/changelog/layout.tsx
+  s_c72d0ada98a9af::t_f5dc842cd7b611 2,8
+src/app/(public)/como-funciona/layout.tsx
+  s_c72d0ada98a9af::t_83c90af7188d9e 2,8
+src/app/(public)/comparativa/layout.tsx
+  s_c72d0ada98a9af::t_e6f5307ad1de17 2,8
+src/app/(public)/etica/layout.tsx
+  s_c72d0ada98a9af::t_6e8fe47d7ce87f 2,8
+src/app/(public)/faq/layout.tsx
+  s_c72d0ada98a9af::t_c5a4b017da72bd 2,8
+src/app/(public)/guia/layout.tsx
+  s_c72d0ada98a9af::t_cde74e55774153 2,8
+src/app/(public)/para-profesionales/layout.tsx
+  s_c72d0ada98a9af::t_2fea6c1e2b2424 2,8
+src/app/(public)/sobre-nosotros/layout.tsx
+  s_c72d0ada98a9af::t_ad175ed799f0fc 2,8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "f8fc965c0ea9748f03b366c5baabb9cbf7719648",
+  "prompts": {},
+  "sessions": {
+    "s_c72d0ada98a9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32e0c70e-9d16-4b7b-82dc-4b3936c0d6a8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { listPublishedSlugs } from "@/services/blog-listing";
 
 const BASE = "https://tresmilmillonesdelatidos.es";
 
@@ -36,10 +37,11 @@ const PAGES: Entry[] = [
   { path: "/terms", priority: 0.2, changeFrequency: "yearly" },
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
-  return PAGES.map((page) => ({
+  // Páginas estáticas del array PAGES.
+  const staticEntries: MetadataRoute.Sitemap = PAGES.map((page) => ({
     url: `${BASE}${page.path}`,
     lastModified: now,
     changeFrequency: page.changeFrequency,
@@ -61,4 +63,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
         }
       : {}),
   }));
+
+  // Posts publicados del blog — dinámicos desde Prisma. Antes NO estaban en
+  // el sitemap y el listado /blog era client-only, así que Googlebot no los
+  // descubría por ningún camino. Ahora sí.
+  //
+  // Tolera fallo de DB (build sin DATABASE_URL, dev sin migraciones aún):
+  // devuelve solo las páginas estáticas.
+  let blogEntries: MetadataRoute.Sitemap = [];
+  try {
+    const posts = await listPublishedSlugs("es");
+    blogEntries = posts.map((p) => ({
+      url: `${BASE}/blog/${p.slug}`,
+      lastModified: p.updatedAt ?? p.publishedAt ?? now,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    }));
+  } catch {
+    // sitemap con solo páginas estáticas es mejor que romper el build
+  }
+
+  return [...staticEntries, ...blogEntries];
 }

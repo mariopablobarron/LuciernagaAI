@@ -1,60 +1,51 @@
-"use client";
-
-import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { useLocale, useTranslations } from "next-intl";
+import { getLocale, getTranslations } from "next-intl/server";
 import { ArrowRight, BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
+import { listPublishedPosts } from "@/services/blog-listing";
 
-type PostCard = {
-  id: string;
-  slug: string;
-  title: string;
-  excerpt: string | null;
-  coverImage: string | null;
-  tags: string[];
-  authorName: string;
-  publishedAt: string | null;
-};
+/**
+ * Server component. Antes era "use client" y cargaba /api/blog en useEffect
+ * — Googlebot veía HTML sin ningún <a> a artículos y no indexaba el blog.
+ * Ahora los posts salen server-side y los enlaces son crawlables desde el
+ * primer byte.
+ *
+ * Paginación via query param `?page=N` (server-rendered <Link>) en vez de
+ * useState. Funciona sin JS y es compartible por URL.
+ */
 
-type Pagination = { page: number; pageSize: number; total: number; totalPages: number };
+export const dynamic = "force-dynamic";
 
 const LOCALE_BCP47: Record<string, string> = {
   es: "es-ES",
   en: "en-US",
   pt: "pt-PT",
   fr: "fr-FR",
+  de: "de-DE",
 };
 
-export default function BlogPage() {
-  const t = useTranslations("blog");
-  const locale = useLocale();
-  const [posts, setPosts] = useState<PostCard[]>([]);
-  const [pagination, setPagination] = useState<Pagination | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
+type SearchParams = { page?: string };
+
+export default async function BlogPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const { page: pageParam } = await searchParams;
+  const locale = await getLocale();
+  const t = await getTranslations("blog");
+
+  const currentPage = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
+  const { posts, pagination } = await listPublishedPosts({
+    locale,
+    page: currentPage,
+    pageSize: 9,
+  });
 
   const bcp = LOCALE_BCP47[locale] ?? "en-US";
-  function formatDate(iso: string | null) {
+  function formatDate(iso: Date | null) {
     if (!iso) return "";
     return new Date(iso).toLocaleDateString(bcp, { day: "numeric", month: "long", year: "numeric" });
   }
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/blog?page=${page}&pageSize=9`);
-      if (!res.ok) return;
-      const data = await res.json();
-      setPosts(Array.isArray(data.posts) ? data.posts : []);
-      setPagination(data.pagination ?? null);
-    } catch {
-      // silent
-    } finally {
-      setLoading(false);
-    }
-  }, [page]);
-
-  useEffect(() => { void load(); }, [load]);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-16 space-y-12">
@@ -68,11 +59,7 @@ export default function BlogPage() {
       </div>
 
       {/* Posts grid */}
-      {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-violet-500 border-t-transparent" />
-        </div>
-      ) : posts.length === 0 ? (
+      {posts.length === 0 ? (
         <div className="text-center py-20 space-y-4">
           <BookOpen className="w-12 h-12 text-zinc-700 mx-auto" />
           <p className="text-zinc-500">{t("empty")}</p>
@@ -91,6 +78,7 @@ export default function BlogPage() {
               {/* Cover image */}
               {post.coverImage ? (
                 <div className="aspect-video bg-zinc-800 overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={post.coverImage}
                     alt={post.title}
@@ -136,26 +124,36 @@ export default function BlogPage() {
         </div>
       )}
 
-      {/* Pagination */}
-      {pagination && pagination.totalPages > 1 && (
+      {/* Pagination — server-rendered <Link>, crawler-friendly */}
+      {pagination.totalPages > 1 && (
         <div className="flex items-center justify-center gap-4">
-          <button
-            disabled={page <= 1}
-            onClick={() => { setPage((p) => p - 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-            className="flex items-center gap-1 rounded-lg border border-zinc-800 px-4 py-2 text-sm text-zinc-400 hover:text-white hover:border-violet-500/30 transition-all disabled:opacity-30"
-          >
-            <ChevronLeft className="w-4 h-4" /> {t("prev")}
-          </button>
+          {pagination.page > 1 ? (
+            <Link
+              href={`/blog?page=${pagination.page - 1}`}
+              className="flex items-center gap-1 rounded-lg border border-zinc-800 px-4 py-2 text-sm text-zinc-400 hover:text-white hover:border-violet-500/30 transition-all"
+            >
+              <ChevronLeft className="w-4 h-4" /> {t("prev")}
+            </Link>
+          ) : (
+            <span className="flex items-center gap-1 rounded-lg border border-zinc-800 px-4 py-2 text-sm text-zinc-600 opacity-30">
+              <ChevronLeft className="w-4 h-4" /> {t("prev")}
+            </span>
+          )}
           <span className="text-sm text-zinc-500">
             {pagination.page} / {pagination.totalPages}
           </span>
-          <button
-            disabled={page >= pagination.totalPages}
-            onClick={() => { setPage((p) => p + 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-            className="flex items-center gap-1 rounded-lg border border-zinc-800 px-4 py-2 text-sm text-zinc-400 hover:text-white hover:border-violet-500/30 transition-all disabled:opacity-30"
-          >
-            {t("next")} <ChevronRight className="w-4 h-4" />
-          </button>
+          {pagination.page < pagination.totalPages ? (
+            <Link
+              href={`/blog?page=${pagination.page + 1}`}
+              className="flex items-center gap-1 rounded-lg border border-zinc-800 px-4 py-2 text-sm text-zinc-400 hover:text-white hover:border-violet-500/30 transition-all"
+            >
+              {t("next")} <ChevronRight className="w-4 h-4" />
+            </Link>
+          ) : (
+            <span className="flex items-center gap-1 rounded-lg border border-zinc-800 px-4 py-2 text-sm text-zinc-600 opacity-30">
+              {t("next")} <ChevronRight className="w-4 h-4" />
+            </span>
+          )}
         </div>
       )}
     </div>

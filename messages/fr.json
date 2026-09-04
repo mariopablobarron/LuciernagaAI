@@ -2870,6 +2870,10 @@
       "impulso": {
         "label": "Impulso 21j",
         "req": "Jour 21"
+      },
+      "itinerarios": {
+        "label": "Itinéraires",
+        "req": "Jour 7"
       }
     },
     "settings": "Paramètres",
